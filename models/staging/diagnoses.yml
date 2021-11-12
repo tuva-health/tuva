@@ -1,0 +1,28 @@
+version: 2
+
+models:
+    - name: diagnoses
+      description: >
+        A table of all diagnosis codes for all patients and encounters (one record per diagnosis code).
+
+      columns:
+          - name: encounter_id
+            description: >
+              The ID corresponding to the encounter where this diagnosis code occurred.
+            tests:
+                - not_null
+                - relationships:
+                    to: ref('encounters')
+                    field: encounter_id
+
+          - name: diagnosis_code
+            description: >
+              ICD-10-CM diagnosis code for this diagnosis.
+
+          - name: diagnosis_code_ranking
+            description: >
+              Integer representing the ranking of this diagnosis code.  1 is the primary diagnosis for the encounter.  2 or greater is a secondary diagnosis.
+
+          - name: present_on_admission_code
+            description: >
+              Code representing whether the diagnosis was present on admission.

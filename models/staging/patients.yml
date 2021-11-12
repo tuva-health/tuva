@@ -1,0 +1,26 @@
+version: 2
+
+models:
+    - name: patients
+      description: "A table of unique patients (members). Each row is a unique person."
+
+      columns:
+          - name: patient_id
+            description: "The primary key for this table (a unique ID for each person)."
+            tests:
+              - unique
+              - not_null
+
+          - name: gender_code
+            description: "A string that takes one of two values: 'male', 'female' "
+            tests:
+              - categorical_data_lookup:
+                  code_set: "Discharge Disposition"
+
+          - name: birth_date
+            description: >
+              The date of birth of the patient in this format: 'YYYY-mm-dd'
+
+          - name: deceased_date
+            description: >
+                The date of death for each patient. It should only be populated for patients who have died and should be NULL for living patients.

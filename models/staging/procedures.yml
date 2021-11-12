@@ -1,0 +1,26 @@
+version: 2
+
+models:
+    - name: procedures
+      description: >
+        A table of all present procedure codes for all members.
+
+
+      columns:
+          - name: encounter_id
+            description: >
+              The encounter_id corresponding to the encounter where this
+              procedure code was present.
+            tests:
+                - not_null
+                - relationships:
+                    to: ref('encounters')
+                    field: encounter_id
+
+          - name: procedure_code
+            description: >
+              ICD-10-PCS procedure code related to this diagnosis.
+
+          - name: procedure_code_ranking
+            description: >
+              Integer representing the ranking of this procedure code (e.g. 1,2,3,...).

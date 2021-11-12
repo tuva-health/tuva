@@ -1,0 +1,29 @@
+version: 2
+
+models:
+    - name: condition_logic
+      description: >
+        This model contains logic for mapping ICD-10-CM diagnosis codes and ICD-10-PCS procedure codes to chronic conditions.  Conditions mapped in this model require
+        additional logic (e.g. restricting diagnosis codes to primary or secondary in order to qualify).
+
+
+      columns:
+          - name: patient_id
+            description: >
+              Unique ID for the patient.
+
+          - name: encounter_id
+            description: >
+              Unique ID for each encounter (visit).
+
+          - name: encounter_start_date
+            description: >
+              The date the encounter began.
+
+          - name: condition_category
+            description: >
+              The category of the condition (e.g. Cardiovascular Disease).
+
+          - name: condition
+            description: >
+              The name of the chronic condition.

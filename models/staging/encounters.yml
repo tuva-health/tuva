@@ -1,0 +1,46 @@
+version: 2
+
+models:
+    - name: encounters
+      description: >
+        A table of unique encounters for all patients (each record is a unique encounter).
+
+      columns:
+          - name: encounter_id
+            description: >
+              The primary key for this table (a unique ID for each encounter).
+            tests:
+                - unique
+                - not_null
+
+          - name: patient_id
+            description: >
+              Unique identifier for each patient involved in the encounter.
+            tests:
+                - not_null
+                - relationships:
+                    to: ref('patients')
+                    field: patient_id
+
+          - name: encounter_start_date
+            description: >
+              The encounter start date in this format: 'YYYY-MM-DD'.
+
+          - name: encounter_end_date
+            description: >
+              The encounter end date in this format: 'YYY-MM-DD'.
+
+          - name: admit_type_code
+            description: >
+              The admit type code for the encounter.  Indicates type and priority of admission for inpatient hospital stays.
+
+          - name: admit_source_code
+            description: >
+              The admit source code for the encounter.  Indicates where the patient came from prior to admission.
+
+          - name: discharge_status_code
+            description: >
+              The discharge status code for the encounter.  Indicates where a patient was discharged to.
+            tests:
+                - categorical_data_lookup:
+                    code_set: "Discharge Disposition"
