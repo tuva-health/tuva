@@ -5,11 +5,11 @@
 This dbt package contains logic necessary to power many different types of healthcare analytics use cases.  See below table for currently supported and planned use cases.  The package is designed to run using a minimum set of commonly available healthcare data fields (currently 4 tables and 18 total fields).  This minimizes the amount of upfront configuration (e.g. source-to-target mapping).
 
 | **use case** | **description** | **status** |
-| --------------- | -------------------- |
+| --------------- | -------------------- | ------------------- |
 | [chronic_conditions](#chronic-conditions) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse). | Available |
 | clinical_classification_software | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) and procedure grouper (over 80,000 ICD-10-PCS codes are grouped into 320 procedure categories across 31 clinical domains). | Planned Release: Nov 2021 |
 | readmissions | All 7 CMS readmission measures, LACE index, and pre-processed tables ready to train ML readmission models. | Planned: Nov 2021 |
-| cms_and_hhs_hccs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned: Dec 2021 |
+| cms_and_hhs_hccs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned Release: Dec 2021 |
 
 ## Pre-requisites
 1. Healthcare data in a data warehouse
