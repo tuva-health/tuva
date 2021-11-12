@@ -2,7 +2,7 @@
 
 # Tuva
 
-This dbt package contains logic necessary to power many different types of healthcare analytics use cases.  See below table for currently supported and planned use cases.  The package is designed to run using a minimum set of commonly available healthcare data fields (currently 4 tables and 18 total fields).  This minimizes the amount of upfront configuration (e.g. source-to-target mapping).
+This project cleans and enhances raw healthcare data (EHR and claims data) to make it ready for machine learning and analytics.  The project runs on a minimum set of commonly available healthcare data fields (currently 4 tables and 18 total fields). This minimizes upfront configuration time.  Running the project creates new, data quality tested data in your data warehouse that is ready to power a variety of healthcare analytics use cases.
 
 | **use case** | **description** | **status** |
 | --------------- | -------------------- | ------------------- |
@@ -12,31 +12,32 @@ This dbt package contains logic necessary to power many different types of healt
 | cms_and_hhs_hccs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned Release: Dec 2021 |
 
 ## Pre-requisites
-1. Healthcare data in a data warehouse
-2. [dbt](https://www.getdbt.com/)
+1. You have healthcare data (EHR or claims data) in a data warehouse
+2. You have [dbt](https://www.getdbt.com/) installed and configured (i.e. connected to your data warehouse)
 
 ## Configuration
 
-These steps assume you already have dbt setup and running against your data warehouse.  If this is not the case, please install and configure dbt as a first step.
-
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
-2. Configure dbt_profile.yml
-3. Create staging tables
+2. Configure [dbt_profile.yml](/dbt_profile.yml) 
+3. Configure staging models
 
-This package requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this repo.
+This package requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this project.
 
-To configure each staging model, directly modify each [staging file](models/staging) so that they run on your data.  The sql provided in these files shows you the target schema but you must map your data to this schema by modifying the files/
+To configure each staging model, directly modify each [sql file](models/staging) so that they run on your data.  The sql provided in these files shows you the target schema (tables, columns, and data types) that are required, but you must map your data to this schema by modifying the files.
 
 | **staging table** | **description** |
 | --------------- | -------------------- |
 | [patients](models/stage/patients.sql) | One record per patient with basic demographic information. |
-| [encounters](models/stage/encounters.sql) | One record per encounter with basic administrative information and links to stg_patients. |
-| [diagnoses](models/stage/diagnoses.sql) | One record per diagnosis which links back to stg_encounters. |
-| [procedures](models/stage/procedures.sql) | One record per procedure which links back to stg_encounters. |
+| [encounters](models/stage/encounters.sql) | One record per encounter with basic administrative information and links to patients. |
+| [diagnoses](models/stage/diagnoses.sql) | One record per diagnosis which links back to encounters. |
+| [procedures](models/stage/procedures.sql) | One record per procedure which links back to encounters. |
 
 ## Use Cases 
+This section summarizes all currently available use cases.
 
 ### Chronic Conditions
+For several types of analyses (e.g. utilization, spend, outcomes, risk-adjustment, etc.) it's necessary to know if a patient has any number of chronic conditions.  The models in this part of the project create 69 chronic conditions flags at the patient-level (i.e. one record per patient).  A 'long' version of the table includes metrics related to each condition such as date of onset, most recent diagnosis date, and total number of encounters with the chronic condition.
+
 
 | **model** | **description** |
 | --------------- | -------------------- |
