@@ -41,7 +41,7 @@ To configure each staging model, directly modify each [sql file](models/staging)
 
 | **staging table** | **description** |
 | --------------- | -------------------- |
-| [patients](models/stage/patients.sql) | One record per patient with basic demographic information. |
+| [patients](models/staging/patients.sql) | One record per patient with basic demographic information. |
 | [encounters](models/stage/encounters.sql) | One record per encounter with basic administrative information and links to patients. |
 | [diagnoses](models/stage/diagnoses.sql) | One record per diagnosis which links back to encounters. |
 | [procedures](models/stage/procedures.sql) | One record per procedure which links back to encounters. |
