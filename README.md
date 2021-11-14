@@ -2,9 +2,23 @@
 
 # Tuva
 
-This project cleans and enhances raw healthcare data (EHR and claims data) to make it ready for machine learning and analytics.  The project runs on a minimum set of commonly available healthcare data fields (currently 4 tables and 18 total fields). This minimizes upfront configuration time.  Running the project creates new, data quality tested data in your data warehouse that is ready to power a variety of healthcare analytics use cases.
+Tuva transforms your healthcare data so that it's ready for machine learning and analytics.  In particular it does three things:
 
-| **use case** | **description** | **status** |
+	[1] Tests for common healthcare data quality problems (e.g. birth date after death date)
+	[2] Creates high-level concepts (e.g. which patients have type 2 diabetes)
+	[3] Formats data so it's ready for analytics or machine learning (e.g. datasets ready to train readmission ML models)
+
+Tuva is designed to support the most common healthcare analytics and machine learning use cases:
+
+| **use case** | **user** | **context** |
+| --------------- | -------------------- | ------------------------- |
+| Population Analytics (e.g. spend, utilization, outcomes) | Healthcare administrator (e.g. chief medical officer, chief financial officer, etc.) | n=large analysis to identify sub-populations of patients where care can be delivered at lower cost and higher quality |
+| Risk Stratification (e.g. ML model to predict patients likely to be readmitted) | Clinician (e.g. nurse, care manager, physician) | n=1 clinical decision support |
+| Patient Analytics (e.g. patient portal analytics) | Patient | n=1 analysis to review recent lab work and understand my trends |
+
+Tuva is designed for use by a data practitioner (e.g. data engineer, analytics engineer, or data scientist) using healthcare data in a data warehouse.  The following modules are either currently available or under development:
+
+| **modules** | **description** | **status** |
 | --------------- | -------------------- | ------------------- |
 | [chronic_conditions](#chronic-conditions) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse). | Available |
 | clinical_classification_software | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) and procedure grouper (over 80,000 ICD-10-PCS codes are grouped into 320 procedure categories across 31 clinical domains). | Planned Release: Nov 2021 |
@@ -21,7 +35,7 @@ This project cleans and enhances raw healthcare data (EHR and claims data) to ma
 2. Configure [dbt_profile.yml](/dbt_profile.yml) 
 3. Configure staging models
 
-This package requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this project.
+Tuva requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this project.
 
 To configure each staging model, directly modify each [sql file](models/staging) so that they run on your data.  The sql provided in these files shows you the target schema (tables, columns, and data types) that are required, but you must map your data to this schema by modifying the files.
 
@@ -33,7 +47,7 @@ To configure each staging model, directly modify each [sql file](models/staging)
 | [procedures](models/stage/procedures.sql) | One record per procedure which links back to encounters. |
 
 ## Use Cases 
-This section summarizes all currently available use cases.
+This section summarizes all currently available logic.
 
 ### Chronic Conditions
 For several types of analyses (e.g. utilization, spend, outcomes, risk-adjustment, etc.) it's necessary to know if a patient has any number of chronic conditions.  The models in this part of the project create 69 chronic conditions flags at the patient-level (i.e. one record per patient).  A 'long' version of the table includes metrics related to each condition such as date of onset, most recent diagnosis date, and total number of encounters with the chronic condition.
