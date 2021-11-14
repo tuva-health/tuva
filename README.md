@@ -32,7 +32,7 @@ Tuva is designed for use by a data practitioner (e.g. data engineer, analytics e
 ## Configuration
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
-2. Configure [dbt_profile.yml](/dbt_profile.yml) 
+2. Configure [dbt_profile.yml](/dbt_project.yml) 
 3. Configure staging models
 
 Tuva requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this project.
@@ -42,9 +42,9 @@ To configure each staging model, directly modify each [sql file](models/staging)
 | **staging table** | **description** |
 | --------------- | -------------------- |
 | [patients](models/staging/patients.sql) | One record per patient with basic demographic information. |
-| [encounters](models/stage/encounters.sql) | One record per encounter with basic administrative information and links to patients. |
-| [diagnoses](models/stage/diagnoses.sql) | One record per diagnosis which links back to encounters. |
-| [procedures](models/stage/procedures.sql) | One record per procedure which links back to encounters. |
+| [encounters](models/staging/encounters.sql) | One record per encounter with basic administrative information and links to patients. |
+| [diagnoses](models/staging/diagnoses.sql) | One record per diagnosis which links back to encounters. |
+| [procedures](models/staging/procedures.sql) | One record per procedure which links back to encounters. |
 
 ## Use Cases 
 This section summarizes all currently available logic.
