@@ -4,19 +4,19 @@
 
 Tuva transforms your healthcare data so that it's ready for machine learning and analytics.  In particular it does three things:
 
-	[1] Tests for common healthcare data quality problems (e.g. birth date after death date)
-	[2] Creates high-level concepts (e.g. which patients have type 2 diabetes)
-	[3] Formats data so it's ready for analytics or machine learning (e.g. datasets ready to train readmission ML models)
+	1. Models healthcare data into a common format
+	2. Tests healthcare data for common data quality problems
+	3. Creates high-level clinical concepts (e.g. which patients have type 2 diabetes)
 
-Tuva is designed to support the most common healthcare analytics and machine learning use cases:
+Tuva creates data that supports the most common healthcare analytics and machine learning use cases:
 
 | **use case** | **user** | **context** |
 | --------------- | -------------------- | ------------------------- |
 | Population Analytics (e.g. spend, utilization, outcomes) | Healthcare administrator (e.g. chief medical officer, chief financial officer, etc.) | n=large analysis to identify sub-populations of patients where care can be delivered at lower cost and higher quality |
-| Risk Stratification (e.g. ML model to predict patients likely to be readmitted) | Clinician (e.g. nurse, care manager, physician) | n=1 clinical decision support |
+| Risk Stratification (e.g. ML model to predict patients likely to be readmitted) | Clinician (e.g. nurse, care manager, physician) | n=1 analysis to determine which patients should receive a higher level of care |
 | Patient Analytics (e.g. patient portal analytics) | Patient | n=1 analysis to review recent lab work and understand my trends |
 
-Tuva is designed for use by a data practitioner (e.g. data engineer, analytics engineer, or data scientist) using healthcare data in a data warehouse.  The following modules are either currently available or under development:
+Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  The following modules are either currently available or under development:
 
 | **modules** | **description** | **status** |
 | --------------- | -------------------- | ------------------- |
@@ -29,10 +29,12 @@ Tuva is designed for use by a data practitioner (e.g. data engineer, analytics e
 1. You have healthcare data (EHR or claims data) in a data warehouse
 2. You have [dbt](https://www.getdbt.com/) installed and configured (i.e. connected to your data warehouse)
 
+[Here](https://docs.getdbt.com/dbt-cli/installation) are instructions for installing dbt.
+
 ## Configuration
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
-2. Configure [dbt_profile.yml](/dbt_project.yml) 
+2. Configure [dbt_project.yml](/dbt_project.yml) 
 3. Configure staging models
 
 Tuva requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this project.
@@ -47,10 +49,10 @@ To configure each staging model, directly modify each [sql file](models/staging)
 | [procedures](models/staging/procedures.sql) | One record per procedure which links back to encounters. |
 
 ## Use Cases 
-This section summarizes all currently available logic.
+This section summarizes all currently available logic in the project.
 
 ### Chronic Conditions
-For several types of analyses (e.g. utilization, spend, outcomes, risk-adjustment, etc.) it's necessary to know if a patient has any number of chronic conditions.  The models in this part of the project create 69 chronic conditions flags at the patient-level (i.e. one record per patient).  A 'long' version of the table includes metrics related to each condition such as date of onset, most recent diagnosis date, and total number of encounters with the chronic condition.
+For several types of analyses (e.g. utilization, spend, outcomes, risk-adjustment, etc.) it's necessary to know if a patient has been diagnosed with any chronic conditions.  The models in this part of the project create 69 chronic conditions flags at the patient-level (i.e. one record per patient).  A 'long' version of the table includes metrics related to each condition for each patient, such as date of onset, most recent diagnosis date, and total number of encounters with the chronic condition.
 
 
 | **model** | **description** |

@@ -34,10 +34,13 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   tuva:
     staging:
-      schema: staging
+      +database: tuva
+      +schema: staging
     chronic_conditions:
-      schema: chronic_conditions
+      +database: tuva
+      +schema: chronic_conditions
 
 seeds:
   tuva:
-    schema: seed
+    +database: tuva
+    +schema: seed
