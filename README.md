@@ -73,9 +73,8 @@ Please create issues or open PRs against `master`. See [the Discourse post](http
 ## Database Support
 This package has been tested on Snowflake.  We are planning to expand testing to BigQuery and Redshift in the near future.
 
-1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine:
-    - Indented four spaces.
-        * indented eight spaces.
+1. Configure [dbt_project.yml](/dbt_project.yml):
+    - profile: 'tuva' by default - change this to an active profile in the profile.yml file
     - Four spaces again.
 2.  Multiple paragraphs in a list items:
     It's best to indent the paragraphs four spaces
