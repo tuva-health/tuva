@@ -26,15 +26,16 @@ Tuva creates data that supports the most common healthcare analytics and machine
 ## Configuration
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
-2. Configure [dbt_project.yml](/dbt_project.yml):
-    - profile: 'tuva' by default - change this to an active profile in the profile.yml file
-    - source_database: 'hcup' by default - change to wherever your source data lives
-    - source_schema: 'public' by default - change to wherever your source data lives
-3. Create a database called 'tuva' - this is where data from the project will be generated
+3. Create a database called 'tuva' in your data warehouse
+    - note: this is where data from the project will be generated
     - note: if you would like data to be created in a different database you can edit this in the dbt_project.yml file
-4. Create source data tables
+4. Create source data tables in your data warehouse
     - note: these tables should match the table in [staging](models/staging)
     - note: for more details on the required source data tables see [sources.yml](models/sources.yml)
+2. Configure [dbt_project.yml](/dbt_project.yml)
+    - profile: 'tuva' by default - change this to an active profile in the profile.yml file
+    - source_database: 'hcup' by default - change this to the database where you created the source data tables
+    - source_schema: 'public' by default - change this to the schema where you created the source data tables
 4. Run project
     1. Navigate to the project in the command line
     2. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
