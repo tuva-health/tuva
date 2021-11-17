@@ -4,9 +4,9 @@
 
 Tuva transforms your healthcare data so that it's ready for machine learning and analytics.  In particular it does three things:
 
-	1. Models healthcare data into a common format
-	2. Tests healthcare data for common data quality problems
-	3. Creates high-level clinical concepts (e.g. which patients have type 2 diabetes)
+1. Models healthcare data into a common format
+2. Tests healthcare data for common data quality problems
+3. Creates high-level clinical concepts (e.g. which patients have type 2 diabetes)
 
 Tuva creates data that supports the most common healthcare analytics and machine learning use cases:
 
