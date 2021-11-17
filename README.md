@@ -35,9 +35,9 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
 2. Configure [dbt_project.yml](/dbt_project.yml):
-    a. profile: 'tuva' by default - change this to an active profile in the profile.yml file
-    b. source_database: 'hcup' by default - change to wherever your source data lives
-    c. source_schema: 'public' by default - change to wherever your source data lives
+    - profile: 'tuva' by default - change this to an active profile in the profile.yml file
+    - source_database: 'hcup' by default - change to wherever your source data lives
+    - source_schema: 'public' by default - change to wherever your source data lives
 3. Create a database called 'tuva' - this is where data from the project will be generated
     note: if you would like data to be created in a different database you can edit this in the dbt_project.yml file
 4. Create source data tables
