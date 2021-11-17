@@ -1,7 +1,7 @@
 version: 2
 
 models:
-    - name: procedures
+    - name: stg_procedures
       description: >
         A table of all present procedure codes for all members.
 
@@ -14,7 +14,7 @@ models:
             tests:
                 - not_null
                 - relationships:
-                    to: ref('encounters')
+                    to: ref('stg_encounters')
                     field: encounter_id
 
           - name: procedure_code

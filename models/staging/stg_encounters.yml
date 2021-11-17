@@ -1,7 +1,7 @@
 version: 2
 
 models:
-    - name: encounters
+    - name: stg_encounters
       description: >
         A table of unique encounters for all patients (each record is a unique encounter).
 
@@ -19,7 +19,7 @@ models:
             tests:
                 - not_null
                 - relationships:
-                    to: ref('patients')
+                    to: ref('stg_patients')
                     field: patient_id
 
           - name: encounter_start_date

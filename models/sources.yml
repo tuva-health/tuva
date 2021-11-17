@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: source
+    schema: "{{ var('source_schema') }}"
+    database: "{{ var('source_database') }}"
+    tables:
+      - name: patients
+      - name: encounters
+      - name: diagnoses
+      - name: procedures

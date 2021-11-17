@@ -1,7 +1,7 @@
 version: 2
 
 models:
-    - name: diagnoses
+    - name: stg_diagnoses
       description: >
         A table of all diagnosis codes for all patients and encounters (one record per diagnosis code).
 
@@ -12,7 +12,7 @@ models:
             tests:
                 - not_null
                 - relationships:
-                    to: ref('encounters')
+                    to: ref('stg_encounters')
                     field: encounter_id
 
           - name: diagnosis_code

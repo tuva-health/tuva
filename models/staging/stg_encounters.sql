@@ -9,4 +9,4 @@ select
     cast(admit_type_code as integer) as admit_type_code,
     cast(admit_source_code as integer) as admit_source_code,
     cast(discharge_status_code as integer) as discharge_status_code
-from hcup.public.encounters
+from {{ source('source','encounters') }}

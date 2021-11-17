@@ -34,22 +34,24 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
 ## Configuration
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
-2. Configure [dbt_project.yml](/dbt_project.yml) 
-3. Configure staging models
+2. Configure [dbt_project.yml](/dbt_project.yml)
+	a. profile: 'tuva' by default - change this to an active profile in the profile.yml file
+	b. source_database: 'hcup' by default - change to wherever your source data lives
+	c. source_schema: 'public' by default - change to wherever your source data lives
+3. Create a database called 'tuva' - this is where data from the project will be generated
+	note: if you would like data to be created in a different database you can edit this in the dbt_project.yml
+	file
+3. Create source data tables
+	note: these tables should match the table in [staging](models/staging)
+	note: for more details on the required source data tables see [sources.yml](models/sources.yml)
+4. Run project
+	a. Navigate to the project in the command line
+	b. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
+	c. Run dbt run
+	d. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
 
-Tuva requires you to configure 4 staging models.  These 4 staging models are all that is needed to run all the logic in this project.
-
-To configure each staging model, directly modify each [sql file](models/staging) so that they run on your data.  The sql provided in these files shows you the target schema (tables, columns, and data types) that are required, but you must map your data to this schema by modifying the files.
-
-| **staging table** | **description** |
-| --------------- | -------------------- |
-| [patients](models/staging/patients.sql) | One record per patient with basic demographic information. |
-| [encounters](models/staging/encounters.sql) | One record per encounter with basic administrative information and links to patients. |
-| [diagnoses](models/staging/diagnoses.sql) | One record per diagnosis which links back to encounters. |
-| [procedures](models/staging/procedures.sql) | One record per procedure which links back to encounters. |
-
-## Use Cases 
-This section summarizes all currently available logic in the project.
+## Modules
+This section summarizes all currently available modules included in the project.
 
 ### Chronic Conditions
 For several types of analyses (e.g. utilization, spend, outcomes, risk-adjustment, etc.) it's necessary to know if a patient has been diagnosed with any chronic conditions.  The models in this part of the project create 69 chronic conditions flags at the patient-level (i.e. one record per patient).  A 'long' version of the table includes metrics related to each condition for each patient, such as date of onset, most recent diagnosis date, and total number of encounters with the chronic condition.
