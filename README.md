@@ -36,19 +36,18 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
 2. Configure [dbt_project.yml](/dbt_project.yml)
     a. profile: 'tuva' by default - change this to an active profile in the profile.yml file
-	b. source_database: 'hcup' by default - change to wherever your source data lives
-	c. source_schema: 'public' by default - change to wherever your source data lives
+    b. source_database: 'hcup' by default - change to wherever your source data lives
+    c. source_schema: 'public' by default - change to wherever your source data lives
 3. Create a database called 'tuva' - this is where data from the project will be generated
-    note: if you would like data to be created in a different database you can edit this in the dbt_project.yml
-	file
-3. Create source data tables
-	note: these tables should match the table in [staging](models/staging)
-	note: for more details on the required source data tables see [sources.yml](models/sources.yml)
+    note: if you would like data to be created in a different database you can edit this in the dbt_project.yml file
+4. Create source data tables
+    note: these tables should match the table in [staging](models/staging)
+    note: for more details on the required source data tables see [sources.yml](models/sources.yml)
 4. Run project
-	a. Navigate to the project in the command line
-	b. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
-	c. Run dbt run
-	d. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
+    a. Navigate to the project in the command line
+    b. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
+    c. Run dbt run
+    d. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
 
 ## Modules
 This section summarizes all currently available modules included in the project.
