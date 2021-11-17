@@ -2,8 +2,8 @@
 
 # Tuva
 
-Check out the latest [DOCS](https://tuva-health.github.io/tuva/#!/overview)
-Explore the latest [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
+    - Check out the latest [DOCS](https://tuva-health.github.io/tuva/#!/overview)
+    - Explore the latest [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
 
 Tuva transforms your healthcare data so that it's ready for machine learning and analytics.  In particular it does three things:
 
