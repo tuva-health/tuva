@@ -8,6 +8,7 @@ Tuva transforms your healthcare data so that it's ready for machine learning and
 2. Tests healthcare data for common data quality problems
 3. Creates high-level clinical concepts (e.g. which patients have type 2 diabetes)
 
+## Use Cases
 Tuva creates data that supports the most common healthcare analytics and machine learning use cases:
 
 | **use case** | **user** | **context** |
@@ -15,15 +16,6 @@ Tuva creates data that supports the most common healthcare analytics and machine
 | Population Analytics (e.g. spend, utilization, outcomes) | Healthcare administrator (e.g. chief medical officer, chief financial officer, etc.) | n=large analysis to identify sub-populations of patients where care can be delivered at lower cost and higher quality |
 | Risk Stratification (e.g. ML model to predict patients likely to be readmitted) | Clinician (e.g. nurse, care manager, physician) | n=1 analysis to determine which patients should receive a higher level of care |
 | Patient Analytics (e.g. patient portal analytics) | Patient | n=1 analysis to review recent lab work and understand my trends |
-
-Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  The following modules are either currently available or under development:
-
-| **modules** | **description** | **status** |
-| --------------- | -------------------- | ------------------- |
-| [chronic_conditions](#chronic-conditions) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse). | Available |
-| clinical_classification_software | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) and procedure grouper (over 80,000 ICD-10-PCS codes are grouped into 320 procedure categories across 31 clinical domains). | Planned Release: Nov 2021 |
-| readmissions | All 7 CMS readmission measures, LACE index, and pre-processed tables ready to train ML readmission models. | Planned: Nov 2021 |
-| cms_and_hhs_hccs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned Release: Dec 2021 |
 
 ## Pre-requisites
 1. You have healthcare data (EHR or claims data) in a data warehouse
@@ -50,11 +42,17 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
     4. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
 
 ## Modules
-This section summarizes all currently available modules included in the project.
+Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  The following modules are either currently available or under development:
 
-### Chronic Conditions
+| **modules** | **description** | **status** |
+| --------------- | -------------------- | ------------------- |
+| [chronic_conditions](#chronic-conditions) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse). | Available |
+| clinical_classification_software | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) and procedure grouper (over 80,000 ICD-10-PCS codes are grouped into 320 procedure categories across 31 clinical domains). | Planned Release: Nov 2021 |
+| readmissions | All 7 CMS readmission measures, LACE index, and pre-processed tables ready to train ML readmission models. | Planned: Nov 2021 |
+| cms_and_hhs_hccs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned Release: Dec 2021 |
+
+#### Chronic Conditions
 For several types of analyses (e.g. utilization, spend, outcomes, risk-adjustment, etc.) it's necessary to know if a patient has been diagnosed with any chronic conditions.  The models in this part of the project create 69 chronic conditions flags at the patient-level (i.e. one record per patient).  A 'long' version of the table includes metrics related to each condition for each patient, such as date of onset, most recent diagnosis date, and total number of encounters with the chronic condition.
-
 
 | **model** | **description** |
 | --------------- | -------------------- |
