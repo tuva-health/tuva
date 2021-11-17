@@ -30,7 +30,7 @@ Tuva creates data that supports the most common healthcare analytics and machine
     - note: this is where data from the project will be generated
     - note: if you would like data to be created in a different database you can edit this in the dbt_project.yml file
 4. Create source data tables in your data warehouse
-    - note: these tables should match the table in [staging](models/staging)
+    - note: these tables should match the columns and data types in the tables in [staging](models/staging)
     - note: for more details on the required source data tables see [sources.yml](models/sources.yml)
 2. Configure [dbt_project.yml](/dbt_project.yml)
     - profile: 'tuva' by default - change this to an active profile in the profile.yml file
