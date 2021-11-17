@@ -34,7 +34,7 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
 ## Configuration
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
-2. Configure [dbt_project.yml](/dbt_project.yml)
+2. Configure [dbt_project.yml](/dbt_project.yml):
     a. profile: 'tuva' by default - change this to an active profile in the profile.yml file
     b. source_database: 'hcup' by default - change to wherever your source data lives
     c. source_schema: 'public' by default - change to wherever your source data lives
@@ -73,7 +73,7 @@ Please create issues or open PRs against `master`. See [the Discourse post](http
 ## Database Support
 This package has been tested on Snowflake.  We are planning to expand testing to BigQuery and Redshift in the near future.
 
-1. Lists in a list item:
+1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine:
     - Indented four spaces.
         * indented eight spaces.
     - Four spaces again.
