@@ -39,15 +39,15 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
     - source_database: 'hcup' by default - change to wherever your source data lives
     - source_schema: 'public' by default - change to wherever your source data lives
 3. Create a database called 'tuva' - this is where data from the project will be generated
-    note: if you would like data to be created in a different database you can edit this in the dbt_project.yml file
+    - note: if you would like data to be created in a different database you can edit this in the dbt_project.yml file
 4. Create source data tables
-    note: these tables should match the table in [staging](models/staging)
-    note: for more details on the required source data tables see [sources.yml](models/sources.yml)
+    - note: these tables should match the table in [staging](models/staging)
+    - note: for more details on the required source data tables see [sources.yml](models/sources.yml)
 4. Run project
-    a. Navigate to the project in the command line
-    b. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
-    c. Run dbt run
-    d. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
+    1. Navigate to the project in the command line
+    2. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
+    3. Run dbt run
+    4. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
 
 ## Modules
 This section summarizes all currently available modules included in the project.
@@ -72,12 +72,3 @@ Please create issues or open PRs against `master`. See [the Discourse post](http
 
 ## Database Support
 This package has been tested on Snowflake.  We are planning to expand testing to BigQuery and Redshift in the near future.
-
-1. Configure [dbt_project.yml](/dbt_project.yml):
-    - profile: 'tuva' by default - change this to an active profile in the profile.yml file
-    - Four spaces again.
-2.  Multiple paragraphs in a list items:
-    It's best to indent the paragraphs four spaces
-    You can get away with three, but it can get
-    confusing when you nest other things.
-    Stick to four.
