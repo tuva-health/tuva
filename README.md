@@ -72,3 +72,13 @@ Please create issues or open PRs against `master`. See [the Discourse post](http
 
 ## Database Support
 This package has been tested on Snowflake.  We are planning to expand testing to BigQuery and Redshift in the near future.
+
+1. Lists in a list item:
+    - Indented four spaces.
+        * indented eight spaces.
+    - Four spaces again.
+2.  Multiple paragraphs in a list items:
+    It's best to indent the paragraphs four spaces
+    You can get away with three, but it can get
+    confusing when you nest other things.
+    Stick to four.
