@@ -1,4 +1,4 @@
-[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=0.20.x&color=orange)
+[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=0.21.x&color=orange)
 
 # Tuva
 
@@ -26,6 +26,7 @@ Tuva creates data that supports the most common healthcare analytics and machine
 [Here](https://docs.getdbt.com/dbt-cli/installation) are instructions for installing dbt.
 
 ## Configuration
+Executing the following steps will load all seed files into your data warehouse, create all models (tables/views) in your data warehouse, and run all tests on your data.
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
 3. Create a database called 'tuva' in your data warehouse
@@ -39,10 +40,8 @@ Tuva creates data that supports the most common healthcare analytics and machine
     - source_database: 'hcup' by default - change this to the database where you created the source data tables
     - source_schema: 'public' by default - change this to the schema where you created the source data tables
 4. Run project
-    1. Navigate to the project in the command line
-    2. Run dbt seed to load seed files into the data warehouse (only needed if this is your first time running)
-    3. Run dbt run
-    4. Run dbt docs generate to create documentation followed by dbt docs serve to view documentation in a browser
+    1. Navigate to the project directory in the command line
+    2. Execute "dbt build"
 
 ## Modules
 Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  The following modules are either currently available or under development:

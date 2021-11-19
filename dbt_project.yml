@@ -6,6 +6,7 @@ profile: 'tuva'   # configuration required
 vars:
     source_database: hcup   # configuration required
     source_schema: public   # configuration required
+    target_database: tuva   # configuration optional
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -21,7 +22,7 @@ clean-targets:
 models:
   tuva:
     staging:
-      +database: tuva 
+      +database: tuva
       +schema: staging
     chronic_conditions:
       +database: tuva 
