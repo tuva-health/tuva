@@ -6,4 +6,4 @@ select
     cast(diagnosis_code as string) as diagnosis_code,
     cast(diagnosis_code_ranking as integer) as diagnosis_code_ranking,
     cast(present_on_admission_code as integer) as present_on_admission_code
-from {{ source('source','diagnoses') }}
+from {{ source('source',var('diagnoses_source')) }}

@@ -3,10 +3,16 @@ version: '0.1.0'
 config-version: 2
 profile: 'tuva'   # configuration required
 
+
 vars:
     source_database: hcup   # configuration required
     source_schema: public   # configuration required
-    target_database: tuva   # configuration optional
+    
+    patients_source: "patients"      # configuration required
+    encounters_source: "encounters"  # configuration required
+    diagnoses_source: "diagnoses"    # configuration required
+    procedures_source: "procedures"  # configuration required
+
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -27,6 +33,9 @@ models:
     chronic_conditions:
       +database: tuva 
       +schema: chronic_conditions
+    ccsr:
+      +database: tuva
+      +schema: ccsr
 
 seeds:
   tuva:
