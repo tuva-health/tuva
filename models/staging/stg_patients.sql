@@ -6,4 +6,4 @@ select
 ,   cast(gender_code as integer) as gender_code
 ,   to_date(birth_date) as birth_date
 ,   to_date(deceased_date) as deceased_date
-from {{ source('source','patients') }}
+from {{ source('source',var('patients_source')) }}
