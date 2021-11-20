@@ -18,13 +18,14 @@ Tuva creates data that supports the most common healthcare analytics and machine
 | --------------- | -------------------- |
 | Population Analytics | n=large analytics typically used by the CMO and CFO organizations to identify ways to deliver care more efficiently and effectively (e.g. utilization, cost and outcomes) |
 | Risk Stratification | Machine learning models for a clinician (e.g. nurse, care manager, physician) to identify patients that need a higher level of care |
-| Patient Analytics | n=1 analytics used by patients diagnosis and treatment options (e.g. to understand new lab results, normal ranges, trends, etc.) |
+| Patient Analytics | n=1 analytics used by patients to understand diagnosis and treatment options (e.g. lab results, normal ranges, trends, etc.) |
 
 ## Data Marts
 Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  Tuva creates the following data marts in your data warehouse:
 
 | **Data Mart** | **Description** | **Status** |
 | --------------- | -------------------- | ------------------- |
+| [Staging](/models/staging/) | Input layer data mart where your source data is mapped (all logic in Tuva runs on data from this layer)  | Available |
 | [Chronic Conditions](/models/chronic_conditions/) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse) | Available |
 | [CCSR Categories](/models/ccsr/) | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) | Available |
 | Readmissions | All 7 CMS readmission measures, LACE index, and pre-processed tables ready to train ML readmission models. | Planned: Nov 2021 |
@@ -37,7 +38,7 @@ Tuva is designed for use by a data practitioner with healthcare data (EHR or cla
 [Here](https://docs.getdbt.com/dbt-cli/installation) are instructions for installing dbt.
 
 ## Configuration
-Executing the following steps will load all seed files into your data warehouse, create all models (tables/views) in your data warehouse, and run all tests on your data.
+Execute the following steps to load all seed files, build all data marts, and run all data quality tests in your data warehouse.
 
 1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
 2. Create a database called 'tuva' in your data warehouse
@@ -48,11 +49,10 @@ Executing the following steps will load all seed files into your data warehouse,
     - note: for more details on the required source data tables see [sources.yml](models/sources.yml)
 4. Configure [dbt_project.yml](/dbt_project.yml)
     - profile: set to 'tuva' by default - change this to an active profile in the profile.yml file
-    - vars: configure source database name, schema name, and table names
+    - vars: configure source database name, schema name, and table names (i.e. point to the tables you created in step 2)
 5. Run project
     1. Navigate to the project directory in the command line
     2. Execute "dbt build"
-
 
 ## Contributions
 Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
