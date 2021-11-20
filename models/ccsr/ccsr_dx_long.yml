@@ -1,0 +1,25 @@
+version: 2
+
+models:
+    - name: ccsr_dx_long
+      description: >
+        This model creates a long table of CCSR categories with one record per encounter per CCSR category.
+
+      columns:
+          - name: encounter_id
+            description: >
+              Unique ID for each encounter in the dataset.
+          - name: ccsr
+            description: >
+              The short name (e.g. BLD001) for the CCSR category assigned to a diagnosis code from the encounter.
+          - name: ccsr_description
+            description: >
+              The long description (e.g. Nutritional anemia) for the CCSR category assigned to a diagnosis code from the encounter.
+          - name: default_ccsr_inpatient_flag
+            description: >
+              Flag indicating whether the CCSR met the criteria for being the default CCSR for the encounter
+              (for inpatient encounters only).
+          - name: default_ccsr_outpatient_flag
+            description: >
+              Flag indicating whether the CCSR met the criteria for being the default CCSR for the encounter
+              (for inpatient encounters only).
