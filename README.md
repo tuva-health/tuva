@@ -20,6 +20,16 @@ Tuva creates data that supports the most common healthcare analytics and machine
 | Risk Stratification | Machine learning models for a clinician (e.g. nurse, care manager, physician) to identify patients that need a higher level of care |
 | Patient Analytics | n=1 analytics used by patients diagnosis and treatment options (e.g. to understand new lab results, normal ranges, trends, etc.) |
 
+## Data Marts
+Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  Tuva creates the following data marts in your data warehouse:
+
+| **Data Mart** | **Description** | **Status** |
+| --------------- | -------------------- | ------------------- |
+| [Chronic Conditions](/models/chronic_conditions/) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse) | Available |
+| [CCSR Categories](/models/ccsr/) | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) | Available |
+| Readmissions | All 7 CMS readmission measures, LACE index, and pre-processed tables ready to train ML readmission models. | Planned: Nov 2021 |
+| CMS and HHS HCCs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned Release: Dec 2021 |
+
 ## Pre-requisites
 1. You have healthcare data (EHR or claims data) in a data warehouse
 2. You have [dbt](https://www.getdbt.com/) installed and configured (i.e. connected to your data warehouse)
@@ -43,15 +53,6 @@ Executing the following steps will load all seed files into your data warehouse,
     1. Navigate to the project directory in the command line
     2. Execute "dbt build"
 
-## Data Marts
-Tuva is designed for use by a data practitioner with healthcare data (EHR or claims) in a data warehouse.  Tuva creates the following data marts in your data warehouse:
-
-| **Data Mart** | **Description** | **Status** |
-| --------------- | -------------------- | ------------------- |
-| [Chronic Conditions](/models/chronic_conditions/) | Each patient is flagged for having any of 69 chronic conditions within 9 clinical areas (definitions based on CMS Chronic Condition Warehouse) | Available |
-| [CCSR Categories](/models/ccsr/) | Diagnosis grouper (over 70,000 ICD-10-CM are grouped into 530 clinical categories across 21 clinical domains) | Available |
-| Readmissions | All 7 CMS readmission measures, LACE index, and pre-processed tables ready to train ML readmission models. | Planned: Nov 2021 |
-| CMS and HHS HCCs | Condition categories, hierarchies, and risk scores at the patient-level. | Planned Release: Dec 2021 |
 
 ## Contributions
 Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
