@@ -14,9 +14,6 @@ vars:
     source_table_diagnoses: "diagnoses"        # configuration required
     source_table_procedures: "procedures"      # configuration required
 
-##  Configure each source data table by specifying the schema name and 
-##  column name e.g. 
-##  table_source: "{{ 'your_schema_name', 'your_table_name' }}"
     patients_source: "{{ source('source_data', var('source_table_patients')) }}"
     coverage_source: "{{ source('source_data', var('source_table_coverage')) }}"
     encounters_source: "{{ source('source_data', var('source_table_encounters')) }}"
@@ -35,6 +32,7 @@ clean-targets:
     - "target"
     - "dbt_modules"
 
+
 models:
   tuva:
     staging:
@@ -46,6 +44,7 @@ models:
     ccsr:
       +database: tuva
       +schema: ccsr
+
 
 seeds:
   tuva:
