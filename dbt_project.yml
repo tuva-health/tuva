@@ -5,13 +5,23 @@ profile: 'tuva'   # configuration required
 
 
 vars:
-    source_database: hcup   # configuration required
-    source_schema: public   # configuration required
+    source_database: hcup                      # configuration required
+    source_schema: public                      # configuration required
     
-    patients_source: "patients"      # configuration required
-    encounters_source: "encounters"  # configuration required
-    diagnoses_source: "diagnoses"    # configuration required
-    procedures_source: "procedures"  # configuration required
+    source_table_patients: "patients"          # configuration required
+    source_table_coverage: "coverage"          # configuration required
+    source_table_encounters: "encounters"      # configuration required
+    source_table_diagnoses: "diagnoses"        # configuration required
+    source_table_procedures: "procedures"      # configuration required
+
+##  Configure each source data table by specifying the schema name and 
+##  column name e.g. 
+##  table_source: "{{ 'your_schema_name', 'your_table_name' }}"
+    patients_source: "{{ source('source_data', var('source_table_patients')) }}"
+    coverage_source: "{{ source('source_data', var('source_table_coverage')) }}"
+    encounters_source: "{{ source('source_data', var('source_table_encounters')) }}"
+    diagnoses_source: "{{ source('source_data', var('source_table_diagnoses')) }}"
+    procedures_source: "{{ source('source_data', var('source_table_procedures')) }}"    
 
 
 source-paths: ["models"]
