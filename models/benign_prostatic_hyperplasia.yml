@@ -1,0 +1,29 @@
+version: 2
+
+models:
+    - name: benign_prostatic_hyperplasia
+      description: >
+        This model contains logic for identifying patients with a history of benign prostatic hyperplasia, also known as an enlarged prostate gland.  The logic for this condition
+        is stored in a separate model because it's more complex than other conditions.
+
+
+      columns:
+          - name: patient_id
+            description: >
+              Unique ID for the patient.
+
+          - name: encounter_id
+            description: >
+              Unique ID for each encounter (visit).
+
+          - name: encounter_start_date
+            description: >
+              The date the encounter began.
+
+          - name: condition_category
+            description: >
+              The category of the condition (e.g. Cardiovascular Disease).
+
+          - name: condition
+            description: >
+              The name of the chronic condition.

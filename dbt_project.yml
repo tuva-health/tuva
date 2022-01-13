@@ -1,25 +1,18 @@
 name: 'tuva'
 version: '0.1.0'
 config-version: 2
-profile: 'tuva'   # configuration required
-
+profile: 'tuva'                 # configuration required
 
 vars:
-    source_database: hcup                      # configuration required
-    source_schema: public                      # configuration required
+    stg_database: desynpuf      # configuration required
+    stg_database: staging        # configuration required
     
-    source_table_patients: "patients"          # configuration required
-    source_table_coverage: "coverage"          # configuration required
-    source_table_encounters: "encounters"      # configuration required
-    source_table_diagnoses: "diagnoses"        # configuration required
-    source_table_procedures: "procedures"      # configuration required
-
-    patients_source: "{{ source('source_data', var('source_table_patients')) }}"
-    coverage_source: "{{ source('source_data', var('source_table_coverage')) }}"
-    encounters_source: "{{ source('source_data', var('source_table_encounters')) }}"
-    diagnoses_source: "{{ source('source_data', var('source_table_diagnoses')) }}"
-    procedures_source: "{{ source('source_data', var('source_table_procedures')) }}"    
-
+    stg_patients: "{{ ref('stg_patients') }}"
+    stg_coverage: "{{ ref('stg_coverage') }}"
+    stg_encounters: "{{ ref('stg_encounters') }}"
+    stg_diagnoses: "{{ ref('stg_diagnoses') }}"
+    stg_procedures: "{{ ref('stg_procedures') }}"
+    stg_medications: "{{ ref('stg_medications') }}"     
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -32,21 +25,10 @@ clean-targets:
     - "target"
     - "dbt_modules"
 
-
 models:
   tuva:
-    staging:
-      +database: tuva
-      +schema: staging
-    chronic_conditions:
-      +database: tuva 
-      +schema: chronic_conditions
-    ccsr:
-      +database: tuva
-      +schema: ccsr
-
+    +schema: core
 
 seeds:
   tuva:
-    +database: tuva
-    +schema: seed
+    +schema: vocabulary
