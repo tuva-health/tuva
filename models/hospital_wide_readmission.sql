@@ -9,16 +9,17 @@ where discharge_status_code not in ('02','07','20')
 
 , encounter_sequence as (
 select
-    row_number() over(partition by patient_id order by discharge_date) as encounter_sequence
+    row_number() over(partition by patient_id order by encounter_end_date) as encounter_sequence
 ,   *
 from {{ ref('encounters') }}
+where encounter_type = 'Acute Inpatient'
 )
 
 , readmit_calc as (
 select
     a.patient_id,
     a.encounter_id,
-    (b.AdmissionDate - a.DischargeDate) AS days_to_readmit,
+    (b.encounter_start_date - a.encounter_end_date) AS days_to_readmit,
     1 as readmit_flag
 from encounter_sequence a
 inner join encounter_sequence b
