@@ -4,7 +4,8 @@ with index_admissions as (
 select
     encounter_id
 from {{ ref('encounters') }}
-where discharge_status_code not in ('02','07','20')
+where discharge_status_code not in (02,07,20)
+    and encounter_type = 'Acute Inpatient'
 )
 
 , encounter_sequence as (
