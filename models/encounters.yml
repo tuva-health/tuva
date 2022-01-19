@@ -9,18 +9,10 @@ models:
           - name: encounter_id
             description: >
               The primary key for this table (a unique ID for each encounter).
-            tests:
-                - unique
-                - not_null
 
           - name: patient_id
             description: >
               Unique identifier for each patient involved in the encounter.
-            tests:
-                - not_null
-                - relationships:
-                    to: ref('stg_patients')
-                    field: patient_id
 
           - name: encounter_start_date
             description: >
@@ -41,6 +33,3 @@ models:
           - name: discharge_status_code
             description: >
               The discharge status code for the encounter.  Indicates where a patient was discharged to.
-            tests:
-                - categorical_data_lookup:
-                    code_set: "Discharge Disposition"

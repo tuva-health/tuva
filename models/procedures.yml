@@ -11,11 +11,6 @@ models:
             description: >
               The encounter_id corresponding to the encounter where this
               procedure code was present.
-            tests:
-                - not_null
-                - relationships:
-                    to: ref('stg_encounters')
-                    field: encounter_id
 
           - name: procedure_code
             description: >
