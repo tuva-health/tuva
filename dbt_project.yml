@@ -1,18 +1,16 @@
 name: 'tuva'
 version: '0.1.0'
 config-version: 2
-profile: 'tuva'                 # configuration required
+profile: 'tuva'                  # configuration required
 
 vars:
-    stg_database: desynpuf      # configuration required
-    stg_database: staging        # configuration required
-    
-    stg_patients: "{{ ref('stg_patients') }}"
-    stg_coverage: "{{ ref('stg_coverage') }}"
-    stg_encounters: "{{ ref('stg_encounters') }}"
-    stg_diagnoses: "{{ ref('stg_diagnoses') }}"
-    stg_procedures: "{{ ref('stg_procedures') }}"
-    stg_medications: "{{ ref('stg_medications') }}"     
+    source_database: desynpuf    # configuration required
+    source_schema: staging       # configuration required
+    src_patients: "{{ source('source','stg_patients') }}"
+    src_coverage: "{{ source('source','stg_coverage') }}"
+    src_encounters: "{{ source('source','stg_encounters') }}"
+    src_diagnoses: "{{ source('source','stg_diagnoses') }}"
+    src_procedures: "{{ source('source','stg_procedures') }}"
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -27,8 +25,10 @@ clean-targets:
 
 models:
   tuva:
+    +database: tuva
     +schema: core
 
 seeds:
   tuva:
+    +database: tuva
     +schema: vocabulary

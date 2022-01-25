@@ -1,0 +1,84 @@
+version: 2
+
+sources:
+  - name: source
+    schema: "{{ var('source_schema') }}"
+    database: "{{ var('source_database') }}"
+    tables:
+      - name: stg_patients
+        description: Staging table to prepare data to feed core.patient.
+        columns:
+          - name: patient_id
+            description: Unique ID for each patient in the dataset.
+          - name: gender
+            description: Indicates whether the patient's gender is male, female, or unknown.
+          - name: birth_date
+            description: Patient's date of birth (YYYY-MM-DD). 
+          - name: death_date
+            description: Patient's date of death, if applicable (YYYY-MM-DD).
+
+      - name: stg_coverage
+        description: Staging table to prepare data to feed core.coverage.
+        columns:
+          - name: patient_id
+            description: Unique ID for each patient in the dataset.
+          - name: coverage_start_date
+            description: The date when the patient's health insurance coverage began (YYYY-MM-DD).
+          - name: coverage_end_date
+            description: The date when the patient's health insurance coverage ended (YYYY-MM-DD). 
+          - name: primary_payer
+            description: The patient's primary insurance provider corresponding to coverage start and end dates.
+          - name: payer_type
+            description: Indicates the type of payer (Medicare, Medicaid, or Commercial).
+
+      - name: stg_encounters
+        description: Staging table to prepare data to feed core.encounter.
+        columns:
+          - name: encounter_id
+            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
+          - name: patient_id
+            description: Unique ID for each patient in the dataset.
+          - name: encounter_start_date
+            description: The date when the encounter began (YYYY-MM-DD).
+          - name: encounter_end_date
+            description: The date when the encounter ended (YYYY-MM-DD).
+          - name: encounter_type
+            description: The type of visit (e.g. acute inpatient, outpatient, ED, etc.).
+          - name: admit_type_code
+            description: Indicates the type of admission for acute inpatient visits (e.g. emergency, urgent, elective, etc.).
+          - name: admit_source_code
+            description: Indicates the source of admission for acute inpatient visits (e.g. ED, clinic referral, etc.).
+          - name: discharge_status_code
+            description: Indicates where the patient was discharged to for acute inpatient visits (e.g. home, SNF, etc.).                  
+          - name: attending_provider_npi
+            description: NPI for the attending provider.
+          - name: facility_npi
+            description: NPI for the facility.
+          - name: drg
+            description: The MS-DRG code for acute inpatient visits.                  
+          - name: paid_amount
+            description: Total amount paid by insurance for the visit.                  
+
+      - name: stg_diagnoses
+        description: Staging table to prepare data to feed core.diagnoses.
+        columns:
+          - name: encounter_id
+            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
+          - name: code_type
+            description: Indicates the type of diagnosis code (e.g. ICD-10-CM, SNOMED-CT).
+          - name: diagnosis_code
+            description: The actual diagnosis code.
+          - name: diagnosis_rank
+            description: The rank of the diagnosis code on the encounter (primary=1).
+          - name: present_on_admission_code
+            description: Indicates whether the diagnosis was present on admission or not.
+
+      - name: stg_procedures
+        description: Staging table to prepare data to feed core.procedures.
+        columns:
+          - name: encounter_id
+            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
+          - name: code_type
+            description: Indicates the type of procedure code (e.g. ICD-10-CM, SNOMED-CT, etc.).
+          - name: procedure_code
+            description: The actual procedure code.

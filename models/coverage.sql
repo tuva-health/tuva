@@ -7,4 +7,4 @@ select
 ,   coverage_end_date
 ,   primary_payer
 ,   payer_type
-from {{ var('stg_coverage') }}
+from {{ var('src_coverage') }}

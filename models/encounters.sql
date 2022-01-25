@@ -14,5 +14,5 @@ select
 ,   facility_npi
 ,   drg
 ,   paid_amount
-from {{ var('stg_encounters') }}
+from {{ var('src_encounters') }}
 
