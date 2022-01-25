@@ -1,5 +1,4 @@
-
-{{ config(materialized='view') }}
+{{ config(materialized='view', tags='chronic conditions') }}
 
 with condition_union as (
 select *

@@ -1,5 +1,4 @@
-
-{{ config(materialized='view') }}
+{{ config(materialized='view', tags='chronic conditions') }}
 
 with conditions as (
 select

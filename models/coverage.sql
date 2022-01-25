@@ -1,5 +1,4 @@
-
-{{ config(materialized='view') }}
+{{ config(materialized='view', tags='core') }}
 
 select
     patient_id

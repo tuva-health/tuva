@@ -1,4 +1,4 @@
-{{ config(materialized='view') }}
+{{ config(materialized='view', tags='ccsr') }}
 
 select 
     a.encounter_id

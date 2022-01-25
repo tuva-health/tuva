@@ -2,7 +2,7 @@
 
 # Tuva
 
-Check out the latest [Docs](https://tuva-health.github.io/tuva/#!/overview).  Explore the latest [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1).
+Check out the latest [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1).
 
 Tuva cleans and transforms your messy healthcare data.  It does 3 things:
 
