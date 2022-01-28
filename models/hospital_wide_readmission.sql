@@ -3,7 +3,7 @@
 with index_admissions as (
 select
     encounter_id
-from {{ ref('encounters') }}
+from {{ ref('stg_encounters') }}
 where discharge_status_code not in (02,07,20)
     and encounter_type = 'Acute Inpatient'
 )
@@ -12,7 +12,7 @@ where discharge_status_code not in (02,07,20)
 select
     row_number() over(partition by patient_id order by encounter_end_date) as encounter_sequence
 ,   *
-from {{ ref('encounters') }}
+from {{ ref('stg_encounters') }}
 where encounter_type = 'Acute Inpatient'
 )
 

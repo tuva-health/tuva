@@ -7,10 +7,10 @@ select
 ,   b.encounter_start_date
 ,   c.diagnosis_code
 ,   c.diagnosis_rank
-from {{ ref('patients') }}  a
-left join {{ ref('encounters') }}  b
+from {{ ref('stg_patients') }}  a
+left join {{ ref('stg_encounters') }}  b
     on a.patient_id = b.patient_id    
-left join {{ ref('diagnoses') }} c
+left join {{ ref('stg_diagnoses') }} c
     on b.encounter_id = c.encounter_id
 )
 

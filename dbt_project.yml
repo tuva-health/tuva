@@ -1,16 +1,18 @@
 name: 'tuva'
-version: '0.1.0'
+version: '0.1.2'
 config-version: 2
 profile: 'tuva'                  # configuration required
 
 vars:
+    source_name: desynpuf        # configuration required
     source_database: desynpuf    # configuration required
     source_schema: staging       # configuration required
-    src_patients: "{{ source('source','stg_patients') }}"
-    src_coverage: "{{ source('source','stg_coverage') }}"
-    src_encounters: "{{ source('source','stg_encounters') }}"
-    src_diagnoses: "{{ source('source','stg_diagnoses') }}"
-    src_procedures: "{{ source('source','stg_procedures') }}"
+
+    src_patients: "{{ source(var('source_name'),'stg_patients') }}"
+    src_coverage: "{{ source(var('source_name'),'stg_coverage') }}"
+    src_encounters: "{{ source(var('source_name'),'stg_encounters') }}"
+    src_diagnoses: "{{ source(var('source_name'),'stg_diagnoses') }}"
+    src_procedures: "{{ source(var('source_name'),'stg_procedures') }}"
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]

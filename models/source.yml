@@ -1,9 +1,9 @@
 version: 2
 
 sources:
-  - name: source
-    schema: "{{ var('source_schema') }}"
+  - name: "{{ var('source_name') }}"
     database: "{{ var('source_database') }}"
+    schema: "{{ var('source_schema') }}"
     tables:
       - name: stg_patients
         description: Staging table to prepare data to feed core.patient.

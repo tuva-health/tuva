@@ -10,7 +10,7 @@ select
         when coverage_end_date is null then to_date(year(current_date()) || '-' || month(current_date()) || '-' || '01', 'YYYY-MM-DD' )
         else to_date(year(coverage_end_date) || '-' || month(coverage_end_date) || '-' || '01', 'YYYY-MM-DD' ) 
     end max_date
-from {{ ref('coverage') }}
+from {{ ref('stg_coverage') }}
 )
 
 select distinct
