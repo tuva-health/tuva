@@ -2,7 +2,7 @@
 
 # Tuva
 
-Check out the Tuva [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1).
+Check out the Tuva [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
 View the Tuva [Data Models](https://docs.google.com/spreadsheets/d/1X69EX9L27oSlopV18oLk86QCJG_-Q4XqP8xvzlIAE84/edit?usp=sharing)
 
 Tuva cleans and transforms your messy healthcare data.  It does 3 things:
