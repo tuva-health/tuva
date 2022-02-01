@@ -36,7 +36,7 @@ select
     cast(a.drg as string) || ': ' || b.description as drg,
     cast(b.mdc as string) || ': ' || c.description as mdc,
     b.medical_surgical as drg_type
-from {{ ref('stg_encounters') }} a
+from {{ ref('stg_encounter') }} a
 left join {{ ref('ms_drg') }} b
     on a.drg = b.drg
 left join {{ ref('mdc') }} c

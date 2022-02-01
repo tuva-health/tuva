@@ -4,7 +4,7 @@ with index_admissions as (
 select
     encounter_id
 ,   1 as index_admit_flag
-from {{ ref('inpatient_encounters') }}
+from {{ ref('inpatient_encounter') }}
 --where discharge_status_code not in (02,07,20)
 )
 
@@ -15,7 +15,7 @@ select
     admit_date,
     discharge_date,
     row_number() over(partition by patient_id order by discharge_date) as admission_sequence
-from {{ ref('inpatient_encounters') }}
+from {{ ref('inpatient_encounter') }}
 )
 
 , readmit_calc as (

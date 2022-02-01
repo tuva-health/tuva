@@ -16,8 +16,8 @@ select
 ,   c.ccsr_4
 ,   c.ccsr_5
 ,   c.ccsr_6
-from {{ ref('stg_encounters') }} a
-left join {{ ref('stg_diagnoses') }} b
+from {{ ref('stg_encounter') }} a
+left join {{ ref('stg_diagnosis') }} b
     on a.encounter_id = b.encounter_id
 left join {{ ref('ccsr_dx_mapping') }} c
     on b.diagnosis_code = c.diagnosis_code

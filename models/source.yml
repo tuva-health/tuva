@@ -5,7 +5,7 @@ sources:
     database: "{{ var('source_database') }}"
     schema: "{{ var('source_schema') }}"
     tables:
-      - name: stg_patients
+      - name: stg_patient
         description: Staging table to prepare data to feed core.patient.
         columns:
           - name: patient_id
@@ -31,7 +31,7 @@ sources:
           - name: payer_type
             description: Indicates the type of payer (Medicare, Medicaid, or Commercial).
 
-      - name: stg_encounters
+      - name: stg_encounter
         description: Staging table to prepare data to feed core.encounter.
         columns:
           - name: encounter_id
@@ -59,7 +59,7 @@ sources:
           - name: paid_amount
             description: Total amount paid by insurance for the visit.                  
 
-      - name: stg_diagnoses
+      - name: stg_diagnosis
         description: Staging table to prepare data to feed core.diagnoses.
         columns:
           - name: encounter_id
@@ -73,7 +73,7 @@ sources:
           - name: present_on_admission_code
             description: Indicates whether the diagnosis was present on admission or not.
 
-      - name: stg_procedures
+      - name: stg_procedure
         description: Staging table to prepare data to feed core.procedures.
         columns:
           - name: encounter_id

@@ -35,12 +35,12 @@ select
     e.facility_npi as readmit_facility_npi,
     e.attending_provider_npi as readmit_attending_provider_npi,
     e.paid_amount as readmit_paid_amount   
-from {{ ref('hospital_wide_readmissions') }} a
-left join {{ ref('inpatient_encounters') }} b
+from {{ ref('hospital_wide_readmission') }} a
+left join {{ ref('inpatient_encounter') }} b
     on a.encounter_id = b.encounter_id
-left join {{ ref('stg_encounters') }} c
+left join {{ ref('stg_encounter') }} c
     on a.encounter_id = c.encounter_id
-left join {{ ref('inpatient_encounters') }} d
+left join {{ ref('inpatient_encounter') }} d
     on a.readmit_encounter_id = d.encounter_id
-left join {{ ref('stg_encounters') }} e
+left join {{ ref('stg_encounter') }} e
     on a.readmit_encounter_id = e.encounter_id

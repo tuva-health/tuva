@@ -8,11 +8,11 @@ vars:
     source_database: desynpuf    # configuration required
     source_schema: staging       # configuration required
 
-    src_patients: "{{ source(var('source_name'),'stg_patients') }}"
+    src_patient: "{{ source(var('source_name'),'stg_patient') }}"
     src_coverage: "{{ source(var('source_name'),'stg_coverage') }}"
-    src_encounters: "{{ source(var('source_name'),'stg_encounters') }}"
-    src_diagnoses: "{{ source(var('source_name'),'stg_diagnoses') }}"
-    src_procedures: "{{ source(var('source_name'),'stg_procedures') }}"
+    src_encounter: "{{ source(var('source_name'),'stg_encounter') }}"
+    src_diagnosis: "{{ source(var('source_name'),'stg_diagnosis') }}"
+    src_procedure: "{{ source(var('source_name'),'stg_procedure') }}"
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]
