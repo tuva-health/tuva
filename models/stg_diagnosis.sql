@@ -6,4 +6,4 @@ select
 ,   diagnosis_code
 ,   diagnosis_rank
 ,   present_on_admission_code   
-from {{ var('src_diagnoses') }}
+from {{ var('src_diagnosis') }}

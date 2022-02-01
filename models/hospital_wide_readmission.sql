@@ -3,37 +3,55 @@
 with index_admissions as (
 select
     encounter_id
-from {{ ref('stg_encounters') }}
-where discharge_status_code not in (02,07,20)
-    and encounter_type = 'Acute Inpatient'
+,   1 as index_admit_flag
+from {{ ref('inpatient_encounter') }}
+--where discharge_status_code not in (02,07,20)
 )
 
-, encounter_sequence as (
+, admission_sequence as (
 select
-    row_number() over(partition by patient_id order by encounter_end_date) as encounter_sequence
-,   *
-from {{ ref('stg_encounters') }}
-where encounter_type = 'Acute Inpatient'
+    encounter_id,
+    patient_id,
+    admit_date,
+    discharge_date,
+    row_number() over(partition by patient_id order by discharge_date) as admission_sequence
+from {{ ref('inpatient_encounter') }}
 )
 
 , readmit_calc as (
 select
     a.patient_id,
     a.encounter_id,
-    (b.encounter_start_date - a.encounter_end_date) AS days_to_readmit,
+    a.encounter_id as readmit_encounter_id,
+    (b.admit_date - a.discharge_date) AS days_to_readmit,
     1 as readmit_flag
-from encounter_sequence a
-inner join encounter_sequence b
+from admission_sequence a
+inner join admission_sequence b
     on a.patient_id = b.patient_id
-    and a.encounter_sequence + 1 = b.encounter_sequence
+    and a.admission_sequence + 1 = b.admission_sequence
 )
 
 select
+    a.encounter_id,
+    a.admission_sequence,
+    a.admit_date,
+    a.discharge_date,
+    a.patient_id,
+    c.index_admit_flag,
+    b.days_to_readmit,
+    b.readmit_encounter_id,
     case
         when b.readmit_flag = 1 then 1 
         else 0
     end as readmit_flag,
-    b.days_to_readmit,
+    case
+        when b.days_to_readmit = 0 then 1 
+        else 0
+    end as readmit_0_flag,
+    case
+        when b.days_to_readmit = 1 then 1 
+        else 0
+    end as readmit_1_flag,
     case
         when b.days_to_readmit < 8 then 1 
         else 0
@@ -51,11 +69,14 @@ select
         else 0
     end as readmit_90_flag,
     case
+        when b.days_to_readmit < 181 then 1 
+        else 0
+    end as readmit_180_flag,
+    case
         when b.days_to_readmit < 366 then 1 
         else 0
-    end as readmit_365_flag,
-    a.*
-from encounter_sequence a
+    end as readmit_365_flag
+from admission_sequence a
 left join readmit_calc b
     on a.encounter_id = b.encounter_id
 inner join index_admissions c

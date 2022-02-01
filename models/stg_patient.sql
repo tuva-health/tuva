@@ -5,4 +5,4 @@ select
 ,   gender
 ,   birth_date
 ,   death_date
-from {{ var('src_patients') }}
+from {{ var('src_patient') }}

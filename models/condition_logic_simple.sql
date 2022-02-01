@@ -5,8 +5,8 @@ select
     a.patient_id
 ,   b.encounter_id
 ,   b.encounter_start_date
-from {{ ref('stg_patients') }} a
-left join {{ ref('stg_encounters') }}  b
+from {{ ref('stg_patient') }} a
+left join {{ ref('stg_encounter') }}  b
     on a.patient_id = b.patient_id    
 )
 
@@ -18,7 +18,7 @@ select
 ,   c.condition_category
 ,   c.condition
 from patients a
-inner join {{ ref('stg_diagnoses') }}  b
+inner join {{ ref('stg_diagnosis') }}  b
     on a.encounter_id = b.encounter_id
 inner join {{ ref('chronic_conditions') }}  c
     on b.diagnosis_code = c.code
@@ -35,7 +35,7 @@ select
 ,   c.condition_category
 ,   c.condition
 from patients a
-inner join {{ ref('stg_procedures') }}  b
+inner join {{ ref('stg_procedure') }}  b
     on a.encounter_id = b.encounter_id
 inner join {{ ref('chronic_conditions') }}  c
     on b.procedure_code = c.code

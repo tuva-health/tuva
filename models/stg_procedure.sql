@@ -4,4 +4,4 @@ select
     encounter_id
 ,   code_type
 ,   procedure_code 
-from {{ var('src_procedures') }}
+from {{ var('src_procedure') }}
