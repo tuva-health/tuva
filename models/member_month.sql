@@ -5,10 +5,10 @@ select
     patient_id
 ,   coverage_start_date
 ,   coverage_end_date
-,   to_date(year(coverage_start_date) || '-' || month(coverage_start_date) || '-' || '01', 'YYYY-MM-DD' ) as min_date
+,   to_date(date_part(year,coverage_start_date) || '-' || date_part(month,coverage_start_date) || '-' || '01', 'YYYY-MM-DD' ) as min_date
 ,   case
-        when coverage_end_date is null then to_date(year(current_date()) || '-' || month(current_date()) || '-' || '01', 'YYYY-MM-DD' )
-        else to_date(year(coverage_end_date) || '-' || month(coverage_end_date) || '-' || '01', 'YYYY-MM-DD' ) 
+        when coverage_end_date is null then to_date(date_part(year,getdate()) || '-' || date_part(month,getdate()) || '-' || '01', 'YYYY-MM-DD' )
+        else to_date(date_part(year,coverage_end_date) || '-' || date_part(month,coverage_end_date) || '-' || '01', 'YYYY-MM-DD' ) 
     end max_date
 from {{ ref('stg_coverage') }}
 )

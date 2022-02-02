@@ -33,8 +33,8 @@ select
         when discharge_status_code in (20,40,41) then 1
         else 0
     end as mortality_flag,
-    cast(a.drg as string) || ': ' || b.description as drg,
-    cast(b.mdc as string) || ': ' || c.description as mdc,
+    cast(a.drg as varchar) || ': ' || b.description as drg,
+    cast(b.mdc as varchar) || ': ' || c.description as mdc,
     b.medical_surgical as drg_type
 from {{ ref('stg_encounter') }} a
 left join {{ ref('ms_drg') }} b
