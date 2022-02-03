@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags='ccsr') }}
+{{ config(materialized='table', tags='ccsr') }}
 
 with ccsr_union as (
 select

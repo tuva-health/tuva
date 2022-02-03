@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags='readmissions') }}
+{{ config(materialized='table', tags='readmissions') }}
 
 with index_admissions as (
 select

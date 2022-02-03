@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags='medical economics') }}
+{{ config(materialized='table', tags='medical economics') }}
 
 with bookend_dates as (
 select 

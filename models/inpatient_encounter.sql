@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags='readmissions') }}
+{{ config(materialized='table', tags='readmissions') }}
 
 select
     encounter_id,

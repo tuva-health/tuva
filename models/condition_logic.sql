@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags='chronic conditions') }}
+{{ config(materialized='table', tags='chronic conditions') }}
 
 with patients as (
 select
