@@ -1,0 +1,31 @@
+
+
+version: 2
+
+models:
+    - name: stg_diagnosis
+      description: "Each row is a single diagnosis for a single patient"
+      columns:
+          - name: encounter_id
+            description: "Unique encounter id"
+            tests:
+                - not_null
+                - relationships:
+                    to: ref('stg_encounter')
+                    field: encounter_id
+          - name: code_type
+            description: "Type of diagnosis code (e.g. icd-10-cm)"
+            tests:
+                - not_null
+          - name: diagnosis_code
+            description: "Diagnosis code"
+            tests:
+                - not_null
+          - name: diagnosis_rank
+            description: "Diagnosis rank (e.g. 1,2,3,...)"
+            tests:
+                - not_null
+          - name: present_on_admission_code
+            description: "Present on admission code"
+            tests:
+                - not_null
