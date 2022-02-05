@@ -1,11 +1,11 @@
 name: 'tuva'
 version: '0.1.2'
 config-version: 2
-profile: 'syntegra'                  # configuration required
+profile: 'tuva'                  # configuration required
 
 vars:
-    source_name: ihm        # configuration required
-    source_database: ihm    # configuration required
+    source_name: desynpuf        # configuration required
+    source_database: desynpuf    # configuration required
     source_schema: source       # configuration required
 
     src_patient: "{{ source(var('source_name'),'stg_patient') }}"
