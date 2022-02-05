@@ -1,7 +1,7 @@
 select
 	patient_id
 ,	birth_date 
-from core.stg_patient
+from {{ ref('stg_patient') }}
 where date_part(YEAR, cast(birth_date as date)) < 1900
 
 union
@@ -9,7 +9,7 @@ union
 select
 	patient_id
 ,	birth_date 
-from core.stg_patient
+from {{ ref('stg_patient') }}
 where date_part(YEAR, cast(birth_date as date)) > current_date
 
 union 
@@ -17,5 +17,5 @@ union
 select
 	patient_id
 ,	birth_date 
-from core.stg_patient
+from {{ ref('stg_patient') }}
 where birth_date > death_date
