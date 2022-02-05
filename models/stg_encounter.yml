@@ -1,32 +1,75 @@
-
-
 version: 2
 
 models:
     - name: stg_encounter
-      description: "Each row is a single encounter for a single patient"
+      description: Each row is a single encounter (e.g. hospital visit) for a single patient.
       columns:
           - name: encounter_id
-            description: "Unique encounter id"
+            description: Unique encounter id.
             tests:
                 - unique
                 - not_null
+
           - name: patient_id
-            description: "Unique patient id"
+            description: Unique patient id.
             tests:
                 - not_null
                 - relationships:
                     to: ref('stg_patient')
                     field: patient_id
+
           - name: encounter_start_date
-            description: "Encounter start date"
+            description: Beginning date of the encounter.
             tests:
                 - not_null
+
           - name: encounter_end_date
-            description: "Encounter end date"
+            description: Ending date of the encounter.
             tests:
                 - not_null
+
           - name: encounter_type
-            description: "Encounter type"
+            description: Indicates the type of encounter e.g. acute inpatient.
             tests:
                 - not_null
+                - valid_values:
+                    lookup_table: ref('encounter_types')
+                    lookup_column: description
+
+          - name: admit_type_code
+            description: Indicates the type of admission (e.g. elective) for acute inpatient encounters.
+            tests:
+                - valid_values:
+                    lookup_table: ref('admit_type_codes')
+                    lookup_column: code
+
+          - name: admit_source_code
+            description: Indicates the source of admission (e.g. clinic referral) for acute inpatient encounters.
+            tests:
+                - valid_values:
+                    lookup_table: ref('admit_source_codes')
+                    lookup_column: code
+
+          - name: discharge_status_code
+            description: Indicates the destination the patient was discharged to (e.g. home).
+            tests:
+                - valid_values:
+                    lookup_table: ref('discharge_status_codes')
+                    lookup_column: code
+          
+          - name: attending_provider_npi
+            description: Indicates the physician listed as the attending provider on the encounter.
+
+          - name: facility_npi
+            description: Indicates the facility that treated the patient (if applicable).
+
+          - name: drg
+            description: The MS-DRG listed on the patient's hospital record (acute inpatient visits only).
+            tests:
+              - valid_values:
+                  lookup_table: ref('ms_drg')
+                  lookup_column: drg
+
+          - name: paid_amount
+            description: Total paid amount by insurer for the encounter inluding all facility and physician payments.
+            

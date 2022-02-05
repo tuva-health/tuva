@@ -1,5 +1,3 @@
-
-
 version: 2
 
 models:
@@ -13,19 +11,32 @@ models:
                 - relationships:
                     to: ref('stg_encounter')
                     field: encounter_id
+
           - name: code_type
             description: "Type of diagnosis code (e.g. icd-10-cm)"
             tests:
                 - not_null
+                - valid_values:
+                    lookup_table: ref('code_types')
+                    lookup_column: description
+
           - name: diagnosis_code
             description: "Diagnosis code"
             tests:
                 - not_null
+                - valid_values:
+                    lookup_table: ref('icd_10_cm')
+                    lookup_column: code
+
           - name: diagnosis_rank
             description: "Diagnosis rank (e.g. 1,2,3,...)"
             tests:
                 - not_null
+                
           - name: present_on_admission_code
             description: "Present on admission code"
             tests:
                 - not_null
+                - valid_values:
+                    lookup_table: ref('present_on_admission_codes')
+                    lookup_column: code

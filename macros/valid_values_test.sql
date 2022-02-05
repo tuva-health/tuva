@@ -4,6 +4,7 @@ with validation as (
 select
     {{ column_name }} as col
 from {{ model }}
+where {{ column_name }} is not null
 ),
 
 validation_errors as (
