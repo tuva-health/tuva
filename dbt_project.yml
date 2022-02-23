@@ -1,15 +1,15 @@
 name: 'tuva'
-version: '0.1.2'
+version: '0.1.5'
 config-version: 2
-profile: 'tuva'                  # configuration required
+
+profile:                # configuration required (your profile to connect dbt to your data warehouse)
 
 vars:
-    source_name: desynpuf        # configuration required
-    source_database: desynpuf    # configuration required
-    source_schema: staging       # configuration required
+    source_name:        # configuration required (name of your source dataset e.g. cms_claims)
+    source_database:    # configuration required (name of the database where your data is stored)
+    source_schema:      # configuration required (name of the schema where you created staging tables)
 
     src_patient: "{{ source(var('source_name'),'stg_patient') }}"
-    src_coverage: "{{ source(var('source_name'),'stg_coverage') }}"
     src_encounter: "{{ source(var('source_name'),'stg_encounter') }}"
     src_diagnosis: "{{ source(var('source_name'),'stg_diagnosis') }}"
     src_procedure: "{{ source(var('source_name'),'stg_procedure') }}"
@@ -27,14 +27,11 @@ clean-targets:
 
 models:
   tuva:
-    +database: desynpuf  # configuration required
-    +schema: core
+    +database:          # configuration required (should be the same as source database)
+    +schema: tuva
 
 seeds:
   tuva:
-    +database: desynpuf  # configuration required
+    +database:          # configuration required (should be the same as source database)
     +schema: vocabulary
     +tags: vocabulary
-
-tests:
-  +severity: warn  

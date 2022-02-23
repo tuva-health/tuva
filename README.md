@@ -4,7 +4,7 @@
 
 Check out the Tuva [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
 
-View the Tuva [Data Models](https://docs.google.com/spreadsheets/d/1X69EX9L27oSlopV18oLk86QCJG_-Q4XqP8xvzlIAE84/edit?usp=sharing)
+View the Tuva [Data Models](https://docs.google.com/spreadsheets/d/127QGhajCtGxo0hpOZ9UBwjoCfbmqlSZyVw-ee4jpq6Q/edit?usp=sharing)
 
 Tuva cleans and transforms your messy healthcare data.  It does 3 things:
 
@@ -36,7 +36,7 @@ Execute the following steps to load all seed files, build all data marts, and ru
 ## Contributions
 Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
 and running the package? If so, we highly encourage and welcome contributions to this package! 
-Please create issues or open PRs against `master`. See [the Discourse post](https://discourse.getdbt.com/t/contributing-to-a-dbt-package/657) for information on how to contribute to a package.
+Join the conversation on [Slack](tuvahealth.slack.com)
 
 ## Database Support
-This package has been tested on Snowflake.  We are planning to expand testing to BigQuery and Redshift in the near future.
+This package has been tested on Snowflake and Redshift.  We are planning to expand testing to BigQuery in the near future.

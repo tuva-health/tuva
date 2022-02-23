@@ -24,8 +24,8 @@ select
     patient_id
 ,   condition_category
 ,   condition
-,   min(encounter_start_date) as condition_onset_date
-,   max(encounter_start_date) as condition_recent_date
+,   min(admit_date) as condition_onset_date
+,   max(admit_date) as condition_recent_date
 ,   count(encounter_id) as condition_count
 from condition_union
 group by 1,2,3
