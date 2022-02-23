@@ -36,7 +36,7 @@ Execute the following steps to load all seed files, build all data marts, and ru
 ## Contributions
 Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
 and running the package? If so, we highly encourage and welcome contributions to this package! 
-Join the conversation on [Slack](tuvahealth.slack.com)
+Join the conversation on [Slack](https://tuvahealth.slack.com)
 
 ## Database Support
 This package has been tested on Snowflake and Redshift.  We are planning to expand testing to BigQuery in the near future.
