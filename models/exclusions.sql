@@ -16,8 +16,11 @@
 with exclusions as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
-where ccs in (select distinct ccs_diagnosis_category
-              from {{ ref('exclusion_categories') }} )
+where
+    diagnosis_rank = 1
+    and
+    ccs in (select distinct ccs_diagnosis_category
+            from {{ ref('exclusion_categories') }} )
 )
 
 

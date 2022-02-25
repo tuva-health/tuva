@@ -40,6 +40,8 @@ medicine as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
 where
+    diagnosis_rank = 1
+    and
     encounter_id not in (select * from surgery_gynecology)
     and
     ccs in (select distinct ccs
@@ -54,6 +56,8 @@ cardiorespiratory as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
 where
+    diagnosis_rank = 1
+    and
     encounter_id not in (select * from surgery_gynecology)
     and
     ccs in (select distinct ccs
@@ -68,6 +72,8 @@ cardiovascular as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
 where
+    diagnosis_rank = 1
+    and
     encounter_id not in (select * from surgery_gynecology)
     and
     ccs in (select distinct ccs
@@ -82,6 +88,8 @@ neurology as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
 where
+    diagnosis_rank = 1
+    and
     encounter_id not in (select * from surgery_gynecology)
     and
     ccs in (select distinct ccs

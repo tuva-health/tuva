@@ -23,8 +23,11 @@ where ccs in (select distinct ccs_procedure_category
 always_planned_dx as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
-where ccs in (select distinct ccs_diagnosis_category
-              from {{ ref('always_planned_dx') }} )
+where
+    diagnosis_rank = 1
+    and
+    ccs in (select distinct ccs_diagnosis_category
+            from {{ ref('always_planned_dx') }} )
 ),
 
 
@@ -57,17 +60,22 @@ where procedure_code in (select distinct icd10pcs
 acute_encounters as (
 select distinct encounter_id
 from {{ ref('diagnosis_ccs') }}
-where diagnosis_code in (select distinct icd10cm
+where
+    diagnosis_rank = 1
+    and
+    ( diagnosis_code in (select distinct icd10cm
                          from {{ ref('acute_diagnoses_icd10cm') }})
       or
       ccs in (select distinct ccs_diagnosis_category
               from {{ ref('acute_diagnoses_ccs') }})
+    )
 ),
 
 
 -- encounter_ids for encounters that are:
 --           [1] potentially planned, based on one of
 --               their CCS procedure categories or
+--               their ICD-10-PCS procedure codes
 --           [2] acute, based on their primary diagnosis code
 --               or their CCS diagnosis category
 -- These encounters are therefore confirmed to be planned
