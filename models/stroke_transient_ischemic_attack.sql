@@ -7,10 +7,10 @@ select
 ,   b.admit_date
 ,   c.diagnosis_code
 ,   c.diagnosis_rank
-from {{ var('src_patient') }} a
-left join {{ var('src_encounter') }}  b
+from {{ ref('stg_patient') }} a
+left join {{ ref('stg_encounter') }}  b
     on a.patient_id = b.patient_id    
-left join {{ var('src_diagnosis') }} c
+left join {{ ref('stg_diagnosis') }} c
     on b.encounter_id = c.encounter_id
 )
 
@@ -22,7 +22,7 @@ select
 ,   condition_category
 ,   condition
 from patients a
-inner join {{ ref('chronic_conditions') }} b
+inner join {{ ref('chronic_condition') }} b
     on a.diagnosis_code = b.code
     and b.condition = 'Stroke/Transient Ischemic Attack'
     and b.inclusion_type = 'Include'
@@ -32,7 +32,7 @@ inner join {{ ref('chronic_conditions') }} b
 select distinct
    a.encounter_id
 from patients a
-inner join {{ ref('chronic_conditions') }} b
+inner join {{ ref('chronic_condition') }} b
     on a.diagnosis_code = b.code
     and b.condition = 'Stroke/Transient Ischemic Attack'
     and b.inclusion_type = 'Exclude'

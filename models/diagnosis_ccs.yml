@@ -1,0 +1,17 @@
+
+version: 2
+
+models:
+  - name: diagnosis_ccs
+    description: "This model includes all encounter_ids from the stg_diagnosis table that have one and only one primary diagnosis code associated with them. There is one row for each of these encounters, namely, the row corresponding to the unique primary diagnosis code of the encounter. Therefore, the number of rows in this model is equal to the number of encounter_ids in the stg_diagnosis model that have one and only one primary diagnosis code. We add a valid_icd_10_cm_flag to indicate if the primary diagnosis code for the encounter is a valid ICD-10-CM code. We also add the CCS diagnosis category associated with the primary diagnosis code of the encounter."
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for the encounter"
+      - name: diagnosis_code
+        description: "An ICD-10-CM diagnosis code associated with this encounter_id"
+      - name: diagnosis_rank
+        description: "A positive integer giving the diagnosis ranking for the encounter"
+      - name: valid_icd_10_cm_flag
+        description: "A flag indicating if the ICD-10-CM diagnosis code given is valid"
+      - name: ccs_diagnosis_category
+        description: "The CCS code associated with the given ICD-10-CM diagnosis"

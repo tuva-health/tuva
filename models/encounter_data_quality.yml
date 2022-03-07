@@ -1,0 +1,31 @@
+
+version: 2
+
+models:
+  - name: encounter_data_quality
+    description: "This model has the same number of rows as the stg_encounter model. Here we have one row for every unique encounter in the stg_encounter model, and for each encounter we have a flag (disqualified_encounter_flag) to indicte if the encounter is disqualified from being useful for readmission measures. We also have other flags to indicate which specific data quality issues this encounter has that may disqualify it from being used in readmission measures."
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for the encounter"
+      - name: diagnosis_ccs
+        description: "The CCS diagnosis category associated with the primary diagnosis of this encounter"
+      - name: disqualified_encounter_flag
+        description: "A flag that indicates whether this encounter is disqualified from being used in readmission measures for any critical data quality problem."
+      - name: missing_admit_date_flag
+        description: "A flag that indicates whether the admit date is missing from this encounter."
+      - name: missing_discharge_date_flag
+        description: "A flag that indicates whether the discharge date is missing from this encounter."
+      - name: admit_after_discharge_flag
+        description: "A flag that indicates whether the admit date for the encounter is after the discharge date for the encounter."
+      - name: missing_discharge_status_code_flag
+        description: "A flag that indicates whether the discharge status code is missing for the encounter."
+      - name: invalid_discharge_status_code_flag
+        description: "A flag that indicates whether the discharge status code that is present for this encounter is invalid. This flag is 1 only when the discharge status code is present but invalid."
+      - name: missing_primary_diagnosis_flag
+        description: "A flag that indicates whether there is no primary diagnosis associated with the encounter."
+      - name: multiple_primary_diagnosis
+        description: "A flag that indicates whether there are multiple primary diagnoses associated with the encounter."
+      - name: invalid_primary_diagnosis_code
+        description: "A flag that indicates whether the primary diagnosis present for this encounter is invalid, i.e. a non existing ICD-10-CM code. This flag indicates that a primary diagnosis code is indeed present for the encounter, but it is not a valid ICD-10-CM code."
+      - name: no_diagnosis_ccs_flag
+        description: "A flag that indicates whether there is no CCS diagnosis category associated with the primary ICD-10-CM diagnosis code for the encounter. This flag indicates that there is a valid primary ICD-10-CM diagnosis code associated with the encounter, but there is no CCS diagnosis category associated with that ICD-10-CM code."
