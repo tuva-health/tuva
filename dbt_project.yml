@@ -1,17 +1,17 @@
 name: 'tuva'
-version: '0.1.5'
+version: '0.1.9'
 config-version: 2
 
-profile:                # configuration required (your profile to connect dbt to your data warehouse)
+profile: hcup_tuva_input               # configuration required (your profile to connect dbt to your data warehouse)
 
 vars:
-    source_name:        # configuration required (name of your source dataset e.g. cms_claims)
-    source_database:    # configuration required (name of the database where your data is stored)
-    source_schema:      # configuration required (name of the schema where you created staging tables)
+    source_name: hcup       # configuration required (name of your source dataset e.g. cms_claims)
+    source_database: hcup   # configuration required (name of the database where your data is stored)
+    source_schema: source     # configuration required (name of the schema where you created staging tables)
 
     src_patient: "{{ source(var('source_name'),'stg_patient') }}"
     src_encounter: "{{ source(var('source_name'),'stg_encounter') }}"
-    src_diagnosis: "{{ source(var('source_name'),'stg_diagnosis') }}"
+    src_condition: "{{ source(var('source_name'),'stg_condition') }}"
     src_procedure: "{{ source(var('source_name'),'stg_procedure') }}"
 
 source-paths: ["models"]

@@ -9,44 +9,91 @@ sources:
         description: Staging table to prepare data to feed core.patient.
         columns:
           - name: patient_id
-            description: Unique ID for each patient in the dataset.
+            description: Unique ID for the patient.
+          - name: name
+            description: Full name of the patient.
           - name: gender
-            description: Indicates whether the patient's gender is male, female, or unknown.
+            description: The patient's gender.
+          - name: race
+            description: The patient's race.
+          - name: ethnicity
+            description: The patient's ethnicity.
           - name: birth_date
-            description: Patient's date of birth (YYYY-MM-DD). 
+            description: Patient's date of birth.
+          - name: death_date
+            description: Patient's date of death.
+          - name: death_flag
+            description: Flag (0 or 1) indicating whether the patient is deceased.
+          - name: address
+            description: Patient's most recent home address.
+          - name: city
+            description: Patient's most recent city of residence (home address).
+          - name: state
+            description: Patient's most recent state of residence (home address).
+          - name: zip_code
+            description: Patient's most recent zip code of residence (home address).
+          - name: phone
+            description: Patient's preferred contact number.
+          - name: email
+            description: Patient's preferred email address.
+          - name: ssn
+            description: Patient's social security number.
+          - name: data_source
+            description: Indicates the name of the source dataset (e.g. Medicare Claims).
+
+      - name: stg_coverage
+        description: Staging table to prepare data to feed core.coverage.
+        columns:
+          - name: patient_id
+            description: Unique ID for the patient.
+          - name: coverage_start_date
+            description: Insurance coverage start date.
+          - name: coverage_end_date
+            description: Insurance coverage end date.       
+          - name: payer
+            description: Name of insurer.
+          - name: payer_type
+            description: Type of insurer (e.g. commercial | medicare | medicaid | unknown)
+          - name: data_source
+            description: Indicates the name of the source dataset (e.g. Medicare Claims).
 
       - name: stg_encounter
         description: Staging table to prepare data to feed core.encounter.
         columns:
           - name: encounter_id
-            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
+            description: Unique ID for each visit.
           - name: patient_id
-            description: Unique ID for each patient in the dataset.
-          - name: admit_date
-            description: The date when the encounter began (YYYY-MM-DD).
-          - name: discharge_date
-            description: The date when the encounter ended (YYYY-MM-DD).
-          - name: discharge_status_code
-            description: Indicates where the patient was discharged to for acute inpatient visits (e.g. home, SNF, etc.).                  
-          - name: facility
-            description: Unique identifier for the facility.
+            description: Unique ID for the patient.
+          - name: encounter_type
+            description: Type of encounter (e.g. acute inpatient | outpatient | emergency department | office visit).       
+          - name: encounter_start_date
+            description: Start date for the encounter.
+          - name: encounter_end_date
+            description: End date for the encounter.
+          - name: admit_source
+            description: Indicates the point of origin for the patient prior to admission (e.g. Non-Health Care | Emergency Room | Transfer).
+          - name: admit_type
+            description: Indicates the type of admission (e.g. elective | urgent | emergency | newborn).
+          - name: discharge_disposition
+            description: Indicates the type of setting the patient was discharged to (e.g. Home | SNF | Home Health).
+          - name: physician_npi
+            description: The attending provider NPI associated with the encounter.
+          - name: location
+            description: The discharge location name (e.g. facility name).
+          - name: location_npi
+            description: The discharge location NPI (e.g. facility NPI).
           - name: ms_drg
-            description: The MS-DRG code for acute inpatient visits.                  
+            description: The MS-DRG billed on the encounter.
+          - name: paid_amount
+            description: The total paid amount (claims cost) for the encounter.
+          - name: data_source
+            description: Indicates the name of the source dataset (e.g. Medicare Claims).                 
 
-      - name: stg_diagnosis
-        description: Staging table to prepare data to feed core.diagnoses.
+      - name: stg_condition
+        description: Staging table to prepare data to feed core.condition.
         columns:
-          - name: encounter_id
-            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
-          - name: diagnosis_code
-            description: The actual diagnosis code.
-          - name: diagnosis_rank
-            description: The rank of the diagnosis code on the encounter (primary=1).
+
 
       - name: stg_procedure
-        description: Staging table to prepare data to feed core.procedures.
+        description: Staging table to prepare data to feed core.procedure.
         columns:
-          - name: encounter_id
-            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
-          - name: procedure_code
-            description: The actual procedure code.
