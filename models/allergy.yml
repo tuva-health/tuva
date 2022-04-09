@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: allergy
+    description: Info about patient allergies, their status, and severity.
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: status
+        description: Indicates the status of the allergy (e.g. active | inactive | resolved).
+      - name: allergy_description
+        description: Description of the allergy.
+      - name: severity
+        description: Indicates the severity of the allergy (e.g. mild | moderate | severe (of event as a whole).
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

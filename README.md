@@ -2,15 +2,16 @@
 
 # Tuva
 
-Check out the Tuva [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
+Check out the latest [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
 
-View the Tuva [Data Models](https://docs.google.com/spreadsheets/d/127QGhajCtGxo0hpOZ9UBwjoCfbmqlSZyVw-ee4jpq6Q/edit?usp=sharing)
+Check out the [Tuva Project Google Sheet](https://docs.google.com/spreadsheets/d/1q6VBqGJ3PBW0vYD1wrsN5jmcP0cEXQNd3xTyTgtHlcU/edit#gid=0)
 
-Tuva cleans and transforms your messy healthcare data.  It does 3 things:
+Check out our [Docs](https://docs.tuvahealth.com/)
 
-1. Tests data for healthcare-specific data quality issues
-2. Creates high-level healthcare concepts on top of raw data
-3. Creates data marts designed to answer key healthcare questions
+The Tuva Project is open source software that cleans and transforms messy healthcare data.  It does 2 main things:
+
+1. Normalizes data into a common quality-tested format
+2. Enriches data with high-level concepts relevant for healthcare
 
 ## Pre-requisites
 1. You have healthcare data (e.g. EHR, claims, lab, HIE, etc.) in a data warehouse
@@ -21,7 +22,7 @@ Tuva cleans and transforms your messy healthcare data.  It does 3 things:
 ## Configuration
 Execute the following steps to load all seed files, build all data marts, and run all data quality tests in your data warehouse:
 
-1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine
+1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine or environment
 2. Create a database called 'tuva' in your data warehouse
     - note: this is where data from the project will be generated
 3. Create source data tables in your data warehouse
@@ -36,7 +37,7 @@ Execute the following steps to load all seed files, build all data marts, and ru
 ## Contributions
 Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
 and running the package? If so, we highly encourage and welcome contributions to this package! 
-Join the conversation on [Slack](https://tuvahealth.slack.com)
+Join the conversation on [Slack](https://tuvahealth.slack.com/ssb/redirect#/shared-invite/email)
 
 ## Database Support
 This package has been tested on Snowflake and Redshift.  We are planning to expand testing to BigQuery in the near future.

@@ -14,17 +14,23 @@ models:
         description: Start date for the encounter.
       - name: encounter_end_date
         description: End date for the encounter.
-      - name: admit_source
+      - name: admit_source_code
         description: Indicates the point of origin for the patient prior to admission (e.g. Non-Health Care | Emergency Room | Transfer).
-      - name: admit_type
+      - name: admit_source_description
+        description: Indicates the point of origin for the patient prior to admission (e.g. Non-Health Care | Emergency Room | Transfer).
+      - name: admit_type_code
         description: Indicates the type of admission (e.g. elective | urgent | emergency | newborn).
-      - name: discharge_disposition
+      - name: admit_type_description
+        description: Indicates the type of admission (e.g. elective | urgent | emergency | newborn).
+      - name: discharge_disposition_code
+        description: Indicates the type of setting the patient was discharged to (e.g. Home | SNF | Home Health).
+      - name: discharge_disposition_description
         description: Indicates the type of setting the patient was discharged to (e.g. Home | SNF | Home Health).
       - name: physician_npi
         description: The attending provider NPI associated with the encounter.
       - name: location
         description: The discharge location name (e.g. facility name).
-      - name: location_npi
+      - name: facility_npi
         description: The discharge location NPI (e.g. facility NPI).
       - name: ms_drg
         description: The MS-DRG billed on the encounter.

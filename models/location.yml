@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: location
+    description: Info about the location in which the patient was treated.
+    columns:
+      - name: facility_npi
+        description: The NPI assigned to the facility.
+      - name: facility_name
+        description: Name of the facility.
+      - name: facility_type
+        description: Type of facility e.g. inpatient hospital, SNF, etc.
+      - name: hospital_type
+        description: Hospital type (e.g. community | critical access | AMC).
+      - name: parent_organization
+        description: Name of the health system, IDN, or other parent organization.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).
