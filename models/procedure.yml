@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: procedure
+    description: Info about procedures including cpt and icd-10-pcs.
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: procedure_date
+        description: Date when the procedure was performed.
+      - name: code_type
+        description: Indicates the type of procedure (e.g. cpt | icd-10-pcs).
+      - name: code
+        description: Procedure code.
+      - name: description
+        description: Procedure description.
+      - name: physician_npi
+        description: NPI for the physician who performed the procedure.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

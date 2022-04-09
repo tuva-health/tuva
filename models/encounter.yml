@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: encounter
+    description: Visit-level information for all different encounter types (1 record per visit).
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: encounter_type
+        description: Type of encounter (e.g. acute inpatient | outpatient | emergency department | office visit).       
+      - name: encounter_start_date
+        description: Start date for the encounter.
+      - name: encounter_end_date
+        description: End date for the encounter.
+      - name: admit_source_code
+        description: Indicates the point of origin for the patient prior to admission (e.g. Non-Health Care | Emergency Room | Transfer).
+      - name: admit_source_description
+        description: Indicates the point of origin for the patient prior to admission (e.g. Non-Health Care | Emergency Room | Transfer).
+      - name: admit_type_code
+        description: Indicates the type of admission (e.g. elective | urgent | emergency | newborn).
+      - name: admit_type_description
+        description: Indicates the type of admission (e.g. elective | urgent | emergency | newborn).
+      - name: discharge_disposition_code
+        description: Indicates the type of setting the patient was discharged to (e.g. Home | SNF | Home Health).
+      - name: discharge_disposition_description
+        description: Indicates the type of setting the patient was discharged to (e.g. Home | SNF | Home Health).
+      - name: physician_npi
+        description: The attending provider NPI associated with the encounter.
+      - name: location
+        description: The discharge location name (e.g. facility name).
+      - name: facility_npi
+        description: The discharge location NPI (e.g. facility NPI).
+      - name: ms_drg
+        description: The MS-DRG billed on the encounter.
+      - name: paid_amount
+        description: The total paid amount (claims cost) for the encounter.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

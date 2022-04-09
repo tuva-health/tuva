@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: condition
+    description: Info about complaints, problems, admit diagnoses, discharge diagnoses, etc.
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: condition_date
+        description: Date the condition was recorded.
+      - name: condition_type
+        description: Type of condition recorded (e.g. problem | complaint | admit diagnosis | discharge diagnosis).
+      - name: code_type
+        description: Type of condition code (e.g. icd-9-cm | icd-10-cm | snomed-ct).
+      - name: code
+        description: The actual condition code.
+      - name: description
+        description: The actual condition description.
+      - name: diagnosis_rank
+        description: The order of diagnosis codes (applies to discharge diagnoses only, 1 indicates primary discharge diagnosis).
+      - name: present_on_admit
+        description: Indicates whether the condition was present on admission for discharge diagnosis codes.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

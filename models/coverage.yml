@@ -1,0 +1,18 @@
+version: 2
+
+models:
+  - name: coverage
+    description: Insurance coverage information (1 record per insurance coverage period).
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: coverage_start_date
+        description: Insurance coverage start date.
+      - name: coverage_end_date
+        description: Insurance coverage end date.       
+      - name: payer
+        description: Name of insurer.
+      - name: payer_type
+        description: Type of insurer (e.g. commercial | medicare | medicaid | unknown)
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

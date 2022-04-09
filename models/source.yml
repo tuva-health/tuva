@@ -5,48 +5,15 @@ sources:
     database: "{{ var('source_database') }}"
     schema: "{{ var('source_schema') }}"
     tables:
-      - name: stg_patient
-        description: Staging table to prepare data to feed core.patient.
-        columns:
-          - name: patient_id
-            description: Unique ID for each patient in the dataset.
-          - name: gender
-            description: Indicates whether the patient's gender is male, female, or unknown.
-          - name: birth_date
-            description: Patient's date of birth (YYYY-MM-DD). 
-
-      - name: stg_encounter
-        description: Staging table to prepare data to feed core.encounter.
-        columns:
-          - name: encounter_id
-            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
-          - name: patient_id
-            description: Unique ID for each patient in the dataset.
-          - name: admit_date
-            description: The date when the encounter began (YYYY-MM-DD).
-          - name: discharge_date
-            description: The date when the encounter ended (YYYY-MM-DD).
-          - name: discharge_status_code
-            description: Indicates where the patient was discharged to for acute inpatient visits (e.g. home, SNF, etc.).                  
-          - name: facility
-            description: Unique identifier for the facility.
-          - name: ms_drg
-            description: The MS-DRG code for acute inpatient visits.                  
-
-      - name: stg_diagnosis
-        description: Staging table to prepare data to feed core.diagnoses.
-        columns:
-          - name: encounter_id
-            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
-          - name: diagnosis_code
-            description: The actual diagnosis code.
-          - name: diagnosis_rank
-            description: The rank of the diagnosis code on the encounter (primary=1).
-
-      - name: stg_procedure
-        description: Staging table to prepare data to feed core.procedures.
-        columns:
-          - name: encounter_id
-            description: Unique ID for each healthcare visit (i.e. encounter) in the dataset.
-          - name: procedure_code
-            description: The actual procedure code.
+      - name: patient
+      - name: coverage
+      - name: encounter              
+      - name: practitioner
+      - name: location
+      - name: condition
+      - name: procedure
+      - name: lab              
+      - name: medication
+      - name: allergy
+      - name: vital_sign              
+      - name: observation

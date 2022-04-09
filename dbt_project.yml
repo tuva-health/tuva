@@ -1,18 +1,26 @@
-name: 'tuva'
-version: '0.1.5'
+name: 'core'
+version: '0.1.9'
 config-version: 2
 
-profile:                # configuration required (your profile to connect dbt to your data warehouse)
+profile: syntegra_snowflake       # configuration required (your profile to connect dbt to your data warehouse)
 
 vars:
-    source_name:        # configuration required (name of your source dataset e.g. cms_claims)
-    source_database:    # configuration required (name of the database where your data is stored)
-    source_schema:      # configuration required (name of the schema where you created staging tables)
+    source_database: tuva         # configuration required (name of the database where your data is stored)
+    source_schema: stg_union      # configuration required (name of the schema where you created staging tables)
+    source_name: stg_union        # configuration required (name of your source dataset e.g. cms_claims)
 
-    src_patient: "{{ source(var('source_name'),'stg_patient') }}"
-    src_encounter: "{{ source(var('source_name'),'stg_encounter') }}"
-    src_diagnosis: "{{ source(var('source_name'),'stg_diagnosis') }}"
-    src_procedure: "{{ source(var('source_name'),'stg_procedure') }}"
+    src_patient: "{{ source(var('source_name'),'patient') }}"
+    src_coverage: "{{ source(var('source_name'),'coverage') }}"
+    src_encounter: "{{ source(var('source_name'),'encounter') }}"
+    src_practitioner: "{{ source(var('source_name'),'practitioner') }}"
+    src_location: "{{ source(var('source_name'),'location') }}"
+    src_condition: "{{ source(var('source_name'),'condition') }}"
+    src_procedure: "{{ source(var('source_name'),'procedure') }}"
+    src_lab: "{{ source(var('source_name'),'lab') }}"
+    src_medication: "{{ source(var('source_name'),'medication') }}"
+    src_allergy: "{{ source(var('source_name'),'allergy') }}"
+    src_vital_sign: "{{ source(var('source_name'),'vital_sign') }}"
+    src_observation: "{{ source(var('source_name'),'observation') }}"
 
 source-paths: ["models"]
 analysis-paths: ["analysis"]
@@ -26,13 +34,13 @@ clean-targets:
     - "dbt_modules"
 
 models:
-  tuva:
-    +database:          # configuration required (should be the same as source database)
-    +schema: tuva
+  core:
+    +database: tuva        
+    +schema: core
 
 seeds:
-  tuva:
-    +database:          # configuration required (should be the same as source database)
-    +schema: vocabulary
-    +tags: vocabulary
+  core:
+    +database: tuva         
+    +schema: terminology
+    +tags: terminolgoy
     

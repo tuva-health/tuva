@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: lab
+    description: Info about lab tests and results.
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: order_id
+        description: Order ID associated with the lab test order.
+      - name: order_date
+        description: The date the lab test was ordered.
+      - name: result_date
+        description: Date of the lab test result.
+      - name: component_name
+        description: Name of the lab test component from the source data.
+      - name: loinc
+        description: Standard LOINC the lab test component maps to.
+      - name: loinc_description
+        description: Standard LOINC the lab test component maps to.
+      - name: result
+        description: Result of the lab test.
+      - name: units
+        description: Unit of measurement for the lab test.
+      - name: reference_range
+        description: Reference range for the lab test.
+      - name: specimen
+        description: The type of specimen the lab test was run on (blood, urine, etc.).
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

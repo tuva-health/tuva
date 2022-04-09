@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: medication
+    description: Info about medication requests, administrations, and prescriptions.
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: request_date
+        description: Date the medication request was entered.
+      - name: filled_date
+        description: Date the prescription was filled.
+      - name: paid_date
+        description: Date the prescription as paid.
+      - name: request_status
+        description: Status of the medication order (e.g. active | on-hold | cancelled | completed).
+      - name: medication_name
+        description: Name of the medication from the source data.
+      - name: ndc
+        description: NDC code associated with the medication.
+      - name: rx_norm
+        description: RxNorm code associated with the medication.
+      - name: dose
+        description: Prescribed dose.
+      - name: dose_unit
+        description: Prescribed dose units.
+      - name: quantity
+        description: Quantity contained in a single medication fill.
+      - name: refills
+        description: Number of refills.
+      - name: duration
+        description: The duration the medication is intended to be taken over.
+      - name: route
+        description: How the medication was delivered (e.g. IV).
+      - name: physician_npi
+        description: Physician who ordered or prescribed the medication.
+      - name: note
+        description: Signatore.
+      - name: paid_amount
+        description: Claim paid amount for the medication.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

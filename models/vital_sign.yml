@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: vital_sign
+    description: Info about vital signs (e.g. heart rate, pulse ox, systolic/diastolic blood pressure, etc.).
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: component_id
+        description: ID linking multiple vital signs together.
+      - name: loinc
+        description: LOINC code associated with the vital sign.
+      - name: loinc_description
+        description: LOINC description associated with the vital sign.
+      - name: vital_date
+        description: Date the vital sign was recorded.
+      - name: value
+        description: Value of the vital sign.
+      - name: units
+        description: Units related to the value of the vital sign.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).

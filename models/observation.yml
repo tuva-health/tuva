@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: observation
+    description: Info about patient observations recorded by a healthcare provider.
+    columns:
+      - name: encounter_id
+        description: Unique ID for each visit.
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: component_name
+        description: Source data name of the observation.
+      - name: observation_date
+        description: Date the observation was recorded.
+      - name: value
+        description: Value of the observation.
+      - name: reference_range
+        description: Refererance range of the observation.
+      - name: body_site
+        description: Body site where the observation was taken or is related to.
+      - name: specimen
+        description: Specimen used to measure the observation.
+      - name: data_source
+        description: Indicates the name of the source dataset (e.g. Medicare Claims).
