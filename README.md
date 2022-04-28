@@ -2,7 +2,7 @@
 
 # Tuva
 
-Check out the latest [DAG](https://tuva-health.github.io/tuva/#!/overview?g_v=1)
+Check out the latest [DAG](https://tuva-health.github.io/core/#!/overview?g_v=1)
 
 Check out the [Tuva Project Google Sheet](https://docs.google.com/spreadsheets/d/1q6VBqGJ3PBW0vYD1wrsN5jmcP0cEXQNd3xTyTgtHlcU/edit#gid=0)
 
