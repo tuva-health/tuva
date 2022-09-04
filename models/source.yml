@@ -1,11 +1,11 @@
 version: 2
 
 sources:
-  - name: "{{ var('source_name') }}"
+  - name: tuva_core_staging
     database: "{{ var('source_database') }}"
     schema: "{{ var('source_schema') }}"
     tables:
-      - name: patient
+      - name: "{{ var('src_patient_table_name') }}"
       - name: coverage
       - name: encounter              
       - name: practitioner

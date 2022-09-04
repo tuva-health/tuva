@@ -19,12 +19,23 @@ The Tuva Project is open source software that cleans and transforms messy health
 
 [Here](https://docs.getdbt.com/dbt-cli/installation) are instructions for installing dbt.
 
-## Configuration
+## Installation
+
 Execute the following steps to load all seed files, build all data marts, and run all data quality tests in your data warehouse:
 
-1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine or environment
-2. Create a database called 'tuva' in your data warehouse
-    - note: this is where data from the project will be generated
+1. Add the following to your project's `packages.yml` file:
+
+```yaml
+packages:
+  - tuva_dbt_core
+    revision: 0.2.0
+```
+
+2. Run `dbt deps` to install `tuva_dbt_core`
+2. Run `dbt seed` to seed tuva core terminology files.
+
+**TODO finish instructions**
+
 3. Create source data tables in your data warehouse
     - note: these tables must match table names and column names exactly as in [source.yml](models/source.yml)
 4. Configure [dbt_project.yml](/dbt_project.yml)
