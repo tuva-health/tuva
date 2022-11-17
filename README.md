@@ -14,7 +14,7 @@ The Tuva Project is the open source data transformation layer for healthcare dat
 ### Step 1:  Pre-requisites
 
 - **Database:**  This package creates and transforms data in a database called Tuva (see step 5 for more detail).
-- **Dataset:**  Claims data is available in your warehouse and modeled after the [Tuva Claims Input Layer](https://thetuvaproject.com/docs/data-models/claims-input-layer).
+- **Dataset:**  Claims data is available in your warehouse and modeled after the [Tuva Claims Input Layer](https://thetuvaproject.com/docs/category/claims-data-model).
 - **dbt version**:  This package requires you to have dbt installed and a functional dbt project running on version `1.x`.
 
 ### Step 2:  Package Installation
