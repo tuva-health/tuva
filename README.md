@@ -24,7 +24,7 @@ Include the following in your `packages.yml`
 ```
 packages:
   - package: tuva-health/the_tuva_project
-    version: 0.1.0
+    version: 0.2.0
 ```
 
 Please refer to [dbt Hub](https://hub.getdbt.com/) or read the [dbt docs](https://docs.getdbt.com/docs/build/packages) for the latest information on installing packages.
