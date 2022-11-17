@@ -36,7 +36,7 @@ This package requires configuration to know where to look for your claims data. 
 ```sql
 vars:
 	input_database: medicare      # name of the database where claims data is stored
-  input_schema: claims_input    # name of the schema where claims data is stored
+  	input_schema: claims_input    # name of the schema where claims data is stored
 ```
 
 ### Step 4:  Enabling and disabling packages
@@ -48,7 +48,7 @@ vars:
 	tuva_packages_enabled: false         # by default true; toggle for all packages
 
 	chronic_conditions_enabled: false    # by default true; toggle for specific package
-  claims_preprocessing_enabled: false  # by default true; toggle for specific package
+  	claims_preprocessing_enabled: false  # by default true; toggle for specific package
 	data_profiling_enabled: false        # by default true; toggle for specific package
 	readmissions_enabled: false          # by default true; toggle for specific package
 	terminology_enabled: false           # by default true; toggle for specific package
@@ -65,8 +65,8 @@ vars:
 	
 	chronic_conditions_database: tuva                # configuration for specific package
 	chronic_conditions_schema: chronic_conditions    # configuration for specific package
-  claims_preprocessing_database: tuva              # configuration for specific package
-  claims_preprocessing_schema: claim_preprocessing # configuration for specific package
+  	claims_preprocessing_database: tuva              # configuration for specific package
+  	claims_preprocessing_schema: claim_preprocessing # configuration for specific package
 	data_profiling_database: tuva                    # configuration for specific package
 	data_profiling_schema: data_profiling            # configuration for specific package
 	readmissions_database: tuva                      # configuration for specific package
