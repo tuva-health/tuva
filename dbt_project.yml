@@ -1,31 +1,14 @@
-name: 'core'
-version: '0.1.9'
+name: 'the_tuva_project'
+version: '0.2.0'
 config-version: 2
 
-profile:        # configuration required (your profile to connect dbt to your data warehouse)
+profile: default        # configuration required (your profile to connect dbt to your data warehouse)
 
-vars:
-    source_database: tuva         # configuration required (name of the database where your data is stored)
-    source_schema: stg_union      # configuration required (name of the schema where you created staging tables)
-    source_name: stg_union        # configuration required (name of your source dataset e.g. cms_claims)
 
-    src_patient: "{{ source(var('source_name'),'patient') }}"
-    src_coverage: "{{ source(var('source_name'),'coverage') }}"
-    src_encounter: "{{ source(var('source_name'),'encounter') }}"
-    src_practitioner: "{{ source(var('source_name'),'practitioner') }}"
-    src_location: "{{ source(var('source_name'),'location') }}"
-    src_condition: "{{ source(var('source_name'),'condition') }}"
-    src_procedure: "{{ source(var('source_name'),'procedure') }}"
-    src_lab: "{{ source(var('source_name'),'lab') }}"
-    src_medication: "{{ source(var('source_name'),'medication') }}"
-    src_allergy: "{{ source(var('source_name'),'allergy') }}"
-    src_vital_sign: "{{ source(var('source_name'),'vital_sign') }}"
-    src_observation: "{{ source(var('source_name'),'observation') }}"
-
-source-paths: ["models"]
+model-paths: ["models"]
 analysis-paths: ["analysis"]
 test-paths: ["tests"]
-data-paths: ["data"]
+seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 target-path: "target"  
@@ -33,14 +16,3 @@ clean-targets:
     - "target"
     - "dbt_modules"
 
-models:
-  core:
-    +database: tuva        
-    +schema: core
-
-seeds:
-  core:
-    +database: tuva         
-    +schema: terminology
-    +tags: terminology
-    
