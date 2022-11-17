@@ -31,7 +31,7 @@ Please refer to [dbt Hub](https://hub.getdbt.com/) or read the [dbt docs](https:
 
 ### Step 3:  Configure input database and schema
 
-By default, this package will use your claims data stored in your target database and schema.  As long as the model name matches the [Tuva Claims Data Model](https://thetuvaproject.com/docs/category/claims-data-model), no additional configuration is needed.
+By default, this package will use your claims data stored in your target database and schema.  As long as your model names match the [Tuva Claims Data Model](https://thetuvaproject.com/docs/category/claims-data-model), no additional configuration is needed.
 
 ### Step 4:  Enabling and disabling packages
 
@@ -60,7 +60,7 @@ vars:
 	chronic_conditions_database: tuva                # configuration for specific package
 	chronic_conditions_schema: chronic_conditions    # configuration for specific package
   	claims_preprocessing_database: tuva              # configuration for specific package
-  	claims_preprocessing_schema: claim_preprocessing # configuration for specific package
+  	claims_preprocessing_schema: core                # configuration for specific package
 	data_profiling_database: tuva                    # configuration for specific package
 	data_profiling_schema: data_profiling            # configuration for specific package
 	readmissions_database: tuva                      # configuration for specific package
@@ -68,7 +68,8 @@ vars:
 	terminology_database: tuva                       # configuration for specific package
 	terminology_schema: terminology                  # configuration for specific package
 ```
-
+> NOTE: Claims preprocessing is an exception to the schema naming rule.  It will create a schema called 'core'.
+>
 ### (Optional) Step 6:  Additional configurations
 <details>
 <summary> Expand for details </summary>
@@ -104,7 +105,7 @@ This dbt package is dependent on the following dbt packages. For more informatio
 ```
 packages:
 	- package: dbt-labs/dbt_utils
-	  version: [">=0.8.0", "<0.9.0"]
+	  version: [">=0.9.2","<1.0.0"]
 	- package: tuva-health/chronic_conditions
 	  version: [">=0.1.0", "<0.2.0"]
 	- package: tuva-health/claims_preprocessing
