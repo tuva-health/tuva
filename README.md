@@ -1,44 +1,138 @@
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=0.21.x&color=orange)
+# The Tuva Project
 
-# Tuva
+## 🧰 What does this project do?
 
-Check out the latest [DAG](https://tuva-health.github.io/core/#!/overview?g_v=1)
+The Tuva Project is the open source data transformation layer for healthcare data.  For a detailed overview of what the project does and how it works, check out our [Knowledge Base](https://thetuvaproject.com/docs/intro).  For information on data models and to view the entire DAG check out our dbt [Docs](https://tuva-health.github.io/the_tuva_project/#!/overview/terminology).
 
-Check out the [Tuva Project Google Sheet](https://docs.google.com/spreadsheets/d/1q6VBqGJ3PBW0vYD1wrsN5jmcP0cEXQNd3xTyTgtHlcU/edit#gid=0)
+## 🔌 Database Support
 
-Check out our [Docs](https://docs.tuvahealth.com/)
+- Snowflake
 
-The Tuva Project is open source software that cleans and transforms messy healthcare data.  It does 2 main things:
+## ✅ How to get started
 
-1. Normalizes data into a common quality-tested format
-2. Enriches data with high-level concepts relevant for healthcare
+### Step 1:  Pre-requisites
 
-## Pre-requisites
-1. You have healthcare data (e.g. EHR, claims, lab, HIE, etc.) in a data warehouse
-2. You have [dbt](https://www.getdbt.com/) installed and configured (i.e. connected to your data warehouse)
+- **Database:**  This package creates and transforms data in a database called Tuva (see step 5 for more detail).
+- **Dataset:**  Claims data is available in your warehouse and modeled after the [Tuva Claims Input Layer](https://thetuvaproject.com/docs/data-models/claims-input-layer).
+- **dbt version**:  This package requires you to have dbt installed and a functional dbt project running on version `1.x`.
 
-[Here](https://docs.getdbt.com/dbt-cli/installation) are instructions for installing dbt.
+### Step 2:  Package Installation
 
-## Configuration
-Execute the following steps to load all seed files, build all data marts, and run all data quality tests in your data warehouse:
+Include the following in your `packages.yml`
 
-1. [Clone](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) this repo to your local machine or environment
-2. Create a database called 'tuva' in your data warehouse
-    - note: this is where data from the project will be generated
-3. Create source data tables in your data warehouse
-    - note: these tables must match table names and column names exactly as in [source.yml](models/source.yml)
-4. Configure [dbt_project.yml](/dbt_project.yml)
-    - profile: set to 'tuva' by default - change this to an active profile in the profile.yml file that connects to your data warehouse
-    - vars: configure source_name, source database name, and source schema name
-5. Run project
-    1. Navigate to the project directory in the command line
-    2. Execute "dbt build" to create all tables/views in your data warehouse
+```
+packages:
+  - package: tuva-health/the_tuva_project
+    version: 0.1.0
+```
 
-## Contributions
-Don't see a model or specific metric you would have liked to be included? Notice any bugs when installing 
-and running the package? If so, we highly encourage and welcome contributions to this package! 
+Please refer to [dbt Hub](https://hub.getdbt.com/) or read the [dbt docs](https://docs.getdbt.com/docs/build/packages) for the latest information on installing packages.
 
-Join the conversation on [Slack](https://tuvahealth.slack.com/ssb/redirect#/shared-invite/email)!
+### Step 3:  Configure input database and schema
 
-## Database Support
-This package has been tested on Snowflake and Redshift.  We are planning to expand testing to BigQuery in the near future.
+This package requires configuration to know where to look for your claims data.  Two variables need to be added to your dbt_project.yml file (see below).
+
+```sql
+vars:
+	input_database: medicare      # name of the database where claims data is stored
+  input_schema: claims_input    # name of the schema where claims data is stored
+```
+
+### Step 4:  Enabling and disabling packages
+
+By default, all packages are enabled to create a comprehensive analytics platform.  If you would like to disable a package, the respective variables can be added to your `dbt_project.yml`.
+
+```sql
+vars:
+	tuva_packages_enabled: false         # by default true; toggle for all packages
+
+	chronic_conditions_enabled: false    # by default true; toggle for specific package
+  claims_preprocessing_enabled: false  # by default true; toggle for specific package
+	data_profiling_enabled: false        # by default true; toggle for specific package
+	readmissions_enabled: false          # by default true; toggle for specific package
+	terminology_enabled: false           # by default true; toggle for specific package
+```
+
+### (Optional) Step 5:  Change build schema and database
+
+By default, this package will build all models in a database called `Tuva`.  Schema names reflect the package that created them.  This behavior can be altered by adding the respective variables to your `dbt_project.yml`:
+
+```sql
+vars:
+	tuva_database: tuva                              # configuration for all packages
+	tuva_schema_prefix: pkg                          # configuration for all packages
+	
+	chronic_conditions_database: tuva                # configuration for specific package
+	chronic_conditions_schema: chronic_conditions    # configuration for specific package
+  claims_preprocessing_database: tuva              # configuration for specific package
+  claims_preprocessing_schema: claim_preprocessing # configuration for specific package
+	data_profiling_database: tuva                    # configuration for specific package
+	data_profiling_schema: data_profiling            # configuration for specific package
+	readmissions_database: tuva                      # configuration for specific package
+	readmissions_schema: readmissions                # configuration for specific package
+	terminology_database: tuva                       # configuration for specific package
+	terminology_schema: terminology                  # configuration for specific package
+```
+
+### (Optional) Step 6:  Additional configurations
+
+- Expand for details
+    
+    **************************************Add schema prefix to all packages**************************************
+    
+    At the package level, a prefix can be added to all schemas.  The following variable can be added to your dbt_project.yml:
+    
+    ```sql
+    vars:
+    	tuva_schema_prefix: testing_environment    # configuration for all packages
+    ```
+    
+    **Modifying a model alias, materialization, and tags**
+    
+    All model-level configurations for a package are in `_models.yml`.  Only a few settings should be altered within this file:
+    
+    - [Custom aliases](https://docs.getdbt.com/docs/build/custom-aliases) - An override of the model name, creating a clearer table name.
+    - [Tags](https://docs.getdbt.com/reference/resource-configs/tags) - A categorization and organization of models
+    - [Materialization](https://docs.getdbt.com/docs/build/materializations) - Pre-configure based on internal testing of query performance
+    
+    > NOTE: The [enabled](https://docs.getdbt.com/reference/resource-configs/enabled) property has also been set within the model.sql file due to a potential bug with dbt.
+    > 
+
+# 🤹🏽 **Does this package have dependencies?**
+
+This dbt package is dependent on the following dbt packages. For more information on the below packages, refer to the [dbt hub](https://hub.getdbt.com/) site.
+
+> If you have any of these dependent packages in your own `packages.yml` we highly recommend removing them to ensure there are no package version conflicts.
+> 
+
+```
+packages:
+  - package: dbt-labs/dbt_utils
+    version: [">=0.8.0", "<0.9.0"]
+  - package: tuva-health/chronic_conditions
+    version: [">=0.1.0"]
+  - package: tuva-health/claims_preprocessing
+    version: [">=0.1.0"]
+  - package: tuva-health/data_profiling
+    version: [">=0.1.0"]
+  - package: tuva-health/readmissions
+    version: [">=0.1.0"]
+  - package: tuva-health/terminology
+    version: [">=0.1.0"]
+```
+
+## 🙋🏻‍♀️ **How is this package maintained and can I contribute?**
+
+### **Package Maintenance**
+
+The Tuva Project team maintaining this package **only** maintains the latest version of the package. We highly recommend you stay consistent with the latest version.
+
+### Contributions
+
+Have an opinion on the mappings? Notice any bugs when installing and running the package?
+If so, we highly encourage and welcome feedback!  While we work on a formal process in Github, we can be easily reached on our Slack community.
+
+## 🤝 Community
+
+Join our growing community of healthcare data practitioners on [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)!
