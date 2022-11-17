@@ -15,7 +15,7 @@ The Tuva Project is the open source data transformation layer for healthcare dat
 
 - **Database:**  This package creates and transforms data in a database called Tuva (see step 5 for more detail).
 - **Dataset:**  Claims data is available in your warehouse and modeled after the [Tuva Claims Input Layer](https://thetuvaproject.com/docs/category/claims-data-model).
-- **dbt version**:  This package requires you to have dbt installed and a functional dbt project running on version `1.x`.
+- **dbt version**:  This package requires you to have dbt installed and a functional dbt project running on version `1.2.x`.
 
 ### Step 2:  Package Installation
 
@@ -109,18 +109,18 @@ This dbt package is dependent on the following dbt packages. For more informatio
 
 ```
 packages:
-  - package: dbt-labs/dbt_utils
-    version: [">=0.8.0", "<0.9.0"]
-  - package: tuva-health/chronic_conditions
-    version: [">=0.1.0"]
-  - package: tuva-health/claims_preprocessing
-    version: [">=0.1.0"]
-  - package: tuva-health/data_profiling
-    version: [">=0.1.0"]
-  - package: tuva-health/readmissions
-    version: [">=0.1.0"]
-  - package: tuva-health/terminology
-    version: [">=0.1.0"]
+	- package: dbt-labs/dbt_utils
+	  version: [">=0.8.0", "<0.9.0"]
+	- package: tuva-health/chronic_conditions
+	  version: [">=0.1.0", "<0.2.0"]
+	- package: tuva-health/claims_preprocessing
+	  version: [">=0.1.0", "<0.2.0"]
+	- package: tuva-health/data_profiling
+	  version: [">=0.1.0", "<0.2.0"]
+	- package: tuva-health/readmissions
+	  version: [">=0.1.0", "<0.2.0"]
+	- package: tuva-health/terminology
+	  version: [">=0.1.0", "<0.2.0"]
 ```
 
 ## 🙋🏻‍♀️ **How is this package maintained and can I contribute?**
