@@ -31,13 +31,7 @@ Please refer to [dbt Hub](https://hub.getdbt.com/) or read the [dbt docs](https:
 
 ### Step 3:  Configure input database and schema
 
-This package requires configuration to know where to look for your claims data.  Two variables need to be added to your dbt_project.yml file (see below).
-
-```sql
-vars:
-	input_database: medicare      # name of the database where claims data is stored
-  	input_schema: claims_input    # name of the schema where claims data is stored
-```
+By default, this package will use your claims data stored in your target database and schema.  As long as the model name matches the [Tuva Claims Data Model](https://thetuvaproject.com/docs/category/claims-data-model), no additional configuration is needed.
 
 ### Step 4:  Enabling and disabling packages
 
