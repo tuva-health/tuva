@@ -76,30 +76,31 @@ vars:
 ```
 
 ### (Optional) Step 6:  Additional configurations
+<details>
+<summary> Expand for details </summary>
 
-- Expand for details
-    
-    **************************************Add schema prefix to all packages**************************************
-    
-    At the package level, a prefix can be added to all schemas.  The following variable can be added to your dbt_project.yml:
-    
-    ```sql
-    vars:
-    	tuva_schema_prefix: testing_environment    # configuration for all packages
-    ```
-    
-    **Modifying a model alias, materialization, and tags**
-    
-    All model-level configurations for a package are in `_models.yml`.  Only a few settings should be altered within this file:
-    
-    - [Custom aliases](https://docs.getdbt.com/docs/build/custom-aliases) - An override of the model name, creating a clearer table name.
-    - [Tags](https://docs.getdbt.com/reference/resource-configs/tags) - A categorization and organization of models
-    - [Materialization](https://docs.getdbt.com/docs/build/materializations) - Pre-configure based on internal testing of query performance
-    
-    > NOTE: The [enabled](https://docs.getdbt.com/reference/resource-configs/enabled) property has also been set within the model.sql file due to a potential bug with dbt.
-    > 
+**Add schema prefix to all packages**
 
-# 🤹🏽 **Does this package have dependencies?**
+At the package level, a prefix can be added to all schemas.  The following variable can be added to your dbt_project.yml:
+
+```sql
+vars:
+	tuva_schema_prefix: testing_environment    # configuration for all packages
+```
+
+**Modifying a model alias, materialization, and tags**
+
+All model-level configurations for a package are in `_models.yml`.  Only a few settings should be altered within this file:
+
+- [Custom aliases](https://docs.getdbt.com/docs/build/custom-aliases) - An override of the model name, creating a clearer table name.
+- [Tags](https://docs.getdbt.com/reference/resource-configs/tags) - A categorization and organization of models
+- [Materialization](https://docs.getdbt.com/docs/build/materializations) - Pre-configure based on internal testing of query performance
+
+> NOTE: The [enabled](https://docs.getdbt.com/reference/resource-configs/enabled) property has also been set within the model.sql file due to a potential bug with dbt.
+>
+</details>
+
+## 🤹🏽 **Does this package have dependencies?**
 
 This dbt package is dependent on the following dbt packages. For more information on the below packages, refer to the [dbt hub](https://hub.getdbt.com/) site.
 
