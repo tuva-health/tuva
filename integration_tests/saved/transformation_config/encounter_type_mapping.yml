@@ -1,0 +1,60 @@
+version: 2
+
+models:
+    - name: encounter_type_mapping
+      description: Mapping of institutional and professional claims at the claim level to an encounter type
+        Institutional claims require bill type and revenue codes.  Professional claims require place of service codes.
+      config:
+        database: "{{ var('output_database')}}"
+        schema: "{{ var('output_schema')}}"
+      tests:
+        - unique:
+            column_name: "(claim_id || '-' || claim_line_number)"
+            config:
+              severity: error
+      columns:
+        - name: claim_line_number
+          description:  Number of the claim line
+          tests:
+            - not_null
+        - name: claim_type
+          description:  Overarching claim type.  Valid values are I and P (institutional and professional).
+          tests:
+            - not_null
+            - accepted_values:
+                values: ['dental','institutional','professional','vision']
+        - name: claim_id
+          description:  The source claim id
+          tests:
+            - not_null
+        - name: patient_id
+          description:  The unique identifier of a beneficiary
+          tests:
+            - not_null
+        - name: encounter_type
+          description:  The encounter type that has been assigned to the claim line item.
+          tests:
+            - encounter_type_mapping
+        - name: claim_start_date
+          description:  The start date of the claim
+          tests:
+            - not_null
+        - name: claim_end_date
+          description:  The end date of the claim
+          tests:
+            - not_null
+        - name: discharge_disposition_code
+          description:  The discharge status of the patient at the time the claim was submitted.
+        - name: facility_npi
+          description:  The facility ID on the claim.  Does not have to be the NPI however it needs to be a consistent ID within the claim to ensure linking/merging.
+          tests:
+            - inst_bill_type_code
+        - name: bill_type_code
+          description:  The 3 digit bill type code on the claim.  Should only be on institutional claims.  Facility type (TOB 1) and classification (TOB 2) required for mapping encounter types.  Frequency (TOB 3) not needed and will be ignored.
+          tests:
+            - inst_bill_type_code
+        - name: revenue_center_code
+          description:  The 4 digit revenue type code on the claim.  Should only be on institutional claims.  Must be 4 digits including leading zeros.
+        - name: place_of_service_code
+          description:  The 2 digit place of service code on the claim.  Should only appear on professional claims.  Must be 2 digits including leading zero.
+

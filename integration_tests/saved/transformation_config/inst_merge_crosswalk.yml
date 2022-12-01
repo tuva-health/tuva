@@ -1,0 +1,14 @@
+version: 2
+
+models:
+    - name: inst_merge_crosswalk
+      description: Crosswalk of claim ids to a master grouper (encounter id)
+      config:
+        database: "{{ var('output_database')}}"
+        schema: "{{ var('output_schema')}}"
+      columns:
+        - name: claim_id
+          description:  Unique identifier and primary key
+          tests:
+            - unique
+            - not_null

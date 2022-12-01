@@ -1,0 +1,14 @@
+version: 2
+
+models:
+    - name: encounter_claim_crosswalk
+      description: A crosswalk between encounter id and  claim id
+      config:
+        database: "{{ var('output_database')}}"
+        schema: "{{ var('output_schema')}}"
+      columns:
+        - name: claim_id
+          description: Claim id from data source and primary key
+          tests:
+            - unique
+            - not_null

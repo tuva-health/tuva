@@ -1,0 +1,14 @@
+version: 2
+
+models:
+    - name: inst_encounter_merge
+      description: Creation of encounter for merged institutional claims
+      config:
+        database: "{{ var('output_database')}}"
+        schema: "{{ var('output_schema')}}"
+      columns:
+        - name: encounter_id
+          description:  Unique identifer and primary key
+          tests:
+            - unique
+            - not_null

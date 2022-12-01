@@ -1,0 +1,14 @@
+version: 2
+
+models:
+    - name: coverage
+      description: Coverage details
+      config:
+        database: "{{ var('output_database')}}"
+        schema: "{{ var('output_schema')}}"
+      tests:
+         - unique:
+             column_name: "(patient_id || payer || payer_type || coverage_start_date || coverage_end_date)"
+      columns:
+        - name: patient_id  
+          description: unique identifier

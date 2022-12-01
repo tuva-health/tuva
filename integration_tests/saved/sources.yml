@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: "{{ var('source_name') }}"
+    database: "{{ var('input_database') }}"
+    schema:  "{{ var('input_schema') }}"
+    tables:
+      - name: medical_claim
+      - name: eligibility
+
+  - name: tuva_terminology
+    database: tuva
+    schema:  terminology
+    tables:
+      - name: admit_source
+      - name: admit_type
+      - name: bill_type
+      - name: claim_type
+      - name: code_type
+      - name: discharge_disposition
+      - name: encounter_type
+      - name: icd_10_cm
+      - name: icd_10_pcs
+      - name: ms_drg
+      - name: place_of_service
+      - name: revenue_center
+      - name: medicare_dual_eligibility
+      - name: medicare_status
