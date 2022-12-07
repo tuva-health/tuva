@@ -1,129 +1,138 @@
+[![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.2.x&color=orange)
 # The Tuva Project
 
-## 🧰 What does this project do?
+## 🧰 What does this dbt package do?
 
-The Tuva Project is the open source data transformation layer for healthcare data.  For a detailed overview of what the project does and how it works, check out our [Knowledge Base](https://thetuvaproject.com/docs/intro).  For information on data models and to view the entire DAG check out our dbt [Docs](https://tuva-health.github.io/the_tuva_project/#!/overview/terminology).
+To understand what this dbt package does, we must first understand what The Tuva Project is. The Tuva Project is a collection of dbt packages that builds healthcare concepts (measures, groupers, data quality tests) on top of your raw healthcare claims data. Currently, the Tuva Project consists of the following 5 dbt packages, each of which is a separate GitHub repo that does something specific:
 
-## 🔌 Database Support
+- `data_profiling`: Runs data quality tests to check for common problems specific to healthcare claims data.
+- `claims_preprocessing`: Groups overlapping claims into a single encounter, assigns every claim to 1 of 18 different encounter types and populates core concept tables.
+- `chronic_conditions`: Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
+- `readmissions`: Calculates hospital readmission measures.
+- `terminology`: Makes the latest version of many useful healthcare terminology datasets available as tables in your DW. This package is different from the others because it does not build healthcare concepts on top of your data.
 
-- Snowflake
+It is possible to run any one of these packages in isolation. For example, if you are only interested in calculating readmission measures, you may run the `readmissions` package without having to run any other package. Each of the above dbt packages (except `terminology`, which does not need input data to run) has its own input layer, which consists of a set of specific tables with specific columns in them. Each package uses the raw data in its input layer as a starting point and then builds healthcare concepts with it. The input layer for each package contains the minimum necessary data elements required for the package to do what it needs to do. The description of the input layer for each package is found in the package’s README. To run any of these packages, the basic idea is the same:
 
-## ✅ How to get started
+1. You create the necessary input tables (the package’s input layer) as models within your dbt project so that the Tuva package of interest can reference them using ref() functions.
+2. You import the Tuva package you are interested in into your dbt project and tell it where to find the relevant input tables as well as what database and schema to dump its output into.
 
-### Step 1:  Pre-requisites
+Teams that work with healthcare claims data from multiple sources (e.g. different commercial payers, Medicare, Medicaid) typically get access to different claims datasets in different formats (different schemas with terminology that is normalized differently). When these teams want to do analytics using data from all sources, they typically map all their data to a common data model where all the data from different sources can live in a uniform format. It is helpful to use a common data model that is well-designed for doing analytics with claims data. The Tuva Project has a [Claims Common Data Model](https://www.notion.so/Claims-Preprocessing-9f511ae8edac47fa9b7a11b10971e2c2) ****(Claims CDM) that has been specifically designed for this purpose. Although each dbt package that is part of the Tuva Project may be run in isolation by mapping data to the package’s input layer, all packages must be run off of the Tuva Claims CDM. Organizations that have mapped all their healthcare claims data to the Tuva Claims CDM can easily run the entire Tuva Project (all 5 dbt packages) by using the `the_tuva_project` package. You can think of this package (`the_tuva_project` package) as a meta-package that is used to run all dbt packages that are part of the Tuva Project with one command. This package calls all 5 packages (or any subset of them you select) and runs them all while dealing with dependencies between them. The input layer for `the_tuva_project` is the full Tuva Claims CDM. This means that to run the entire Tuva Project, you need to map all of your claims data into the Tuva Claims CDM.
 
-- **Database:**  This package creates and transforms data in a database called Tuva (see step 5 for more detail).
-- **Dataset:**  Claims data is available in your warehouse and modeled after the [Tuva Claims Input Layer](https://thetuvaproject.com/docs/data-models/claims-input-layer).
-- **dbt version**:  This package requires you to have dbt installed and a functional dbt project running on version `1.2.x`.
+For a detailed overview of the methodology used in the package check out our [Knowledge Base](https://thetuvaproject.com/docs/intro).  
 
-### Step 2:  Package Installation
+For information on data models and to view the entire DAG check out our dbt [Docs](https://tuva-health.github.io/the_tuva_project/#!/overview).
 
-Include the following in your `packages.yml`
+## 🔌 What databases are supported?
+
+This package has been tested on **Snowflake** and **Redshift**.
+
+## 📚 What versions of dbt are supported?
+
+This package requires you to have dbt installed and a functional dbt project running on dbt version `1.2.x` or higher.
+
+## ✅ How do I use this dbt package?
+
+Below are the steps to run this individual dbt package, which runs all packages that are part of the Tuva Project.
+
+### Overview
+
+As mentioned above, each dbt package that is part of the Tuva Project (except `terminology`) expects you to have data in a certain format (specific tables with specific columns in them) and uses that as an input to then build healthcare concepts. To run all packages (the entire Tuva Project), the necessary input layer is the full [Tuva Claims Common Data Model](https://thetuvaproject.com/docs/category/claims-data-model), which means that in order to run this package (`the_tuva_project` package) you must map all of your healthcare claims data into the Tuva Claims CDM.
+
+### **Step 1:**
+
+First, you must map all your claims data to the [Tuva Claims CDM](https://thetuvaproject.com/docs/category/claims-data-model), which consists of 3 tables. You need to create these 3 tables as models within your dbt project so that the Tuva dbt packages can reference them using ref() functions. This is typically done by writing SQL select statements within your dbt project to create 3 models (that constitute the 3 tables in the Tuva Claims CDM) containing your healthcare claims data within your dbt project.
+
+### **Step 2:**
+
+Once you have created the necessary 3 input tables as models within your dbt project, the next step is to import the `the_tuva_project` dbt package and tell it where to find the input tables as well as what database and schema to dump its output into. If you are only interested in running a subset of the Tuva Project, you may also tell the `the_tuva_project` package which packages to run. These things are done by editing 2 different files in your dbt project: `packages.yml` and `dbt_project.yml`. 
+
+To import the `the_tuva_project` package, you need to include the following in your `packages.yml`:
 
 ```yaml
 packages:
   - package: tuva-health/the_tuva_project
-    version: 0.1.0
+    version: 0.2.1
 ```
 
-Please refer to [dbt Hub](https://hub.getdbt.com/) or read the [dbt docs](https://docs.getdbt.com/docs/build/packages) for the latest information on installing packages.
-
-### Step 3:  Configure input
-
-By default, this package will use the claims data created by your dbt project (i.e. the data in the target database and schema in your `dbt_project.yml`).  As long as the model names match the [Tuva Claim Data Model](https://thetuvaproject.com/docs/category/claims-data-model), no additional configuration is needed.
-
-### Step 4:  Enabling and disabling packages
-
-By default, all packages are enabled to create a comprehensive analytics platform.  If you would like to disable a package, the respective variables can be added to your `dbt_project.yml`.
+To tell the `the_tuva_project` package where to find the necessary input tables, what databases and schemas to dump its output into, and what subset of the Tuva Project to run, you must add the following in your `dbt_project.yml:`
 
 ```yaml
+# These variables tell the_tuva_project package what
+# packages to run. If there are some packages you 
+# are not interested in running, this is where you
+# need to set the relevant variable(s) to 'false':
 vars:
-  tuva_packages_enabled: false         # by default true; toggle for all packages
+  tuva_packages_enabled: true  
+  data_profiling_enabled: true  
+  claims_preprocessing_enabled: true
+  chronic_conditions_enabled: true
+  readmissions_enabled: true
+  terminology_enabled: true
 
-  chronic_conditions_enabled: false    # by default true; toggle for specific package
-  claims_preprocessing_enabled: false  # by default true; toggle for specific package
-  data_profiling_enabled: false        # by default true; toggle for specific package
-  readmissions_enabled: false          # by default true; toggle for specific package
-  terminology_enabled: false           # by default true; toggle for specific package
+# These variables point to the 3 input tables you created 
+# in your dbt project which constitutes the
+# Tuva Claims CMD. 
+# If you named these 3 models anything other than 'medical_claim',
+# 'eligibility', 'pharmacy_claim', you must modify the
+# refs here:
+  medical_claim_override:   "{{ref('medical_claim')}}"
+  eligibility_override: "{{ref('eligibility')}}"
+  pharmacy_claim_override: "{{ref('pharmacy_claim')}}"
+
+# This variable sets the name of the database
+# where the output of the Tuva Project will be 
+# dumped into. Make sure this database exists
+# in your data warehouse before you run this package, 
+# since dbt can create schemas in your data warehouse, 
+# but it cannot create databases. Note that further 
+# down you may choose separate databases for the 
+# output of different dbt packages within the Tuva Project:
+  tuva_database: tuva  
+
+# If you want to add a prefix to every schema that the
+# Tuva Project will write data to, set this prefix in
+# this variable (it is commented out by default):
+# tuva_schema_prefix: test
+
+# If you want to write the output of any package 
+# that is part of the Tuva Project to a database
+# or schema different than the default names we
+# suggest here, change the name here:
+  data_profiling_database: tuva
+  data_profiling_schema: data_profiling
+  claims_preprocessing_database: tuva
+  claims_preprocessing_schema: core
+  chronic_conditions_database: tuva
+  chronic_conditions_schema: chronic_conditions
+  readmissions_database: tuva
+  readmissions_schema: readmissions
+  terminology_database: tuva
+  terminology_schema: terminology
+
+      
+
+# By default, dbt prefixes schema names with the target 
+# schema in your profile. We recommend including this 
+# here so that dbt does not prefix the output schemas
+# of the Tuva Project with anything:
+dispatch:
+  - macro_namespace: dbt
+    search_order: [ 'readmissions', 'dbt']
 ```
 
-### (Optional) Step 5:  Change build schema and database
+After completing the above steps you’re ready to run your project.
 
-By default, this package will build all models in a database called `Tuva` schema names reflect the package that created them.  This behavior can be altered at two grains:  for all packages or for each individual package.
+- Run `dbt deps` to install the package
+- Run `dbt build` to run the entire project
 
-Variables that start with `tuva` are configurations for all packages.  The database can be altered and a prefix added to the default schema.
+You now have all the Tuva tables in your database and are ready to do analytics!
 
-Variables that start with the package name (e.g. `readmissions`) are configurations for just that package.  The database and schema can be altered for all models in that particular package.
-
-These changes are made by adding the respective variables to your `dbt_project.yml`:
-
-```yaml
-vars:
-  tuva_database: tuva                              # configuration for all packages
-  tuva_schema_prefix: testing                      # configuration for all packages
-
-  chronic_conditions_database: tuva                # configuration for the specific package
-  chronic_conditions_schema: chronic_conditions    # configuration for the specific package
-  claims_preprocessing_database: tuva              # configuration for the specific package
-  claims_preprocessing_schema: core                # configuration for the specific package
-  data_profiling_database: tuva                    # configuration for the specific package
-  data_profiling_schema: data_profiling            # configuration for the specific package
-  readmissions_database: tuva                      # configuration for the specific package
-  readmissions_schema: readmissions                # configuration for the specific package
-  terminology_database: tuva                       # configuration for the specific package
-  terminology_schema: terminology                  # configuration for the specific package
-```
-
-### (Optional) Step 6:  Additional configurations
-<details>
-<summary> Expand for details </summary>
-    
-**Modifying a model alias, materialization, and tags**
-    
-All model-level configurations for a package are in `_models.yml`.  Only a few settings should be altered within this file:
-    
-- [Custom aliases](https://docs.getdbt.com/docs/build/custom-aliases) - An override of the model name, creating a clearer table name.
-- [Tags](https://docs.getdbt.com/reference/resource-configs/tags) - A categorization and organization of models
-- [Materialization](https://docs.getdbt.com/docs/build/materializations) - Pre-configure based on internal testing of query performance
-    
-> NOTE: The [enabled](https://docs.getdbt.com/reference/resource-configs/enabled) property has also been set within the model.sql file due to limitations with dbt.
->
-</details>
-
-## 🤹🏽 **Does this package have dependencies?**
-
-This dbt package is dependent on the following dbt packages. For more information on the below packages, refer to the [dbt hub](https://hub.getdbt.com/) site.
-
-> If you have any of these dependent packages in your own `packages.yml` we highly recommend removing them to ensure there are no package version conflicts.
-> 
-
-```
-packages:
-  - package: dbt-labs/dbt_utils
-    version: [">=0.8.0", "<0.9.0"]
-  - package: tuva-health/chronic_conditions
-    version: [">=0.1.0"]
-  - package: tuva-health/claims_preprocessing
-    version: [">=0.1.0"]
-  - package: tuva-health/data_profiling
-    version: [">=0.1.0"]
-  - package: tuva-health/readmissions
-    version: [">=0.1.0"]
-  - package: tuva-health/terminology
-    version: [">=0.1.0"]
-```
-
-## 🙋🏻‍♀️ **How is this package maintained and can I contribute?**
-
-### **Package Maintenance**
+## 🙋🏻‍♀️ ****How is this package maintained and how do I contribute?****
 
 The Tuva Project team maintaining this package **only** maintains the latest version of the package. We highly recommend you stay consistent with the latest version.
 
-### Contributions
+Have an opinion on the mappings? Notice any bugs when installing and running the package? If so, we highly encourage and welcome feedback! While we work on a formal process in Github, we can be easily reached in our Slack community.
 
-Have an opinion on the mappings? Notice any bugs when installing and running the package?
-If so, we highly encourage and welcome feedback!  While we work on a formal process in Github, we can be easily reached in our Slack community.
+## 🤝 Join our community!
 
-## 🤝 Community
-
-Join our growing community of healthcare data practitioners on [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)!
+Join our growing community of healthcare data practitioners in [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)!
