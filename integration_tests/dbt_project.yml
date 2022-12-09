@@ -2,34 +2,30 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: 'default'
+profile: 'default_redshift'
 
 
 
 vars:
 
 ## optional output config option 1 (all tuva packages)
-#  tuva_database: tuva
-#  tuva_schema_prefix: test
-
-## optional output config option 2 (package specific config), overrides option 1
-#  claims_preprocessing_database: tuva
-#  claims_preprocessing_schema: test_claims_preprocessing
+  tuva_database: tuva
+  tuva_schema_prefix: test1
 
 
-## optional input config 1
-  claims_input_eligibility_override: "{{source('claims_input','eligibility')}}"
-  claims_input_medical_claim_override: "{{source('claims_input','medical_claim')}}"
-  claims_input_pharmacy_claim_override: "{{source('claims_input','pharmacy_claim')}}"
+## optional input config
+  eligibility_override: "{{source('claims_input','eligibility')}}"
+  medical_claim_override: "{{source('claims_input','medical_claim')}}"
+  pharmacy_claim_override: "{{source('claims_input','pharmacy_claim')}}"
 
-## optional input config 2
-#  claims_preprocessing_eligibility_override: "{{ref('eligibility')}}"
-#  claims_preprocessing_medical_claim_override: "{{ref('medical_claim')))}}"
-#  claims_preprocessing_pharmacy_claim_override: "{{ref('pharmacy_claim')}}"
 
 ### optional overrides for sources only for integration_tests
 #  claims_preprocessing_input_database: tuva
 #  claims_preprocessing_input_schema: test_claims_input
+#  data_profiling_input_database: tuva
+#  data_profiling_input_schema: test_claims_input
+
+
 
 
 model-paths: ["models"]
@@ -39,8 +35,10 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+
+
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 

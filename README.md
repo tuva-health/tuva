@@ -117,7 +117,7 @@ vars:
 # of the Tuva Project with anything:
 dispatch:
   - macro_namespace: dbt
-    search_order: [ 'readmissions', 'dbt']
+    search_order: [ 'the_tuva_project', 'dbt']
 ```
 
 After completing the above steps you’re ready to run your project.
