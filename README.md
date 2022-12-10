@@ -3,11 +3,11 @@
 
 To understand what this dbt package does, we must first understand what The Tuva Project is. The Tuva Project is a collection of dbt packages that builds healthcare concepts (measures, groupers, data quality tests) on top of your raw healthcare claims data. Currently, the Tuva Project consists of the following 5 dbt packages, each of which is a separate GitHub repo that does something specific:
 
-- `data_profiling`: Runs data quality tests to check for common problems specific to healthcare claims data.
-- `claims_preprocessing`: Groups overlapping claims into a single encounter, assigns every claim to 1 of 18 different encounter types and populates core concept tables.
-- `chronic_conditions`: Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
-- `readmissions`: Calculates hospital readmission measures.
-- `terminology`: Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
+- [data_profiling](https://github.com/tuva-health/data_profiling): Runs data quality tests to check for common problems specific to healthcare claims data.
+- [claims_preprocessing](https://github.com/tuva-health/claims_preprocessing): Groups overlapping claims into a single encounter, assigns every claim to 1 of 18 different encounter types and populates core concept tables.
+- [chronic_conditions](https://github.com/tuva-health/chronic_conditions): Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
+- [readmissions](https://github.com/tuva-health/readmissions): Calculates hospital readmission measures.
+- [terminology](https://github.com/tuva-health/terminology): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
 
 It is possible to run any one of these packages in isolation. For example, if you are only interested in calculating readmission measures, you may run the `readmissions` package without having to run any other package. Each of the above dbt packages (except `terminology`, which does not need input data to run) has its own input layer, which consists of a set of specific tables with specific columns in them. Each package uses the raw data in its input layer as a starting point and then builds healthcare concepts with it. The input layer for each package contains the minimum necessary data elements required for the package to do what it needs to do. The description of the input layer for each package is found in the package’s README. To run any of these packages, the basic idea is the same:
 
