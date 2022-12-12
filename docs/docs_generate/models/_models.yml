@@ -1,0 +1,370 @@
+version: 2
+
+models:
+  - name: eligibility
+    config:
+      database: tuva
+      schema: the_tuva_project_input
+    description: > 
+     The eligibility table includes information about a patient's health insurance coverage and demographics (note: we use the word patient as a synonym for member). Every claims dataset should include some sort of eligibility data, otherwise it's impossible to calculate member months, which are needed to calculate measures like PMPM.
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: gender
+        description: Biological sex of the patient.
+      - name: race
+        description: Race of the patient.
+      - name: birth_date
+        description: Date the patient was born.
+      - name: death_date
+        description: Date the patient died.
+      - name: death_flag
+        description: Indicates whether the patient has died.
+      - name: enrollment_start_date
+        description: Date the patient's insurance eligibility began.
+      - name: enrollment_end_date
+        description: Date the patient's insurance eligibility ended.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: payer_type
+        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
+      - name: dual_status_code
+        description: Indicates whether the patient is dually eligible for Medicare and Medicaid.
+      - name: medicare_status_code
+        description: Indicates how the patient became eligible for Medicare.
+      - name: first_name
+        description: Patient's first name.
+      - name: last_name
+        description: Patient's last name.
+      - name: address
+        description: Patient's street address.
+      - name: city
+        description: Patient's city of address.
+      - name: state
+        description: State the patient lives in (most recent known address)
+      - name: zip_code
+        description: Zip code the patient lives in (most recent known address).
+      - name: phone
+        description: Patient's phone number.
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
+
+  - name: medical_claim
+    config:
+      database: tuva
+      schema: the_tuva_project_input
+    description: > 
+     The medical_claim table contains information on healthcare services and supplies provided to patients, billed by providers, and paid for by health insurers. It includes information on the provider who rendered the service, the amount paid for the service by the health insurer, and the underlying reason for the service (i.e. diagnosis).
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: Indicates the line number for the particular line of the claim.
+      - name: claim_type
+        description: Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: claim_start_date
+        description: Start date for the claim.
+      - name: claim_end_date
+        description: End date for the claim.
+      - name: claim_line_start_date
+        description: Start date for the claim line.
+      - name: claim_line_end_date
+        description: End date for the claim line.
+      - name: admission_date
+        description: Admission date for the claim (inpatient claims only).
+      - name: discharge_date
+        description: Discharge date for the claim (inpatient claims only).
+      - name: admit_source_code
+        description: Indicates where the patient was before the healthcare encounter (inpatient claims only).
+      - name: admit_type_code
+        description: Indicates the type of admission (inpatient claims only).
+      - name: discharge_disposition_code
+        description: Indicates the type of setting the patient was discharged to (institutional inpatient claims only).
+      - name: place_of_service_code
+        description: Place of service for the claim (professional claims only).
+      - name: bill_type_code
+        description: Bill type code for the claim (institutional claims only).
+      - name: ms_drg_code
+        description: MS-DRG for the claim (inpatient claims only).
+      - name: revenue_center_code
+        description: Revenue center code for the claim line (institutional only and typically multiple codes per claim).
+      - name: service_unit_quantity
+        description: The number of units for the particular revenue center code.
+      - name: hcpcs_code
+        description: HCPCS level 1 or level 2 code for the claim line.
+      - name: hcpcs_modifier_1
+        description: 1st modifier for HCPCS code.
+      - name: hcpcs_modifier_2
+        description: 2nd modifier for HCPCS code.
+      - name: hcpcs_modifier_3
+        description: 3rd modifier for HCPCS code.
+      - name: hcpcs_modifier_4
+        description: 4th modifier for HCPCS code.
+      - name: hcpcs_modifier_5
+        description: 5th modifier for HCPCS code.
+      - name: rendering_npi
+        description: Rendering NPI for the claim (typically represents the physician or entity providing services).
+      - name: billing_npi
+        description: Billing NPI for the claim (typically represents organization billing the claim).
+      - name: facility_npi
+        description: Facility NPI for the claim (typically represents the facility where services were performed).
+      - name: paid_date
+        description: The date the claim was paid.
+      - name: paid_amount
+        description: The total amount paid on the claim by the insurer.
+      - name: allowed_amount
+        description: The total amount allowed (includes amount paid by the insurer and patient) on the claim.
+      - name: charge_amount
+        description: The total amount charged on the claim by the provider.
+      - name: diagnosis_code_type
+        description: Indicates the type of diagnosis code (e.g. ICD-10-CM).
+      - name: diagnosis_code_1
+        description: 1st ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_2
+        description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_3
+        description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_4
+        description: 4th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_5
+        description: 5th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_6
+        description: 6th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_7
+        description: 7th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_8
+        description: 8th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_9
+        description: 9th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_10
+        description: 10th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_11
+        description: 11th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_12
+        description: 12th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_13
+        description: 13th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_14
+        description: 14th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_15
+        description: 15th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_16
+        description: 16th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_17
+        description: 17th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_18
+        description: 18th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_19
+        description: 19th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_20
+        description: 20th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_21
+        description: 21st ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_22
+        description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_23
+        description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_24
+        description: 24th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_25
+        description: 25th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_poa_1
+        description: Present on admission code for the 1st diagnosis on the claim.
+      - name: diagnosis_poa_2
+        description: Present on admission code for the 2nd diagnosis on the claim.
+      - name: diagnosis_poa_3
+        description: Present on admission code for the 3rd diagnosis on the claim.
+      - name: diagnosis_poa_4
+        description: Present on admission code for the 4th diagnosis on the claim.
+      - name: diagnosis_poa_5
+        description: Present on admission code for the 5th diagnosis on the claim.
+      - name: diagnosis_poa_6
+        description: Present on admission code for the 6th diagnosis on the claim.
+      - name: diagnosis_poa_7
+        description: Present on admission code for the 7th diagnosis on the claim.
+      - name: diagnosis_poa_8
+        description: Present on admission code for the 8th diagnosis on the claim.
+      - name: diagnosis_poa_9
+        description: Present on admission code for the 9th diagnosis on the claim.
+      - name: diagnosis_poa_10
+        description: Present on admission code for the 10th diagnosis on the claim.
+      - name: diagnosis_poa_11
+        description: Present on admission code for the 11th diagnosis on the claim.
+      - name: diagnosis_poa_12
+        description: Present on admission code for the 12th diagnosis on the claim.
+      - name: diagnosis_poa_13
+        description: Present on admission code for the 13th diagnosis on the claim.
+      - name: diagnosis_poa_14
+        description: Present on admission code for the 14th diagnosis on the claim.
+      - name: diagnosis_poa_15
+        description: Present on admission code for the 15th diagnosis on the claim.
+      - name: diagnosis_poa_16
+        description: Present on admission code for the 16th diagnosis on the claim.
+      - name: diagnosis_poa_17
+        description: Present on admission code for the 17th diagnosis on the claim.
+      - name: diagnosis_poa_18
+        description: Present on admission code for the 18th diagnosis on the claim.
+      - name: diagnosis_poa_19
+        description: Present on admission code for the 19th diagnosis on the claim.
+      - name: diagnosis_poa_20
+        description: Present on admission code for the 20th diagnosis on the claim.
+      - name: diagnosis_poa_21
+        description: Present on admission code for the 21st diagnosis on the claim.
+      - name: diagnosis_poa_22
+        description: Present on admission code for the 22nd diagnosis on the claim.
+      - name: diagnosis_poa_23
+        description: Present on admission code for the 23rd diagnosis on the claim.
+      - name: diagnosis_poa_24
+        description: Present on admission code for the 24th diagnosis on the claim.
+      - name: diagnosis_poa_25
+        description: Present on admission code for the 25th diagnosis on the claim.
+      - name: procedure_code_type
+        description: Indicates the type of procedure code (e.g. ICD-10-PCS).
+      - name: procedure_code_1
+        description: 1st ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_2
+        description: 2nd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_3
+        description: 3rd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_4
+        description: 4th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_5
+        description: 5th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_6
+        description: 6th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_7
+        description: 7th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_8
+        description: 8th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_9
+        description: 9th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_10
+        description: 10th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_11
+        description: 11th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_12
+        description: 12th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_13
+        description: 13th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_14
+        description: 14th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_15
+        description: 15th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_16
+        description: 16th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_17
+        description: 17th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_18
+        description: 18th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_19
+        description: 19th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_20
+        description: 20th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_21
+        description: 21st ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_22
+        description: 22nd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_23
+        description: 23rd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_24
+        description: 24th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_25
+        description: 25th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_date_1
+        description: Date of the 1st procedure on the claim.
+      - name: procedure_date_2
+        description: Date of the 2nd procedure on the claim.
+      - name: procedure_date_3
+        description: Date of the 3rd procedure on the claim.
+      - name: procedure_date_4
+        description: Date of the 4th procedure on the claim.
+      - name: procedure_date_5
+        description: Date of the 5th procedure on the claim.
+      - name: procedure_date_6
+        description: Date of the 6th procedure on the claim.
+      - name: procedure_date_7
+        description: Date of the 7th procedure on the claim.
+      - name: procedure_date_8
+        description: Date of the 8th procedure on the claim.
+      - name: procedure_date_9
+        description: Date of the 9th procedure on the claim.
+      - name: procedure_date_10
+        description: Date of the 10th procedure on the claim.
+      - name: procedure_date_11
+        description: Date of the 11th procedure on the claim.
+      - name: procedure_date_12
+        description: Date of the 12th procedure on the claim.
+      - name: procedure_date_13
+        description: Date of the 13th procedure on the claim.
+      - name: procedure_date_14
+        description: Date of the 14th procedure on the claim.
+      - name: procedure_date_15
+        description: Date of the 15th procedure on the claim.
+      - name: procedure_date_16
+        description: Date of the 16th procedure on the claim.
+      - name: procedure_date_17
+        description: Date of the 17th procedure on the claim.
+      - name: procedure_date_18
+        description: Date of the 18th procedure on the claim.
+      - name: procedure_date_19
+        description: Date of the 19th procedure on the claim.
+      - name: procedure_date_20
+        description: Date of the 20th procedure on the claim.
+      - name: procedure_date_21
+        description: Date of the 21st procedure on the claim.
+      - name: procedure_date_22
+        description: Date of the 22nd procedure on the claim.
+      - name: procedure_date_23
+        description: Date of the 23rd procedure on the claim.
+      - name: procedure_date_24
+        description: Date of the 24th procedure on the claim.
+      - name: procedure_date_25
+        description: Date of the 25th procedure on the claim.
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
+
+  - name: pharmacy_claim
+    config:
+      database: tuva
+      schema: the_tuva_project_input
+    description: >
+      The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled by a patient, billed by a pharmacy, and paid by an insurer.
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: Indicates the line number for the particular line of the claim.
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: prescribing_provider_npi
+        description: NPI for the provider that wrote the prescription (e.g. priamry care physician).
+      - name: dispensing_provider_npi
+        description: NPI for the provider that dispensed the prescription (e.g. pharmacy).
+      - name: dispensing_date
+        description: Date the prescription was filled.
+      - name: ndc_code
+        description: National drug code on the claim.
+      - name: quantity
+        description: Number of doses.
+      - name: days_supply
+        description: Number of days supply.
+      - name: refills
+        description: Number of refills for the prescription.
+      - name: paid_date
+        description: Date the claim was paid.
+      - name: paid_amount
+        description: Amount paid by the health insurer for the claim.
+      - name: allowed_amount
+        description: Contractual amount allowed to be paid by the payer + patient.
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").

@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: claims_input
+    database: "{{ var('claims_preprocessing_input_database','tuva') }}"
+    schema:  "{{ var('claims_preprocessing_input_schema','claims_input') }}"
+    tables:
+      - name: medical_claim
+      - name: eligibility
+      - name: pharmacy_claim
+
