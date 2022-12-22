@@ -1,11 +1,14 @@
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.2.x&color=orange)
+# The Tuva Project
 ## 🧰 What does this dbt package do?
 
 To understand what this dbt package does, we must first understand what The Tuva Project is. The Tuva Project is a collection of dbt packages that builds healthcare concepts (measures, groupers, data quality tests) on top of your raw healthcare claims data. Currently, the Tuva Project consists of the following 5 dbt packages, each of which is a separate GitHub repo that does something specific:
 
 - [data_profiling](https://github.com/tuva-health/data_profiling): Runs data quality tests to check for common problems specific to healthcare claims data.
 - [claims_preprocessing](https://github.com/tuva-health/claims_preprocessing): Groups overlapping claims into a single encounter, assigns every claim to 1 of 18 different encounter types and populates core concept tables.
-- [chronic_conditions](https://github.com/tuva-health/chronic_conditions): Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
+- [cms_chronic_conditions](https://github.com/tuva-health/chronic_conditions): Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
+- [tuva_chronic_conditions](https://github.com/tuva-health/tuva_chronic_conditions): implements a chronic condition grouper created by the Tuva Project which creates ~40 homogeneous and mutually exclusive chronic condition groups on your patient.
+- [pmpm](https://github.com/tuva-health/pmpm): Calculates spend and utilization metrics for your patient population on a per-member-per-month basis.
 - [readmissions](https://github.com/tuva-health/readmissions): Calculates hospital readmission measures.
 - [terminology](https://github.com/tuva-health/terminology): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
 
@@ -63,11 +66,14 @@ To tell the `the_tuva_project` package where to find the necessary input tables,
 # need to set the relevant variable(s) to 'false':
 vars:
   tuva_packages_enabled: true  
-  data_profiling_enabled: true  
+ 
   claims_preprocessing_enabled: true
-  chronic_conditions_enabled: true
+  cms_chronic_conditions_enabled: true
+  data_profiling_enabled: true 
+  pmpm_enabled: true
   readmissions_enabled: true
   terminology_enabled: true
+  tuva_chronic_conditions_enabled: true
 
 # These variables point to the 3 input tables you created 
 # in your dbt project which constitutes the
@@ -98,17 +104,20 @@ vars:
 # that is part of the Tuva Project to a database
 # or schema different than the default names we
 # suggest here, change the name here:
-  data_profiling_database: tuva
-  data_profiling_schema: data_profiling
   claims_preprocessing_database: tuva
   claims_preprocessing_schema: core
-  chronic_conditions_database: tuva
-  chronic_conditions_schema: chronic_conditions
+  cms_chronic_conditions_database: tuva
+  cms_chronic_conditions_schema: chronic_conditions
+  data_profiling_database: tuva
+  data_profiling_schema: data_profiling
+  pmpm_database: tuva
+  pmpm_schema: pmpm
   readmissions_database: tuva
   readmissions_schema: readmissions
   terminology_database: tuva
   terminology_schema: terminology
-
+  tuva_chronic_conditions_database: tuva
+  tuva_chronic_conditions_schema: pmpm
       
 
 # By default, dbt prefixes schema names with the target 
