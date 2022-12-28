@@ -54,7 +54,7 @@ To import the `the_tuva_project` package, you need to include the following in y
 ```yaml
 packages:
   - package: tuva-health/the_tuva_project
-    version: 0.2.1
+    version: 0.2.3
 ```
 
 To tell the `the_tuva_project` package where to find the necessary input tables, what databases and schemas to dump its output into, and what subset of the Tuva Project to run, you must add the following in your `dbt_project.yml:`
