@@ -107,7 +107,7 @@ vars:
   claims_preprocessing_database: tuva
   claims_preprocessing_schema: core
   cms_chronic_conditions_database: tuva
-  cms_chronic_conditions_schema: chronic_conditions
+  cms_chronic_conditions_schema: cms_chronic_conditions
   data_profiling_database: tuva
   data_profiling_schema: data_profiling
   pmpm_database: tuva
@@ -117,8 +117,8 @@ vars:
   terminology_database: tuva
   terminology_schema: terminology
   tuva_chronic_conditions_database: tuva
-  tuva_chronic_conditions_schema: pmpm
-      
+  tuva_chronic_conditions_schema: tuva_chronic_conditions
+
 
 # By default, dbt prefixes schema names with the target 
 # schema in your profile. We recommend including this 
