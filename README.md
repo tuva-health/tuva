@@ -1,5 +1,6 @@
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.2.x&color=orange)
 # The Tuva Project
+
 ## 🧰 What does this dbt package do?
 
 To understand what this dbt package does, we must first understand what The Tuva Project is. The Tuva Project is a collection of dbt packages that builds healthcare concepts (measures, groupers, data quality tests) on top of your raw healthcare claims data. Currently, the Tuva Project consists of the following 7 dbt packages, each of which is a separate GitHub repo that does something specific:
