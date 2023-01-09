@@ -8,7 +8,7 @@ To understand what this dbt package does, we must first understand what The Tuva
 - [claims_preprocessing](https://github.com/tuva-health/claims_preprocessing): Groups overlapping claims into a single encounter, assigns every claim to 1 of 15 different encounter types and populates core concept tables.
 - [cms_chronic_conditions](https://github.com/tuva-health/chronic_conditions): Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
 - [tuva_chronic_conditions](https://github.com/tuva-health/tuva_chronic_conditions): implements a chronic condition grouper created by the Tuva Project which creates ~40 homogeneous and mutually exclusive chronic condition groups on your patient.
-- [pmpm](https://github.com/tuva-health/pmpm): Calculates spend and utilization metrics for your patient population on a per-member-per-month basis.
+- [pmpm](https://github.com/tuva-health/pmpm): Calculates spend and utilization metrics for your patient population on a per-member-per-month (pmpm) basis.
 - [readmissions](https://github.com/tuva-health/readmissions): Calculates hospital readmission measures.
 - [terminology](https://github.com/tuva-health/terminology): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
 
