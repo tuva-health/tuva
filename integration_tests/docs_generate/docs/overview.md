@@ -1,5 +1,5 @@
 {% docs __overview__ %}
-# The Tuva Project
+# 🌎 The Tuva Project
 ## 🧰 What is The Tuva Project?
 
 Healthcare data is messy, and working with it is hard!  Analytics teams spend countless hours ingesting, cleaning and transforming healthcare data in order to get it ready for analytics and machine learning. Healthcare knowledge and code are siloed; countless institutions are wasting hours duplicating the same work, and when mistakes are made or issues are missed, the insights gained from the analytics have little value.
