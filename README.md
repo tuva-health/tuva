@@ -33,7 +33,9 @@ This package supports dbt version `1.2.x` or higher.
 
 ### Step 1: Map Your Claims Data to the Tuva Claims Data Model
 
-In step 1 you need to map your claims data to the Tuva Claims Data Model.  You need to create each of these tables as models within your dbt project so that the Tuva Project dbt package can reference them using ref() functions.  The Tuva Claims Data Model consists of 3 tables: 
+The first step is mapping your claims data to the Tuva Claims Data Model.  You can map your claims data to the Tuva Claims Data Model yourself (i.e. by writing SQL inside your dbt project).  Or if you have Medicare CCLF or Medicare SAF (LDS) claims data you can use our connectors, which are separate repos that you can find on our GitHub page.  You need to create each of the tables in the Tuva Claims Data Model as models within your dbt project so that the Tuva Project dbt package can reference them using ref() functions.
+
+The Tuva Claims Data Model consists of 3 tables: 
 - [medical_claim](https://tuva-health.github.io/the_tuva_project/#!/model/model.the_tuva_project_input.medical_claim)
 - [pharmacy_claim](https://tuva-health.github.io/the_tuva_project/#!/model/model.the_tuva_project_input.pharmacy_claim)
 - [eligibility](https://tuva-health.github.io/the_tuva_project/#!/model/model.the_tuva_project_input.eligibility)
