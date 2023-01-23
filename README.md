@@ -48,7 +48,7 @@ In step 2 you need to import the `the_tuva_project` dbt package.  To import the 
 ```yaml
 packages:
   - package: tuva-health/the_tuva_project
-    version: 0.2.4
+    version: 0.2.5
 ```
 
 
