@@ -88,12 +88,11 @@ Data Profiling is the process of examining and analyzing your data to gain insig
 
 Data Profiling produces 3 detail tables that provide row-level data quality insights for your mapped Claims Data Model models, and a summary table that provides a high level overview into all three tables.    
 
-| Table                                                                                                    | Definition                                                                                                                 |
-|----------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------|
-| [claim_summary](#!/model/model.data_profiling.data_profiling__claim_summary#description)                 | A table that summarizes the data quality issues in `medical_claim`, `pharmacy_claim`, and `eligibility`                    |
-| [eligibility_detail](#!/model/model.data_profiling.data_profiling__eligibility_detail#description)       | A table with the keys to link to `eligibiltiy` and flags indicating whether or not that row failed data quality checks    |
-| [medical_claim_detail](#!/model/model.data_profiling.data_profiling__medical_claim_detail#description)   | A table with the keys to link to `medical_claim` and flags indicating whether or not that row failed data quality checks  |
-| [pharmacy_claim_detail](#!/model/model.data_profiling.data_profiling__pharmacy_claim_detail#description) | A table with the keys to link to `pharmacy_claim` and flags indicating whether or not that row failed data quality checks |
+| Table                                                                                  | Definition                                                                                                                          |
+|----------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| [summary](#!/model/model.data_profiling.data_profiling__summary#description)           | A high level table that summarizes and aggregates the data quality issues in `medical_claim`, `pharmacy_claim`, and `eligibility`   |
+| [test_detail](#!/model/model.data_profiling.data_profiling__test_detail#description)   | A table detailing every failed claim or eligibility record with details on the tests that failed and links back to the source table |
+| [test_results](#!/model/model.data_profiling.data_profiling__test_results#description) | A table that shows pass/fail counts and percentages for every test on every input table                                             |
 
   
 
