@@ -19,4 +19,4 @@ select patient_id
        ,zip_code
        ,phone
        ,data_source
-from tuva_claims_demo_sample.claims_common.eligibility
+from tuva_claims_demo_sample.claims_data_model.eligibility
