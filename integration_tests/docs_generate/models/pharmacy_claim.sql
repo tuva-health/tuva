@@ -14,4 +14,4 @@ select
     , paid_amount
     , allowed_amount
     , data_source
-from tuva_claims_demo_sample.claims_common.pharmacy_claim
+from tuva_claims_demo_sample.claims_data_model.pharmacy_claim
