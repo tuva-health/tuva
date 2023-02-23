@@ -15,6 +15,7 @@ select claim_id
        ,place_of_service_code
        ,bill_type_code
        ,ms_drg_code
+       ,apr_drg_code
        ,revenue_center_code
        ,service_unit_quantity
        ,hcpcs_code
@@ -133,4 +134,4 @@ select claim_id
        ,procedure_date_24
        ,procedure_date_25
        ,data_source
-from tuva_claims_demo_sample.claims_common.medical_claim
+from tuva_claims_demo_sample.claims_data_model.medical_claim
