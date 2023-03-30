@@ -29,6 +29,7 @@ select claim_id
        ,facility_npi
        ,paid_date
        ,paid_amount
+       ,total_cost_amount
        ,allowed_amount
        ,charge_amount
        ,diagnosis_code_type

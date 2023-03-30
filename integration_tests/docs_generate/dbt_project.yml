@@ -26,6 +26,7 @@ clean-targets:
   - "../dbt_packages"
 
 models:
+  +bind: false
   claims_data_model:
     +materialized: view
     +docs:
