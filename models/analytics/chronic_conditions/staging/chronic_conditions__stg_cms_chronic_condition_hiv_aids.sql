@@ -4,7 +4,7 @@
 
 with chronic_conditions as (
 
-    select * from {{ ref('cms_chronic_conditions__cms_chronic_conditions_hierarchy') }}
+    select * from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }}
     where condition = '{{ condition_filter }}'
 
 ),
@@ -19,8 +19,8 @@ patient_encounters as (
         , encounter.data_source
         , replace(condition.code,'.','') as condition_code
         , condition.code_type as condition_code_type
-    from {{ var('encounter') }} as encounter
-         left join {{ var('condition') }} as condition
+    from {{ ref('claims_preprocessing__encounter') }} as encounter
+         left join {{ ref('claims_preprocessing__condition') }} as condition
              on encounter.encounter_id = condition.encounter_id
 
 ),

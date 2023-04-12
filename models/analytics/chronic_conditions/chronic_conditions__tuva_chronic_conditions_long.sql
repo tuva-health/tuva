@@ -8,7 +8,7 @@ with condition_row_number as
         ,condition_date
         ,row_number() over(partition by patient_id, code order by condition_date asc) as rn_asc
         ,row_number() over(partition by patient_id, code order by condition_date desc) as rn_desc
-    from {{var('condition')}}
+    from {{ ref('claims_preprocessing__condition')}}
 )
 , patient_conditions as
 (
@@ -29,7 +29,7 @@ select
     ,h.condition
     ,min(first_diagnosis_date) as first_diagnosis_date
     ,max(last_diagnosis_date) as last_diagnosis_date
-from {{ref('tuva_chronic_conditions__tuva_chronic_conditions_hierarchy')}} h
+from {{ref('chronic_conditions__tuva_chronic_conditions_hierarchy')}} h
 inner join patient_conditions pc
     on h.icd_10_cm_code = pc.icd_10_cm
 group by 

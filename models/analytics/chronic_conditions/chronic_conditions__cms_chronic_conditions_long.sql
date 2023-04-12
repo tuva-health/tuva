@@ -3,17 +3,17 @@
 with conditions_unioned as (
 
     select *
-    from {{ ref('cms_chronic_conditions__stg_cms_chronic_condition_all') }}
+    from {{ ref('chronic_conditions__stg_cms_chronic_condition_all') }}
 
     union distinct
 
     select *
-    from {{ ref('cms_chronic_conditions__stg_cms_chronic_condition_hiv_aids') }}
+    from {{ ref('chronic_conditions__stg_cms_chronic_condition_hiv_aids') }}
 
     union distinct
 
     select *
-    from {{ ref('cms_chronic_conditions__stg_cms_chronic_condition_oud') }}
+    from {{ ref('chronic_conditions__stg_cms_chronic_condition_oud') }}
 
 )
 

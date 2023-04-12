@@ -32,7 +32,7 @@
 
 with chronic_conditions as (
 
-    select * from {{ ref('cms_chronic_conditions__cms_chronic_conditions_hierarchy') }}
+    select * from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }}
     where condition = '{{ condition_filter }}'
 
 ),
@@ -49,10 +49,10 @@ patient_encounters as (
         , condition.code_type as condition_code_type
         , replace(procedure.code,'.','') as procedure_code
         , procedure.code_type as procedure_code_type
-    from {{ var('encounter') }} as encounter
-         left join {{ var('condition') }} as condition
+    from {{ ref('claims_preprocessing__encounter') }} as encounter
+         left join {{ ref('claims_preprocessing__condition') }} as condition
              on encounter.encounter_id = condition.encounter_id
-         left join {{ var('procedure') }}  as procedure
+         left join {{ ref('claims_preprocessing__procedure') }}  as procedure
              on encounter.encounter_id = procedure.encounter_id
 
 ),
@@ -62,28 +62,14 @@ patient_encounters as (
     using the table_exists variable, otherwise it uses the actual table
 */
 patient_medications as (
-
-    {% if table_exists or project_name == 'data_profiling' %}
-
     select
         cast(null as varchar)  encounter_id,
           patient_id
         , cast(paid_date as date) as encounter_start_date
         , replace(ndc_code,'.','') as ndc_code
         , data_source
-    from {{ var('pharmacy_claim') }}
+    from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }}
 
-    {% else %}
-
-    select
-          cast(null as {{ dbt.type_string() }} ) as encounter_id
-        , cast(null as {{ dbt.type_string() }} ) as patient_id
-        , cast(null as date ) as encounter_start_date
-        , cast(null as {{ dbt.type_string() }} ) as ndc_code
-        , cast(null as {{ dbt.type_string() }} ) as data_source
-    limit 0
-
-    {% endif %}
 
 ),
 
@@ -158,7 +144,7 @@ inclusions_medication as (
 exclusions_other_chronic_conditions as (
 
     select distinct patient_id
-    from {{ ref('cms_chronic_conditions__stg_cms_chronic_condition_all') }}
+    from {{ ref('chronic_conditions__stg_cms_chronic_condition_all') }}
     where condition in (
           'Alcohol Use Disorders'
         , 'Drug Use Disorders'
