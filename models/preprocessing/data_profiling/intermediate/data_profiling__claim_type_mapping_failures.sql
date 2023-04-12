@@ -15,7 +15,7 @@ with claim_type_mapping as(
                 then 'professional'
             else null
         end as data_profiling_claim_type
-    from {{ ref('data_profiling__medical_claim') }} 
+    from {{ ref('input_layer__medical_claim') }} 
     )
 
 select

@@ -12,7 +12,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
-    from {{ ref('data_profiling__eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
     group by
         patient_id
     having count(distinct gender) > 1
@@ -25,7 +25,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
-    from {{ ref('data_profiling__eligibility') }} 
+    from {{ ref('input_layer__eligibility') }} 
     group by
         patient_id
     having count(distinct race) > 1
@@ -38,7 +38,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
-    from {{ ref('data_profiling__eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
     group by
         patient_id
     having count(distinct birth_date) > 1
@@ -51,7 +51,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
-    from {{ ref('data_profiling__eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
     group by
         patient_id
     having count(distinct death_date) > 1
@@ -64,7 +64,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
-    from {{ ref('data_profiling__eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
     where birth_date > death_date
     group by
         patient_id

@@ -13,7 +13,7 @@ with claim_start_date_after_claim_end_date as (
       , 'claim_id' as grain
       , claim_id
       , count(*) as counts
-  from {{ ref('data_profiling__medical_claim') }}
+  from {{ ref('input_layer__medical_claim') }}
   where claim_start_date > claim_end_date
   group by
       claim_id
@@ -27,7 +27,7 @@ with claim_start_date_after_claim_end_date as (
       , 'claim_id' as grain
       , claim_id
       , count(*) as counts
-  from {{ ref('data_profiling__medical_claim') }}
+  from {{ ref('input_layer__medical_claim') }}
   where claim_type = 'institutional'
   and admission_date > discharge_date
   group by
