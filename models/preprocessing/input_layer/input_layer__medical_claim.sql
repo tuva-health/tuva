@@ -9,6 +9,6 @@
 
 
 select *
-from {{ var('medical_claim')}}
+from {{ ref('medical_claim')}}
 
 

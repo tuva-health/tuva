@@ -13,7 +13,7 @@ select
   cast( {{ dbt.date_trunc( "month", "enrollment_start_date") }} as date)   as floor_enrollment_start_date,
   cast( {{ dbt.last_day("enrollment_end_date", "month") }} as date)    as ceil_enrollment_end_date
 
-from {{ var('eligibility') }}
+from {{ ref('claims_preprocessing__eligibility_enhanced') }}
 where patient_id is not null
 and enrollment_start_date is not null
 and enrollment_end_date is not null
@@ -25,14 +25,14 @@ all_claim_dates as (
 select
   claim_start_date as claim_date,
   patient_id as patient_id
-from {{ var('medical_claim') }}
+from {{ ref('claims_preprocessing__medical_claim_enhanced') }}
 
 union all
 
 select
   dispensing_date as claim_date,
   patient_id as patient_id
-from {{ var('pharmacy_claim') }}
+from {{ var('claims_preprocessing__pharmacy_claim_enhanced') }}
 ),
 
 

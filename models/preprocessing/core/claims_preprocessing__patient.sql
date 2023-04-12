@@ -34,7 +34,7 @@ with patient_stage as(
         ,row_number() over (
 	    partition by patient_id
 	    order by enrollment_end_date DESC) as row_sequence
-    from {{ ref('claims_preprocessing__eligibility')}}
+    from {{ ref('input_layer__eligibility')}}
 )
 
 select

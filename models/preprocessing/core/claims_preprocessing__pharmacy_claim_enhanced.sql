@@ -17,4 +17,4 @@
 
 
 select *
-from {{ ref('claims_preprocessing__pharmacy_claim') }} 
+from {{ ref('input_layer__pharmacy_claim') }} 

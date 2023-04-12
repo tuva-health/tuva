@@ -9,6 +9,6 @@
 
 
 select *
-from {{ var('eligibility')}}
+from {{ ref('pharmacy_claim')}}
 
 

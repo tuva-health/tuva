@@ -10,7 +10,7 @@ with src as
               payer_type
               -- dual_status_code,
               -- medicare_status_code
-          from  {{ var('eligibility') }}
+          from  {{ ref('claims_preprocessing__eligibility_enhanced') }}
          )
 , months as (
     select 1 as month

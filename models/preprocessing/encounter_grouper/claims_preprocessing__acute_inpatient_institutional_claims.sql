@@ -24,7 +24,7 @@
 
 with room_and_board_requirement as (
 select distinct claim_id
-from 
+from {{ ref('input_layer__medical_claim') }} 
 where revenue_center_code in
   ('0100','0101',
    '0110','0111','0112','0113','0114','0116','0117','0118','0119',
@@ -43,7 +43,7 @@ where revenue_center_code in
 
 drg_requirement as (
 select distinct claim_id
-from {{ var('medical_claim') }} mc
+from {{ ref('input_layer__medical_claim') }} mc
 
 left join {{ ref('terminology__ms_drg')}} msdrg
 on mc.ms_drg_code = msdrg.ms_drg_code
@@ -58,7 +58,7 @@ where (msdrg.ms_drg_code is not null)
 
 bill_type_requirement as (
 select distinct claim_id
-from {{ var('medical_claim') }}
+from {{ ref('input_layer__medical_claim') }}
 where left(bill_type_code,2) in ('11','12') 
 ),
 
@@ -80,7 +80,7 @@ select
   mc.facility_npi,
   mc.claim_type
 
-from {{ var('medical_claim') }} mc
+from {{ ref('input_layer__medical_claim') }} mc
 
 inner join room_and_board_requirement rb
 on mc.claim_id = rb.claim_id

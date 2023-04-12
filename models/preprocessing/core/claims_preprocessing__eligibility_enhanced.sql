@@ -16,4 +16,4 @@
 
 
 select *
-from {{ ref('claims_preprocessing__eligibility') }} 
+from {{ ref('input_layer__eligibility') }} 
