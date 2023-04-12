@@ -19,7 +19,7 @@ select distinct
     cast(a.encounter_id as {{ dbt.type_string() }}) as encounter_id
 ,   cast(a.code as {{ dbt.type_string() }}) as diagnosis_code
 ,   cast(a.diagnosis_rank as integer) as diagnosis_rank
-from {{ var('condition') }} a
+from {{ ref('claims_preprocessing__condition') }} a
 inner join  acute_institutional_claims b
     on a.claim_id = b.claim_id
 where code_type = 'icd-10-cm'

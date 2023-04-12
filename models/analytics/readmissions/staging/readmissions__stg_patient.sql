@@ -13,6 +13,6 @@ select
     cast(gender as {{ dbt.type_string() }}) as gender,
     cast(birth_date as date) as birth_date
 
-from {{ var('patient') }}
+from {{ ref('claims_preprocessing__patient') }}
 
 

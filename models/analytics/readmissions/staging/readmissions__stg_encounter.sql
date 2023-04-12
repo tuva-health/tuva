@@ -15,5 +15,5 @@ select
     cast(facility_npi as {{ dbt.type_string() }}) as facility_npi,
     cast(ms_drg_code as {{ dbt.type_string() }}) as ms_drg_code,
     cast(paid_amount as numeric) as paid_amount    
-from {{ var('encounter') }}
+from {{ ref('claims_preprocessing__encounter') }}
 where encounter_type = 'acute inpatient'
