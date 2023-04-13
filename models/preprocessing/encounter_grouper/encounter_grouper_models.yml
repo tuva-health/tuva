@@ -6,11 +6,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_institutional_claims
     description: All acute inpatient institutional claim_ids with header values and data quality flags
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_institutional_claims
       tags: claims_preprocessing
       materialized: table
@@ -20,11 +16,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_data_quality_summary
     description: Summary of data quality issues with acute inpatient claims
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_data_quality_summary
       tags: claims_preprocessing
 
@@ -32,11 +24,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_institutional_encounter_id
     description: Assigns encounter_id to every acute inpatient institutional claim
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_institutional_encounter_id
       tags: claims_preprocessing
 
@@ -44,11 +32,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_encounter_start_and_end_dates
     description: Defines encounter start and end dates for acute inpatient encounters
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_encounter_start_and_end_dates
       tags: claims_preprocessing
       materialized: table
@@ -58,11 +42,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_professional_encounter_id
     description: Assigns encounter_id to every acute inpatient professional claim
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_professional_encounter_id
       tags: claims_preprocessing
       materialized: table
@@ -72,11 +52,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_encounter_id
     description: Fix encounter_id so each professional claim can only belong to one encounter
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_encounter_id
       tags: claims_preprocessing
 
@@ -84,11 +60,7 @@ models:
   - name: claims_preprocessing__acute_inpatient_claims_with_encounter_data
     description: Add all relevant encounter data to each acute inpatient claim_id
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_acute_inpatient_claims_with_encounter_data
       tags: claims_preprocessing
       materialized: table
@@ -97,10 +69,6 @@ models:
   - name: claims_preprocessing__encounter_data_for_medical_claims
     description: All encounter-related fields that will be added to medical_claim
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+      schema: claims_preprocessing
       alias: _intermediate_encounter_data_for_medical_claims
       tags: claims_preprocessing
