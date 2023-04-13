@@ -3,11 +3,7 @@ version: 2
 models:
   - name: pmpm__member_months
     config:
-      database: "{{ var('pmpm_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('pmpm_schema',None) != None -%}{{var('pmpm_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+      schema: pmpm
       alias: intermediate_member_months
       tags: pmpm
       materialized: table
@@ -33,13 +29,11 @@ models:
         description: Name of the payer (i.e. health insurer) providing coverage.
       - name: payer_type
         description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
+  
+  
   - name: pmpm__claim_spend_and_utilization
     config:
-      database: "{{ var('pmpm_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('pmpm_schema',None) != None -%}{{var('pmpm_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+      schema: pmpm
       alias: intermediate_claim_spend_and_utilization
       tags: pmpm
       materialized: table
@@ -59,13 +53,11 @@ models:
         description: This metric counts the number of claims over the given dimension for each member month.
       - name: spend
         description: This metric sums the paid_amounts or spend over the given dimension for each member month.
+  
+  
   - name: pmpm__pmpm_builder
     config:
-      database: "{{ var('pmpm_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('pmpm_schema',None) != None -%}{{var('pmpm_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+      schema: pmpm
       alias: pmpm_builder
       tags: pmpm
       materialized: table
@@ -89,11 +81,7 @@ models:
 
   - name: pmpm__pmpm_output
     config:
-      database: "{{ var('pmpm_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('pmpm_schema',None) != None -%}{{var('pmpm_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+      schema: pmpm
       alias: intermediate_pmpm_output
       tags: pmpm
       materialized: table
@@ -103,11 +91,7 @@ models:
 
   - name: pmpm__member_month_count
     config:
-      database: "{{ var('pmpm_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('pmpm_schema',None) != None -%}{{var('pmpm_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+      schema: pmpm
       alias: intermediate_member_month_count
       tags: pmpm
       materialized: table
@@ -117,11 +101,7 @@ models:
 
   - name: pmpm__pmpm_trends
     config:
-      database: "{{ var('pmpm_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('pmpm_schema',None) != None -%}{{var('pmpm_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+      schema: pmpm
       alias: pmpm_trends
       tags: pmpm
       materialized: table
