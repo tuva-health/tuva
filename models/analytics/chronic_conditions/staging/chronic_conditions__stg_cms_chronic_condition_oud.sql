@@ -1,6 +1,5 @@
 {{ config(enabled = var('cms_chronic_conditions_enabled',var('tuva_packages_enabled',True)) ) }}
 
---depends_on: {{ var('pharmacy_claim') }}
 
 {%- set condition_filter = 'Opioid Use Disorder (OUD)' -%}
 
@@ -16,19 +15,6 @@
     '68115068030'
     )
 -%}
-
-{#
-    Not all data sources have medications the below code block will set the
-    variable table_exists using the get_relation macro
-#}
-
-{%- set source_relation = adapter.get_relation(
-      database=var("input_database","tuva"),
-      schema=var("input_schema","core"),
-      identifier="pharmacy_claim"
-    ) -%}
-
-{%- set table_exists=source_relation is not none %}
 
 with chronic_conditions as (
 

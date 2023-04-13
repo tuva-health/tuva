@@ -32,7 +32,7 @@ union all
 select
   dispensing_date as claim_date,
   patient_id as patient_id
-from {{ var('claims_preprocessing__pharmacy_claim_enhanced') }}
+from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }}
 ),
 
 

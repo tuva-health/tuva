@@ -13,6 +13,8 @@ models:
         {% else %}core{%- endif -%}
       alias: _intermediate_acute_inpatient_institutional_claims
       tags: claims_preprocessing
+      materialized: table
+
 
 
   - name: claims_preprocessing__acute_inpatient_data_quality_summary
@@ -49,6 +51,8 @@ models:
         {% else %}core{%- endif -%}
       alias: _intermediate_acute_inpatient_encounter_start_and_end_dates
       tags: claims_preprocessing
+      materialized: table
+
 
 
   - name: claims_preprocessing__acute_inpatient_professional_encounter_id
@@ -61,6 +65,8 @@ models:
         {% else %}core{%- endif -%}
       alias: _intermediate_acute_inpatient_professional_encounter_id
       tags: claims_preprocessing
+      materialized: table
+
 
 
   - name: claims_preprocessing__acute_inpatient_encounter_id
@@ -85,6 +91,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _intermediate_acute_inpatient_claims_with_encounter_data
       tags: claims_preprocessing
+      materialized: table
 
 
   - name: claims_preprocessing__encounter_data_for_medical_claims

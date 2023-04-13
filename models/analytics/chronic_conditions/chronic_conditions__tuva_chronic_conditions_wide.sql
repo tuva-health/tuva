@@ -13,7 +13,7 @@ select
         , else_value= 0
         , quote_identifiers = False
       ) }}
-from {{ var('patient') }} p
+from {{ ref('claims_preprocessing__patient') }} p
 left join {{ ref('chronic_conditions__tuva_chronic_conditions_long') }} l
     on p.patient_id = l.patient_id
 left join condition_columns cc

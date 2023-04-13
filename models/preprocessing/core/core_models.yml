@@ -1,7 +1,21 @@
 version: 2
 
 models:
-  
+####  Intermediate
+  - name: claims_preprocessing__medical_claim_enhanced
+    description: Add all relevant encounter data to medical_claim_table
+    config:
+      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
+      schema: |
+        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
+        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _intermediate_medical_claim_enhanced
+      tags: claims_preprocessing
+      materialized: view
+
+
+####  Final
   - name: claims_preprocessing__medical_claim_core
     description: Core medical_claim table
     config:
@@ -12,6 +26,7 @@ models:
         {% else %}core{%- endif -%}
       alias: medical_claim
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -145,6 +160,7 @@ models:
         {% else %}core{%- endif -%}
       alias: encounter
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: encounter_id
         description: Unique identifier for an encounter.
@@ -270,6 +286,7 @@ models:
         {% else %}core{%- endif -%}
       alias: condition
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: encounter_id
         description: Unique encounter_id for each encounter.
@@ -314,6 +331,7 @@ models:
         {% else %}core{%- endif -%}
       alias: procedure
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: encounter_id
         description: The encounter_id for the encounter where this procedure was performed.
@@ -351,6 +369,7 @@ models:
         {% else %}core{%- endif -%}
       alias: pharmacy_claim
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -402,6 +421,7 @@ models:
         {% else %}core{%- endif -%}
       alias: eligibility
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
@@ -468,6 +488,7 @@ models:
         {% else %}core{%- endif -%}
       alias: provider
       tags: claims_preprocessing
+      materialized: table
     columns:
       - name: npi
         description: NPI for the provider.
