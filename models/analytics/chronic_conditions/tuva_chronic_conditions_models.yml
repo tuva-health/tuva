@@ -1,16 +1,12 @@
 version: 2
 
 models:
-    - name: tuva_chronic_conditions__tuva_chronic_conditions_long
+    - name: chronic_conditions__tuva_chronic_conditions_long
       description: > 
         This model creates one record per patient per condition using the tuva chronic conditions hierarchy 
         as the grouper. The model pulls in the first and last date of the diagnosis that flagged the patient for this condition group.
       config:
-        database: "{{ var('tuva_chronic_conditions_database',var('tuva_database','tuva')) }}"
-        schema: |
-          {%- if var('tuva_chronic_conditions_schema',None) != None -%}{{var('tuva_chronic_conditions_schema')}}
-          {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-          {% else %}chronic_conditions{%- endif -%}
+        schema: chronic_conditions
         alias: tuva_chronic_conditions_long
         tags: tuva_chronic_conditions
         materialized: table
@@ -32,14 +28,12 @@ models:
             description: The first date when a diagnosis code that rolls up to this condition was coded to this patient
           - name: last_diagnosis_date
             description: The last date when a diagnosis code that rolls up to this condition was coded to this patient
-    - name: tuva_chronic_conditions__tuva_chronic_conditions_wide
+
+
+    - name: chronic_conditions__tuva_chronic_conditions_wide
       description: This model creates one record per patient with flags for all the conditions in the tuva chronic conditions hierarchy. A patient will have a 1 in the column for a certain condition if they have every been coded with a diagnosis that rolls up to that condition and a 0 if not.
       config:
-        database: "{{ var('tuva_chronic_conditions_database',var('tuva_database','tuva')) }}"
-        schema: |
-          {%- if var('tuva_chronic_conditions_schema',None) != None -%}{{var('tuva_chronic_conditions_schema')}}
-          {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-          {% else %}chronic_conditions{%- endif -%}
+        schema: chronic_conditions
         alias: tuva_chronic_conditions_wide
         tags: tuva_chronic_conditions
         materialized: table

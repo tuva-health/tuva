@@ -1,13 +1,9 @@
 version: 2
 
 models:
-  - name: cms_chronic_conditions__cms_chronic_conditions_wide
+  - name: chronic_conditions__cms_chronic_conditions_wide
     config:
-      database: "{{ var('cms_chronic_conditions_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('cms_chronic_conditions_schema',None) != None -%}{{var('cms_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
+      schema: chronic_conditions
       alias: cms_chronic_conditions_wide
       tags: cms_chronic_conditions
       materialized: table
@@ -320,13 +316,10 @@ models:
           description: chronic condition flag 1 or 0
           data_type: boolean
 
-  - name: cms_chronic_conditions__cms_chronic_conditions_long
+
+  - name: chronic_conditions__cms_chronic_conditions_long
     config:
-      database: "{{ var('cms_chronic_conditions_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('cms_chronic_conditions_schema',None) != None -%}{{var('cms_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
+      schema: chronic_conditions
       alias: cms_chronic_conditions_long
       tags: cms_chronic_conditions
       materialized: table
@@ -379,13 +372,9 @@ models:
 
 ##### Stage
 
-  - name: cms_chronic_conditions__stg_cms_chronic_condition_all
+  - name: chronic_conditions__stg_cms_chronic_conditions_all
     config:
-      database: "{{ var('cms_chronic_conditions_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('cms_chronic_conditions_schema',None) != None -%}{{var('cms_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
+      schema: chronic_conditions
       alias: stg_cms_chronic_condition_all
       tags: cms_chronic_conditions
       materialized: table
@@ -427,13 +416,10 @@ models:
           description: >
             Indicates the name of the source dataset (e.g. Medicare Claims).
 
-  - name: cms_chronic_conditions__stg_cms_chronic_condition_hiv_aids
+
+  - name: chronic_conditions__stg_cms_chronic_conditions_hiv_aids
     config:
-      database: "{{ var('cms_chronic_conditions_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('cms_chronic_conditions_schema',None) != None -%}{{var('cms_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
+      schema: chronic_conditions
       alias: stg_cms_chronic_condition_hiv_aids
       tags: cms_chronic_conditions
       materialized: table
@@ -476,13 +462,9 @@ models:
           description: >
             Indicates the name of the source dataset (e.g. Medicare Claims).
 
-  - name: cms_chronic_conditions__stg_cms_chronic_condition_oud
+  - name: chronic_conditions__stg_cms_chronic_conditions_oud
     config:
-      database: "{{ var('cms_chronic_conditions_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('cms_chronic_conditions_schema',None) != None -%}{{var('cms_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
+      schema: chronic_conditions
       alias: stg_cms_chronic_condition_oud
       tags: cms_chronic_conditions
       materialized: table

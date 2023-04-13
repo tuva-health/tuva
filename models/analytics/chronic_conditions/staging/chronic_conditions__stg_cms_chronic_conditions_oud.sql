@@ -130,7 +130,7 @@ inclusions_medication as (
 exclusions_other_chronic_conditions as (
 
     select distinct patient_id
-    from {{ ref('chronic_conditions__stg_cms_chronic_condition_all') }}
+    from {{ ref('chronic_conditions__stg_cms_chronic_conditions_all') }}
     where condition in (
           'Alcohol Use Disorders'
         , 'Drug Use Disorders'

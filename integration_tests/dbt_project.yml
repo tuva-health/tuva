@@ -8,10 +8,6 @@ profile: 'default'
 
 vars:
 
-## optional output config option 1 (all tuva packages)
-  tuva_database: dev_thuxuan
-
-
 
 ### optional overrides for sources only for integration_tests
   claims_preprocessing_input_database: dev_ci_testing
@@ -42,5 +38,5 @@ models:
   integration_tests:
     +materialized: ephemeral
   the_tuva_project:
-    +database: dev_thuxuan
+    +database: tuva_test
   
