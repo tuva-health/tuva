@@ -3,9 +3,7 @@ version: 2
 seeds:
   - name: terminology__admit_source
     config:
-      database: "{{ var('terminology_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: terminology
       alias: admit_source
       enabled: |
         {%- if var('terminology_enabled',var('tuva_packages_enabled',True))  -%}{{ True | as_bool }}
@@ -23,11 +21,11 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         newborn_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__admit_type
     config:
-      database: "{{ var('terminology_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: terminology
       alias: admit_type
       enabled: |
         {%- if var('terminology_enabled',var('tuva_packages_enabled',True))  -%}{{ True | as_bool }}
@@ -43,11 +41,11 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         admit_type_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__bill_type
     config:
-      database: "{{ var('terminology_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: terminology
       alias: bill_type
       enabled: |
         {%- if var('terminology_enabled',var('tuva_packages_enabled',True))  -%}{{ True | as_bool }}
@@ -64,11 +62,11 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         deprecated : integer
         deprecated_date : date
+
+
   - name: terminology__calendar
     config:
-      database: "{{ var('terminology_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: terminology
       alias: calendar
       enabled: |
         {%- if var('terminology_enabled',var('tuva_packages_enabled',True))  -%}{{ True | as_bool }}
@@ -94,11 +92,11 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         first_day_of_month: date
         last_day_of_month: date
+
+
   - name: terminology__claim_type
     config:
-      database: "{{ var('terminology_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: terminology
       alias: claim_type
       enabled: |
         {%- if var('terminology_enabled',var('tuva_packages_enabled',True))  -%}{{ True | as_bool }}
@@ -113,11 +111,11 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         claim_type_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__code_type
     config:
-      database: "{{ var('terminology_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      schema: terminology
       alias: code_type
       enabled: |
         {%- if var('terminology_enabled',var('tuva_packages_enabled',True))  -%}{{ True | as_bool }}
