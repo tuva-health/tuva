@@ -17,10 +17,6 @@
 -- ccs_diagnosis_category that is determined by their unique
 -- primary diagnosis ICD-10-CM code.
 
-
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True)))}}
-
-
 select
     aa.encounter_id,
     aa.diagnosis_code,
@@ -31,7 +27,7 @@ select
     end as valid_icd_10_cm_flag,
     cc.ccs_diagnosis_category
 from
-    {{ ref('readmissions__stg_diagnosis') }} aa
+    {{ ref('readmissions__diagnosis') }} aa
     left join {{ ref('terminology__icd_10_cm') }} bb
     on aa.diagnosis_code = bb.icd_10_cm
     left join {{ ref('readmissions__icd_10_cm_to_ccs') }} cc

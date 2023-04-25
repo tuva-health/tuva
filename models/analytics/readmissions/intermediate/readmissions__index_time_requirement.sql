@@ -6,13 +6,9 @@
 -- in the dataset.
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
-
 
 select encounter_id
-from {{ ref('readmissions__stg_encounter') }}
+from {{ ref('readmissions__encounter') }}
 where discharge_date <= (select max(discharge_date)
-                         from {{ ref('readmissions__stg_encounter') }} ) - 30
+                         from {{ ref('readmissions__encounter') }} ) - 30
 

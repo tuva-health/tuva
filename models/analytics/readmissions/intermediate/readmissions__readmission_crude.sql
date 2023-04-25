@@ -5,17 +5,13 @@
 -- rate without taking into account all the CMS HWR logic.
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True)))  }}
-
-
-
 with encounter_info as (
 select
     enc.encounter_id,
     enc.patient_id,
     enc.admit_date,
     enc.discharge_date
-from {{ ref('readmissions__stg_encounter') }} enc
+from {{ ref('readmissions__encounter') }} enc
 left join {{ ref('readmissions__encounter_overlap') }} over_a
     on enc.encounter_id = over_a.encounter_id_A
 left join {{ ref('readmissions__encounter_overlap') }} over_b

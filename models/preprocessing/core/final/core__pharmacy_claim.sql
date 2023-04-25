@@ -1,3 +1,10 @@
+-- *************************************************
+-- This dbt model creates the pharmacy_claim
+-- table in core.
+-- *************************************************
+
+
+
 
 select
          cast(claim_id as {{ dbt.type_string() }} ) as claim_id
@@ -15,6 +22,4 @@ select
        , cast(paid_amount as numeric(38,2) ) as paid_amount
        , cast(allowed_amount as numeric(38,2) ) as allowed_amount
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
-from {{ ref('pharmacy_claim')}}
-
-
+from {{ ref('input_layer__pharmacy_claim') }} 

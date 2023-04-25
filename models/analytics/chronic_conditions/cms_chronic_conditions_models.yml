@@ -5,7 +5,9 @@ models:
     config:
       schema: chronic_conditions
       alias: cms_chronic_conditions_wide
-      tags: cms_chronic_conditions
+      tags:
+        - cms_chronic_conditions
+        - chronic_conditions
       materialized: table
     description: >
       This model pivots conditions on the patient level (i.e. one record per 
@@ -321,7 +323,9 @@ models:
     config:
       schema: chronic_conditions
       alias: cms_chronic_conditions_long
-      tags: cms_chronic_conditions
+      tags:
+        - cms_chronic_conditions
+        - chronic_conditions
       materialized: table
     description: >
       This model unions condition flags from the 3 upstream stage models that
@@ -370,13 +374,15 @@ models:
             Indicates the name of the source dataset (e.g. Medicare Claims).
 
 
-##### Stage
+##### Intermediate
 
-  - name: chronic_conditions__stg_cms_chronic_conditions_all
+  - name: chronic_conditions__cms_chronic_conditions_all
     config:
       schema: chronic_conditions
-      alias: stg_cms_chronic_condition_all
-      tags: cms_chronic_conditions
+      alias: _int_cms_chronic_condition_all
+      tags:
+        - cms_chronic_conditions
+        - chronic_conditions
       materialized: table
     description: >
       This model contains logic for all chronic conditions where 
@@ -417,11 +423,13 @@ models:
             Indicates the name of the source dataset (e.g. Medicare Claims).
 
 
-  - name: chronic_conditions__stg_cms_chronic_conditions_hiv_aids
+  - name: chronic_conditions__cms_chronic_conditions_hiv_aids
     config:
       schema: chronic_conditions
-      alias: stg_cms_chronic_condition_hiv_aids
-      tags: cms_chronic_conditions
+      alias: _int_cms_chronic_condition_hiv_aids
+      tags:
+        - cms_chronic_conditions
+        - chronic_conditions
       materialized: table
     description: >
       This model contains logic for the chronic condition Human
@@ -462,10 +470,10 @@ models:
           description: >
             Indicates the name of the source dataset (e.g. Medicare Claims).
 
-  - name: chronic_conditions__stg_cms_chronic_conditions_oud
+  - name: chronic_conditions__cms_chronic_conditions_oud
     config:
       schema: chronic_conditions
-      alias: stg_cms_chronic_condition_oud
+      alias: _int_cms_chronic_condition_oud
       tags: cms_chronic_conditions
       materialized: table
     description: >

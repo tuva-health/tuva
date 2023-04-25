@@ -1,8 +1,3 @@
-
-
-{{ config(enabled = var('pmpm_enabled',var('tuva_packages_enabled',True)) ) }}
-
-
 with valid_eligibility_rows as (
 select
   patient_id,
@@ -16,7 +11,7 @@ select
     as date
   ) as ceil_enrollment_end_date
 
-from {{ ref('claims_preprocessing__eligibility_enhanced') }}
+from {{ ref('core__eligibility') }}
 where patient_id is not null
 and enrollment_start_date is not null
 and enrollment_end_date is not null
@@ -28,14 +23,14 @@ all_claim_dates as (
 select
   claim_start_date as claim_date,
   patient_id as patient_id
-from {{ ref('claims_preprocessing__medical_claim_enhanced') }}
+from {{ ref('core__medical_claim') }}
 
 union all
 
 select
   dispensing_date as claim_date,
   patient_id as patient_id
-from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }}
+from {{ ref('core__pharmacy_claim') }}
 ),
 
 
@@ -73,7 +68,7 @@ from (
         when bb.patient_id is not null then 1
         else 0
       end as had_eligibility_flag
-    from {{ ref('claims_preprocessing__medical_claim_enhanced') }} aa
+    from {{ ref('core__medical_claim') }} aa
          left join valid_eligibility_rows bb
          on aa.patient_id = bb.patient_id
          and aa.claim_start_date
@@ -98,7 +93,7 @@ from (
         when bb.patient_id is not null then 1
         else 0
       end as had_eligibility_flag
-    from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }} aa 
+    from {{ ref('core__pharmacy_claim') }} aa
          left join valid_eligibility_rows bb
          on aa.patient_id = bb.patient_id
          and aa.dispensing_date
@@ -122,7 +117,7 @@ select
   cast(aa.paid_amount as numeric) as paid_amount,
   cast(cc.had_eligibility_flag as integer) as had_eligibility_flag
   
-from {{ ref('claims_preprocessing__medical_claim_enhanced') }} aa
+from {{ ref('core__medical_claim') }} aa
 
      left join member_months bb
      on substring(cast(aa.claim_start_date as {{ dbt.type_string() }}), 1, 7) = bb.year_month
@@ -148,7 +143,7 @@ select
   cast(aa.paid_amount as numeric) as paid_amount,
   cast(cc.had_eligibility_flag as integer) as had_eligibility_flag
   
-from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }} aa 
+from {{ ref('core__pharmacy_claim') }} aa
 
      left join member_months bb
      on substring(cast(aa.dispensing_date as {{ dbt.type_string() }}), 1, 7) = bb.year_month

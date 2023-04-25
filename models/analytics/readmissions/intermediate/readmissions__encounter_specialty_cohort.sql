@@ -13,10 +13,6 @@
 -- For encounters that are not in the 'Surgery/Gynecology' cohort,
 -- we then check to see if they are in one of the other 4 cohorts.
 
-
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
 --ranking to eventually assign a cohort to encounters in multiple cohorts
 with cohort_ranks as (
     select 'Surgery/Gynecology' as cohort, 1 as c_rank
@@ -66,7 +62,7 @@ with cohort_ranks as (
 
 --getting all encounters, with labeled cohorts, if no cohort cohort is "medicine"
 select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort
-from {{ ref('readmissions__stg_encounter') }} enc
+from {{ ref('readmissions__encounter') }} enc
 left join main_encounter_cohort mec
     on enc.encounter_id = mec.encounter_id
 left join cohort_ranks

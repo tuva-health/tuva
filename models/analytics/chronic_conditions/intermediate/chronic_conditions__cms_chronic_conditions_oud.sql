@@ -35,18 +35,15 @@ patient_encounters as (
         , condition.code_type as condition_code_type
         , replace(procedure.code,'.','') as procedure_code
         , procedure.code_type as procedure_code_type
-    from {{ ref('claims_preprocessing__encounter') }} as encounter
-         left join {{ ref('claims_preprocessing__condition') }} as condition
+    from {{ ref('core__encounter') }} as encounter
+         left join {{ ref('core__condition') }} as condition
              on encounter.encounter_id = condition.encounter_id
-         left join {{ ref('claims_preprocessing__procedure') }}  as procedure
+         left join {{ ref('core__procedure') }}  as procedure
              on encounter.encounter_id = procedure.encounter_id
 
 ),
 
-/*
-    This code block creates an empty medication CTE if one is not found
-    using the table_exists variable, otherwise it uses the actual table
-*/
+
 patient_medications as (
     select
         cast(null as varchar)  encounter_id,
@@ -54,7 +51,7 @@ patient_medications as (
         , cast(paid_date as date) as encounter_start_date
         , replace(ndc_code,'.','') as ndc_code
         , data_source
-    from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }}
+    from {{ ref('core__pharmacy_claim') }}
 
 
 ),
@@ -130,7 +127,7 @@ inclusions_medication as (
 exclusions_other_chronic_conditions as (
 
     select distinct patient_id
-    from {{ ref('chronic_conditions__stg_cms_chronic_conditions_all') }}
+    from {{ ref('chronic_conditions__cms_chronic_conditions_all') }}
     where condition in (
           'Alcohol Use Disorders'
         , 'Drug Use Disorders'

@@ -1,5 +1,3 @@
-{{ config(enabled = var('pmpm_enabled',var('tuva_packages_enabled',True)) ) }}
-
 with member_months as
 (
     select distinct patient_id, year_month

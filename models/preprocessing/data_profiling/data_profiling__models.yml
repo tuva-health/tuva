@@ -3,172 +3,115 @@ version: 2
 ## Staging
 
 models:
-  - name: data_profiling__medical_claim
-    config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
-        {% else %}data_profiling{%- endif -%}
-      alias: staging_medical_claim
-      tags: data_profiling
-      materialized: view
-
-  - name: data_profiling__eligibility
-    config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
-        {% else %}data_profiling{%- endif -%}
-      alias: staging_eligibility
-      tags: data_profiling
-      materialized: view
-
-  - name: data_profiling__pharmacy_claim
-    config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
-        {% else %}data_profiling{%- endif -%}
-      alias: staging_pharmacy_claim
-      tags: data_profiling
-      materialized: view
-
-## Transformation
+## Intermediate
 ####  medical claim
 
   - name: data_profiling__claim_type_unmapped
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: claim_type_unmapped
+      alias: _int_claim_type_unmapped
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__institutional_header_failures
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: institutional_header_failures
+      alias: _int_institutional_header_failures
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__professional_header_failures
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: professional_header_failures
+      alias: _int_professional_header_failures
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__institutional_header_fail_details
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: institutional_header_fail_details
+      alias: _int_institutional_header_fail_details
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__professional_header_fail_details
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: professional_header_fail_details
+      alias: _int_professional_header_fail_details
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__medical_claim_invalid_values
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: medical_claim_invalid_values
+      alias: _int_medical_claim_invalid_values
       tags: data_profiling
       materialized: table
 
 
   - name: data_profiling__medical_claim_missing_values
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: medical_claim_missing_values
+      alias: _int_medical_claim_missing_values
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__claim_type_mapping_failures
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: claim_type_mapping_failures
+      alias: _int_claim_type_mapping_failures
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__medical_claim_duplicates
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: medical_claim_duplicates
+      alias: _int_medical_claim_duplicates
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__test_result_stage_medical_claim
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: test_result_stage_medical_claim
+      alias: _int_test_result_stage_medical_claim
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__medical_claim_denominators
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: medical_claim_denominators
+      alias: _int_medical_claim_denominators
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__medical_claim_plausibility
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: medical_claim_plausibility
+      alias: _int_medical_claim_plausibility
       tags: data_profiling
       materialized: table
 
@@ -177,67 +120,55 @@ models:
 
   - name: data_profiling__eligibility_duplicates
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: eligibility_duplicates
+      alias: _int_eligibility_duplicates
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__eligibility_invalid_values
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: eligibility_invalid_values
+      alias: _int_eligibility_invalid_values
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__eligibility_missing_values
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: eligibility_missing_values
+      alias: _int_eligibility_missing_values
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__test_result_stage_eligibility
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: test_result_stage_eligibility
+      alias: _int_test_result_stage_eligibility
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__eligibility_denominators
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: eligibility_denominators
+      alias: _int_eligibility_denominators
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__eligibility_plausibility
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: eligibility_plausibility
+      alias: _int_eligibility_plausibility
       tags: data_profiling
       materialized: table
 
@@ -245,34 +176,28 @@ models:
 
   - name: data_profiling__pharmacy_claim_duplicates
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: pharmacy_claim_duplicates
+      alias: _int_pharmacy_claim_duplicates
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__pharmacy_claim_missing_values
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: pharmacy_claim_missing_values
+      alias: _int_pharmacy_claim_missing_values
       tags: data_profiling
       materialized: table
 
   - name: data_profiling__test_result_stage_pharmacy_claim
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
-      alias: test_result_stage_pharmacy_claim
+      alias: _int_test_result_stage_pharmacy_claim
       tags: data_profiling
       materialized: table
 
@@ -280,10 +205,8 @@ models:
 
   - name: data_profiling__summary
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
       alias: summary
       tags: data_profiling
@@ -300,10 +223,8 @@ models:
 
   - name: data_profiling__test_detail
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
       alias: test_detail
       tags: data_profiling
@@ -324,10 +245,8 @@ models:
 
   - name: data_profiling__test_result
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
       alias: test_result
       tags: data_profiling
@@ -355,10 +274,8 @@ models:
 
   - name: data_profiling__use_case
     config:
-      database: "{{ var('data_profiling_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('data_profiling_schema',None) != None -%}{{var('data_profiling_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
         {% else %}data_profiling{%- endif -%}
       alias: use_case
       tags: data_profiling

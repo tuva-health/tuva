@@ -1,5 +1,3 @@
-{{ config(enabled = var('cms_chronic_conditions_enabled',var('tuva_packages_enabled',True)) ) }}
-
 with chronic_conditions as (
 
     select distinct
@@ -33,7 +31,7 @@ conditions as (
         , else_value= 0
         , quote_identifiers = False
       ) }}
-from {{ ref('claims_preprocessing__patient') }} p
+from {{ ref('core__patient') }} p
 left join conditions on p.patient_id = conditions.patient_id
 group by
     p.patient_id

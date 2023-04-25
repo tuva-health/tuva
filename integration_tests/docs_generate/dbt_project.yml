@@ -31,62 +31,86 @@ models:
     +materialized: view
     +docs:
       node_color: "#1a0707"
-  claims_preprocessing:
-    +docs:
-      node_color: "#0f3d0b"
-    staging:
-      +docs:
-        show: false
-    intermediate:
-      +docs:
-        show: false
-  cms_chronic_conditions:
-    +docs:
-      node_color: "#2e0e0e"
-    staging:
-      +docs:
-        show: false
-  data_profiling:
-    +docs:
-      node_color: "#141161"
-    staging:
-      +docs:
-        show: false
-    intermediate:
-      +docs:
-        show: false
-  pmpm:
-    +docs:
-      node_color: "#abab26"
-    intermediate:
-      +docs:
-        show: false
-  readmissions:
-    +docs:
-      node_color: "#161a7d"
-    staging:
-      +docs:
-        show: false
-    intermediate:
-      +docs:
-        show: false
-  tuva_chronic_conditions:
-    +docs:
-      node_color: "#804912"
+  the_tuva_project:
+    preprocessing:
+      claims_preprocessing:
+        +docs:
+          node_color: "#0f3d0b"
+#        staging:
+#          +docs:
+#            show: false
+        intermediate:
+          +docs:
+            show: false
+      core:
+        +docs:
+          node_color: "#0f3d0b"
+#          staging:
+#            +docs:
+#              show: false
+#        intermediate:
+#          +docs:
+#            show: false
+      input_layer:
+        +docs:
+          node_color: "#0f3d0b"
+#          staging:
+#            +docs:
+#              show: false
+        intermediate:
+          +docs:
+            show: false
+      data_profiling:
+        +docs:
+          node_color: "#141161"
+#        staging:
+#          +docs:
+#            show: false
+        intermediate:
+          +docs:
+            show: false
+    analytics:
+      chronic_conditions:
+        +docs:
+          node_color: "#2e0e0e"
+#        staging:
+#          +docs:
+#            show: false
+      pmpm:
+        +docs:
+          node_color: "#abab26"
+        intermediate:
+          +docs:
+            show: false
+      readmissions:
+        +docs:
+          node_color: "#161a7d"
+#        staging:
+#          +docs:
+#            show: false
+        intermediate:
+          +docs:
+            show: false
+
 
 
 seeds:
-  data_profiling:
-    +docs:
-      node_color: "#141161"
-  terminology:
-    +docs:
-      node_color: "#460d4f"
-  tuva_chronic_conditions:
-    +docs:
-      node_color: "#804912"
+  the_tuva_project:
+    terminology:
+      +docs:
+        node_color: "#460d4f"
+    value_sets:
+      data_profiling:
+        +docs:
+          node_color: "#141161"
+      chronic_conditions:
+        +docs:
+          node_color: "#804912"
+      readmissions:
+        +docs:
+          node_color: "#161a7d"
 
-snapshots:
-  data_profiling:
-    +docs:
-      show: false
+#snapshots:
+#  data_profiling:
+#    +docs:
+#      show: false

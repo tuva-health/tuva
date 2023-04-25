@@ -1,11 +1,6 @@
-
 -- Here we list all encounters from the stg_encounter model
 -- and we augment them with extra fields
 -- that are relevant for readmission measures
-
-
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
 select
     aa.encounter_id,
     aa.patient_id,
@@ -44,7 +39,7 @@ select
     ee.missing_ms_drg_flag,
     ee.invalid_ms_drg_flag
 from
-    {{ ref('readmissions__stg_encounter') }} aa
+    {{ ref('readmissions__encounter') }} aa
     left join {{ ref('readmissions__index_admission') }} bb
     on aa.encounter_id = bb.encounter_id
     left join {{ ref('readmissions__planned_encounter') }} cc

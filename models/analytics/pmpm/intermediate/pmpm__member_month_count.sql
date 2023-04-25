@@ -1,8 +1,3 @@
-
-
-{{ config(enabled = var('pmpm_enabled',var('tuva_packages_enabled',True)) ) }}
-
-
 with valid_eligibility_rows as (
 select
   patient_id,
@@ -13,7 +8,7 @@ select
   cast( {{ dbt.date_trunc( "month", "enrollment_start_date") }} as date)   as floor_enrollment_start_date,
   cast( {{ dbt.last_day("enrollment_end_date", "month") }} as date)    as ceil_enrollment_end_date
 
-from {{ ref('claims_preprocessing__eligibility_enhanced') }}
+from {{ ref('core__eligibility') }}
 where patient_id is not null
 and enrollment_start_date is not null
 and enrollment_end_date is not null
@@ -25,14 +20,14 @@ all_claim_dates as (
 select
   claim_start_date as claim_date,
   patient_id as patient_id
-from {{ ref('claims_preprocessing__medical_claim_enhanced') }}
+from {{ ref('core__medical_claim') }}
 
 union all
 
 select
   dispensing_date as claim_date,
   patient_id as patient_id
-from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }}
+from {{ ref('core__pharmacy_claim') }}
 ),
 
 

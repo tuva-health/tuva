@@ -21,13 +21,9 @@
 --                             or psychiatric reasons.
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
-
 
 select distinct a.encounter_id
-from {{ ref('readmissions__stg_encounter') }} a
+from {{ ref('readmissions__encounter') }} a
 inner join {{ ref('readmissions__index_time_requirement') }} b
     on a.encounter_id = b.encounter_id
 inner join {{ ref('readmissions__index_discharge_requirement') }} c

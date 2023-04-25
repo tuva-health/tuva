@@ -1,13 +1,3 @@
-
-
-{{ config(
-     enabled = var('claims_preprocessing_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
-
-
-
 -- *************************************************
 -- This dbt model gives us all acute inpatient institutional claims.
 -- We have one row per claim_id (for all claim_ids belonging to
@@ -78,7 +68,8 @@ select
   mc.admit_type_code,
   mc.discharge_disposition_code,
   mc.facility_npi,
-  mc.claim_type
+  mc.claim_type,
+  mc.data_source
 
 from {{ ref('input_layer__medical_claim') }} mc
 
@@ -250,11 +241,12 @@ select
     when max(claim_end_date) is not null then 'claim_end_date'
     when max(claim_line_end_date) is not null then 'claim_line_end_date'
     else null
-  end as date_used_as_end_date
+  end as date_used_as_end_date,
+    data_source
 
   
 from acute_inpatient_claim_lines
-group by claim_id
+group by claim_id, data_source
 ),
 
 
@@ -357,7 +349,8 @@ select
   dq.facility_npi_missing as facility_npi_missing,
   dq.claim_type_not_unique as claim_type_not_unique,
   dq.claim_type_missing as claim_type_missing,
-  dq.claim_type_not_institutional as claim_type_not_institutional
+  dq.claim_type_not_institutional as claim_type_not_institutional,
+  h.data_source
 
 from header_level_values h
 left join data_quality_flags dq

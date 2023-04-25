@@ -2,30 +2,17 @@ version: 2
 
 models:
 ####  Intermediate
-  - name: claims_preprocessing__medical_claim_enhanced
-    description: Add all relevant encounter data to medical_claim_table
-    config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
-      schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _intermediate_medical_claim_enhanced
-      tags: claims_preprocessing
-      materialized: view
 
 
 ####  Final
-  - name: claims_preprocessing__medical_claim_core
+  - name: core__medical_claim
     description: Core medical_claim table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: medical_claim
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: claim_id
@@ -150,16 +137,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__encounter
+  - name: core__encounter
     description: Core encounter table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: encounter
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: encounter_id
@@ -230,16 +215,15 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__patient
+  - name: core__patient
     description: Core patient table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: patient
-      tags: claims_preprocessing
+      tags: core
+      materialized: table
     columns:
       - name: patient_id
         description: Unique identifier for each person across all datasets.
@@ -276,16 +260,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__condition
+  - name: core__condition
     description: Core condition table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: condition
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: encounter_id
@@ -321,16 +303,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__procedure
+  - name: core__procedure
     description: Core procedure table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: procedure
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: encounter_id
@@ -359,16 +339,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__pharmacy_claim_enhanced
+  - name: core__pharmacy_claim
     description: Core pharmacy_claim table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: pharmacy_claim
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: claim_id
@@ -411,16 +389,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__eligibility_enhanced
+  - name: core__eligibility
     description: Core eligibility table
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: eligibility
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: patient_id
@@ -478,16 +454,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: claims_preprocessing__provider
+  - name: core__provider
     description: Core provider table with all providers in the claims dataset
     config:
-      database: "{{ var('claims_preprocessing_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('claims_preprocessing_schema',None) != None -%}{{var('claims_preprocessing_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: provider
-      tags: claims_preprocessing
+      tags: core
       materialized: table
     columns:
       - name: npi

@@ -3,10 +3,12 @@ version: 2
 models:
   - name: input_layer__eligibility
     config:
-      schema: input_layer
-      alias: staging_eligibility
-      tags: claims_preprocessing
-      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}input_layer{%- endif -%}
+      alias: eligibility
+      tags: input_layer
+      materialized: view
     description: > 
      The eligibility table includes information about a patient's health insurance coverage and demographics (note: we use the word patient as a synonym for member). Every claims dataset should include some sort of eligibility data, otherwise it's impossible to calculate member months, which are needed to calculate measures like PMPM.
     columns:
@@ -65,14 +67,16 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: medical_claim
+  - name: input_layer__medical_claim
     description: > 
      The medical_claim table contains information on healthcare services and supplies provided to patients, billed by providers, and paid for by health insurers. It includes information on the provider who rendered the service, the amount paid for the service by the health insurer, and the underlying reason for the service (i.e. diagnosis).
     config:
-      schema: input_layer
-      alias: staging_medical_claim
-      tags: claims_preprocessing
-      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}input_layer{%- endif -%}
+      alias: medical_claim
+      tags: input_layer
+      materialized: view
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -542,14 +546,16 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: pharmacy_claim
+  - name: input_layer__pharmacy_claim
     description: >
       The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled by a patient, billed by a pharmacy, and paid by an insurer.
     config:
-      schema: input_layer
-      alias: staging_pharmacy_claim
-      tags: claims_preprocessing
-      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}input_layer{%- endif -%}
+      alias: pharmacy_claim
+      tags: input_layer
+      materialized: view
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

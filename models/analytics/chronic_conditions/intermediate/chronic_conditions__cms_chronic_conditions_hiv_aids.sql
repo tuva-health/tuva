@@ -1,5 +1,3 @@
-{{ config(enabled = var('cms_chronic_conditions_enabled',var('tuva_packages_enabled',True)) ) }}
-
 {%- set condition_filter = 'Human Immunodeficiency Virus and/or Acquired Immunodeficiency Syndrome (HIV/AIDS)' -%}
 
 with chronic_conditions as (
@@ -19,8 +17,8 @@ patient_encounters as (
         , encounter.data_source
         , replace(condition.code,'.','') as condition_code
         , condition.code_type as condition_code_type
-    from {{ ref('claims_preprocessing__encounter') }} as encounter
-         left join {{ ref('claims_preprocessing__condition') }} as condition
+    from {{ ref('core__encounter') }} as encounter
+         left join {{ ref('core__condition') }} as condition
              on encounter.encounter_id = condition.encounter_id
 
 ),

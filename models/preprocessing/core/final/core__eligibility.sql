@@ -1,3 +1,9 @@
+-- *************************************************
+-- This dbt model creates the eligibility table in core.
+-- *************************************************
+
+
+
 
 select
          cast(patient_id as {{ dbt.type_string() }} ) as patient_id
@@ -21,6 +27,4 @@ select
        , cast(zip_code as {{ dbt.type_string() }} ) as zip_code
        , cast(phone as {{ dbt.type_string() }} ) as phone
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
-from {{ ref('eligibility')}}
-
-
+from {{ ref('input_layer__eligibility') }} 

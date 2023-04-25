@@ -1,5 +1,3 @@
-{{ config(enabled = var('tuva_chronic_conditions_enabled',var('tuva_packages_enabled',True)) ) }}
-
 with condition_row_number as
 (
     select 
@@ -8,7 +6,7 @@ with condition_row_number as
         ,condition_date
         ,row_number() over(partition by patient_id, code order by condition_date asc) as rn_asc
         ,row_number() over(partition by patient_id, code order by condition_date desc) as rn_desc
-    from {{ ref('claims_preprocessing__condition')}}
+    from {{ ref('core__condition')}}
 )
 , patient_conditions as
 (

@@ -1,13 +1,3 @@
-
-
-{{ config(
-     enabled = var('claims_preprocessing_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
-
-
-
 -- *************************************************
 -- This dbt model creates the patient table in core.
 -- *************************************************
@@ -32,8 +22,11 @@ with patient_stage as(
         ,phone
         ,data_source
         ,row_number() over (
-	    partition by patient_id
-	    order by enrollment_end_date DESC) as row_sequence
+	        partition by patient_id
+	        order by case when enrollment_end_date is null
+                then cast ('2050-01-01' as date)
+                else enrollment_end_date end DESC)
+            as row_sequence
     from {{ ref('input_layer__eligibility')}}
 )
 

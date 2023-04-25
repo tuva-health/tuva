@@ -3,9 +3,6 @@
 -- stg_encounter input layer model.
 -- This contains one row for every unique encounter in the dataset.
 
-
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
 select
     cast(encounter_id as {{ dbt.type_string() }}) as encounter_id,
     cast(patient_id as {{ dbt.type_string() }}) as patient_id,
@@ -15,5 +12,5 @@ select
     cast(facility_npi as {{ dbt.type_string() }}) as facility_npi,
     cast(ms_drg_code as {{ dbt.type_string() }}) as ms_drg_code,
     cast(paid_amount as numeric) as paid_amount    
-from {{ ref('claims_preprocessing__encounter') }}
+from {{ ref('core__encounter') }}
 where encounter_type = 'acute inpatient'

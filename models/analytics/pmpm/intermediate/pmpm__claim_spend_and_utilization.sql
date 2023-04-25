@@ -1,6 +1,3 @@
-{{ config(enabled = var('pmpm_enabled',var('tuva_packages_enabled',True)) ) }}
-
-
 with medical as
 (
     select
@@ -11,7 +8,7 @@ with medical as
             || lpad(cast({{ date_part("month", "claim_end_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
        ,claim_type
        ,paid_amount
-    from {{ ref('claims_preprocessing__medical_claim_core') }}
+    from {{ ref('core__medical_claim') }}
 )
 , pharmacy as
 (
@@ -23,7 +20,7 @@ with medical as
             || lpad(cast({{ date_part("month", "dispensing_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
        ,cast('pharmacy' as {{ dbt.type_string() }}) as claim_type
        ,paid_amount
-    from {{ ref('claims_preprocessing__pharmacy_claim_enhanced') }}
+    from {{ ref('core__pharmacy_claim') }}
 )
 
 

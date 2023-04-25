@@ -3,10 +3,6 @@
 -- that have some date overlap.
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
-
 with encounters_with_row_num as (
 select
     encounter_id,
@@ -16,7 +12,7 @@ select
     row_number() over (
         partition by patient_id order by encounter_id
 	) as row_num
-from {{ ref('readmissions__stg_encounter') }}
+from {{ ref('readmissions__encounter') }}
 ),
 
 

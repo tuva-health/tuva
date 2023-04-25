@@ -1,13 +1,4 @@
 
-
-{{ config(
-     enabled = var('claims_preprocessing_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
-
-
-
 -- *************************************************
 -- This dbt model assigns service categories to
 -- every claim line in the medical_claim table.
@@ -20,10 +11,12 @@
 
 
 
-
-with add_encounter_fields_to_medical_claim_table as (
 select
-  aa.*,
+  aa.claim_id,
+  aa.claim_line_number,
+  aa.claim_type,
+  aa.patient_id,
+  aa.member_id,
 -- Add service categories:
   cc.service_category_1,
   cc.service_category_2,  
@@ -38,7 +31,8 @@ select
   bb.encounter_admit_type_code,
   bb.encounter_discharge_disposition_code,
   bb.orphan_claim_flag,
-  bb.encounter_count
+  bb.encounter_count,
+  aa.data_source
 from {{ ref('input_layer__medical_claim') }} aa
 
 left join
@@ -50,8 +44,6 @@ left join
 {{ ref('claims_preprocessing__service_categories') }} cc
 on aa.claim_id = cc.claim_id
 and aa.claim_line_number = cc.claim_line_number
-)
 
 
-select *
-from add_encounter_fields_to_medical_claim_table
+

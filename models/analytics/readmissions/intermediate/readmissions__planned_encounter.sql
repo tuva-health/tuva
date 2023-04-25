@@ -3,9 +3,6 @@
 -- that are planned.
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
 -- encounter_ids for encounters that we know
 -- are planned because they had a procedure category
 -- that is only present for planned encounters 

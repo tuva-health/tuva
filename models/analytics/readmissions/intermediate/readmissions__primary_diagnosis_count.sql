@@ -7,9 +7,6 @@
 -- with each encounter in the stg_diagnosis model.
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
 
 -- Here we list the primary diagnosis count for every
 -- encounter_id in the stg_diagnosis model that has
@@ -18,7 +15,7 @@ with primary_diagnosis_count_greater_than_zero as (
 select
     encounter_id,
     count(*) as primary_dx_count
-from {{ ref('readmissions__stg_diagnosis') }}
+from {{ ref('readmissions__diagnosis') }}
 where diagnosis_rank = 1
 group by encounter_id
 ),
@@ -28,7 +25,7 @@ group by encounter_id
 -- stg_diagnosis model
 all_encounter_ids as (
 select distinct encounter_id
-from {{ ref('readmissions__stg_diagnosis') }}
+from {{ ref('readmissions__diagnosis') }}
 ),
 
 

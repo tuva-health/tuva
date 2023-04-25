@@ -7,9 +7,6 @@
 --       [3] Psychiatric
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
 -- encounter_ids for encounters that should be
 -- excluded because they belong to one of the
 -- exclusion categories

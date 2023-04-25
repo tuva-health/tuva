@@ -1,5 +1,3 @@
-{{ config(enabled = var('pmpm_enabled',var('tuva_packages_enabled',True)) ) }}
-
 with src as
          (select
               patient_id,
@@ -10,7 +8,7 @@ with src as
               payer_type
               -- dual_status_code,
               -- medicare_status_code
-          from  {{ ref('claims_preprocessing__eligibility_enhanced') }}
+          from  {{ ref('core__eligibility') }}
          )
 , months as (
     select 1 as month

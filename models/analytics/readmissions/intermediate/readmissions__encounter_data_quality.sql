@@ -4,10 +4,6 @@
 -- being used for readmission measures 
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
-
 -- Flag several potential data quality issues
 -- with all encounters.
 -- Every encounter_id from the stg_encounter model
@@ -84,7 +80,7 @@ select
 	else 0
     end as invalid_ms_drg_flag
 
-from {{ ref('readmissions__stg_encounter') }} aa
+from {{ ref('readmissions__encounter') }} aa
      left join {{ ref('readmissions__diagnosis_ccs') }} bb
      on aa.encounter_id = bb.encounter_id
      left join {{ ref('terminology__discharge_disposition') }} cc

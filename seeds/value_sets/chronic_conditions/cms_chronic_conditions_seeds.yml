@@ -1,14 +1,12 @@
 version: 2
 
 seeds:
-  - name: cms_chronic_conditions__cms_chronic_conditions_hierarchy
+  - name: chronic_conditions__cms_chronic_conditions_hierarchy
     description: CMS generated grouping of ICD 10 codes into chronic conditions groups
     config:
-      database: "{{ var('cms_chronic_conditions_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('cms_chronic_conditions_schema',None) != None -%}{{var('cms_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      enabled: "{{ var('cms_chronic_conditions_enabled',var('tuva_packages_enabled',True)) }}"
-      alias: cms_chronic_conditions_hierarchy
-      tags: cms_chronic_conditions
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
+      alias: _value_sets_cms_chronic_conditions_hierarchy
+      tags:
+        - cms_chronic_conditions
+        - chronic_conditions

@@ -1,17 +1,15 @@
 version: 2
 
 seeds:
-  - name: tuva_chronic_conditions__tuva_chronic_conditions_hierarchy
+  - name: chronic_conditions__tuva_chronic_conditions_hierarchy
     description: A list of the diagnoses codes and their long and short names along with grouping logic classifying each code into a condition group and a condition family group.
     config:
-      database: "{{ var('tuva_chronic_conditions_database',var('tuva_database','tuva')) }}"
       schema: |
-        {%- if var('tuva_chronic_conditions_schema',None) != None -%}{{var('tuva_chronic_conditions_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      enabled: "{{ var('tuva_chronic_conditions_enabled',var('tuva_packages_enabled',True)) }}"
-      alias: tuva_chronic_conditions_hierarchy
-      tags: tuva_chronic_conditions
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
+      alias: _value_sets_tuva_chronic_conditions_hierarchy
+      tags:
+        - tuva_chronic_conditions
+        - chronic_conditions
     columns:
       - name: condition_family
         description: A higher level rollup grouping of conditions from the condition column

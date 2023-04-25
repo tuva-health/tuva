@@ -7,14 +7,10 @@
 --    *** Patient must be alive at discharge
 
 
-{{ config(enabled=var('readmissions_enabled',var('tuva_packages_enabled',True))) }}
-
-
-
 
 with all_invalid_discharges as (
 select encounter_id
-from {{ ref('readmissions__stg_encounter') }}
+from {{ ref('readmissions__encounter') }}
 where discharge_disposition_code in (
      '02' -- Patient discharged/transferred to other short term general hospital for inpatient care.
     ,'07' -- Patient left against medical advice
@@ -25,7 +21,7 @@ where discharge_disposition_code in (
 -- All discharges that meet the discharge_disposition_code
 -- requirements to be an index admission
 select a.encounter_id
-from {{ ref('readmissions__stg_encounter') }} a
+from {{ ref('readmissions__encounter') }} a
 left join all_invalid_discharges b
     on a.encounter_id = b.encounter_id
 where b.encounter_id is null

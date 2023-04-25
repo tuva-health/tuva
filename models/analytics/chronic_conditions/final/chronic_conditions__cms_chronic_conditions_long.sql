@@ -1,19 +1,17 @@
-{{ config(enabled = var('cms_chronic_conditions_enabled',var('tuva_packages_enabled',True)) ) }}
-
 with conditions_unioned as (
 
     select *
-    from {{ ref('chronic_conditions__stg_cms_chronic_conditions_all') }}
+    from {{ ref('chronic_conditions__cms_chronic_conditions_all') }}
 
     union distinct
 
     select *
-    from {{ ref('chronic_conditions__stg_cms_chronic_conditions_hiv_aids') }}
+    from {{ ref('chronic_conditions__cms_chronic_conditions_hiv_aids') }}
 
     union distinct
 
     select *
-    from {{ ref('chronic_conditions__stg_cms_chronic_conditions_oud') }}
+    from {{ ref('chronic_conditions__cms_chronic_conditions_oud') }}
 
 )
 
