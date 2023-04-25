@@ -12,6 +12,52 @@ models:
       alias: encounter_grouper
       tags: claims_preprocessing
       materialized: table
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: Indicates the line number for the particular line of the claim.
+      - name: claim_type
+        description: Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.
+        meta:
+          terminology: /terminology/tuva-concepts/claim-type
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: service_category_1
+        description: The first service category of the claim line
+      - name: service_category_2
+        description: The second, more specific service category of the claim line
+      - name: encounter_type
+        description: Type of encounter.
+        meta:
+          terminology: /terminology/tuva-concepts/encounter-type
+      - name: encounter_id
+        description: Unique identifier for an encounter.
+      - name: encounter_start_date
+        description: Date when the encounter started.
+      - name: encounter_end_date
+        description: Date when the encounter ended.
+      - name: encounter_admit_source_code
+        description: Admission source code for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/admit-source
+      - name: encounter_admit_type_code
+        description: Admission type code for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/admit-type
+      - name: encounter_discharge_disposition_code
+        description: Discharge disposition code for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/discharge-disposition
+      - name: orphan_claim_flag
+        description: A flag indicating if the claim was orphaned
+      - name: encounter_count
+        description: A count of
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
 
 
   - name: claims_preprocessing__service_categories
@@ -23,6 +69,15 @@ models:
       alias: service_categories
       tags: claims_preprocessing
       materialized: table
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: Indicates the line number for the particular line of the claim.
+      - name: service_category_1
+        description: The first service category of the claim line
+      - name: service_category_2
+        description: The second, more specific service category of the claim line
 
 
   ### Intermediate
