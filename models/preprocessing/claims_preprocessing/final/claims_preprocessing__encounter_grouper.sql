@@ -21,8 +21,8 @@ select
   cc.service_category_1,
   cc.service_category_2,  
 -- Fields with encounter data to append to medical_claim:
-  bb.start_date,
-  bb.end_date,
+--   bb.start_date,
+--   bb.end_date,
   bb.encounter_type,
   bb.encounter_id,
   bb.encounter_start_date,
