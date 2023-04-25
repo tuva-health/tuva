@@ -1,9 +1,3 @@
-{{ config(
-     enabled = var('data_profiling_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
-
 {% set institutional_header_column_list = [
       'claim_id'
     , 'claim_type'

@@ -1,8 +1,3 @@
-{{ config(
-     enabled = var('data_profiling_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
 select
     source_table
     , grain

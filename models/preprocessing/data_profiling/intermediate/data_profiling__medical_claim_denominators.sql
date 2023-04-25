@@ -1,8 +1,3 @@
-{{ config(
-     enabled = var('data_profiling_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
 with professional_denominator as(
   select 
     cast('professional' as {{ dbt.type_string() }} ) as test_denominator_name

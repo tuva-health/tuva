@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('data_profiling_enabled',var('tuva_packages_enabled',True))
-   )
-}}
 with pharmacy_claim_denominator as(
   select 
     cast('all' as {{ dbt.type_string() }} ) as claim_type

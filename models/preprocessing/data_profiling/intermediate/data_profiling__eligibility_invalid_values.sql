@@ -1,8 +1,3 @@
-{{ config(
-     enabled = var('data_profiling_enabled',var('tuva_packages_enabled',True))
-   )
-}}
-
 with valid_gender as(
     select
         'gender invalid' as test_name
