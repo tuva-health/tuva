@@ -2,13 +2,14 @@
 # The Tuva Project
 
 ## 🔗  Quick Links
+- [Knowledge Base](https://thetuvaproject.com/): Learn about claims data fundamentals and how to do claims data analytics
 - [Docs](https://tuva-health.github.io/the_tuva_project/#!/overview): Learn about the Tuva Project data model
-- [Knowledge Base](https://thetuvaproject.com/docs/intro): Learn about claims data fundamentals and how to do claims data analytics
+
 <br/><br/>
 
 ## 🧰  What is the Tuva Project?
 
-The Tuva Project is a collection of dbt packages that clean and transform healthcare claims data so that it's ready for analytics. Currently, the Tuva Project consists of the following 7 dbt packages, each of which is a separate GitHub repository.  This repository is the main dbt package you use to run any one or all of the packages below:
+The Tuva Project a package that clean and transform healthcare claims data so that it's ready for analytics. Currently, the Tuva Project consists of the following 7 dbt packages, each of which is a separate GitHub repository.  This repository is the main dbt package you use to run any one or all of the packages below:
 
 - [data_profiling](https://github.com/tuva-health/data_profiling): Runs data quality tests to check for common problems specific to healthcare claims data.
 - [claims_preprocessing](https://github.com/tuva-health/claims_preprocessing): Groups overlapping claims into a single encounter, assigns every claim to 1 of 15 different encounter types and populates core data tables.
@@ -48,7 +49,7 @@ In step 2 you need to import the `the_tuva_project` dbt package.  To import the 
 ```yaml
 packages:
   - package: tuva-health/the_tuva_project
-    version: 0.2.6
+    version: 0.3.0
 ```
 
 
