@@ -13,7 +13,6 @@
 
 with select_relevant_columns_without_dx_and_px as (
 select
-  eg.encounter_id,
   mc.claim_id,
   mc.claim_line_number,
   mc.claim_type,
@@ -23,11 +22,6 @@ select
   mc.claim_end_date,
   mc.claim_line_start_date,
   mc.claim_line_end_date,
-  eg.service_category_1,
-  eg.service_category_2,
-  eg.encounter_type,
-  eg.encounter_start_date,
-  eg.encounter_end_date,
   mc.admission_date,
   mc.discharge_date,
   mc.admit_source_code,
@@ -53,15 +47,16 @@ select
   mc.allowed_amount,
   mc.charge_amount,
   mc.total_cost_amount,
+  eg.encounter_type,
+  eg.encounter_id,
+  eg.service_category_1,
+  eg.service_category_2,
   mc.data_source
-from {{ ref('claims_preprocessing__encounter_grouper') }} eg
-inner join {{ ref('input_layer__medical_claim') }} mc
+from {{ ref('input_layer__medical_claim') }} mc
+left join {{ ref('claims_preprocessing__encounter_grouper') }} eg
     on eg.claim_id = mc.claim_id
     and eg.claim_line_number = mc.claim_line_number
-    and eg.claim_type = mc.claim_type
     and eg.patient_id = mc.patient_id
-    and eg.member_id = mc.member_id
-    and eg.data_source = mc.data_source
 
 )
 
