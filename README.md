@@ -47,7 +47,7 @@ These three models should named `medical_claim`, `pharmacy_claim`, and `eligibil
 
 ### Step 2: Import the Tuva Project package into Your dbt Project
 
-In step 2 you need to import the `the_tuva_project` dbt package.  To import the `the_tuva_project` package, you need to include the yaml below in your `packages.yml` file.  Once you've done this you can run `dbt deps`.  Check the latest release of the Tuva Project in GitHub to know the latest version number to use (i.e. the latest version won't always be 0.2.4 as shown in the yaml below).
+In step 2 you need to import the `the_tuva_project` dbt package.  To import the `the_tuva_project` package, you need to include the yaml below in your `packages.yml` file.  Once you've done this you can run `dbt deps`.  Check the latest release of the Tuva Project in GitHub to know the latest version number to use.
 
 ```yaml
 packages:
