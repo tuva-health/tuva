@@ -1,0 +1,23 @@
+version: 2
+
+seeds:
+  - name: chronic_conditions__tuva_chronic_conditions_hierarchy
+    description: A list of the diagnoses codes and their long and short names along with grouping logic classifying each code into a condition group and a condition family group.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
+      alias: _value_set_tuva_chronic_conditions_hierarchy
+      tags:
+        - tuva_chronic_conditions
+        - chronic_conditions
+    columns:
+      - name: condition_family
+        description: A higher level rollup grouping of conditions from the condition column
+      - name: condition
+        description: The name of the condition that each diagnosis code rolls up into
+      - name: icd_10_cm_code
+        description: The icd10 code
+      - name: icd_10_cm_description
+        description: The description for the icd10 code
+      - name: condition_column_name
+        description: The name of the column as it will appear in chronic_conditions_wide

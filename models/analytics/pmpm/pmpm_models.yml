@@ -1,0 +1,144 @@
+version: 2
+
+models:
+
+  - name: pmpm__pmpm_builder
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: pmpm_builder
+      tags: pmpm
+      materialized: table
+    tests:
+       - unique:
+           column_name: "(patient_id || '_' || year_month)"
+    description: >
+      Add model description
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: year_month
+        description: Concatenation of the year and month for the record. Each patient has one record per year_month of their eligibility, or in other words, one record per member month.
+      - name: total_paid
+        description: This metric sums the total paid_amounts or spend for pharmacy and medical claims over the given dimension for each member month.
+      - name: medical_paid
+        description: This metric sums the medical claims paid_amounts or spend over the given dimension for each member month.
+      - name: pharmacy_paid
+        description: This metric sums the pharmacy claims paid_amounts or spend over the given dimension for each member month.
+
+
+  - name: pmpm__pmpm_trends
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: pmpm_trends
+      tags: pmpm
+      materialized: table
+    description: >
+      Shows pmpm over time for different categories of spend
+    columns:
+      - name: year_month
+        description: Unique year-month of in the dataset.
+      - name: medical_spend
+        description: Total medical spend on this year-month
+      - name: member_month_count
+        description: The number of members with eligibility on this year-month
+      - name: medical_pmpm
+        description: The medical pmpm for this year-month
+      - name: inpatient_pmpm
+        description: The inpatient pmpm for this year-month
+      - name: outpatient_pmpm
+        description: The outpatient pmpm for this year-month
+      - name: office_visit_pmpm
+        description: The office visit pmpm for this year-month
+      - name: ancillary_pmpm
+        description: The ancillary pmpm for this year-month
+      - name: other_pmpm
+        description: The pmpm for this year-month corresponding to other categories
+
+
+#### Intermediate
+
+
+  - name: pmpm__claim_spend_and_utilization
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_claim_spend_and_utilization
+      tags: pmpm
+      materialized: table
+    tests:
+       - unique:
+           column_name: "(patient_id || '_'  || claim_type || '_' || year_month)"
+    description: >
+      Add model description
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: claim_type
+        description: Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.
+      - name: year_month
+        description: Concatenation of the year and month for the record. Each patient has one record per year_month of their eligibility, or in other words, one record per member month.
+      - name: count_claims
+        description: This metric counts the number of claims over the given dimension for each member month.
+      - name: spend
+        description: This metric sums the paid_amounts or spend over the given dimension for each member month.
+
+
+  - name: pmpm__member_months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_member_months
+      tags: pmpm
+      materialized: table
+    tests:
+       - unique:
+           column_name: "(patient_id || '_' || year_month)"
+    description: >
+      This model has a record for every year and month combination for every month that a patient is eligibile.
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: year_month
+        description: Concatenation of the year and month for the record. Each patient has one record per year_month of their eligibility.
+      - name: year
+        description: The year for the record.
+      - name: month
+        description: The month for the record.
+      - name: month_start
+        description: The first day of the month of the year_month for the record.
+      - name: month_end
+        description: The last day of the month of the year_month for the record.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: payer_type
+        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
+
+
+  - name: pmpm__member_month_count
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_member_month_count
+      tags: pmpm
+      materialized: table
+    description: >
+      Counts of how many members have eligibility in each year-month
+
+
+  - name: pmpm__pmpm_output
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_pmpm_output
+      tags: pmpm
+      materialized: table
+    description: >
+      Table used to calculate pmpm trends

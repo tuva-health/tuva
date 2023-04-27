@@ -1,0 +1,12 @@
+select distinct
+    'pharmacy_claim' as source_table
+  , 'all' as claim_type
+  , 'claim_id' as grain
+  ,  claim_id   
+  , 'duplicate_values' as test_category
+  , 'duplicate pharmacy claims' as test_name
+from {{ ref('input_layer__pharmacy_claim') }} 
+group by
+    claim_id
+    , claim_line_number
+having count(*) > 1

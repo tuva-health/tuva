@@ -1,0 +1,142 @@
+version: 2
+
+seeds:
+  - name: readmissions__acute_diagnosis_ccs
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_acute_diagnosis_ccs
+      tags: readmissions
+      column_types:
+        ccs_diagnosis_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__acute_diagnosis_icd_10_cm
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_acute_diagnosis_icd_10_cm
+      tags: readmissions
+      column_types:
+        icd_10_cm : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__always_planned_ccs_diagnosis_category
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_always_planned_ccs_diagnosis_category
+      tags: readmissions
+      column_types:
+        ccs_diagnosis_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__always_planned_ccs_procedure_category
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_always_planned_ccs_procedure_category
+      tags: readmissions
+      column_types:
+        ccs_procedure_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__exclusion_ccs_diagnosis_category
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_exclusion_ccs_diagnosis_category
+      tags: readmissions
+      column_types:
+        ccs_diagnosis_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        exclusion_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__icd_10_cm_to_ccs
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_icd_10_cm_to_ccs
+      tags: readmissions
+      column_types:
+        icd_10_cm : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        ccs_diagnosis_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        ccs_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__icd_10_pcs_to_ccs
+    config:
+      schema: |
+        {%- if var('readmissions_schema',None) != None -%}{{var('readmissions_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_treadmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_icd_10_pcs_to_ccs
+      tags: readmissions
+      column_types:
+        icd_10_pcs : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        ccs_procedure_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        ccs_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__potentially_planned_ccs_procedure_category
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_potentially_planned_ccs_procedure_category
+      tags: readmissions
+      column_types:
+        ccs_procedure_category : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__potentially_planned_icd_10_pcs
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_potentially_planned_icd_10_pcs
+      tags: readmissions
+      column_types:
+        icd_10_pcs : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__specialty_cohort
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_specialty_cohort
+      tags: readmissions
+      column_types:
+        ccs : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        specialty_cohort : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        procedure_or_diagnosis : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+  - name: readmissions__surgery_gynecology_cohort
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+      alias: _value_set_surgery_gynecology_cohort
+      tags: readmissions
+      column_types:
+        icd_10_pcs : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        ccs_code_and_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        specialty_cohort : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}

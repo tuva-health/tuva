@@ -135,4 +135,4 @@ select claim_id
        ,procedure_date_24
        ,procedure_date_25
        ,data_source
-from tuva_claims_demo_sample.claims_data_model.medical_claim
+from tuva_claims_demo_sample_test.claims_data_model.medical_claim
