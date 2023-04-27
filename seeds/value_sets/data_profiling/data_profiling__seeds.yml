@@ -5,7 +5,7 @@ seeds:
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling{% else %}data_profiling{%- endif -%}
-      alias: _value_sets_test_catalog
+      alias: _value_set_test_catalog
       tags:
         - data_profiling
       column_types:
