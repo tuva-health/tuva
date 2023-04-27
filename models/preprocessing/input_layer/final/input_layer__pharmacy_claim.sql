@@ -12,8 +12,8 @@ select
        , cast(days_supply as integer ) as days_supply
        , cast(refills as integer ) as refills
        , cast(paid_date as date ) as paid_date
-       , cast(paid_amount as numeric(31,2) ) as paid_amount
-       , cast(allowed_amount as numeric(31,2) ) as allowed_amount
+       , cast(paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
+       , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
 from {{ ref('pharmacy_claim')}}
 

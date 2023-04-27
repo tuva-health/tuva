@@ -9,14 +9,15 @@
 
 ## 🧰  What is the Tuva Project?
 
-The Tuva Project a package that clean and transform healthcare claims data so that it's ready for analytics. Currently, the Tuva Project consists of the following 7 dbt packages, each of which is a separate GitHub repository.  This repository is the main dbt package you use to run any one or all of the packages below:
+The Tuva Project is a package that cleans and transforms healthcare claims data so that it's ready for analytics. Currently, the Tuva Project consists of the following marts:
 
 - [data_profiling](https://thetuvaproject.com/data-marts/data-profiling/about): Runs data quality tests to check for common problems specific to healthcare claims data.
-- [claims_preprocessing](https://thetuvaproject.com/data-marts/claims-preprocessing/about): Groups overlapping claims into a single encounter, assigns every claim to 1 of 15 different encounter types and populates core data tables.
-- [chronic_conditions](https://thetuvaproject.com/data-marts/chronic-conditions/about): Two different chronic condition groupers based on ICD-10-CM codes, one using grouping methodology defined by CMS, and another developed by Tuva. 
+- [claims_preprocessing](https://thetuvaproject.com/data-marts/claims-preprocessing/about): Assigns service categories to claim lines, groups overlapping claims into a single encounter,and assigns encounter types to encounters.
+- [core](https://thetuvaproject.com/data-marts/core/about): Builds atomic-level tables from the claims data.
+- [chronic_conditions](https://thetuvaproject.com/data-marts/chronic-conditions/about): Two different chronic condition groupers based on ICD-10-CM codes, one using grouping methodology defined by CMS and another developed by Tuva. 
 - [pmpm](https://thetuvaproject.com/data-marts/pmpm/about): Calculates spend and utilization metrics for your patient population on a per-member-per-month (pmpm) basis.
 - [readmissions](https://thetuvaproject.com/data-marts/readmissions/about): Calculates hospital readmission measures based on CMS methodology.
-- [terminology](https://thetuvaproject.com/terminology/about): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
+- [terminology](https://thetuvaproject.com/terminology/about): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. 
 <br/><br/>
 
 ## 🔌  Supported Databases and dbt Versions

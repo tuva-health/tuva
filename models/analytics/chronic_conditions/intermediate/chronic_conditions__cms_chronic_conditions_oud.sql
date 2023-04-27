@@ -46,7 +46,7 @@ patient_encounters as (
 
 patient_medications as (
     select
-        cast(null as varchar)  encounter_id,
+        cast(null as  {{ dbt.type_string() }} )  encounter_id,
           patient_id
         , cast(paid_date as date) as encounter_start_date
         , replace(ndc_code,'.','') as ndc_code
