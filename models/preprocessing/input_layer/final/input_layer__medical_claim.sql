@@ -30,10 +30,10 @@ select
        , cast(billing_npi as {{ dbt.type_string() }} ) as billing_npi
        , cast(facility_npi as {{ dbt.type_string() }} ) as facility_npi
        , cast(paid_date as date ) as paid_date
-       , cast(paid_amount as numeric(38,2) ) as paid_amount
-       , cast(total_cost_amount as numeric(38,2) ) as total_cost_amount
-       , cast(allowed_amount as numeric(38,2) ) as allowed_amount
-       , cast(charge_amount as numeric(38,2) ) as charge_amount
+       , cast(paid_amount as numeric(31,2) ) as paid_amount
+       , cast(total_cost_amount as numeric(31,2) ) as total_cost_amount
+       , cast(allowed_amount as numeric(31,2) ) as allowed_amount
+       , cast(charge_amount as numeric(31,2) ) as charge_amount
        , cast(diagnosis_code_type as {{ dbt.type_string() }} ) as diagnosis_code_type
        , cast(diagnosis_code_1 as {{ dbt.type_string() }} ) as diagnosis_code_1
        , cast(diagnosis_code_2 as {{ dbt.type_string() }} ) as diagnosis_code_2

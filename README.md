@@ -11,13 +11,12 @@
 
 The Tuva Project a package that clean and transform healthcare claims data so that it's ready for analytics. Currently, the Tuva Project consists of the following 7 dbt packages, each of which is a separate GitHub repository.  This repository is the main dbt package you use to run any one or all of the packages below:
 
-- [data_profiling](https://github.com/tuva-health/data_profiling): Runs data quality tests to check for common problems specific to healthcare claims data.
-- [claims_preprocessing](https://github.com/tuva-health/claims_preprocessing): Groups overlapping claims into a single encounter, assigns every claim to 1 of 15 different encounter types and populates core data tables.
-- [cms_chronic_conditions](https://github.com/tuva-health/chronic_conditions): Implements a chronic condition grouper based on ICD-10-CM codes. As a result, it is possible to know whether each patient in your population has any of ~70 different chronic conditions defined for the grouper.
-- [tuva_chronic_conditions](https://github.com/tuva-health/tuva_chronic_conditions): implements a chronic condition grouper created by the Tuva Project which creates ~40 homogeneous and mutually exclusive chronic condition groups on your patient.
-- [pmpm](https://github.com/tuva-health/pmpm): Calculates spend and utilization metrics for your patient population on a per-member-per-month (pmpm) basis.
-- [readmissions](https://github.com/tuva-health/readmissions): Calculates hospital readmission measures.
-- [terminology](https://github.com/tuva-health/terminology): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
+- [data_profiling](https://thetuvaproject.com/data-marts/data-profiling/about): Runs data quality tests to check for common problems specific to healthcare claims data.
+- [claims_preprocessing](https://thetuvaproject.com/data-marts/claims-preprocessing/about): Groups overlapping claims into a single encounter, assigns every claim to 1 of 15 different encounter types and populates core data tables.
+- [chronic_conditions](https://thetuvaproject.com/data-marts/chronic-conditions/about): Two different chronic condition groupers based on ICD-10-CM codes, one using grouping methodology defined by CMS, and another developed by Tuva. 
+- [pmpm](https://thetuvaproject.com/data-marts/pmpm/about): Calculates spend and utilization metrics for your patient population on a per-member-per-month (pmpm) basis.
+- [readmissions](https://thetuvaproject.com/data-marts/readmissions/about): Calculates hospital readmission measures based on CMS methodology.
+- [terminology](https://thetuvaproject.com/terminology/about): Makes the latest version of many useful healthcare terminology datasets available as tables in your data warehouse. This package is different from the others because it does not build healthcare concepts on top of your data.
 <br/><br/>
 
 ## 🔌  Supported Databases and dbt Versions
@@ -34,13 +33,17 @@ This package supports dbt version `1.2.x` or higher.
 
 ### Step 1: Map Your Claims Data to the Tuva Claims Data Model
 
+See our [Quickstart Guide](https://thetuvaproject.com/quickstart) for detailed instructions.
+
 The first step is mapping your claims data to the Tuva Claims Data Model.  You can map your claims data to the Tuva Claims Data Model yourself (i.e. by writing SQL inside your dbt project).  Or if you have Medicare CCLF or Medicare SAF (LDS) claims data you can use our connectors, which are separate repos that you can find on our GitHub page.  You need to create each of the tables in the Tuva Claims Data Model as models within your dbt project so that the Tuva Project dbt package can reference them using ref() functions.
 
 The Tuva Claims Data Model consists of 3 tables: 
-- [medical_claim](https://tuva-health.github.io/the_tuva_project/#!/model/model.claims_data_model.medical_claim#description)
-- [pharmacy_claim](https://tuva-health.github.io/the_tuva_project/#!/model/model.claims_data_model.pharmacy_claim#description)
-- [eligibility](https://tuva-health.github.io/the_tuva_project/#!/model/model.claims_data_model.eligibility#description)
+- [medical_claim](https://thetuvaproject.com/data-marts/input-layer/data-dictionary/eligibility)
+- [pharmacy_claim](https://thetuvaproject.com/data-marts/input-layer/data-dictionary/medical-claim)
+- [eligibility](https://thetuvaproject.com/data-marts/input-layer/data-dictionary/pharmacy-claim)
 <br/><br/>
+
+These three models should named `medical_claim`, `pharmacy_claim`, and `eligibility` respectively in your project
 
 ### Step 2: Import the Tuva Project package into Your dbt Project
 
@@ -53,80 +56,22 @@ packages:
 ```
 
 
-### Step 3: Configure dbt Variables
+### Step 3: Configure dbt 
 
-The easiest way to accomplish the steps in this section is by copying and pasting the yaml code below into your `dbt_project.yml` file and then changing any of the preset configurations from the yaml below as needed.  To configure the dbt variables for the project you need to complete the following steps:
+The Tuva Project will write to the database used in the profile of your project. 
 
-1. Configure the `Package Enabled Variables`.  These variables tell the Tuva Project which packages should be turned on or off.  This is the first set of variables shown in the yaml below.
-2. Configure the target database, i.e. the database where dbt will write the output from the Tuva Project.  This variable is called `tuva_database` in the yaml below.  Note that you must create this database in your data warehouse before running the Tuva Project.  
-3. We also recommend adding the `dispatch` configuration at the end of the yaml below to ensure your schema names are not prefixed with the target schema name from your dbt `profile.yml`.
-
-The Tuva Project already knows where your source data is located, because it references the models you created in step 1 via ref() statements, so no additional configuration of source data location is needed before running the Tuva Project.
+Optionally, to override dbt's default schema naming behavior and to write to schemas defined by the mart name without a prefix defined in your profile, add the following code to your dbt_project.yml  
 
 ```yaml
 vars:
-
-## Package Enabled Variables:
-## These variables tell the Tuva Project which packages you want
-## to enable.  To enable a package set it to true, to disable a 
-## package set it to false.
-  claims_preprocessing_enabled: true
-  cms_chronic_conditions_enabled: true
-  data_profiling_enabled: true 
-  pmpm_enabled: true
-  readmissions_enabled: true
-  terminology_enabled: true
-  tuva_chronic_conditions_enabled: true
-
-
-## Target Database Variable:
-## This variable tells the Tuva Project where to write the 
-## output data to.  You must create this database in your
-## data warehouse before running the Tuva Project.
-  tuva_database: tuva  
-
-
-## Optional Configuration Variables:
-## If you named the 3 tables in the Tuva Claims Data Model
-## something other than the default names (i.e. medical_claim,
-## pharmacy_claim, and eligibility), you can edit the names
-## here.
-  # medical_claim_override:   "{{ref('medical_claim')}}"
-  # eligibility_override: "{{ref('eligibility')}}"
-  # pharmacy_claim_override: "{{ref('pharmacy_claim')}}"
-
-## If you want to add a prefix to every schema that the
-## Tuva Project will write data to, set this prefix in
-## this variable (it is commented out by default):
-  # tuva_schema_prefix: test
-
-## Use these variables to write the output of any specific 
-## package to a specific database and schema:
-  # claims_preprocessing_database: tuva
-  # claims_preprocessing_schema: core
-  # cms_chronic_conditions_database: tuva
-  # cms_chronic_conditions_schema: cms_chronic_conditions
-  # data_profiling_database: tuva
-  # data_profiling_schema: data_profiling
-  # pmpm_database: tuva
-  # pmpm_schema: pmpm
-  # readmissions_database: tuva
-  # readmissions_schema: readmissions
-  # terminology_database: tuva
-  # terminology_schema: terminology
-  # tuva_chronic_conditions_database: tuva
-  # tuva_chronic_conditions_schema: tuva_chronic_conditions
-
-
-## By default, dbt prefixes schema names with the target 
-## schema in your profile. Including the dispatch variable
-## will fix this.
 dispatch:
   - macro_namespace: dbt
     search_order: [ 'the_tuva_project', 'dbt']
 ```
 
-After completing the above steps you’re ready to run your project.  `cd` into your root dbt project directory and execute `dbt build` to run the entire project.  You now have all the Tuva tables in your database and are ready to do analytics!
+### Step 4: Run the Project
+
+After completing the above steps you’re ready to run your project.  Execute `dbt build` while in the root folder  run the entire project.  You now have all the Tuva tables in your database and are ready to do analytics!
 <br/><br/>
 
 ## 🙋🏻‍♀️ How is this package maintained and how do I contribute?
