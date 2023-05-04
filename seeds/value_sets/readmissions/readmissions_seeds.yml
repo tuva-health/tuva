@@ -76,7 +76,7 @@ seeds:
   - name: readmissions__icd_10_pcs_to_ccs
     config:
       schema: |
-        {%- if var('readmissions_schema',None) != None -%}{{var('readmissions_schema')}}{%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_treadmissions{% else %}readmissions{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_icd_10_pcs_to_ccs
       tags: readmissions
       column_types:
