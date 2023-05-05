@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- Staging model for the input layer:
 -- stg_diagnosis input layer model.
 -- This contains one row for every unique diagnosis each patient has.

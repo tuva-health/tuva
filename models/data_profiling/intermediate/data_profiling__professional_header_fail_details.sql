@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 {% set professional_header_column_list = [
     'claim_id'
     , 'claim_type'

@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- *************************************************
 -- This dbt model assigns an encounter_start_date and
 -- an encounter_end_date to each acute inpatient

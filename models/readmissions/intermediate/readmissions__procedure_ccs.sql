@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Here we map every procedure code to its corresponding
 -- CCS procedure category.

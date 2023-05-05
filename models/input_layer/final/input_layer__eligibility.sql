@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('input_layer_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 select
          cast(patient_id as {{ dbt.type_string() }} ) as patient_id

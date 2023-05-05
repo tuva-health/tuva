@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Staging model for the input layer:
 -- stg_encounter input layer model.

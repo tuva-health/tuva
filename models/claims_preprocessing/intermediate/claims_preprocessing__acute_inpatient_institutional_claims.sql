@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- *************************************************
 -- This dbt model gives us all acute inpatient institutional claims.
 -- We have one row per claim_id (for all claim_ids belonging to

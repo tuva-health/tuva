@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Here we give a list of all pairs of encounters
 -- that have some date overlap.

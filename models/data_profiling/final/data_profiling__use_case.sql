@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 select
     'encounters' as use_case
     , source_table

@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 select * from {{ ref('data_profiling__test_result_stage_medical_claim') }}
 
 union all

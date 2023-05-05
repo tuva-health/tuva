@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 with test_failure_summary as (
   select
       cast(source_table as {{ dbt.type_string() }} ) as source_table

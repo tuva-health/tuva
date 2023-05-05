@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Here we list all index admissions for the hospital wide readmissions
 -- measure.

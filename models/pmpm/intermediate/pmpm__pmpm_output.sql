@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('pmpm_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 with valid_eligibility_rows as (
 select
   patient_id,

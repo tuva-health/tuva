@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- *************************************************
 -- This dbt model returns all the columns with relevant
 -- encounter fields that we will append to the medical_claim

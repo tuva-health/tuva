@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 {% set eligibility_missing_column_list = [
     'patient_id'
     , 'member_id'
