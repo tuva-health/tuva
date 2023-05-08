@@ -192,6 +192,7 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(2000) {%- endif -%}
         short_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
   - name: terminology__icd_10_cm
     config:
       schema: |
@@ -211,6 +212,7 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
   - name: terminology__icd_10_pcs
     config:
       schema: |
@@ -229,6 +231,27 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
+  - name: terminology__icd_9_cm
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: icd_9_cm
+      tags:
+        - terminology
+        - claims_preprocessing
+        - readmissions
+        - data_profiling
+      column_types:
+        icd_9_cm : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        long_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        short_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__mdc
     config:
       schema: |
@@ -240,6 +263,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         mcd_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__medicare_dual_eligibility
     config:
       schema: |
@@ -254,6 +279,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         dual_status_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__ssa_fips_state
     config:
       schema: |
@@ -265,6 +292,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         ssa_fips_state_name : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__medicare_status
     config:
       schema: |
@@ -281,6 +310,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         medicare_status_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
   - name: terminology__ms_drg
     config:
       schema: |
@@ -302,6 +333,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         deprecated: integer
         deprecated_date: date
+
+
   - name: terminology__other_provider_taxonomy
     config:
       schema: |
@@ -320,6 +353,8 @@ seeds:
         description: |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(101) {%- endif -%}
         primary_flag:  integer
+
+        
   - name: terminology__payer_type
     config:
       schema: |
