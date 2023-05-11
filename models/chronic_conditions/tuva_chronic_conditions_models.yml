@@ -6,7 +6,9 @@ models:
       This model creates one record per patient per condition using the tuva chronic conditions hierarchy 
       as the grouper. The model pulls in the first and last date of the diagnosis that flagged the patient for this condition group.
     config:
-      schema: chronic_conditions
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}
       alias: tuva_chronic_conditions_long
       tags:
         - tuva_chronic_conditions
@@ -35,7 +37,9 @@ models:
   - name: chronic_conditions__tuva_chronic_conditions_wide
     description: This model creates one record per patient with flags for all the conditions in the tuva chronic conditions hierarchy. A patient will have a 1 in the column for a certain condition if they have every been coded with a diagnosis that rolls up to that condition and a 0 if not.
     config:
-      schema: chronic_conditions
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}
       alias: tuva_chronic_conditions_wide
       tags:
         - tuva_chronic_conditions
