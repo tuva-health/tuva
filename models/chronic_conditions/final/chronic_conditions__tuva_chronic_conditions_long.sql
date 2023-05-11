@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('tuva_chronic_conditions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 with condition_row_number as
 (
     select 

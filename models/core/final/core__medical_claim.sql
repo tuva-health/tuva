@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('core_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- *************************************************
 -- This dbt model creates the medical_claim table
 -- in core. It adds these 4 fields to the input layer

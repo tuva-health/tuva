@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 {% set pharmacy_claim_missing_column_list = [
     'claim_id'
     , 'claim_line_number'

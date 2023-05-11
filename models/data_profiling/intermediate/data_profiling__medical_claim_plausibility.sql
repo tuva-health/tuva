@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 with claim_start_date_after_claim_end_date as (
   select
       'claim start date after claim end date' as test_name

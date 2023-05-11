@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Here we list all encounters from the stg_encounter table
 -- with data quality flags that may disqualify them from

@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- Here calculate days to readmission for encounters
 -- that had a readmission and create readmission flags
 

@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- *************************************************
 -- This dbt model summarizes data quality issues
 -- that could affect claims preprocessing.

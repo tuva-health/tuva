@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- *************************************************
 -- This dbt model returns relevant encounter-level
 -- data for every professional or institutional

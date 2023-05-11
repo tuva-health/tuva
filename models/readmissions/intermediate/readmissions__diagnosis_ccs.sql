@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Here we take all rows from the stg_diagnosis
 -- table that correspond to encounters with

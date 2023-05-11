@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('cms_chronic_conditions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 with chronic_conditions as (
 
     select * from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }}

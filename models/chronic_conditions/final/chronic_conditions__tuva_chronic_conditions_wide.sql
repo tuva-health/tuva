@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('tuva_chronic_conditions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 with condition_columns as
     (select distinct condition, condition_column_name from {{ ref('chronic_conditions__tuva_chronic_conditions_hierarchy')}})
 

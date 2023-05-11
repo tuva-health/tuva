@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('cms_chronic_conditions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 {%- set condition_filter = 'Human Immunodeficiency Virus and/or Acquired Immunodeficiency Syndrome (HIV/AIDS)' -%}
 
 with chronic_conditions as (

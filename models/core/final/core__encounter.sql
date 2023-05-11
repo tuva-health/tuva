@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('core_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- *************************************************
 -- This dbt model creates the encounter table in core.

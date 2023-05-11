@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Every encounter should have one and only one primary
 -- diagnosis. A potential data quality problem would

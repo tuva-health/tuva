@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
+
 -- Here we list all encounters from the stg_encounter model
 -- and we augment them with extra fields
 -- that are relevant for readmission measures

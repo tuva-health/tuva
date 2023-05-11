@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('input_layer_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 select
          cast(claim_id as {{ dbt.type_string() }} ) as claim_id

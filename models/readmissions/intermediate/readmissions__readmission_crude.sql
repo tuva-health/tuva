@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+   )
+}}
 
 -- Here we calculate readmissions using all encounters
 -- that have valid admit and discharge dates and no overlap.
