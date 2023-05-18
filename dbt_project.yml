@@ -5,6 +5,20 @@ require-dbt-version: ">=1.2.0"
 
 profile: default
 
+vars:
+
+    ## These vars are specific to the CCSR data mart
+    # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
+    wide_condition_enabled: True
+    wide_procedure_enabled: True
+
+    # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
+    record_type: "ip"
+
+    # CCSR Version numbers from HCUP
+    dxccsr_version: "'2023.1'"
+    prccsr_version: "'2023.1'"
+
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -16,3 +30,11 @@ target-path: "target"
 clean-targets:
     - "target"
     - "dbt_packages"
+
+seeds:
+  terminology:
+    terminology__provider:
+      +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv') }}"
+    terminology__other_provider_taxonomy:
+      +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv') }}"
+

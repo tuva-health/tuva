@@ -8,6 +8,7 @@ seeds:
       alias: _value_set_test_catalog
       tags:
         - data_profiling
+      enabled: "{{ var('data_profiling_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         source_table : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}

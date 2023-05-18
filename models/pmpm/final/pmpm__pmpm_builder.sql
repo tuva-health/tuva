@@ -6,7 +6,7 @@
 with member_months as
 (
     select distinct patient_id, year_month
-    from {{ref('pmpm__member_months')}}
+    from {{ref('member_months')}}
 )
 , claim_spend_and_utilization as
 (

@@ -5,10 +5,12 @@ models:
   - name: pmpm__pmpm_builder
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
       alias: pmpm_builder
-      tags: pmpm
+      tags: 
+        - pmpm
+        - claims_preprocessing
       materialized: table
     tests:
        - unique:
@@ -31,10 +33,12 @@ models:
   - name: pmpm__pmpm_trends
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
       alias: pmpm_trends
-      tags: pmpm
+      tags: 
+        - pmpm
+        - claims_preprocessing
       materialized: table
     description: >
       Shows pmpm over time for different categories of spend
@@ -65,10 +69,12 @@ models:
   - name: pmpm__claim_spend_and_utilization
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
       alias: _int_claim_spend_and_utilization
-      tags: pmpm
+      tags: 
+        - pmpm
+        - claims_preprocessing
       materialized: table
     tests:
        - unique:
@@ -88,45 +94,15 @@ models:
         description: This metric sums the paid_amounts or spend over the given dimension for each member month.
 
 
-  - name: pmpm__member_months
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
-      alias: _int_member_months
-      tags: pmpm
-      materialized: table
-    tests:
-       - unique:
-           column_name: "(patient_id || '_' || year_month)"
-    description: >
-      This model has a record for every year and month combination for every month that a patient is eligibile.
-    columns:
-      - name: patient_id
-        description: Unique identifier for each patient in the dataset.
-      - name: year_month
-        description: Concatenation of the year and month for the record. Each patient has one record per year_month of their eligibility.
-      - name: year
-        description: The year for the record.
-      - name: month
-        description: The month for the record.
-      - name: month_start
-        description: The first day of the month of the year_month for the record.
-      - name: month_end
-        description: The last day of the month of the year_month for the record.
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
-      - name: payer_type
-        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
-
-
   - name: pmpm__member_month_count
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
       alias: _int_member_month_count
-      tags: pmpm
+      tags: 
+        - pmpm
+        - claims_preprocessing
       materialized: table
     description: >
       Counts of how many members have eligibility in each year-month
@@ -135,10 +111,12 @@ models:
   - name: pmpm__pmpm_output
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
       alias: _int_pmpm_output
-      tags: pmpm
+      tags: 
+        - pmpm
+        - claims_preprocessing
       materialized: table
     description: >
       Table used to calculate pmpm trends

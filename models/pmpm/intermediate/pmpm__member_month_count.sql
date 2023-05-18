@@ -8,33 +8,28 @@ select
   patient_id,
   enrollment_start_date,
   enrollment_end_date,
-
-
-  cast( {{ dbt.date_trunc( "month", "enrollment_start_date") }} as date)   as floor_enrollment_start_date,
-  cast( {{ dbt.last_day("enrollment_end_date", "month") }} as date)    as ceil_enrollment_end_date
-
-from {{ ref('core__eligibility') }}
+  cast( {{ dbt.date_trunc( "month", "enrollment_start_date") }} as date) as floor_enrollment_start_date,
+  cast( {{ dbt.last_day("enrollment_end_date", "month") }} as date) as ceil_enrollment_end_date
+from {{ ref('input_layer__eligibility') }}
 where patient_id is not null
-and enrollment_start_date is not null
-and enrollment_end_date is not null
-and enrollment_start_date <= enrollment_end_date
+  and enrollment_start_date is not null
+  and enrollment_end_date is not null
+  and enrollment_start_date <= enrollment_end_date
 ),
-
 
 all_claim_dates as (
 select
   claim_start_date as claim_date,
-  patient_id as patient_id
-from {{ ref('core__medical_claim') }}
+  patient_id
+from {{ ref('input_layer__medical_claim') }}
 
 union all
 
 select
   dispensing_date as claim_date,
-  patient_id as patient_id
-from {{ ref('core__pharmacy_claim') }}
+  patient_id
+from {{ ref('input_layer__pharmacy_claim') }}
 ),
-
 
 member_months as (
 select
@@ -53,7 +48,6 @@ from (
 )
 group by year_month
 )
-
 
 select *
 from member_months

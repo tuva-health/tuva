@@ -10,6 +10,7 @@ seeds:
       tags:
         - tuva_chronic_conditions
         - chronic_conditions
+      enabled: "{{ var('tuva_chronic_conditions_enabled',var('tuva_marts_enabled',True)) }}"
     columns:
       - name: condition_family
         description: A higher level rollup grouping of conditions from the condition column

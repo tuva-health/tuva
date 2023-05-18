@@ -12,6 +12,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__acute_diagnosis_icd_10_cm
     config:
       schema: |
@@ -23,6 +25,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__always_planned_ccs_diagnosis_category
     config:
       schema: |
@@ -34,6 +38,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__always_planned_ccs_procedure_category
     config:
       schema: |
@@ -45,6 +51,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__exclusion_ccs_diagnosis_category
     config:
       schema: |
@@ -58,6 +66,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         exclusion_category : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__icd_10_cm_to_ccs
     config:
       schema: |
@@ -73,6 +83,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         ccs_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__icd_10_pcs_to_ccs
     config:
       schema: |
@@ -88,6 +100,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         ccs_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__potentially_planned_ccs_procedure_category
     config:
       schema: |
@@ -99,6 +113,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__potentially_planned_icd_10_pcs
     config:
       schema: |
@@ -110,6 +126,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__specialty_cohort
     config:
       schema: |
@@ -125,6 +143,8 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         procedure_or_diagnosis : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
   - name: readmissions__surgery_gynecology_cohort
     config:
       schema: |
@@ -140,3 +160,4 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         specialty_cohort : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
