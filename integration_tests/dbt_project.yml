@@ -48,10 +48,9 @@ clean-targets:
 
 models:
   integration_tests:
-    +database: dev
-    +schema: tuva_claims
-  the_tuva_project:
-    +database: dev
-  
-seeds:
-  +database: dev
+    +materialized: ephemeral
+#  the_tuva_project:
+#    +database: tuva_test
+
+# seeds:
+#   +database: dev
