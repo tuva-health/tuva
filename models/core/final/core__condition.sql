@@ -525,7 +525,7 @@ select distinct
   poa.present_on_admit_description as present_on_admit_description,
   unpivot_cte.data_source as data_source
 from unpivot_cte
-    left join {{ ref('claims_preprocessing__encounter_data_for_medical_claims')}} as eg
+    left join {{ ref('encounter_grouper__encounter_data_for_medical_claims')}} as eg
         on  unpivot_cte.claim_id = eg.claim_id
         and unpivot_cte.patient_id = eg.patient_id
 --         and unpivot_cte.data_source = eg.data_source

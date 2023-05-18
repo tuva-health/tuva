@@ -1,0 +1,37 @@
+version: 2
+
+seeds:
+  - name: dxccsr_v2023_1_cleaned_map
+    description: A table containing the CSV mapping file included with the DXCCSR SAS program.
+      The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
+      For each ICD-10-CM code, the table contains up to six CCSR category codes and a default CCSR category code.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+      alias: _value_set_dxccsr_v2023_1_cleaned_map
+      tags:
+        - ccsr
+      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+
+  - name: prccsr_v2023_1_cleaned_map
+    description: A table containing the CSV mapping file included with the PRCCSR SAS program.
+      The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+      alias: _value_set_prccsr_v2023_1_cleaned_map
+      tags:
+        - ccsr
+      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+
+  - name: dxccsr_v2023_1_body_systems
+    description: |
+      A table containing descriptions of the top level categories used in the CCSR condition mapper.
+      This was manually exctracted from the User Guide PDF included with the DXCCSR SAS program.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+      alias: _value_set_dxccsr_v2023_1_body_systems
+      tags:
+        - ccsr
+      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"

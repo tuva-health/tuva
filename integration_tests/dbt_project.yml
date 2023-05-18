@@ -4,22 +4,35 @@ config-version: 2
 
 profile: 'default'
 
-
-
 vars:
 
+  input_database: tuva_project_demo
+  input_schema: tuva_synthetic
 
-### optional overrides for sources only for integration_tests
-#  claims_preprocessing_input_database: dev_ci_testing
-  claims_preprocessing_input_schema: claims_data_model
+  ## Input Layer
+  input_layer_enabled: true
+  
+  ## All Data Marts
+  tuva_marts_enabled: true
 
-#  tuva_database: yabbadabba
-#  tuva_schema_prefix: test
+  ## Claims Data Marts
+  member_months_enabled: true
+  service_category_grouper_enabled: true
+  encounter_grouper_enabled: true
+  pmpm_enabled: true
+  data_profiling_enabled: true
+  claims_date_profiling_enabled: true
+  #cms_hccs_enabled: false
 
+  ## Core Data Model
+  core_enabled: true
 
-dispatch:
-  - macro_namespace: dbt
-    search_order: [ 'the_tuva_project', 'dbt']
+  # ## High-level Data Marts
+  readmissions_enabled: true
+  cms_chronic_conditions_enabled: true
+  tuva_chronic_conditions_enabled: true
+  ccsr_enabled: true
+  ## emergency_department_enabled: false
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -28,18 +41,17 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-
-
 target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
 
-
-
 models:
   integration_tests:
-    +materialized: ephemeral
-#  the_tuva_project:
-#    +database: tuva_test
+    +database: dev
+    +schema: tuva_claims
+  the_tuva_project:
+    +database: dev
   
+seeds:
+  +database: dev

@@ -32,7 +32,7 @@ select
   sum(aa.total_cost_amount) as total_cost_amount,
   max(aa.data_source) as data_source
 from {{ ref('core__medical_claim') }} aa
-left join {{ ref('claims_preprocessing__encounter_grouper')}} as eg
+left join {{ ref('encounter_grouper__encounter_grouper')}} as eg
     on  aa.claim_id = eg.claim_id
     and aa.claim_line_number = eg.claim_line_number
     and aa.patient_id = eg.patient_id
