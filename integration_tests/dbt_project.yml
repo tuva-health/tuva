@@ -2,7 +2,7 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: 'default'
+profile: 'tuva-snowflake'
 
 vars:
 
@@ -13,25 +13,25 @@ vars:
   input_layer_enabled: true
   
   ## All Data Marts
-  tuva_marts_enabled: true
+  tuva_marts_enabled: false
 
   ## Claims Data Marts
-  member_months_enabled: true
+  member_months_enabled: false
   service_category_grouper_enabled: true
-  encounter_grouper_enabled: true
-  pmpm_enabled: true
-  data_profiling_enabled: true
-  claims_date_profiling_enabled: true
+  encounter_grouper_enabled: false
+  pmpm_enabled: false
+  data_profiling_enabled: false
+  claims_date_profiling_enabled: false
   #cms_hccs_enabled: false
 
   ## Core Data Model
-  core_enabled: true
+  core_enabled: false
 
   # ## High-level Data Marts
-  readmissions_enabled: true
-  cms_chronic_conditions_enabled: true
-  tuva_chronic_conditions_enabled: true
-  ccsr_enabled: true
+  readmissions_enabled: false
+  cms_chronic_conditions_enabled: false
+  tuva_chronic_conditions_enabled: false
+  ccsr_enabled: false
   ## emergency_department_enabled: false
 
 model-paths: ["models"]
@@ -49,8 +49,8 @@ clean-targets:
 models:
   integration_tests:
     +materialized: ephemeral
-#  the_tuva_project:
-#    +database: tuva_test
+  the_tuva_project:
+   +database: dev_aaron2
 
-# seeds:
-#   +database: dev
+seeds:
+  +database: dev_aaron2
