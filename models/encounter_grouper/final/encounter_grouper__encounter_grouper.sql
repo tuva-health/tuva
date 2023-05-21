@@ -46,7 +46,7 @@ on aa.claim_id = bb.claim_id
 and aa.patient_id = bb.patient_id
 
 left join
-{{ ref('service_category') }} cc
+{{ ref('service_category_grouper') }} cc
 on aa.claim_id = cc.claim_id
 and aa.claim_line_number = cc.claim_line_number
 
