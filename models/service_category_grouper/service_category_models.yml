@@ -3,16 +3,12 @@ version: 2
 
 models:
 
-  - name: service_category
-    description: Assigns service categories to claim lines
+  - name: service_category_grouper
+    description: Assigns every claim line into a unique service category.
     config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: service_category
-      tags: 
-        - claims_preprocessing
+      alias: service_category_grouper
       materialized: table
+      tags: service_category_grouper
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

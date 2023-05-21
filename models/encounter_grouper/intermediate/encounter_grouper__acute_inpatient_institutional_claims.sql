@@ -15,11 +15,9 @@
 -- *************************************************
 
 
-
-
 with room_and_board_requirement as (
 select distinct claim_id
-from {{ ref('medical_claim') }} 
+from {{ ref('input_layer__medical_claim') }} 
 where revenue_center_code in
   ('0100','0101',
    '0110','0111','0112','0113','0114','0116','0117','0118','0119',
@@ -39,13 +37,10 @@ where revenue_center_code in
 drg_requirement as (
 select distinct claim_id
 from {{ ref('input_layer__medical_claim') }} mc
-
 left join {{ ref('terminology__ms_drg')}} msdrg
-on mc.ms_drg_code = msdrg.ms_drg_code
-
+  on mc.ms_drg_code = msdrg.ms_drg_code
 left join {{ ref('terminology__apr_drg')}} aprdrg
-on mc.apr_drg_code = aprdrg.apr_drg_code
-
+  on mc.apr_drg_code = aprdrg.apr_drg_code
 where (msdrg.ms_drg_code is not null) 
    or (aprdrg.apr_drg_code is not null)
 ),
@@ -73,19 +68,14 @@ select
   mc.facility_npi,
   mc.claim_type,
   mc.data_source
-
 from {{ ref('input_layer__medical_claim') }} mc
-
 inner join room_and_board_requirement rb
-on mc.claim_id = rb.claim_id
-
+  on mc.claim_id = rb.claim_id
 inner join drg_requirement drg
-on mc.claim_id = drg.claim_id
-
+  on mc.claim_id = drg.claim_id
 inner join bill_type_requirement bt
-on mc.claim_id = bt.claim_id
+  on mc.claim_id = bt.claim_id
 ),
-
 
 data_quality_flags as (
 select
