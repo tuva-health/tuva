@@ -38,10 +38,13 @@ from rx_transform
 group by 1,2
 )
 
-select *
+select
+year_month
+, {{ dbt_utils.pivot(
+        column='date_type'
+    , values=['dispensing_date','paid_date']
+    , agg='sum'
+    , quote_identifiers=false
+    ) }}
 from rx_pivot_prep
-pivot (sum(cnt) for date_type in (
-    'dispensing_date',
-    'paid_date'
-    )) as p
-order by 1
+group by year_month

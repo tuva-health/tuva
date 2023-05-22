@@ -27,7 +27,7 @@ select distinct
     else null
   end service_category_1
 , service_category as service_category_2
-from {{ ref('combined_professional')}}
+from {{ ref('service_category__combined_professional')}}
 
 union
 
@@ -55,4 +55,4 @@ select distinct
     else null
   end service_category_1
 , service_category as service_category_2
-from {{ ref('combined_institutional')}}
+from {{ ref('service_category__combined_institutional')}}

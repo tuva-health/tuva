@@ -6,14 +6,16 @@ profile: default
 
 vars:
 
-  input_database: tuva_project_demo
-  input_schema: tuva_synthetic
+  input_database: dev_ci_testing
+  input_schema: connector
+  
+  tuva_database: dev_ci_testing
+
+  ## All Data Marts
+  tuva_marts_enabled: true
 
   ## Input Layer
   input_layer_enabled: true
-  
-  ## All Data Marts
-  tuva_marts_enabled: true
 
   ## Claims Data Marts
   member_months_enabled: true
@@ -22,17 +24,28 @@ vars:
   pmpm_enabled: true
   data_profiling_enabled: true
   claims_date_profiling_enabled: true
-  #cms_hccs_enabled: false
 
   ## Core Data Model
   core_enabled: true
 
-  # ## High-level Data Marts
+  ## High-level Data Marts
   readmissions_enabled: true
   cms_chronic_conditions_enabled: true
   tuva_chronic_conditions_enabled: true
   ccsr_enabled: true
-  ## emergency_department_enabled: false
+
+  ## These vars are specific to the CCSR data mart
+  # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
+  wide_condition_enabled: True
+  wide_procedure_enabled: True
+
+  # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
+  record_type: "ip"
+
+  # CCSR Version numbers from HCUP
+  dxccsr_version: "'2023.1'"
+  prccsr_version: "'2023.1'"
+
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]

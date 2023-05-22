@@ -28,7 +28,7 @@ from med_claims
 
 , pivot_prep as (
 select
-  claim_start_date as year_month
+  cast(claim_start_date as {{ dbt.type_string() }} ) as year_month
 , 'claim_start_date' as date_type
 , count(distinct claim_id) as cnt
 from transform 
@@ -37,7 +37,7 @@ group by 1,2
 union all
 
 select
-  claim_end_date as year_month
+  cast(claim_end_date as {{ dbt.type_string() }} ) as year_month
 , 'claim_end_date' as date_type
 , count(distinct claim_id) as cnt
 from transform 
@@ -46,7 +46,7 @@ group by 1,2
 union all
 
 select
-  admission_date as year_month
+  cast(admission_date as {{ dbt.type_string() }} ) as year_month
 , 'admission_date' as date_type
 , count(distinct claim_id) as cnt
 from transform 
@@ -55,7 +55,7 @@ group by 1,2
 union all
 
 select
-  discharge_date as year_month
+  cast(discharge_date as {{ dbt.type_string() }} ) as year_month
 , 'discharge_date' as date_type
 , count(distinct claim_id) as cnt
 from transform 
@@ -64,20 +64,20 @@ group by 1,2
 union all
 
 select
-  paid_date as year_month
+  cast(paid_date as {{ dbt.type_string() }} ) as year_month
 , 'paid_date' as date_type
 , count(distinct claim_id) as cnt
 from transform 
 group by 1,2
 )
 
-select *
+select 
+year_month
+, {{ dbt_utils.pivot(
+        column='date_type'
+    , values=['claim_start_date','claim_end_date','admission_date','discharge_date','paid_date']
+    , agg='sum'
+    , quote_identifiers=false
+    ) }}
 from pivot_prep
-pivot (sum(cnt) for date_type in (
-    'claim_start_date',
-    'claim_end_date',
-    'admission_date',
-    'discharge_date',
-    'paid_date'
-    )) as p
-order by 1
+group by year_month
