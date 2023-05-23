@@ -58,42 +58,42 @@ select
 , count(1) as cnt
 from claim_start
 
-union
+union all
 
 select 
   'claim_end_date' as date_type
 , count(1) as cnt
 from claim_end
 
-union
+union all
 
 select 
   'admission_date' as date_type
 , count(1) as cnt
 from admission_date
 
-union
+union all
 
 select 
   'discharge_date' as date_type
 , count(1) as cnt
 from discharge_date
 
-union
+union all
 
 select 
   'med_paid_date' as date_type
 , count(1) as cnt
 from med_paid_date
 
-union
+union all
 
 select 
   'dispensing_date' as date_type
 , count(1) as cnt
 from dispensing_date
 
-union
+union all
 
 select 
   'rx_paid_date' as date_type

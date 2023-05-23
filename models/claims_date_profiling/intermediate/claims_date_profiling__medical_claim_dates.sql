@@ -17,11 +17,11 @@ group by claim_id
 
 , transform as (
 select
-  date_part(year,claim_start_date) || lpad(date_part(month,claim_start_date),2,0) as claim_start_date
-, date_part(year,claim_end_date) || lpad(date_part(month,claim_end_date),2,0) as claim_end_date
-, date_part(year,admission_date) || lpad(date_part(month,admission_date),2,0) as admission_date
-, date_part(year,discharge_date) || lpad(date_part(month,discharge_date),2,0) as discharge_date
-, date_part(year,paid_date) || lpad(date_part(month,paid_date),2,0) as paid_date
+  cast({{ date_part("year","claim_start_date") }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month","claim_start_date") }} as {{ dbt.type_string() }} ),2,'0') as claim_start_date
+, cast({{ date_part("year","claim_end_date") }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month","claim_end_date") }} as {{ dbt.type_string() }} ),2,'0') as claim_end_date
+, cast({{ date_part("year","admission_date") }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month","admission_date") }} as {{ dbt.type_string() }} ),2,'0') as admission_date
+, cast({{ date_part("year","discharge_date") }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month","discharge_date") }} as {{ dbt.type_string() }} ),2,'0') as discharge_date
+, cast({{ date_part("year","paid_date") }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month","paid_date") }} as {{ dbt.type_string() }} ),2,'0') as paid_date
 , claim_id
 from med_claims
 )

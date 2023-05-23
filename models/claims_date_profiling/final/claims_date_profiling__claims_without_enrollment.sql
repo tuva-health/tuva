@@ -5,17 +5,17 @@
 
 select 
   'medical claims without enrollment' as test_description
-, count(distinct claim_id)
+, count(distinct claim_id) as claim_count
 from {{ ref('medical_claim') }}  a
 left join {{ ref('eligibility') }}  b
     on a.patient_id = b.patient_id
 where b.patient_id is null
 
-union
+union all
 
 select 
   'rx claims without enrollment' as test_description
-, count(distinct claim_id)
+, count(distinct claim_id) as claim_count
 from {{ ref('pharmacy_claim') }}  a
 left join {{ ref('eligibility') }}  b
     on a.patient_id = b.patient_id

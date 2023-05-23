@@ -29,7 +29,7 @@ select distinct
 , service_category as service_category_2
 from {{ ref('service_category__combined_professional')}}
 
-union
+union all
 
 select distinct 
   claim_id

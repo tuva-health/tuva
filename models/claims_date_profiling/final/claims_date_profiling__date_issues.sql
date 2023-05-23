@@ -9,7 +9,7 @@ select
 from {{ ref('medical_claim') }} 
 where claim_start_date > claim_end_date
 
-union
+union all
 
 select
   'admission_date > discharge_date' as test_description
@@ -17,7 +17,7 @@ select
 from {{ ref('medical_claim') }} 
 where admission_date > discharge_date
 
-union
+union all
 
 select
   'enrollment_start_date > enrollment_end_date' as test_description

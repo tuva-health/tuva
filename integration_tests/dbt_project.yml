@@ -6,10 +6,10 @@ profile: default
 
 vars:
 
-  input_database: dev_ci_testing
-  input_schema: connector
+  input_database: tuva-datasets
+  input_schema: dev_ci_testing
   
-  tuva_database: dev_ci_testing
+  #tuva_database: dev_ci_testing
 
   ## All Data Marts
   tuva_marts_enabled: true
@@ -62,30 +62,3 @@ clean-targets:
 models:
   integration_tests:
     +materialized: ephemeral
-#   the_tuva_project:
-#    +database: dev_aaron2
-#    input_layer:
-#     +schema: input_layer
-#    member_months:
-#     +schema: member_months
-#    service_category_grouper:
-#     +schema: service_category_grouper
-#    encounter_grouper:
-#     +schema: encounter_grouper
-#    pmpm:
-#     +schema: pmpm
-#    data_profiling:
-#     +schema: claims_profiling
-#    claims_date_profiling:
-#     +schema: claims_profiling
-#    core:
-#     +schema: core
-#    readmissions:
-#     +schema: readmissions
-#    chronic_conditions:
-#     +schema: chronic_conditions
-#    ccsr:
-#     +schema: ccsr   
-
-# seeds:
-#   +database: dev_aaron2
