@@ -32,9 +32,9 @@ clean-targets:
     - "dbt_packages"
 
 seeds:
-  terminology:
-    terminology__provider:
-      +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv') }}"
-    terminology__other_provider_taxonomy:
-      +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv') }}"
-
+  the_tuva_project:
+    terminology:
+      terminology__provider:
+        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv') }}"
+      terminology__other_provider_taxonomy:
+        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv') }}"
