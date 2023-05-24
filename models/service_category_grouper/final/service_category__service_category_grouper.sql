@@ -34,7 +34,7 @@ left join {{ ref('combined_professional') }} b
   and a.claim_line_number = b.claim_line_number
 where a.claim_type = 'professional'
 
-union
+union all
 
 select distinct 
   a.claim_id

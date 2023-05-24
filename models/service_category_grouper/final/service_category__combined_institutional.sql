@@ -6,47 +6,47 @@
 select *
 from {{ ref('acute_inpatient_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('dialysis_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('emergency_department_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('home_health_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('hospice_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('lab_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('outpatient_hospital_or_clinic_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('outpatient_psychiatric_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('skilled_nursing_institutional') }}
 
-union
+union all
 
 select *
 from {{ ref('urgent_care_institutional') }}

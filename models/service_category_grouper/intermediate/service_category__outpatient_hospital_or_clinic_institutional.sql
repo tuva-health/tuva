@@ -7,9 +7,10 @@ select distinct
   a.claim_id
 , 'Outpatient Hospital or Clinic' as service_category_2
 from {{ ref('input_layer__medical_claim') }} a
-left join {{ ref('emergency_department_institutional') }} b
+left join {{ ref('service_category__emergency_department_institutional') }} b
   on a.claim_id = b.claim_id
-left join {{ ref('urgent_care_institutional') }} c
+  and b.claim_line_number = b.claim_line_number
+left join {{ ref('service_category__urgent_care_institutional') }} c
   on a.claim_id = c.claim_id
 where a.claim_type = 'institutional'
   and left(a.bill_type_code,2) in ('13','71','73')
