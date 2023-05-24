@@ -7,7 +7,7 @@ profile: tuva-snowflake
 vars:
 
   input_database: medicare_lds_five_percent
-  input_schema: input_layer
+  input_schema: tuva_claims
 
   ## Input Layer
   input_layer_enabled: true
@@ -50,29 +50,11 @@ models:
   integration_tests:
     +materialized: ephemeral
   the_tuva_project:
-   +database: martin_sprocket
-   input_layer:
-    +schema: input_layer2
-   member_months:
-    +schema: member_months
-   service_category_grouper:
-    +schema: service_category_grouper
-   encounter_grouper:
-    +schema: encounter_grouper
-   pmpm:
-    +schema: pmpm
-   data_profiling:
-    +schema: claims_profiling
-   claims_date_profiling:
-    +schema: claims_profiling
-   core:
-    +schema: core
-   readmissions:
-    +schema: readmissions
-   chronic_conditions:
-    +schema: chronic_conditions
-   ccsr:
-    +schema: ccsr   
+    +database: medicare_lds_five_percent
+    # input_layer:
+    #   +schema: input_layer
+    # service_category_grouper:
+    #   +schema: service_category_grouper
 
 seeds:
-  +database: dev_aaron2
+  +database: medicare_lds_five_percent

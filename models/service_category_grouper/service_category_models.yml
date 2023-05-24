@@ -1,29 +1,8 @@
-
 version: 2
 
 models:
 
 ##  Final
-  - name: service_category__combined_professional
-    description: N/A
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
-        {% else %}service_category{%- endif -%}
-      alias: combined_professional
-      materialized: table
-      tags: service_category_grouper
-
-
-  - name: service_category__combined_institutional
-    description: N/A
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
-        {% else %}service_category{%- endif -%}
-      alias: combined_institutional
-      materialized: table
-      tags: service_category_grouper
 
   - name: service_category__service_category_grouper
     description: Assigns every claim line into a unique service category.
@@ -46,6 +25,26 @@ models:
 
 
   ##  Intermediate
+
+  - name: service_category__combined_professional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
+        {% else %}service_category{%- endif -%}
+      alias: _int_combined_professional
+      materialized: table
+      tags: service_category_grouper
+    
+  - name: service_category__combined_institutional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
+        {% else %}service_category{%- endif -%}
+      alias: _int_combined_institutional
+      materialized: table
+      tags: service_category_grouper
 
   - name:  service_category__acute_inpatient_institutional
     description: N/A

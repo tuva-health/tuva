@@ -8,7 +8,7 @@ select distinct
 , a.claim_line_number
 , 'Ambulatory Surgery' as service_category_2
 from {{ ref('input_layer__medical_claim') }} a
-left join {{ ref('dme_professional') }} b
+left join {{ ref('service_category__dme_professional') }} b
   on a.claim_id = b.claim_id
   and a.claim_line_number = b.claim_line_number
 where a.claim_type = 'professional'

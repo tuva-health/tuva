@@ -5,8 +5,7 @@
 
 select
   claim_id
-, claim_line_number
 , count(distinct service_category_2) as distinct_service_category_count
-from {{ ref('combined_professional') }}
-group by 1,2
+from {{ ref('service_category__combined_institutional') }}
+group by 1
 having count(distinct service_category_2) > 1

@@ -9,7 +9,6 @@ select distinct
 from {{ ref('input_layer__medical_claim') }} a
 left join {{ ref('service_category__emergency_department_institutional') }} b
   on a.claim_id = b.claim_id
-  and b.claim_line_number = b.claim_line_number
 left join {{ ref('service_category__urgent_care_institutional') }} c
   on a.claim_id = c.claim_id
 where a.claim_type = 'institutional'
