@@ -9,6 +9,7 @@ models:
       alias: eligibility
       tags: input_layer
       materialized: view
+      bind: false
     description: > 
      The eligibility table includes information about a patient's health insurance coverage and demographics (note: we use the word patient as a synonym for member). Every claims dataset should include some sort of eligibility data, otherwise it's impossible to calculate member months, which are needed to calculate measures like PMPM.
     columns:
@@ -77,6 +78,7 @@ models:
       alias: medical_claim
       tags: input_layer
       materialized: view
+      bind: false
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -556,6 +558,7 @@ models:
       alias: pharmacy_claim
       tags: input_layer
       materialized: view
+      bind: false
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
