@@ -8,4 +8,3 @@ select
 , count(1) as member_months
 from {{ ref('member_months') }}
 group by 1
-order by 1

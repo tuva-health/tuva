@@ -14,8 +14,8 @@ group by claim_id
 
 , rx_transform as (
 select
-  date_part(year,dispensing_date) || lpad(date_part(month,dispensing_date),2,0) as dispensing_date
-, date_part(year,paid_date) || lpad(date_part(month,paid_date),2,0) as paid_date
+  cast({{ date_part("year","dispensing_date") }} as {{ dbt.type_string() }} ) || lpad( cast( {{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }} ) ,2,'0') as dispensing_date
+, cast({{ date_part("year","paid_date") }} as {{ dbt.type_string() }} ) || lpad( cast( {{ date_part("month", "paid_date") }} as {{ dbt.type_string() }} ) ,2,'0') as paid_date
 , claim_id
 from rx_claims
 )
@@ -38,10 +38,13 @@ from rx_transform
 group by 1,2
 )
 
-select *
+select
+year_month
+, {{ dbt_utils.pivot(
+        column='date_type'
+    , values=['dispensing_date','paid_date']
+    , agg='sum'
+    , quote_identifiers=false
+    ) }}
 from rx_pivot_prep
-pivot (sum(cnt) for date_type in (
-    'dispensing_date',
-    'paid_date'
-    )) as p
-order by 1
+group by year_month
