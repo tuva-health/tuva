@@ -6,13 +6,13 @@
 select
   coalesce(a.year_month,b.year_month,c.year_month) as year_month
 , c.member_months
-, a."'claim_start_date'" as claim_start_date
-, a."'claim_end_date'" as claim_end_date
-, a."'admission_date'" as admission_date
-, a."'discharge_date'" as discharge_date
-, a."'paid_date'" as medical_paid_date
-, b."'dispensing_date'" as dispensing_date
-, b."'paid_date'" as rx_paid_date
+, a.claim_start_date as claim_start_date
+, a.claim_end_date as claim_end_date
+, a.admission_date as admission_date
+, a.discharge_date as discharge_date
+, a.paid_date as medical_paid_date
+, b.dispensing_date as dispensing_date
+, b.paid_date as rx_paid_date
 from {{ ref('claims_date_profiling__medical_claim_dates') }} a
 full join {{ ref('claims_date_profiling__pharmacy_claim_dates') }} b
     on a.year_month = b.year_month

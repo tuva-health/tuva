@@ -6,14 +6,16 @@ profile: default
 
 vars:
 
-  input_database: tuva_project_demo
-  input_schema: tuva_synthetic
+#  input_database: tuva_project_demo
+#  input_schema: tuva_synthetic
+  
+#  tuva_database: dev_thuxuan
+
+  ## All Data Marts
+  tuva_marts_enabled: true
 
   ## Input Layer
   input_layer_enabled: true
-  
-  ## All Data Marts
-  tuva_marts_enabled: true
 
   ## Claims Data Marts
   member_months_enabled: true
@@ -22,17 +24,28 @@ vars:
   pmpm_enabled: true
   data_profiling_enabled: true
   claims_date_profiling_enabled: true
-  #cms_hccs_enabled: false
 
   ## Core Data Model
   core_enabled: true
 
-  # ## High-level Data Marts
+  ## High-level Data Marts
   readmissions_enabled: true
   cms_chronic_conditions_enabled: true
   tuva_chronic_conditions_enabled: true
   ccsr_enabled: true
-  ## emergency_department_enabled: false
+
+  ## These vars are specific to the CCSR data mart
+  # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
+  wide_condition_enabled: true
+  wide_procedure_enabled: true
+
+  # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
+  record_type: "ip"
+
+  # CCSR Version numbers from HCUP
+  dxccsr_version: "'2023.1'"
+  prccsr_version: "'2023.1'"
+
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -49,30 +62,3 @@ clean-targets:
 models:
   integration_tests:
     +materialized: ephemeral
-#   the_tuva_project:
-#    +database: dev_aaron2
-#    input_layer:
-#     +schema: input_layer
-#    member_months:
-#     +schema: member_months
-#    service_category_grouper:
-#     +schema: service_category_grouper
-#    encounter_grouper:
-#     +schema: encounter_grouper
-#    pmpm:
-#     +schema: pmpm
-#    data_profiling:
-#     +schema: claims_profiling
-#    claims_date_profiling:
-#     +schema: claims_profiling
-#    core:
-#     +schema: core
-#    readmissions:
-#     +schema: readmissions
-#    chronic_conditions:
-#     +schema: chronic_conditions
-#    ccsr:
-#     +schema: ccsr   
-
-# seeds:
-#   +database: dev_aaron2

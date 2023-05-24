@@ -7,10 +7,10 @@ select distinct
   a.claim_id
 , a.claim_line_number
 from {{ ref('input_layer__medical_claim') }} a
-left join {{ ref('emergency_department_institutional') }} b
+left join {{ ref('service_category__emergency_department_institutional') }} b
   on a.claim_id = b.claim_id
   and b.claim_line_number = b.claim_line_number
-left join {{ ref('urgent_care_institutional') }} c
+left join {{ ref('service_category__urgent_care_institutional') }} c
   on a.claim_id = c.claim_id
   and a.claim_line_number = c.claim_line_number
 where a.claim_type = 'institutional'

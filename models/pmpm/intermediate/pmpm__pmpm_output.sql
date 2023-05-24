@@ -118,7 +118,7 @@ select
 from {{ ref('input_layer__medical_claim') }} aa
 left join member_months bb
   on substring(cast(aa.claim_start_date as {{ dbt.type_string() }}), 1, 7) = bb.year_month
-left join {{ ref('service_category_grouper') }} dd
+left join {{ ref('service_category__service_category_grouper') }} dd
   on aa.claim_id = dd.claim_id
   and aa.claim_line_number = dd.claim_line_number
 left join medical_eligibility_flags cc

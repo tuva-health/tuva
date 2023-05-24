@@ -18,11 +18,11 @@ with bool_ranks as (
         claim_id,
         patient_id,
         ccsr_category,
-        ccsr_category like 'XXX%' as is_excluded,
-        booland_agg(diagnosis_rank = 1) as is_only_first,
-        boolor_agg(diagnosis_rank = 1) as is_first,
-        boolor_agg(diagnosis_rank >= 1) as is_nth,
-        boolor_agg(diagnosis_rank > 1) as not_first
+        case when ccsr_category like 'XXX%' then 1 else 0 end as is_excluded,
+        min(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_only_first,
+        max(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_first,
+        max(cast(case when diagnosis_rank >= 1 then 1 else 0 end as int)) as is_nth,
+        max(cast(case when diagnosis_rank > 1 then 1 else 0 end as int)) as not_first
     from {{ ref('ccsr__long_condition_category') }}
     {{ dbt_utils.group_by(n=5) }}
 
@@ -35,10 +35,10 @@ with bool_ranks as (
         ccsr_category,
         -- assigns one of four values for each DXCCSR data element as per pg 25 of DXCCSR User guide v2023.1
         case 
-            when not is_nth then 0
-            when is_only_first and not is_excluded then 1
-            when is_first and is_nth and not is_excluded then 2
-            when not_first then 3 
+            when is_nth = 0 then 0
+            when is_only_first = 1 and is_excluded = 0 then 1
+            when is_first = 1 and is_nth = 1 and is_excluded = 0 then 2
+            when not_first = 1 then 3 
             else -99 
             end as dx_code
     from bool_ranks 
