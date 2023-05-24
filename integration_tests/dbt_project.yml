@@ -6,10 +6,10 @@ profile: default
 
 vars:
 
-  input_database: dev_ci_testing
-  input_schema: claims_common
+#  input_database: tuva_project_demo
+#  input_schema: tuva_synthetic
   
-  tuva_database: dev_thuxuan
+#  tuva_database: dev_thuxuan
 
   ## All Data Marts
   tuva_marts_enabled: true
@@ -36,8 +36,8 @@ vars:
 
   ## These vars are specific to the CCSR data mart
   # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
-  wide_condition_enabled: True
-  wide_procedure_enabled: True
+  wide_condition_enabled: true
+  wide_procedure_enabled: true
 
   # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
   record_type: "ip"

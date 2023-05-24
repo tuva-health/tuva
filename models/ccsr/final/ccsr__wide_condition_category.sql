@@ -18,7 +18,7 @@ with bool_ranks as (
         claim_id,
         patient_id,
         ccsr_category,
-        case when ccsr_category like 'XXX%' then 1 end as is_excluded,
+        case when ccsr_category like 'XXX%' then 1 else 0 end as is_excluded,
         min(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_only_first,
         max(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_first,
         max(cast(case when diagnosis_rank >= 1 then 1 else 0 end as int)) as is_nth,
