@@ -4,55 +4,61 @@
 }}
 
 select distinct 
-  claim_id
-, claim_line_number
+  a.claim_id
+, a.claim_line_number
+, a.claim_type
 , case
-    when service_category = 'Acute Inpatient'               then 'Inpatient'
-    when service_category = 'Ambulance'                     then 'Ancillary'
-    when service_category = 'Ambulatory Surgery'            then 'Outpatient'
-    when service_category = 'Dialysis'                      then 'Outpatient'
-    when service_category = 'Durable Medical Equipment'     then 'Ancillary'
-    when service_category = 'Emergency Department'          then 'Outpatient'
-    when service_category = 'Home Health'                   then 'Outpatient'
-    when service_category = 'Hospice'                       then 'Outpatient'
-    when service_category = 'Inpatient Psychiatric'         then 'Inpatient'
-    when service_category = 'Inpatient Rehab'               then 'Inpatient'
-    when service_category = 'Lab'                           then 'Ancillary'
-    when service_category = 'Office Visit'                  then 'Office Visit'
-    when service_category = 'Other'                         then 'Other'
-    when service_category = 'Outpatient Hospital or Clinic' then 'Outpatient'
-    when service_category = 'Outpatient Psychiatric'        then 'Outpatient'
-    when service_category = 'Skilled Nursing'               then 'Inpatient'
-    when service_category = 'Urgent Care'                   then 'Outpatient'
-    else null
+    when service_category_2 = 'Acute Inpatient'               then 'Inpatient'
+    when service_category_2 = 'Ambulance'                     then 'Ancillary'
+    when service_category_2 = 'Ambulatory Surgery'            then 'Outpatient'
+    when service_category_2 = 'Dialysis'                      then 'Outpatient'
+    when service_category_2 = 'Durable Medical Equipment'     then 'Ancillary'
+    when service_category_2 = 'Emergency Department'          then 'Outpatient'
+    when service_category_2 = 'Home Health'                   then 'Outpatient'
+    when service_category_2 = 'Hospice'                       then 'Outpatient'
+    when service_category_2 = 'Inpatient Psychiatric'         then 'Inpatient'
+    when service_category_2 = 'Inpatient Rehabilitation'      then 'Inpatient'
+    when service_category_2 = 'Lab'                           then 'Ancillary'
+    when service_category_2 = 'Office Visit'                  then 'Office Visit'
+    when service_category_2 = 'Outpatient Hospital or Clinic' then 'Outpatient'
+    when service_category_2 = 'Outpatient Psychiatric'        then 'Outpatient'
+    when service_category_2 = 'Outpatient Rehabilitation'     then 'Outpatient'
+    when service_category_2 = 'Skilled Nursing'               then 'Inpatient'
+    when service_category_2 = 'Urgent Care'                   then 'Outpatient'
+    when service_category_2 is null                           then 'Other'
   end service_category_1
-, service_category as service_category_2
-from {{ ref('combined_professional')}}
+, service_category_2
+from {{ ref('input_layer__medical_claim') }} a
+left join {{ ref('combined_professional') }} b
+  on a.claim_id = b.claim_id
+  and a.claim_line_number = b.claim_line_number
+where a.claim_type = 'professional'
 
 union
 
 select distinct 
-  claim_id
-, claim_line_number
+  a.claim_id
+, a.claim_line_number
+, a.claim_type
 , case
-    when service_category = 'Acute Inpatient'               then 'Inpatient'
-    when service_category = 'Ambulance'                     then 'Ancillary'
-    when service_category = 'Ambulatory Surgery'            then 'Outpatient'
-    when service_category = 'Dialysis'                      then 'Outpatient'
-    when service_category = 'Durable Medical Equipment'     then 'Ancillary'
-    when service_category = 'Emergency Department'          then 'Outpatient'
-    when service_category = 'Home Health'                   then 'Outpatient'
-    when service_category = 'Hospice'                       then 'Outpatient'
-    when service_category = 'Inpatient Psychiatric'         then 'Inpatient'
-    when service_category = 'Inpatient Rehab'               then 'Inpatient'
-    when service_category = 'Lab'                           then 'Ancillary'
-    when service_category = 'Office Visit'                  then 'Office Visit'
-    when service_category = 'Other'                         then 'Other'
-    when service_category = 'Outpatient Hospital or Clinic' then 'Outpatient'
-    when service_category = 'Outpatient Psychiatric'        then 'Outpatient'
-    when service_category = 'Skilled Nursing'               then 'Inpatient'
-    when service_category = 'Urgent Care'                   then 'Outpatient'
-    else null
+    when service_category_2 = 'Acute Inpatient'               then 'Inpatient'
+    when service_category_2 = 'Ambulatory Surgery'            then 'Outpatient'
+    when service_category_2 = 'Dialysis'                      then 'Outpatient'
+    when service_category_2 = 'Emergency Department'          then 'Outpatient'
+    when service_category_2 = 'Home Health'                   then 'Outpatient'
+    when service_category_2 = 'Hospice'                       then 'Outpatient'
+    when service_category_2 = 'Inpatient Psychiatric'         then 'Inpatient'
+    when service_category_2 = 'Inpatient Rehabilitation'      then 'Inpatient'
+    when service_category_2 = 'Lab'                           then 'Ancillary'
+    when service_category_2 = 'Office Visit'                  then 'Office Visit'
+    when service_category_2 = 'Outpatient Hospital or Clinic' then 'Outpatient'
+    when service_category_2 = 'Outpatient Psychiatric'        then 'Outpatient'
+    when service_category_2 = 'Skilled Nursing'               then 'Inpatient'
+    when service_category_2 = 'Urgent Care'                   then 'Outpatient'
+    when service_category_2 is null                           then 'Other'
   end service_category_1
-, service_category as service_category_2
-from {{ ref('combined_institutional')}}
+, service_category_2
+from {{ ref('input_layer__medical_claim') }} a
+left join {{ ref('combined_institutional') }} b
+  on a.claim_id = b.claim_id
+where a.claim_type = 'institutional'

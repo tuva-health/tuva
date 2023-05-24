@@ -5,7 +5,7 @@
 
 select distinct 
   claim_id
-, claim_line_number
+, 'Outpatient Psychiatric' as service_category_2
 from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'institutional'
   and left(bill_type_code,2) in ('52')

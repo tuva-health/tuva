@@ -5,7 +5,7 @@
 
 select distinct 
   claim_id
-, claim_line_number
+, 'Emergency Department' as service_category_2
 from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'institutional'
   and revenue_center_code in ('0450','0451','0452','0459','0981')
