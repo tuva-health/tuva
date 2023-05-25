@@ -6,5 +6,5 @@
 select
   dq_problem
 , count(distinct claim_id) as distinct_claims
-from {{ ref('dq_input_layer_tests') }}
+from {{ ref('service_category__dq_input_layer_tests') }}
 group by 1

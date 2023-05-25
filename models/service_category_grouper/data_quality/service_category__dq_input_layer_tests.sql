@@ -10,7 +10,7 @@ from {{ ref('input_layer__medical_claim') }}
 group by 1
 having count(distinct claim_type) > 1
 
-union
+union all
 
 select distinct 
   claim_id
@@ -19,7 +19,7 @@ from {{ ref('input_layer__medical_claim') }}
 group by 1
 having count(distinct bill_type_code) > 1
 
-union
+union all
 
 select distinct 
   claim_id
@@ -27,7 +27,7 @@ select distinct
 from {{ ref('input_layer__medical_claim') }}
 where claim_type is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -36,7 +36,7 @@ from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'professional'
   and place_of_service_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -45,7 +45,7 @@ from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'institutional'
   and bill_type_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -54,7 +54,7 @@ from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'institutional'
   and revenue_center_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -63,7 +63,7 @@ from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'professional'
   and hcpcs_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -73,7 +73,7 @@ inner join {{ ref('terminology__claim_type') }} b
   on a.claim_type = b.claim_type
 where b.claim_type is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -84,7 +84,7 @@ inner join {{ ref('terminology__place_of_service') }} b
 where a.claim_type = 'professional'
   and b.place_of_service_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -95,7 +95,7 @@ inner join {{ ref('terminology__bill_type') }} b
 where a.claim_type = 'institutional'
   and b.bill_type_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -106,7 +106,7 @@ inner join {{ ref('terminology__revenue_center') }} b
 where a.claim_type = 'institutional'
   and b.revenue_center_code is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -117,7 +117,7 @@ inner join {{ ref('terminology__hcpcs_level_2') }} b
 where a.claim_type = 'professional'
   and b.hcpcs is null
 
-union
+union all
 
 select distinct 
   claim_id
@@ -128,7 +128,7 @@ inner join {{ ref('terminology__ms_drg') }} b
 where a.claim_type = 'institutional'
   and b.ms_drg_code is null
 
-union
+union all
 
 select distinct 
   claim_id

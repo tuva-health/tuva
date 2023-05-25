@@ -2,45 +2,37 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: tuva-snowflake
+profile: default
 
 vars:
 
-<<<<<<< HEAD
-  input_database: medicare_lds_five_percent
-  input_schema: tuva_claims
-=======
-#  input_database: tuva_project_demo
-#  input_schema: tuva_synthetic
+  # input_database: tuva-project-demo
+  # input_schema: tuva_synthetic
 
   ## All Data Marts
   tuva_marts_enabled: true
->>>>>>> 5420b3048a145f0e4f2d92c176e4b2339ce0e751
 
-  ## Input Layer
-  input_layer_enabled: true
+  # ## Input Layer
+  # input_layer_enabled: true
   
-  ## All Data Marts
-  tuva_marts_enabled: false
+  # ## Claims Data Marts
+  # member_months_enabled: false
+  # service_category_grouper_enabled: true
+  # encounter_grouper_enabled: false
+  # pmpm_enabled: false
+  # data_profiling_enabled: false
+  # claims_date_profiling_enabled: false
+  # #cms_hccs_enabled: false
 
-  ## Claims Data Marts
-  member_months_enabled: false
-  service_category_grouper_enabled: true
-  encounter_grouper_enabled: false
-  pmpm_enabled: false
-  data_profiling_enabled: false
-  claims_date_profiling_enabled: false
-  #cms_hccs_enabled: false
+  # ## Core Data Model
+  # core_enabled: false
 
-  ## Core Data Model
-  core_enabled: false
-
-  # ## High-level Data Marts
-  readmissions_enabled: false
-  cms_chronic_conditions_enabled: false
-  tuva_chronic_conditions_enabled: false
-  ccsr_enabled: false
-  ## emergency_department_enabled: false
+  # # ## High-level Data Marts
+  # readmissions_enabled: false
+  # cms_chronic_conditions_enabled: false
+  # tuva_chronic_conditions_enabled: false
+  # ccsr_enabled: false
+  # ## emergency_department_enabled: false
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -57,12 +49,4 @@ clean-targets:
 models:
   integration_tests:
     +materialized: ephemeral
-  the_tuva_project:
-    +database: medicare_lds_five_percent
-    # input_layer:
-    #   +schema: input_layer
-    # service_category_grouper:
-    #   +schema: service_category_grouper
 
-seeds:
-  +database: medicare_lds_five_percent

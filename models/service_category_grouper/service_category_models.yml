@@ -66,16 +66,6 @@ models:
       materialized: table
       tags: service_category_grouper
 
-  - name:  service_category__ambulance_institutional
-    description: N/A
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
-        {% else %}service_category{%- endif -%}
-      alias: _int_ambulance_institutional
-      materialized: table
-      tags: service_category_grouper
-
   - name:  service_category__ambulance_professional
     description: N/A
     config:
@@ -113,16 +103,6 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
         {% else %}service_category{%- endif -%}
       alias: _int_dialysis_professional
-      materialized: table
-      tags: service_category_grouper
-
-  - name:  service_category__dme_institutional
-    description: N/A
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
-        {% else %}service_category{%- endif -%}
-      alias: _int_service_category__dme_institutional
       materialized: table
       tags: service_category_grouper
 
