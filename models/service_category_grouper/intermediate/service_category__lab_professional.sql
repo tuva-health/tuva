@@ -6,6 +6,7 @@
 select distinct 
   claim_id
 , claim_line_number
+, 'Lab' as service_category_2
 from {{ ref('input_layer__medical_claim') }}
 where claim_type = 'professional'
   and place_of_service_code = '81'
