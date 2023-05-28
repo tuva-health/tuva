@@ -2,121 +2,306 @@ version: 2
 
 models:
 
-  - name: pmpm__pmpm_builder
+#### Final 
+
+  - name: pmpm__pmpm_prep
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: pmpm_builder
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: pmpm_prep
       tags: 
         - pmpm
-        - claims_preprocessing
       materialized: table
     tests:
        - unique:
            column_name: "(patient_id || '_' || year_month)"
     description: >
-      Add model description
+      Computes all the paid and allowed statistics for every patient_id and year_month combination.  
     columns:
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: year_month
-        description: Concatenation of the year and month for the record. Each patient has one record per year_month of their eligibility, or in other words, one record per member month.
+        description: Unique year-month of in the dataset computed from eligibility.
+      - name: member_months
+        description: The sum of member months.
       - name: total_paid
-        description: This metric sums the total paid_amounts or spend for pharmacy and medical claims over the given dimension for each member month.
+        description: Total paid amount per member per month (PMPM).
       - name: medical_paid
-        description: This metric sums the medical claims paid_amounts or spend over the given dimension for each member month.
+        description: Total medical paid amount per member per month (PMPM).
+      - name: inpatient_paid
+        description: Total inpatient paid amount per member per month (PMPM).
+      - name: outpatient_paid
+        description: Total outpatient paid amount per member per month (PMPM).
+      - name: office_visit_paid
+        description: Total office visit paid amount per member per month (PMPM).
+      - name: ancillary_paid
+        description: Total ancillary paid amount per member per month (PMPM).
       - name: pharmacy_paid
-        description: This metric sums the pharmacy claims paid_amounts or spend over the given dimension for each member month.
+        description: Total pharmacy paid amount per member per month (PMPM).
+      - name: other_paid
+        description: Total other paid amount per member per month (PMPM).
+      - name: acute_inpatient_paid
+        description: Total acute inpatient paid amount per member per month (PMPM).
+      - name: ambulance_paid
+        description: Total ambulance paid amount per member per month (PMPM).
+      - name: ambulatory_surgery_paid
+        description: Total ambulatory surgery paid amount per member per month (PMPM).
+      - name: dialysis_paid
+        description: Total dialysis paid amount per member per month (PMPM).
+      - name: durable_medical_equipment_paid
+        description: Total durable medical equipment paid amount per member per month (PMPM).
+      - name: emergency_department_paid
+        description: Total emergency department paid amount per member per month (PMPM).
+      - name: home_health_paid
+        description: Total home health paid amount per member per month (PMPM).
+      - name: hospice_paid
+        description: Total hospice paid amount per member per month (PMPM).
+      - name: inpatient_psychiatric_paid
+        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+      - name: inpatient_rehabilitation_paid
+        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+      - name: lab_paid
+        description: Total lab paid amount per member per month (PMPM).
+      - name: office_visit_paid_2
+        description: Total office visit paid amount per member per month (PMPM).
+      - name: outpatient_hospital_or_clinic_paid
+        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+      - name: outpatient_psychiatric_paid
+        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+      - name: outpatient_rehabilitation_paid
+        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+      - name: skilled_nursing_paid
+        description: Total skilled nursing paid amount per member per month (PMPM).
+      - name: urgent_care_paid
+        description: Total urgent care paid amount per member per month (PMPM).
+      - name: total_allowed
+        description: Total allowed amount per member per month (PMPM).
+      - name: medical_allowed
+        description: Total medical allowed amount per member per month (PMPM).
+      - name: inpatient_allowed
+        description: Total inpatient allowed amount per member per month (PMPM).
+      - name: outpatient_allowed
+        description: Total outpatient allowed amount per member per month (PMPM).
+      - name: office_visit_allowed
+        description: Total office visit allowed amount per member per month (PMPM).
+      - name: ancillary_allowed
+        description: Total ancillary allowed amount per member per month (PMPM).
+      - name: pharmacy_allowed
+        description: Total pharmacy allowed amount per member per month (PMPM).
+      - name: other_allowed
+        description: Total other allowed amount per member per month (PMPM).
+      - name: acute_inpatient_allowed
+        description: Total acute inpatient allowed amount per member per month (PMPM).
+      - name: ambulance_allowed
+        description: Total ambulance allowed amount per member per month (PMPM).
+      - name: ambulatory_surgery_allowed
+        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+      - name: dialysis_allowed
+        description: Total dialysis allowed amount per member per month (PMPM).
+      - name: durable_medical_equipment_allowed
+        description: Total durable medical equipment allowed amount per member per month (PMPM).
+      - name: emergency_department_allowed
+        description: Total emergency department allowed amount per member per month (PMPM).
+      - name: home_health_allowed
+        description: Total home health allowed amount per member per month (PMPM).
+      - name: hospice_allowed
+        description: Total hospice allowed amount per member per month (PMPM).
+      - name: inpatient_psychiatric_allowed
+        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+      - name: inpatient_rehabilitation_allowed
+        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+      - name: lab_allowed
+        description: Total lab allowed amount per member per month (PMPM).
+      - name: office_visit_allowed_2
+        description: Total office visit allowed amount per member per month (PMPM).
+      - name: outpatient_hospital_or_clinic_allowed
+        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+      - name: outpatient_psychiatric_allowed
+        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+      - name: outpatient_rehabilitation_allowed
+        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+      - name: skilled_nursing_allowed
+        description: Total skilled nursing allowed amount per member per month (PMPM).
+      - name: urgent_care_allowed
+        description: Total urgent care allowed amount per member per month (PMPM).
 
-
-  - name: pmpm__pmpm_trends
+  - name: pmpm__pmpm
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: pmpm_trends
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: pmpm
       tags: 
         - pmpm
-        - claims_preprocessing
       materialized: table
     description: >
-      Shows pmpm over time for different categories of spend
+      Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
     columns:
       - name: year_month
-        description: Unique year-month of in the dataset.
-      - name: medical_spend
-        description: Total medical spend on this year-month
-      - name: member_month_count
-        description: The number of members with eligibility on this year-month
-      - name: medical_pmpm
-        description: The medical pmpm for this year-month
-      - name: inpatient_pmpm
-        description: The inpatient pmpm for this year-month
-      - name: outpatient_pmpm
-        description: The outpatient pmpm for this year-month
-      - name: office_visit_pmpm
-        description: The office visit pmpm for this year-month
-      - name: ancillary_pmpm
-        description: The ancillary pmpm for this year-month
-      - name: other_pmpm
-        description: The pmpm for this year-month corresponding to other categories
-
+        description: Unique year-month of in the dataset computed from eligibility.
+      - name: member_months
+        description: The sum of member months.
+      - name: total_paid
+        description: Total paid amount per member per month (PMPM).
+      - name: medical_paid
+        description: Total medical paid amount per member per month (PMPM).
+      - name: inpatient_paid
+        description: Total inpatient paid amount per member per month (PMPM).
+      - name: outpatient_paid
+        description: Total outpatient paid amount per member per month (PMPM).
+      - name: office_visit_paid
+        description: Total office visit paid amount per member per month (PMPM).
+      - name: ancillary_paid
+        description: Total ancillary paid amount per member per month (PMPM).
+      - name: pharmacy_paid
+        description: Total pharmacy paid amount per member per month (PMPM).
+      - name: other_paid
+        description: Total other paid amount per member per month (PMPM).
+      - name: acute_inpatient_paid
+        description: Total acute inpatient paid amount per member per month (PMPM).
+      - name: ambulance_paid
+        description: Total ambulance paid amount per member per month (PMPM).
+      - name: ambulatory_surgery_paid
+        description: Total ambulatory surgery paid amount per member per month (PMPM).
+      - name: dialysis_paid
+        description: Total dialysis paid amount per member per month (PMPM).
+      - name: durable_medical_equipment_paid
+        description: Total durable medical equipment paid amount per member per month (PMPM).
+      - name: emergency_department_paid
+        description: Total emergency department paid amount per member per month (PMPM).
+      - name: home_health_paid
+        description: Total home health paid amount per member per month (PMPM).
+      - name: hospice_paid
+        description: Total hospice paid amount per member per month (PMPM).
+      - name: inpatient_psychiatric_paid
+        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+      - name: inpatient_rehabilitation_paid
+        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+      - name: lab_paid
+        description: Total lab paid amount per member per month (PMPM).
+      - name: office_visit_paid_2
+        description: Total office visit paid amount per member per month (PMPM).
+      - name: outpatient_hospital_or_clinic_paid
+        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+      - name: outpatient_psychiatric_paid
+        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+      - name: outpatient_rehabilitation_paid
+        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+      - name: skilled_nursing_paid
+        description: Total skilled nursing paid amount per member per month (PMPM).
+      - name: urgent_care_paid
+        description: Total urgent care paid amount per member per month (PMPM).
+      - name: total_allowed
+        description: Total allowed amount per member per month (PMPM).
+      - name: medical_allowed
+        description: Total medical allowed amount per member per month (PMPM).
+      - name: inpatient_allowed
+        description: Total inpatient allowed amount per member per month (PMPM).
+      - name: outpatient_allowed
+        description: Total outpatient allowed amount per member per month (PMPM).
+      - name: office_visit_allowed
+        description: Total office visit allowed amount per member per month (PMPM).
+      - name: ancillary_allowed
+        description: Total ancillary allowed amount per member per month (PMPM).
+      - name: pharmacy_allowed
+        description: Total pharmacy allowed amount per member per month (PMPM).
+      - name: other_allowed
+        description: Total other allowed amount per member per month (PMPM).
+      - name: acute_inpatient_allowed
+        description: Total acute inpatient allowed amount per member per month (PMPM).
+      - name: ambulance_allowed
+        description: Total ambulance allowed amount per member per month (PMPM).
+      - name: ambulatory_surgery_allowed
+        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+      - name: dialysis_allowed
+        description: Total dialysis allowed amount per member per month (PMPM).
+      - name: durable_medical_equipment_allowed
+        description: Total durable medical equipment allowed amount per member per month (PMPM).
+      - name: emergency_department_allowed
+        description: Total emergency department allowed amount per member per month (PMPM).
+      - name: home_health_allowed
+        description: Total home health allowed amount per member per month (PMPM).
+      - name: hospice_allowed
+        description: Total hospice allowed amount per member per month (PMPM).
+      - name: inpatient_psychiatric_allowed
+        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+      - name: inpatient_rehabilitation_allowed
+        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+      - name: lab_allowed
+        description: Total lab allowed amount per member per month (PMPM).
+      - name: office_visit_allowed_2
+        description: Total office visit allowed amount per member per month (PMPM).
+      - name: outpatient_hospital_or_clinic_allowed
+        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+      - name: outpatient_psychiatric_allowed
+        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+      - name: outpatient_rehabilitation_allowed
+        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+      - name: skilled_nursing_allowed
+        description: Total skilled nursing allowed amount per member per month (PMPM).
+      - name: urgent_care_allowed
+        description: Total urgent care allowed amount per member per month (PMPM).
 
 #### Intermediate
 
-
-  - name: pmpm__claim_spend_and_utilization
+  - name: pmpm__patient_spend_with_service_categories
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_claim_spend_and_utilization
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_patient_spend_with_service_categories
       tags: 
         - pmpm
-        - claims_preprocessing
       materialized: table
-    tests:
-       - unique:
-           column_name: "(patient_id || '_'  || claim_type || '_' || year_month)"
     description: >
-      Add model description
-    columns:
-      - name: patient_id
-        description: Unique identifier for each patient in the dataset.
-      - name: claim_type
-        description: Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.
-      - name: year_month
-        description: Concatenation of the year and month for the record. Each patient has one record per year_month of their eligibility, or in other words, one record per member month.
-      - name: count_claims
-        description: This metric counts the number of claims over the given dimension for each member month.
-      - name: spend
-        description: This metric sums the paid_amounts or spend over the given dimension for each member month.
+      Adds service categories to claims and sums paid and allowed amounts to the year-month level.
 
-
-  - name: pmpm__member_month_count
+  - name: pmpm__service_category_1_allowed_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_member_month_count
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_service_category_1_allowed_pivot
       tags: 
         - pmpm
-        - claims_preprocessing
       materialized: table
     description: >
-      Counts of how many members have eligibility in each year-month
+      Pivots out allowed amounts into columns by service category level 1.
 
-
-  - name: pmpm__pmpm_output
+  - name: pmpm__service_category_2_allowed_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_pmpm_output
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_service_category_2_allowed_pivot
       tags: 
         - pmpm
-        - claims_preprocessing
       materialized: table
     description: >
-      Table used to calculate pmpm trends
+      Pivots out allowed amounts into columns by service category level 2.
+
+  - name: pmpm__service_category_1_paid_pivot
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_service_category_1_paid_pivot
+      tags: 
+        - pmpm
+      materialized: table
+    description: >
+      Pivots out paid amounts into columns by service category level 1.
+
+
+  - name: pmpm__service_category_2_paid_pivot
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
+        {% else %}pmpm{%- endif -%}
+      alias: _int_service_category_2_paid_pivot
+      tags: 
+        - pmpm
+      materialized: table
+    description: >
+      Pivots out paid amounts into columns by service category level 2.

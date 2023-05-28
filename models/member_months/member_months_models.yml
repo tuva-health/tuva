@@ -7,12 +7,11 @@ models:
     description: Creates member months from eligibility data
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_member_months
+        {% else %}member_months{%- endif -%}
       alias: member_months
       tags: 
         - member_months
-        - claims_preprocessing
       materialized: table
 
 
