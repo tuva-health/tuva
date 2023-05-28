@@ -27,7 +27,10 @@ select distinct
     when service_category_2 = 'Urgent Care'                   then 'Outpatient'
     when service_category_2 is null                           then 'Other'
   end service_category_1
-, service_category_2
+, case
+    when service_category_2 is null then 'Other'
+    else service_category_2
+  end service_category_2
 from {{ ref('input_layer__medical_claim') }} a
 left join {{ ref('service_category__combined_professional') }} b
   on a.claim_id = b.claim_id
@@ -57,7 +60,10 @@ select distinct
     when service_category_2 = 'Urgent Care'                   then 'Outpatient'
     when service_category_2 is null                           then 'Other'
   end service_category_1
-, service_category_2
+, case
+    when service_category_2 is null then 'Other'
+    else service_category_2
+  end service_category_2
 from {{ ref('input_layer__medical_claim') }} a
 left join {{ ref('service_category__combined_institutional') }} b
   on a.claim_id = b.claim_id

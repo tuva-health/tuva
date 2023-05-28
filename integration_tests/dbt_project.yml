@@ -6,20 +6,20 @@ profile: default
 
 vars:
 
-  # input_database: tuva-project-demo
-  # input_schema: tuva_synthetic
+  input_database: tuva-project-demo
+  input_schema: tuva_synthetic
 
   ## All Data Marts
   tuva_marts_enabled: true
 
   # ## Input Layer
-  # input_layer_enabled: true
+  # input_layer_enabled: false
   
   # ## Claims Data Marts
-  # member_months_enabled: false
+  # member_months_enabled: true
   # service_category_grouper_enabled: true
+  # pmpm_enabled: true
   # encounter_grouper_enabled: false
-  # pmpm_enabled: false
   # data_profiling_enabled: false
   # claims_date_profiling_enabled: false
   # #cms_hccs_enabled: false
@@ -49,4 +49,11 @@ clean-targets:
 models:
   integration_tests:
     +materialized: ephemeral
+    +database: dev
+  the_tuva_project:
+    +database: dev
+
+seeds:
+  the_tuva_project:
+    +database: dev
 

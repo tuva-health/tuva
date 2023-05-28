@@ -8,8 +8,7 @@ with src as
               patient_id,
               enrollment_start_date as start_date,
               enrollment_end_date as end_date,
-              payer,
-              payer_type
+              payer
           from {{ ref('input_layer__eligibility') }} 
          )
 , months as (
@@ -74,8 +73,7 @@ select distinct
     lpad(cast(month as {{ dbt.type_string() }}),2,'0') as month,
     month_start,
     month_end,
-    payer,
-    payer_type
+    payer
 from src
 inner join dates
     on src.start_date <= dates.month_end 
