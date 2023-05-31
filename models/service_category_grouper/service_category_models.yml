@@ -24,7 +24,7 @@ models:
         description: The second, more specific service category of the claim line
 
 
-  ##  Intermediate
+##  Intermediate
 
   - name: service_category__combined_professional
     description: N/A
@@ -72,7 +72,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
         {% else %}service_category{%- endif -%}
-      alias: _int_
+      alias: _int_ambulance_professional
       materialized: table
       tags: service_category_grouper
 
@@ -316,3 +316,44 @@ models:
       materialized: table
       tags: service_category_grouper       
 
+##  Data Quality
+
+  - name: service_category__dq_input_layer_results
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
+        {% else %}service_category{%- endif -%}
+      alias: _dq_input_layer_results
+      materialized: table
+      tags: service_category_grouper
+
+  - name: service_category__dq_input_layer_tests
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
+        {% else %}service_category{%- endif -%}
+      alias: _dq_input_layer_tests
+      materialized: table
+      tags: service_category_grouper
+
+  - name: service_category__dq_multiple_service_categories_institutional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
+        {% else %}service_category{%- endif -%}
+      alias: _dq_multiple_service_categories_institutional
+      materialized: table
+      tags: service_category_grouper
+
+  - name: service_category__dq_multiple_service_categories_professional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category
+        {% else %}service_category{%- endif -%}
+      alias: _dq_multiple_service_categories_professional
+      materialized: table
+      tags: service_category_grouper
