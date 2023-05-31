@@ -6,7 +6,7 @@ default:
       host: "{{ env_var('DBT_REDSHIFT_CI_HOST') }}"
       keepalives_idle: 240
       password: "{{ env_var('DBT_REDSHIFT_CI_PASSWORD') }}"
-      port: "{{ env_var('DBT_REDSHIFT_CI_PORT') }}"
+      port: {{ env_var('DBT_REDSHIFT_CI_PORT') }}
       ra3_node: true
       schema: default
       threads: 4
