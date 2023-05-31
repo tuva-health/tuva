@@ -19,7 +19,7 @@
      {{ log("Medical Column: " ~ column, info=true) }}
 
      select
-     'medical_claim' as table_name
+     'medical_claim' as source_table
      , 'claim_line' as grain
      , '{{ column }}' as column_name
      {{ descriptive_stats(column) }}
@@ -32,7 +32,7 @@
      {{ log("Pharmacy Column: " ~ column, info=true) }}
 
      select
-     'pharmacy_claim' as table_name
+     'pharmacy_claim' as source_table
      , 'claim_line' as grain
      , '{{ column }}' as column_name
      {{ descriptive_stats(column) }}
@@ -45,7 +45,7 @@
      {{ log("Medical Column: " ~ column, info=true) }}
 
      select
-     'medical_claim' as table_name
+     'medical_claim' as source_table
      , 'claim_header' as grain
      , '{{ column }}' as column_name
      {{ descriptive_stats(column) }}
@@ -58,7 +58,7 @@
      {{ log("Pharmacy Column: " ~ column, info=true) }}
 
      select
-     'pharmacy_claim' as table_name
+     'pharmacy_claim' as source_table
      , 'claim_header' as grain
      , '{{ column }}' as column_name
      {{ descriptive_stats(column) }}
