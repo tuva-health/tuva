@@ -18,6 +18,7 @@
     , 'facility_npi'
     , 'paid_date'
     , 'paid_amount'
+    , 'allowed_amount'
     , 'diagnosis_code_type'
     , 'diagnosis_code_1'
     , 'data_source'
@@ -36,6 +37,7 @@
     , 'billing_npi'
     , 'paid_date'
     , 'paid_amount'
+    , 'allowed_amount'
     , 'diagnosis_code_type'
     , 'diagnosis_code_1'
     , 'data_source'
@@ -57,7 +59,7 @@ select
       'medical_claim' as source_table
     , 'institutional' as claim_type
     , 'claim_id' as grain
-    ,  claim_id    
+    ,  claim_id
     , 'missing_values' as test_category
     , column_checked||' missing' as test_name
 from institutional_missing
@@ -71,7 +73,7 @@ select
       'medical_claim' as source_table
     , 'professional' as claim_type
     , 'claim_id' as grain
-    ,  claim_id    
+    ,  claim_id
     , 'missing_values' as test_category
     , column_checked||' missing' as test_name
 from professional_missing

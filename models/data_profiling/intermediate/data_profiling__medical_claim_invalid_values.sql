@@ -23,8 +23,8 @@ with valid_bill_type as(
 
 )
 , valid_revenue_center as(
-    select 
-          'revenue_center_code invalid' as test_name 
+    select
+          'revenue_center_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -41,8 +41,8 @@ with valid_bill_type as(
         claim_id
 )
 , valid_discharge_disposition as(
-    select 
-          'discharge_disposition_code invalid' as test_name 
+    select
+          'discharge_disposition_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -60,8 +60,8 @@ with valid_bill_type as(
 
 )
 , valid_admit_source as(
-    select 
-          'admit_source_code invalid' as test_name 
+    select
+          'admit_source_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -78,8 +78,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_admit_type as(
-    select 
-          'admit_type_code invalid' as test_name 
+    select
+          'admit_type_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -96,8 +96,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_ms_drg as(
-    select 
-          'ms_drg_code invalid' as test_name 
+    select
+          'ms_drg_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -114,8 +114,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_apr_drg as(
-    select 
-          'apr_drg_code invalid' as test_name 
+    select
+          'apr_drg_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -133,8 +133,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_present_on_admission as(
-    select 
-          'diagnosis_poa_1 invalid' as test_name 
+    select
+          'diagnosis_poa_1 invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -151,8 +151,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_procedure_code_type as(
-    select 
-          'procedure_code_type invalid' as test_name 
+    select
+          'procedure_code_type invalid' as test_name
         , 'medical_claim' as source_table
         , 'institutional' as claim_type
         , 'invalid_values' as test_category
@@ -169,8 +169,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_place_of_service as(
-    select 
-          'place_of_service_code invalid' as test_name 
+    select
+          'place_of_service_code invalid' as test_name
         , 'medical_claim' as source_table
         , 'professional' as claim_type
         , 'invalid_values' as test_category
@@ -187,8 +187,8 @@ with valid_bill_type as(
          claim_id
 )
 , valid_diagnosis_code_type as(
-    select 
-          'diagnosis_code_type invalid' as test_name 
+    select
+          'diagnosis_code_type invalid' as test_name
         , 'medical_claim' as source_table
         , 'all' as claim_type
         , 'invalid_values' as test_category
@@ -205,8 +205,8 @@ with valid_bill_type as(
 )
 
 , valid_diagnosis_code as(
-    select 
-          'diagnosis_code_1 invalid' as test_name 
+    select
+          'diagnosis_code_1 invalid' as test_name
         , 'medical_claim' as source_table
         , 'all' as claim_type
         , 'invalid_values' as test_category
@@ -225,8 +225,8 @@ with valid_bill_type as(
 )
 
 , valid_claim_type as(
-    select 
-          'claim_type invalid' as test_name 
+    select
+          'claim_type invalid' as test_name
         , 'medical_claim' as source_table
         , 'all' as claim_type
         , 'claim_type' as test_category
@@ -241,28 +241,46 @@ with valid_bill_type as(
     group by
          claim_id
 )
+
+, valid_paid_amount as(
+  select
+    'paid_amount negative' as test_name
+    , 'medical_claim' as source_table
+    , 'all' as claim_type
+    , 'claim_type' as test_category
+    , 'claim_id' as grain
+    , claim_id
+    , count(med.paid_amount) as filled_row_count
+    from {{ ref('input_layer__medical_claim') }} med
+   where med.paid_amount < 0
+   group by
+       claim_id
+)
+
 select * from valid_bill_type
-union all 
+union all
 select * from valid_revenue_center
-union all 
+union all
 select * from valid_discharge_disposition
-union all 
+union all
 select * from valid_admit_source
-union all 
+union all
 select * from valid_admit_type
-union all 
+union all
 select * from valid_ms_drg
-union all 
+union all
 select * from valid_apr_drg
-union all 
+union all
 select * from valid_present_on_admission
-union all 
+union all
 select * from valid_diagnosis_code_type
-union all 
+union all
 select * from valid_procedure_code_type
-union all 
+union all
 select * from valid_diagnosis_code
-union all 
+union all
 select * from valid_claim_type
-union all 
+union all
 select * from valid_place_of_service
+union all
+select * from valid_paid_amount
