@@ -5,7 +5,7 @@ default:
       type: bigquery
       method: service-account
       keyfile: ./creds.json
-      project: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
+      project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
       dataset: connector
       threads: 4
       timeout_seconds: 300
