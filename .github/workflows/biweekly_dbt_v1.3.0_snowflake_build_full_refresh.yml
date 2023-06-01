@@ -1,0 +1,48 @@
+name: biweekly_dbt_v1.3.0_snowflake_build_full_refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    # This job will run at midnight on the 1st and 15th of the month
+    - cron: '0 0 1,15 * *'
+
+env:
+  DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
+  DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
+  DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
+  DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+  DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+  DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+  DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+  
+jobs:
+  action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.3.0
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "integration_tests"
+
+          
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.3.0
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.3.0
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"tuva_database":"dev_ci_testing","input_database":"dev_ci_testing","input_schema":"claims_common"}'
+          dbt_project_folder: "integration_tests"
+
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash

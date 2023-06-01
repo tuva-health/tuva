@@ -1,0 +1,45 @@
+name: biweekly_dbt_v1.3.0_bigquery_build_full_refresh
+
+on:
+  workflow_dispatch:
+  schedule:
+    # This job will run at midnight on the 1st and 15th of the month
+    - cron: '0 0 1,15 * *'
+  
+
+env:
+  DBT_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
+  TUVA_BIGQUERY_PROJECT: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
+
+  
+jobs:
+  action:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.3.0
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "integration_tests"
+
+          
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.3.0
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.3.0
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"tuva_database":"dev-ci-testing","input_database":"dev-ci-testing","input_schema":"connector"}'
+          dbt_project_folder: "integration_tests"
+
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
