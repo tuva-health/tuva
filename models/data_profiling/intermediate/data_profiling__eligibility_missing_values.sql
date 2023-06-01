@@ -31,7 +31,7 @@
 
 with eligibility_missing as(
 
- {{ eligibility_missing_column_check(builtins.ref('input_layer__eligibility'), eligibility_missing_column_list) }}
+ {{ eligibility_missing_column_check(builtins.ref('eligibility'), eligibility_missing_column_list) }}
 
 )
 

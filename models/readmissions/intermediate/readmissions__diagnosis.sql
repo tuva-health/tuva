@@ -12,7 +12,7 @@ with acute_institutional_claims as (
 select distinct
     encounter_id
 ,   claim_id
-from {{ ref('core__medical_claim') }}
+from {{ ref('readmissions__stg_core__medical_claim') }}
 where encounter_type = 'acute inpatient'
     and claim_type = 'institutional'
 )
@@ -21,7 +21,7 @@ select distinct
     cast(a.encounter_id as {{ dbt.type_string() }}) as encounter_id
 ,   cast(a.code as {{ dbt.type_string() }}) as diagnosis_code
 ,   cast(a.diagnosis_rank as integer) as diagnosis_rank
-from {{ ref('core__condition') }} a
+from {{ ref('readmissions__stg_core__condition') }} a
 inner join  acute_institutional_claims b
     on a.claim_id = b.claim_id
 where code_type = 'icd-10-cm'

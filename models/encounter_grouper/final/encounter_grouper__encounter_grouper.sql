@@ -38,7 +38,7 @@ select
   bb.orphan_claim_flag,
   bb.encounter_count,
   aa.data_source
-from {{ ref('input_layer__medical_claim') }} aa
+from {{ ref('medical_claim') }} aa
 
 left join
 {{ ref('encounter_grouper__encounter_data_for_medical_claims') }} bb

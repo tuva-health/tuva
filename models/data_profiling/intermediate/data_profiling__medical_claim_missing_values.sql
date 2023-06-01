@@ -43,12 +43,12 @@
 
 with institutional_missing as(
 
- {{ medical_claim_missing_column_check(builtins.ref('input_layer__medical_claim'), institutional_missing_column_list, 'institutional') }}
+ {{ medical_claim_missing_column_check(builtins.ref('medical_claim'), institutional_missing_column_list, 'institutional') }}
 
 )
 , professional_missing as(
 
- {{ medical_claim_missing_column_check(builtins.ref('input_layer__medical_claim'), professional_missing_column_list, 'professional') }}
+ {{ medical_claim_missing_column_check(builtins.ref('medical_claim'), professional_missing_column_list, 'professional') }}
 
 )
 

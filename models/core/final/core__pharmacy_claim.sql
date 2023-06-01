@@ -27,4 +27,4 @@ select
        , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount
        , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
-from {{ ref('input_layer__pharmacy_claim') }} 
+from {{ ref('pharmacy_claim') }} 

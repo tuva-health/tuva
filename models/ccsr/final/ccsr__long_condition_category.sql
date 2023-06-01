@@ -9,7 +9,7 @@ with ccsr__dx_vertical_pivot as (
 
 ), condition as (
     
-    select * from {{ ref('core__condition') }}
+    select * from {{ ref('ccsr__stg_core__condition') }}
 
 ), dxccsr_body_systems as (
 

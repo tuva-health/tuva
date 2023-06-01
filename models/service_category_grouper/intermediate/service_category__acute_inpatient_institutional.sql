@@ -6,7 +6,7 @@
 with room_and_board_requirement as (
 select distinct 
   claim_id
-from {{ ref('input_layer__medical_claim') }}
+from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
   and revenue_center_code in
   ('0100','0101',
@@ -26,7 +26,7 @@ where claim_type = 'institutional'
 , drg_requirement as (
 select distinct 
   mc.claim_id
-from {{ ref('input_layer__medical_claim') }} mc
+from {{ ref('service_category__stg_medical_claim') }} mc
 left join {{ ref('terminology__ms_drg')}} msdrg
   on mc.ms_drg_code = msdrg.ms_drg_code
 left join {{ ref('terminology__apr_drg')}} aprdrg
@@ -38,7 +38,7 @@ where claim_type = 'institutional'
 , bill_type_requirement as (
 select distinct 
   claim_id
-from {{ ref('input_layer__medical_claim') }}
+from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
   and left(bill_type_code,2) in ('11','12') 
 )
@@ -46,7 +46,7 @@ where claim_type = 'institutional'
 select distinct 
   a.claim_id
 , 'Acute Inpatient' as service_category_2
-from {{ ref('input_layer__medical_claim') }} a
+from {{ ref('service_category__stg_medical_claim') }} a
 inner join room_and_board_requirement b
   on a.claim_id = b.claim_id
 inner join drg_requirement c

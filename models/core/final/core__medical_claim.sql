@@ -57,7 +57,7 @@ select
   eg.service_category_1,
   eg.service_category_2,
   mc.data_source
-from {{ ref('input_layer__medical_claim') }} mc
+from {{ ref('medical_claim') }} mc
 left join {{ ref('encounter_grouper__encounter_grouper') }} eg
     on eg.claim_id = mc.claim_id
     and eg.claim_line_number = mc.claim_line_number

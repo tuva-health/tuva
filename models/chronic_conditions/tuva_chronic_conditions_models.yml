@@ -1,6 +1,9 @@
 version: 2
 
 models:
+
+## Final
+
   - name: chronic_conditions__tuva_chronic_conditions_long
     description: > 
       This model creates one record per patient per condition using the tuva chronic conditions hierarchy 
@@ -173,3 +176,15 @@ models:
       - name: ulcerative_colitis
         description: flag indicating if the condition is present
         data_type: boolean
+
+## Staging
+
+  - name: tuva_chronic_conditions__stg_core__condition
+    config:
+      tags: tuva_chronic_conditions
+      materialized: ephemeral
+
+  - name: tuva_chronic_conditions__stg_core__patient
+    config:
+      tags: tuva_chronic_conditions
+      materialized: ephemeral

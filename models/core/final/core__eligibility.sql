@@ -32,4 +32,4 @@ select
        , cast(zip_code as {{ dbt.type_string() }} ) as zip_code
        , cast(phone as {{ dbt.type_string() }} ) as phone
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
-from {{ ref('input_layer__eligibility') }} 
+from {{ ref('eligibility') }} 

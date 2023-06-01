@@ -36,7 +36,7 @@ conditions as (
         , else_value= 0
         , quote_identifiers = False
       ) }}
-from {{ ref('core__patient') }} p
+from {{ ref('cms_chronic_conditions__stg_core__patient') }} p
 left join conditions on p.patient_id = conditions.patient_id
 group by
     p.patient_id

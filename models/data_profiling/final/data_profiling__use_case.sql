@@ -8,7 +8,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__medical_claim') }}) as denominator
+    , (select count(distinct claim_id) from {{ ref('medical_claim') }}) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('revenue_center_code missing'
@@ -41,7 +41,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__medical_claim') }} ) as denominator
+    , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('revenue_center_code missing'
@@ -68,7 +68,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__medical_claim') }} ) as denominator
+    , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('diagnosis_code_1 missing'
@@ -103,7 +103,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__medical_claim') }} ) as denominator
+    , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('patient_id missing'
@@ -124,7 +124,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__pharmacy_claim') }} ) as denominator
+    , (select count(distinct claim_id) from {{ ref('pharmacy_claim') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('patient_id missing'
@@ -145,7 +145,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct patient_id) from {{ ref('input_layer__eligibility') }} ) as denominator
+    , (select count(distinct patient_id) from {{ ref('eligibility') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('patient_id missing'
@@ -167,7 +167,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__medical_claim') }} ) as denominator
+    , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('diagnosis_code_1 missing'
@@ -215,7 +215,7 @@ select
     , source_table
     , test_name
     , count(distinct foreign_key) as failures
-    , (select count(distinct claim_id) from {{ ref('input_layer__pharmacy_claim') }} ) as denominator
+    , (select count(distinct claim_id) from {{ ref('pharmacy_claim') }} ) as denominator
 from {{ ref('data_profiling__test_detail')}}
 where 1=1
 and test_name in ('ndc_code missing'

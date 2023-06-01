@@ -10,7 +10,7 @@ select
   ,  claim_id    
   , 'claim_type' as test_category
   , 'claim_type missing' as test_name
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where claim_type is null
 group by
     claim_id

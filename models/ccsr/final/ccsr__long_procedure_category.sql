@@ -5,7 +5,7 @@
 
 with procedure as (
     
-    select * from {{ ref('core__procedure') }}
+    select * from {{ ref('ccsr__stg_core__procedure') }}
 
 ), ccsr__procedure_category_map as (
 

@@ -38,10 +38,10 @@ patient_encounters as (
         , condition.code_type as condition_code_type
         , replace(procedure.code,'.','') as procedure_code
         , procedure.code_type as procedure_code_type
-    from {{ ref('core__encounter') }} as encounter
-         left join {{ ref('core__condition') }} as condition
+    from {{ ref('cms_chronic_conditions__stg_core__encounter') }} as encounter
+         left join {{ ref('cms_chronic_conditions__stg_core__condition') }} as condition
              on encounter.encounter_id = condition.encounter_id
-         left join {{ ref('core__procedure') }}  as procedure
+         left join {{ ref('cms_chronic_conditions__stg_core__procedure') }}  as procedure
              on encounter.encounter_id = procedure.encounter_id
 
 ),
@@ -54,7 +54,7 @@ patient_medications as (
         , cast(paid_date as date) as encounter_start_date
         , replace(ndc_code,'.','') as ndc_code
         , data_source
-    from {{ ref('core__pharmacy_claim') }}
+    from {{ ref('cms_chronic_conditions__stg_core__pharmacy_claim') }}
 
 
 ),

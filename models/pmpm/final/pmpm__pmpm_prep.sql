@@ -61,7 +61,7 @@ SELECT
   COALESCE(e.outpatient_rehabilitation_allowed, 0) AS outpatient_rehabilitation_allowed,
   COALESCE(e.skilled_nursing_allowed, 0) AS skilled_nursing_allowed,
   COALESCE(e.urgent_care_allowed, 0) AS urgent_care_allowed
-FROM {{ ref('member_months') }} a
+FROM {{ ref('pmpm__stg_member_months') }} a
 left join {{ ref('pmpm__service_category_1_paid_pivot') }} b
   on a.patient_id = b.patient_id
   and a.year_month = b.year_month

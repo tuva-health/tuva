@@ -6,7 +6,7 @@
 select distinct 
   a.claim_id
 , 'Outpatient Hospital or Clinic' as service_category_2
-from {{ ref('input_layer__medical_claim') }} a
+from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__emergency_department_institutional') }} b
   on a.claim_id = b.claim_id
 left join {{ ref('service_category__urgent_care_institutional') }} c

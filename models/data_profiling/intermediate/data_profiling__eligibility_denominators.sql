@@ -7,41 +7,41 @@ with all_denominator as(
     select
         cast('all' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
-    from {{ ref('input_layer__eligibility') }}
+    from {{ ref('eligibility') }}
 )
 , gender_denominator as(
     select
         cast('gender invalid' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
-    from {{ ref('input_layer__eligibility') }}
+    from {{ ref('eligibility') }}
     where gender is not null
 )
 , race_denominator as(
     select
         cast('race invalid' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
-    from {{ ref('input_layer__eligibility') }}
+    from {{ ref('eligibility') }}
     where race is not null
 )
 , payer_type_denominator as(
     select
         cast('payer_type invalid' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
-    from {{ ref('input_layer__eligibility') }}
+    from {{ ref('eligibility') }}
     where payer_type is not null
 )
 , dual_status_denominator as(
     select
         cast('dual_status_code invalid' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
-    from {{ ref('input_layer__eligibility') }}
+    from {{ ref('eligibility') }}
     where dual_status_code is not null
 )
 , medicare_status_denominator as(
     select
         cast('medicare_status_code invalid' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
-    from {{ ref('input_layer__eligibility') }}
+    from {{ ref('eligibility') }}
     where medicare_status_code is not null
 )
 select * from all_denominator

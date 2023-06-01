@@ -21,7 +21,7 @@ select
     end as valid_icd_10_pcs_flag,
     cc.ccs_procedure_category
 from
-    {{ ref('core__procedure') }} aa
+    {{ ref('readmissions__stg_core__procedure') }} aa
     left join {{ ref('terminology__icd_10_pcs') }} bb
     on aa.code = bb.icd_10_pcs
     left join {{ ref('readmissions__icd_10_pcs_to_ccs') }} cc

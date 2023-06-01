@@ -305,3 +305,26 @@ models:
       materialized: table
     description: >
       Pivots out paid amounts into columns by service category level 2.
+
+## Staging
+
+  - name: pmpm__stg_medical_claim
+    config:
+      tags: pmpm
+      materialized: ephemeral
+
+  - name: pmpm__stg_pharmacy_claim
+    config:
+      tags: pmpm
+      materialized: ephemeral
+
+  - name: pmpm__stg_member_months
+    config:
+      tags: pmpm
+      materialized: ephemeral
+
+  - name: pmpm__stg_service_category_grouper
+    config:
+      tags: pmpm
+      materialized: ephemeral
+

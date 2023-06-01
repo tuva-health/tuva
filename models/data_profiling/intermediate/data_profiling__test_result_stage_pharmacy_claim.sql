@@ -7,7 +7,7 @@ with pharmacy_claim_denominator as(
   select 
     cast('all' as {{ dbt.type_string() }} ) as claim_type
     , cast(count(distinct claim_id) as int) as count
-  from {{ ref('input_layer__pharmacy_claim') }}
+  from {{ ref('pharmacy_claim') }}
 )
 
 , distinct_patient_per_category as(

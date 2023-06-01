@@ -4,12 +4,8 @@
 }}
 
 with src as
-         (select
-              patient_id,
-              enrollment_start_date as start_date,
-              enrollment_end_date as end_date,
-              payer
-          from {{ ref('input_layer__eligibility') }} 
+         (select *
+          from {{ ref('member_months__stg_eligibility') }} 
          )
 , months as (
     select 1 as month

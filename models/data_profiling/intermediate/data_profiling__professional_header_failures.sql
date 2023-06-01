@@ -39,7 +39,7 @@ with stage as(
         , diagnosis_code_24
         , diagnosis_code_25
         , data_source
-  from {{ ref('input_layer__medical_claim') }} med
+  from {{ ref('medical_claim') }} med
   where claim_type = 'professional'
   )  
 , claims_with_duplicates as (
@@ -52,5 +52,5 @@ having count(*) > 1
 )
 
 select med.* from claims_with_duplicates dupe
-inner join {{ ref('input_layer__medical_claim') }} med
+inner join {{ ref('medical_claim') }} med
     on dupe.claim_id = med.claim_id

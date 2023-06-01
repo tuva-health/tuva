@@ -316,3 +316,10 @@ models:
       materialized: table
       tags: service_category_grouper       
 
+## Staging
+
+  - name: service_category__stg_medical_claim
+    description: Staging med claims for sc grouper
+    config:
+      materialized: ephemeral
+      tags: service_category_grouper

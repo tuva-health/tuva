@@ -11,7 +11,7 @@ with condition_row_number as
         ,condition_date
         ,row_number() over(partition by patient_id, code order by condition_date asc) as rn_asc
         ,row_number() over(partition by patient_id, code order by condition_date desc) as rn_desc
-    from {{ ref('core__condition')}}
+    from {{ ref('tuva_chronic_conditions__stg_core__condition')}}
 )
 , patient_conditions as
 (

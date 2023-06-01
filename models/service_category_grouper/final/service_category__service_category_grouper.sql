@@ -31,7 +31,7 @@ select distinct
     when service_category_2 is null then 'Other'
     else service_category_2
   end service_category_2
-from {{ ref('input_layer__medical_claim') }} a
+from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__combined_professional') }} b
   on a.claim_id = b.claim_id
   and a.claim_line_number = b.claim_line_number
@@ -64,7 +64,7 @@ select distinct
     when service_category_2 is null then 'Other'
     else service_category_2
   end service_category_2
-from {{ ref('input_layer__medical_claim') }} a
+from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__combined_institutional') }} b
   on a.claim_id = b.claim_id
 where a.claim_type = 'institutional'
