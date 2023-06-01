@@ -466,21 +466,27 @@ models:
       - name: ms_drg
         description: "The MS-DRG associted with the inpatient visit"
 
-#
-#  - name: readmissions__procedure
-#    config:
-#      schema: readmissions
-#      alias: _int_procedure
-#      tags: readmissions
-#      materialized: view
-#    description: "This is a staging table for the input layer. Each row represents a unique procedure a patient got in an encouter. All procedures available in the input data set are present here."
-#    columns:
-#      - name: encounter_id
-#        description: "The unique identifier for the encounter"
-#      - name: procedure_code
-#        description: "An ICD-10-PCS code associated with this encounter_id"
+## Staging
 
+  - name: readmissions__stg_core__condition
+    config:
+      tags: readmissions
+      materialized: ephemeral
 
+  - name: readmissions__stg_core__encounter
+    config:
+      tags: readmissions
+      materialized: ephemeral
+
+  - name: readmissions__stg_core__medical_claim
+    config:
+      tags: readmissions
+      materialized: ephemeral
+
+  - name: readmissions__stg_core__procedure
+    config:
+      tags: readmissions
+      materialized: ephemeral
 
 
 

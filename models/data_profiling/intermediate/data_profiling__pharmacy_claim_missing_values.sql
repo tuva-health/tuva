@@ -25,7 +25,7 @@
 
 with eligibility_missing as(
 
- {{ pharmacy_claim_missing_column_check(builtins.ref('input_layer__pharmacy_claim'), pharmacy_claim_missing_column_list) }}
+ {{ pharmacy_claim_missing_column_check(builtins.ref('pharmacy_claim'), pharmacy_claim_missing_column_list) }}
 
 )
 

@@ -32,7 +32,7 @@
 
 with acute_inpatient_professional_claim_ids as (
 select distinct claim_id
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where place_of_service_code = '21'
 -- Do we include a requirement for claim_type = 'professional'
 -- to avoid having institutional claims where a place of service
@@ -52,7 +52,7 @@ select
            mc.claim_line_end_date,
 	   mc.claim_start_date,
 	   mc.claim_line_start_date) as end_date	   
-from {{ ref('input_layer__medical_claim') }} mc
+from {{ ref('medical_claim') }} mc
      inner join acute_inpatient_professional_claim_ids prof
      on mc.claim_id = prof.claim_id
 ),

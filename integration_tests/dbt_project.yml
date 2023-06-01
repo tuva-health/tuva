@@ -6,33 +6,24 @@ profile: default
 
 vars:
 
-#  input_database: tuva_project_demo
-#  input_schema: tuva_synthetic
+  # input_database: 
+  # input_schema: 
 
-  ## All Data Marts
+  ## All Tuva Data Marts
   tuva_marts_enabled: true
-
-  # ## Input Layer
-  # input_layer_enabled: false
   
-  # ## Claims Data Marts
-  # member_months_enabled: true
-  # service_category_grouper_enabled: true
-  # pmpm_enabled: true
-  # encounter_grouper_enabled: false
-  # data_profiling_enabled: false
-  # claims_date_profiling_enabled: false
-  # #cms_hccs_enabled: false
-
-  # ## Core Data Model
-  # core_enabled: false
-
-  # # ## High-level Data Marts
-  # readmissions_enabled: false
+  ## Individual Tuva Data Marts
+  # ccsr_enabled: true
   # cms_chronic_conditions_enabled: false
   # tuva_chronic_conditions_enabled: false
-  # ccsr_enabled: false
-  # ## emergency_department_enabled: false
+  # claims_date_profiling_enabled: false
+  # core_enabled: true
+  # data_profiling_enabled: false
+  # encounter_grouper_enabled: true
+  # member_months_enabled: false
+  # pmpm_enabled: false
+  # readmissions_enabled: false
+  # service_category_grouper_enabled: true
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -46,14 +37,13 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-models:
-  integration_tests:
-    +materialized: ephemeral
-#     +database: dev
+# models:
+#   integration_tests:
+#     +database: 
 #   the_tuva_project:
-#     +database: dev
+#     +database: 
 
 # seeds:
 #   the_tuva_project:
-#     +database: dev
+#     +database: 
 

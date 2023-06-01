@@ -523,3 +523,33 @@ models:
         - name: data_source
           description: >
             Indicates the name of the source dataset (e.g. Medicare Claims).
+
+## Staging
+
+  - name: cms_chronic_conditions__stg_core__condition
+    config:
+      tags: cms_chronic_conditions
+      materialized: ephemeral
+
+  - name: cms_chronic_conditions__stg_core__encounter
+    config:
+      tags: cms_chronic_conditions
+      materialized: ephemeral
+
+  - name: cms_chronic_conditions__stg_core__patient
+    config:
+      tags: cms_chronic_conditions
+      materialized: ephemeral
+
+  - name: cms_chronic_conditions__stg_core__pharmacy_claim
+    config:
+      tags: cms_chronic_conditions
+      materialized: ephemeral
+
+  - name: cms_chronic_conditions__stg_core__procedure
+    config:
+      tags: cms_chronic_conditions
+      materialized: ephemeral
+
+
+

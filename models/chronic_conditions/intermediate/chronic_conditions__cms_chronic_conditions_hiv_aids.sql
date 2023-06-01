@@ -22,8 +22,8 @@ patient_encounters as (
         , encounter.data_source
         , replace(condition.code,'.','') as condition_code
         , condition.code_type as condition_code_type
-    from {{ ref('core__encounter') }} as encounter
-         left join {{ ref('core__condition') }} as condition
+    from {{ ref('cms_chronic_conditions__stg_core__encounter') }} as encounter
+         left join {{ ref('cms_chronic_conditions__stg_core__condition') }} as condition
              on encounter.encounter_id = condition.encounter_id
 
 ),

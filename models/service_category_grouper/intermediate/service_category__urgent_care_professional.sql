@@ -7,7 +7,7 @@ select distinct
   claim_id
 , claim_line_number
 , 'Urgent Care' as service_category_2
-from {{ ref('input_layer__medical_claim') }}
+from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'professional'
   and place_of_service_code in ('20')
   

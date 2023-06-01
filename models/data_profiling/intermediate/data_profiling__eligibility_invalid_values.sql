@@ -13,7 +13,7 @@ with valid_gender as(
         , patient_id
         , elig.gender
         , count(elig.gender) as filled_row_count
-    from {{ ref('input_layer__eligibility') }} elig
+    from {{ ref('eligibility') }} elig
     left join {{ ref('terminology__gender') }} gender
         on elig.gender = gender.gender
     where gender.gender is null
@@ -32,7 +32,7 @@ with valid_gender as(
         , patient_id
         , elig.race
         , count(elig.race) as filled_row_count
-    from {{ ref('input_layer__eligibility') }} elig
+    from {{ ref('eligibility') }} elig
     left join {{ ref('terminology__race') }} race
         on elig.race = race.description
     where race.description is null
@@ -51,7 +51,7 @@ with valid_gender as(
         , patient_id
         , elig.payer_type
         , count(elig.payer_type) as filled_row_count
-    from {{ ref('input_layer__eligibility') }} elig
+    from {{ ref('eligibility') }} elig
     left join {{ ref('terminology__payer_type') }} payer
         on elig.payer_type = payer.payer_type
     where payer.payer_type is null
@@ -70,7 +70,7 @@ with valid_gender as(
         , patient_id
         , elig.dual_status_code
         , count(elig.dual_status_code) as filled_row_count
-    from {{ ref('input_layer__eligibility') }} elig
+    from {{ ref('eligibility') }} elig
     left join {{ ref('terminology__medicare_dual_eligibility') }} dual
         on elig.dual_status_code = dual.dual_status_code
     where dual.dual_status_code is null
@@ -89,7 +89,7 @@ with valid_gender as(
         , patient_id
         , elig.medicare_status_code
         , count(elig.medicare_status_code) as filled_row_count
-    from {{ ref('input_layer__eligibility') }} elig
+    from {{ ref('eligibility') }} elig
     left join {{ ref('terminology__medicare_status') }} status
         on elig.medicare_status_code = status.medicare_status_code
     where status.medicare_status_code is null

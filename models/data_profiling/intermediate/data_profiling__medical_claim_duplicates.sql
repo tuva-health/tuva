@@ -10,7 +10,7 @@ select distinct
   ,  claim_id    
   , 'duplicate_values' as test_category
   , 'duplicate medical claims' as test_name
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 group by
     claim_id
     , claim_line_number

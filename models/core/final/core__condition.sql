@@ -24,7 +24,7 @@ select
   1 as diagnosis_rank,
   diagnosis_poa_1 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_1 is not null
 
 union all 
@@ -44,7 +44,7 @@ select
   2 as diagnosis_rank,
   diagnosis_poa_2 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_2 is not null
 
 union all 
@@ -64,7 +64,7 @@ select
   3 as diagnosis_rank,
   diagnosis_poa_3 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_3 is not null
 
 union all 
@@ -84,7 +84,7 @@ select
   4 as diagnosis_rank,
   diagnosis_poa_4 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_4 is not null
 
 union all 
@@ -104,7 +104,7 @@ select
   5 as diagnosis_rank,
   diagnosis_poa_5 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_5 is not null
 
 union all 
@@ -124,7 +124,7 @@ select
   6 as diagnosis_rank,
   diagnosis_poa_6 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_6 is not null
 
 union all 
@@ -144,7 +144,7 @@ select
   7 as diagnosis_rank,
   diagnosis_poa_7 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_7 is not null
 
 union all 
@@ -164,7 +164,7 @@ select
   8 as diagnosis_rank,
   diagnosis_poa_8 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_8 is not null
 
 union all 
@@ -184,7 +184,7 @@ select
   9 as diagnosis_rank,
   diagnosis_poa_9 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_9 is not null
 
 union all 
@@ -204,7 +204,7 @@ select
   10 as diagnosis_rank,
   diagnosis_poa_10 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_10 is not null
 
 union all 
@@ -224,7 +224,7 @@ select
   11 as diagnosis_rank,
   diagnosis_poa_11 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_11 is not null
 
 union all 
@@ -244,7 +244,7 @@ select
   12 as diagnosis_rank,
   diagnosis_poa_12 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_12 is not null
 
 union all 
@@ -264,7 +264,7 @@ select
   13 as diagnosis_rank,
   diagnosis_poa_13 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_13 is not null
 
 union all 
@@ -284,7 +284,7 @@ select
   14 as diagnosis_rank,
   diagnosis_poa_14 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_14 is not null
 
 union all 
@@ -304,7 +304,7 @@ select
   15 as diagnosis_rank,
   diagnosis_poa_15 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_15 is not null
 
 union all 
@@ -324,7 +324,7 @@ select
   16 as diagnosis_rank,
   diagnosis_poa_16 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_16 is not null
 
 union all 
@@ -344,7 +344,7 @@ select
   17 as diagnosis_rank,
   diagnosis_poa_17 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_17 is not null
 
 union all 
@@ -364,7 +364,7 @@ select
   18 as diagnosis_rank,
   diagnosis_poa_18 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_18 is not null
 
 union all 
@@ -384,7 +384,7 @@ select
   19 as diagnosis_rank,
   diagnosis_poa_19 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_19 is not null
 
 union all 
@@ -404,7 +404,7 @@ select
   20 as diagnosis_rank,
   diagnosis_poa_20 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_20 is not null
 
 union all 
@@ -424,7 +424,7 @@ select
   21 as diagnosis_rank,
   diagnosis_poa_21 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_21 is not null
 
 union all 
@@ -444,7 +444,7 @@ select
   22 as diagnosis_rank,
   diagnosis_poa_22 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_22 is not null
 
 union all 
@@ -464,7 +464,7 @@ select
   23 as diagnosis_rank,
   diagnosis_poa_23 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_23 is not null
 
 union all 
@@ -484,7 +484,7 @@ select
   24 as diagnosis_rank,
   diagnosis_poa_24 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_24 is not null
 
 union all 
@@ -504,7 +504,7 @@ select
   25 as diagnosis_rank,
   diagnosis_poa_25 as present_on_admit_code,
   data_source
-from {{ ref('input_layer__medical_claim') }} 
+from {{ ref('medical_claim') }} 
 where diagnosis_code_25 is not null
 
 )

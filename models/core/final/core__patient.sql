@@ -32,7 +32,7 @@ with patient_stage as(
                 then cast ('2050-01-01' as date)
                 else enrollment_end_date end DESC)
             as row_sequence
-    from {{ ref('input_layer__eligibility')}}
+    from {{ ref('eligibility')}}
 )
 
 select

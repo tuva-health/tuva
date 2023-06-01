@@ -10,7 +10,7 @@ select distinct
   ,  patient_id   
   , 'duplicate_values' as test_category
   , 'duplicate eligibility' as test_name
-from {{ ref('input_layer__eligibility') }} 
+from {{ ref('eligibility') }} 
 group by
     patient_id
     , member_id
