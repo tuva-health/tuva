@@ -2,6 +2,9 @@ name: dbt_v1.4.6_redshift_build_full_refresh
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 env:
   DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
