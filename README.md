@@ -17,7 +17,7 @@ This package has been tested on:
 - Redshift
 - BigQuery
 
-This package supports dbt version `1.2.x` or higher.
+This package supports dbt version `1.3.x` or higher.
 <br/><br/>
 
 ## ✅  Quickstart Guide
