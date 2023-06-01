@@ -2,12 +2,12 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: 
+profile: default
 
 vars:
 
-  input_database: 
-  input_schema: 
+  # input_database: 
+  # input_schema: 
 
   ## All Tuva Data Marts
   tuva_marts_enabled: true
@@ -37,13 +37,13 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-models:
-  integration_tests:
-    +database: 
-  the_tuva_project:
-    +database: 
+# models:
+#   integration_tests:
+#     +database: 
+#   the_tuva_project:
+#     +database: 
 
-seeds:
-  the_tuva_project:
-    +database: 
+# seeds:
+#   the_tuva_project:
+#     +database: 
 
