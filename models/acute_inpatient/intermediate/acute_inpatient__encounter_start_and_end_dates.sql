@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -17,8 +17,6 @@
 -- *************************************************
 
 
-
-
 with add_encounter_id_to_acute_inpatient_encounters as (
 select
   aip.claim_id as claim_id,
@@ -26,11 +24,10 @@ select
   aip.start_date as start_date,
   aip.end_date as end_date,
   eid.encounter_id as encounter_id
-from {{ ref('encounter_grouper__acute_inpatient_institutional_claims') }} aip
-left join
-{{ ref('encounter_grouper__acute_inpatient_institutional_encounter_id') }} eid
-on aip.patient_id = eid.patient_id
-and aip.claim_id = eid.claim_id
+from {{ ref('acute_inpatient__institutional_claims') }} aip
+left join {{ ref('acute_inpatient__institutional_encounter_id') }} eid
+  on aip.patient_id = eid.patient_id
+  and aip.claim_id = eid.claim_id
 ),
 
 

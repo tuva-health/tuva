@@ -13,4 +13,4 @@ select
     facility_npi,
     ms_drg_code,
     paid_amount    
-from {{ ref('core__encounter') }}
+from {{ ref('acute_inpatient__summary') }}

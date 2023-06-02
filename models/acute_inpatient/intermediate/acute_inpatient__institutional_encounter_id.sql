@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -16,8 +16,6 @@
 -- *************************************************
 
 
-
-
 with add_row_num as (
 select
   patient_id,
@@ -26,13 +24,9 @@ select
   end_date,
   discharge_disposition_code,
   facility_npi,
-  row_number() over (
-    partition by patient_id
-    order by end_date, start_date, claim_id 
-  ) as row_num
-from {{ ref('encounter_grouper__acute_inpatient_institutional_claims') }}
+  row_number() over (partition by patient_id order by end_date, start_date, claim_id) as row_num
+from {{ ref('acute_inpatient__institutional_claims') }}
 ),
-
 
 check_for_merges_with_larger_row_num as (
 select
@@ -60,13 +54,11 @@ select
 	 )then 1
     else 0
   end as merge_flag
-
 from add_row_num aa
      inner join add_row_num bb
      on aa.patient_id = bb.patient_id
      and aa.row_num < bb.row_num
 ),
-
 
 merges_with_larger_row_num as (
 select

@@ -19,7 +19,7 @@ select
   max(eg.encounter_end_date) as encounter_end_date,
    max(eg.encounter_admit_source_code) as encounter_admit_source_code,
    max(eg.encounter_admit_type_code) as encounter_admit_type_code,
-   max(eg.encounter_discharge_disposition_code) as encounter_discharge_disposition_code,
+   max(eg.discharge_disposition_code),
   max(aa.rendering_npi) as rendering_npi,
   max(aa.billing_npi) as billing_npi,
   max(aa.facility_npi) as facility_npi,
@@ -32,7 +32,7 @@ select
   sum(aa.total_cost_amount) as total_cost_amount,
   max(aa.data_source) as data_source
 from {{ ref('core__medical_claim') }} aa
-left join {{ ref('encounter_grouper__encounter_grouper')}} as eg
+left join {{ ref('acute_inpatient__summary')}} as eg
     on  aa.claim_id = eg.claim_id
     and aa.claim_line_number = eg.claim_line_number
     and aa.patient_id = eg.patient_id

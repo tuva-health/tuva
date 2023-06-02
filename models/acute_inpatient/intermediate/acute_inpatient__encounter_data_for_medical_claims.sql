@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -49,7 +49,7 @@ select
 -- they overlap with more than one encounter:
   0 as orphan_claim_flag,
   1 as encounter_count
-from {{ ref('encounter_grouper__acute_inpatient_claims_with_encounter_data') }}
+from {{ ref('acute_inpatient__claims_with_encounter_data') }}
 ),
 
 
@@ -76,7 +76,7 @@ select
   orphan_claim_flag,
   encounter_count
   
-from {{ ref('encounter_grouper__acute_inpatient_professional_encounter_id') }}
+from {{ ref('acute_inpatient__professional_encounter_id') }}
 where (orphan_claim_flag = 1) or (encounter_count > 1)
 )
 

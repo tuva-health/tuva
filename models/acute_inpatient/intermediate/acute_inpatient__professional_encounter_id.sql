@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -32,13 +32,10 @@
 
 with acute_inpatient_professional_claim_ids as (
 select distinct claim_id
-from {{ ref('medical_claim') }} 
-where place_of_service_code = '21'
--- Do we include a requirement for claim_type = 'professional'
--- to avoid having institutional claims where a place of service
--- code was imputed?
+from {{ ref('service_category__service_category_grouper') }} 
+where claim_type = 'professional'
+  and service_category_2 = 'Acute Inpatient'
 ),
-
 
 acute_inpatient_professional_claim_lines as (
 select
@@ -53,8 +50,8 @@ select
 	   mc.claim_start_date,
 	   mc.claim_line_start_date) as end_date	   
 from {{ ref('medical_claim') }} mc
-     inner join acute_inpatient_professional_claim_ids prof
-     on mc.claim_id = prof.claim_id
+inner join acute_inpatient_professional_claim_ids prof
+  on mc.claim_id = prof.claim_id
 ),
 
 
@@ -83,7 +80,7 @@ select
   
 from acute_inpatient_professional_claim_dates aa
 left join
-{{ ref('encounter_grouper__acute_inpatient_encounter_start_and_end_dates') }} bb
+{{ ref('acute_inpatient__encounter_start_and_end_dates') }} bb
 on aa.patient_id = bb.patient_id
 and (aa.start_date
      between bb.encounter_start_date and bb.encounter_end_date)

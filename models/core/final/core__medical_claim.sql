@@ -58,7 +58,7 @@ select
   eg.service_category_2,
   mc.data_source
 from {{ ref('medical_claim') }} mc
-left join {{ ref('encounter_grouper__encounter_grouper') }} eg
+left join {{ ref('acute_inpatient__summary') }} eg
     on eg.claim_id = mc.claim_id
     and eg.claim_line_number = mc.claim_line_number
     and eg.patient_id = mc.patient_id

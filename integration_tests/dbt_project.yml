@@ -2,24 +2,24 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: default
+profile: tuva-snowflake
 
 vars:
 
-  # input_database: 
-  # input_schema: 
+  input_database: tuva_project_demo
+  input_schema: tuva_synthetic
 
   ## All Tuva Data Marts
   tuva_marts_enabled: true
   
   ## Individual Tuva Data Marts
-  # ccsr_enabled: true
+  # ccsr_enabled: false
   # cms_chronic_conditions_enabled: false
   # tuva_chronic_conditions_enabled: false
   # claims_date_profiling_enabled: false
-  # core_enabled: true
+  # core_enabled: false
   # data_profiling_enabled: false
-  # encounter_grouper_enabled: true
+  # acute_inpatient_enabled: true
   # member_months_enabled: false
   # pmpm_enabled: false
   # readmissions_enabled: false
@@ -37,13 +37,13 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-# models:
-#   integration_tests:
-#     +database: 
-#   the_tuva_project:
-#     +database: 
+models:
+  integration_tests:
+    +database: dev_aaron
+  the_tuva_project:
+    +database: dev_aaron
 
-# seeds:
-#   the_tuva_project:
-#     +database: 
+seeds:
+  the_tuva_project:
+    +database: dev_aaron
 
