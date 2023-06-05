@@ -7,7 +7,7 @@ profile: default
 
 vars:
 
-    ## These vars are specific to the CCSR data mart
+    ## CCSR data mart vars
     # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
     wide_condition_enabled: True
     wide_procedure_enabled: True
@@ -19,10 +19,9 @@ vars:
     dxccsr_version: "'2023.1'"
     prccsr_version: "'2023.1'"
 
-    ## These vars are specific to the CMS HCC data mart
+
+    ## CMS HCC data mart vars
     # The payment_year variable has a default of the current year
-    # it can be changed here or during execution with
-    # the syntax: dbt build --vars '{payment_year: 2022}'
     cms_hcc_payment_year: 2023
 
     # DO NOT CHANGE - Future logic to be added for selecting different HCC model versions
