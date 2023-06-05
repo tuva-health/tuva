@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.3.9'
+version: '0.3.10'
 config-version: 2
 require-dbt-version: ">=1.2.0"
 
@@ -18,6 +18,15 @@ vars:
     # CCSR Version numbers from HCUP
     dxccsr_version: "'2023.1'"
     prccsr_version: "'2023.1'"
+
+    ## These vars are specific to the CMS HCC data mart
+    # The payment_year variable has a default of the current year
+    # it can be changed here or during execution with
+    # the syntax: dbt build --vars '{payment_year: 2022}'
+    cms_hcc_payment_year: 2023
+
+    # DO NOT CHANGE - Future logic to be added for selecting different HCC model versions
+    cms_hcc_model_version: CMS-HCC-V24
 
 
 model-paths: ["models"]
