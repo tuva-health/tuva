@@ -142,3 +142,21 @@ models:
       materialized: view
 
 ## Staging
+
+  - name: acute_inpatient__stg_eligibility
+    config:
+      alias: _stg_eligibility
+      tags: acute_inpatient
+      materialized: ephemeral
+
+  - name: acute_inpatient__stg_medical_claim
+    config:
+      alias: _stg_medical_claim
+      tags: acute_inpatient
+      materialized: ephemeral
+
+  - name: acute_inpatient__stg_service_category__service_category_grouper
+    config:
+      alias: _stg_service_category__service_category_grouper
+      tags: acute_inpatient
+      materialized: ephemeral

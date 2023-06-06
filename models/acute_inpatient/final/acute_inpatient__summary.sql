@@ -40,7 +40,7 @@ select
 , sum(paid_amount) as prof_paid_amount
 , sum(allowed_amount) as prof_allowed_amount
 , sum(charge_amount) as prof_charge_amount
-from {{ ref('medical_claim') }} a
+from {{ ref('acute_inpatient__stg_medical_claim') }} a
 inner join {{ ref('acute_inpatient__encounter_id') }} b
   on a.claim_id = b.claim_id
   and a.claim_type = 'professional'
@@ -53,7 +53,7 @@ select distinct
 , birth_date
 , gender
 , race
-from {{ ref('eligibility') }}
+from {{ ref('acute_inpatient__stg_eligibility') }}
 )
 
 , provider as (

@@ -2,12 +2,12 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: tuva-snowflake
+profile: default
 
 vars:
 
-  input_database: tuva_project_demo
-  input_schema: tuva_synthetic
+  # input_database: tuva_project_demo
+  # input_schema: tuva_synthetic
 
   ## All Tuva Data Marts
   tuva_marts_enabled: true
@@ -40,13 +40,13 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
-models:
-  integration_tests:
-    +database: dev_aaron
-  the_tuva_project:
-    +database: dev_aaron
+# models:
+#   integration_tests:
+#     +database: dev_aaron
+#   the_tuva_project:
+#     +database: dev_aaron
 
-seeds:
-  the_tuva_project:
-    +database: dev_aaron
+# seeds:
+#   the_tuva_project:
+#     +database: dev_aaron
 

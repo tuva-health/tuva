@@ -32,7 +32,7 @@
 
 with acute_inpatient_professional_claim_ids as (
 select distinct claim_id
-from {{ ref('service_category__service_category_grouper') }} 
+from {{ ref('acute_inpatient__stg_service_category__service_category_grouper') }} 
 where claim_type = 'professional'
   and service_category_2 = 'Acute Inpatient'
 ),
@@ -41,9 +41,9 @@ acute_inpatient_professional_claim_lines as (
 select
   mc.claim_id,
   mc.patient_id,
-  coalesce(mc.claim_start_date, mc.claim_line_start_date) as start_date,
-  coalesce(mc.claim_end_date, mc.claim_line_end_date) as end_date	   
-from {{ ref('medical_claim') }} mc
+  mc.claim_start_date as start_date,
+  mc.claim_end_date as end_date	   
+from {{ ref('acute_inpatient__stg_medical_claim') }} mc
 inner join acute_inpatient_professional_claim_ids prof
   on mc.claim_id = prof.claim_id
 ),
