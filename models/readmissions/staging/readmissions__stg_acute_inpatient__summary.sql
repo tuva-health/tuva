@@ -8,9 +8,8 @@ select
     patient_id,
     encounter_start_date,
     encounter_end_date,
-    encounter_type,
     discharge_disposition_code,
     facility_npi,
     ms_drg_code,
-    paid_amount    
+    total_paid_amount    
 from {{ ref('acute_inpatient__summary') }}

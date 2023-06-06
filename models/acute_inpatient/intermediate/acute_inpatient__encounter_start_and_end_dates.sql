@@ -30,7 +30,6 @@ left join {{ ref('acute_inpatient__institutional_encounter_id') }} eid
   and aip.claim_id = eid.claim_id
 ),
 
-
 encounter_start_and_end_dates as (
 select
   patient_id,
@@ -40,7 +39,6 @@ select
 from add_encounter_id_to_acute_inpatient_encounters
 group by patient_id, encounter_id
 )
-
 
 select *
 from encounter_start_and_end_dates

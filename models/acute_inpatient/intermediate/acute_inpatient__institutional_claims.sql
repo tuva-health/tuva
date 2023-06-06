@@ -155,8 +155,6 @@ select
      and min(claim_type) <> 'institutional' then 1
     else 0
   end as claim_type_not_institutional
-
-
 from acute_inpatient_claim_lines
 group by claim_id
 ),
@@ -184,21 +182,16 @@ select
     when min(claim_start_date) is not null then 'claim_start_date'
     else null
   end as date_used_as_start_date,
-  
   case
     when max(discharge_date) is not null then 'discharge_date'
     when max(claim_end_date) is not null then 'claim_end_date'
     else null
   end as date_used_as_end_date,
-    data_source
-
-  
+  data_source
 from acute_inpatient_claim_lines
 group by claim_id, data_source
-),
+)
 
-
-acute_inpatient_claims as (
 select
   h.patient_id as patient_id,
   h.claim_id as claim_id,  
@@ -302,10 +295,4 @@ select
 
 from header_level_values h
 left join data_quality_flags dq
-on h.claim_id = dq.claim_id
-)
-
-
-
-select *
-from acute_inpatient_claims
+  on h.claim_id = dq.claim_id

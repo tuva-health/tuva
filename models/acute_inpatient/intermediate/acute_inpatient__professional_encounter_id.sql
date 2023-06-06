@@ -41,14 +41,8 @@ acute_inpatient_professional_claim_lines as (
 select
   mc.claim_id,
   mc.patient_id,
-  coalesce(mc.claim_start_date,
-           mc.claim_line_start_date,
-	   mc.claim_end_date,
-	   mc.claim_line_end_date) as start_date,
-  coalesce(mc.claim_end_date,
-           mc.claim_line_end_date,
-	   mc.claim_start_date,
-	   mc.claim_line_start_date) as end_date	   
+  coalesce(mc.claim_start_date, mc.claim_line_start_date) as start_date,
+  coalesce(mc.claim_end_date, mc.claim_line_end_date) as end_date	   
 from {{ ref('medical_claim') }} mc
 inner join acute_inpatient_professional_claim_ids prof
   on mc.claim_id = prof.claim_id
@@ -77,17 +71,12 @@ select
     when bb.encounter_id is null then 1
     else 0
   end as orphan_claim_flag
-  
 from acute_inpatient_professional_claim_dates aa
-left join
-{{ ref('acute_inpatient__encounter_start_and_end_dates') }} bb
-on aa.patient_id = bb.patient_id
-and (aa.start_date
-     between bb.encounter_start_date and bb.encounter_end_date)
-and (aa.end_date
-     between bb.encounter_start_date and bb.encounter_end_date)
+left join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} bb
+  on aa.patient_id = bb.patient_id
+  and (aa.start_date between bb.encounter_start_date and bb.encounter_end_date)
+  and (aa.end_date between bb.encounter_start_date and bb.encounter_end_date)
 ),
-
 
 professional_claims_in_more_than_one_encounter as (
 select
