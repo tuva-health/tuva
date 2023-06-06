@@ -92,7 +92,7 @@ select
 , c.inst_paid_amount + d.prof_paid_amount as total_paid_amount
 , c.inst_allowed_amount + d.prof_allowed_amount as total_allowed_amount
 , c.inst_charge_amount + d.prof_charge_amount as total_charge_amount
-, datediff(d,a.encounter_start_date,a.encounter_end_date) as length_of_stay
+, {{ dbt.datediff(“a.encounter_start_date”, “a.encounter_end_date”,“day”) }} as length_of_stay
 , case
     when c.discharge_disposition_code = '20' then 1
     else 0
