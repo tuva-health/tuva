@@ -101,7 +101,7 @@ select
   count(distinct encounter_id) as encounter_count
 from roll_up_professional_claims_to_institutional_claims
 group by patient_id, claim_id
-having encounter_count > 1
+having count(distinct encounter_id) > 1
 ),
 
 
