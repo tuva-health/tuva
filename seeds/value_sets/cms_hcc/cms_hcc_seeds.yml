@@ -1,0 +1,147 @@
+version: 2
+
+seeds:
+  - name: cms_hcc__adjustment_rates
+    description: >
+      Adjustment rates by payment year. Extracted from rate announcement
+      documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_adjustment_rates
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        coefficient: float
+
+  - name: cms_hcc__cpt_hcpcs
+    description: >
+      CPT/HCPCS encounter filtering included list by payment year. Combined 
+      and cleaned version of code files on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_cpt_hcpcs
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcpcs_cpt_code: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+  - name: cms_hcc__demographic_factors
+    description: > 
+      Demographic factors by model version and risk segment. Extracted from 
+      rate announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_demographic_factors
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        coefficient: float
+
+  - name: cms_hcc__disabled_interaction_factors
+    description: > 
+      Disease and disabled interaction factors by model version 
+      and risk segment. Extracted from rate announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_disabled_interaction_factors
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcc_code: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: float
+
+  - name: cms_hcc__disease_factors
+    description: >
+      Disease factors by model version and risk segment. Extracted from rate 
+      announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_disease_factors
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcc_code: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: float
+
+  - name: cms_hcc__disease_hierarchy
+    description: >
+      Disease hierarchies by model version. Extracted from rate announcement
+      documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_disease_hierarchy
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcc_code: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        hccs_to_exclude: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+  - name: cms_hcc__disease_interaction_factors
+    description: >
+      Disease interaction factors by model version and risk segment. Extracted 
+      from rate announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_disease_interaction_factors
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcc_code_1: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        hcc_code_2: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: float
+
+  - name: cms_hcc__enrollment_interaction_factors
+    description: >
+      Enrollment interaction factors by model version and risk segment. 
+      Extracted from rate announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_enrollment_interaction_factors
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        coefficient: float
+
+  - name: cms_hcc__icd_10_cm_mappings
+    description: >
+      ICD-10 to HCC mapping by payment year and model version. Combined and 
+      cleaned version of code files on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_icd_10_cm_mappings
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        diagnosis_code: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        cms_hcc_v24: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+  - name: cms_hcc__payment_hcc_count_factors
+    description: >
+      Payment HCC count factors by model version and risk segment. Extracted 
+      from rate announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _value_set_payment_hcc_count_factors
+      tags: cms_hcc
+      enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        coefficient: float
