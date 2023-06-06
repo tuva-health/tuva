@@ -509,8 +509,6 @@ where diagnosis_code_25 is not null
 
 )
 
-
-
 select distinct
   eg.encounter_id,
   unpivot_cte.claim_id,
@@ -525,11 +523,10 @@ select distinct
   poa.present_on_admit_description as present_on_admit_description,
   unpivot_cte.data_source as data_source
 from unpivot_cte
-    left join {{ ref('encounter_grouper__encounter_data_for_medical_claims')}} as eg
-        on  unpivot_cte.claim_id = eg.claim_id
-        and unpivot_cte.patient_id = eg.patient_id
---         and unpivot_cte.data_source = eg.data_source
-    left join {{ ref('terminology__icd_10_cm') }} icd
-        on unpivot_cte.code = icd.icd_10_cm
-    left join {{ ref('terminology__present_on_admission') }} as poa
-        on unpivot_cte.present_on_admit_code = poa.present_on_admit_code
+left join {{ ref('acute_inpatient__encounter_data_for_medical_claims')}} as eg
+    on  unpivot_cte.claim_id = eg.claim_id
+    and unpivot_cte.patient_id = eg.patient_id
+left join {{ ref('terminology__icd_10_cm') }} icd
+    on unpivot_cte.code = icd.icd_10_cm
+left join {{ ref('terminology__present_on_admission') }} as poa
+    on unpivot_cte.present_on_admit_code = poa.present_on_admit_code

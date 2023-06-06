@@ -6,14 +6,15 @@ profile: default
 
 vars:
 
-  # input_database:
-  # input_schema:
+  # input_database: tuva_project_demo
+  # input_schema: tuva_synthetic
 
   ## All Tuva Data Marts
   tuva_marts_enabled: true
   
   ## Individual Tuva Data Marts
-  # ccsr_enabled: true
+  # acute_inpatient_enabled: false
+  # ccsr_enabled: false
   # cms_chronic_conditions_enabled: false
   # tuva_chronic_conditions_enabled: false
   # claims_date_profiling_enabled: false
@@ -24,7 +25,8 @@ vars:
   # member_months_enabled: false
   # pmpm_enabled: false
   # readmissions_enabled: false
-  # service_category_grouper_enabled: true
+  # service_category_grouper_enabled: false
+  # tuva_chronic_conditions_enabled: false
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -40,11 +42,11 @@ clean-targets:
 
 # models:
 #   integration_tests:
-#     +database: 
+#     +database: dev_aaron
 #   the_tuva_project:
-#     +database: 
+#     +database: dev_aaron
 
 # seeds:
 #   the_tuva_project:
-#     +database: 
+#     +database: dev_aaron
 
