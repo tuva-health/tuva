@@ -3,11 +3,11 @@
    )
 }}
 
+
 select
       claim_id
     , patient_id
-    , condition_date
-    , code_type
-    , code
+    , paid_date
+    , ndc_code
     , data_source
-from {{ ref('core__condition') }}
+from {{ ref('pharmacy_claim') }}

@@ -3,9 +3,11 @@
    )
 }}
 
-
 select
-  encounter_id
-, code
-, code_type
+      claim_id
+    , patient_id
+    , procedure_date
+    , code_type
+    , code
+    , data_source
 from {{ ref('core__procedure') }}

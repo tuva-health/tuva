@@ -22,8 +22,8 @@ with conditions_unioned as (
 
 select
       patient_id
-    , encounter_id
-    , encounter_start_date
+    , claim_id
+    , start_date
     , chronic_condition_type
     , condition_category
     , condition
