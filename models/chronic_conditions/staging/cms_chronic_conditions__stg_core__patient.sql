@@ -3,7 +3,5 @@
    )
 }}
 
-
-select
-  patient_id
+select patient_id
 from {{ ref('core__patient') }}

@@ -3,7 +3,6 @@
    )
 }}
 
-
 select
       claim_id
     , patient_id
