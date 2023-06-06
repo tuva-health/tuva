@@ -350,8 +350,6 @@ select distinct
 from unpivot_cte
   left join {{ ref('terminology__icd_10_pcs') }} as icd
     on unpivot_cte.code = icd.icd_10_pcs
-  left join {{ ref('encounter_grouper__encounter_data_for_medical_claims')}}  as eg
+  left join {{ ref('acute_inpatient__encounter_data_for_medical_claims')}}  as eg
     on  unpivot_cte.claim_id = eg.claim_id
---     and unpivot_cte.claim_line_number = eg.claim_line_number
     and unpivot_cte.patient_id = eg.patient_id
---     and unpivot_cte.data_source = eg.data_source

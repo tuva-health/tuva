@@ -14,57 +14,40 @@
 -- *************************************************
 
 
-
-
-with select_relevant_columns_without_dx_and_px as (
 select
-  mc.claim_id,
-  mc.claim_line_number,
-  mc.claim_type,
-  mc.patient_id,
-  mc.member_id,
-  mc.claim_start_date,
-  mc.claim_end_date,
-  mc.claim_line_start_date,
-  mc.claim_line_end_date,
-  mc.admission_date,
-  mc.discharge_date,
-  mc.admit_source_code,
-  mc.admit_type_code,
-  mc.discharge_disposition_code,
-  mc.place_of_service_code,
-  mc.bill_type_code,
-  mc.ms_drg_code,
-  mc.apr_drg_code,
-  mc.revenue_center_code,
-  mc.service_unit_quantity,
-  mc.hcpcs_code,
-  mc.hcpcs_modifier_1,
-  mc.hcpcs_modifier_2,
-  mc.hcpcs_modifier_3,
-  mc.hcpcs_modifier_4,
-  mc.hcpcs_modifier_5,
-  mc.rendering_npi,
-  mc.billing_npi,
-  mc.facility_npi,
-  mc.paid_date,
-  mc.paid_amount,
-  mc.allowed_amount,
-  mc.charge_amount,
-  mc.total_cost_amount,
-  eg.encounter_type,
-  eg.encounter_id,
-  eg.service_category_1,
-  eg.service_category_2,
-  mc.data_source
-from {{ ref('medical_claim') }} mc
-left join {{ ref('encounter_grouper__encounter_grouper') }} eg
-    on eg.claim_id = mc.claim_id
-    and eg.claim_line_number = mc.claim_line_number
-    and eg.patient_id = mc.patient_id
-
-)
-
-
-select *
-from select_relevant_columns_without_dx_and_px
+  claim_id,
+  claim_line_number,
+  claim_type,
+  patient_id,
+  member_id,
+  claim_start_date,
+  claim_end_date,
+  claim_line_start_date,
+  claim_line_end_date,
+  admission_date,
+  discharge_date,
+  admit_source_code,
+  admit_type_code,
+  discharge_disposition_code,
+  place_of_service_code,
+  bill_type_code,
+  ms_drg_code,
+  apr_drg_code,
+  revenue_center_code,
+  service_unit_quantity,
+  hcpcs_code,
+  hcpcs_modifier_1,
+  hcpcs_modifier_2,
+  hcpcs_modifier_3,
+  hcpcs_modifier_4,
+  hcpcs_modifier_5,
+  rendering_npi,
+  billing_npi,
+  facility_npi,
+  paid_date,
+  paid_amount,
+  allowed_amount,
+  charge_amount,
+  total_cost_amount,
+  data_source
+from {{ ref('medical_claim') }} 

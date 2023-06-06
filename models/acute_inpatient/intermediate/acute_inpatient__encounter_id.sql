@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -25,7 +25,7 @@ select
   patient_id,
   claim_id,
   encounter_id
-from {{ ref('encounter_grouper__acute_inpatient_institutional_encounter_id') }}
+from {{ ref('acute_inpatient__institutional_encounter_id') }}
 
 union distinct
 
@@ -33,5 +33,5 @@ select
   patient_id,
   claim_id,
   encounter_id
-from {{ ref('encounter_grouper__acute_inpatient_professional_encounter_id') }}
+from {{ ref('acute_inpatient__professional_encounter_id') }}
 where (orphan_claim_flag = 0) and (encounter_count = 1)
