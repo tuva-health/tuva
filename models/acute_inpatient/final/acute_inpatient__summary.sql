@@ -73,7 +73,7 @@ select
 , a.encounter_start_date
 , a.encounter_end_date
 , a.patient_id
-, datediff(d,birth_date,encounter_start_date)/365 as admit_age
+, {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race
 , f.facility_npi
