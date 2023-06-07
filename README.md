@@ -13,9 +13,9 @@ The Tuva Project is a collection of data marts and terminology sets that transfo
 ## 🔌  Supported Databases and dbt Versions
 
 This package has been tested on: 
-- Snowflake
-- Redshift
 - BigQuery
+- Redshift
+- Snowflake
 
 This package supports dbt version `1.3.x` or higher.
 <br/><br/>
