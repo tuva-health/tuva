@@ -1,5 +1,5 @@
 [![Apache License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![dbt logo and version](https://img.shields.io/static/v1?logo=dbt&label=dbt-version&message=1.2.x&color=orange)
-# The Tuva Project 
+# The Tuva Project
 
 ## 🔗  Docs
 Check out our [docs](https://thetuvaproject.com/) to learn about the Tuva Project and how to use it with your healthcare data.
