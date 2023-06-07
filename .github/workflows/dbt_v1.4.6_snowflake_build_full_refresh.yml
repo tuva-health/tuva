@@ -2,9 +2,7 @@ name: dbt_v1.4.6_snowflake_build_full_refresh
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
+  pull_request_target:
 
 env:
   DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
