@@ -3,9 +3,8 @@
    )
 }}
 
-
 select 
-  patient_id
-, code
-, condition_date
+      patient_id
+    , code
+    , condition_date
 from {{ ref('core__condition')}}

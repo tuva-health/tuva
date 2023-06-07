@@ -3,7 +3,6 @@
    )
 }}
 
-
 {%- set condition_filter = 'Opioid Use Disorder (OUD)' -%}
 
 {%- set naltrexone_ndcs = (
@@ -24,76 +23,81 @@ with chronic_conditions as (
     select * from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }}
     where condition = '{{ condition_filter }}'
 
-),
+)
 
-patient_encounters as (
+, patient_conditions as (
 
     select
-          encounter.patient_id
-        , encounter.encounter_id
-        , encounter.encounter_start_date
-        , encounter.ms_drg_code
-        , encounter.data_source
-        , replace(condition.code,'.','') as condition_code
-        , condition.code_type as condition_code_type
-        , replace(procedure.code,'.','') as procedure_code
-        , procedure.code_type as procedure_code_type
-    from {{ ref('cms_chronic_conditions__stg_core__encounter') }} as encounter
-         left join {{ ref('cms_chronic_conditions__stg_core__condition') }} as condition
-             on encounter.encounter_id = condition.encounter_id
-         left join {{ ref('cms_chronic_conditions__stg_core__procedure') }}  as procedure
-             on encounter.encounter_id = procedure.encounter_id
-
-),
-
-
-patient_medications as (
-    select
-        cast(null as  {{ dbt.type_string() }} )  encounter_id,
           patient_id
-        , cast(paid_date as date) as encounter_start_date
-        , replace(ndc_code,'.','') as ndc_code
+        , claim_id
+        , condition_date as start_date
+        , code_type as code_type
+        , replace(code,'.','') as code
         , data_source
-    from {{ ref('cms_chronic_conditions__stg_core__pharmacy_claim') }}
+    from {{ ref('cms_chronic_conditions__stg_core__condition') }}
 
+)
 
-),
-
-inclusions_diagnosis as (
+, patient_medications as (
 
     select
-          patient_encounters.patient_id
-        , patient_encounters.encounter_id
-        , patient_encounters.encounter_start_date
-        , patient_encounters.data_source
+          patient_id
+        , claim_id
+        , paid_date as start_date
+        , replace(ndc_code,'.','') as code
+        , data_source
+    from {{ ref('cms_chronic_conditions__stg_pharmacy_claim') }}
+
+)
+
+, patient_procedures as (
+
+    select
+          patient_id
+        , claim_id
+        , procedure_date as start_date
+        , code_type as code_type
+        , replace(code,'.','') as code
+        , data_source
+    from {{ ref('cms_chronic_conditions__stg_core__procedure') }}
+
+)
+
+, inclusions_diagnosis as (
+
+    select
+          patient_conditions.patient_id
+        , patient_conditions.claim_id
+        , patient_conditions.start_date
+        , patient_conditions.data_source
         , chronic_conditions.chronic_condition_type
         , chronic_conditions.condition_category
         , chronic_conditions.condition
-    from patient_encounters
+    from patient_conditions
          inner join chronic_conditions
-             on patient_encounters.condition_code = chronic_conditions.code
+             on patient_conditions.code = chronic_conditions.code
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'ICD-10-CM'
 
-),
+)
 
-inclusions_procedure as (
+, inclusions_procedure as (
 
     select
-          patient_encounters.patient_id
-        , patient_encounters.encounter_id
-        , patient_encounters.encounter_start_date
-        , patient_encounters.data_source
+          patient_procedures.patient_id
+        , patient_procedures.claim_id
+        , patient_procedures.start_date
+        , patient_procedures.data_source
         , chronic_conditions.chronic_condition_type
         , chronic_conditions.condition_category
         , chronic_conditions.condition
-    from patient_encounters
+    from patient_procedures
          inner join chronic_conditions
-             on patient_encounters.procedure_code = chronic_conditions.code
+             on patient_procedures.code = chronic_conditions.code
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system in ('ICD-10-PCS', 'HCPCS')
 
-),
+)
 
 /*
     Exclusion logic: Naltrexone NDCs are excluded if there is evidence of an
@@ -102,23 +106,24 @@ inclusions_procedure as (
     This CTE excludes medication encounters with the exception codes for
     Naltrexone. Those encounters will be evaluated separately.
 */
-inclusions_medication as (
+, inclusions_medication as (
+
     select
           patient_medications.patient_id
-        , patient_medications.encounter_id
-        , patient_medications.encounter_start_date
+        , patient_medications.claim_id
+        , patient_medications.start_date
         , patient_medications.data_source
         , chronic_conditions.chronic_condition_type
         , chronic_conditions.condition_category
         , chronic_conditions.condition
     from patient_medications
          inner join chronic_conditions
-             on patient_medications.ndc_code = chronic_conditions.code
+             on patient_medications.code = chronic_conditions.code
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'NDC'
     and chronic_conditions.code not in {{ naltrexone_ndcs }}
 
-),
+)
 
 /*
     Exclusion logic: Naltrexone NDCs are excluded if there is evidence of an
@@ -127,7 +132,7 @@ inclusions_medication as (
     This CTE includes patients with evidence of the chronic conditions Alcohol
     Use Disorders or Drug Use Disorders.
 */
-exclusions_other_chronic_conditions as (
+, exclusions_other_chronic_conditions as (
 
     select distinct patient_id
     from {{ ref('chronic_conditions__cms_chronic_conditions_all') }}
@@ -136,7 +141,7 @@ exclusions_other_chronic_conditions as (
         , 'Drug Use Disorders'
     )
 
-),
+)
 
 /*
     Exclusion logic: Naltrexone NDCs are excluded if there is evidence of an
@@ -146,26 +151,24 @@ exclusions_other_chronic_conditions as (
     medication encounters for Naltrexone having Alcohol Use Disorder or Drug
     Use Disorder and missing the Opioid Use Disorder diagnosis codes.
 */
-exclusions_medication as (
+, exclusions_medication as (
     select distinct
           patient_medications.patient_id
     from patient_medications
          inner join chronic_conditions
-             on patient_medications.ndc_code = chronic_conditions.code
+             on patient_medications.code = chronic_conditions.code
          inner join exclusions_other_chronic_conditions
-             on patient_medications.patient_id =
-                exclusions_other_chronic_conditions.patient_id
+             on patient_medications.patient_id = exclusions_other_chronic_conditions.patient_id
          left join inclusions_diagnosis
-             on patient_medications.patient_id =
-                inclusions_diagnosis.patient_id
+             on patient_medications.patient_id = inclusions_diagnosis.patient_id
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'NDC'
     and chronic_conditions.code in {{ naltrexone_ndcs }}
     and inclusions_diagnosis.patient_id is null
 
-),
+)
 
-inclusions_unioned as (
+, inclusions_unioned as (
 
     select * from inclusions_diagnosis
     union distinct
@@ -177,13 +180,10 @@ inclusions_unioned as (
 
 select distinct
       cast(inclusions_unioned.patient_id as {{ dbt.type_string() }}) as patient_id
-    , cast(inclusions_unioned.encounter_id as {{ dbt.type_string() }}) as encounter_id
-    , cast(inclusions_unioned.encounter_start_date as date)
-      as encounter_start_date
-    , cast(inclusions_unioned.chronic_condition_type as {{ dbt.type_string() }})
-      as chronic_condition_type
-    , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }})
-      as condition_category
+    , cast(inclusions_unioned.claim_id as {{ dbt.type_string() }}) as claim_id
+    , cast(inclusions_unioned.start_date as date) as start_date
+    , cast(inclusions_unioned.chronic_condition_type as {{ dbt.type_string() }}) as chronic_condition_type
+    , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }}) as condition_category
     , cast(inclusions_unioned.condition as {{ dbt.type_string() }}) as condition
     , cast(inclusions_unioned.data_source as {{ dbt.type_string() }}) as data_source
 from inclusions_unioned

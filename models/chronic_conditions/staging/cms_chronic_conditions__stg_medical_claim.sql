@@ -6,8 +6,7 @@
 select
       claim_id
     , patient_id
-    , condition_date
-    , code_type
-    , code
+    , claim_start_date
+    , ms_drg_code
     , data_source
-from {{ ref('core__condition') }}
+from {{ ref('medical_claim') }}
