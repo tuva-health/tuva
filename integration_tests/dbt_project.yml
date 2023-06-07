@@ -6,8 +6,8 @@ profile: default
 
 vars:
 
-  # input_database: tuva_project_demo
-  # input_schema: tuva_synthetic
+  input_database: dev_thuxuan
+  input_schema: input_layer
 
   ## All Tuva Data Marts
   tuva_marts_enabled: true
@@ -37,14 +37,4 @@ target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
-
-# models:
-#   integration_tests:
-#     +database: dev_aaron
-#   the_tuva_project:
-#     +database: dev_aaron
-
-# seeds:
-#   the_tuva_project:
-#     +database: dev_aaron
 

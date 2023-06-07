@@ -33,7 +33,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('duplicate_claims' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__medical_claim_duplicates' )}} )
     union all
     select * from (
@@ -42,7 +42,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('claim_type' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts 
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__claim_type_mapping_failures' )}} )
     and not exists (select 1 from {{ ref('data_profiling__claim_type_unmapped' )}} )
     and not exists (select 1 from {{ ref('data_profiling__medical_claim_missing_values' )}} where test_category = 'claim_type')
@@ -53,7 +53,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('header' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__institutional_header_fail_details' )}} )
     and not exists (select 1 from {{ ref('data_profiling__professional_header_fail_details' )}} )
     union all
@@ -63,7 +63,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('invalid_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__medical_claim_invalid_values' )}} )
     union all
     select * from (
@@ -72,7 +72,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__medical_claim_missing_values' )}} )
 
     /****  eligibility  ****/
@@ -83,7 +83,7 @@ with test_failure_summary as (
             , cast('patient_id' as {{ dbt.type_string() }} ) as grain
             , cast('duplicate_eligibility' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__eligibility_duplicates' )}} )
     union all
     select * from (
@@ -92,7 +92,7 @@ with test_failure_summary as (
             , cast('patient_id' as {{ dbt.type_string() }} ) as grain
             , cast('invalid_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__eligibility_invalid_values' )}} )
     union all
     select * from (
@@ -101,7 +101,7 @@ with test_failure_summary as (
             , cast('patient_id' as {{ dbt.type_string() }} ) as grain
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__eligibility_missing_values' )}} )
 
     /****  pharmacy_claim  ****/
@@ -112,7 +112,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('duplicate_claims' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )   
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__pharmacy_claim_duplicates' )}} )
     union all
     select * from (
@@ -121,7 +121,7 @@ with test_failure_summary as (
             , cast('claim_id' as {{ dbt.type_string() }} ) as grain
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
-    )
+    ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__pharmacy_claim_missing_values' )}} )
 )
 
