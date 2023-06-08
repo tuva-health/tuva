@@ -101,15 +101,32 @@ select
 from rx_paid_date
 )
 
-select *
+select
+ {{ dbt_utils.pivot(
+      column='date_type'
+    , values=('claim_start_date',
+              'claim_end_date',
+              'admission_date',
+              'discharge_date',
+              'med_paid_date',
+              'dispensing_date',
+              'rx_paid_date'
+              )
+    , agg='sum'
+    , then_value='cnt'
+    , else_value= 0
+    , quote_identifiers = False
+  ) }}
 from combine
-pivot (sum(cnt) for date_type in (
-    'claim_start_date',
-    'claim_end_date',
-    'admission_date',
-    'discharge_date',
-    'med_paid_date',
-    'dispensing_date',
-    'rx_paid_date'
-    )) as p
+-- pivot (sum(cnt) for date_type in (
+--    'claim_start_date',
+--    'claim_end_date',
+--    'admission_date',
+--    'discharge_date',
+--    'med_paid_date',
+--    'dispensing_date',
+--    'rx_paid_date'
+--    ))
+-- as p
+
 order by 1
