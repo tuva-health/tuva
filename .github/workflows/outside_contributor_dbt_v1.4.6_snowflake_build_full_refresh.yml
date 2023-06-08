@@ -120,7 +120,10 @@ jobs:
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
+  
+  
   post_status:
+    needs:  [snowflake, bigquery, redshift]
     runs-on: ubuntu-latest
 
     steps:
