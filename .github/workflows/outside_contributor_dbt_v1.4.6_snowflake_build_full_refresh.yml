@@ -120,3 +120,16 @@ jobs:
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
+  post_status:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Post comment on PR
+        run: |
+          PR_COMMENT="Workflow has finished running with status ${{ job.status }}."
+          PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
+          gh pr comment $PR_ID --body "$PR_COMMENT"
+
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
