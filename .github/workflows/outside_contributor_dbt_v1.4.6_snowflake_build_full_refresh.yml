@@ -131,5 +131,5 @@ jobs:
           PR_COMMENT="Workflow has finished running with status ${{ job.status }}."
           PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
           gh pr comment $PR_ID --body "$PR_COMMENT"
-
+        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
