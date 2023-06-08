@@ -10,23 +10,33 @@ with chronic_conditions as (
     select * from {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }}
     where condition = '{{ condition_filter }}'
 
-),
+)
 
-patient_encounters as (
+, patient_conditions as (
 
     select
-          encounter.patient_id
-        , encounter.encounter_id
-        , encounter.encounter_start_date
-        , encounter.ms_drg_code
-        , encounter.data_source
-        , replace(condition.code,'.','') as condition_code
-        , condition.code_type as condition_code_type
-    from {{ ref('cms_chronic_conditions__stg_core__encounter') }} as encounter
-         left join {{ ref('cms_chronic_conditions__stg_core__condition') }} as condition
-             on encounter.encounter_id = condition.encounter_id
+          patient_id
+        , claim_id
+        , condition_date as start_date
+        , code_type as code_type
+        , replace(code,'.','') as code
+        , data_source
+    from {{ ref('cms_chronic_conditions__stg_core__condition') }}
 
-),
+)
+
+, patient_ms_drgs as (
+
+    select
+          patient_id
+        , claim_id
+        , claim_start_date as start_date
+        , 'MS-DRG' as code_type
+        , ms_drg_code as code
+        , data_source
+    from {{ ref('cms_chronic_conditions__stg_medical_claim') }}
+
+)
 
 /*
     Exception logic: a claim with the diagnosis code R75 requires a second
@@ -35,42 +45,42 @@ patient_encounters as (
     This CTE excludes encounters with the exception code. Those encounters
     will be evaluated separately.
 */
-inclusions_diagnosis as (
+, inclusions_diagnosis as (
 
     select
-          patient_encounters.patient_id
-        , patient_encounters.encounter_id
-        , patient_encounters.encounter_start_date
-        , patient_encounters.data_source
+          patient_conditions.patient_id
+        , patient_conditions.claim_id
+        , patient_conditions.start_date
+        , patient_conditions.data_source
         , chronic_conditions.chronic_condition_type
         , chronic_conditions.condition_category
         , chronic_conditions.condition
-    from patient_encounters
+    from patient_conditions
          inner join chronic_conditions
-             on patient_encounters.condition_code = chronic_conditions.code
+             on patient_conditions.code = chronic_conditions.code
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'ICD-10-CM'
     and chronic_conditions.code <> 'R75'
 
-),
+)
 
-inclusions_ms_drg as (
+, inclusions_ms_drg as (
 
     select
-          patient_encounters.patient_id
-        , patient_encounters.encounter_id
-        , patient_encounters.encounter_start_date
-        , patient_encounters.data_source
+          patient_ms_drgs.patient_id
+        , patient_ms_drgs.claim_id
+        , patient_ms_drgs.start_date
+        , patient_ms_drgs.data_source
         , chronic_conditions.chronic_condition_type
         , chronic_conditions.condition_category
         , chronic_conditions.condition
-    from patient_encounters
+    from patient_ms_drgs
          inner join chronic_conditions
-             on patient_encounters.ms_drg_code = chronic_conditions.code
+             on patient_ms_drgs.code = chronic_conditions.code
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'MS-DRG'
 
-),
+)
 
 /*
     Exception logic: a claim with the diagnosis code R75 requires a second
@@ -79,28 +89,28 @@ inclusions_ms_drg as (
     This CTE includes encounters with the exception code only where that
     patient has another encounter that is not R75.
 */
-exception_diagnosis as (
+, exception_diagnosis as (
 
     select
-          patient_encounters.patient_id
-        , patient_encounters.encounter_id
-        , patient_encounters.encounter_start_date
-        , patient_encounters.data_source
+          patient_conditions.patient_id
+        , patient_conditions.claim_id
+        , patient_conditions.start_date
+        , patient_conditions.data_source
         , chronic_conditions.chronic_condition_type
         , chronic_conditions.condition_category
         , chronic_conditions.condition
-    from patient_encounters
+    from patient_conditions
          inner join chronic_conditions
-             on patient_encounters.condition_code = chronic_conditions.code
+             on patient_conditions.code = chronic_conditions.code
          inner join inclusions_diagnosis
-             on patient_encounters.patient_id = inclusions_diagnosis.patient_id
+             on patient_conditions.patient_id = inclusions_diagnosis.patient_id
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'ICD-10-CM'
     and chronic_conditions.code = 'R75'
 
-),
+)
 
-inclusions_unioned as (
+, inclusions_unioned as (
 
     select * from inclusions_diagnosis
     union distinct
@@ -112,13 +122,10 @@ inclusions_unioned as (
 
 select distinct
       cast(inclusions_unioned.patient_id as {{ dbt.type_string() }}) as patient_id
-    , cast(inclusions_unioned.encounter_id as {{ dbt.type_string() }}) as encounter_id
-    , cast(inclusions_unioned.encounter_start_date as date)
-      as encounter_start_date
-    , cast(inclusions_unioned.chronic_condition_type as {{ dbt.type_string() }})
-      as chronic_condition_type
-    , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }})
-      as condition_category
+    , cast(inclusions_unioned.claim_id as {{ dbt.type_string() }}) as claim_id
+    , cast(inclusions_unioned.start_date as date) as start_date
+    , cast(inclusions_unioned.chronic_condition_type as {{ dbt.type_string() }}) as chronic_condition_type
+    , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }}) as condition_category
     , cast(inclusions_unioned.condition as {{ dbt.type_string() }}) as condition
     , cast(inclusions_unioned.data_source as {{ dbt.type_string() }}) as data_source
 from inclusions_unioned

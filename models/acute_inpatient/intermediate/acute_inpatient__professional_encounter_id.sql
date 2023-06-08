@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -32,29 +32,20 @@
 
 with acute_inpatient_professional_claim_ids as (
 select distinct claim_id
-from {{ ref('medical_claim') }} 
-where place_of_service_code = '21'
--- Do we include a requirement for claim_type = 'professional'
--- to avoid having institutional claims where a place of service
--- code was imputed?
+from {{ ref('acute_inpatient__stg_service_category__service_category_grouper') }} 
+where claim_type = 'professional'
+  and service_category_2 = 'Acute Inpatient'
 ),
-
 
 acute_inpatient_professional_claim_lines as (
 select
   mc.claim_id,
   mc.patient_id,
-  coalesce(mc.claim_start_date,
-           mc.claim_line_start_date,
-	   mc.claim_end_date,
-	   mc.claim_line_end_date) as start_date,
-  coalesce(mc.claim_end_date,
-           mc.claim_line_end_date,
-	   mc.claim_start_date,
-	   mc.claim_line_start_date) as end_date	   
-from {{ ref('medical_claim') }} mc
-     inner join acute_inpatient_professional_claim_ids prof
-     on mc.claim_id = prof.claim_id
+  mc.claim_start_date as start_date,
+  mc.claim_end_date as end_date	   
+from {{ ref('acute_inpatient__stg_medical_claim') }} mc
+inner join acute_inpatient_professional_claim_ids prof
+  on mc.claim_id = prof.claim_id
 ),
 
 
@@ -80,17 +71,12 @@ select
     when bb.encounter_id is null then 1
     else 0
   end as orphan_claim_flag
-  
 from acute_inpatient_professional_claim_dates aa
-left join
-{{ ref('encounter_grouper__acute_inpatient_encounter_start_and_end_dates') }} bb
-on aa.patient_id = bb.patient_id
-and (aa.start_date
-     between bb.encounter_start_date and bb.encounter_end_date)
-and (aa.end_date
-     between bb.encounter_start_date and bb.encounter_end_date)
+left join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} bb
+  on aa.patient_id = bb.patient_id
+  and (aa.start_date between bb.encounter_start_date and bb.encounter_end_date)
+  and (aa.end_date between bb.encounter_start_date and bb.encounter_end_date)
 ),
-
 
 professional_claims_in_more_than_one_encounter as (
 select

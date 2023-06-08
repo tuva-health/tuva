@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -14,46 +14,7 @@
 -- that no two people can have the same claim_id.
 -- *************************************************
 
-
-with room_and_board_requirement as (
-select distinct claim_id
-from {{ ref('medical_claim') }} 
-where revenue_center_code in
-  ('0100','0101',
-   '0110','0111','0112','0113','0114','0116','0117','0118','0119',
-   '0120','0121','0122','0123','0124','0126','0127','0128','0129',
-   '0130','0131','0132','0133','0134','0136','0137','0138','0139',
-   '0140','0141','0142','0143','0144','0146','0147','0148','0149',
-   '0150','0151','0152','0153','0154','0156','0157','0158','0159',
-   '0160','0164','0167','0169',
-   '0170','0171','0172','0173','0174','0179',
-   '0190','0191','0192','0193','0194','0199',
-   '0200','0201','0202','0203','0204','0206','0207','0208','0209',
-   '0210','0211','0212','0213','0214','0219',
-   '1000','1001','1002')
-),
-
-
-drg_requirement as (
-select distinct claim_id
-from {{ ref('medical_claim') }} mc
-left join {{ ref('terminology__ms_drg')}} msdrg
-  on mc.ms_drg_code = msdrg.ms_drg_code
-left join {{ ref('terminology__apr_drg')}} aprdrg
-  on mc.apr_drg_code = aprdrg.apr_drg_code
-where (msdrg.ms_drg_code is not null) 
-   or (aprdrg.apr_drg_code is not null)
-),
-
-
-bill_type_requirement as (
-select distinct claim_id
-from {{ ref('medical_claim') }}
-where left(bill_type_code,2) in ('11','12') 
-),
-
-
-acute_inpatient_claim_lines as (
+with acute_inpatient_claim_lines as (
 select
   mc.patient_id,
   mc.claim_id,
@@ -68,13 +29,11 @@ select
   mc.facility_npi,
   mc.claim_type,
   mc.data_source
-from {{ ref('medical_claim') }} mc
-inner join room_and_board_requirement rb
-  on mc.claim_id = rb.claim_id
-inner join drg_requirement drg
-  on mc.claim_id = drg.claim_id
-inner join bill_type_requirement bt
-  on mc.claim_id = bt.claim_id
+from {{ ref('acute_inpatient__stg_medical_claim') }} mc
+inner join {{ ref('acute_inpatient__stg_service_category__service_category_grouper')}} sc
+  on mc.claim_id = sc.claim_id
+where mc.claim_type = 'institutional'
+  and sc.service_category_2 = 'Acute Inpatient'
 ),
 
 data_quality_flags as (
@@ -196,8 +155,6 @@ select
      and min(claim_type) <> 'institutional' then 1
     else 0
   end as claim_type_not_institutional
-
-
 from acute_inpatient_claim_lines
 group by claim_id
 ),
@@ -225,21 +182,16 @@ select
     when min(claim_start_date) is not null then 'claim_start_date'
     else null
   end as date_used_as_start_date,
-  
   case
     when max(discharge_date) is not null then 'discharge_date'
     when max(claim_end_date) is not null then 'claim_end_date'
     else null
   end as date_used_as_end_date,
-    data_source
-
-  
+  data_source
 from acute_inpatient_claim_lines
 group by claim_id, data_source
-),
+)
 
-
-acute_inpatient_claims as (
 select
   h.patient_id as patient_id,
   h.claim_id as claim_id,  
@@ -343,10 +295,4 @@ select
 
 from header_level_values h
 left join data_quality_flags dq
-on h.claim_id = dq.claim_id
-)
-
-
-
-select *
-from acute_inpatient_claims
+  on h.claim_id = dq.claim_id

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('encounter_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('acute_inpatient_enabled',var('tuva_marts_enabled',True))
    )
 }}
 
@@ -44,15 +44,15 @@ select
   cc.encounter_start_date,
   cc.encounter_end_date
 
-from {{ ref('encounter_grouper__acute_inpatient_institutional_claims') }} aa
+from {{ ref('acute_inpatient__institutional_claims') }} aa
 
 left join
-{{ ref('encounter_grouper__acute_inpatient_encounter_id') }} bb
+{{ ref('acute_inpatient__encounter_id') }} bb
 on aa.claim_id = bb.claim_id
 and aa.patient_id = bb.patient_id
 
 left join
-{{ ref('encounter_grouper__acute_inpatient_encounter_start_and_end_dates') }} cc
+{{ ref('acute_inpatient__encounter_start_and_end_dates') }} cc
 on bb.encounter_id = cc.encounter_id
 and bb.patient_id = cc.patient_id
 ),
