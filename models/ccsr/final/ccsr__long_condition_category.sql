@@ -13,7 +13,7 @@ with ccsr__dx_vertical_pivot as (
 
 ), dxccsr_body_systems as (
 
-    select * from {{ ref('dxccsr_v2023_1_body_systems') }}
+    select * from {{ ref('ccsr__dxccsr_v2023_1_body_systems') }}
 
 )
 

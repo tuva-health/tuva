@@ -15,7 +15,7 @@ with codes as (
         {%- endfor %}
         default_ccsr_category_ip,
         default_ccsr_category_op
-    from {{ ref('dxccsr_v2023_1_cleaned_map') }}
+    from {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }}
 
 ), long_union as (
     -- generate select & union statements to pivot category columns to rows

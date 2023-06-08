@@ -11,4 +11,4 @@ select
     prccsr_description as ccsr_category_description,
     clinical_domain,
     '{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as _model_run_time
-from {{ ref('prccsr_v2023_1_cleaned_map')}}
+from {{ ref('ccsr__prccsr_v2023_1_cleaned_map')}}
