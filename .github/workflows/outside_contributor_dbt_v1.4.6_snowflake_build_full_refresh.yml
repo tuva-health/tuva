@@ -58,7 +58,6 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
   
-  
   redshift:
     runs-on: ubuntu-latest
 
@@ -90,11 +89,16 @@ jobs:
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
+        
+        
   bigquery:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.4.6
@@ -123,7 +127,8 @@ jobs:
   
   
   post_status:
-    needs:  [snowflake, bigquery, redshift]
+    needs: [snowflake, bigquery, redshift]
+    if: always()
     runs-on: ubuntu-latest
 
     steps:
@@ -131,7 +136,7 @@ jobs:
       
       - name: Post comment on PR
         run: |
-          PR_COMMENT="Workflow has finished running with status ${{ job.status }}."
+          PR_COMMENT="Workflow has finished running: \n- Snowflake: ${{ needs.snowflake.result }}\n- Redshift: ${{ needs.redshift.result }}\n- BigQuery: ${{ needs.bigquery.result }}"
           PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
           gh pr comment $PR_ID --body "$PR_COMMENT"
         env:
