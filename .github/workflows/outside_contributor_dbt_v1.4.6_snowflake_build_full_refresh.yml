@@ -131,7 +131,7 @@ jobs:
         
       - name: Post comment on PR
         run: |
-          PR_COMMENT="Workflow has finished with the following statuses:\n- Snowflake: "${{ needs.snowflake.result }}"\n- Redshift: "${{ needs.redshift.result }}"\n- BigQuery: "${{ needs.bigquery.result }}
+          PR_COMMENT="Workflow has finished with the following statuses:<ul><li>Snowflake: "${{ needs.snowflake.result }}"</li></ul><ul><li>Redshift: "${{ needs.redshift.result }}"</li></ul><ul><li>BigQuery: "${{ needs.bigquery.result }}</li></ul>
           PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
           gh pr comment $PR_ID --body "$PR_COMMENT"
         env:
