@@ -40,7 +40,6 @@ jobs:
           dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
           dbt_project_folder: "integration_tests"
 
-          
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.4.6
         with:
@@ -73,7 +72,6 @@ jobs:
           dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
-
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.4.6
         with:
@@ -105,8 +103,7 @@ jobs:
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
-
-          
+ 
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.4.6
         with:
@@ -119,7 +116,6 @@ jobs:
           dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"tuva_database":"dev-ci-testing","input_database":"dev-ci-testing","input_schema":"connector"}'
           dbt_project_folder: "integration_tests"
 
-
       - name: Get the result
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
@@ -130,6 +126,9 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
       - name: Post comment on PR
         run: |
           PR_COMMENT="Workflow has finished with the following statuses:\n- Snowflake: "${{ needs.snowflake.result }}"\n- Redshift: "${{ needs.redshift.result }}"\n- BigQuery: "${{ needs.bigquery.result }}
