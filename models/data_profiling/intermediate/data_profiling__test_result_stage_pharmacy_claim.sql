@@ -7,6 +7,7 @@ with pharmacy_claim_denominator as(
   select 
     cast('all' as {{ dbt.type_string() }} ) as claim_type
     , cast(count(distinct claim_id) as int) as count
+    , '{{ var('last_update')}}' as last_update
   from {{ ref('pharmacy_claim') }}
 )
 
@@ -18,6 +19,7 @@ with pharmacy_claim_denominator as(
         , test_name
         , claim_type
         , count(distinct foreign_key) as failures
+        , last_update
     from {{ ref('data_profiling__test_detail') }}
     where source_table = 'pharmacy_claim'
     group by
@@ -26,6 +28,7 @@ with pharmacy_claim_denominator as(
         , test_category
         , test_name
         , claim_type
+        , last_update
     )
 
   select
@@ -36,7 +39,7 @@ with pharmacy_claim_denominator as(
     , claim.claim_type
     , claim.failures
     , elig.count as denominator
-    , '{{ var('last_update')}}' as last_update
+    , last_update
   from distinct_patient_per_category claim
   left join pharmacy_claim_denominator elig
       on claim.claim_type = elig.claim_type
@@ -48,5 +51,6 @@ with pharmacy_claim_denominator as(
     , claim.claim_type
     , claim.failures
     , elig.count
-    , '{{ var('last_update')}}'
+    , last_update
+
 

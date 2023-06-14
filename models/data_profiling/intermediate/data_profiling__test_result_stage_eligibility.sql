@@ -24,7 +24,6 @@ group by
     , test_name
     , claim_type
     , denom.denominator
-    , '{{ var('last_update')}}'
 
 union all
 
@@ -49,5 +48,4 @@ group by
     , test_name
     , claim_type
     , denom.denominator
-    , '{{ var('last_update')}}'
 
