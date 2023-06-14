@@ -19,7 +19,6 @@ with pharmacy_claim_denominator as(
         , test_name
         , claim_type
         , count(distinct foreign_key) as failures
-        , last_update
     from {{ ref('data_profiling__test_detail') }}
     where source_table = 'pharmacy_claim'
     group by
@@ -28,7 +27,6 @@ with pharmacy_claim_denominator as(
         , test_category
         , test_name
         , claim_type
-        , last_update
     )
 
   select
