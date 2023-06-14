@@ -11,4 +11,5 @@ select
     , claim_end_date
     , bill_type_code
     , hcpcs_code
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }}

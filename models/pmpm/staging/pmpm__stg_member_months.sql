@@ -7,4 +7,5 @@
 SELECT
   patient_id
 , year_month
+, '{{ var('last_update')}}' as last_update
 from {{ ref('member_months') }}

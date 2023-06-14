@@ -13,6 +13,7 @@ select
 , a.paid_date as medical_paid_date
 , b.dispensing_date as dispensing_date
 , b.paid_date as rx_paid_date
+, '{{ var('last_update')}}' as last_update
 from {{ ref('claims_date_profiling__medical_claim_dates') }} a
 full join {{ ref('claims_date_profiling__pharmacy_claim_dates') }} b
     on a.year_month = b.year_month
@@ -24,6 +25,13 @@ union all
 select 
   'Duplicate' as year_month
 , null as member_months
-, c.*
+, c.claim_start_date
+, c.claim_end_date
+, c.admission_date
+, c.discharge_date
+, c.med_paid_date as medical_paid_date
+, c.dispensing_date
+, c.rx_paid_date
+, '{{ var('last_update')}}' as last_update
 from {{ ref('claims_date_profiling__duplicate_dates') }} c
 order by 1

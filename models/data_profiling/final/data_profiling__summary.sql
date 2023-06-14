@@ -163,4 +163,5 @@ select
         else test_category 
     end as {{ dbt.type_string() }} ) as test_category
     , cast(counts as int) as counts
+    , '{{ var('last_update')}}' as last_update
 from summary_union

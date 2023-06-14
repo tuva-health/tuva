@@ -25,13 +25,6 @@ select
     , quote_identifiers = False
     , suffix='_paid'
   ) }}
--- , inpatient_paid
--- , outpatient_paid
--- , office_visit_paid
--- , ancillary_paid
--- , other_paid
--- , pharmacy_paid
+, '{{ var('last_update')}}' as last_update
 from service_cat_1
--- pivot(sum(total_paid) for service_category_1 in ('Inpatient','Outpatient','Office Visit','Ancillary','Other','Pharmacy')) 
---   as p (patient_id, year_month, inpatient_paid, outpatient_paid, office_visit_paid, ancillary_paid, other_paid, pharmacy_paid)
 group by 1,2

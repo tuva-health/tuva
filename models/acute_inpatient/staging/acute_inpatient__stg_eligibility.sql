@@ -8,4 +8,5 @@ select
 , birth_date
 , gender
 , race
+, '{{ var('last_update')}}' as last_update
 from {{ ref('eligibility') }}

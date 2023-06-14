@@ -149,5 +149,5 @@ from encounter_data_quality_issues
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from all_data_quality_flags

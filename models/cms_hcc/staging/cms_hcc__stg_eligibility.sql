@@ -10,4 +10,5 @@ select
     , enrollment_end_date
     , dual_status_code
     , medicare_status_code
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('eligibility') }}

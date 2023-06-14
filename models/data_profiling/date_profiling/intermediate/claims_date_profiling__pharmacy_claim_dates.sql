@@ -46,5 +46,6 @@ year_month
     , agg='sum'
     , quote_identifiers=false
     ) }}
+, '{{ var('last_update')}}' as last_update
 from rx_pivot_prep
 group by year_month

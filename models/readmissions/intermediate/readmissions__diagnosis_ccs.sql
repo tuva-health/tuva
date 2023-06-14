@@ -29,7 +29,8 @@ select
         when bb.icd_10_cm is null then 0
 	else 1
     end as valid_icd_10_cm_flag,
-    cc.ccs_diagnosis_category
+    cc.ccs_diagnosis_category,
+    '{{ var('last_update')}}' as last_update
 from
     {{ ref('readmissions__diagnosis') }} aa
     left join {{ ref('terminology__icd_10_cm') }} bb

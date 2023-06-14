@@ -19,7 +19,8 @@ select
         when bb.icd_10_pcs is null then 0
 	else 1
     end as valid_icd_10_pcs_flag,
-    cc.ccs_procedure_category
+    cc.ccs_procedure_category,
+    '{{ var('last_update')}}' as last_update
 from
     {{ ref('readmissions__stg_core__procedure') }} aa
     left join {{ ref('terminology__icd_10_pcs') }} bb

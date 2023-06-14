@@ -25,13 +25,6 @@ select
     , quote_identifiers = False
     , suffix='_allowed'
   ) }}
--- , inpatient_allowed
--- , outpatient_allowed
--- , office_visit_allowed
--- , ancillary_allowed
--- , other_allowed
--- , pharmacy_allowed
+, '{{ var('last_update')}}' as last_update
 from service_cat_1
--- pivot(sum(total_allowed) for service_category_1 in ('Inpatient','Outpatient','Office Visit','Ancillary','Other','Pharmacy')) 
---   as p (patient_id, year_month, inpatient_allowed, outpatient_allowed, office_visit_allowed, ancillary_allowed, other_allowed, pharmacy_allowed)
 group by 1,2

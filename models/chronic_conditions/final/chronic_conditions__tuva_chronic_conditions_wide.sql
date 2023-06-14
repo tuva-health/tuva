@@ -26,6 +26,7 @@ select
         , else_value= 0
         , quote_identifiers = False
       ) }}
+      , '{{ var('last_update')}}' as last_update
 from {{ ref('tuva_chronic_conditions__stg_core__patient') }} p
      left join {{ ref('chronic_conditions__tuva_chronic_conditions_long') }} l
         on p.patient_id = l.patient_id

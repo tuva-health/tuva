@@ -3,5 +3,7 @@
    )
 }}
 
-select patient_id
+select 
+    patient_id
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('core__patient') }}

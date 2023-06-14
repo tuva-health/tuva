@@ -81,10 +81,10 @@ where (orphan_claim_flag = 1) or (encounter_count > 1)
 )
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from acute_inpatient_claims_with_encounter_id
 
 union all
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from acute_inpatient_claims_without_encounter_id

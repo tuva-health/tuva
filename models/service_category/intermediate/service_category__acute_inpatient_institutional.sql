@@ -46,6 +46,7 @@ where claim_type = 'institutional'
 select distinct 
   a.claim_id
 , 'Acute Inpatient' as service_category_2
+, '{{ var('last_update')}}' as last_update
 from {{ ref('service_category__stg_medical_claim') }} a
 inner join room_and_board_requirement b
   on a.claim_id = b.claim_id

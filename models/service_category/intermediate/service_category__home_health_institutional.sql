@@ -6,6 +6,7 @@
 select distinct 
   claim_id
 , 'Home Health' as service_category_2
+, '{{ var('last_update')}}' as last_update
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
   and left(bill_type_code,2) in ('31','32','33')

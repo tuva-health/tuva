@@ -81,4 +81,5 @@ select *
 , inpatient_paid + outpatient_paid + office_visit_paid + ancillary_paid + other_paid as medical_paid
 , inpatient_allowed + outpatient_allowed + office_visit_allowed + ancillary_allowed + other_allowed + pharmacy_allowed as total_allowed
 , inpatient_allowed + outpatient_allowed + office_visit_allowed + ancillary_allowed + other_allowed as medical_allowed
+, '{{ var('last_update')}}' as last_update
 from combine

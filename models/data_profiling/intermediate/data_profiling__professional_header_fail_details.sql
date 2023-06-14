@@ -55,6 +55,7 @@ select
     ,  claim_id
     , 'header' as test_category
     , column_checked||' duplicated' as test_name
+    , '{{ var('last_update')}}' as last_update
 from professional_header_duplicates
 group by 
     claim_id

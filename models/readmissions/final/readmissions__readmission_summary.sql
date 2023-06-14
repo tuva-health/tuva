@@ -62,7 +62,8 @@ select
     bb.planned_flag as readmission_planned_flag,
     bb.specialty_cohort as readmission_specialty_cohort,
     bb.died_flag as readmission_died_flag,
-    bb.diagnosis_ccs as readmission_diagnosis_ccs
+    bb.diagnosis_ccs as readmission_diagnosis_ccs,
+    '{{ var('last_update')}}' as last_update
 from
     encounter_sequence aa
     left join encounter_sequence bb

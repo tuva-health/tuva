@@ -12,6 +12,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.bill_type_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__bill_type')}} tob
         on med.bill_type_code = tob.bill_type_code
@@ -31,6 +32,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.revenue_center_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__revenue_center') }} rev
         on med.revenue_center_code = rev.revenue_center_code
@@ -49,6 +51,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.discharge_disposition_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__discharge_disposition') }} discharge
         on med.discharge_disposition_code = discharge.discharge_disposition_code
@@ -68,6 +71,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.admit_source_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__admit_source') }} adsource
         on med.admit_source_code = adsource.admit_source_code
@@ -86,6 +90,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.admit_type_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__admit_type') }} adtype
         on med.admit_type_code = adtype.admit_type_code
@@ -104,6 +109,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.ms_drg_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__ms_drg') }} msdrg
         on med.ms_drg_code = msdrg.ms_drg_code
@@ -122,6 +128,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.apr_drg_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__apr_drg') }} aprdrg
         on med.apr_drg_code = aprdrg.apr_drg_code
@@ -141,6 +148,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.diagnosis_poa_1) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__present_on_admission') }} poa
         on med.diagnosis_poa_1 = poa.present_on_admit_code
@@ -159,6 +167,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.procedure_code_type) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__code_type') }} codetype
         on med.procedure_code_type = codetype.code_type
@@ -177,6 +186,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.place_of_service_code) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__place_of_service') }} pos
         on med.place_of_service_code = pos.place_of_service_code
@@ -195,6 +205,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.diagnosis_code_type) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__code_type') }} codetype
         on med.diagnosis_code_type = codetype.code_type
@@ -213,6 +224,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.diagnosis_code_1) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__icd_10_cm') }} icd
         on med.diagnosis_code_1 = icd.icd_10_cm
@@ -233,6 +245,7 @@ with valid_bill_type as(
         , 'claim_id' as grain
         , claim_id
         , count(med.claim_type) as filled_row_count
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('medical_claim') }} med
     left join {{ ref('terminology__claim_type') }} claimtype
         on med.claim_type = claimtype.claim_type

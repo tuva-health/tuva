@@ -52,5 +52,5 @@ from
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from all_primary_diagnosis_count

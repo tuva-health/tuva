@@ -11,7 +11,7 @@
 
 
 
-select encounter_id
+select encounter_id, '{{ var('last_update')}}' as last_update
 from {{ ref('readmissions__encounter') }}
 where discharge_date <= (select max(discharge_date)
                          from {{ ref('readmissions__encounter') }} ) - 30

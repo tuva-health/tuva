@@ -36,6 +36,7 @@ with pharmacy_claim_denominator as(
     , claim.claim_type
     , claim.failures
     , elig.count as denominator
+    , '{{ var('last_update')}}' as last_update
   from distinct_patient_per_category claim
   left join pharmacy_claim_denominator elig
       on claim.claim_type = elig.claim_type
@@ -47,4 +48,5 @@ with pharmacy_claim_denominator as(
     , claim.claim_type
     , claim.failures
     , elig.count
+    , '{{ var('last_update')}}'
 

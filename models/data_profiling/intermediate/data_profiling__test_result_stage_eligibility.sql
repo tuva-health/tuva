@@ -11,6 +11,7 @@ select
     , claim_type
     , count(distinct foreign_key) as failures
     , denom.denominator
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('data_profiling__test_detail') }} det
 inner join {{ ref('data_profiling__eligibility_denominators') }} denom
     on det.claim_type = denom.test_denominator_name
@@ -23,6 +24,7 @@ group by
     , test_name
     , claim_type
     , denom.denominator
+    , '{{ var('last_update')}}'
 
 union all
 
@@ -34,6 +36,7 @@ select
     , claim_type
     , count(distinct foreign_key) as failures
     , denom.denominator
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('data_profiling__test_detail') }} det
 inner join {{ ref('data_profiling__eligibility_denominators') }} denom
     on det.test_name = denom.test_denominator_name
@@ -46,4 +49,5 @@ group by
     , test_name
     , claim_type
     , denom.denominator
+    , '{{ var('last_update')}}'
 

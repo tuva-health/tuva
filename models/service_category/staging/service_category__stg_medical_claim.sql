@@ -12,5 +12,6 @@ CLAIM_TYPE,
 HCPCS_CODE,
 MS_DRG_CODE,
 PLACE_OF_SERVICE_CODE,
-REVENUE_CENTER_CODE
+REVENUE_CENTER_CODE,
+'{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }}

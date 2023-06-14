@@ -7,4 +7,5 @@ select
     , patient_id
     , code_type
     , code
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('core__condition') }}

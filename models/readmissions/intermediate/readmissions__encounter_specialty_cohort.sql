@@ -65,7 +65,7 @@ with cohort_ranks as (
 
 
 --getting all encounters, with labeled cohorts, if no cohort cohort is "medicine"
-select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort
+select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort, '{{ var('last_update')}}' as last_update
 from {{ ref('readmissions__encounter') }} enc
 left join main_encounter_cohort mec
     on enc.encounter_id = mec.encounter_id

@@ -9,4 +9,5 @@ select
     , paid_date
     , ndc_code
     , data_source
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('pharmacy_claim') }}

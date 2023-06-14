@@ -6,6 +6,7 @@
 select distinct 
   claim_id
 , 'Urgent Care' as service_category_2
+, '{{ var('last_update')}}' as last_update
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
   and revenue_center_code = '0456'

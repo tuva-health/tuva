@@ -26,7 +26,7 @@
 
 
 
-select distinct a.encounter_id
+select distinct a.encounter_id, '{{ var('last_update')}}' as last_update
 from {{ ref('readmissions__encounter') }} a
 inner join {{ ref('readmissions__index_time_requirement') }} b
     on a.encounter_id = b.encounter_id

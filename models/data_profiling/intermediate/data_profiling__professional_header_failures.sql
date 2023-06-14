@@ -51,6 +51,6 @@ group by claim_id
 having count(*) > 1
 )
 
-select med.* from claims_with_duplicates dupe
+select med.*, '{{ var('last_update')}}' as last_update from claims_with_duplicates dupe
 inner join {{ ref('medical_claim') }} med
     on dupe.claim_id = med.claim_id

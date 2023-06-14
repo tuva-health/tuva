@@ -11,5 +11,6 @@ select
     discharge_disposition_code,
     facility_npi,
     ms_drg_code,
-    total_paid_amount    
+    total_paid_amount,
+    '{{ var('last_update')}}' as last_update
 from {{ ref('acute_inpatient__summary') }}

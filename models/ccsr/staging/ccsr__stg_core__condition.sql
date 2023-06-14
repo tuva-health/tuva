@@ -3,5 +3,5 @@
    )
 }}
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from {{ ref('core__condition') }}

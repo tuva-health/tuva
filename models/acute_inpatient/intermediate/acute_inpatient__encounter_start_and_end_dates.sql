@@ -40,5 +40,5 @@ from add_encounter_id_to_acute_inpatient_encounters
 group by patient_id, encounter_id
 )
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from encounter_start_and_end_dates
