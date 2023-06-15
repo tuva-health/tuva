@@ -251,7 +251,7 @@ with valid_bill_type as(
     , 'claim_id' as grain
     , claim_id
     , count(med.paid_amount) as filled_row_count
-    from {{ ref('input_layer__medical_claim') }} med
+    from {{ ref('medical_claim') }} med
    where med.paid_amount < 0
    group by
        claim_id

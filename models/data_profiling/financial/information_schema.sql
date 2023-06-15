@@ -6,5 +6,4 @@ select
   , lower(data_type) as data_type
   from information_schema.columns
 where lower(table_name) in ('medical_claim', 'pharmacy_claim', 'eligibility')
-   and lower(table_schema) = 'tuva_synthetic'
 order by table_name, ordinal_position
