@@ -9,35 +9,9 @@ vars:
   input_database: tuva_project_demo
   input_schema: tuva_synthetic
 
-  tuva_database:  dev_thuxuan
 
   ## All Tuva Data Marts
   tuva_marts_enabled: true
-
-  ## CCSR data mart vars
-  # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
-  wide_condition_enabled: True
-  wide_procedure_enabled: True
-
-  # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
-  record_type: "ip"
-
-  # CCSR Version numbers from HCUP
-  dxccsr_version: "'2023.1'"
-  prccsr_version: "'2023.1'"
-
-
-  ## CMS HCC data mart vars
-  # The payment_year variable has a default of the current year
-  cms_hcc_payment_year: 2023
-
-  # DO NOT CHANGE - Future logic to be added for selecting different HCC model versions
-  cms_hcc_model_version: CMS-HCC-V24
-
-  ## Last Update
-  # The date and timestamp of the dbt run that will populate the last_update column in all models.
-  # Default timezone is EST
-  last_update: '{{ run_started_at.astimezone(modules.pytz.timezone("America/New_York")) }}'
 
   
   ## Individual Tuva Data Marts
