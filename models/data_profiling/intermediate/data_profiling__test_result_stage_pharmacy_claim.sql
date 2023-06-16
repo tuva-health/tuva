@@ -7,7 +7,7 @@ with pharmacy_claim_denominator as(
   select 
     cast('all' as {{ dbt.type_string() }} ) as claim_type
     , cast(count(distinct claim_id) as int) as count
-    , cast('{{ var('last_update')}}' as {{ dbt.type_timestamp() }} ) as last_update
+    , cast('{{ var('last_update')}}' as {{ dbt.type_string() }} ) as last_update
   from {{ ref('pharmacy_claim') }}
 )
 
