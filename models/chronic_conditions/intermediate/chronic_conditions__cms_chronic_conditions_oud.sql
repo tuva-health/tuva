@@ -186,6 +186,7 @@ select distinct
     , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }}) as condition_category
     , cast(inclusions_unioned.condition as {{ dbt.type_string() }}) as condition
     , cast(inclusions_unioned.data_source as {{ dbt.type_string() }}) as data_source
+    , '{{ var('last_update')}}' as last_update
 from inclusions_unioned
      left join exclusions_medication
          on inclusions_unioned.patient_id = exclusions_medication.patient_id

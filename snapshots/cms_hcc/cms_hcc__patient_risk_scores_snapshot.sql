@@ -10,8 +10,8 @@
     , "alias": "patient_risk_scores_snapshot"
     , "tags": "cms_hcc"
     , "strategy": "timestamp"
-    , "updated_at": "date_calculated"
-    , "unique_key": "patient_id||model_version||payment_year||date_calculated"
+    , "updated_at": "last_update"
+    , "unique_key": "patient_id||model_version||payment_year||last_update"
     , "enabled": var('cms_hcc_enabled',var('tuva_marts_enabled',True))
   })
 }}

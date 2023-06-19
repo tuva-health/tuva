@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.3.13'
+version: '0.3.14'
 config-version: 2
 require-dbt-version: ">=1.3.0"
 
@@ -27,6 +27,11 @@ vars:
 
     # DO NOT CHANGE - Future logic to be added for selecting different HCC model versions
     cms_hcc_model_version: CMS-HCC-V24
+
+    ## Last Update
+    # The date and timestamp of the dbt run that will populate the last_update column in all models.
+    # Default timezone is EST
+    last_update: '{{ run_started_at.astimezone(modules.pytz.timezone("America/New_York")) }}'
 
 
 model-paths: ["models"]

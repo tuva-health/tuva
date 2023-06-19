@@ -10,6 +10,7 @@ select distinct
   ,  patient_id   
   , 'duplicate_values' as test_category
   , 'duplicate eligibility' as test_name
+  , '{{ var('last_update')}}' as last_update
 from {{ ref('eligibility') }} 
 group by
     patient_id

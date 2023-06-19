@@ -10,6 +10,7 @@ select
   ,  claim_id    
   , 'claim_type' as test_category
   , 'claim_type missing' as test_name
+  , '{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }} 
 where claim_type is null
 group by

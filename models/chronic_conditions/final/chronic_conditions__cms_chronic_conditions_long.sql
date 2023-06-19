@@ -21,4 +21,5 @@ select
     , condition_category
     , condition
     , data_source
+    , '{{ var('last_update')}}' as last_update
 from conditions_unioned

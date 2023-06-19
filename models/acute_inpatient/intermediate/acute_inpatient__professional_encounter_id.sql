@@ -137,6 +137,6 @@ from professional_claims_in_more_than_one_encounter
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from all_acute_inpatient_professional_claims
 

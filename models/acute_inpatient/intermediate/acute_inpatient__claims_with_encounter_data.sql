@@ -102,5 +102,6 @@ from useful_fields_at_claim_id_level aa
 
 
 
-select *
+select 
+ *, '{{ var('last_update')}}' as last_update
 from all_useful_fields_at_claim_id_level 

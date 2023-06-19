@@ -12,4 +12,5 @@ SELECT
 , claim_end_date
 , paid_amount
 , allowed_amount
+, '{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }}

@@ -346,7 +346,8 @@ select distinct
   unpivot_cte.code as code,
   icd.short_description as description,
   unpivot_cte.practitioner_npi as practitioner_npi,
-  unpivot_cte.data_source as data_source
+  unpivot_cte.data_source as data_source,
+  '{{ var('last_update')}}' as last_update
 from unpivot_cte
   left join {{ ref('terminology__icd_10_pcs') }} as icd
     on unpivot_cte.code = icd.icd_10_pcs

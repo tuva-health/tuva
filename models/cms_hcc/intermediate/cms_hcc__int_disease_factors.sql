@@ -118,5 +118,5 @@ select
     , coefficient
     , model_version
     , payment_year
-    , date_calculated
+    , '{{ var('last_update')}}' as last_update
 from add_data_types

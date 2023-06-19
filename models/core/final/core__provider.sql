@@ -35,5 +35,5 @@ on aa.npi = bb.npi
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from provider

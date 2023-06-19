@@ -54,5 +54,5 @@ as
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from overlapping_pairs

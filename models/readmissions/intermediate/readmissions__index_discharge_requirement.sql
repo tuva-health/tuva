@@ -24,7 +24,7 @@ where discharge_disposition_code in (
 
 -- All discharges that meet the discharge_disposition_code
 -- requirements to be an index admission
-select a.encounter_id
+select a.encounter_id, '{{ var('last_update')}}' as last_update
 from {{ ref('readmissions__encounter') }} a
 left join all_invalid_discharges b
     on a.encounter_id = b.encounter_id

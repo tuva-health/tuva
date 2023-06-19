@@ -88,8 +88,8 @@ where acute_encounters.encounter_id is null
 
 -- Aggregate of all encounter_ids for planned encounters
 
-select * from always_planned_px
+select * , '{{ var('last_update')}}' as last_update from always_planned_px
 union distinct
-select * from always_planned_dx
+select *, '{{ var('last_update')}}' as last_update from always_planned_dx
 union distinct
-select * from potentially_planned_that_are_actually_planned
+select *, '{{ var('last_update')}}' as last_update from potentially_planned_that_are_actually_planned

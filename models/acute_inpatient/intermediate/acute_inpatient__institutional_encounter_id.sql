@@ -172,5 +172,5 @@ from add_min_closing_row_to_every_claim aa
      and aa.min_closing_row = bb.row_num
 )
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from add_encounter_id

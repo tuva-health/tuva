@@ -23,5 +23,5 @@ where ccs_diagnosis_category in
 )
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from exclusions

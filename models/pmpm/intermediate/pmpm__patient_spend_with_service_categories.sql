@@ -67,5 +67,6 @@ select
 , service_category_2
 , sum(paid_amount) as total_paid
 , sum(allowed_amount) as total_allowed
+, '{{ var('last_update')}}' as last_update
 from combine_medical_and_rx
 group by 1,2,3,4

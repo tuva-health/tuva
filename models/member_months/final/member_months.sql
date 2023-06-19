@@ -69,7 +69,8 @@ select distinct
     lpad(cast(month as {{ dbt.type_string() }}),2,'0') as month,
     month_start,
     month_end,
-    payer
+    payer,
+    '{{ var('last_update')}}' as last_update
 from src
 inner join dates
     on src.start_date <= dates.month_end 

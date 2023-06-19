@@ -11,6 +11,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('eligibility') }}
     group by
         patient_id
@@ -24,6 +25,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('eligibility') }} 
     group by
         patient_id
@@ -37,6 +39,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('eligibility') }}
     group by
         patient_id
@@ -50,6 +53,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('eligibility') }}
     group by
         patient_id
@@ -63,6 +67,7 @@ with multiple_genders_test as (
         , 'plausibility' as test_category
         , 'patient_id' as grain
         , patient_id
+        , '{{ var('last_update')}}' as last_update
     from {{ ref('eligibility') }}
     where birth_date > death_date
     group by

@@ -13,7 +13,7 @@ select
     parent_category_description,
     body_system,
     {{ var('dxccsr_version') }} as dxccsr_version,
-    '{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as _model_run_time
+    '{{ var('last_update')}}' as last_update
 from {{ref('ccsr__long_condition_category')}}
 where 
     is_{{ var('record_type', 'ip') }}_default_category = true

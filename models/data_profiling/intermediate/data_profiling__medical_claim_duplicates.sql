@@ -10,6 +10,7 @@ select distinct
   ,  claim_id    
   , 'duplicate_values' as test_category
   , 'duplicate medical claims' as test_name
+  , '{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }} 
 group by
     claim_id

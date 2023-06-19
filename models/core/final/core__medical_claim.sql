@@ -49,5 +49,6 @@ select
   allowed_amount,
   charge_amount,
   total_cost_amount,
-  data_source
+  data_source,
+  '{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }} 

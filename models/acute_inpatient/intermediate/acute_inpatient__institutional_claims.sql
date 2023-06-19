@@ -291,7 +291,8 @@ select
   dq.claim_type_not_unique as claim_type_not_unique,
   dq.claim_type_missing as claim_type_missing,
   dq.claim_type_not_institutional as claim_type_not_institutional,
-  h.data_source
+  h.data_source,
+  '{{ var('last_update')}}' as last_update
 
 from header_level_values h
 left join data_quality_flags dq

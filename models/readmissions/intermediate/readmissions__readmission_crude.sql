@@ -65,6 +65,6 @@ from encounter_sequence aa left join encounter_sequence bb
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from readmission_calc
 

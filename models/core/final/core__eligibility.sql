@@ -32,4 +32,5 @@ select
        , cast(zip_code as {{ dbt.type_string() }} ) as zip_code
        , cast(phone as {{ dbt.type_string() }} ) as phone
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
+       , '{{ var('last_update')}}' as last_update
 from {{ ref('eligibility') }} 

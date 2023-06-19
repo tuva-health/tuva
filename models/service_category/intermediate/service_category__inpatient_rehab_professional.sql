@@ -7,6 +7,7 @@ select distinct
   claim_id
 , claim_line_number
 , 'Inpatient Rehabilitation' as service_category_2
+, '{{ var('last_update')}}' as last_update
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'professional'
   and place_of_service_code in ('61')

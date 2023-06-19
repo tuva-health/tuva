@@ -24,7 +24,8 @@
 select
   patient_id,
   claim_id,
-  encounter_id
+  encounter_id,
+  '{{ var('last_update')}}' as last_update
 from {{ ref('acute_inpatient__institutional_encounter_id') }}
 
 union distinct
@@ -32,6 +33,7 @@ union distinct
 select
   patient_id,
   claim_id,
-  encounter_id
+  encounter_id,
+  '{{ var('last_update')}}' as last_update
 from {{ ref('acute_inpatient__professional_encounter_id') }}
 where (orphan_claim_flag = 0) and (encounter_count = 1)

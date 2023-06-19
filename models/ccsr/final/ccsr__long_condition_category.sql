@@ -33,7 +33,7 @@ select
     ccsr__dx_vertical_pivot.is_ip_default_category,
     ccsr__dx_vertical_pivot.is_op_default_category,
     {{ var('dxccsr_version') }} as dxccsr_version,
-    '{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as _model_run_time
+    '{{ var('last_update')}}' as last_update
 from condition 
 left join ccsr__dx_vertical_pivot using(code)
 left join dxccsr_body_systems using(ccsr_parent_category)

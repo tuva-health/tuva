@@ -117,16 +117,6 @@ select
     , else_value= 0
     , quote_identifiers = False
   ) }}
+, '{{ var('last_update')}}' as last_update
 from combine
--- pivot (sum(cnt) for date_type in (
---    'claim_start_date',
---    'claim_end_date',
---    'admission_date',
---    'discharge_date',
---    'med_paid_date',
---    'dispensing_date',
---    'rx_paid_date'
---    ))
--- as p
-
 order by 1

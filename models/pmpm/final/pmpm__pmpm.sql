@@ -54,6 +54,7 @@ SELECT
   SUM(outpatient_psychiatric_allowed) / COUNT(1) AS outpatient_psychiatric_allowed,
   SUM(outpatient_rehabilitation_allowed) / COUNT(1) AS outpatient_rehabilitation_allowed,
   SUM(skilled_nursing_allowed) / COUNT(1) AS skilled_nursing_allowed,
-  SUM(urgent_care_allowed) / COUNT(1) AS urgent_care_allowed
+  SUM(urgent_care_allowed) / COUNT(1) AS urgent_care_allowed,
+  '{{ var('last_update')}}' as last_update
 FROM {{ ref('pmpm__pmpm_prep') }} a
 GROUP BY 1

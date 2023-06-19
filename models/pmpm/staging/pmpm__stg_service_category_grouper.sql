@@ -9,4 +9,5 @@ SELECT
 , claim_line_number
 , service_category_1
 , service_category_2
+, '{{ var('last_update')}}' as last_update
 from {{ ref('service_category__service_category_grouper') }}

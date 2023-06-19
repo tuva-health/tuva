@@ -9,4 +9,5 @@ select
     , claim_start_date
     , ms_drg_code
     , data_source
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('medical_claim') }}

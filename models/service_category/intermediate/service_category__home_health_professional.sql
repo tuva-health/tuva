@@ -7,6 +7,7 @@ select distinct
   a.claim_id
 , a.claim_line_number
 , 'Home Health' as service_category_2
+, '{{ var('last_update')}}' as last_update
 from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__dme_professional') }} b
   on a.claim_id = b.claim_id

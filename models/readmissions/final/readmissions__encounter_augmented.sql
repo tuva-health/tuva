@@ -42,7 +42,8 @@ select
     ee.no_diagnosis_ccs_flag,
     ee.overlaps_with_another_encounter_flag,
     ee.missing_ms_drg_flag,
-    ee.invalid_ms_drg_flag
+    ee.invalid_ms_drg_flag,
+    '{{ var('last_update')}}' as last_update
 from
     {{ ref('readmissions__encounter') }} aa
     left join {{ ref('readmissions__index_admission') }} bb

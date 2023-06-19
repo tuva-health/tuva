@@ -10,4 +10,5 @@ select
     , code_type
     , code
     , data_source
+    , '{{ var('last_update')}}' as last_update
 from {{ ref('core__procedure') }}

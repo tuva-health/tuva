@@ -9,4 +9,5 @@ SELECT
 , dispensing_date
 , paid_amount
 , allowed_amount
+, '{{ var('last_update')}}' as last_update
 from {{ ref('pharmacy_claim') }}

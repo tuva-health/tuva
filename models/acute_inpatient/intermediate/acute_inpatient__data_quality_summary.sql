@@ -418,5 +418,5 @@ from start_date_after_end_date
 
 
 
-select *
+select *, '{{ var('last_update')}}' as last_update
 from union_cte

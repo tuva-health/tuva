@@ -23,4 +23,5 @@ select
 , total_allowed_amount
 , total_charge_amount
 , data_source
+, '{{ var('last_update')}}' as last_update
 from {{ ref('acute_inpatient__summary') }} 

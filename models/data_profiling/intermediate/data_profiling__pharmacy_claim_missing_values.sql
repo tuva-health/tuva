@@ -37,6 +37,7 @@ select
     ,  claim_id    
     , 'missing_values' as test_category
     , column_checked||' missing' as test_name
+    , '{{ var('last_update')}}' as last_update
 from eligibility_missing
 group by
     claim_id
