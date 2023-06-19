@@ -4,12 +4,11 @@ models:
   - name: eligibility
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims
-        {% else %}claims{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_claims
+        {% else %}tuva_claims{%- endif -%}
       alias: eligibility
       tags: claims
-      materialized: ephemeral
-      bind: false
+      materialized: table
     description: > 
      The eligibility table includes information about a patient's health insurance coverage and demographics (note: we use the word patient as a synonym for member). Every claims dataset should include some sort of eligibility data, otherwise it's impossible to calculate member months, which are needed to calculate measures like PMPM.
     columns:
@@ -73,12 +72,11 @@ models:
      The medical_claim table contains information on healthcare services and supplies provided to patients, billed by providers, and paid for by health insurers. It includes information on the provider who rendered the service, the amount paid for the service by the health insurer, and the underlying reason for the service (i.e. diagnosis).
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims
-        {% else %}claims{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_claims
+        {% else %}tuva_claims{%- endif -%}
       alias: medical_claim
       tags: claims
-      materialized: ephemeral
-      bind: false
+      materialized: table
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -553,12 +551,11 @@ models:
       The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled by a patient, billed by a pharmacy, and paid by an insurer.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims
-        {% else %}claims{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_claims
+        {% else %}tuva_claims{%- endif -%}
       alias: pharmacy_claim
       tags: claims
-      materialized: ephemeral
-      bind: false
+      materialized: table
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
