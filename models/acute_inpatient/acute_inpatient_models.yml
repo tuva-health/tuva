@@ -6,7 +6,7 @@ models:
 ## Final
 
   - name: acute_inpatient__summary
-    description: Add all relevant encounter data to medical_claim_table
+    description: This table pulls together all the data needed to perform acute inpatient analytics into a single table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_acute_inpatient
@@ -15,48 +15,82 @@ models:
       tags: acute_inpatient
       materialized: table
     columns:
-      - name: claim_id
-        description: Unique identifier for each claim.
-      - name: claim_line_number
-        description: Indicates the line number for the particular line of the claim.
-      - name: claim_type
-        description: Indicates whether the claim is professional (CMS-1500), institutional (UB-04), dental, or vision.
-        meta:
-          terminology: /terminology/tuva-concepts/claim-type
+      - name: encounter_id
+        description: Unique identifier for the acute inpatient encounter.
+      - name: encounter_start_date
+        description: Date when the patient was admitted.
+      - name: encounter_end_date
+        description: Date when the patient was discharged.
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
-      - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
-      - name: service_category_1
-        description: The first service category of the claim line
-      - name: service_category_2
-        description: The second, more specific service category of the claim line
-      - name: encounter_type
-        description: Type of encounter.
+      - name: admit_age
+        description: The age of the patient as of their admission date.
+      - name: gender
+        description: The gender of the patient.
         meta:
-          terminology: /terminology/tuva-concepts/encounter-type
-      - name: encounter_id
-        description: Unique identifier for an encounter.
-      - name: encounter_start_date
-        description: Date when the encounter started.
-      - name: encounter_end_date
-        description: Date when the encounter ended.
-      - name: encounter_admit_source_code
+          terminology: /terminology/demographics/gender
+      - name: race
+        description: The race of the patient.
+        meta:
+          terminology: /terminology/demographics/race
+      - name: facility_npi
+        description: The NPI for the facility where the encounter occurred.
+      - name: provider_name
+        description: The name of the facility where the encounter occurred.
+      - name: ms_drg_code
+        description: The MS-DRG code associted with the inpatient visit
+        meta:
+          terminology: /terminology/conditions-and-procedures/ms-drg
+      - name: ms_drg_description
+        description: The MS-DRG description associted with the inpatient visit
+        meta:
+          terminology: /terminology/conditions-and-procedures/ms-drg
+      - name: medical_surgical
+        description: Indicates whether the MS-DRG is medical or surgical in nature.
+        meta:
+          terminology: /terminology/conditions-and-procedures/ms-drg
+      - name: apr_drg_code
+        description: The APR-DRG code associted with the inpatient visit
+        meta:
+          terminology: /terminology/conditions-and-procedures/apr-drg
+      - name: apr_drg_description
+        description: The APR-DRG description associted with the inpatient visit
+        meta:
+          terminology: /terminology/conditions-and-procedures/apr-drg
+      - name: admit_source_code
         description: Admission source code for the encounter.
         meta:
           terminology: /terminology/administrative-codes/admit-source
-      - name: encounter_admit_type_code
+      - name: admit_source_description
+        description: Admission source description for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/admit-source
+      - name: admit_type_code
         description: Admission type code for the encounter.
         meta:
           terminology: /terminology/administrative-codes/admit-type
-      - name: encounter_discharge_disposition_code
+      - name: admit_type_description
+        description: Admission type description for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/admit-type
+      - name: discharge_disposition_code
         description: Discharge disposition code for the encounter.
         meta:
           terminology: /terminology/administrative-codes/discharge-disposition
-      - name: orphan_claim_flag
-        description: A flag indicating if the claim was orphaned
-      - name: encounter_count
-        description: A count of
+      - name: discharge_disposition_description
+        description: Discharge disposition description for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/discharge-disposition
+      - name: total_paid_amount
+        description: The total paid amount across all claims for the encounter.
+      - name: total_allowed_amount
+        description: The total allowed amount across all claims for the encounter.
+      - name: total_charge_amount
+        description: The total charge amount across all claims for the encounter.
+      - name: length_of_stay
+        description: The length of stay for the encoujnter.
+      - name: mortality_flag
+        description: 1 if a patient died during the encounter, 0 otherwise.
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
