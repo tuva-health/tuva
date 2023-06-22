@@ -2,21 +2,21 @@
 # The Tuva Project 
 
 ## 🧰  What is the Tuva Project?
-The Tuva Project is a collection of data marts and terminology sets that transform healthcare data for analytics.
+The Tuva Project is a collection of data marts and terminology code sets that transform healthcare data for analytics.
 
 **Data Marts:**
-- [Acute Inpatient](../the_tuva_project/models/acute_inpatient)
-- [CCSR](../the_tuva_project/models/ccsr)
-- [Chronic Conditions](../the_tuva_project/models/chronic_conditions)
-- [CMS-HCCs](../the_tuva_project/models/cms_hcc)
-- [Core](../the_tuva_project/models/core)
-- [Data Profiling](../the_tuva_project/models/data_profiling)
-- [Member Months](../the_tuva_project/models/member_months)
-- [PMPM](../the_tuva_project/models/pmpm)
-- [Readmissions](../the_tuva_project/models/readmissions)
-- [Service Category](../the_tuva_project/models/service_category)
+- [Acute Inpatient](models/acute_inpatient)
+- [CCSR](models/ccsr)
+- [Chronic Conditions](models/chronic_conditions)
+- [CMS-HCCs](models/cms_hcc)
+- [Core](models/core)
+- [Data Profiling](models/data_profiling)
+- [Member Months](models/member_months)
+- [PMPM](models/pmpm)
+- [Readmissions](models/readmissions)
+- [Service Category](models/service_category)
 
-You can find all the terminology sets **[here](../the_tuva_project/seeds/terminology)**.
+You can find all the terminology sets **[here](seeds/terminology)**.  In many cases the actual terminology code sets are too large to maintain on GitHub, so we main them in an AWS S3 bucket.  However when you run the Tuva Project they are loaded into data warehouse just as they would be as if they were seed files.
 <br/><br/>
 
 ## 🔗  Docs
