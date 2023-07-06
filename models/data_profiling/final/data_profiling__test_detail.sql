@@ -30,7 +30,16 @@ with test_detail_union as(
         , claim_id
         , test_category
         , test_name 
-    from {{ ref('data_profiling__medical_claim_missing_values') }}
+    from {{ ref('data_profiling__medical_claim_inst_missing_values') }}
+    union all
+    select distinct
+        source_table
+        , claim_type
+        , grain
+        , claim_id
+        , test_category
+        , test_name 
+    from {{ ref('data_profiling__medical_claim_prof_missing_values') }}
     union all
     select distinct
         source_table
