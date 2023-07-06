@@ -45,7 +45,8 @@ with test_failure_summary as (
     ) failure_stub
     where not exists (select 1 from {{ ref('data_profiling__claim_type_mapping_failures' )}} )
     and not exists (select 1 from {{ ref('data_profiling__claim_type_unmapped' )}} )
-    and not exists (select 1 from {{ ref('data_profiling__medical_claim_missing_values' )}} where test_category = 'claim_type')
+    and not exists (select 1 from {{ ref('data_profiling__medical_claim_inst_missing_values' )}} where test_category = 'claim_type')
+    and not exists (select 1 from {{ ref('data_profiling__medical_claim_prof_missing_values' )}} where test_category = 'claim_type')
     union all
     select * from (
         select
@@ -73,7 +74,8 @@ with test_failure_summary as (
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__medical_claim_missing_values' )}} )
+    where not exists (select 1 from {{ ref('data_profiling__medical_claim_inst_missing_values' )}} )
+    and not exists (select 1 from {{ ref('data_profiling__medical_claim_prof_missing_values' )}} )
 
     /****  eligibility  ****/
     union all
