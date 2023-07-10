@@ -206,11 +206,7 @@ seeds:
       column_types:
         icd_10_cm : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
-        valid_flag : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
-        short_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
-        long_description : |
+        description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
 
   - name: terminology__icd_10_pcs
@@ -225,11 +221,7 @@ seeds:
       column_types:
         icd_10_pcs : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
-        valid_flag : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
-        short_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
-        long_description : |
+        description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
 
 
@@ -245,6 +237,26 @@ seeds:
         - data_profiling
       column_types:
         icd_9_cm : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        long_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+        short_description : |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+
+
+
+  - name: terminology__icd_9_pcs
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: icd_9_pcs
+      tags:
+        - terminology
+        - claims_preprocessing
+        - readmissions
+        - data_profiling
+      column_types:
+        icd_9_pcs : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
