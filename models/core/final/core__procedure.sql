@@ -344,7 +344,7 @@ select distinct
   unpivot_cte.procedure_date as procedure_date,
   unpivot_cte.code_type as code_type,
   unpivot_cte.code as code,
-  icd.short_description as description,
+  icd.description as description,
   unpivot_cte.practitioner_npi as practitioner_npi,
   unpivot_cte.data_source as data_source,
   '{{ var('last_update')}}' as last_update

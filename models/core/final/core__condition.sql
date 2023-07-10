@@ -517,7 +517,7 @@ select distinct
   unpivot_cte.condition_type as condition_type,
   unpivot_cte.code_type as code_type,
   unpivot_cte.code as code,
-  icd.short_description as description,
+  icd.description as description,
   unpivot_cte.diagnosis_rank as diagnosis_rank,
   unpivot_cte.present_on_admit_code as present_on_admit_code,
   poa.present_on_admit_description as present_on_admit_description,
