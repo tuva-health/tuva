@@ -26,7 +26,7 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcpcs_cpt_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: cms_hcc__demographic_factors
     description: > 
@@ -53,7 +53,7 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcc_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: float
 
   - name: cms_hcc__disease_factors
@@ -68,7 +68,7 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcc_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: float
 
   - name: cms_hcc__disease_hierarchy
@@ -83,9 +83,9 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcc_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hccs_to_exclude: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: cms_hcc__disease_interaction_factors
     description: >
@@ -99,9 +99,9 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         hcc_code_1: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hcc_code_2: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: float
 
   - name: cms_hcc__enrollment_interaction_factors
@@ -129,9 +129,9 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         diagnosis_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         cms_hcc_v24: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: cms_hcc__payment_hcc_count_factors
     description: >

@@ -12,11 +12,11 @@ seeds:
         - data_profiling
       column_types:
         admit_source_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         admit_source_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         newborn_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__admit_type
@@ -30,9 +30,9 @@ seeds:
         - data_profiling
       column_types:
         admit_type_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         admit_type_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__bill_type
@@ -45,9 +45,9 @@ seeds:
         - data_profiling
       column_types:
         bill_type_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         bill_type_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         deprecated : integer
         deprecated_date : date
 
@@ -66,14 +66,14 @@ seeds:
         month: integer
         day: integer
         month_name: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         day_of_week_number: integer
         day_of_week_name: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         week_of_year: integer
         day_of_year: integer
         year_month: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         first_day_of_month: date
         last_day_of_month: date
 
@@ -88,9 +88,9 @@ seeds:
         - data_profiling
       column_types:
         claim_type_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         claim_type_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__code_type
@@ -103,7 +103,7 @@ seeds:
         - data_profiling
       column_types:
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__discharge_disposition
     config:
       schema: |
@@ -111,9 +111,9 @@ seeds:
       alias: discharge_disposition
       column_types:
         discharge_disposition_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         discharge_disposition_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__encounter_type
     config:
       schema: |
@@ -124,7 +124,7 @@ seeds:
         - claims_preprocessing
       column_types:
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__ethnicity
     config:
       schema: |
@@ -133,9 +133,9 @@ seeds:
       tags: terminology
       column_types:
         code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__fips_county
     config:
       schema: |
@@ -144,11 +144,11 @@ seeds:
       tags: terminology
       column_types:
         fips_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         county : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         state : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__ansi_fips_state
     config:
       schema: |
@@ -159,11 +159,11 @@ seeds:
         - medicare_cclf_connector
       column_types:
         ansi_fips_state_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ansi_fips_state_abbreviation : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ansi_fips_state_name : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__gender
     config:
       schema: |
@@ -174,7 +174,7 @@ seeds:
         - data_profiling
       column_types:
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__hcpcs_level_2
     config:
       schema: |
@@ -183,15 +183,15 @@ seeds:
       tags: terminology
       column_types:
         hcpcs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         seqnum : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         recid : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(2000) {%- endif -%}
         short_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: terminology__icd_10_cm
     config:
@@ -205,9 +205,9 @@ seeds:
         - data_profiling
       column_types:
         icd_10_cm : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: terminology__icd_10_pcs
     config:
@@ -220,9 +220,9 @@ seeds:
         - readmissions
       column_types:
         icd_10_pcs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__icd_9_cm
@@ -237,11 +237,11 @@ seeds:
         - data_profiling
       column_types:
         icd_9_cm : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         short_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
 
@@ -257,11 +257,11 @@ seeds:
         - data_profiling
       column_types:
         icd_9_pcs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         short_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__mdc
@@ -272,9 +272,9 @@ seeds:
       tags: terminology
       column_types:
         mdc_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         mcd_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__medicare_dual_eligibility
@@ -288,9 +288,9 @@ seeds:
         - data_profiling
       column_types:
         dual_status_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         dual_status_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__ssa_fips_state
@@ -301,9 +301,9 @@ seeds:
       tags: terminology
       column_types:
         ssa_fips_state_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ssa_fips_state_name : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__medicare_status
@@ -319,9 +319,9 @@ seeds:
         - data_profiling
       column_types:
         medicare_status_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         medicare_status_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
   - name: terminology__ms_drg
@@ -336,13 +336,13 @@ seeds:
         - claims_preprocessing
       column_types:
         ms_drg_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         mdc_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         medical_surgical : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ms_drg_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         deprecated: integer
         deprecated_date: date
 
@@ -377,7 +377,7 @@ seeds:
         - data_profiling
       column_types:
         payer_type : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__place_of_service
     config:
       schema: |
@@ -389,9 +389,9 @@ seeds:
         - data_profiling
       column_types:
         place_of_service_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         place_of_service_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__present_on_admission
     config:
       schema: |
@@ -403,9 +403,9 @@ seeds:
         - claims_preprocessing
       column_types:
         present_on_admit_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: terminology__provider
     config:
@@ -455,9 +455,9 @@ seeds:
         - data_profiling
       column_types:
         race_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         race_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__revenue_center
     config:
       schema: |
@@ -469,9 +469,9 @@ seeds:
         - data_profiling
       column_types:
         revenue_center_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__apr_drg
     config:
       schema: |
@@ -482,8 +482,8 @@ seeds:
         - data_profiling
       column_types:
         apr_drg_code : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         severity : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         apr_drg_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}

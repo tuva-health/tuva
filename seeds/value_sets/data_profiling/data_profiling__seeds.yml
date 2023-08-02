@@ -11,10 +11,10 @@ seeds:
       enabled: "{{ var('data_profiling_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         source_table : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         test_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         test_name : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         medical_claim_type : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
