@@ -470,7 +470,7 @@ seeds:
       column_types:
         revenue_center_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        description : |
+        revenue_center_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   - name: terminology__apr_drg
     config:
