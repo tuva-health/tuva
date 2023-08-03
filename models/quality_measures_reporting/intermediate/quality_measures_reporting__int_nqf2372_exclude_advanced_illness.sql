@@ -21,7 +21,7 @@ with denominator as (
         , age
         , performance_period_begin
         , performance_period_end
-    from {{ ref('quality_measures__int_nqf2372_operational_denominator') }}
+    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
 
 )
 
@@ -31,7 +31,7 @@ with denominator as (
           code
         , code_system
         , concept_name
-    from {{ ref('quality_measures__value_sets') }}
+    from {{ ref('quality_measures_reporting__value_sets') }}
     where concept_name in (
           'Frailty Device'
         , 'Frailty Diagnosis'
@@ -56,7 +56,7 @@ with denominator as (
         , condition_date
         , code_type
         , code
-    from {{ ref('quality_measures__stg_core__condition') }}
+    from {{ ref('quality_measures_reporting__stg_core__condition') }}
 
 )
 
@@ -69,7 +69,7 @@ with denominator as (
         , claim_end_date
         , hcpcs_code
         , place_of_service_code
-    from {{ ref('quality_measures__stg_medical_claim') }}
+    from {{ ref('quality_measures_reporting__stg_medical_claim') }}
 
 )
 
@@ -80,7 +80,7 @@ with denominator as (
         , procedure_date
         , code_type
         , code
-    from {{ ref('quality_measures__stg_core__procedure') }}
+    from {{ ref('quality_measures_reporting__stg_core__procedure') }}
 
 )
 
