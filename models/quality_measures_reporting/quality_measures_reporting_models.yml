@@ -1,6 +1,287 @@
 version: 2
 
 models:
+## Intermediate
+ - name: quality_measures_reporting__int_nqf2372_denominator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_denominator
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Denominator logic for the reporting version of NQF 2372, Breast Cancer 
+      Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: age
+        description: Patient's age as of the performance_period_begin date.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: last_update
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures_reporting__int_nqf2372_exclude_advanced_illness
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclude_advanced_illness
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty and advanced illness for 
+      the reporting version of NQF 2372, Breast Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+
+  - name: quality_measures_reporting__int_nqf2372_exclude_dementia
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclude_dementia
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty and taking dementia medications
+      for the reporting version of NQF 2372, Breast Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+
+  - name: quality_measures_reporting__int_nqf2372_exclude_hospice
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclude_hospice
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Exclusion logic for patients using hospice services for the reporting 
+      version of NQF 2372, Breast Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+
+  - name: quality_measures_reporting__int_nqf2372_exclude_institutional
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclude_institutional
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Exclusion logic for patients staying in an institution for the reporting 
+      version of NQF 2372, Breast Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+
+  - name: quality_measures_reporting__int_nqf2372_exclude_mastectomy
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclude_mastectomy
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Exclusion logic for patients with a mastectomy for the reporting 
+      version of NQF 2372, Breast Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+
+  - name: quality_measures_reporting__int_nqf2372_exclude_palliative
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclude_palliative
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Exclusion logic for patients using palliative services for the reporting 
+      version of NQF 2372, Breast Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+
+  - name: quality_measures_reporting__int_nqf2372_exclusions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_exclusions
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of NQF 2372, Breast Cancer 
+      Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: last_update
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures_reporting__int_nqf2372_long
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_long
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Final preparation of the reporting version of NQF 2372, Breast Cancer 
+      Screening before combining with other measures.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: last_update
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures_reporting__int_nqf2372_numerator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _int_nqf2372_numerator
+      tags: quality_measures_reporting
+      materialized: table
+    description: >
+      Numerator logic for the reporting version of NQF 2372, Breast Cancer 
+      Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: last_update
+        description: The date and timestamp of the dbt run.
+
 ## Staging
   - name: quality_measures_reporting__stg_core__condition
     config:
