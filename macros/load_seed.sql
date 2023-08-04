@@ -56,7 +56,6 @@ pattern = '.*\/{{pattern}}.*';
 
 
 
-
 {% macro bigquery__load_seed(uri,pattern) %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
 {%- set collist = [] -%}
@@ -89,6 +88,77 @@ from files (format = 'csv',
 {% endif %}
 
 {% endmacro %}
+
+
+
+{% macro databricks__load_seed(uri,pattern) %}
+{% if execute %}
+
+{%- set s3_path = 's3://' ~ uri ~ '/' -%}
+{%- set columns = adapter.get_columns_in_relation(this) -%}
+{%- set collist = [] -%}
+
+{% for col in columns %}
+  {% do collist.append("_c" ~ loop.index0 ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
+{% endfor %}
+
+{%- set cols = collist|join(',\n    ') -%}
+
+{% set sql %}
+COPY INTO {{ this }}
+FROM (
+  SELECT
+    {{ cols }}
+
+  FROM '{{ s3_path }}'
+  WITH (
+    CREDENTIAL (
+      AWS_ACCESS_KEY = "{{ env_var('AWS_ACCESS_KEY') }}",
+      AWS_SECRET_KEY = "{{ env_var('AWS_SECRET_KEY') }}",
+      AWS_SESSION_TOKEN = "{{ env_var('AWS_SESSION_TOKEN') }}"
+    )
+  )
+)
+FILEFORMAT = CSV
+PATTERN = '{{ pattern }}*'
+FORMAT_OPTIONS (
+  'enforceSchema' = 'true',
+  'header' = 'false',
+  'inferSchema' = 'false',
+  'nullValue' = '\\N',
+  'sep' = ','
+)
+COPY_OPTIONS (
+  'mergeSchema' = 'false',
+  'force' = 'true'
+)
+{% endset %}
+
+{# check logs/dbt.log for output #}
+{{ log(cols, info=False) }}
+{{ log('Current model: ' ~ this ~ '\n', info=False) }}
+{{ log('Full s3 path: ' ~ s3_path ~ '\n', info=False) }}
+{{ log(sql, info=False) }}
+
+{% call statement('databrickssql',fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% set results = load_result('databrickssql') %}
+{% set rows_affected = results['data'][0][0] %}
+
+{{ log(results, info=False) }}
+{{ log(rows_affected, info=False) }}
+
+{{ log("Loaded data from external s3 resource:", True) }}
+{{ log("  source: \t" ~ s3_path ~ pattern, True) }}
+{{ log("  target: \t" ~ this | replace('`',''), True) }}
+{{ log("  rows: \t\033[92m" ~ rows_affected ~ "\033[0m", True) }}
+
+{% endif %}
+{% endmacro %}
+
+
 
 {% macro default__load_seed(uri,pattern) %}
 {% if execute %}
