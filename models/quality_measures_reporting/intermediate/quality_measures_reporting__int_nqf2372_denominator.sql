@@ -33,8 +33,8 @@ with patient as (
         , gender
         , birth_date
         , death_date
-        , {{ performance_period_begin }} as performance_period_begin
-        , '{{ performance_period_end }}' as performance_period_end
+        , cast({{ performance_period_begin }} as date) as performance_period_begin
+        , cast('{{ performance_period_end }}'as date) as performance_period_end
     from {{ ref('quality_measures_reporting__stg_core__patient') }}
 
 )
