@@ -232,7 +232,7 @@ with denominator as (
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
-        , cast(exclusion_flag as boolean) as exclusion_flag
+        , cast(exclusion_flag as integer) as exclusion_flag
     from exclusions_unioned
 
 )

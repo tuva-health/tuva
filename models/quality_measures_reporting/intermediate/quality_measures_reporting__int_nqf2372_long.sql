@@ -150,9 +150,9 @@ with patient as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(denominator_flag as boolean) as denominator_flag
-        , cast(numerator_flag as boolean) as numerator_flag
-        , cast(exclusion_flag as boolean) as exclusion_flag
+        , cast(denominator_flag as integer) as denominator_flag
+        , cast(numerator_flag as integer) as numerator_flag
+        , cast(exclusion_flag as integer) as exclusion_flag
         , cast(evidence_date as date) as evidence_date
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason

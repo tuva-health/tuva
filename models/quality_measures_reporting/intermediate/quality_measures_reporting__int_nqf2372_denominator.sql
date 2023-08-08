@@ -147,7 +147,7 @@ with patient as (
         , cast({{ measure_id }} as {{ dbt.type_string() }}) as measure_id
         , cast({{ measure_name }} as {{ dbt.type_string() }}) as measure_name
         , cast({{ measure_version }} as {{ dbt.type_string() }}) as measure_version
-        , cast(denominator_flag as boolean) as denominator_flag
+        , cast(denominator_flag as integer) as denominator_flag
     from eligible_population
 
 )
