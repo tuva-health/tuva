@@ -119,8 +119,8 @@ with patient as (
                 , measure_id
                 , measure_name
             order by
-                  evidence_date desc
-                , exclusion_date desc
+                  evidence_date desc nulls last
+                , exclusion_date desc nulls last
           ) as row_num
     from measure_flags
 

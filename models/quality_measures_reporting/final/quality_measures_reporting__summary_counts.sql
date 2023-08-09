@@ -51,7 +51,10 @@ with summary_long as (
         , denominator_sum
         , numerator_sum
         , exclusion_sum
-        , ( numerator_sum / (denominator_sum - exclusion_sum))*100 as performance_rate
+        , (
+            cast(numerator_sum as {{ dbt.type_numeric() }}) /
+                (cast(denominator_sum as {{ dbt.type_numeric() }}) - cast(exclusion_sum as {{ dbt.type_numeric() }}))
+          )*100 as performance_rate
     from sum_flags
 
 )
