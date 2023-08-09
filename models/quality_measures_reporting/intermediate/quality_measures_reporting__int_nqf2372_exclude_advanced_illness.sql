@@ -217,11 +217,10 @@ with denominator as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , concat (
-              med_claim_exclusions.concept_name
-            , ' with '
-            , condition_exclusions.concept_name
-          ) as exclusion_reason
+        , med_claim_exclusions.concept_name
+            || ' with '
+            || condition_exclusions.concept_name
+          as exclusion_reason
     from patients_with_frailty
          inner join med_claim_exclusions
          on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
@@ -256,11 +255,10 @@ with denominator as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , concat (
-              med_claim_exclusions.concept_name
-            , ' with '
-            , condition_exclusions.concept_name
-          ) as exclusion_reason
+        , med_claim_exclusions.concept_name
+            || ' with '
+            || condition_exclusions.concept_name
+          as exclusion_reason
     from patients_with_frailty
          inner join med_claim_exclusions
          on patients_with_frailty.patient_id = med_claim_exclusions.patient_id

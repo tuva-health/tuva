@@ -223,11 +223,10 @@ with denominator as (
     select
           patients_with_frailty.patient_id
         , patients_with_frailty.exclusion_date
-        , concat (
-              patients_with_frailty.concept_name
-            , ' with '
-            , pharmacy_claim_exclusions.concept_name
-          ) as exclusion_reason
+        , patients_with_frailty.concept_name
+            || ' with '
+            || pharmacy_claim_exclusions.concept_name
+          as exclusion_reason
     from patients_with_frailty
          inner join pharmacy_claim_exclusions
          on patients_with_frailty.patient_id = pharmacy_claim_exclusions.patient_id
