@@ -59,7 +59,7 @@ with denominator as (
 
 )
 
-select distinct
+select
       patient_id
     , exclusion_date
     , exclusion_reason
