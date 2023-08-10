@@ -28,7 +28,7 @@ with measures_long as (
             then
                 case
                     when exclusion_flag = 1 then null
-                    when exclusion_flag = 0 then numerator_flag
+                    when exclusion_flag = 0  then numerator_flag
             else null
                 end
           end as flag
