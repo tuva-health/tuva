@@ -23,22 +23,19 @@ models:
         description: Ending date of the performance or measurement period.
       - name: denominator_sum
         description: >
+          The denominator sum after exclusion logic applied.
           The denominator is associated with a given patient population that 
           may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_sum
         description: >
+          The numerator sum after exclusion logic applied.
           The numerator reflects the subset of patients in the denominator 
           for whom a particular service has been provided or for whom a 
-          particular outcome has been achieved.
-      - name: exclusion_sum
-        description: >
-          Specifications of those characteristics that would cause groups of 
-          individuals to be removed from the numerator and/or denominator of 
-          a measure although they experience the denominator index event.
+          particular outcome has been achieved with exclusion logic applied.
       - name: performance_rate
         description: >
-          Calculated performance rate. Numerator sum divided by the denominator
-          sum minus the exclusion sum multiplied by 100.
+          Calculated performance rate. The numerator sum divided by the 
+          denominator sum after exclusion logic applied and multiplied by 100.
       - name: last_update
         description: The date and timestamp of the dbt run.
 
