@@ -1,8 +1,7 @@
 {#
-    This macro includes options for compression and headers.
-    Default options are set to FALSE.
-    When set to TRUE, the appropriate command for each adapter-specific macro
-    will be used.
+    This macro includes options for compression and headers. Default options
+    are set to FALSE. When set to TRUE, the appropriate adapter-specific
+    syntax will be used.
 
     Argument examples:
     compression=false
