@@ -31,7 +31,7 @@ vars:
     ## Last Update
     # The date and timestamp of the dbt run that will populate the last_update column in all models.
     # Default timezone is EST
-    last_update: '{{ run_started_at.astimezone(modules.pytz.timezone("America/New_York")) }}'
+    last_update: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
     ## Quality Measure data mart vars
     # The measurement period variable has a default of the end of the previous year

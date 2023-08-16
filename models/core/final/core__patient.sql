@@ -37,19 +37,21 @@ with patient_stage as(
 
 select
     cast(patient_id as {{ dbt.type_string() }}) as patient_id
-    ,cast(gender as {{ dbt.type_string() }}) as gender
-    ,cast(race as {{ dbt.type_string() }}) as race
-    ,cast(birth_date as date) as birth_date
-    ,cast(death_date as date) as death_date
-    ,cast(death_flag as int) as death_flag
-    ,cast(first_name as {{ dbt.type_string() }}) as first_name
-    ,cast(last_name as {{ dbt.type_string() }}) as last_name
-    ,cast(address as {{ dbt.type_string() }}) as address
-    ,cast(city as {{ dbt.type_string() }}) as city
-    ,cast(state as {{ dbt.type_string() }}) as state
-    ,cast(zip_code as {{ dbt.type_string() }}) as zip_code
-    ,cast(phone as {{ dbt.type_string() }}) as phone
-    ,cast(data_source as {{ dbt.type_string() }}) as data_source
+    , cast(first_name as {{ dbt.type_string() }}) as first_name
+    , cast(last_name as {{ dbt.type_string() }}) as last_name
+    , cast(gender as {{ dbt.type_string() }}) as sex
+    , cast(race as {{ dbt.type_string() }}) as race
+    , cast(birth_date as date) as birth_date
+    , cast(death_date as date) as death_date
+    , cast(death_flag as int) as death_flag
+    , cast(address as {{ dbt.type_string() }}) as address
+    , cast(city as {{ dbt.type_string() }}) as city
+    , cast(state as {{ dbt.type_string() }}) as state
+    , cast(zip_code as {{ dbt.type_string() }}) as zip_code
+    , null as county
+    , null as latitude 
+    , null as logitude
+    , cast(data_source as {{ dbt.type_string() }}) as data_source
     , '{{ var('last_update')}}' as last_update
 from patient_stage
 where row_sequence = 1

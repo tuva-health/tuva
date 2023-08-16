@@ -35,5 +35,13 @@ on aa.npi = bb.npi
 
 
 
-select *, '{{ var('last_update')}}' as last_update
+select 
+    npi as practitioner_id
+    , npi
+    , first_name
+    , last_name
+    , practice_affiliation
+    , specialty
+    , sub_specialty
+    , '{{ var('last_update')}}' as last_update
 from provider
