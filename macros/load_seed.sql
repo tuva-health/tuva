@@ -49,8 +49,9 @@ copy  {{ this }}
 copy into {{ this }}
     from s3://{{ uri }}
     file_format = (type = CSV
-    {% if compression == true %} compression = 'GZIP' {% else %} {% endif %}
+    {% if compression == true %} compression = 'GZIP' {% else %} compression = 'none' {% endif %}
     {% if headers == true %} skip_header = 1 {% else %} {% endif %}
+    empty_field_as_null = true
     field_optionally_enclosed_by = '"'
 )
 pattern = '.*\/{{pattern}}.*';
@@ -87,8 +88,7 @@ from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
     {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
-    quote = '"',
-    null_marker = '\\N'
+    quote = '"'
     )
 {% endset %}
 
