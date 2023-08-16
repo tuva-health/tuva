@@ -50,11 +50,16 @@ clean-targets:
   - "dbt_packages"
 
 
+dispatch:
+  - macro_namespace: 'the_tuva_project'
+    search_order: ['integration_tests','the_tuva_project']
+
+
 seeds:
   integration_tests:
     eligibility_seed:
-      +post-hook: "{{ load_seed('tuva-public-resources/tuva_synthetic_data/eligibility.csv') }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
     medical_claim_seed:
-      +post-hook: "{{ load_seed('tuva-public-resources/tuva_synthetic_data/medical_claim.csv') }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','medical_claim.csv',headers=true) }}"
     pharmacy_claim_seed:
-      +post-hook: "{{ load_seed('tuva-public-resources/tuva_synthetic_data/pharmacy_claim.csv') }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"

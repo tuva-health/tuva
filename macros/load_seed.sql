@@ -1,17 +1,31 @@
-{% macro load_seed(uri,pattern) %}
-{{ return(adapter.dispatch('load_seed')(uri,pattern)) }}
+{#
+    This macro includes options for compression and headers.
+    Default options are set to FALSE.
+    When set to TRUE, the appropriate command for each adapter-specific macro
+    will be used.
+
+    Argument examples:
+    compression=false
+    compression=true
+    headers=false
+    headers=true
+#}
+
+{% macro load_seed(uri,pattern,compression=false,headers=false) %}
+{{ return(adapter.dispatch('load_seed', 'the_tuva_project')(uri,pattern,compression,headers)) }}
 {% endmacro %}
 
 
 
-{% macro redshift__load_seed(uri,pattern) %}
+{% macro redshift__load_seed(uri,pattern,compression,headers) %}
 {% set sql %}
 copy  {{ this }}
   from 's3://{{ uri }}/{{ pattern }}'
   access_key_id 'AKIA2EPVNTV4FLAEBFGE'
   secret_access_key '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'
   csv
-  gzip
+  {% if compression == true %} gzip {% else %} {% endif %}
+  {% if headers == true %} ignoreheader 1 {% else %} {% endif %}
   region 'us-east-1'
 
 {% endset %}
@@ -31,12 +45,13 @@ copy  {{ this }}
 
 
 
-{% macro snowflake__load_seed(uri,pattern) %}
+{% macro snowflake__load_seed(uri,pattern,compression,headers) %}
 {% set sql %}    
 copy into {{ this }}
     from s3://{{ uri }}
     file_format = (type = CSV
-    compression = 'GZIP'
+    {% if compression == true %} compression = 'GZIP' {% else %} {% endif %}
+    {% if headers == true %} skip_header = 1 {% else %} {% endif %}
     field_optionally_enclosed_by = '"'
 )
 pattern = '.*\/{{pattern}}.*';
@@ -57,7 +72,7 @@ pattern = '.*\/{{pattern}}.*';
 
 
 
-{% macro bigquery__load_seed(uri,pattern) %}
+{% macro bigquery__load_seed(uri,pattern,compression,headers) %}
 {%- set columns = adapter.get_columns_in_relation(this) -%}
 {%- set collist = [] -%}
 
@@ -71,7 +86,8 @@ pattern = '.*\/{{pattern}}.*';
 load data into {{ this }} ( {{collist|join(',')}} )
 from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
-    compression = 'GZIP',
+    {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
+    {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
     quote = '"',
     null_marker = '\\N'
     )
@@ -90,7 +106,7 @@ from files (format = 'csv',
 
 {% endmacro %}
 
-{% macro default__load_seed(uri,pattern) %}
+{% macro default__load_seed(uri,pattern,compression,headers) %}
 {% if execute %}
 {% do log('No adapter found, seed not loaded',info = True) %}
 {% endif %}
