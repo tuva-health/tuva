@@ -88,6 +88,7 @@ from files (format = 'csv',
     uris = ['gs://{{ uri }}/{{ pattern }}*'],
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
     {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
+    {% if compression == true %} null_marker = '\\N', {% else %} {% endif %}
     quote = '"'
     )
 {% endset %}
