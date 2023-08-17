@@ -326,7 +326,7 @@ union distinct
 select
   claim_id as claim_id,
   patient_id as patient_id,
-  procedure_date_25 as procedure_date,as source_code_type,
+  procedure_date_25 as procedure_date,
   procedure_code_type as source_code_type,
   procedure_code_25 as source_code,
   rendering_npi as practitioner_npi,
@@ -347,9 +347,9 @@ select distinct
     unpivot_cte.source_code as source_code,
     null as source_description,
     case
-        when icd.icd_10_cm is not null then 'icd-10-cm'
+        when icd.icd_10_pcs is not null then 'icd-10-pcs'
     end as normalized_code_type,
-    icd.icd_10_cm as normalized_code,
+    icd.icd_10_pcs as normalized_code,
     icd.description as normalized_description,
     null as modifier_1,
     null as modifier_2,

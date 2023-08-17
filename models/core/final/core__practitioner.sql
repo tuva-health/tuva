@@ -38,10 +38,9 @@ on aa.npi = bb.npi
 select 
     npi as practitioner_id
     , npi
-    , first_name
-    , last_name
-    , practice_affiliation
-    , specialty
-    , sub_specialty
+    , provider_name
+    , parent_organization_name as practice_affiliation
+    , primary_specialty_description as specialty
+    , null as sub_specialty
     , '{{ var('last_update')}}' as last_update
 from provider
