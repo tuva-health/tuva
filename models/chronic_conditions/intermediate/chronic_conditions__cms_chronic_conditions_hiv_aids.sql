@@ -17,9 +17,9 @@ with chronic_conditions as (
     select
           patient_id
         , claim_id
-        , condition_date as start_date
-        , code_type as code_type
-        , replace(code,'.','') as code
+        , recorded_date as start_date
+        , normalized_code_type as code_type
+        , replace(normalized_code,'.','') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__condition') }}
 

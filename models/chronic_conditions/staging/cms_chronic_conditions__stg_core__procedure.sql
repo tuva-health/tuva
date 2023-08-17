@@ -7,8 +7,8 @@ select
       claim_id
     , patient_id
     , procedure_date
-    , code_type
-    , code
+    , normalized_code_type
+    , normalized_code
     , data_source
     , '{{ var('last_update')}}' as last_update
 from {{ ref('core__procedure') }}

@@ -5,7 +5,7 @@
 
 select 
       patient_id
-    , code
-    , condition_date
+    , normalized_code
+    , recorded_date
     , '{{ var('last_update')}}' as last_update
 from {{ ref('core__condition')}}
