@@ -17,4 +17,4 @@ select
 from {{ref('ccsr__long_condition_category')}}
 where 
     is_{{ var('record_type', 'ip') }}_default_category = true
-    and diagnosis_rank = 1
+    and rank = 1

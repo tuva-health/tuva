@@ -5,8 +5,8 @@
 
 select
   encounter_id
-, code
-, code_type
+, normalized_code
+, normalized_code_type
 , '{{ var('last_update')}}' as last_update
 from {{ ref('core__procedure') }}
 

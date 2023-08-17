@@ -21,9 +21,9 @@ select
     condition.encounter_id,
     condition.claim_id,
     condition.patient_id,
-    condition.code,
+    condition.normalized_code,
     ccsr__dx_vertical_pivot.code_description,
-    condition.diagnosis_rank,
+    condition.rank,
     ccsr__dx_vertical_pivot.ccsr_parent_category,
     dxccsr_body_systems.body_system,
     dxccsr_body_systems.parent_category_description,
@@ -34,8 +34,9 @@ select
     ccsr__dx_vertical_pivot.is_op_default_category,
     {{ var('dxccsr_version') }} as dxccsr_version,
     '{{ var('last_update')}}' as last_update
-from condition 
-left join ccsr__dx_vertical_pivot using(code)
+from condition
+left join ccsr__dx_vertical_pivot
+    on condition.normalized_code = ccsr__dx_vertical_pivot.code
 left join dxccsr_body_systems using(ccsr_parent_category)
 
     

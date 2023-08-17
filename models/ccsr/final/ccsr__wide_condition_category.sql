@@ -19,10 +19,10 @@ with bool_ranks as (
         patient_id,
         ccsr_category,
         case when ccsr_category like 'XXX%' then 1 else 0 end as is_excluded,
-        min(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_only_first,
-        max(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_first,
-        max(cast(case when diagnosis_rank >= 1 then 1 else 0 end as int)) as is_nth,
-        max(cast(case when diagnosis_rank > 1 then 1 else 0 end as int)) as not_first
+        min(cast(case when rank = 1 then 1 else 0 end as int)) as is_only_first,
+        max(cast(case when rank = 1 then 1 else 0 end as int)) as is_first,
+        max(cast(case when rank >= 1 then 1 else 0 end as int)) as is_nth,
+        max(cast(case when rank > 1 then 1 else 0 end as int)) as not_first
     from {{ ref('ccsr__long_condition_category') }}
     {{ dbt_utils.group_by(n=5) }}
 

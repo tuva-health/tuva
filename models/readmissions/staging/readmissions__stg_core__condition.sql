@@ -5,9 +5,9 @@
 
 select
   encounter_id
-, code
-, diagnosis_rank
-, code_type
+, normalized_code
+, rank
+, normalized_code_type
 , claim_id
 , '{{ var('last_update')}}' as last_update
 from {{ ref('core__condition') }}
