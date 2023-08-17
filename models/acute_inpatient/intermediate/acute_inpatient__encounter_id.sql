@@ -25,7 +25,7 @@ select
   patient_id,
   claim_id,
   encounter_id,
-  '{{ var('last_update')}}' as last_update
+  '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('acute_inpatient__institutional_encounter_id') }}
 
 union distinct
@@ -34,6 +34,6 @@ select
   patient_id,
   claim_id,
   encounter_id,
-  '{{ var('last_update')}}' as last_update
+  '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('acute_inpatient__professional_encounter_id') }}
 where (orphan_claim_flag = 0) and (encounter_count = 1)

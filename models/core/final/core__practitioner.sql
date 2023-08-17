@@ -38,7 +38,8 @@ on aa.npi = bb.npi
 select 
     npi as practitioner_id
     , npi
-    , provider_name
+    , provider_first_name
+    , provider_last_name
     , parent_organization_name as practice_affiliation
     , primary_specialty_description as specialty
     , null as sub_specialty

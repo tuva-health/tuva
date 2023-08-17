@@ -28,6 +28,6 @@ select
     sum(case when ccsr_category = '{{ category }}' then 1 else 0 end) as prccsr_{{ category|lower }},
     {% endfor %}
     {{ var('prccsr_version') }} as prccsr_version,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from dedupe_records
 group by encounter_id, patient_id, prccsr_version, last_update

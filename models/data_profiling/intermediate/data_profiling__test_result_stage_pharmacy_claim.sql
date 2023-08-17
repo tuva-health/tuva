@@ -7,7 +7,7 @@ with pharmacy_claim_denominator as(
   select 
     cast('all' as {{ dbt.type_string() }} ) as claim_type
     , cast(count(distinct claim_id) as int) as count
-    , cast('{{ var('last_update')}}' as {{ dbt.type_string() }} ) as last_update
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_string() }} ) as tuva_last_run
   from {{ ref('pharmacy_claim') }}
 )
 
@@ -37,7 +37,7 @@ with pharmacy_claim_denominator as(
     , claim.claim_type
     , claim.failures
     , elig.count as denominator
-    , last_update
+    , tuva_last_run
   from distinct_patient_per_category claim
   left join pharmacy_claim_denominator elig
       on claim.claim_type = elig.claim_type
@@ -49,6 +49,6 @@ with pharmacy_claim_denominator as(
     , claim.claim_type
     , claim.failures
     , elig.count
-    , last_update
+    , tuva_last_run
 
 
