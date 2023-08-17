@@ -357,7 +357,7 @@ select distinct
     null as modifier_4,
     unpivot_cte.practitioner_npi as practitioner_id,
     unpivot_cte.data_source as data_source,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from unpivot_cte
   left join {{ ref('terminology__icd_10_pcs') }} as icd
     on unpivot_cte.source_code = icd.icd_10_pcs

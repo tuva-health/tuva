@@ -32,5 +32,5 @@ select
 , total_allowed_amount as allowed_amount
 , total_charge_amount as charge_amount
 , data_source
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('acute_inpatient__summary') }} 

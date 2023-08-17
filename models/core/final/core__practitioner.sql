@@ -42,5 +42,5 @@ select
     , parent_organization_name as practice_affiliation
     , primary_specialty_description as specialty
     , null as sub_specialty
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from provider

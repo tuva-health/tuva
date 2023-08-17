@@ -9,7 +9,7 @@ vars:
   input_database: tuva_project_demo
   input_schema: tuva_synthetic
 
-  last_update: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
   ## All Tuva Data Marts
   tuva_marts_enabled: true
 

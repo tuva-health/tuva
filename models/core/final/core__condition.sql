@@ -526,11 +526,11 @@ select distinct
     end as normalized_code_type,
     icd.icd_10_cm as normalized_code,
     icd.description as normalized_description,
-    unpivot_cte.diagnosis_rank as rank,
+    unpivot_cte.diagnosis_rank as condition_rank,
     unpivot_cte.present_on_admit_code as present_on_admit_code,
     poa.present_on_admit_description as present_on_admit_description,
     unpivot_cte.data_source as data_source,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from unpivot_cte
 left join {{ ref('acute_inpatient__encounter_data_for_medical_claims')}} as eg
     on  unpivot_cte.claim_id = eg.claim_id

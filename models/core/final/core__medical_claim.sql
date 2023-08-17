@@ -50,5 +50,5 @@ select
   charge_amount,
   total_cost_amount,
   data_source,
-  '{{ var('last_update')}}' as last_update
+  '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }} 
