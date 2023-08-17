@@ -426,7 +426,11 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(35) {%- endif -%}
         primary_specialty_description: |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(173) {%- endif -%}
-        provider_name: |
+        provider_first_name: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_last_name: |
+          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_organization_name: |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
         parent_organization_name: |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
