@@ -12,7 +12,7 @@ with claim_start_date_after_claim_end_date as (
       , 'claim_id' as grain
       , claim_id
       , count(*) as counts
-      , '{{ var('last_update')}}' as last_update
+      , '{{ var('tuva_last_run')}}' as tuva_last_run
   from {{ ref('medical_claim') }}
   where claim_start_date > claim_end_date
   group by
@@ -27,7 +27,7 @@ with claim_start_date_after_claim_end_date as (
       , 'claim_id' as grain
       , claim_id
       , count(*) as counts
-      , '{{ var('last_update')}}' as last_update
+      , '{{ var('tuva_last_run')}}' as tuva_last_run
   from {{ ref('medical_claim') }}
   where claim_type = 'institutional'
   and admission_date > discharge_date

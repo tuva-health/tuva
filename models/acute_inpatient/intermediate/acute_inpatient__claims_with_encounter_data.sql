@@ -103,5 +103,5 @@ from useful_fields_at_claim_id_level aa
 
 
 select 
- *, '{{ var('last_update')}}' as last_update
+ *, '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_useful_fields_at_claim_id_level 

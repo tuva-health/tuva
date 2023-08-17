@@ -18,7 +18,7 @@ select distinct
   a.patient_id
 , year_month
 , a.payer
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('member_months__stg_eligibility') }} a
 inner join month_start_and_end_dates b
   on a.enrollment_start_date <= b.month_end_date

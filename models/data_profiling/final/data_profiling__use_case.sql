@@ -228,4 +228,4 @@ with use_case_stage as(
         , test_name
 )
 
-select *, '{{ var('last_update')}}' as last_update from use_case_stage
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from use_case_stage

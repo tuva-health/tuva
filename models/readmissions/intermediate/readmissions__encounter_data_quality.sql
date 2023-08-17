@@ -149,5 +149,5 @@ from encounter_data_quality_issues
 
 
 
-select *, '{{ var('last_update')}}' as last_update
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_data_quality_flags

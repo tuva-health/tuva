@@ -36,7 +36,7 @@ select
     ,  claim_id    
     , 'missing_values' as test_category
     , column_checked||' missing' as test_name
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from institutional_missing
 group by
     claim_id

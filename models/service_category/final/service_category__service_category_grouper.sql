@@ -31,7 +31,7 @@ select distinct
     when service_category_2 is null then 'Other'
     else service_category_2
   end service_category_2
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__combined_professional') }} b
   on a.claim_id = b.claim_id
@@ -65,7 +65,7 @@ select distinct
     when service_category_2 is null then 'Other'
     else service_category_2
   end service_category_2
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__combined_institutional') }} b
   on a.claim_id = b.claim_id

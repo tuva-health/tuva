@@ -26,7 +26,7 @@
 
 
 
-select distinct a.encounter_id, '{{ var('last_update')}}' as last_update
+select distinct a.encounter_id, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('readmissions__encounter') }} a
 inner join {{ ref('readmissions__index_time_requirement') }} b
     on a.encounter_id = b.encounter_id

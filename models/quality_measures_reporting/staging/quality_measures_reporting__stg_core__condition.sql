@@ -8,5 +8,5 @@ select
     , recorded_date as condition_date
     , normalized_code_type as code_type
     , normalized_code as code
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__condition') }}

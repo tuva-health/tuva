@@ -8,5 +8,5 @@ select
 , enrollment_start_date
 , enrollment_end_date
 , payer
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility') }} 

@@ -43,7 +43,7 @@ select
     ,  patient_id    
     , 'missing_values' as test_category
     , column_checked||' missing' as test_name
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from eligibility_missing
 group by
     patient_id
