@@ -5,8 +5,8 @@
 select
       patient_id
     , claim_id
-    , condition_date
-    , code_type
-    , code
+    , recorded_date as condition_date
+    , normalized_code_type as code_type
+    , normalized_code as code
     , '{{ var('last_update')}}' as last_update
 from {{ ref('core__condition') }}

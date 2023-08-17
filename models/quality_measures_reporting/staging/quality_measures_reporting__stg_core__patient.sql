@@ -4,7 +4,7 @@
 }}
 select
       patient_id
-    , gender
+    , sex as gender
     , birth_date
     , death_date
     , '{{ var('last_update')}}' as last_update
