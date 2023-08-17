@@ -53,23 +53,23 @@ seeds:
   the_tuva_project:
     terminology:
       terminology__calendar:
-        +post-hook: "{{ load_seed('tuva-public-resources/terminology','calendar.csv',compression=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','calendar.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
-        +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_pcs.csv',compression=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_pcs.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_cm:
-        +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_cm.csv',compression=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
-        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv',compression=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
       terminology__provider:
-        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv',compression=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv',compression=true,null_marker=true) }}"
     value_sets:
       ccsr:
         ccsr__dxccsr_v2023_1_cleaned_map:
-          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','dxccsr_v2023_1_cleaned_map.csv',compression=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','dxccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
         ccsr__prccsr_v2023_1_cleaned_map:
-          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','prccsr_v2023_1_cleaned_map.csv',compression=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','prccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
       readmissions:
         readmissions__icd_10_pcs_to_ccs:
-          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_pcs_to_ccs.csv',compression=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_pcs_to_ccs.csv',compression=true,null_marker=true) }}"
         readmissions__icd_10_cm_to_ccs:
-          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_cm_to_ccs.csv',compression=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
