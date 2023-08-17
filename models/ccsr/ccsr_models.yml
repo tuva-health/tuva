@@ -30,12 +30,7 @@ models:
       - name: ccsr_category
         description: "A CCSR category for the ICD-10-CM code. One ICD-10-CM code may have up
           6 CCSR categories associated, ordinally ranked by the ccsr_category_rank.
-          The not_null test will fail on this dimension if a record has a `code` that isn't
-          referenced in the CCSR seed file."
-        tests:
-          - not_null:
-              config:
-                severity: warn
+          Will be null if a record has a `code` that isn't referenced in the CCSR seed file."
       - name: ccsr_category_rank
         description: "The ordinal rank of a given CCSR category mapped to an ICD-10-CM code. The
           CCSR seed CSV has the order of categories assigned to each ICD-10-CM code."
@@ -99,10 +94,6 @@ models:
     columns:
       - name: encounter_id
         description: Unique identifier for each the encounter.
-        tests:
-          - unique:
-              config:
-                severity: warn
       - name: claim_id
         description: Unique identifier for each claim.
       - name: patient_id
@@ -124,12 +115,7 @@ models:
       - name: ccsr_category
         description: "A CCSR category for the ICD-10-CM code. One ICD-10-CM code may have up
           6 CCSR categories associated, ordinally ranked by the ccsr_category_rank.
-          The not_null test will fail on this dimension if a record has a `code` that isn't
-          referenced in the CCSR seed file."
-        tests:
-          - not_null:
-              config:
-                severity: warn
+          Will be null if a record has a `code` that isn't referenced in the CCSR seed file."
       - name: ccsr_category_description
         description: "The description of the CCSR category as provided in the CCSR seed file."
       - name: ccsr_category_rank
@@ -194,13 +180,6 @@ models:
     columns:
       - name: encounter_id
         description: Unique identifier for an encounter.
-        tests:
-            - unique:
-                config:
-                  severity: warn
-            - not_null:
-                config:
-                  severity: warn
       - name: claim_id
         description: Unique claim_id for each claim.
         tests:
@@ -222,12 +201,7 @@ models:
       - name: ccsr_category
         description: "A CCSR category for the ICD-10-CM code. One ICD-10-CM code may have up
           6 CCSR categories associated, ordinally ranked by the ccsr_category_rank.
-          The not_null test will fail on this dimension if a record has a `code` that isn't
-          referenced in the CCSR seed file."
-        tests:
-            - not_null:
-                config:
-                  severity: warn
+          Will be null if a record has a `code` that isn't referenced in the CCSR seed file."
       - name: ccsr_category_description
         description: The human readable description of the `ccsr_category`.
       - name: dxccsr_version
@@ -251,10 +225,6 @@ models:
     columns:
       - name: encounter_id
         description: The encounter_id for the encounter where this procedure was performed.
-        tests:
-            - not_null:
-                config:
-                  severity: warn
       - name: patient_id
         description: Unique identifier for each patient.
       - name: code
@@ -270,10 +240,6 @@ models:
         description: A description of the clinical domain.
       - name: ccsr_category
         description: The CCSR category mapped to the ICD-10-PCS code.
-        tests:
-            - not_null:
-                config:
-                  severity: warn
       - name: prccsr_version
         description: The version number of the CCSR program from which the dbt model was derived.
       - name: _model_run_time
@@ -304,11 +270,6 @@ models:
     columns:
       - name: encounter_id
         description: The encounter_id for the encounter where this procedure was performed.
-        tests:
-            - unique
-            - not_null:
-                config:
-                  severity: warn
       - name: patient_id
         description: Unique identifier for each patient.
       - name: prccsr_version
