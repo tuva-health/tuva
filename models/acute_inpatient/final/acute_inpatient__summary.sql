@@ -60,12 +60,13 @@ from {{ ref('acute_inpatient__stg_eligibility') }}
 select
   a.encounter_id
 , max(a.facility_npi) as facility_npi
-, b.provider_name
+, b.provider_first_name
+, b.provider_last_name
 , count(distinct facility_npi) as npi_count
 from {{ ref('acute_inpatient__institutional_encounter_id') }} a
 left join {{ ref('terminology__provider') }} b
   on a.facility_npi = b.npi
-group by 1,3
+group by 1,3,4
 )
 
 select
@@ -77,7 +78,8 @@ select
 , e.gender
 , e.race
 , f.facility_npi
-, f.provider_name
+, f.provider_first_name
+, f.provider_last_name
 , c.ms_drg_code
 , j.ms_drg_description
 , j.medical_surgical
