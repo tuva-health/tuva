@@ -19,6 +19,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_1 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_1 is not null
@@ -32,6 +37,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_2 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_2 is not null
@@ -45,6 +55,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_3 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_3 is not null
@@ -58,6 +73,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_4 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_4 is not null
@@ -71,6 +91,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_5 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_5 is not null
@@ -84,6 +109,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_6 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_6 is not null
@@ -97,6 +127,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_7 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_7 is not null
@@ -110,6 +145,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_8 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_8 is not null
@@ -123,6 +163,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_9 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_9 is not null
@@ -136,6 +181,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_10 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_10 is not null
@@ -149,6 +199,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_11 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_11 is not null
@@ -161,6 +216,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_12 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_12 is not null
@@ -174,6 +234,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_13 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_13 is not null
@@ -187,6 +252,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_14 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_14 is not null
@@ -200,6 +270,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_15 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_15 is not null
@@ -213,6 +288,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_16 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_16 is not null
@@ -226,6 +306,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_17 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_17 is not null
@@ -239,6 +324,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_18 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_18 is not null
@@ -252,6 +342,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_19 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_19 is not null
@@ -265,6 +360,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_20 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_20 is not null
@@ -278,6 +378,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_21 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_21 is not null
@@ -291,6 +396,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_22 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_22 is not null
@@ -304,6 +414,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_23 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_23 is not null
@@ -317,6 +432,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_24 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_24 is not null
@@ -330,6 +450,11 @@ select
   procedure_code_type as source_code_type,
   procedure_code_25 as source_code,
   rendering_npi as practitioner_npi,
+  hcpcs_modifier_1 as modifier_1,
+  hcpcs_modifier_2 as modifier_2,
+  hcpcs_modifier_3 as modifier_3,
+  hcpcs_modifier_4 as modifier_4,
+  hcpcs_modifier_5 as modifier_5,
   data_source as data_source
 from {{ ref('medical_claim') }} 
 where procedure_code_25 is not null
@@ -351,10 +476,10 @@ select distinct
     end as normalized_code_type,
     icd.icd_10_pcs as normalized_code,
     icd.description as normalized_description,
-    null as modifier_1,
-    null as modifier_2,
-    null as modifier_3,
-    null as modifier_4,
+    unpivot_cte.modifier_1,
+    unpivot_cte.modifier_2,
+    unpivot_cte.modifier_3,
+    unpivot_cte.modifier_4,
     unpivot_cte.practitioner_npi as practitioner_id,
     unpivot_cte.data_source as data_source,
     '{{ var('tuva_last_run')}}' as tuva_last_run
