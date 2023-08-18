@@ -517,6 +517,7 @@ select distinct
     unpivot_cte.condition_date as recorded_date,
     null as onset_date,
     null as resolved_date,
+    'active' as status,
     unpivot_cte.condition_type as condition_type,
     unpivot_cte.source_code_type as source_code_type,
     unpivot_cte.source_code as source_code,
