@@ -51,6 +51,7 @@ select
     , null as county
     , null as latitude 
     , null as logitude
+    ,cast(data_source as {{ dbt.type_string() }}) as data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from patient_stage
 where row_sequence = 1

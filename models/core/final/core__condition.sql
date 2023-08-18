@@ -529,6 +529,7 @@ select distinct
     unpivot_cte.diagnosis_rank as condition_rank,
     unpivot_cte.present_on_admit_code as present_on_admit_code,
     poa.present_on_admit_description as present_on_admit_description,
+    unpivot_cte.data_source,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 from unpivot_cte
 left join {{ ref('acute_inpatient__encounter_data_for_medical_claims')}} as eg
