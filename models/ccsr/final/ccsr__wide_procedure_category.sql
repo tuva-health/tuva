@@ -30,4 +30,4 @@ select
     {{ var('prccsr_version') }} as prccsr_version,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 from dedupe_records
-group by encounter_id, patient_id, prccsr_version, last_update
+group by encounter_id, patient_id, prccsr_version, tuva_last_run

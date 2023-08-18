@@ -23,7 +23,7 @@ select
     condition.patient_id,
     condition.normalized_code,
     ccsr__dx_vertical_pivot.code_description,
-    condition.rank,
+    condition.condition_rank,
     ccsr__dx_vertical_pivot.ccsr_parent_category,
     dxccsr_body_systems.body_system,
     dxccsr_body_systems.parent_category_description,
@@ -33,7 +33,7 @@ select
     ccsr__dx_vertical_pivot.is_ip_default_category,
     ccsr__dx_vertical_pivot.is_op_default_category,
     {{ var('dxccsr_version') }} as dxccsr_version,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from condition
 left join ccsr__dx_vertical_pivot
     on condition.normalized_code = ccsr__dx_vertical_pivot.code
