@@ -20,7 +20,7 @@ select
 	else 1
     end as valid_icd_10_pcs_flag,
     cc.ccs_procedure_category,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     {{ ref('readmissions__stg_core__procedure') }} aa
     left join {{ ref('terminology__icd_10_pcs') }} bb

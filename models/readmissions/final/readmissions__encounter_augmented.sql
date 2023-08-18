@@ -43,7 +43,7 @@ select
     ee.overlaps_with_another_encounter_flag,
     ee.missing_ms_drg_flag,
     ee.invalid_ms_drg_flag,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     {{ ref('readmissions__encounter') }} aa
     left join {{ ref('readmissions__index_admission') }} bb
