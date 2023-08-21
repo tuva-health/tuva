@@ -111,7 +111,7 @@ from files (format = 'csv',
 
 
 
-{% macro databricks__load_seed(uri,pattern) %}
+{% macro databricks__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% if execute %}
 
 {%- set s3_path = 's3://' ~ uri ~ '/' -%}
@@ -119,7 +119,11 @@ from files (format = 'csv',
 {%- set collist = [] -%}
 
 {% for col in columns %}
-  {% do collist.append("_c" ~ loop.index0 ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
+  {% if headers == true %}
+    {% do collist.append(col.name ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
+  {% else %}
+    {% do collist.append("_c" ~ loop.index0 ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
+  {% endif %}
 {% endfor %}
 
 {%- set cols = collist|join(',\n    ') -%}
@@ -142,10 +146,10 @@ FROM (
 FILEFORMAT = CSV
 PATTERN = '{{ pattern }}*'
 FORMAT_OPTIONS (
+  {% if headers == true %} 'header' = 'true', {% else %} 'header' = 'false', {% endif %}
+  {% if null_marker == true %} 'nullValue' = '\\N', {% else %} {% endif %}
   'enforceSchema' = 'true',
-  'header' = 'false',
   'inferSchema' = 'false',
-  'nullValue' = '\\N',
   'sep' = ','
 )
 COPY_OPTIONS (
