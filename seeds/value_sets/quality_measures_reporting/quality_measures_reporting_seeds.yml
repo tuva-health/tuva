@@ -29,4 +29,4 @@ seeds:
       enabled: "{{ var('quality_measures_reporting_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
