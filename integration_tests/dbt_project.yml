@@ -6,8 +6,15 @@ profile: default
 
 vars:
 
-  input_database: tuva_project_demo
-  input_schema: tuva_synthetic
+  ## Use this variable to run the project with synthetic data loaded as seeds
+  # otherwise set to false and set the input vars below
+  test_data_override: true
+
+
+  ## Update these vars to use your own data as input, do not comment out
+  # enabled logic has been added to the sources config
+  input_database: medicare_lds_five_percent
+  input_schema: input_layer
 
 
   ## All Tuva Data Marts
@@ -24,9 +31,11 @@ vars:
   # data_profiling_enabled: false
   # member_months_enabled: false
   # pmpm_enabled: false
+  # quality_measures_reporting_enabled: false
   # readmissions_enabled: false
   # service_category_grouper_enabled: false
   # tuva_chronic_conditions_enabled: false
+
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -41,6 +50,16 @@ clean-targets:
   - "dbt_packages"
 
 
+dispatch:
+  - macro_namespace: 'the_tuva_project'
+    search_order: ['integration_tests','the_tuva_project']
+
+
 seeds:
-  config:
-    database: dev_thuxuan
+  integration_tests:
+    eligibility_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
+    medical_claim_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','medical_claim.csv',headers=true) }}"
+    pharmacy_claim_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"
