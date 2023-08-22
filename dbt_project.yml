@@ -29,7 +29,7 @@ vars:
     cms_hcc_model_version: CMS-HCC-V24
 
     ## Tuva Last Run
-    # The date and timestamp of the dbt run that will populate the last_updtuva_last_runate column in all models.
+    # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
     # Default timezone is UTC
     tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
