@@ -10,5 +10,5 @@ select
     , enrollment_end_date
     , dual_status_code
     , medicare_status_code
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility') }}

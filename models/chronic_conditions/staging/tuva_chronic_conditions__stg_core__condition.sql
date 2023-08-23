@@ -5,7 +5,7 @@
 
 select 
       patient_id
-    , code
-    , condition_date
-    , '{{ var('last_update')}}' as last_update
+    , normalized_code
+    , recorded_date
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__condition')}}

@@ -63,7 +63,7 @@ select
     bb.specialty_cohort as readmission_specialty_cohort,
     bb.died_flag as readmission_died_flag,
     bb.diagnosis_ccs as readmission_diagnosis_ccs,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     encounter_sequence aa
     left join encounter_sequence bb

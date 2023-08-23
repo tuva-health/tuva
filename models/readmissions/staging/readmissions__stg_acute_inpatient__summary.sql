@@ -12,5 +12,5 @@ select
     facility_npi,
     ms_drg_code,
     total_paid_amount,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('acute_inpatient__summary') }}

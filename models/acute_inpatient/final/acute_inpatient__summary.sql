@@ -100,7 +100,7 @@ select
     else 0
   end mortality_flag
 , data_source
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from distinct_encounters a
 left join institutional_claim_details c
   on a.encounter_id = c.encounter_id

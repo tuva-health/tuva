@@ -9,5 +9,5 @@ select
     , claim_end_date
     , place_of_service_code
     , hcpcs_code
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }}

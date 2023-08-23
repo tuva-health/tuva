@@ -172,5 +172,5 @@ from add_min_closing_row_to_every_claim aa
      and aa.min_closing_row = bb.row_num
 )
 
-select *, '{{ var('last_update')}}' as last_update
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_encounter_id

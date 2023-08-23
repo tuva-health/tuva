@@ -9,5 +9,5 @@ SELECT
 , dispensing_date
 , paid_amount
 , allowed_amount
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy_claim') }}

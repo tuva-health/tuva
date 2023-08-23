@@ -19,10 +19,10 @@ with bool_ranks as (
         patient_id,
         ccsr_category,
         case when ccsr_category like 'XXX%' then 1 else 0 end as is_excluded,
-        min(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_only_first,
-        max(cast(case when diagnosis_rank = 1 then 1 else 0 end as int)) as is_first,
-        max(cast(case when diagnosis_rank >= 1 then 1 else 0 end as int)) as is_nth,
-        max(cast(case when diagnosis_rank > 1 then 1 else 0 end as int)) as not_first
+        min(cast(case when condition_rank = 1 then 1 else 0 end as int)) as is_only_first,
+        max(cast(case when condition_rank = 1 then 1 else 0 end as int)) as is_first,
+        max(cast(case when condition_rank >= 1 then 1 else 0 end as int)) as is_nth,
+        max(cast(case when condition_rank > 1 then 1 else 0 end as int)) as not_first
     from {{ ref('ccsr__long_condition_category') }}
     {{ dbt_utils.group_by(n=5) }}
 
@@ -54,6 +54,6 @@ select distinct
     sum(case when ccsr_category = '{{ category }}' then dx_code else 0 end) as dxccsr_{{ category }},
     {% endfor %}
     {{ var('dxccsr_version') }} as dxccsr_version,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from bool_logic
-group by encounter_id, claim_id, patient_id, dxccsr_version, last_update
+group by encounter_id, claim_id, patient_id, dxccsr_version, tuva_last_run

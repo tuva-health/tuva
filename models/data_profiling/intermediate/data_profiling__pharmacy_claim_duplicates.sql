@@ -10,7 +10,7 @@ select distinct
   ,  claim_id   
   , 'duplicate_values' as test_category
   , 'duplicate pharmacy claims' as test_name
-  , '{{ var('last_update')}}' as last_update
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy_claim') }} 
 group by
     claim_id
