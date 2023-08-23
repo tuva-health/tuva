@@ -17,9 +17,9 @@ with chronic_conditions as (
     select
           patient_id
         , claim_id
-        , condition_date as start_date
-        , code_type as code_type
-        , replace(code,'.','') as code
+        , recorded_date as start_date
+        , normalized_code_type as code_type
+        , replace(normalized_code,'.','') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__condition') }}
 
@@ -128,5 +128,5 @@ select distinct
     , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }}) as condition_category
     , cast(inclusions_unioned.condition as {{ dbt.type_string() }}) as condition
     , cast(inclusions_unioned.data_source as {{ dbt.type_string() }}) as data_source
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from inclusions_unioned

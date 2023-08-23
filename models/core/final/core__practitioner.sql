@@ -11,23 +11,23 @@
 
 
 with all_providers_in_claims_dataset as (
-select distinct facility_npi as npi
+select distinct facility_npi as npi, data_source
 from {{ ref('core__medical_claim') }}
 
 union all
 
-select distinct rendering_npi as npi
+select distinct rendering_npi as npi, data_source
 from {{ ref('core__medical_claim') }}
 
 union all
 
-select distinct billing_npi as npi
+select distinct billing_npi as npi, data_source
 from {{ ref('core__medical_claim') }}
 ),
 
 
 provider as (
-select aa.*
+select aa.*, bb.data_source
 from {{ ref('terminology__provider') }} aa
 inner join all_providers_in_claims_dataset bb
 on aa.npi = bb.npi
@@ -35,5 +35,14 @@ on aa.npi = bb.npi
 
 
 
-select *, '{{ var('last_update')}}' as last_update
+select 
+    npi as practitioner_id
+    , npi
+    , provider_first_name
+    , provider_last_name
+    , parent_organization_name as practice_affiliation
+    , primary_specialty_description as specialty
+    , null as sub_specialty
+    , data_source as data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from provider

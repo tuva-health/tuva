@@ -418,5 +418,5 @@ from start_date_after_end_date
 
 
 
-select *, '{{ var('last_update')}}' as last_update
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run
 from union_cte

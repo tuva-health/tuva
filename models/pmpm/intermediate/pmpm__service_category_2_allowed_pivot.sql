@@ -42,6 +42,6 @@ year_month,
   , quote_identifiers = False
   , suffix='_allowed'
 ) }}
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from service_cat_2
 group by 1,2

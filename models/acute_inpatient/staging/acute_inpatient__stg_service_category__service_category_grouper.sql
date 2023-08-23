@@ -8,5 +8,5 @@ SELECT
   claim_id
 , claim_type
 , service_category_2
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__service_category_grouper')}}

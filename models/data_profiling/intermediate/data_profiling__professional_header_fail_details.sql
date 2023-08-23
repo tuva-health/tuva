@@ -55,7 +55,7 @@ select
     ,  claim_id
     , 'header' as test_category
     , column_checked||' duplicated' as test_name
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from professional_header_duplicates
 group by 
     claim_id

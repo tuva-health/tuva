@@ -247,5 +247,5 @@ select
     , exclusion_date
     , exclusion_reason
     , exclusion_flag
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

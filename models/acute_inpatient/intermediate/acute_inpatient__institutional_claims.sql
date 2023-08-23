@@ -292,7 +292,7 @@ select
   dq.claim_type_missing as claim_type_missing,
   dq.claim_type_not_institutional as claim_type_not_institutional,
   h.data_source,
-  '{{ var('last_update')}}' as last_update
+  '{{ var('tuva_last_run')}}' as tuva_last_run
 
 from header_level_values h
 left join data_quality_flags dq

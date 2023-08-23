@@ -16,7 +16,7 @@ vars:
   input_database: medicare_lds_five_percent
   input_schema: input_layer
 
-
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
   ## All Tuva Data Marts
   tuva_marts_enabled: true
 

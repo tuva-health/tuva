@@ -23,5 +23,5 @@ where ccs_diagnosis_category in
 )
 
 
-select *, '{{ var('last_update')}}' as last_update
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run
 from exclusions

@@ -117,6 +117,6 @@ select
     , else_value= 0
     , quote_identifiers = False
   ) }}
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from combine
 order by 1

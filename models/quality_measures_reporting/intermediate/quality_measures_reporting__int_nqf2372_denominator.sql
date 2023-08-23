@@ -161,5 +161,5 @@ with patient as (
     , measure_name
     , measure_version
     , denominator_flag
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

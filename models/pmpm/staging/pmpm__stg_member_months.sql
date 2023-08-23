@@ -7,5 +7,5 @@
 SELECT
   patient_id
 , year_month
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('member_months') }}

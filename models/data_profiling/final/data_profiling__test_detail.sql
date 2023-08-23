@@ -49,5 +49,5 @@ select
     , grain
     , claim_type
     , claim_id as foreign_key
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from test_detail_union

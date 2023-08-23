@@ -13,5 +13,5 @@ HCPCS_CODE,
 MS_DRG_CODE,
 PLACE_OF_SERVICE_CODE,
 REVENUE_CENTER_CODE,
-'{{ var('last_update')}}' as last_update
+'{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }}

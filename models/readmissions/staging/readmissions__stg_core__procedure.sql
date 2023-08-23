@@ -5,8 +5,8 @@
 
 select
   encounter_id
-, code
-, code_type
-, '{{ var('last_update')}}' as last_update
+, normalized_code
+, normalized_code_type
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__procedure') }}
 

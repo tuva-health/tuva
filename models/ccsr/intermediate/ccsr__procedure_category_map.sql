@@ -10,5 +10,5 @@ select
     left(prccsr, 3) as ccsr_parent_category,
     prccsr_description as ccsr_category_description,
     clinical_domain,
-   '{{ var('last_update')}}' as last_update
+   '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('ccsr__prccsr_v2023_1_cleaned_map')}}

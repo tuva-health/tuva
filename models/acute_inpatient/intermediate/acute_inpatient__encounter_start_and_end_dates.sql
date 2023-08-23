@@ -40,5 +40,5 @@ from add_encounter_id_to_acute_inpatient_encounters
 group by patient_id, encounter_id
 )
 
-select *, '{{ var('last_update')}}' as last_update
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run
 from encounter_start_and_end_dates

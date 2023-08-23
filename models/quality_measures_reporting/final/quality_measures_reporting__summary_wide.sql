@@ -60,5 +60,5 @@ with measures_long as (
 select
       patient_id
     , nqf_2372
-    , '{{ var('last_update')}}' as last_update
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

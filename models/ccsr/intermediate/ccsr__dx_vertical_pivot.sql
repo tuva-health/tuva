@@ -37,7 +37,7 @@ with codes as (
 
 select distinct
     *,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from long_union
 -- as not all diagnosis codes have multiple categories, we can discard nulls
 where ccsr_category is not null

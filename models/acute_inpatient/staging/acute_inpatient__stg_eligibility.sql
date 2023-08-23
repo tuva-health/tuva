@@ -8,5 +8,5 @@ select
 , birth_date
 , gender
 , race
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility') }}

@@ -46,6 +46,6 @@ year_month
     , agg='sum'
     , quote_identifiers=false
     ) }}
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from rx_pivot_prep
 group by year_month

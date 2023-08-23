@@ -14,17 +14,17 @@
 
 select
     aa.encounter_id,
-    aa.code as procedure_code,
+    aa.normalized_code as procedure_code,
     case
         when bb.icd_10_pcs is null then 0
 	else 1
     end as valid_icd_10_pcs_flag,
     cc.ccs_procedure_category,
-    '{{ var('last_update')}}' as last_update
+    '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     {{ ref('readmissions__stg_core__procedure') }} aa
     left join {{ ref('terminology__icd_10_pcs') }} bb
-    on aa.code = bb.icd_10_pcs
+    on aa.normalized_code = bb.icd_10_pcs
     left join {{ ref('readmissions__icd_10_pcs_to_ccs') }} cc
-    on aa.code = cc.icd_10_pcs
-where aa.code_type = 'icd-10-pcs'
+    on aa.normalized_code = cc.icd_10_pcs
+where aa.normalized_code_type = 'icd-10-pcs'

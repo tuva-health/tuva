@@ -25,7 +25,7 @@ select
   ,  claim_id    
   , 'claim_type' as test_category
   , 'claim_type mapping incorrect' as test_name
-  , '{{ var('last_update')}}' as last_update
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from claim_type_mapping
 where source_claim_type <> data_profiling_claim_type
 group by

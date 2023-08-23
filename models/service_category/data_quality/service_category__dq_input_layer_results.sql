@@ -6,6 +6,6 @@
 select
   dq_problem
 , count(distinct claim_id) as distinct_claims
-, '{{ var('last_update')}}' as last_update
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__dq_input_layer_tests') }}
 group by 1
