@@ -14,41 +14,41 @@ seeds:
       enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_cm_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         icd_10_cm_code_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         default_ccsr_category_ip: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         default_ccsr_category_description_ip: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         default_ccsr_category_op: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         default_ccsr_category_description_op: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_1: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_1_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_2: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_2_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_3: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_3_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_4: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_4_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_5: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_5_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_6: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}  
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}  
         ccsr_category_6_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}    
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}    
 
 
 
@@ -64,15 +64,15 @@ seeds:
       enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_pcs: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         icd_10_pcs_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         prccsr: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         prccsr_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         clinical_domain: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
                     
 
 

@@ -9,9 +9,9 @@ seeds:
       tags: readmissions
       column_types:
         ccs_diagnosis_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__acute_diagnosis_icd_10_cm
@@ -22,9 +22,9 @@ seeds:
       tags: readmissions
       column_types:
         icd_10_cm : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__always_planned_ccs_diagnosis_category
@@ -35,9 +35,9 @@ seeds:
       tags: readmissions
       column_types:
         ccs_diagnosis_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__always_planned_ccs_procedure_category
@@ -48,9 +48,9 @@ seeds:
       tags: readmissions
       column_types:
         ccs_procedure_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__exclusion_ccs_diagnosis_category
@@ -61,11 +61,11 @@ seeds:
       tags: readmissions
       column_types:
         ccs_diagnosis_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         exclusion_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__icd_10_cm_to_ccs
@@ -76,13 +76,13 @@ seeds:
       tags: readmissions
       column_types:
         icd_10_cm : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccs_diagnosis_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccs_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__icd_10_pcs_to_ccs
@@ -93,13 +93,13 @@ seeds:
       tags: readmissions
       column_types:
         icd_10_pcs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccs_procedure_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccs_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__potentially_planned_ccs_procedure_category
@@ -110,9 +110,9 @@ seeds:
       tags: readmissions
       column_types:
         ccs_procedure_category : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__potentially_planned_icd_10_pcs
@@ -123,9 +123,9 @@ seeds:
       tags: readmissions
       column_types:
         icd_10_pcs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__specialty_cohort
@@ -136,13 +136,13 @@ seeds:
       tags: readmissions
       column_types:
         ccs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         specialty_cohort : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         procedure_or_diagnosis : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: readmissions__surgery_gynecology_cohort
@@ -153,11 +153,11 @@ seeds:
       tags: readmissions
       column_types:
         icd_10_pcs : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccs_code_and_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         specialty_cohort : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"

@@ -24,9 +24,11 @@ Check out our [docs](https://thetuvaproject.com/) to learn about the Tuva Projec
 <br/><br/>
 
 ## 🔌  Supported Data Warehouses and dbt Versions
-- Snowflake
-- Redshift
 - BigQuery
+- Databricks (community supported)
+- Redshift
+- Snowflake
+
 
 This package supports dbt version `1.3.x` or higher.
 <br/><br/>
