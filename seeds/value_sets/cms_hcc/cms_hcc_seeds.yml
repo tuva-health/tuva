@@ -26,7 +26,7 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         payment_year: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          integer
         hcpcs_cpt_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         included_flag: |
@@ -133,7 +133,7 @@ seeds:
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         payment_year: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          integer
         diagnosis_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         cms_hcc_v24: |
