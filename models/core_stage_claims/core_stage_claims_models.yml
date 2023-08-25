@@ -1,18 +1,16 @@
 version: 2
 
 models:
-####  Intermediate
-
 
 ####  Final
-  - name: core__medical_claim
+  - name: core_stage_claims__medical_claim
     description: Core medical_claim table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: medical_claim
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: claim_id
@@ -137,14 +135,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__encounter
+  - name: core_stage_claims__encounter
     description: Core encounter table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: encounter
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: encounter_id
@@ -215,14 +213,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__patient
+  - name: core_stage_claims__patient
     description: Core patient table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: patient
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: patient_id
@@ -260,14 +258,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__condition
+  - name: core_stage_claims__condition
     description: Core condition table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: condition
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: encounter_id
@@ -303,14 +301,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__procedure
+  - name: core_stage_claims__procedure
     description: Core procedure table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: procedure
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: encounter_id
@@ -339,14 +337,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__pharmacy_claim
+  - name: core_stage_claims__pharmacy_claim
     description: Core pharmacy_claim table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: pharmacy_claim
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: claim_id
@@ -389,14 +387,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__eligibility
+  - name: core_stage_claims__eligibility
     description: Core eligibility table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: eligibility
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: patient_id
@@ -454,14 +452,14 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__practitioner
+  - name: core_stage_claims__practitioner
     description: Core provider table with all providers in the claims dataset
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
+        {% else %}core_stage_claims{%- endif -%}
       alias: practitioner
-      tags: core
+      tags: core_stage_claims
       materialized: table
     columns:
       - name: npi
