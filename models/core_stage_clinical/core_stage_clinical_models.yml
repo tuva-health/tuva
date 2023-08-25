@@ -1,0 +1,84 @@
+version: 2
+
+models:
+####  Final
+  - name: core_stage_clinical__condition
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: condition
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__encounter
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: encounter
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__lab_result
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: lab_result
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__medication
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: medication
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__observation
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: observation
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__patient
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: patient
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__practitioner
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: practitioner
+      tags: core_stage_clinical
+      materialized: table
+
+    - name: core_stage_clinical__procedure
+    description: 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core_stage_clinical{%- endif -%}
+      alias: procedure
+      tags: core_stage_clinical
+      materialized: table
+
