@@ -18,4 +18,4 @@ select
     , practitioner_id
     , data_source
     , tuva_last_run
-from {{ ref('core_stage_clinical__procedure') }}
+from {{ ref('core__stg_clinical_procedure') }}
