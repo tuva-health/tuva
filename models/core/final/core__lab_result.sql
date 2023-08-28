@@ -1,1 +1,6 @@
-select * from {{ ref('core_stage_clinical__lab_result')}}
+{{ config(
+     enabled = var('medical_records_enabled',var('tuva_marts_enabled',False))
+   )
+}}
+
+select * from {{ ref('core__stg_medical_records_lab_result')}}
