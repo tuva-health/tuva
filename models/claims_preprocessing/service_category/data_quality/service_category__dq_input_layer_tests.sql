@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('service_category_grouper_enabled',var('tuva_marts_enabled',True))
+     enabled = var('claims_enabled',var('tuva_marts_enabled',True))
    )
 }}
 

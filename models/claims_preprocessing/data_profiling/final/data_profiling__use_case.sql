@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('data_profiling_enabled',var('tuva_marts_enabled',True))
+     enabled = var('claims_enabled',var('tuva_marts_enabled',True))
    )
 }}
 with use_case_stage as(
