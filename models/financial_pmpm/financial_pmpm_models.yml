@@ -3,15 +3,25 @@ version: 2
 models:
 
 #### Final 
-
-  - name: pmpm__pmpm_prep
+  - name: financial_pmpm__member_months
+    description: Creates member months from eligibility data
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
+      alias: member_months
+      tags: 
+        - financial_pmpm
+      materialized: table
+      
+  - name: financial_pmpm__pmpm_prep
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: pmpm_prep
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     tests:
        - unique:
@@ -126,14 +136,14 @@ models:
       - name: urgent_care_allowed
         description: Total urgent care allowed amount per member per month (PMPM).
 
-  - name: pmpm__pmpm
+  - name: financial_pmpm__pmpm
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: pmpm
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     description: >
       Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
@@ -245,86 +255,91 @@ models:
 
 #### Intermediate
 
-  - name: pmpm__patient_spend_with_service_categories
+  - name: financial_pmpm__patient_spend_with_service_categories
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: _int_patient_spend_with_service_categories
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     description: >
       Adds service categories to claims and sums paid and allowed amounts to the year-month level.
 
-  - name: pmpm__service_category_1_allowed_pivot
+  - name: financial_pmpm__service_category_1_allowed_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_1_allowed_pivot
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     description: >
       Pivots out allowed amounts into columns by service category level 1.
 
-  - name: pmpm__service_category_2_allowed_pivot
+  - name: financial_pmpm__service_category_2_allowed_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_2_allowed_pivot
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     description: >
       Pivots out allowed amounts into columns by service category level 2.
 
-  - name: pmpm__service_category_1_paid_pivot
+  - name: financial_pmpm__service_category_1_paid_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_1_paid_pivot
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     description: >
       Pivots out paid amounts into columns by service category level 1.
 
 
-  - name: pmpm__service_category_2_paid_pivot
+  - name: financial_pmpm__service_category_2_paid_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pmpm
-        {% else %}pmpm{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_2_paid_pivot
       tags: 
-        - pmpm
+        - financial_pmpm
       materialized: table
     description: >
       Pivots out paid amounts into columns by service category level 2.
 
 ## Staging
-
-  - name: pmpm__stg_medical_claim
+  - name: financial_pmpm__stg_eligibility
     config:
-      tags: pmpm
+      tags: 
+        - financial_pmpm
       materialized: ephemeral
 
-  - name: pmpm__stg_pharmacy_claim
+  - name: financial_pmpm__stg_medical_claim
     config:
-      tags: pmpm
+      tags: financial_pmpm
       materialized: ephemeral
 
-  - name: pmpm__stg_member_months
+  - name: financial_pmpm__stg_pharmacy_claim
     config:
-      tags: pmpm
+      tags: financial_pmpm
       materialized: ephemeral
 
-  - name: pmpm__stg_service_category_grouper
+  - name: financial_pmpm__stg_member_months
     config:
-      tags: pmpm
+      tags: financial_pmpm
+      materialized: ephemeral
+
+  - name: financial_pmpm__stg_service_category_grouper
+    config:
+      tags: financial_pmpm
       materialized: ephemeral
 
