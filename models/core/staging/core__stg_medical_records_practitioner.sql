@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('medical_records_enabled',var('tuva_marts_enabled',True))
+     enabled = var('medical_records_enabled',var('tuva_marts_enabled',False))
    )
 }}
 
