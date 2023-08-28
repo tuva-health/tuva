@@ -1,6 +1,5 @@
 {{ config(
-     enabled = var('pmpm_enabled',var('tuva_marts_enabled',True))
-   )
+     enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True))))
 }}
 
 with service_cat_2 as (
@@ -9,7 +8,7 @@ select
 , year_month
 , service_category_2
 , sum(total_allowed) as total_allowed
-from {{ ref('pmpm__patient_spend_with_service_categories') }}
+from {{ ref('financial_pmpm__patient_spend_with_service_categories') }}
 group by 1,2,3
 )
 

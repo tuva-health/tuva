@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('pmpm_enabled',var('tuva_marts_enabled',True))
+     enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True)))
    )
 }}
 
@@ -61,17 +61,17 @@ SELECT
   COALESCE(e.outpatient_rehabilitation_allowed, 0) AS outpatient_rehabilitation_allowed,
   COALESCE(e.skilled_nursing_allowed, 0) AS skilled_nursing_allowed,
   COALESCE(e.urgent_care_allowed, 0) AS urgent_care_allowed
-FROM {{ ref('pmpm__stg_member_months') }} a
-left join {{ ref('pmpm__service_category_1_paid_pivot') }} b
+FROM {{ ref('financial_pmpm__stg_member_months') }} a
+left join {{ ref('financial_pmpm__service_category_1_paid_pivot') }} b
   on a.patient_id = b.patient_id
   and a.year_month = b.year_month
-left join {{ ref('pmpm__service_category_2_paid_pivot') }} c
+left join {{ ref('financial_pmpm__service_category_2_paid_pivot') }} c
   on a.patient_id = c.patient_id
   and a.year_month = c.year_month
-left join {{ ref('pmpm__service_category_1_allowed_pivot') }} d
+left join {{ ref('financial_pmpm__service_category_1_allowed_pivot') }} d
   on a.patient_id = d.patient_id
   and a.year_month = d.year_month
-left join {{ ref('pmpm__service_category_2_allowed_pivot') }} e
+left join {{ ref('financial_pmpm__service_category_2_allowed_pivot') }} e
   on a.patient_id = e.patient_id
   and a.year_month = e.year_month 
 )

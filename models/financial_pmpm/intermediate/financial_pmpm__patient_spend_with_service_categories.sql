@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('pmpm_enabled',var('tuva_marts_enabled',True))
+     enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True)))
    )
 }}
 
@@ -11,8 +11,8 @@ select
 , coalesce(a.claim_start_date,a.claim_end_date) as claim_date
 , a.paid_amount
 , a.allowed_amount
-from {{ ref('pmpm__stg_medical_claim') }} a
-inner join {{ ref('pmpm__stg_service_category_grouper') }} b
+from {{ ref('financial_pmpm__stg_medical_claim') }} a
+inner join {{ ref('financial_pmpm__stg_service_category_grouper') }} b
   on a.claim_id = b.claim_id
   and a.claim_line_number = b.claim_line_number
 )
@@ -36,7 +36,7 @@ select
 , dispensing_date as claim_date
 , paid_amount
 , allowed_amount
-from {{ ref('pmpm__stg_pharmacy_claim') }} 
+from {{ ref('financial_pmpm__stg_pharmacy_claim') }} 
 )
 
 , rx_claims_year_month as (

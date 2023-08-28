@@ -1,5 +1,5 @@
 {{ config(
-   enabled = var('pmpm_enabled',var('tuva_marts_enabled',True))
+   enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True)))
 )}}
 
 SELECT 
@@ -56,5 +56,5 @@ SELECT
   SUM(skilled_nursing_allowed) / COUNT(1) AS skilled_nursing_allowed,
   SUM(urgent_care_allowed) / COUNT(1) AS urgent_care_allowed,
   '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('pmpm__pmpm_prep') }} a
+FROM {{ ref('financial_pmpm__pmpm_prep') }} a
 GROUP BY 1

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('member_months_enabled',var('tuva_marts_enabled',True))
+     enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True)))
    )
 }}
 
@@ -19,7 +19,7 @@ select distinct
 , year_month
 , a.payer
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('member_months__stg_eligibility') }} a
+from {{ ref('financial_pmpm__stg_eligibility') }} a
 inner join month_start_and_end_dates b
   on a.enrollment_start_date <= b.month_end_date
   and a.enrollment_end_date >= b.month_start_date
