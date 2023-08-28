@@ -4,11 +4,11 @@
 }}
 
 
-{% if var('claims_enabled') == true and var('clinical_enabled') == false -%}
+{% if var('claims_enabled') == true -%}
 
 select * from {{ ref('core__stg_claims_patient') }}
 
-{% elif var('clinical_enabled') == true and var('claims_enabled') == false -%}
+{% elif var('clinical_enabled') == true -%}
 
 select * from {{ ref('core__stg_clinical_patient') }}
 
