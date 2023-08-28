@@ -9,4 +9,4 @@ select
 , enrollment_end_date
 , payer
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('eligibility') }} 
+from {{ ref('core__eligibility') }} 

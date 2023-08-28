@@ -10,4 +10,4 @@ SELECT
 , paid_amount
 , allowed_amount
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('pharmacy_claim') }}
+from {{ ref('core__pharmacy_claim') }}
