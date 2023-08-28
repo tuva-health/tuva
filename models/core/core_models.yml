@@ -2,6 +2,204 @@ version: 2
 
 models:
 ## Final
+
+  - name: core__condition
+    description: Core condition table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: condition
+      tags: core
+      materialized: table
+    columns:
+      - name: encounter_id
+        description: Unique encounter_id for each encounter.
+      - name: claim_id
+        description: Unique claim_id for each claim.
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: condition_date
+        description: Date in which the condition occured.
+      - name: condition_type
+        description: The type of condition.
+      - name: code_type
+        description: The type of condition code.
+        meta:
+          terminology: /terminology/tuva-concepts/code-type
+      - name: code
+        description: The condition code.
+        meta:
+          terminology: /terminology/conditions-and-procedures/icd-10-cm
+      - name: description
+        description: Description of the condition code.
+      - name: diagnosis_rank
+        description: The numerical ranking of a diagnosis code in a claim.
+        data_type: integer
+      - name: present_on_admit_code
+        description: The present_on_admit_code related to the condition.
+        meta:
+          terminology: /terminology/administrative-codes/present-on-admission
+      - name: present_on_admit_description
+        description: The description of the present_on_admit_code for the condition.
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
+
+  - name: core__eligibility
+    description: Core eligibility table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: eligibility
+      tags: core
+      materialized: table
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: gender
+        description: Biological sex of the patient.
+        meta:
+          terminology: /terminology/demographics/gender
+      - name: race
+        description: Race of the patient.
+        meta:
+          terminology: /terminology/demographics/race
+      - name: birth_date
+        description: Date the patient was born.
+      - name: death_date
+        description: Date the patient died.
+      - name: death_flag
+        description: Indicates whether the patient has died.
+        data_type: boolean
+      - name: enrollment_start_date
+        description: Date the patient's insurance eligibility began.
+      - name: enrollment_end_date
+        description: Date the patient's insurance eligibility ended.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: payer_type
+        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
+        meta:
+          terminology: /terminology/tuva-concepts/payer-type
+      - name: dual_status_code
+        description: Indicates whether the patient is dually eligible for Medicare and Medicaid.
+        meta:
+          terminology: /terminology/administrative-codes/medicare-dual-eligibility
+      - name: medicare_status_code
+        description: Indicates how the patient became eligible for Medicare.
+        meta:
+          terminology: /terminology/administrative-codes/medicare-status
+      - name: first_name
+        description: Patient's first name.
+      - name: last_name
+        description: Patient's last name.
+      - name: address
+        description: Patient's street address.
+      - name: city
+        description: Patient's city of address.
+      - name: state
+        description: State the patient lives in (most recent known address)
+      - name: zip_code
+        description: Zip code the patient lives in (most recent known address).
+      - name: phone
+        description: Patient's phone number.
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
+
+  - name: core__encounter
+    description: Core encounter table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: encounter
+      tags: core
+      materialized: table
+    columns:
+      - name: encounter_id
+        description: Unique identifier for an encounter.
+      - name: patient_id
+        description: Unique identifier for a person across all datasets.
+      - name: encounter_type
+        description: Type of encounter.
+        meta:
+          terminology: /terminology/tuva-concepts/encounter-type
+      - name: encounter_start_date
+        description: Date when the encounter started.
+      - name: encounter_end_date
+        description: Date when the encounter ended.
+      - name: admit_source_code
+        description: Admission source code for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/admit-source
+      - name: admit_source_description
+        description: Description of the admit_source_code for the encounter.
+      - name: admit_type_code
+        description: Admission type code for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/admit-type
+      - name: admit_type_description
+        description: Description of the admit_type_code for the encounter.
+      - name: discharge_disposition_code
+        description: Discharge disposition code for the encounter.
+        meta:
+          terminology: /terminology/administrative-codes/discharge-disposition
+      - name: discharge_disposition_description
+        description: Description of the discharge_disposition_code for the encounter.
+      - name: rendering_npi
+        description: Rendering NPI for the encounter (typically represents the physician or entity providing services).
+        meta:
+          terminology: /terminology/providers/provider
+      - name: billing_npi
+        description: Billing NPI for the encounter (typically represents organization billing the claim).
+        meta:
+          terminology: /terminology/providers/provider
+      - name: facility_npi
+        description: Facility NPI for the encounter (typically represents the facility where services were performed).
+        meta:
+          terminology: /terminology/providers/provider
+      - name: ms_drg_code
+        description: MS-DRG code for the encounter.
+        meta:
+          terminology: /terminology/conditions-and-procedures/ms-drg
+      - name: ms_drg_description
+        description: Description of the ms_drg_code.
+      - name: apr_drg_code
+        description: APR-DRG code for the encounter.
+        meta:
+          terminology: /terminology/conditions-and-procedures/ms-drg
+      - name: apr_drg_description
+        description: Description of the APR-DRG code.
+      - name: paid_date
+        description: The pay date for the encounter.
+      - name: paid_amount
+        description: The total amount paid for the encounter by the insurer.
+      - name: allowed_amount
+        description: The total amount allowed (includes amount paid by the insurer and patient) on the encounter.
+      - name: charge_amount
+        description: The total amount charged on the encounter by the provider.
+      - name: total_cost_amount
+        description: The total amount paid on the encounter by different parties.
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
+
+  - name: core__lab_result
+    description: Core encounter table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: lab_result
+      tags: core
+      materialized: table
+
+
   - name: core__medical_claim
     description: Core medical_claim table
     config:
@@ -134,82 +332,26 @@ models:
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
-  - name: core__encounter
+  - name: core__medication
     description: Core encounter table
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: encounter
+      alias: medication
       tags: core
       materialized: table
-    columns:
-      - name: encounter_id
-        description: Unique identifier for an encounter.
-      - name: patient_id
-        description: Unique identifier for a person across all datasets.
-      - name: encounter_type
-        description: Type of encounter.
-        meta:
-          terminology: /terminology/tuva-concepts/encounter-type
-      - name: encounter_start_date
-        description: Date when the encounter started.
-      - name: encounter_end_date
-        description: Date when the encounter ended.
-      - name: admit_source_code
-        description: Admission source code for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/admit-source
-      - name: admit_source_description
-        description: Description of the admit_source_code for the encounter.
-      - name: admit_type_code
-        description: Admission type code for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/admit-type
-      - name: admit_type_description
-        description: Description of the admit_type_code for the encounter.
-      - name: discharge_disposition_code
-        description: Discharge disposition code for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/discharge-disposition
-      - name: discharge_disposition_description
-        description: Description of the discharge_disposition_code for the encounter.
-      - name: rendering_npi
-        description: Rendering NPI for the encounter (typically represents the physician or entity providing services).
-        meta:
-          terminology: /terminology/providers/provider
-      - name: billing_npi
-        description: Billing NPI for the encounter (typically represents organization billing the claim).
-        meta:
-          terminology: /terminology/providers/provider
-      - name: facility_npi
-        description: Facility NPI for the encounter (typically represents the facility where services were performed).
-        meta:
-          terminology: /terminology/providers/provider
-      - name: ms_drg_code
-        description: MS-DRG code for the encounter.
-        meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
-      - name: ms_drg_description
-        description: Description of the ms_drg_code.
-      - name: apr_drg_code
-        description: APR-DRG code for the encounter.
-        meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
-      - name: apr_drg_description
-        description: Description of the APR-DRG code.
-      - name: paid_date
-        description: The pay date for the encounter.
-      - name: paid_amount
-        description: The total amount paid for the encounter by the insurer.
-      - name: allowed_amount
-        description: The total amount allowed (includes amount paid by the insurer and patient) on the encounter.
-      - name: charge_amount
-        description: The total amount charged on the encounter by the provider.
-      - name: total_cost_amount
-        description: The total amount paid on the encounter by different parties.
-      - name: data_source
-        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+
+
+  - name: core__observation
+    description: Core encounter table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: observation
+      tags: core
+      materialized: table
 
 
   - name: core__patient
@@ -253,85 +395,6 @@ models:
         description: The zip code for the patient.
       - name: phone
         description: The phone number for the patient.
-      - name: data_source
-        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
-
-
-  - name: core__condition
-    description: Core condition table
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: condition
-      tags: core
-      materialized: table
-    columns:
-      - name: encounter_id
-        description: Unique encounter_id for each encounter.
-      - name: claim_id
-        description: Unique claim_id for each claim.
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: condition_date
-        description: Date in which the condition occured.
-      - name: condition_type
-        description: The type of condition.
-      - name: code_type
-        description: The type of condition code.
-        meta:
-          terminology: /terminology/tuva-concepts/code-type
-      - name: code
-        description: The condition code.
-        meta:
-          terminology: /terminology/conditions-and-procedures/icd-10-cm
-      - name: description
-        description: Description of the condition code.
-      - name: diagnosis_rank
-        description: The numerical ranking of a diagnosis code in a claim.
-        data_type: integer
-      - name: present_on_admit_code
-        description: The present_on_admit_code related to the condition.
-        meta:
-          terminology: /terminology/administrative-codes/present-on-admission
-      - name: present_on_admit_description
-        description: The description of the present_on_admit_code for the condition.
-      - name: data_source
-        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
-
-
-  - name: core__procedure
-    description: Core procedure table
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: procedure
-      tags: core
-      materialized: table
-    columns:
-      - name: encounter_id
-        description: The encounter_id for the encounter where this procedure was performed.
-      - name: claim_id
-        description: The claim on which the procedure was recorded.
-      - name: patient_id
-        description: Unique identifier for each person across all datasets.
-      - name: procedure_date
-        description: Date when the procedure was performed.
-      - name: code_type
-        description: Type of procedure code for the procedure.
-        meta:
-          terminology: /terminology/tuva-concepts/code-type
-      - name: code
-        description: The procedure code.
-        meta:
-          terminology: /terminology/conditions-and-procedures/icd-10-pcs
-      - name: description
-        description: Description of the procedure code.
-      - name: practitioner_npi
-        description: NPI of the provider who performed the procedure.
-        meta:
-          terminology: /terminology/providers/provider
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
@@ -385,72 +448,6 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
-
-  - name: core__eligibility
-    description: Core eligibility table
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: eligibility
-      tags: core
-      materialized: table
-    columns:
-      - name: patient_id
-        description: Unique identifier for each patient in the dataset.
-      - name: member_id
-        description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
-      - name: gender
-        description: Biological sex of the patient.
-        meta:
-          terminology: /terminology/demographics/gender
-      - name: race
-        description: Race of the patient.
-        meta:
-          terminology: /terminology/demographics/race
-      - name: birth_date
-        description: Date the patient was born.
-      - name: death_date
-        description: Date the patient died.
-      - name: death_flag
-        description: Indicates whether the patient has died.
-        data_type: boolean
-      - name: enrollment_start_date
-        description: Date the patient's insurance eligibility began.
-      - name: enrollment_end_date
-        description: Date the patient's insurance eligibility ended.
-      - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
-      - name: payer_type
-        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
-        meta:
-          terminology: /terminology/tuva-concepts/payer-type
-      - name: dual_status_code
-        description: Indicates whether the patient is dually eligible for Medicare and Medicaid.
-        meta:
-          terminology: /terminology/administrative-codes/medicare-dual-eligibility
-      - name: medicare_status_code
-        description: Indicates how the patient became eligible for Medicare.
-        meta:
-          terminology: /terminology/administrative-codes/medicare-status
-      - name: first_name
-        description: Patient's first name.
-      - name: last_name
-        description: Patient's last name.
-      - name: address
-        description: Patient's street address.
-      - name: city
-        description: Patient's city of address.
-      - name: state
-        description: State the patient lives in (most recent known address)
-      - name: zip_code
-        description: Zip code the patient lives in (most recent known address).
-      - name: phone
-        description: Patient's phone number.
-      - name: data_source
-        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
-
-
   - name: core__practitioner
     description: Core provider table with all providers in the claims dataset
     config:
@@ -494,6 +491,42 @@ models:
       - name: deactivation_flag
         description: Flag indicating if this NPI was deactivated.
         data_type: boolean
+
+
+  - name: core__procedure
+    description: Core procedure table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: procedure
+      tags: core
+      materialized: table
+    columns:
+      - name: encounter_id
+        description: The encounter_id for the encounter where this procedure was performed.
+      - name: claim_id
+        description: The claim on which the procedure was recorded.
+      - name: patient_id
+        description: Unique identifier for each person across all datasets.
+      - name: procedure_date
+        description: Date when the procedure was performed.
+      - name: code_type
+        description: Type of procedure code for the procedure.
+        meta:
+          terminology: /terminology/tuva-concepts/code-type
+      - name: code
+        description: The procedure code.
+        meta:
+          terminology: /terminology/conditions-and-procedures/icd-10-pcs
+      - name: description
+        description: Description of the procedure code.
+      - name: practitioner_npi
+        description: NPI of the provider who performed the procedure.
+        meta:
+          terminology: /terminology/providers/provider
+      - name: data_source
+        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
 
 
