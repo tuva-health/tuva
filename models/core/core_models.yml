@@ -993,84 +993,84 @@ models:
 
 
 
-## Staging - Medical Records
+## Staging - Clinical
 
-  - name: core__stg_medical_records_condition
+  - name: core__stg_clinical_condition
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_condition
+      alias: _stg_clinical_condition
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_encounter
+  - name: core__stg_clinical_encounter
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_encounter
+      alias: _stg_clinical_encounter
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_lab_result
+  - name: core__stg_clinical_lab_result
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_lab_result
+      alias: _stg_clinical_lab_result
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_medication
+  - name: core__stg_clinical_medication
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_medication
+      alias: _stg_clinical_medication
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_observation
+  - name: core__stg_clinical_observation
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_observation
+      alias: _stg_clinical_observation
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_patient
+  - name: core__stg_clinical_patient
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_patient
+      alias: _stg_clinical_patient
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_practitioner
+  - name: core__stg_clinical_practitioner
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_practitioner
+      alias: _stg_clinical_practitioner
       tags: core_stage_clinical
       materialized: view
 
-  - name: core__stg_medical_records_procedure
+  - name: core__stg_clinical_procedure
     description: |
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: _stg_medical_records_procedure
+      alias: _stg_clinical_procedure
       tags: core_stage_clinical
       materialized: view
