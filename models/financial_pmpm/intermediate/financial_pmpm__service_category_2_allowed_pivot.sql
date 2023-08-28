@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True))))
+     enabled = var('financial_pmpm_enabled',var('claims_enabled',var('tuva_marts_enabled',True)))
+    )
 }}
 
 with service_cat_2 as (
