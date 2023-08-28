@@ -10,12 +10,12 @@ select * from {{ ref('core__stg_claims_condition') }}
 
 {% elif var('clinical_enabled') == true and var('claims_enabled') == false -%}
 
-select * from {{ ref('core__stg_medical_records_condition') }}
+select * from {{ ref('core__stg_clinical_condition') }}
 
 {% else %}
 
 select * from {{ ref('core__stg_claims_condition') }}
 union all
-select * from {{ ref('core__stg_medical_records_condition') }}
+select * from {{ ref('core__stg_clinical_condition') }}
 
 {%- endif %}
