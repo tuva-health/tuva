@@ -32,4 +32,4 @@ select
     , ordering_practitioner_id
     , data_source
     , tuva_last_run
-from {{ ref('core_stage_clinical__lab_result') }}
+from {{ ref('lab_result') }}

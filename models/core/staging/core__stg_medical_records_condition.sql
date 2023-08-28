@@ -24,4 +24,4 @@ select
     , present_on_admit_description
     , data_source
     , tuva_last_run
-from {{ ref('core_stage_clinical__condition') }}
+from {{ ref('condition') }}

@@ -26,4 +26,4 @@ select
     , normalized_reference_range_high
     , data_source
     , tuva_last_run
-from {{ ref('core_stage_clinical__observation') }}
+from {{ ref('observation') }}

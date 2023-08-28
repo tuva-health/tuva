@@ -21,4 +21,4 @@ select
     , longitude
     , data_source
     , tuva_last_run
-from {{ ref('core_stage_clinical__patient') }}
+from {{ ref('patient') }}

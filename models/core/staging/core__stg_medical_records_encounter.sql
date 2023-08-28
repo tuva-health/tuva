@@ -29,4 +29,4 @@ select
     , charge_amount
     , data_source
     , tuva_last_run
-from {{ ref('core_stage_clinical__encounter') }}
+from {{ ref('encounter') }}
