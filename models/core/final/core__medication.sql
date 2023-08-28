@@ -4,4 +4,4 @@
 }}
 
 
-select * from {{ ref('core__stg_medical_records_medication')}}
+select * from {{ ref('core__stg_clinical_medication')}}

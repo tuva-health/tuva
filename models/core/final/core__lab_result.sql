@@ -3,4 +3,4 @@
    )
 }}
 
-select * from {{ ref('core__stg_medical_records_lab_result')}}
+select * from {{ ref('core__stg_clinical_lab_result')}}
