@@ -199,6 +199,16 @@ models:
       tags: core
       materialized: table
 
+  - name: core__location
+    description: Core encounter table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: location
+      tags: core
+      materialized: table
+
 
   - name: core__medical_claim
     description: Core medical_claim table
@@ -740,6 +750,15 @@ models:
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
 
+  - name: core__stg_claims_location
+    description: Core patient table
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _stg_claims_location
+      tags: core_stage_claims
+      materialized: view
 
   - name: core__stg_claims_patient
     description: Core patient table
@@ -1055,6 +1074,16 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_lab_result
+      tags: core_stage_clinical
+      materialized: view
+
+  - name: core__stg_clinical_location
+    description: |
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _stg_clinical_location
       tags: core_stage_clinical
       materialized: view
 
