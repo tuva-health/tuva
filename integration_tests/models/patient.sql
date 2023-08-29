@@ -16,4 +16,4 @@ null as patient_id
 , null as longitude
 , null as data_source
 , null as tuva_last_run
-where 1=0
+limit 0

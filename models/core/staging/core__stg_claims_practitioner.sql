@@ -31,6 +31,7 @@ select aa.*, bb.data_source
 from {{ ref('terminology__provider') }} aa
 inner join all_providers_in_claims_dataset bb
 on aa.npi = bb.npi
+where lower(aa.entity_type_description) = 'individual'
 )
 
 
