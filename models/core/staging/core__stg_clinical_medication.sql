@@ -14,8 +14,8 @@ select
     , source_description
     , ndc_code
     , ndc_description
-    , rx_norm_code
-    , rx_norm_description
+    , rxnorm_code
+    , rxnorm_description
     , atc_code
     , atc_description
     , route
