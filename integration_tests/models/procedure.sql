@@ -18,4 +18,4 @@ select
 , null as practitioner_id
 , null as data_source
 , null as tuva_last_run
-where 1=0
+limit 0

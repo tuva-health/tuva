@@ -20,4 +20,4 @@ null as observation_id
 , null as normalized_reference_range_high
 , null as data_source
 , null as tuva_last_run
-where 1=0
+limit 0

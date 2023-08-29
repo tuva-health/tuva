@@ -19,4 +19,4 @@ select
 , null as present_on_admit_description
 , null as data_source
 , null as tuva_last_run
-where 1 = 0
+limit 0
