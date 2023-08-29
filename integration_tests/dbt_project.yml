@@ -8,13 +8,13 @@ vars:
 
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
-  test_data_override: true
+  test_data_override: false
 
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: medicare_lds_five_percent
-  input_schema: input_layer
+  input_database: dev_thuxuan
+  input_schema: tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
   ## All Tuva Data Marts
@@ -25,16 +25,16 @@ vars:
   # By default, all models are disabled.
   # Use the vars below to turn enabled or disable the pieces of The Tuva Project 
   #    that work for your data.
-  # clinical_enabled: true  ## All models related to clinical data are turned on
+  clinical_enabled: true  ## All models related to clinical data are turned on
   # claims_enabled: true  ## All models related to claims data are turned on **/
   # claims_preprocessing_enabled: true  ## Only models that preprocess claims data are turned on **/
-  ccsr_enabled: true
+  # ccsr_enabled: true
   # cms_chronic_conditions_enabled: true
   # tuva_chronic_conditions_enabled: true
   # cms_hcc_enabled: true
   # financial_pmpm_enabled: true
-  # quality_measures_enabled: true
-  # readmission_enabled: true
+  # quality_measures_reporting_enabled: true
+  # readmissions_enabled: true
 
 
 model-paths: ["models"]

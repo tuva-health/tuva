@@ -6,15 +6,12 @@
 with claims_with_service_categories as (
 select 
   a.patient_id
-, b.service_category_1
-, b.service_category_2
+, a.service_category_1
+, a.service_category_2
 , coalesce(a.claim_start_date,a.claim_end_date) as claim_date
 , a.paid_amount
 , a.allowed_amount
 from {{ ref('financial_pmpm__stg_medical_claim') }} a
-inner join {{ ref('financial_pmpm__stg_service_category_grouper') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_line_number = b.claim_line_number
 )
 
 , medical_claims_year_month as (

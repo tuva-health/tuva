@@ -11,6 +11,7 @@ select
     discharge_disposition_code,
     facility_npi,
     ms_drg_code,
-    total_paid_amount,
+    paid_amount as total_paid_amount,
     '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('acute_inpatient__summary') }}
+from {{ ref('core__encounter') }}
+where encounter_type = 'acute inpatient'
