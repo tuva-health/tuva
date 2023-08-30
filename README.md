@@ -5,16 +5,14 @@
 The Tuva Project is a collection of data marts and terminology code sets that transform healthcare data for analytics.
 
 **Data Marts:**
-- [Acute Inpatient](models/acute_inpatient)
 - [CCSR](models/ccsr)
 - [Chronic Conditions](models/chronic_conditions)
+- [Claims Preprocessing](models/claims_preprocessing)
 - [CMS-HCCs](models/cms_hcc)
 - [Core](models/core)
-- [Data Profiling](models/data_profiling)
-- [Member Months](models/member_months)
-- [PMPM](models/pmpm)
+- [Financial PMPM](models/financial_pmpm)
+- [Qualtity Measures](models/quality_measures)
 - [Readmissions](models/readmissions)
-- [Service Category](models/service_category)
 
 You can find all the terminology sets **[here](seeds/terminology)**.  In many cases the actual terminology code sets are too large to maintain on GitHub, so we main them in an AWS S3 bucket.  However when you run the Tuva Project they are loaded into data warehouse just as they would be as if they were seed files.
 <br/><br/>
