@@ -11,7 +11,7 @@ The Tuva Project is a collection of data marts and terminology code sets that tr
 - [CMS-HCCs](models/cms_hcc)
 - [Core](models/core)
 - [Financial PMPM](models/financial_pmpm)
-- [Qualtity Measures](models/quality_measures)
+- [Quality Measures](models/quality_measures)
 - [Readmissions](models/readmissions)
 
 You can find all the terminology sets **[here](seeds/terminology)**.  In many cases the actual terminology code sets are too large to maintain on GitHub, so we main them in an AWS S3 bucket.  However when you run the Tuva Project they are loaded into data warehouse just as they would be as if they were seed files.
