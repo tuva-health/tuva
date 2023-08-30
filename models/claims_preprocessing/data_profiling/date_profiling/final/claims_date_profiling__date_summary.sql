@@ -4,7 +4,7 @@
 }}
 
 select
-  coalesce(a.year_month,b.year_month,c.year_month) as year_month
+  coalesce(a.year_month,b.year_month) as year_month
 , a.claim_start_date as claim_start_date
 , a.claim_end_date as claim_end_date
 , a.admission_date as admission_date

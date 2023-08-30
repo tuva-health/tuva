@@ -4,8 +4,7 @@
 }}
 
 
-{% if var('claims_enabled', false) == true -%}
-
+{% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
 
 select * from {{ ref('core__stg_claims_condition') }}
 union all
@@ -15,7 +14,7 @@ select * from {{ ref('core__stg_clinical_condition') }}
 
 select * from {{ ref('core__stg_clinical_condition') }}
 
-{% elif var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
+{% elif var('claims_enabled', false) == true -%}
 
 select * from {{ ref('core__stg_claims_condition') }}
 

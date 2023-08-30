@@ -3,8 +3,7 @@
    )
 }}
 
-
-{% if var('claims_enabled', false) == true -%}
+{% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true-%}
 
 select * from {{ ref('core__stg_claims_practitioner') }}
 union all
@@ -14,7 +13,7 @@ select * from {{ ref('core__stg_clinical_practitioner') }}
 
 select * from {{ ref('core__stg_clinical_practitioner') }}
 
-{% elif var('clinical_enabled', false) == true and var('claims_enabled', false) == true-%}
+{% elif var('claims_enabled', false) == true -%}
 
 select * from {{ ref('core__stg_claims_practitioner') }}
 
