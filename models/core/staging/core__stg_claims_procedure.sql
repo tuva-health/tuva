@@ -480,6 +480,7 @@ select distinct
     unpivot_cte.modifier_2,
     unpivot_cte.modifier_3,
     unpivot_cte.modifier_4,
+    null as modifier_5,
     unpivot_cte.practitioner_npi as practitioner_id,
     unpivot_cte.data_source as data_source,
     '{{ var('tuva_last_run')}}' as tuva_last_run

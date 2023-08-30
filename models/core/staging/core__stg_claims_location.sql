@@ -37,6 +37,7 @@ select
     , parent_organization_name as parent_organization
     , practice_address_line_1 as address
     , practice_city as city
+    , practice_state as state
     , practice_zip_code as zip_code
     , null as latitude
     , null as longitude
