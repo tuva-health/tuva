@@ -1,11 +1,10 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+     enabled = var('claims_preprocessing',var('claims_enabled',var('tuva_marts_enabled',False))
    )
 }}
 
 select
   coalesce(a.year_month,b.year_month,c.year_month) as year_month
-, c.member_months
 , a.claim_start_date as claim_start_date
 , a.claim_end_date as claim_end_date
 , a.admission_date as admission_date
@@ -17,14 +16,11 @@ select
 from {{ ref('claims_date_profiling__medical_claim_dates') }} a
 full join {{ ref('claims_date_profiling__pharmacy_claim_dates') }} b
     on a.year_month = b.year_month
-full join {{ ref('claims_date_profiling__member_months_count') }} c
-    on a.year_month = c.year_month
 
 union all
 
 select 
   'Duplicate' as year_month
-, null as member_months
 , c.claim_start_date
 , c.claim_end_date
 , c.admission_date
