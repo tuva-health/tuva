@@ -17,16 +17,18 @@ vars:
   input_schema: tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
-  ## All Tuva Data Marts
-  #tuva_marts_enabled: true
-
   
   ## The Tuva Project can support claims and clinical data.  
   # By default, all models are disabled.
-  # Use the vars below to enabled or disable the pieces of The Tuva Project 
-  #    as needed.
+  # Use the vars below to enabled or disable sections of The Tuva Project.
+
+  ## The vars directly below enable all models related to the type of healthcare data being used
   # clinical_enabled: true
   # claims_enabled: true
+
+  ## The vars directly below enable a single data mart.  See the Quickstart section of
+  # thetuvaproject.com for instructions.
+
   # claims_preprocessing_enabled: true
   # ccsr_enabled: true
   # cms_chronic_conditions_enabled: true
