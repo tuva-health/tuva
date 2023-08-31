@@ -2,7 +2,7 @@
 version: 2
 
 models:
-
+#### Acute Inpatient
 ## Final
 
   - name: acute_inpatient__summary
@@ -197,9 +197,9 @@ models:
 
 
 
-
+####  Data Profiling
 ## Intermediate
-####  medical claim
+# medical claim
 
   - name: data_profiling__claim_type_unmapped
     config:
@@ -502,8 +502,6 @@ models:
         data_type: integer
 
 
-
-
   - name: data_profiling__use_case
     config:
       schema: |
@@ -528,8 +526,75 @@ models:
 
 
 
+#### Date Profiling
+  - name: claims_date_profiling__medical_claim_dates
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_medical_claim_dates
+      tags: data_profiling
+      materialized: table
+
+  - name: claims_date_profiling__pharmacy_claim_dates
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_pharmacy_claim_dates
+      tags: data_profiling
+      materialized: table  
+
+  - name: claims_date_profiling__duplicate_dates
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_duplicate_dates
+      tags: data_profiling
+      materialized: table
+
+  - name: claims_date_profiling__date_summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: date_summary
+      tags: data_profiling
+      materialized: table
+
+  - name: claims_date_profiling__date_issues
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: date_issues
+      tags: data_profiling
+      materialized: table
+
+  - name: claims_date_profiling__claims_without_enrollment
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: claims_without_enrollment
+      tags: data_profiling
+      materialized: table
+
+  - name: claims_date_profiling__member_months_count
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: member_months_count
+      tags: data_profiling
+      materialized: table
 
 
+
+
+
+#### Service Category
 ##  Final
 
   - name: service_category__service_category_grouper
