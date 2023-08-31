@@ -1,48 +1,22 @@
 {{ config(
-     enabled = var('core_enabled',var('tuva_marts_enabled',True))
+     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
    )
 }}
 
--- *************************************************
--- This dbt model creates the provider table 
--- in core. It includes data about all providers
--- present in the raw claims dataset.
--- *************************************************
+{% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true-%}
 
-
-with all_providers_in_claims_dataset as (
-select distinct facility_npi as npi, data_source
-from {{ ref('core__medical_claim') }}
-
+select * from {{ ref('core__stg_claims_practitioner') }}
 union all
+select * from {{ ref('core__stg_clinical_practitioner') }}
 
-select distinct rendering_npi as npi, data_source
-from {{ ref('core__medical_claim') }}
+{% elif var('clinical_enabled', false) == true -%}
 
-union all
+select * from {{ ref('core__stg_clinical_practitioner') }}
 
-select distinct billing_npi as npi, data_source
-from {{ ref('core__medical_claim') }}
-),
+{% elif var('claims_enabled', false) == true -%}
 
+select * from {{ ref('core__stg_claims_practitioner') }}
 
-provider as (
-select aa.*, bb.data_source
-from {{ ref('terminology__provider') }} aa
-inner join all_providers_in_claims_dataset bb
-on aa.npi = bb.npi
-)
+{%- endif %}
 
 
-
-select 
-    npi as practitioner_id
-    , npi
-    , provider_first_name
-    , provider_last_name
-    , parent_organization_name as practice_affiliation
-    , primary_specialty_description as specialty
-    , null as sub_specialty
-    , data_source as data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from provider

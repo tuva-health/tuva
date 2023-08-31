@@ -1,57 +1,22 @@
 {{ config(
-     enabled = var('core_enabled',var('tuva_marts_enabled',True))
+     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
    )
 }}
 
--- *************************************************
--- This dbt model creates the patient table in core.
--- *************************************************
+{% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
+
+select * from {{ ref('core__stg_claims_patient') }}
+union all
+select * from {{ ref('core__stg_clinical_patient') }}
+
+{% elif var('clinical_enabled', false) == true -%}
+
+select * from {{ ref('core__stg_clinical_patient') }}
+
+{% elif var('claims_enabled', false) == true -%}
+
+select * from {{ ref('core__stg_claims_patient') }}
+
+{%- endif %}
 
 
-
-
-with patient_stage as(
-    select
-        patient_id
-        ,gender
-        ,race
-        ,birth_date
-        ,death_date
-        ,death_flag
-        ,first_name
-        ,last_name
-        ,address
-        ,city
-        ,state
-        ,zip_code
-        ,phone
-        ,data_source
-        ,row_number() over (
-	        partition by patient_id
-	        order by case when enrollment_end_date is null
-                then cast ('2050-01-01' as date)
-                else enrollment_end_date end DESC)
-            as row_sequence
-    from {{ ref('eligibility')}}
-)
-
-select
-    cast(patient_id as {{ dbt.type_string() }}) as patient_id
-    , cast(first_name as {{ dbt.type_string() }}) as first_name
-    , cast(last_name as {{ dbt.type_string() }}) as last_name
-    , cast(gender as {{ dbt.type_string() }}) as sex
-    , cast(race as {{ dbt.type_string() }}) as race
-    , cast(birth_date as date) as birth_date
-    , cast(death_date as date) as death_date
-    , cast(death_flag as int) as death_flag
-    , cast(address as {{ dbt.type_string() }}) as address
-    , cast(city as {{ dbt.type_string() }}) as city
-    , cast(state as {{ dbt.type_string() }}) as state
-    , cast(zip_code as {{ dbt.type_string() }}) as zip_code
-    , null as county
-    , null as latitude 
-    , null as logitude
-    ,cast(data_source as {{ dbt.type_string() }}) as data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from patient_stage
-where row_sequence = 1

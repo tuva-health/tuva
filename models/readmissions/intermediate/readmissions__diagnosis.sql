@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('readmissions_enabled',var('tuva_marts_enabled',True))
+     enabled = var('readmissions_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
 
@@ -13,6 +13,6 @@ select distinct
 ,   cast(a.condition_rank as integer) as diagnosis_rank
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('readmissions__stg_core__condition') }} a
-inner join  {{ ref('readmissions__stg_acute_inpatient__summary') }} b
+inner join  {{ ref('readmissions__stg_core__encounter') }} b
   on a.encounter_id = b.encounter_id
 where normalized_code_type = 'icd-10-cm'
