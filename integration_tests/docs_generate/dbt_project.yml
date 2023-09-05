@@ -21,7 +21,9 @@ vars:
 
   ## The vars directly below enable all models related to the type of healthcare data being used
   # clinical_enabled: true
-  claims_enabled: true
+#  claims_enabled: true
+  tuva_marts_enabled: true
+
 
 dispatch:
   - macro_namespace: dbt
@@ -53,18 +55,9 @@ models:
       acute_inpatient:
         +docs:
           node_color: "#0f3d0b"
-        staging:
-          +docs:
-            show: false
-        intermediate:
-          +docs:
-            show: false
-      core:
-        +docs:
-          node_color: "#0f3d0b"
-#          staging:
-#            +docs:
-#              show: false
+#        staging:
+#          +docs:
+#            show: false
 #        intermediate:
 #          +docs:
 #            show: false
@@ -83,31 +76,35 @@ models:
 #        staging:
 #          +docs:
 #            show: false
-        intermediate:
-          +docs:
-            show: false
-    analytics:
-      chronic_conditions:
-        +docs:
-          node_color: "#2e0e0e"
+#        intermediate:
+#          +docs:
+#            show: false
+#    analytics:
+    core:
+      +docs:
+        node_color: "#0f3d0b"
+
+    chronic_conditions:
+      +docs:
+        node_color: "#2e0e0e"
 #        staging:
 #          +docs:
 #            show: false
-      pmpm:
-        +docs:
-          node_color: "#abab26"
-        intermediate:
-          +docs:
-            show: false
-      readmissions:
-        +docs:
-          node_color: "#161a7d"
+    financial_pmpm:
+      +docs:
+        node_color: "#abab26"
+#        intermediate:
+#          +docs:
+#            show: false
+    readmissions:
+      +docs:
+        node_color: "#161a7d"
 #        staging:
 #          +docs:
 #            show: false
-        intermediate:
-          +docs:
-            show: false
+#        intermediate:
+#          +docs:
+#            show: false
 
 
 
