@@ -13,16 +13,34 @@ models:
       tags: core
       materialized: table
     columns:
+      - name: condition_id
+        description: Unique id for each condition.
+      - name: patient_id
+        description: Unique patient_id for each person.
       - name: encounter_id
         description: Unique encounter_id for each encounter.
       - name: claim_id
         description: Unique claim_id for each claim.
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: condition_date
-        description: Date in which the condition occured.
+      - name: recorded_date
+        description: Date in which the condition was recorded.
+      - name: onset_date
+        description: Reported date in when the condition began.
+      - name: resolved_date
+        description: Date in which the condition was resolved.
+      - name: status
+        description: Status of the condition.
       - name: condition_type
         description: The type of condition.
+      - name: source_code_type
+        description: The type of condition code reported in the source system.
+        meta:
+          terminology: /terminology/tuva-concepts/code-type
+      - name: code
+        description: The condition code.
+        meta:
+          terminology: /terminology/conditions-and-procedures/icd-10-cm
+      - name: description
+        description: Description of the condition code.
       - name: code_type
         description: The type of condition code.
         meta:
