@@ -4,17 +4,17 @@
 }}
 
 
-{% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
+{% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select * from {{ ref('core__stg_claims_condition') }}
 union all
 select * from {{ ref('core__stg_clinical_condition') }}
 
-{% elif var('clinical_enabled', false) == true -%}
+{% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select * from {{ ref('core__stg_clinical_condition') }}
 
-{% elif var('claims_enabled', false) == true -%}
+{% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select * from {{ ref('core__stg_claims_condition') }}
 
