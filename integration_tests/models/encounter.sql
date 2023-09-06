@@ -1,27 +1,27 @@
 select 
-null as encounter_id
-, null as patient_id
-, null as encounter_type
-, null as encounter_start_date
-, null as encounter_end_date
-, null as length_of_stay
-, null as admit_source_code
-, null as admit_source_description
-, null as admit_type_code
-, null as admit_type_description
-, null as discharge_disposition_code
-, null as discharge_disposition_description
-, null as attending_provider_id
-, null as facility_npi
-, null as primary_diagnosis_code
-, null as primary_diagnosis_description
-, null as ms_drg_code
-, null as ms_drg_description
-, null as apr_drg_code
-, null as apr_drg_description
-, null as paid_amount
-, null as allowed_amount
-, null as charge_amount
-, null as data_source
-, null as tuva_last_run
+cast(null as {{ dbt.type_string() }} ) as encounter_id
+, cast(null as {{ dbt.type_string() }} ) as patient_id
+, cast(null as {{ dbt.type_string() }} ) as encounter_type
+, {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as  as encounter_start_date
+, {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as  as encounter_end_date
+, cast(null as {{ dbt.type_int() }} ) as length_of_stay
+, cast(null as {{ dbt.type_string() }} ) as admit_source_code
+, cast(null as {{ dbt.type_string() }} ) as admit_source_description
+, cast(null as {{ dbt.type_string() }} ) as admit_type_code
+, cast(null as {{ dbt.type_string() }} ) as admit_type_description
+, cast(null as {{ dbt.type_string() }} ) as discharge_disposition_code
+, cast(null as {{ dbt.type_string() }} ) as discharge_disposition_description
+, cast(null as {{ dbt.type_string() }} ) as attending_provider_id
+, cast(null as {{ dbt.type_string() }} ) as facility_npi
+, cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_code
+, cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_description
+, cast(null as {{ dbt.type_string() }} ) as ms_drg_code
+, cast(null as {{ dbt.type_string() }} ) as ms_drg_description
+, cast(null as {{ dbt.type_string() }} ) as apr_drg_code
+, cast(null as {{ dbt.type_string() }} ) as apr_drg_description
+, cast(null as {{ dbt.type_float() }} ) as paid_amount
+, cast(null as {{ dbt.type_float() }} ) as allowed_amount
+, cast(null as {{ dbt.type_float() }} ) as charge_amount
+, cast(null as {{ dbt.type_string() }} ) as data_source
+, cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 limit 0
