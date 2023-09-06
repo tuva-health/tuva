@@ -510,28 +510,28 @@ where diagnosis_code_25 is not null
 )
 
 select distinct
-    null as condition_id,
-    unpivot_cte.patient_id,
-    eg.encounter_id,
-    unpivot_cte.claim_id,
-    unpivot_cte.condition_date as recorded_date,
-    null as onset_date,
-    null as resolved_date,
-    'active' as status,
-    unpivot_cte.condition_type as condition_type,
-    unpivot_cte.source_code_type as source_code_type,
-    unpivot_cte.source_code as source_code,
-    null as source_description,
-    case
+    cast(null as {{ dbt.type_string() }} ) as condition_id,
+    cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id,
+    cast(eg.encounter_id as {{ dbt.type_string() }} ) as encounter_id,
+    cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id,
+    {{ try_to_cast_date('unpivot_cte.condition_date', 'YYYY-MM-DD') }} as recorded_date,
+    {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as onset_date,
+    {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as resolved_date,
+    cast('active' as {{ dbt.type_string() }} ) as status,
+    cast(unpivot_cte.condition_type as {{ dbt.type_string() }} ) as condition_type,
+    cast(unpivot_cte.source_code_type as {{ dbt.type_string() }} ) as source_code_type,
+    cast(unpivot_cte.source_code as {{ dbt.type_string() }} ) as source_code,
+    cast(null as {{ dbt.type_string() }} ) as source_description,
+    cast(case
     when icd.icd_10_cm is not null then 'icd-10-cm'
-    end as normalized_code_type,
-    icd.icd_10_cm as normalized_code,
-    icd.description as normalized_description,
-    unpivot_cte.diagnosis_rank as condition_rank,
-    unpivot_cte.present_on_admit_code as present_on_admit_code,
-    poa.present_on_admit_description as present_on_admit_description,
-    unpivot_cte.data_source,
-    '{{ var('tuva_last_run')}}' as tuva_last_run
+    end as {{ dbt.type_string() }} ) as normalized_code_type,
+    cast(icd.icd_10_cm as {{ dbt.type_string() }} ) as normalized_code,
+    cast(icd.description as {{ dbt.type_string() }} ) as normalized_description,
+    cast(unpivot_cte.diagnosis_rank as {{ dbt.type_int() }} ) as condition_rank,
+    cast(unpivot_cte.present_on_admit_code as {{ dbt.type_string() }} ) as present_on_admit_code,
+    cast(poa.present_on_admit_description as {{ dbt.type_string() }} ) as present_on_admit_description,
+    cast(unpivot_cte.data_source as {{ dbt.type_string() }} ) as data_source,
+    cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from unpivot_cte
 left join {{ ref('acute_inpatient__encounter_data_for_medical_claims')}} as eg
     on  unpivot_cte.claim_id = eg.claim_id
