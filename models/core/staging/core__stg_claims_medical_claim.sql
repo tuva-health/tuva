@@ -14,45 +14,45 @@
 
 
 select
-    med.claim_id
-    , med.claim_line_number
-    , enc.encounter_id
-    , med.claim_type
-    , med.patient_id
-    , med.member_id
-    , med.claim_start_date
-    , med.claim_end_date
-    , med.claim_line_start_date
-    , med.claim_line_end_date
-    , med.admission_date
-    , med.discharge_date
-    , srv_group.service_category_1
-    , srv_group.service_category_2
-    , med.admit_source_code
-    , med.admit_type_code
-    , med.discharge_disposition_code
-    , med.place_of_service_code
-    , med.bill_type_code
-    , med.ms_drg_code
-    , med.apr_drg_code
-    , med.revenue_center_code
-    , med.service_unit_quantity
-    , med.hcpcs_code
-    , med.hcpcs_modifier_1
-    , med.hcpcs_modifier_2
-    , med.hcpcs_modifier_3
-    , med.hcpcs_modifier_4
-    , med.hcpcs_modifier_5
-    , med.rendering_npi
-    , med.billing_npi
-    , med.facility_npi
-    , med.paid_date
-    , med.paid_amount
-    , med.allowed_amount
-    , med.charge_amount
-    , med.total_cost_amount
-    , med.data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
+    , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
+    , cast(enc.encounter_id as {{ dbt.type_string() }} ) as encounter_id 
+    , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
+    , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
+    , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
+    , {{ try_to_cast_date('med.claim_start_date', 'YYYY-MM-DD') }} as claim_start_date
+    , {{ try_to_cast_date('med.claim_end_date', 'YYYY-MM-DD') }} as claim_end_date
+    , {{ try_to_cast_date('med.claim_line_start_date', 'YYYY-MM-DD') }} as claim_line_start_date
+    , {{ try_to_cast_date('med.claim_line_end_date', 'YYYY-MM-DD') }} as claim_line_end_date
+    , {{ try_to_cast_date('med.admission_date', 'YYYY-MM-DD') }} as admission_date
+    , {{ try_to_cast_date('med.discharge_date', 'YYYY-MM-DD') }} as discharge_date
+    , cast(srv_group.service_category_1 as {{ dbt.type_string() }} ) as service_category_1
+    , cast(srv_group.service_category_2 as {{ dbt.type_string() }} ) as service_category_2
+    , cast(med.admit_source_code as {{ dbt.type_string() }} ) as admit_source_code
+    , cast(med.admit_type_code as {{ dbt.type_string() }} ) as admit_type_code
+    , cast(med.discharge_disposition_code as {{ dbt.type_string() }} ) as discharge_disposition_code
+    , cast(med.place_of_service_code as {{ dbt.type_string() }} ) as place_of_service_code
+    , cast(med.bill_type_code as {{ dbt.type_string() }} ) as bill_type_code
+    , cast(med.ms_drg_code as {{ dbt.type_string() }} ) as ms_drg_code
+    , cast(med.apr_drg_code as {{ dbt.type_string() }} ) as apr_drg_code
+    , cast(med.revenue_center_code as {{ dbt.type_string() }} ) as revenue_center_code
+    , cast(med.service_unit_quantity as {{ dbt.type_int() }} ) as service_unit_quantity
+    , cast(med.hcpcs_code as {{ dbt.type_string() }} ) as hcpcs_code
+    , cast(med.hcpcs_modifier_1 as {{ dbt.type_string() }} ) as hcpcs_modifier_1
+    , cast(med.hcpcs_modifier_2 as {{ dbt.type_string() }} ) as hcpcs_modifier_2
+    , cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }} ) as hcpcs_modifier_3
+    , cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }} ) as hcpcs_modifier_4
+    , cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }} ) as hcpcs_modifier_5
+    , cast(med.rendering_npi as {{ dbt.type_string() }} ) as rendering_npi
+    , cast(med.billing_npi as {{ dbt.type_string() }} ) as billing_npi
+    , cast(med.facility_npi as {{ dbt.type_string() }} ) as facility_npi
+    , {{ try_to_cast_date('med.paid_date', 'YYYY-MM-DD') }} as paid_date
+    , cast(med.paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
+    , cast(med.allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
+    , cast(med.charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
+    , cast(med.total_cost_amount as {{ dbt.type_numeric() }} ) as total_cost_amount
+    , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('medical_claim') }} med
 inner join {{ ref('service_category__service_category_grouper') }} srv_group
     on med.claim_id = srv_group.claim_id

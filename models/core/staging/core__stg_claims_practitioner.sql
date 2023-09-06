@@ -37,13 +37,13 @@ where lower(aa.entity_type_description) = 'individual'
 
 
 select 
-    npi as practitioner_id
-    , npi
-    , provider_first_name
-    , provider_last_name
-    , parent_organization_name as practice_affiliation
-    , primary_specialty_description as specialty
-    , null as sub_specialty
-    , data_source as data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    cast(npi as {{ dbt.type_string() }} ) as practitioner_id
+    , cast(npi as {{ dbt.type_string() }} ) as npi
+    , cast(provider_first_name as {{ dbt.type_string() }} ) as provider_first_name
+    , cast(provider_last_name as {{ dbt.type_string() }} ) as provider_last_name
+    , cast(parent_organization_name as {{ dbt.type_string() }} ) as practice_affiliation
+    , cast(primary_specialty_description as {{ dbt.type_string() }} ) as specialty
+    , cast(null as {{ dbt.type_string() }} ) as sub_specialty
+    , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from provider

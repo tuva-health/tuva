@@ -4,24 +4,24 @@
 }}
 
 select
-    condition_id
-    , patient_id
-    , encounter_id
-    , claim_id
-    , recorded_date
-    , onset_date
-    , resolved_date
-    , status
-    , condition_type
-    , source_code_type
-    , source_code
-    , source_description
-    , normalized_code_type
-    , normalized_code
-    , normalized_description
-    , condition_rank
-    , present_on_admit_code
-    , present_on_admit_description
-    , data_source
-    , tuva_last_run
+    cast(condition_id as {{ dbt.type_string() }} ) as condition_id
+    , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
+    , cast(encounter_id as {{ dbt.type_string() }} ) as encounter_id
+    , cast(claim_id as {{ dbt.type_string() }} ) as claim_id
+    , {{ try_to_cast_date('recorded_date', 'YYYY-MM-DD') }} as recorded_date
+    , {{ try_to_cast_date('onset_date', 'YYYY-MM-DD') }} as onset_date
+    , {{ try_to_cast_date('resolved_date', 'YYYY-MM-DD') }} as resolved_date
+    , cast(status as {{ dbt.type_string() }} ) as status
+    , cast(condition_type as {{ dbt.type_string() }} ) as condition_type
+    , cast(source_code_type as {{ dbt.type_string() }} ) as source_code_type
+    , cast(source_code as {{ dbt.type_string() }} ) as source_code
+    , cast(source_description as {{ dbt.type_string() }} ) as source_description
+    , cast(normalized_code_type as {{ dbt.type_string() }} ) as normalized_code_type
+    , cast(normalized_code as {{ dbt.type_string() }} ) as normalized_code
+    , cast(normalized_description as {{ dbt.type_string() }} ) as normalized_description
+    , cast(condition_rank as {{ dbt.type_int() }} ) as condition_rank
+    , cast(present_on_admit_code as {{ dbt.type_string() }} ) as present_on_admit_code
+    , cast(present_on_admit_description as {{ dbt.type_string() }} ) as present_on_admit_description
+    , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast(tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('condition') }}
