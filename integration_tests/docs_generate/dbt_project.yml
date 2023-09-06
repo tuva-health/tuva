@@ -4,6 +4,25 @@ config-version: 2
 
 profile: 'default'
 
+vars:
+  test_data_override: true
+
+
+  ## Update these vars to use your own data as input, do not comment out
+  # enabled logic has been added to the sources config
+  input_database: tuva
+  input_schema: tuva_claims
+
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+
+  ## The Tuva Project can support claims and clinical data.
+  # By default, all models are disabled.
+  # Use the vars below to enabled or disable sections of The Tuva Project.
+
+  ## The vars directly below enable all models related to the type of healthcare data being used
+  # clinical_enabled: true
+#  claims_enabled: true
+  tuva_marts_enabled: true
 
 
 dispatch:
@@ -32,22 +51,13 @@ models:
     +docs:
       node_color: "#1a0707"
   the_tuva_project:
-    preprocessing:
-      claims_preprocessing:
+    claims_preprocessing:
+      acute_inpatient:
         +docs:
           node_color: "#0f3d0b"
 #        staging:
 #          +docs:
 #            show: false
-        intermediate:
-          +docs:
-            show: false
-      core:
-        +docs:
-          node_color: "#0f3d0b"
-#          staging:
-#            +docs:
-#              show: false
 #        intermediate:
 #          +docs:
 #            show: false
@@ -66,31 +76,35 @@ models:
 #        staging:
 #          +docs:
 #            show: false
-        intermediate:
-          +docs:
-            show: false
-    analytics:
-      chronic_conditions:
-        +docs:
-          node_color: "#2e0e0e"
+#        intermediate:
+#          +docs:
+#            show: false
+#    analytics:
+    core:
+      +docs:
+        node_color: "#0f3d0b"
+
+    chronic_conditions:
+      +docs:
+        node_color: "#2e0e0e"
 #        staging:
 #          +docs:
 #            show: false
-      pmpm:
-        +docs:
-          node_color: "#abab26"
-        intermediate:
-          +docs:
-            show: false
-      readmissions:
-        +docs:
-          node_color: "#161a7d"
+    financial_pmpm:
+      +docs:
+        node_color: "#abab26"
+#        intermediate:
+#          +docs:
+#            show: false
+    readmissions:
+      +docs:
+        node_color: "#161a7d"
 #        staging:
 #          +docs:
 #            show: false
-        intermediate:
-          +docs:
-            show: false
+#        intermediate:
+#          +docs:
+#            show: false
 
 
 

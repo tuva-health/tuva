@@ -13,28 +13,30 @@ vars:
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: medicare_lds_five_percent
-  input_schema: input_layer
+  input_database: tuva
+  input_schema: tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
-  ## All Tuva Data Marts
-  tuva_marts_enabled: true
-
   
-  ## Individual Tuva Data Marts
-  # acute_inpatient_enabled: false
-  # ccsr_enabled: false
-  # cms_chronic_conditions_enabled: false
-  # claims_date_profiling_enabled: false
-  # cms_hcc_enabled: false
-  # core_enabled: false
-  # data_profiling_enabled: false
-  # member_months_enabled: false
-  # pmpm_enabled: false
-  # quality_measures_reporting_enabled: false
-  # readmissions_enabled: false
-  # service_category_grouper_enabled: false
-  # tuva_chronic_conditions_enabled: false
+  ## The Tuva Project can support claims and clinical data.  
+  # By default, all models are disabled.
+  # Use the vars below to enabled or disable sections of The Tuva Project.
+
+  ## The vars directly below enable all models related to the type of healthcare data being used
+  clinical_enabled: true
+  claims_enabled: true
+
+  ## The vars directly below enable a single data mart.  See the Quickstart section of
+  # thetuvaproject.com for instructions.
+
+  # claims_preprocessing_enabled: true
+  # ccsr_enabled: true
+  # cms_chronic_conditions_enabled: true
+  # tuva_chronic_conditions_enabled: true
+  # cms_hcc_enabled: true
+  # financial_pmpm_enabled: true
+  # quality_measures_reporting_enabled: true
+  # readmissions_enabled: true
 
 
 model-paths: ["models"]
