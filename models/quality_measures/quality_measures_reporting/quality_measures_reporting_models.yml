@@ -405,18 +405,71 @@ models:
     description: Staging conditions from core.
     columns:
       - name: patient_id
-        description: Unique patient_id for each person.
         tests:
           - not_null:
               severity: warn
-      - name: condition_date
-        description: Date in which the condition occured.
-      - name: code_type
-        description: The type of condition code.
-      - name: code
-        description: The condition code.
-      - name: last_update
-        description: The date and timestamp of the dbt run.
+      - name: recorded_date
+      - name: source_code_type
+      - name: source_code
+      - name: normalized_code_type
+      - name: normalized_code
+      - name: tuva_last_run
+
+  - name: quality_measures_reporting__stg_core__encounter
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _stg_condition
+      tags: quality_measures_reporting
+      materialized: ephemeral
+    description: Staging encounters from core.
+    columns:
+      - name: patient_id
+        tests:
+          - not_null:
+              severity: warn
+      - name: encounter_type
+      - name: encounter_start_date
+      - name: encounter_end_date
+      - name: tuva_last_run
+
+  - name: quality_measures_reporting__stg_core__medication
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _stg_condition
+      tags: quality_measures_reporting
+      materialized: ephemeral
+    description: Staging medications from core.
+    columns:
+      - name: patient_id
+        tests:
+          - not_null:
+              severity: warn
+      - name: dispensing_date
+      - name: ndc_code
+      - name: rxnorm_code
+      - name: tuva_last_run
+
+  - name: quality_measures_reporting__stg_core__observation
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
+      alias: _stg_condition
+      tags: quality_measures_reporting
+      materialized: ephemeral
+    description: Staging medications from core.
+    columns:
+      - name: patient_id
+        tests:
+          - not_null:
+              severity: warn
+      - name: observation_date
+      - name: source_code_type
+      - name: source_code
+      - name: normalized_code_type
+      - name: normalized_code
+      - name: tuva_last_run
 
   - name: quality_measures_reporting__stg_core__patient
     config:
@@ -428,12 +481,10 @@ models:
     description: Staging eligibility from the input layer.
     columns:
       - name: patient_id
-        description: Unique patient_id for each person.
         tests:
           - not_null:
               severity: warn
-      - name: gender
-        description: Biological sex of the patient.
+      - name: sex
         tests:
           - not_null:
               severity: warn
@@ -441,14 +492,11 @@ models:
               values: ['female', 'male']
               severity: warn
       - name: birth_date
-        description: Date the patient was born.
         tests:
           - not_null:
               severity: warn
       - name: death_date
-        description: The death date of the patient if there is one.
-      - name: last_update
-        description: The date and timestamp of the dbt run.
+      - name: tuva_last_run
 
   - name: quality_measures_reporting__stg_core__procedure
     config:
@@ -460,18 +508,15 @@ models:
     description: Staging procedures from core.
     columns:
       - name: patient_id
-        description: Unique patient_id for each person.
         tests:
           - not_null:
               severity: warn
       - name: procedure_date
-        description: Date when the procedure was performed.
-      - name: code_type
-        description: The type of condition code.
-      - name: code
-        description: The condition code.
-      - name: last_update
-        description: The date and timestamp of the dbt run.
+      - name: source_code_type
+      - name: source_code
+      - name: normalized_code_type
+      - name: normalized_code
+      - name: tuva_last_run
 
   - name: quality_measures_reporting__stg_medical_claim
     config:
@@ -483,18 +528,11 @@ models:
     description: Staging medical claims from the input layer.
     columns:
       - name: patient_id
-        description: Unique patient_id for each person.
       - name: claim_start_date
-        description: Start date for the claim.
       - name: claim_end_date
-        description: End date for the claim.
       - name: place_of_service
-        description: Place of service for the claim (professional claims only).
       - name: hcpcs_code
-        description: HCPCS level 1 or level 2 code for the claim line.
-      - name: last_update
-        description: The date and timestamp of the dbt run.
-
+      - name: tuva_last_run
 
   - name: quality_measures_reporting__stg_pharmacy_claim
     config:
@@ -506,12 +544,7 @@ models:
     description: Staging pharmacy claims from the input layer.
     columns:
       - name: patient_id
-        description: Unique patient_id for each person.
       - name: dispensing_date
-        description: Date the prescription was filled.
       - name: ndc_code
-        description: National drug code on the claim.
       - name: paid_date
-        description: Date the claim was paid.
-      - name: last_update
-        description: The date and timestamp of the dbt run.
+      - name: tuva_last_run
