@@ -419,7 +419,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
-      alias: _stg_condition
+      alias: _stg_encounter
       tags: quality_measures_reporting
       materialized: ephemeral
     description: Staging encounters from core.
@@ -437,7 +437,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
-      alias: _stg_condition
+      alias: _stg_medication
       tags: quality_measures_reporting
       materialized: ephemeral
     description: Staging medications from core.
@@ -455,7 +455,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures_reporting{% else %}quality_measures_reporting{%- endif -%}
-      alias: _stg_condition
+      alias: _stg_observation
       tags: quality_measures_reporting
       materialized: ephemeral
     description: Staging medications from core.
