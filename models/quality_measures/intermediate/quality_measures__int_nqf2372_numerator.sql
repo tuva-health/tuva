@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -15,7 +15,7 @@ with denominator as (
         , measure_id
         , measure_name
         , measure_version
-    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
+    from {{ ref('quality_measures__int_nqf2372_denominator') }}
 
 )
 
@@ -24,7 +24,7 @@ with denominator as (
     select
           code
         , code_system
-    from {{ ref('quality_measures_reporting__value_sets') }}
+    from {{ ref('quality_measures__value_sets') }}
     where concept_name = 'Mammography'
 
 )
@@ -36,7 +36,7 @@ with denominator as (
         , claim_start_date
         , claim_end_date
         , hcpcs_code
-    from {{ ref('quality_measures_reporting__stg_medical_claim') }}
+    from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
 
@@ -57,7 +57,7 @@ with denominator as (
               normalized_code
             , source_code
           ) as code
-    from {{ ref('quality_measures_reporting__stg_core__observation') }}
+    from {{ ref('quality_measures__stg_core__observation') }}
 
 )
 
@@ -78,7 +78,7 @@ with denominator as (
               normalized_code
             , source_code
           ) as code
-    from {{ ref('quality_measures_reporting__stg_core__procedure') }}
+    from {{ ref('quality_measures__stg_core__procedure') }}
 
 )
 

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -7,7 +7,7 @@
 with patient as (
 
     select distinct patient_id
-    from {{ ref('quality_measures_reporting__stg_core__patient') }}
+    from {{ ref('quality_measures__stg_core__patient') }}
 
 )
 
@@ -21,7 +21,7 @@ with patient as (
         , measure_name
         , measure_version
         , denominator_flag
-    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
+    from {{ ref('quality_measures__int_nqf2372_denominator') }}
 
 )
 
@@ -36,7 +36,7 @@ with patient as (
         , measure_version
         , evidence_date
         , numerator_flag
-    from {{ ref('quality_measures_reporting__int_nqf2372_numerator') }}
+    from {{ ref('quality_measures__int_nqf2372_numerator') }}
 
 )
 
@@ -52,7 +52,7 @@ with patient as (
         , exclusion_date
         , exclusion_reason
         , exclusion_flag
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclusions') }}
+    from {{ ref('quality_measures__int_nqf2372_exclusions') }}
 
 )
 

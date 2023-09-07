@@ -1,12 +1,12 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
 /* measures should already be at the full eligibility population grain */
 with measures_unioned as (
 
-    select * from {{ ref('quality_measures_reporting__int_nqf2372_long') }}
+    select * from {{ ref('quality_measures__int_nqf2372_long') }}
 
 )
 

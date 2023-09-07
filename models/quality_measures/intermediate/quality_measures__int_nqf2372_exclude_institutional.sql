@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -17,7 +17,7 @@ with denominator as (
         , age
         , performance_period_begin
         , performance_period_end
-    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
+    from {{ ref('quality_measures__int_nqf2372_denominator') }}
 
 )
 
@@ -29,7 +29,7 @@ with denominator as (
         , claim_end_date
         , hcpcs_code
         , place_of_service_code
-    from {{ ref('quality_measures_reporting__stg_medical_claim') }}
+    from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
 

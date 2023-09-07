@@ -1,8 +1,8 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
-{%- set performance_period_end = var('quality_measure_reporting_period_end') -%}
+{%- set performance_period_end = var('quality_measures_period_end') -%}
 
 {%- set performance_period_begin -%}
 {{ dbt.dateadd(datepart="month", interval=-27, from_date_or_timestamp="'"~performance_period_end~"'") }}
@@ -10,19 +10,19 @@
 
 {%- set measure_id -%}
 (select id
-from {{ ref('quality_measures_reporting__measures') }}
+from {{ ref('quality_measures__measures') }}
 where id = 'NQF2372')
 {%- endset -%}
 
 {%- set measure_name -%}
 (select name
-from {{ ref('quality_measures_reporting__measures') }}
+from {{ ref('quality_measures__measures') }}
 where id = 'NQF2372')
 {%- endset -%}
 
 {%- set measure_version -%}
 (select version
-from {{ ref('quality_measures_reporting__measures') }}
+from {{ ref('quality_measures__measures') }}
 where id = 'NQF2372')
 {%- endset -%}
 
@@ -35,7 +35,7 @@ with patient as (
         , death_date
         , cast({{ performance_period_begin }} as date) as performance_period_begin
         , cast('{{ performance_period_end }}'as date) as performance_period_end
-    from {{ ref('quality_measures_reporting__stg_core__patient') }}
+    from {{ ref('quality_measures__stg_core__patient') }}
 
 )
 
@@ -45,7 +45,7 @@ with patient as (
           patient_id
         , encounter_type
         , encounter_start_date
-    from {{ ref('quality_measures_reporting__stg_core__encounter') }}
+    from {{ ref('quality_measures__stg_core__encounter') }}
 
 )
 
@@ -56,7 +56,7 @@ with patient as (
         , claim_start_date
         , claim_end_date
         , hcpcs_code
-    from {{ ref('quality_measures_reporting__stg_medical_claim') }}
+    from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
 
@@ -77,7 +77,7 @@ with patient as (
               normalized_code
             , source_code
           ) as code
-    from {{ ref('quality_measures_reporting__stg_core__procedure') }}
+    from {{ ref('quality_measures__stg_core__procedure') }}
 
 )
 
@@ -86,7 +86,7 @@ with patient as (
     select
           code
         , code_system
-    from {{ ref('quality_measures_reporting__value_sets') }}
+    from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
           'Office Visit'
         , 'Home Healthcare Services'

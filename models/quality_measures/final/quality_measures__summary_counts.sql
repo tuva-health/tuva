@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -14,7 +14,7 @@ with summary_long as (
         , denominator_flag
         , numerator_flag
         , exclusion_flag
-    from {{ ref('quality_measures_reporting__summary_long') }}
+    from {{ ref('quality_measures__summary_long') }}
     where measure_id is not null
 
 )

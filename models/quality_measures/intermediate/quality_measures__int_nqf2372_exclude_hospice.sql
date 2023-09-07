@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -13,7 +13,7 @@ with denominator as (
           patient_id
         , performance_period_begin
         , performance_period_end
-    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
+    from {{ ref('quality_measures__int_nqf2372_denominator') }}
 
 )
 
@@ -23,7 +23,7 @@ with denominator as (
           code
         , code_system
         , concept_name
-    from {{ ref('quality_measures_reporting__value_sets') }}
+    from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
           'Hospice Care Ambulatory'
         , 'Hospice Encounter'
@@ -48,7 +48,7 @@ with denominator as (
               normalized_code
             , source_code
           ) as code
-    from {{ ref('quality_measures_reporting__stg_core__observation') }}
+    from {{ ref('quality_measures__stg_core__observation') }}
 
 )
 
@@ -60,7 +60,7 @@ with denominator as (
         , claim_end_date
         , hcpcs_code
         , place_of_service_code
-    from {{ ref('quality_measures_reporting__stg_medical_claim') }}
+    from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
 
@@ -71,7 +71,7 @@ with denominator as (
         , procedure_date
         , normalized_code_type
         , normalized_code
-    from {{ ref('quality_measures_reporting__stg_core__procedure') }}
+    from {{ ref('quality_measures__stg_core__procedure') }}
 
 )
 
