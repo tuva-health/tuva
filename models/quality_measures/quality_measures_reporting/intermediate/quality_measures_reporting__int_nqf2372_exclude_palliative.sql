@@ -47,8 +47,8 @@ with denominator as (
     select
           patient_id
         , procedure_date
-        , code_type
-        , code
+        , normalized_code_type
+        , normalized_code
     from {{ ref('quality_measures_reporting__stg_core__procedure') }}
 
 )
@@ -73,13 +73,13 @@ with denominator as (
     select
           procedures.patient_id
         , procedures.procedure_date
-        , procedures.code_type
-        , procedures.code
+        , procedures.normalized_code_type
+        , procedures.normalized_code
         , exclusion_codes.concept_name
     from procedures
          inner join exclusion_codes
-         on procedures.code = exclusion_codes.code
-         and procedures.code_type = exclusion_codes.code_system
+         on procedures.normalized_code = exclusion_codes.code
+         and procedures.normalized_code_type = exclusion_codes.code_system
 
 )
 

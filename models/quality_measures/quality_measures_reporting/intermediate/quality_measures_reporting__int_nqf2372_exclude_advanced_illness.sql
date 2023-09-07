@@ -53,9 +53,9 @@ with denominator as (
     select
           patient_id
         , claim_id
-        , condition_date
-        , code_type
-        , code
+        , recorded_date
+        , normalized_code_type
+        , normalized_code
     from {{ ref('quality_measures_reporting__stg_core__condition') }}
 
 )
@@ -78,8 +78,8 @@ with denominator as (
     select
           patient_id
         , procedure_date
-        , code_type
-        , code
+        , normalized_code_type
+        , normalized_code
     from {{ ref('quality_measures_reporting__stg_core__procedure') }}
 
 )
@@ -89,14 +89,14 @@ with denominator as (
     select
           conditions.patient_id
         , conditions.claim_id
-        , conditions.condition_date
-        , conditions.code_type
-        , conditions.code
+        , conditions.recorded_date
+        , conditions.normalized_code_type
+        , conditions.normalized_code
         , exclusion_codes.concept_name
     from conditions
          inner join exclusion_codes
-         on conditions.code = exclusion_codes.code
-         and conditions.code_type = exclusion_codes.code_system
+         on conditions.normalized_code = exclusion_codes.code
+         and conditions.normalized_code_type = exclusion_codes.code_system
 
 )
 
@@ -121,13 +121,13 @@ with denominator as (
     select
           procedures.patient_id
         , procedures.procedure_date
-        , procedures.code_type
-        , procedures.code
+        , procedures.normalized_code_type
+        , procedures.normalized_code
         , exclusion_codes.concept_name
     from procedures
          inner join exclusion_codes
-         on procedures.code = exclusion_codes.code
-         and procedures.code_type = exclusion_codes.code_system
+         on procedures.normalized_code = exclusion_codes.code
+         and procedures.normalized_code_type = exclusion_codes.code_system
 
 )
 
@@ -176,7 +176,7 @@ with denominator as (
         , 'Frailty Encounter'
         , 'Frailty Symptom'
     )
-    and condition_exclusions.condition_date
+    and condition_exclusions.recorded_date
         between denominator.performance_period_begin
         and denominator.performance_period_end
 

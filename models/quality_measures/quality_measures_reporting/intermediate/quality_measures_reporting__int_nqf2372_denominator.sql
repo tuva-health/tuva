@@ -30,7 +30,7 @@ with patient as (
 
     select
           patient_id
-        , gender
+        , sex
         , birth_date
         , death_date
         , cast({{ performance_period_begin }} as date) as performance_period_begin
@@ -72,7 +72,7 @@ with patient as (
 
     select
           patient_id
-        , gender
+        , sex
         , birth_date
         , death_date
         , performance_period_begin
@@ -95,7 +95,7 @@ with patient as (
         , performance_period_end
         , 1 as denominator_flag
     from patient_with_age
-    where lower(gender) = 'female'
+    where lower(sex) = 'female'
         and age between 51 and 74
         and death_date is null
 
