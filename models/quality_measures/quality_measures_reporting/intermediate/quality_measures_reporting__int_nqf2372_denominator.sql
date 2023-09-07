@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 {%- set performance_period_end = var('quality_measure_reporting_period_end') -%}
@@ -39,6 +39,16 @@ with patient as (
 
 )
 
+, encounters as (
+
+    select
+          patient_id
+        , encounter_type
+        , encounter_start_date
+    from {{ ref('quality_measures_reporting__stg_core__encounter') }}
+
+)
+
 , medical_claim as (
 
     select
@@ -47,6 +57,27 @@ with patient as (
         , claim_end_date
         , hcpcs_code
     from {{ ref('quality_measures_reporting__stg_medical_claim') }}
+
+)
+
+, procedures as (
+
+    select
+          patient_id
+        , procedure_date
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce (
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures_reporting__stg_core__procedure') }}
 
 )
 
@@ -102,9 +133,9 @@ with patient as (
 )
 
 /*
-    Filter to qualifying visit types
+    Filter to qualifying visit types by claim procedures
 */
-, qualifying_visits as (
+, visit_claims as (
 
     select
           medical_claim.patient_id
@@ -113,8 +144,36 @@ with patient as (
         , medical_claim.hcpcs_code
     from medical_claim
          inner join visit_codes
-         on medical_claim.hcpcs_code = visit_codes.code
+            on medical_claim.hcpcs_code = visit_codes.code
     where visit_codes.code_system = 'hcpcs'
+
+)
+
+/*
+    Filter encounters to qualifying visit type
+*/
+, visit_encounters as (
+
+    select
+          patient_id
+        , encounter_start_date
+    from encounters
+    where lower(encounter_type) = 'office visit'
+
+)
+
+/*
+    Filter to qualifying visit types by procedure
+*/
+, visit_procedures as (
+
+    select
+          procedures.patient_id
+        , procedures.procedure_date
+    from procedures
+         inner join visit_codes
+             on procedures.code = visit_codes.code
+             and procedures.code_type = visit_codes.code_system
 
 )
 
@@ -131,10 +190,27 @@ with patient as (
         , patient_filtered.performance_period_end
         , patient_filtered.denominator_flag
     from patient_filtered
-         inner join qualifying_visits
-         on patient_filtered.patient_id = qualifying_visits.patient_id
-    where qualifying_visits.claim_start_date >= patient_filtered.performance_period_begin
-        or qualifying_visits.claim_end_date <= patient_filtered.performance_period_end
+         left join visit_claims
+            on patient_filtered.patient_id = visit_claims.patient_id
+         left join visit_procedures
+            on patient_filtered.patient_id = visit_procedures.patient_id
+         left join visit_encounters
+            on patient_filtered.patient_id = visit_encounters.patient_id
+    where (
+        visit_claims.claim_start_date
+            between patient_filtered.performance_period_begin
+            and patient_filtered.performance_period_end
+        or visit_claims.claim_end_date
+            between patient_filtered.performance_period_begin
+            and patient_filtered.performance_period_end
+        or visit_procedures.procedure_date
+            between patient_filtered.performance_period_begin
+            and patient_filtered.performance_period_end
+        or visit_encounters.encounter_start_date
+            between patient_filtered.performance_period_begin
+            and patient_filtered.performance_period_end
+    )
+
 )
 
 , add_data_types as (

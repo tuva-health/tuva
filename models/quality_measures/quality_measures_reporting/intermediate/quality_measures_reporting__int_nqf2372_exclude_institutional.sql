@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -63,4 +63,5 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from exclusions

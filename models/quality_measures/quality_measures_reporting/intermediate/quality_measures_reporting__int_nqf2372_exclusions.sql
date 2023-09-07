@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -96,7 +96,7 @@ with denominator as (
         , advanced_illness.exclusion_reason
     from denominator
          left join advanced_illness
-         on denominator.patient_id = advanced_illness.patient_id
+            on denominator.patient_id = advanced_illness.patient_id
 
 )
 
@@ -117,7 +117,7 @@ with denominator as (
         , dementia.exclusion_reason
     from denominator
          left join dementia
-         on denominator.patient_id = dementia.patient_id
+            on denominator.patient_id = dementia.patient_id
 
 )
 
@@ -138,7 +138,7 @@ with denominator as (
         , hospice.exclusion_reason
     from denominator
          left join hospice
-         on denominator.patient_id = hospice.patient_id
+            on denominator.patient_id = hospice.patient_id
 
 )
 
@@ -159,7 +159,7 @@ with denominator as (
         , institutional.exclusion_reason
     from denominator
          left join institutional
-         on denominator.patient_id = institutional.patient_id
+            on denominator.patient_id = institutional.patient_id
 
 )
 
@@ -180,7 +180,7 @@ with denominator as (
         , mastectomy.exclusion_reason
     from denominator
          left join mastectomy
-         on denominator.patient_id = mastectomy.patient_id
+            on denominator.patient_id = mastectomy.patient_id
 
 )
 
@@ -201,7 +201,7 @@ with denominator as (
         , palliative.exclusion_reason
     from denominator
          left join palliative
-         on denominator.patient_id = palliative.patient_id
+            on denominator.patient_id = palliative.patient_id
 
 )
 

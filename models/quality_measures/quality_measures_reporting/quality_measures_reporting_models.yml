@@ -23,20 +23,23 @@ models:
         description: Ending date of the performance or measurement period.
       - name: denominator_sum
         description: >
-          The denominator sum after exclusion logic applied.
           The denominator is associated with a given patient population that 
           may be counted as eligible to meet a measure’s inclusion requirements.
       - name: numerator_sum
         description: >
-          The numerator sum after exclusion logic applied.
           The numerator reflects the subset of patients in the denominator 
           for whom a particular service has been provided or for whom a 
           particular outcome has been achieved with exclusion logic applied.
+      - name: exclusion_sum
+          description: >
+            Specifications of those characteristics that would cause groups of 
+            individuals to be removed from the numerator and/or denominator of 
+            a measure although they experience the denominator index event.
       - name: performance_rate
         description: >
           Calculated performance rate. The numerator sum divided by the 
           denominator sum after exclusion logic applied and multiplied by 100.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
   - name: quality_measures_reporting__summary_long
@@ -87,7 +90,7 @@ models:
         description: Name of the measure.
       - name: measure_version
         description: Version of the measure.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
   - name: quality_measures_reporting__summary_wide
@@ -110,7 +113,7 @@ models:
           Each measure has a boolean flag which is the result of evaluating 
           the denominator, numerator, and exclusion indicators for the patient.
           A null indicates that the measure was not applicable for the patient.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
 ## Intermediate
@@ -143,7 +146,7 @@ models:
         description: >
           The denominator is associated with a given patient population that 
           may be counted as eligible to meet a measure’s inclusion requirements.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
   - name: quality_measures_reporting__int_nqf2372_exclude_advanced_illness
@@ -307,7 +310,7 @@ models:
           Specifications of those characteristics that would cause groups of 
           individuals to be removed from the numerator and/or denominator of 
           a measure although they experience the denominator index event.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
   - name: quality_measures_reporting__int_nqf2372_long
@@ -357,7 +360,7 @@ models:
         description: Name of the measure.
       - name: measure_version
         description: Version of the measure.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
   - name: quality_measures_reporting__int_nqf2372_numerator
@@ -391,7 +394,7 @@ models:
           The numerator reflects the subset of patients in the denominator 
           for whom a particular service has been provided or for whom a 
           particular outcome has been achieved.
-      - name: last_update
+      - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
 ## Staging

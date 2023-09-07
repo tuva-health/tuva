@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -41,9 +41,39 @@ with denominator as (
     select
           patient_id
         , recorded_date
-        , normalized_code_type
-        , normalized_code
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce(
+              normalized_code
+            , source_code
+          ) as code
     from {{ ref('quality_measures_reporting__stg_core__condition') }}
+
+)
+
+, observations as (
+
+    select
+          patient_id
+        , observation_date
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce(
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures_reporting__stg_core__observation') }}
 
 )
 
@@ -52,8 +82,18 @@ with denominator as (
     select
           patient_id
         , procedure_date
-        , normalized_code_type
-        , normalized_code
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce(
+              normalized_code
+            , source_code
+          ) as code
     from {{ ref('quality_measures_reporting__stg_core__procedure') }}
 
 )
@@ -63,13 +103,24 @@ with denominator as (
     select
           conditions.patient_id
         , conditions.recorded_date
-        , conditions.normalized_code_type
-        , conditions.normalized_code
         , exclusion_codes.concept_name
     from conditions
          inner join exclusion_codes
-         on conditions.normalized_code = exclusion_codes.code
-         and conditions.normalized_code_type = exclusion_codes.code_system
+             on conditions.code = exclusion_codes.code
+             and conditions.code_type = exclusion_codes.code_system
+
+)
+
+, observation_exclusions as (
+
+    select
+          observations.patient_id
+        , observations.observation_date
+        , exclusion_codes.concept_name
+    from observations
+         inner join exclusion_codes
+             on observations.code = exclusion_codes.code
+             and observations.code_type = exclusion_codes.code_system
 
 )
 
@@ -78,17 +129,15 @@ with denominator as (
     select
           procedures.patient_id
         , procedures.procedure_date
-        , procedures.normalized_code_type
-        , procedures.normalized_code
         , exclusion_codes.concept_name
     from procedures
          inner join exclusion_codes
-         on procedures.normalized_code = exclusion_codes.code
-         and procedures.normalized_code_type = exclusion_codes.code_system
+             on procedures.code = exclusion_codes.code
+             and procedures.code_type = exclusion_codes.code_system
 
 )
 
-, mastectomy_conditions as (
+, mastectomy as (
 
     select
           denominator.patient_id
@@ -96,11 +145,19 @@ with denominator as (
         , condition_exclusions.concept_name as exclusion_reason
     from denominator
          inner join condition_exclusions
-         on denominator.patient_id = condition_exclusions.patient_id
+            on denominator.patient_id = condition_exclusions.patient_id
 
-)
+    union all
 
-, mastectomy_procedures as (
+    select
+          denominator.patient_id
+        , observation_exclusions.observation_date as exclusion_date
+        , observation_exclusions.concept_name as exclusion_reason
+    from denominator
+         inner join observation_exclusions
+            on denominator.patient_id = observation_exclusions.patient_id
+
+    union all
 
     select
           denominator.patient_id
@@ -108,25 +165,7 @@ with denominator as (
         , procedure_exclusions.concept_name as exclusion_reason
     from denominator
          inner join procedure_exclusions
-         on denominator.patient_id = procedure_exclusions.patient_id
-
-)
-
-, exclusions_unioned as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from mastectomy_conditions
-
-    union all
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from mastectomy_procedures
+            on denominator.patient_id = procedure_exclusions.patient_id
 
 )
 
@@ -134,4 +173,5 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
-from exclusions_unioned
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from mastectomy
