@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: unclassified_conditions
+    description: >
+      CCS Level Breakdown of the conditions table augmented with the probabilistic
+      classification flags. Includes statistics about the codes and conditions
+      that could not be classified using the ED Classification algorithm.
+    config:
+      materialized: table
+    columns:
+      - name: ccs_description_with_covid
+        description: >
+          CCS Description for the ICD code in the discharge diagnosis of the conditions
+          table augmented with COVID.
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: unique_codes_in_ccs_count
+        description: Number of unique condition codes that fit into the CCS descrption
+      - name: unique_unclassified_codes_in_ccs_count
+        description: Number of the condition diagnoses in the CCS description
+      - name: condition_row_unclassified_percent
+        description: >
+          Percent of the discharge diagnosis condition rows that were not
+          classifiable using the ED Classification algorithm. I.e. the rows with
+          diagnosis codes that weren't assigned a ED classification probability, either
+          because the code didn't exist the time the algorithm was created or something
+          else.
+      - name: unclassified_claim_paid_amount_sum
+        description: Total spend associated with unclassified ED claims
+  - name: ed_claim_categorization
+    description: >
+       For all condition rows associated with ED claims, perform a crosstab against
+       the service category to double check that they really are mostly outpatient ED claims.
+  - name: unclassified_rows
+    description: Overall unclassified rows stats.
+    columns:
+      - name: condition_row_unclassified_percent
+        description: Percent of discharge condition rows that were not classifiable
+        tests:
+          - dbt_utils.accepted_range:
+              max_value: 20
+              config:
+                severity: warn

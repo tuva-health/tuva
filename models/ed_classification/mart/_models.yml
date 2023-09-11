@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: by_year
+    description: ED_Summary aggregated by year
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: condition_date_year
+      - name: claim_count
+      - name: claim_paid_amount_sum
+  - name: by_year_month
+    description: ED_Summary aggregated by year month
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: condition_date_year_month
+      - name: claim_count
+      - name: claim_paid_amount_sum
+  - name: by_ccs_description
+    description: ED_Summary aggregated by year, and ccs_description
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: ccs_description_with_covid
+      - name: condition_date_year
+      - name: claim_count
+      - name: claim_paid_amount_sum
+  - name: by_patient_race
+    description: ED_Summary aggregated by year, and ccs_description
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: patient_race
+      - name: condition_date_year
+      - name: claim_count
+      - name: claim_paid_amount_sum
+  - name: by_provider_parent_organization
+    description: ED_Summary aggregated by year, and ccs_description
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: provider_parent_organization_with_provider_name
+      - name: condition_date_year
+      - name: claim_count
+      - name: claim_paid_amount_sum
+  - name: by_provider_practice_state
+    description: ED_Summary aggregated by year, and ccs_description
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: provider_practice_state
+      - name: condition_date_year
+      - name: claim_count
+      - name: claim_paid_amount_sum
+  - name: patient_list
+    description: >
+      ED condition rows with all available patient information joined in.
+      Useful for identifying patients who have more than a certain number
+      of ED visits per time period.

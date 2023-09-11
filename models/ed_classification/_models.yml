@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: ed_summary
+    description: >
+      ED Classification as a cube that can be summarized
+    config:
+      materialized: table
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: ccs_description_with_covid
+      - name: condition_date_year
+      - name: condition_date_year_month
+      - name: claim_count
+      - name: claim_paid_amount_sum
