@@ -4,10 +4,15 @@ version: 2
 
 
 models:
-  - name: ed_summary
+  - name: ed_classification__summary
     description: >
       ED Classification as a cube that can be summarized
     config:
+      Schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}quality_measures_reporting{%- endif -%}
+      alias: summary_counts
+      tags: quality_measures_reporting
       materialized: table
     columns:
       - name: classification_order
@@ -20,25 +25,7 @@ models:
 
 
 # Intermediate
-  - name: by_year
-    description: ED_Summary aggregated by year
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: condition_date_year
-      - name: claim_count
-      - name: claim_paid_amount_sum
-
-  - name: by_year_month
-    description: ED_Summary aggregated by year month
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: condition_date_year_month
-      - name: claim_count
-      - name: claim_paid_amount_sum
-
-  - name: by_ccs_description
+  - name: ed_classification__int_by_ccs_description
     description: ED_Summary aggregated by year, and ccs_description
     columns:
       - name: classification_order
@@ -48,7 +35,7 @@ models:
       - name: claim_count
       - name: claim_paid_amount_sum
 
-  - name: by_patient_race
+  - name: ed_classification__int_by_patient_race
     description: ED_Summary aggregated by year, and ccs_description
     columns:
       - name: classification_order
@@ -58,7 +45,7 @@ models:
       - name: claim_count
       - name: claim_paid_amount_sum
 
-  - name: by_provider_parent_organization
+  - name: ed_classification__int_by_provider_parent_organization
     description: ED_Summary aggregated by year, and ccs_description
     columns:
       - name: classification_order
@@ -68,7 +55,7 @@ models:
       - name: claim_count
       - name: claim_paid_amount_sum
 
-  - name: by_provider_practice_state
+  - name: ed_classification__int_by_provider_practice_state
     description: ED_Summary aggregated by year, and ccs_description
     columns:
       - name: classification_order
@@ -78,13 +65,25 @@ models:
       - name: claim_count
       - name: claim_paid_amount_sum
 
-  - name: patient_list
-    description: >
-      ED condition rows with all available patient information joined in.
-      Useful for identifying patients who have more than a certain number
-      of ED visits per time period.
+  - name: ed_classification__int_by_year
+    description: ED_Summary aggregated by year
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: condition_date_year
+      - name: claim_count
+      - name: claim_paid_amount_sum
 
-  - name: ed_classified_condition
+  - name: ed_classification__int_by_year_month
+    description: ED_Summary aggregated by year month
+    columns:
+      - name: classification_order
+      - name: classification_name
+      - name: condition_date_year_month
+      - name: claim_count
+      - name: claim_paid_amount_sum
+
+  - name: ed_classification__int_condition
     config:
       materialized: table
     description: >
@@ -94,15 +93,7 @@ models:
       - dbt_utils.equal_rowcount:
           compare_model: ref('ed_condition')
 
-  - name: ed_classified_condition_with_class
-    description: Filtered condition row table to classified ones.
-    config:
-      materialized: table
-    tests:
-      - dbt_utils.fewer_rows_than:
-          compare_model: ref('ed_condition')
-
-  - name: ed_classified_condition_with_claim
+  - name: ed_classification__int_condition_with_claim
     description: >
       Filtered condition row table to classified ones. Includes additional
       information from the claim header, provider and patient tables
@@ -117,10 +108,24 @@ models:
           - unique
           - not_null
 
+  - name: ed_classification__int_condition_with_class
+    description: Filtered condition row table to classified ones.
+    config:
+      materialized: table
+    tests:
+      - dbt_utils.fewer_rows_than:
+          compare_model: ref('ed_condition')
+
+  - name: ed_classification__int_patient_list
+    description: >
+      ED condition rows with all available patient information joined in.
+      Useful for identifying patients who have more than a certain number
+      of ED visits per time period.
+
 
 ##  Staging
 
-  - name: ed_condition
+  - name: ed_classification__stg_condition
     description: Conditions table filtered to only those rows associated with ED claims
     config:
       materialized: table
@@ -128,7 +133,12 @@ models:
 
 ##  Data Quality
 
-  - name: unclassified_conditions
+  - name: ed_classification__claim_categorization
+    description: >
+       For all condition rows associated with ED claims, perform a crosstab against
+       the service category to double check that they really are mostly outpatient ED claims.
+
+  - name: ed_classification__unclassified_conditions
     description: >
       CCS Level Breakdown of the conditions table augmented with the probabilistic
       classification flags. Includes statistics about the codes and conditions
@@ -157,13 +167,9 @@ models:
           else.
       - name: unclassified_claim_paid_amount_sum
         description: Total spend associated with unclassified ED claims
-        
-  - name: ed_claim_categorization
-    description: >
-       For all condition rows associated with ED claims, perform a crosstab against
-       the service category to double check that they really are mostly outpatient ED claims.
 
-  - name: unclassified_rows
+
+  - name: ed_classification__unclassified_rows
     description: Overall unclassified rows stats.
     columns:
       - name: condition_row_unclassified_percent
