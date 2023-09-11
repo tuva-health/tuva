@@ -31,5 +31,5 @@ select
           when drug then 'drug'
           else 'unclassified'
    end as classification
-from {{ ref('ed_classified_condition') }} a
+from {{ ref('ed_classification__int_merge_condition') }} a
 where ed_classification_capture = 1

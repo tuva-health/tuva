@@ -8,6 +8,6 @@ select
     , (1 - avg(ed_classification_capture)) * 100 as condition_row_unclassified_percent
     , sum(case when ed_classification_capture = 0 then claim_paid_amount_sum else 0 end) as "unclassified_claim_paid_amount_sum"
 
-from {{ ref('ed_classified_condition') }}
+from {{ ref('ed_classification__int_merge_condition') }}
 group by "condition_date_year"
 order by "unclassified_claim_paid_amount_sum" desc

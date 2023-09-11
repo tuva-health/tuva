@@ -8,7 +8,7 @@ indicators of ED classification terminology
 {% set colnames = ["edcnnpa", "edcnpa", "epct", "noner", "injury", "psych", "alcohol", "drug"] %}
 
 with condition as (
-select * from {{ ref('ed_condition') }}
+select * from {{ ref('ed_classification__int_merge_condition') }}
 )
 , icd9 as (
   select
@@ -17,7 +17,7 @@ select * from {{ ref('ed_condition') }}
      , {{colname}}
      {% endfor %}
      , 1 as ed_classification_capture
-  from {{ ref('johnston_icd9') }}
+  from {{ ref('ed_classification__johnston_icd9') }}
 )
 , icd10 as (
   select
@@ -26,7 +26,7 @@ select * from {{ ref('ed_condition') }}
      , {{colname}}
      {% endfor %}
      , 1 as ed_classification_capture
-  from {{ ref('johnston_icd10') }}
+  from {{ ref('ed_classification__johnston_icd10') }}
 )
 
 select

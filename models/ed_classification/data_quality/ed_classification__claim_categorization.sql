@@ -10,6 +10,6 @@ select
    , service_category_2
    , count(*) as condition_count
 
-from {{ ref('ed_classified_condition_with_claim') }}
+from {{ ref('ed_classification__int_condition_with_claim') }}
 group by service_category_1, service_category_2
 order by count(*) desc

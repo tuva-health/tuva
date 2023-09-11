@@ -10,7 +10,7 @@ with ed_claims as (
   select
     claim_id
     , sum(paid_amount) as claim_paid_amount_sum
-  from {{ var('medical_claim') }}
+  from {{ ref('core__medical_claim') }}
   where (place_of_service_code = '23' or revenue_center_code in ('0450', '0451', '0452', '0456', '0459', '0981'))
   and (encounter_type <> 'acute inpatient' or encounter_type is null)
   group by claim_id
@@ -31,7 +31,7 @@ select
           as {{ dbt.type_string() }}) as ccs_description_with_covid
    , condition_date
    , cast(claim_paid_amount_sum as {{ dbt.type_float() }}) as claim_paid_amount_sum
-from {{ var('condition') }} condition
+from {{ ref('core__condition') }} condition
 inner join ed_claims using(claim_id)
-left join {{ var('terminology_icd_10_cm_to_ccs_mapping') }} mapping on condition.code = mapping.icd_10_cm
+left join {{ ref('readmissions__icd_10_cm_to_ccs') }} mapping on condition.code = mapping.icd_10_cm
 where diagnosis_rank = 1

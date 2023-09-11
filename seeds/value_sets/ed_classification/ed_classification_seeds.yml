@@ -1,7 +1,7 @@
 version: 2
 
 seeds:
-  - name: ed_classification_categories
+  - name: ed_classification__categories
     description: A mapping of ED Classifications to human readable names
     columns:
       - name: classification
@@ -10,7 +10,8 @@ seeds:
         description: human readable name for classification
       - name: classification_order
         description: Sortable column that organizes the ED classes
-  - name: johnston_icd9
+
+  - name: ed_classification__johnston_icd9
     description: A probabilistic mapping of icd9 codes to ed classification categories
     config:
       column_types:
@@ -28,7 +29,8 @@ seeds:
       - name: psych
       - name: alcohol
       - name: drug
-  - name: johnston_icd10
+      
+  - name: ed_classification__johnston_icd10
     description: A probabilistic mapping of icd9 codes to ed classification categories
     config:
       column_types:
