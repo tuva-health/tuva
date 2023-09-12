@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -15,7 +15,7 @@ with denominator as (
         , measure_id
         , measure_name
         , measure_version
-    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
+    from {{ ref('quality_measures__int_nqf2372_denominator') }}
 
 )
 
@@ -25,7 +25,7 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclude_advanced_illness') }}
+    from {{ ref('quality_measures__int_nqf2372_exclude_advanced_illness') }}
 
 )
 
@@ -35,7 +35,7 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclude_dementia') }}
+    from {{ ref('quality_measures__int_nqf2372_exclude_dementia') }}
 
 )
 
@@ -45,7 +45,7 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclude_hospice') }}
+    from {{ ref('quality_measures__int_nqf2372_exclude_hospice') }}
 
 )
 
@@ -55,7 +55,7 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclude_institutional') }}
+    from {{ ref('quality_measures__int_nqf2372_exclude_institutional') }}
 
 )
 
@@ -65,7 +65,7 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclude_mastectomy') }}
+    from {{ ref('quality_measures__int_nqf2372_exclude_mastectomy') }}
 
 )
 
@@ -75,7 +75,7 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures_reporting__int_nqf2372_exclude_palliative') }}
+    from {{ ref('quality_measures__int_nqf2372_exclude_palliative') }}
 
 )
 
@@ -96,7 +96,7 @@ with denominator as (
         , advanced_illness.exclusion_reason
     from denominator
          left join advanced_illness
-         on denominator.patient_id = advanced_illness.patient_id
+            on denominator.patient_id = advanced_illness.patient_id
 
 )
 
@@ -117,7 +117,7 @@ with denominator as (
         , dementia.exclusion_reason
     from denominator
          left join dementia
-         on denominator.patient_id = dementia.patient_id
+            on denominator.patient_id = dementia.patient_id
 
 )
 
@@ -138,7 +138,7 @@ with denominator as (
         , hospice.exclusion_reason
     from denominator
          left join hospice
-         on denominator.patient_id = hospice.patient_id
+            on denominator.patient_id = hospice.patient_id
 
 )
 
@@ -159,7 +159,7 @@ with denominator as (
         , institutional.exclusion_reason
     from denominator
          left join institutional
-         on denominator.patient_id = institutional.patient_id
+            on denominator.patient_id = institutional.patient_id
 
 )
 
@@ -180,7 +180,7 @@ with denominator as (
         , mastectomy.exclusion_reason
     from denominator
          left join mastectomy
-         on denominator.patient_id = mastectomy.patient_id
+            on denominator.patient_id = mastectomy.patient_id
 
 )
 
@@ -201,7 +201,7 @@ with denominator as (
         , palliative.exclusion_reason
     from denominator
          left join palliative
-         on denominator.patient_id = palliative.patient_id
+            on denominator.patient_id = palliative.patient_id
 
 )
 

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -14,28 +14,8 @@ with summary_long as (
         , denominator_flag
         , numerator_flag
         , exclusion_flag
-    from {{ ref('quality_measures_reporting__summary_long') }}
+    from {{ ref('quality_measures__summary_long') }}
     where measure_id is not null
-
-)
-
-, apply_exclusions as (
-
-    select
-          measure_id
-        , measure_name
-        , measure_version
-        , performance_period_begin
-        , performance_period_end
-        , case
-            when exclusion_flag = 1 then null
-            else denominator_flag
-          end as denominator_flag_adjusted
-        , case
-            when exclusion_flag = 1 then null
-            else numerator_flag
-          end as numerator_flag_adjusted
-    from summary_long
 
 )
 
@@ -47,9 +27,10 @@ with summary_long as (
         , measure_version
         , performance_period_begin
         , performance_period_end
-        , sum(denominator_flag_adjusted) as denominator_sum
-        , sum(numerator_flag_adjusted) as numerator_sum
-    from apply_exclusions
+        , sum(denominator_flag) as denominator_sum
+        , sum(numerator_flag) as numerator_sum
+        , sum(exclusion_flag) as exclusion_sum
+    from summary_long
     group by
           measure_id
         , measure_name
@@ -69,9 +50,10 @@ with summary_long as (
         , performance_period_end
         , denominator_sum
         , numerator_sum
+        , exclusion_sum
         , (
             cast(numerator_sum as {{ dbt.type_numeric() }}) /
-                cast(denominator_sum as {{ dbt.type_numeric() }})
+                (cast(denominator_sum as {{ dbt.type_numeric() }}) - cast(exclusion_sum as {{ dbt.type_numeric() }}))
           )*100 as performance_rate
     from sum_flags
 
@@ -87,6 +69,7 @@ with summary_long as (
         , cast(performance_period_end as date) as performance_period_end
         , cast(denominator_sum as integer) as denominator_sum
         , cast(numerator_sum as integer) as numerator_sum
+        , cast(exclusion_sum as integer) as exclusion_sum
         , round(cast(performance_rate as {{ dbt.type_numeric() }}),3) as performance_rate
     from calculate_performance_rate
 
@@ -100,6 +83,7 @@ select
     , performance_period_end
     , denominator_sum
     , numerator_sum
+    , exclusion_sum
     , performance_rate
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

@@ -591,17 +591,6 @@ models:
       tags: data_profiling
       materialized: table
 
-  - name: claims_date_profiling__member_months_count
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: member_months_count
-      tags: data_profiling
-      materialized: table
-
-
-
 
 
 #### Service Category
