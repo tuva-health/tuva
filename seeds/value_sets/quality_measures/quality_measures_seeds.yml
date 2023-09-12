@@ -1,0 +1,32 @@
+version: 2
+
+seeds:
+  - name: quality_measures__measures
+    description: Overview of reporting measures.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _value_set_measures
+      tags: quality_measures
+      enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
+
+  - name: quality_measures__concepts
+    description: Measures to concepts crosswalk. List of concepts used in each reporting measure.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _value_set_concepts
+      tags: quality_measures
+      enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
+
+  - name: quality_measures__value_sets
+    description: Concepts to value sets crosswalk. List of codes in each concept.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _value_set_codes
+      tags: quality_measures
+      enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}

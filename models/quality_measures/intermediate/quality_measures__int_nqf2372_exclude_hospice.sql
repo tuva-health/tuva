@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_reporting_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 
@@ -13,7 +13,7 @@ with denominator as (
           patient_id
         , performance_period_begin
         , performance_period_end
-    from {{ ref('quality_measures_reporting__int_nqf2372_denominator') }}
+    from {{ ref('quality_measures__int_nqf2372_denominator') }}
 
 )
 
@@ -23,11 +23,32 @@ with denominator as (
           code
         , code_system
         , concept_name
-    from {{ ref('quality_measures_reporting__value_sets') }}
+    from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
           'Hospice Care Ambulatory'
         , 'Hospice Encounter'
     )
+
+)
+
+, observations as (
+
+    select
+          patient_id
+        , observation_date
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce(
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures__stg_core__observation') }}
 
 )
 
@@ -39,7 +60,7 @@ with denominator as (
         , claim_end_date
         , hcpcs_code
         , place_of_service_code
-    from {{ ref('quality_measures_reporting__stg_medical_claim') }}
+    from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
 
@@ -48,9 +69,22 @@ with denominator as (
     select
           patient_id
         , procedure_date
-        , code_type
-        , code
-    from {{ ref('quality_measures_reporting__stg_core__procedure') }}
+        , normalized_code_type
+        , normalized_code
+    from {{ ref('quality_measures__stg_core__procedure') }}
+
+)
+
+, observation_exclusions as (
+
+    select
+          observations.patient_id
+        , observations.observation_date
+        , exclusion_codes.concept_name
+    from observations
+         inner join exclusion_codes
+             on observations.code = exclusion_codes.code
+             and observations.code_type = exclusion_codes.code_system
 
 )
 
@@ -64,7 +98,7 @@ with denominator as (
         , exclusion_codes.concept_name
     from medical_claim
          inner join exclusion_codes
-         on medical_claim.hcpcs_code = exclusion_codes.code
+            on medical_claim.hcpcs_code = exclusion_codes.code
     where exclusion_codes.code_system = 'hcpcs'
 
 )
@@ -74,28 +108,39 @@ with denominator as (
     select
           procedures.patient_id
         , procedures.procedure_date
-        , procedures.code_type
-        , procedures.code
         , exclusion_codes.concept_name
     from procedures
          inner join exclusion_codes
-         on procedures.code = exclusion_codes.code
-         and procedures.code_type = exclusion_codes.code_system
+             on procedures.normalized_code = exclusion_codes.code
+             and procedures.normalized_code_type = exclusion_codes.code_system
 
 )
 
-, hospice_claims as (
+, hospice as (
 
     select
           denominator.patient_id
-        , coalesce(
+        , observation_exclusions.observation_date as exclusion_date
+        , observation_exclusions.concept_name as exclusion_reason
+    from denominator
+         inner join observation_exclusions
+            on denominator.patient_id = observation_exclusions.patient_id
+    where observation_exclusions.observation_date
+        between denominator.performance_period_begin
+        and denominator.performance_period_end
+
+    union all
+
+    select
+          denominator.patient_id
+        , coalesce (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
         , med_claim_exclusions.concept_name as exclusion_reason
     from denominator
          inner join med_claim_exclusions
-         on denominator.patient_id = med_claim_exclusions.patient_id
+            on denominator.patient_id = med_claim_exclusions.patient_id
     where (
         med_claim_exclusions.claim_start_date
             between denominator.performance_period_begin
@@ -105,9 +150,7 @@ with denominator as (
             and denominator.performance_period_end
     )
 
-)
-
-, hospice_procedures as (
+    union all
 
     select
           denominator.patient_id
@@ -115,28 +158,10 @@ with denominator as (
         , procedure_exclusions.concept_name as exclusion_reason
     from denominator
          inner join procedure_exclusions
-         on denominator.patient_id = procedure_exclusions.patient_id
+            on denominator.patient_id = procedure_exclusions.patient_id
     where procedure_exclusions.procedure_date
         between denominator.performance_period_begin
         and denominator.performance_period_end
-
-)
-
-, exclusions_unioned as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from hospice_claims
-
-    union all
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from hospice_procedures
 
 )
 
@@ -144,4 +169,5 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
-from exclusions_unioned
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from hospice
