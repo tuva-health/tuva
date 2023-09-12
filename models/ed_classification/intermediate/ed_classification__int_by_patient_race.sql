@@ -5,13 +5,13 @@ with summary as (
   select
      classification_order
      , classification_name
-     , condition_date_year
+     , recorded_date_year
      , patient_race
      , count(distinct(claim_id)) as claim_count
      , sum(claim_paid_amount_sum) as claim_paid_amount_sum
 
   from {{ ref('ed_classification__summary') }}
-  group by classification_order, classification_name, condition_date_year, patient_race
+  group by classification_order, classification_name, recorded_date_year, patient_race
 )
 
 select
@@ -19,7 +19,7 @@ select
   , 100 * ratio_to_report(claim_count)
     over(partition by classification_name) as percent_claim_count_of_classification
   , 100 * ratio_to_report(claim_paid_amount_sum)
-    over(partition by classification_name) as "percent_claim_paid_amount_sum_of_classification"
+    over(partition by classification_name) as percent_claim_paid_amount_sum_of_classification
 
 from summary
-order by "percent_claim_paid_amount_sum_of_classification" desc
+order by percent_claim_paid_amount_sum_of_classification desc

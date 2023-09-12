@@ -4,13 +4,13 @@ with summary as (
   select
      classification_order
      , classification_name
-     , condition_date_year
+     , recorded_date_year
      , provider_parent_organization_name_with_provider_name
      , count(distinct(claim_id)) as claim_count
      , sum(claim_paid_amount_sum) as claim_paid_amount_sum
 
   from {{ ref('ed_classification__summary') }}
-  group by classification_order, classification_name, condition_date_year, provider_parent_organization_name_with_provider_name
+  group by classification_order, classification_name, recorded_date_year, provider_parent_organization_name_with_provider_name
 )
 
 select

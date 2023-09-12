@@ -4,9 +4,9 @@
 select
    p.*
    , c.claim_id
-   , c.condition_date
-   , c.condition_date_year
-   , c.condition_date_year_month
+   , c.recorded_date
+   , c.recorded_date_year
+   , c.recorded_date_year_month
    , c.code_type
    , c.code
    , c.description
