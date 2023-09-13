@@ -30,7 +30,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: by_ccs_description
+      alias: _int_by_ccs_description
       tags: ed_classification
       materialized: table
     description: ED_Summary aggregated by year, and ccs_description
@@ -47,7 +47,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: by_patient_race
+      alias: _int_by_patient_race
       tags: ed_classification
       materialized: table
     description: ED_Summary aggregated by year, and ccs_description
@@ -64,7 +64,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: by_provider_parent_organization
+      alias: _int_by_provider_parent_organization
       tags: ed_classification
       materialized: table
     description: ED_Summary aggregated by year, and ccs_description
@@ -81,7 +81,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: by_provider_practice_state
+      alias: _int_by_provider_practice_state
       tags: ed_classification
       materialized: table
     description: ED_Summary aggregated by year, and ccs_description
@@ -98,7 +98,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: by_year
+      alias: _int_by_year
       tags: ed_classification
       materialized: table
     description: ED_Summary aggregated by year
@@ -114,7 +114,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: by_year_month
+      alias: _int_by_year_month
       tags: ed_classification
       materialized: table
     description: ED_Summary aggregated by year month
@@ -130,7 +130,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: condition_with_claim
+      alias: _int_condition_with_claim
       tags: ed_classification
       materialized: table
     description: |
@@ -151,7 +151,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
       alias: condition_with_class
-      tags: ed_classification
+      tags: _int_ed_classification
       materialized: table
     description: Filtered condition row table to classified ones.
     tests:
@@ -163,7 +163,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: merge_condition
+      alias: _int_merge_condition
       tags: ed_classification
       materialized: table
     description: |
@@ -178,7 +178,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: patient_list
+      alias: _int_patient_list
       tags: ed_classification
       materialized: table
     description: |
@@ -191,7 +191,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: primary_dx_per_claim
+      alias: _int_primary_dx_per_claim
       tags: ed_classification
       materialized: table
     description: |
