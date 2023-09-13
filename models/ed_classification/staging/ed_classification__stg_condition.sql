@@ -4,7 +4,10 @@ This contains one row for every unique primary discharge diagnosis in the datase
 This is also filtered to ED claims.
 */
 
-{{ config(enabled=var('ed_classification_enabled',var('tuva_packages_enabled',True))) }}
+{{ config(
+     enabled = var('ed_classification_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
 
 with ed_claims as (
   select

@@ -3,7 +3,10 @@ Denormalized view of each condition row with additional provider and patient lev
 information merged on based on the header level detail on the claim
 */
 
-{{ config(enabled=var('ed_classification_enabled',var('tuva_packages_enabled',True))) }}
+{{ config(
+     enabled = var('ed_classification_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
 
 with deduped_claims as (
    select distinct

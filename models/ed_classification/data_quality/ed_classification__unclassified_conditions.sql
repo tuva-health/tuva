@@ -4,7 +4,10 @@ on the number of codes and condition rows that could not
 be classified using the johnston algorithm
 */
 
-{{ config(enabled=var('ed_classification_enabled',var('tuva_packages_enabled',True))) }}
+{{ config(
+     enabled = var('ed_classification_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
 
 select
    ccs_description_with_covid

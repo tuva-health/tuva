@@ -3,8 +3,10 @@ Filter conditions to those that were classified and pick the classification
 with the greatest probability (that's the greatest logic). This logic removes
 any rows that were not classified.
 */
-
-{{ config(enabled=var('ed_classification_enabled',var('tuva_packages_enabled',True))) }}
+{{ config(
+     enabled = var('ed_classification_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
 
 select
    a.encounter_id
