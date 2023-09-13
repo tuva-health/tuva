@@ -15,13 +15,58 @@ models:
     description: |
       ED Classification as a cube that can be summarized
     columns:
-      - name: classification_order
-      - name: classification_name
+      - name: classification
+        description: ED classification categories
+      - name: claim_id
+        description: Unique identifer for each claim 
+      - name: patient_id
+        description: Unique identifier for each person across all datasets
+      - name: recorded_date 
+        description: Date on which the condition was recorded
+      - name: code
+        description: The normalized condition code
+      - name: description
+        description: The normalized description of the condition code
       - name: ccs_description_with_covid
-      - name: condition_date_year
-      - name: condition_date_year_month
-      - name: claim_count
+        description: The condition category with covid
+      - name: recorded_date_year
+        description: The year of the condition recorded date
+      - name: recorded_date_year_month
+        description: The year and month of the condition recorded date
       - name: claim_paid_amount_sum
+        description: The sum of the claim paid amount lines
+      - name: service_category_1
+        description: The broader service category the claim belongs to
+      - name: service_category_2
+        description: The more specific service category the claim belongs to
+      - name: provider_parent_organization_name_with_provider_name
+        description: The parent organization and provider name associate with the claim
+      - name: provider_first_name
+        description: The provider first name
+      - name: provider_last_name
+        description: The provider last name
+      - name: provider_organization_name
+        description: The provider organization
+      - name: provider_practice_state
+        description: The provider practice state
+      - name: provider_practice_zip_code
+        description: The provider practice zip code
+      - name: patient_gender
+        description: The patient gender
+      - name: patient_birth_date
+        description: The patient date of birth
+      - name: patient_age
+        description: The patient age as of now
+      - name: patient_race
+        description: The patient race
+      - name: patient_state
+        description: The patient state
+      - name: classification_name
+        description: Human readable name of the classification
+      - name: classification_order
+        description: The order of the classification
+      - name: classification_column
+        description: A short hand name of the classification
 
 
 # Intermediate
@@ -150,8 +195,8 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: condition_with_class
-      tags: _int_ed_classification
+      alias: _int_condition_with_class
+      tags: ed_classification
       materialized: table
     description: Filtered condition row table to classified ones.
     tests:
@@ -240,7 +285,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: claim_categorization
+      alias: _int_claim_categorization
       tags: ed_classification
       materialized: table
     description: |
@@ -252,7 +297,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: unclassified_conditions
+      alias: _int_unclassified_conditions
       tags: ed_classification
       materialized: table
     description: |
@@ -288,7 +333,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: unclassified_rows
+      alias: _int_unclassified_rows
       tags: ed_classification
       materialized: table
     description: Overall unclassified rows stats.
