@@ -125,21 +125,6 @@ models:
       - name: claim_count
       - name: claim_paid_amount_sum
 
-  - name: ed_classification__int_merge_condition
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: merge_condition
-      tags: ed_classification
-      materialized: table
-    description: |
-      All conditions with the classifications merged on and resolved to a single
-      category per condition row.
-    tests:
-      - dbt_utils.equal_rowcount:
-          compare_model: ref('ed_condition')
-
   - name: ed_classification__int_condition_with_claim
     config:
       schema: |
@@ -173,6 +158,21 @@ models:
       - dbt_utils.fewer_rows_than:
           compare_model: ref('ed_condition')
 
+  - name: ed_classification__int_merge_condition
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      alias: merge_condition
+      tags: ed_classification
+      materialized: table
+    description: |
+      All conditions with the classifications merged on and resolved to a single
+      category per condition row.
+    tests:
+      - dbt_utils.equal_rowcount:
+          compare_model: ref('ed_condition')
+
   - name: ed_classification__int_patient_list
     config:
       schema: |
@@ -186,10 +186,46 @@ models:
       Useful for identifying patients who have more than a certain number
       of ED visits per time period.
 
+  - name: ed_classification__int_primary_dx_per_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      alias: primary_dx_per_claim
+      tags: ed_classification
+      materialized: table
+    description: |
+      ED condition rows with all available patient information joined in.
+      Useful for identifying patients who have more than a certain number
+      of ED visits per time period.
+
 
 ##  Staging
 
   - name: ed_classification__stg_condition
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      tags: ed_classification
+
+  - name: ed_classification__stg_encounter
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      tags: ed_classification
+      materialized: ephemeral
+
+  - name: ed_classification__stg_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      tags: ed_classification
+      materialized: ephemeral
+
+  - name: ed_classification__stg_patient
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification

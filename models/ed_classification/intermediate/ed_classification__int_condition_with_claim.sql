@@ -17,7 +17,7 @@ with deduped_claims as (
       , facility_npi
       , billing_npi
       , patient_id
-   from {{ ref('core__medical_claim') }} mc
+   from {{ ref('ed_classification__stg_medical_claim') }} mc
    where mc.claim_line_number = 1
 )
 , deduped_providers as (
@@ -77,4 +77,4 @@ inner join deduped_claims mc
       and c.recorded_date = mc.claim_line_end_date
 left join deduped_providers fp on mc.facility_npi = fp.npi
 left join deduped_providers bp on mc.billing_npi = bp.npi
-left join {{ ref('core__patient') }} p on mc.patient_id = p.patient_id
+left join {{ ref('ed_classification__stg_patient') }} p on mc.patient_id = p.patient_id

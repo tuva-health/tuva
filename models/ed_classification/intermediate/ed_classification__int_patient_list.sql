@@ -18,5 +18,5 @@ select
    , c.classification
    , ec.classification_name
 from {{ ref('ed_classification__int_condition_with_class') }} c
-inner join {{ ref('core__patient') }} p using(patient_id)
+inner join {{ ref('ed_classification__stg_patient') }} p using(patient_id)
 inner join {{ ref('ed_classification__categories') }} ec using(classification)
