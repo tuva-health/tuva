@@ -64,7 +64,7 @@ select
   -- patient level additions
   , p.sex as patient_gender
   , p.birth_date as patient_birth_date
-  , floor({{ datediff('birth_date', 'getdate()', 'hour') }} / 8766.0) as age
+  , floor({{ datediff('birth_date', 'current_date()', 'hour') }} / 8766.0) as age
   , p.race as patient_race
   , p.state as patient_state
 

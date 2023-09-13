@@ -15,7 +15,8 @@ seeds:
     description: A probabilistic mapping of icd9 codes to ed classification categories
     config:
       column_types:
-        icd9: text
+        icd9: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
     columns:
       - name: icd9
         tests:
@@ -34,7 +35,8 @@ seeds:
     description: A probabilistic mapping of icd9 codes to ed classification categories
     config:
       column_types:
-        icd10: text
+        icd10: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
     columns:
       - name: icd10
         tests:

@@ -12,13 +12,20 @@ with summary as (
   from {{ ref('ed_classification__summary') }}
   group by classification_order, classification_name, recorded_date_year, provider_parent_organization_name_with_provider_name
 )
-
+, totals_by_classification as (
+    select
+        classification_name
+        , count(distinct(claim_id)) as total_claim_count
+        , sum(claim_paid_amount_sum) as total_claim_paid_amount
+    from {{ ref('ed_classification__summary') }}
+    group by
+        classification_name
+)
 select
-  summary.*
-  , 100 * ratio_to_report(claim_count)
-    over(partition by classification_name) as percent_claim_count_of_classification
-  , 100 * ratio_to_report(claim_paid_amount_sum)
-    over(partition by classification_name) as "percent_claim_paid_amount_sum_of_classification"
-
+    summary.*
+    , claim_count/total_claim_count * 100 as percent_claim_count_of_classification
+    , claim_paid_amount_sum/total_claim_paid_amount * 100 as percent_claim_paid_amount_sum_of_classification
 from summary
-order by "percent_claim_paid_amount_sum_of_classification" desc
+inner join totals_by_classification class
+    on summary.classification_name = class.classification_name
+order by percent_claim_paid_amount_sum_of_classification desc

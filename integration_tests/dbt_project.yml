@@ -12,8 +12,8 @@ vars:
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva
-  input_schema: tuva_claims
+  input_database: dev_ci_testing
+  input_schema: input_layer
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
@@ -57,7 +57,7 @@ dispatch:
 
 
 seeds:
-  +database: dev_thuxuan
+  +database: dev-ci-testing
   integration_tests:
     eligibility_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
@@ -67,5 +67,5 @@ seeds:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"
 
 models:
-  +database: dev_thuxuan
+  +database: dev-ci-testing
   
