@@ -38,6 +38,6 @@ select
    , cast(claim_paid_amount_sum as {{ dbt.type_float() }}) as claim_paid_amount_sum
 from {{ ref('ed_classification__stg_condition') }} condition
 inner join ed_claims using(claim_id)
-left join {{ ref('readmissions__icd_10_cm_to_ccs') }} mapping 
+left join {{ ref('ed_classification__icd_10_cm_to_ccs') }} mapping 
 on condition.normalized_code = mapping.icd_10_cm
 where condition_rank = 1

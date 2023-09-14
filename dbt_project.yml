@@ -69,6 +69,9 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','dxccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
         ccsr__prccsr_v2023_1_cleaned_map:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','prccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
+      ed_classification:
+        ed_classification__icd_10_pcs_to_ccs:
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_pcs_to_ccs.csv',compression=true,null_marker=true) }}"
       readmissions:
         readmissions__icd_10_pcs_to_ccs:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_pcs_to_ccs.csv',compression=true,null_marker=true) }}"
