@@ -26,6 +26,7 @@ select
 , sum(paid_amount) as inst_paid_amount
 , sum(allowed_amount) as inst_allowed_amount
 , sum(charge_amount) as inst_charge_amount
+, max(diagnosis_code_1) as primary_diagnosis_code
 , max(data_source) as data_source
 from {{ ref('medical_claim') }} a
 inner join {{ ref('acute_inpatient__encounter_id') }} b
@@ -94,6 +95,8 @@ select
 , c.inst_paid_amount + d.prof_paid_amount as total_paid_amount
 , c.inst_allowed_amount + d.prof_allowed_amount as total_allowed_amount
 , c.inst_charge_amount + d.prof_charge_amount as total_charge_amount
+, c.primary_diagnosis_code
+, icd.description as primary_diagnosis_description
 , {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }} as length_of_stay
 , case
     when c.discharge_disposition_code = '20' then 1
@@ -120,4 +123,6 @@ left join {{ ref('terminology__ms_drg') }} j
   on c.ms_drg_code = j.ms_drg_code
 left join {{ ref('terminology__apr_drg') }} k
   on c.apr_drg_code = k.apr_drg_code
+left join {{ ref('terminology__icd_10_cm') }} icd
+    on a.diagnosis_code_1 = icd.icd_10_cm
 
