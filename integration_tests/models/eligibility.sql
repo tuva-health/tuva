@@ -6,6 +6,6 @@ select * from {{ ref('eligibility_seed') }}
 
 {%- else -%}
 
-select * from {{ source('claims_input', 'eligibility') }}
+select * from {{ source('source_input', 'eligibility') }}
 
 {%- endif %}
