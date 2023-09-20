@@ -55,6 +55,10 @@ seeds:
     terminology:
       terminology__calendar:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','calendar.csv',compression=true,null_marker=true) }}"
+      terminology__loinc:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','loinc.csv',compression=true,null_marker=true) }}"
+      terminology__loinc_deprecated_mapping:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','loinc_deprecated_mapping.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_pcs.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_cm:
