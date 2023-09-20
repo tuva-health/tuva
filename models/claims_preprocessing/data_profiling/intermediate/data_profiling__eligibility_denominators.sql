@@ -40,7 +40,7 @@ with all_denominator as(
         , count(distinct patient_id) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ ref('eligibility') }}
-    where orec is not null
+    where original_reason_entitlement_code is not null
 )
 , dual_status_denominator as(
     select

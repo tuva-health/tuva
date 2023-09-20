@@ -303,9 +303,9 @@ seeds:
         - claims_preprocessing
         - data_profiling
       column_types:
-        orec: |
+        original_reason_entitlement_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        orec_description: |
+        original_reason_entitlement_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
   
 

@@ -71,17 +71,17 @@ with valid_gender as(
         , 'invalid_values' as test_category
         , 'patient_id' as grain
         , patient_id
-        , elig.orec
-        , count(elig.orec) as filled_row_count
+        , elig.original_reason_entitlement_code
+        , count(elig.original_reason_entitlement_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__medicare_orec') }} dual
-        on elig.orec = dual.orec
-    where dual.orec is null
-    and elig.orec is not null
+    left join {{ ref('terminology__medicare_orec') }} orec
+        on elig.original_reason_entitlement_code = orec.original_reason_entitlement_code
+    where orec.original_reason_entitlement_code is null
+    and elig.original_reason_entitlement_code is not null
     group by
         patient_id
-        , elig.orec
+        , elig.original_reason_entitlement_code
 )
 , valid_dual_status_code as(
     select
