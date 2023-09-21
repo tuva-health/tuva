@@ -1,5 +1,101 @@
 version: 2
 
 models:
-  - name: insights__claim_count_by_claim_type
+  - name: insights__count_claim_by_claim_type
     description: Count of distinct claims by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: count_claim_by_claim_type
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__count_claim_by_date_column
+    description: Count of distinct claims by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: count_claim_by_date_column
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__count_claim_by_service_category
+    description: Count of distinct claims by service category
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: count_claim_by_service_category
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__sum_amount_by_claim_type
+    description: Sum of paid_amount, allowed_amount, and charge_amount by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: sum_amount_by_claim_type
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__sum_amount_by_service_category
+    description: Sum of paid_amount, allowed_amount, and charge_amount by service category
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: sum_amount_by_service_category
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__trend_count_claim_by_claim_type
+    description: Monthly trend of distinct claims by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: trend_count_claim_by_claim_type
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__trend_count_claim_by_service_category
+    description: Monthly trend of distinct claims by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: trend_count_claim_by_service_category
+      tags: 
+        - insights
+      materialized: table
+    
+  - name: insights__trend_sum_amount_by_claim_type
+    description: Monthly trend of distinct claims by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: trend_sum_amount_by_claim_type
+      tags: 
+        - insights
+      materialized: table
+
+  - name: insights__trend_sum_amount_by_service_category
+    description: Monthly trend of distinct claims by claim type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: trend_sum_amount_by_service_category
+      tags: 
+        - insights
+      materialized: table
