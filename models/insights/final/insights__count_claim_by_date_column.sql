@@ -6,8 +6,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "claim_start_date") }}
-        , {{ date_part("month", "claim_start_date") }}
+        year_month
 
     union all
 
@@ -17,9 +16,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "claim_end_date") }}
-        , {{ date_part("month", "claim_end_date") }}
-
+        year_month
     union all
 
     select
@@ -28,8 +25,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "admission_date") }}
-        , {{ date_part("month", "admission_date") }}
+        year_month
 
     union all
 
@@ -39,8 +35,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "discharge_date") }}
-        , {{ date_part("month", "discharge_date") }}
+        year_month
 
     union all
 
@@ -50,8 +45,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "paid_date") }}
-        , {{ date_part("month", "paid_date") }}
+        year_month
 
     union all
 
@@ -61,8 +55,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__pharmacy_claim') }}
     group by 
-        {{ date_part("year", "dispensing_date") }}
-        , {{ date_part("month", "dispensing_date") }}
+        year_month
 
     union all
 
@@ -72,8 +65,7 @@ with date_stage as(
         , count(distinct claim_id) as distinct_count
     from {{ ref('core__pharmacy_claim') }}
     group by 
-        {{ date_part("year", "paid_date") }}
-        , {{ date_part("month", "paid_date") }}
+        year_month
 
     union all 
 
