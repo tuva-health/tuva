@@ -3,7 +3,9 @@ version: 2
 seeds:
   - name: eligibility_seed
     config:
-      schema: tuva_synthetic
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
+        {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
         {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
@@ -49,7 +51,9 @@ seeds:
 
   - name: medical_claim_seed
     config:
-      schema: tuva_synthetic
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
+        {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
         {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
@@ -292,7 +296,9 @@ seeds:
 
   - name: pharmacy_claim_seed
     config:
-      schema: tuva_synthetic
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
+        {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
         {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
