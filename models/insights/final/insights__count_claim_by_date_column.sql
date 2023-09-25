@@ -79,14 +79,48 @@ with date_stage as(
 )
 
 
-select * from
-    (select
-        year_month
-        , date_field
-        , distinct_count
-        from date_stage
-        ) s
-        pivot
-        (max(distinct_count) for date_field in ('claim_start_date','claim_end_date','admission_date'
-        ,'discharge_date','medical paid_date','dispensing_date','pharmacy paid_date','member_months')
-    )piv
+, all_date_range as (
+    select distinct 
+        replace(cal.year_month,'-','') as year_month
+    from {{ ref('terminology__calendar') }} cal
+    where (cal.year_month >= (select min(year_month) from date_stage)
+    and cal.year_month <= (select max(year_month) from date_stage))
+    
+)
+
+select
+    cast(all_date.year_month as {{ dbt.type_int() }} ) as year_month
+    , member_months.distinct_count as member_months
+    , claim_start.distinct_count as claim_start_date
+    , claim_end.distinct_count as claim_end_date
+    , admission_date.distinct_count as admission_date
+    , discharge_date.distinct_count as discharge_date
+    , med_paid_date.distinct_count as medical_paid_date
+    , dispensing_date.distinct_count as dispensing_date
+    , pharm_paid_date.distinct_count as pharmacy_paid_date
+from all_date_range all_date
+left join date_stage member_months
+    on all_date.year_month = member_months.year_month
+    and member_months.date_field = 'member_months'
+left join date_stage claim_start
+    on all_date.year_month = claim_start.year_month
+    and claim_start.date_field = 'claim_start_date'
+left join date_stage claim_end
+    on all_date.year_month = claim_end.year_month
+    and claim_end.date_field = 'claim_end_date'
+left join date_stage admission_date
+    on all_date.year_month = admission_date.year_month
+    and admission_date.date_field = 'admission_date'
+left join date_stage discharge_date
+    on all_date.year_month = discharge_date.year_month
+    and discharge_date.date_field = 'discharge_date'
+left join date_stage med_paid_date
+    on all_date.year_month = med_paid_date.year_month
+    and med_paid_date.date_field = 'medical paid_date'
+left join date_stage dispensing_date
+    on all_date.year_month = dispensing_date.year_month
+    and dispensing_date.date_field = 'dispensing_date'
+left join date_stage pharm_paid_date
+    on all_date.year_month = pharm_paid_date.year_month
+    and pharm_paid_date.date_field = 'pharmacy paid_date'
+
