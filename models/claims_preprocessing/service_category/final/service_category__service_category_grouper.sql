@@ -99,7 +99,7 @@ with service_category_1_mapping as(
             when service_category_2 = 'Urgent Care'                   then 2
             when service_category_2 is null                           then 18
                 else 99 end) as duplicate_row_number
-    from claims_preprocessing.service_category_grouper
+    from service_category_1_mapping
 )
 
 select
