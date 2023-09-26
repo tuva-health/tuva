@@ -50,7 +50,7 @@ select
     , cast(zip_code as {{ dbt.type_string() }}) as zip_code
     , cast(null as {{ dbt.type_string() }}) as county
     , cast(null as {{ dbt.type_float() }}) as latitude 
-    , cast(null as {{ dbt.type_float() }}) as logitude
+    , cast(null as {{ dbt.type_float() }}) as longitude
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from patient_stage
