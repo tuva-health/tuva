@@ -63,6 +63,26 @@ with valid_gender as(
         patient_id
         , elig.payer_type
 )
+, valid_orec as(
+    select
+        'orec invalid' as test_name
+        , 'eligibility' as source_table
+        , 'all' as claim_type
+        , 'invalid_values' as test_category
+        , 'patient_id' as grain
+        , patient_id
+        , elig.original_reason_entitlement_code
+        , count(elig.original_reason_entitlement_code) as filled_row_count
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
+    from {{ ref('eligibility') }} elig
+    left join {{ ref('terminology__medicare_orec') }} orec
+        on elig.original_reason_entitlement_code = orec.original_reason_entitlement_code
+    where orec.original_reason_entitlement_code is null
+    and elig.original_reason_entitlement_code is not null
+    group by
+        patient_id
+        , elig.original_reason_entitlement_code
+)
 , valid_dual_status_code as(
     select
         'dual_status_code invalid' as test_name
@@ -108,6 +128,8 @@ union all
 select * from valid_race
 union all
 select * from valid_payer_type
+union all
+select * from valid_orec
 union all
 select * from valid_dual_status_code
 union all
