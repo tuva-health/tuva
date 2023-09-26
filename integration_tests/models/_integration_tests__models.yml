@@ -1,0 +1,103 @@
+version: 2
+
+models:
+# claim input models
+  - name: eligibility
+    description: Created from seed or source data depending on test_data_override variable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
+        {% else %}_tuva_claims{%- endif -%}
+      tags: claims
+      materialized: table
+
+  - name: medical_claim
+    description: Created from seed or source data depending on test_data_override variable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
+        {% else %}_tuva_claims{%- endif -%}
+      tags: claims
+      materialized: table
+
+  - name: pharmacy_claim
+    description: Created from seed or source data depending on test_data_override variable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
+        {% else %}_tuva_claims{%- endif -%}
+      tags: claims
+      materialized: table
+
+# clinical input models
+  - name: condition
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: encounter
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: lab_result
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: location
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: medication
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: observation
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: patient
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: practitioner
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
+
+  - name: procedure
+    description: Created using empty table logic.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
+        {% else %}_tuva_clinical{%- endif -%}
+      materialized: view
