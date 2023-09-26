@@ -6,6 +6,6 @@ select * from {{ ref('pharmacy_claim_seed') }}
 
 {%- else -%}
 
-select * from {{ source('claims_input', 'pharmacy_claim') }}
+select * from {{ source('source_input', 'pharmacy_claim') }}
 
 {%- endif %}
