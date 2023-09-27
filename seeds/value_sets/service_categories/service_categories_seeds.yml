@@ -5,8 +5,9 @@ seeds:
     description: List of service categories and sub-categories
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_service_category{% else %}service_category{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{% else %}claims_preprocessing{%- endif -%}
       alias: _value_set_service_categories
       tags:
         - service_category
+        - claims_preprocessing
       enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
