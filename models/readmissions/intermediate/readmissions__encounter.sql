@@ -15,6 +15,6 @@ select
     cast(discharge_disposition_code as {{ dbt.type_string() }}) as discharge_disposition_code,
     cast(facility_npi as {{ dbt.type_string() }}) as facility_npi,
     cast(ms_drg_code as {{ dbt.type_string() }}) as ms_drg_code,
-    cast(total_paid_amount as numeric) as total_paid_amount,
+    cast(paid_amount as numeric) as paid_amount,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('readmissions__stg_core__encounter') }}

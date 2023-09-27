@@ -14,7 +14,7 @@ select
     aa.discharge_disposition_code,
     aa.facility_npi,
     aa.ms_drg_code,
-    aa.total_paid_amount,
+    aa.paid_amount,
     {{ dbt.datediff("aa.admit_date", "aa.discharge_date","day") }} as length_of_stay,
     case
         when bb.encounter_id is not null then 1
