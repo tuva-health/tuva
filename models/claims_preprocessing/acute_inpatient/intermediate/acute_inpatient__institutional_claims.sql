@@ -30,7 +30,7 @@ select
   mc.claim_type,
   mc.data_source
 from {{ ref('acute_inpatient__stg_medical_claim') }} mc
-inner join {{ ref('acute_inpatient__stg_service_category__service_category_grouper')}} sc
+inner join {{ ref('acute_inpatient__stg_service_category')}} sc
   on mc.claim_id = sc.claim_id
 where mc.claim_type = 'institutional'
   and sc.service_category_2 = 'Acute Inpatient'
