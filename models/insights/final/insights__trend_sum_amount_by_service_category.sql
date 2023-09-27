@@ -1,6 +1,6 @@
 with trend_by_service_category_1 as(
     select
-        cast(year(claim_end_date) as varchar) || right('0'||cast(month(claim_end_date) as varchar),2) as year_month
+        cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
         , 'service_category_1' as service_category_type
         , service_category_1 as service_category
         , sum(paid_amount) as total_paid_amount
@@ -14,7 +14,7 @@ with trend_by_service_category_1 as(
 )
 , trend_by_service_category_2 as(
     select
-        cast(year(claim_end_date) as varchar) || right('0'||cast(month(claim_end_date) as varchar),2) as year_month
+        cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
         , 'service_category_2' as service_category_type
         , service_category_2 as service_category
         , sum(paid_amount) as total_paid_amount

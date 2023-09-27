@@ -3,38 +3,51 @@
    )
 }}
 
-with trend_service_category_1 as (
+with trend_by_service_category_1 as (
     select 
-        year(claim_end_date) || month(claim_end_date) as year_month
+        cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
         , service_category_1
         , count(distinct claim_id) as distinct_claim_count
-        , lag(count(distinct claim_id),1) over (partition by service_category_1 order by year(claim_end_date) || month(claim_end_date)) as previous_distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
         year(claim_end_date)
         , month(claim_end_date)
         , service_category_1
 )
-, trend_service_category_2 as (
+, trend_by_service_category_2 as (
     select 
-        year(claim_end_date) || month(claim_end_date) as year_month
+        cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
         , service_category_2
         , count(distinct claim_id) as distinct_claim_count
-        , lag(count(distinct claim_id),1) over (partition by service_category_2 order by year(claim_end_date) || month(claim_end_date)) as previous_distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
         year(claim_end_date)
         , month(claim_end_date)
         , service_category_2
 )
-
+, previous_service_category_1_claim_count as(
+    select
+        year_month
+        , service_category_1
+        , distinct_claim_count
+        , lag(distinct_claim_count) over (partition by service_category_1 order by year_month) as previous_distinct_claim_count
+    from trend_by_service_category_1
+)
+, previous_service_category_2_claim_count as(
+    select
+        year_month
+        , service_category_2
+        , distinct_claim_count
+        , lag(distinct_claim_count) over (partition by service_category_2 order by year_month) as previous_distinct_claim_count
+    from trend_by_service_category_2
+)
 select 
     year_month
     , service_category_1
     , distinct_claim_count
     , distinct_claim_count-previous_distinct_claim_count as distinct_claim_count_change
     , ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 as percent_change
-from trend_service_category_1
+from previous_service_category_1_claim_count
 
  union all
 
@@ -44,4 +57,4 @@ from trend_service_category_1
     , distinct_claim_count
     , distinct_claim_count-previous_distinct_claim_count as distinct_claim_count_change
     , ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 as percent_change
-from trend_service_category_2
+from previous_service_category_2_claim_count

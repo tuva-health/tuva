@@ -1,6 +1,6 @@
 with trend_by_medical_claim_type as(
     select
-        cast(year(claim_end_date) as varchar) || right('0'||cast(month(claim_end_date) as varchar),2) as year_month
+        cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
         , claim_type
         , sum(paid_amount) as total_paid_amount
         , sum(allowed_amount) as total_allowed_amount
@@ -13,7 +13,7 @@ with trend_by_medical_claim_type as(
 )
 , trend_by_pharmacy_claim_type as(
     select
-        cast(year(dispensing_date) as varchar) || right('0'||cast(month(dispensing_date) as varchar),2) as year_month
+        cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
         , 'pharmacy' as claim_type
         , sum(paid_amount) as total_paid_amount
         , sum(allowed_amount) as total_allowed_amount
