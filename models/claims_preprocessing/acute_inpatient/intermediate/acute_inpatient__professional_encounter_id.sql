@@ -32,7 +32,7 @@
 
 with acute_inpatient_professional_claim_ids as (
 select distinct claim_id
-from {{ ref('acute_inpatient__stg_service_category__service_category_grouper') }} 
+from {{ ref('acute_inpatient__stg_service_category') }} 
 where claim_type = 'professional'
   and service_category_2 = 'Acute Inpatient'
 ),
