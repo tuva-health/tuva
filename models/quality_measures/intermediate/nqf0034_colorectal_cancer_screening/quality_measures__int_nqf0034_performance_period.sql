@@ -11,6 +11,6 @@
 
 
 
-    select
-        cast({{ performance_period_begin }} as date) as performance_period_begin,
-        cast('{{ performance_period_end }}' as date) as performance_period_end
+select
+    cast({{ performance_period_begin }} as date) as performance_period_begin,
+    cast('{{ performance_period_end }}' as date) as performance_period_end

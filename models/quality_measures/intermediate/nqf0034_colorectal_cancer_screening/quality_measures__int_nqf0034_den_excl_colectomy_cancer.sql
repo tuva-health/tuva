@@ -4,19 +4,8 @@
 }}
 
 /*
-DENOMINATOR:
-Patients 45-75 years of age with a visit during the measurement period
-DENOMINATOR NOTE: To assess the age for exclusions, the patient’s age on the date of the encounter
-should be used
-*Signifies that this CPT Category I code is a non-covered service under the Medicare Part B Physician Fee
-Schedule (PFS). These non-covered services should be counted in the denominator population for MIPS
-CQMs.
-Denominator Criteria (Eligible Cases):
-Patients 45 to 75 years of age on date of encounter
-AND
-Patient encounter during the performance period (CPT or HCPCS): 99202, 99203, 99204, 99205,
-99212, 99213, 99214, 99215, 99341, 99342, 99344, 99345, 99347, 99348, 99349, 99350, 99386*, 99387*,
-99396*, 99397*, G0438, G0439
+DENOMINATOR EXCLUSIONS:
+Patients with a diagnosis or past history of total colectomy or colorectal cancer: G9711
 */
 
 
@@ -27,29 +16,6 @@ Patient encounter during the performance period (CPT or HCPCS): 99202, 99203, 99
 {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="'"~performance_period_end~"'") }}
 {%- endset -%}
 
-
-/*
--- todo: which encounter_types to use?
-with cte as (select $1 as cpt
-             From (values ('99202'), ('99203'), ('99204'), ('99205')
-                        , ('99212'), ('99213'), ('99214'), ('99215')
-                        , ('99341'), ('99342'), ('99344'), ('99345')
-                        , ('99347'), ('99348'), ('99349'), ('99350')
-                        , ('99386'), ('99387')) -- these are the values in https://qpp.cms.gov/docs/QPP_quality_measure_specifications/CQM-Measures/2023_Measure_113_MIPSCQM.pdf
-             )
-select ValueSetName, count_if(cpt is null) ctnull,count_if(cpt is not null) ctnotnull, count(*) ctall
-From value_sets.value_set_codes vsc
-left join cte on cte.cpt = vsc.Code
-where CodeSystemName in (
-'CPT'
-,'HCPCS Level II'
-) -- these are all of the value sets from cms
-group by ValueSetName
-having ctnotnull > 0
-order by ValueSetName, count(*) desc
-
-select * From terminology.encounter_type
- */
 
 
 with visits_encounters as (
