@@ -92,9 +92,9 @@ select
 , i.admit_type_description
 , c.discharge_disposition_code
 , g.discharge_disposition_description
-, c.inst_paid_amount + d.prof_paid_amount as total_paid_amount
-, c.inst_allowed_amount + d.prof_allowed_amount as total_allowed_amount
-, c.inst_charge_amount + d.prof_charge_amount as total_charge_amount
+, c.inst_paid_amount + coalesce(d.prof_paid_amount,0) as total_paid_amount
+, c.inst_allowed_amount + coalesce(d.prof_allowed_amount,0) as total_allowed_amount
+, c.inst_charge_amount + coalesce(d.prof_charge_amount,0) as total_charge_amount
 , c.primary_diagnosis_code
 , icd.description as primary_diagnosis_description
 , {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }} as length_of_stay
