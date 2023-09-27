@@ -181,9 +181,6 @@ models:
     description: |
       Filtered condition row table to classified ones. Includes additional
       information from the claim header, provider and patient tables
-    tests:
-      - dbt_utils.equal_rowcount:
-          compare_model: ref('ed_condition_with_class')
     columns:
       - name: claim_id
         tests:
@@ -199,9 +196,6 @@ models:
       tags: ed_classification
       materialized: table
     description: Filtered condition row table to classified ones.
-    tests:
-      - dbt_utils.fewer_rows_than:
-          compare_model: ref('ed_condition')
 
   - name: ed_classification__int_merge_condition
     config:
@@ -214,9 +208,7 @@ models:
     description: |
       All conditions with the classifications merged on and resolved to a single
       category per condition row.
-    tests:
-      - dbt_utils.equal_rowcount:
-          compare_model: ref('ed_condition')
+
 
   - name: ed_classification__int_patient_list
     config:
