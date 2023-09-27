@@ -34,6 +34,17 @@ models:
         - insights
       materialized: table
 
+  - name: insights__orphan_claim_by_claim_type
+    description: Count of distinct claims by service category
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_insights
+        {% else %}insights{%- endif -%}
+      alias: orphan_claim_by_claim_type
+      tags: 
+        - insights
+      materialized: table
+
   - name: insights__sum_amount_by_claim_type
     description: Sum of paid_amount, allowed_amount, and charge_amount by claim type
     config:
