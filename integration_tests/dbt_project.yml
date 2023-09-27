@@ -12,8 +12,8 @@ vars:
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: dev_ci_testing
-  input_schema: input_layer
+  input_database: tuva
+  input_schema: tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
@@ -56,7 +56,7 @@ dispatch:
   - macro_namespace: 'the_tuva_project'
     search_order: ['integration_tests','the_tuva_project']
 
-
+models:
 seeds:
   integration_tests:
     eligibility_seed:
