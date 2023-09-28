@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
+
 select 
     claim_type
     , sum(paid_amount) as total_paid_amount

@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
+
 with medical_claim_orphan as(
 select
     'medical_claim' as claim_type

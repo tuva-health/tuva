@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
+
 with trend_by_claim_type as(
     select
         cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
