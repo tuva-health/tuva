@@ -18,7 +18,7 @@ with trend_by_medical_claim_type as(
 , trend_by_pharmacy_claim_type as(
     select
         cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}),2) as year_month
-        , 'pharmacy' as claim_type
+        , cast('pharmacy' as {{ dbt.type_string() }}) as claim_type
         , sum(paid_amount) as total_paid_amount
         , sum(allowed_amount) as total_allowed_amount
         , 0 as total_charge_amount
