@@ -5,7 +5,7 @@
 
 with medical_claim_orphan as(
 select
-    'medical_claim' as claim_type
+    'medical_claim' as claim_category
     , claim_id
     , patient_id
     , cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
@@ -14,7 +14,7 @@ from {{ ref('core__medical_claim') }}
 
 , pharmacy_claim_orphan as(
 select
-    'pharmacy_claim' as claim_type
+    'pharmacy_claim' as claim_category
     , claim_id
     , patient_id
     , cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}),2) as year_month
@@ -41,7 +41,7 @@ from {{ ref('core__pharmacy_claim') }}
 )
 
 select
-    claim_type
+    claim_category
     , count(distinct claim_id) as distinct_claim_count
 from union_orphans
-group by claim_type
+group by claim_category

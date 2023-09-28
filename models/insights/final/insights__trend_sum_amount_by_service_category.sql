@@ -14,8 +14,8 @@ with trend_by_service_category_1 as(
         , sum(charge_amount) as total_charge_amount
     from {{ ref('core__medical_claim') }}
     group by 
-        year(claim_end_date)
-        , month(claim_end_date)
+        {{ date_part("year", "claim_end_date") }}
+        , {{ date_part("month", "claim_end_date") }}
         , service_category_1
 )
 , trend_by_service_category_2 as(
@@ -28,8 +28,8 @@ with trend_by_service_category_1 as(
         , sum(charge_amount) as total_charge_amount
     from {{ ref('core__medical_claim') }}
     group by 
-        year(claim_end_date)
-        , month(claim_end_date)
+        {{ date_part("year", "claim_end_date") }}
+        , {{ date_part("month", "claim_end_date") }}
         , service_category_2
 )
 , trend_with_previous_service_category_1_sum as(

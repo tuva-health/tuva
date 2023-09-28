@@ -10,8 +10,8 @@ with trend_by_service_category_1 as (
         , count(distinct claim_id) as distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
-        year(claim_end_date)
-        , month(claim_end_date)
+        {{ date_part("year", "claim_end_date") }}
+        , {{ date_part("month", "claim_end_date") }}
         , service_category_1
 )
 , trend_by_service_category_2 as (
@@ -21,8 +21,8 @@ with trend_by_service_category_1 as (
         , count(distinct claim_id) as distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
-        year(claim_end_date)
-        , month(claim_end_date)
+        {{ date_part("year", "claim_end_date") }}
+        , {{ date_part("month", "claim_end_date") }}
         , service_category_2
 )
 , previous_service_category_1_claim_count as(
@@ -43,7 +43,7 @@ with trend_by_service_category_1 as (
 )
 select 
     year_month
-    , service_category_1
+    , service_category_1 as service_category
     , distinct_claim_count
     , distinct_claim_count-previous_distinct_claim_count as distinct_claim_count_change
     , ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 as percent_change
@@ -53,7 +53,7 @@ from previous_service_category_1_claim_count
 
  select 
     year_month
-    , service_category_2
+    , service_category_2 as service_category
     , distinct_claim_count
     , distinct_claim_count-previous_distinct_claim_count as distinct_claim_count_change
     , ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 as percent_change
