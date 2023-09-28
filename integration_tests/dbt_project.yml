@@ -12,7 +12,7 @@ vars:
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: medicare_lds_five_percent
+  input_database: tuva
   input_schema: tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
@@ -56,10 +56,8 @@ dispatch:
   - macro_namespace: 'the_tuva_project'
     search_order: ['integration_tests','the_tuva_project']
 
-models:
-  +database: medicare_lds_five_percent
+
 seeds:
-  +database: medicare_lds_five_percent
   integration_tests:
     eligibility_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
