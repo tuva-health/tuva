@@ -12,8 +12,7 @@ with trend_by_medical_claim_type as(
         , sum(charge_amount) as total_charge_amount
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "claim_end_date") }}
-        , {{ date_part("month", "claim_end_date") }}
+        year_month
         , claim_type
 )
 , trend_by_pharmacy_claim_type as(
@@ -25,8 +24,7 @@ with trend_by_medical_claim_type as(
         , 0 as total_charge_amount
     from {{ ref('core__pharmacy_claim') }}
     group by 
-        {{ date_part("year", "dispensing_date") }}
-        , {{ date_part("month", "dispensing_date") }}
+        year_month
 )
 , trend_with_previous_medical_sum as(
     select 

@@ -10,8 +10,7 @@ with trend_by_service_category_1 as (
         , count(distinct claim_id) as distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "claim_end_date") }}
-        , {{ date_part("month", "claim_end_date") }}
+        year_month
         , service_category_1
 )
 , trend_by_service_category_2 as (
@@ -21,8 +20,7 @@ with trend_by_service_category_1 as (
         , count(distinct claim_id) as distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "claim_end_date") }}
-        , {{ date_part("month", "claim_end_date") }}
+        year_month
         , service_category_2
 )
 , previous_service_category_1_claim_count as(

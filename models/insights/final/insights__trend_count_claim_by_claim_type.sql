@@ -10,8 +10,7 @@ with trend_by_claim_type as(
         , count(distinct claim_id) as distinct_claim_count
     from {{ ref('core__medical_claim') }}
     group by 
-        {{ date_part("year", "claim_end_date") }}
-        , {{ date_part("month", "claim_end_date") }}
+        year_month
         , claim_type
 )
 , trend_with_previous_count as(
