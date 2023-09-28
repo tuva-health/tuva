@@ -13,4 +13,4 @@ select claim_id,
        paid_amount,
        allowed_amount,
        data_source
-from tuva.tuva_synthetic.pharmacy_claim_seed
+from tuva._tuva_synthetic.pharmacy_claim_seed

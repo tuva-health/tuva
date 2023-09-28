@@ -20,4 +20,4 @@ select patient_id,
        zip_code,
        phone,
        data_source
-from tuva.tuva_synthetic.eligibility_seed
+from tuva._tuva_synthetic.eligibility_seed
