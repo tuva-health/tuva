@@ -44,7 +44,10 @@ select
     , service_category_1 as service_category
     , distinct_claim_count
     , distinct_claim_count-previous_distinct_claim_count as distinct_claim_count_change
-    , ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 as percent_change
+    , case
+        when distinct_claim_count <> 0 then ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 
+            else distinct_claim_count
+    end as distinct_claim_percentage_change
 from previous_service_category_1_claim_count
 
  union all
@@ -54,5 +57,8 @@ from previous_service_category_1_claim_count
     , service_category_2 as service_category
     , distinct_claim_count
     , distinct_claim_count-previous_distinct_claim_count as distinct_claim_count_change
-    , ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 as percent_change
+    , case
+        when distinct_claim_count <> 0 then ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 
+            else distinct_claim_count
+    end as distinct_claim_percentage_change
 from previous_service_category_2_claim_count

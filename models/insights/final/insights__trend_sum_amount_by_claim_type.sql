@@ -55,13 +55,22 @@ select
     , claim_type
     , total_paid_amount
     , total_paid_amount - previous_total_paid_amount as total_paid_amount_change
-    , ((total_paid_amount - previous_total_paid_amount)/total_paid_amount)*100 as total_paid_amount_percent_change
+   , case 
+        when total_paid_amount <> 0 then ((total_paid_amount - previous_total_paid_amount)/total_paid_amount)*100
+            else total_paid_amount
+     end as total_paid_amount_percent_change
     , total_allowed_amount
     , total_allowed_amount - previous_total_allowed_amount as total_allowed_amount_change
-    , ((total_allowed_amount - previous_total_allowed_amount)/total_allowed_amount)*100 as total_allowed_amount_percent_change
+   , case 
+        when total_allowed_amount <> 0 then ((total_allowed_amount - previous_total_allowed_amount)/total_allowed_amount)*100
+            else total_allowed_amount
+     end as total_allowed_amount_percent_change
     , total_charge_amount
     , total_charge_amount - previous_total_charge_amount as total_charge_amount_change
-    , ((total_charge_amount - previous_total_charge_amount)/total_charge_amount)*100 as total_charge_amount_percent_change
+   , case 
+        when total_charge_amount <> 0 then ((total_charge_amount - previous_total_charge_amount)/total_charge_amount)*100
+            else total_charge_amount
+     end as total_charge_amount_percent_change
 from trend_with_previous_medical_sum
 
 union all 
@@ -71,11 +80,20 @@ select
     , claim_type
     , total_paid_amount
     , total_paid_amount - previous_total_paid_amount as total_paid_amount_change
-    , ((total_paid_amount - previous_total_paid_amount)/total_paid_amount)*100 as total_paid_amount_percent_change
+   , case 
+        when total_paid_amount <> 0 then ((total_paid_amount - previous_total_paid_amount)/total_paid_amount)*100
+            else total_paid_amount
+     end as total_paid_amount_percent_change
     , total_allowed_amount
     , total_allowed_amount - previous_total_allowed_amount as total_allowed_amount_change
-    , ((total_allowed_amount - previous_total_allowed_amount)/total_allowed_amount)*100 as total_allowed_amount_percent_change
+   , case 
+        when total_allowed_amount <> 0 then ((total_allowed_amount - previous_total_allowed_amount)/total_allowed_amount)*100
+            else total_allowed_amount
+     end as total_allowed_amount_percent_change
     , total_charge_amount
     , total_charge_amount - previous_total_charge_amount as total_charge_amount_change
-    , ((total_charge_amount - previous_total_charge_amount)/total_charge_amount)*100 as total_charge_amount_percent_change
+   , case 
+        when total_charge_amount <> 0 then ((total_charge_amount - previous_total_charge_amount)/total_charge_amount)*100
+            else total_charge_amount
+     end as total_charge_amount_percent_change
 from trend_with_previous_pharmacy_sum

@@ -27,5 +27,8 @@ select
     , claim_type
     , distinct_claim_count
     , distinct_claim_count - previous_claim_count as distinct_claim_count_change
-    , ((distinct_claim_count - previous_claim_count)/distinct_claim_count)*100 as distinct_claim_percent_change
+    , case
+        when distinct_claim_count <> 0 then ((distinct_claim_count-previous_distinct_claim_count) / distinct_claim_count) * 100 
+            else distinct_claim_count
+    end as distinct_claim_percentage_change
 from trend_with_previous_count
