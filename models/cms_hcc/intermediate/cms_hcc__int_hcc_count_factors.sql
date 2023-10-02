@@ -27,6 +27,7 @@ with demographics as (
 
     select
           model_version
+        , factor_type
         , enrollment_status
         , medicaid_status
         , dual_status
@@ -101,6 +102,7 @@ with demographics as (
           hcc_counts_normalized.patient_id
         , hcc_counts_normalized.model_version
         , hcc_counts_normalized.payment_year
+        , seed_payment_hcc_count_factors.factor_type
         , seed_payment_hcc_count_factors.description
         , seed_payment_hcc_count_factors.coefficient
     from hcc_counts_normalized
@@ -120,6 +122,7 @@ with demographics as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
         , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
@@ -131,6 +134,7 @@ select
       patient_id
     , description
     , coefficient
+    , factor_type
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run

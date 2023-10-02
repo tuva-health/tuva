@@ -63,6 +63,7 @@ with members as (
         , members.institutional_status_default
         , members.model_version
         , members.payment_year
+        , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
     from members
          inner join seed_demographic_factors
@@ -91,6 +92,7 @@ with members as (
         , members.institutional_status_default
         , members.model_version
         , members.payment_year
+        , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
     from members
          inner join seed_demographic_factors
@@ -125,6 +127,7 @@ with members as (
         , members.institutional_status_default
         , members.model_version
         , members.payment_year
+        , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
     from members
          inner join seed_demographic_factors
@@ -165,6 +168,7 @@ with members as (
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
         , cast(institutional_status_default as boolean) as institutional_status_default
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
         , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
@@ -185,6 +189,7 @@ select
     , medicaid_dual_status_default
     , institutional_status_default
     , coefficient
+    , factor_type
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run

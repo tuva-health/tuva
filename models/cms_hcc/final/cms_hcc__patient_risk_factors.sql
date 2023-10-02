@@ -28,6 +28,7 @@ with demographic_factors as (
                 end
           as description
         , coefficient
+        , factor_type
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_demographic_factors') }}
@@ -51,6 +52,7 @@ with demographic_factors as (
           patient_id
         , hcc_description || ' (HCC ' || hcc_code || ')' as description
         , coefficient
+        , factor_type
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_disease_factors') }}
@@ -63,6 +65,7 @@ with demographic_factors as (
           patient_id
         , description
         , coefficient
+        , factor_type
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_enrollment_interaction_factors') }}
@@ -75,6 +78,7 @@ with demographic_factors as (
           patient_id
         , description
         , coefficient
+        , factor_type
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_disabled_interaction_factors') }}
@@ -87,6 +91,7 @@ with demographic_factors as (
           patient_id
         , description
         , coefficient
+        , factor_type
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_disease_interaction_factors') }}
@@ -99,6 +104,7 @@ with demographic_factors as (
           patient_id
         , description
         , coefficient
+        , factor_type
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_hcc_count_factors') }}
@@ -130,6 +136,7 @@ with demographic_factors as (
         , demographic_defaults.institutional_status_default
         , unioned.description as risk_factor_description
         , unioned.coefficient
+        , unioned.factor_type
         , unioned.model_version
         , unioned.payment_year
     from unioned
@@ -147,6 +154,7 @@ with demographic_factors as (
         , cast(institutional_status_default as boolean) as institutional_status_default
         , cast(risk_factor_description as {{ dbt.type_string() }}) as risk_factor_description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
         , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
@@ -161,6 +169,7 @@ select
     , institutional_status_default
     , risk_factor_description
     , coefficient
+    , factor_type
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
