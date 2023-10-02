@@ -425,14 +425,14 @@ models:
       - name: code
         description: The condition code.
 
-  - name: cms_hcc__stg_eligibility
+  - name: cms_hcc__stg_core__eligibility
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_eligibility
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging eligibility from the input layer.
+    description: Staging eligibility from core.
     columns:
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
@@ -451,14 +451,14 @@ models:
       - name: medicare_status_code
         description: Indicates how the patient became eligible for Medicare.
 
-  - name: cms_hcc__stg_medical_claim
+  - name: cms_hcc__stg_core__medical_claim
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_medical_claim
       tags: cms_hcc
       materialized: ephemeral
-    description: Staging medical claims from the input layer.
+    description: Staging medical claims from core.
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

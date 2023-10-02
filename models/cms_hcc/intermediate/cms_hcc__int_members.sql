@@ -37,7 +37,7 @@ with stg_eligibility as (
             partition by patient_id
             order by enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
-    from {{ ref('cms_hcc__stg_eligibility') }}
+    from {{ ref('cms_hcc__stg_core__eligibility') }}
 
 )
 
