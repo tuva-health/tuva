@@ -3,13 +3,9 @@
    )
 }}
 
+with combined as (
 select *
 from {{ ref('service_category__acute_inpatient_professional') }}
-
-union all
-
-select *
-from {{ ref('service_category__ambulance_professional') }}
 
 union all
 
@@ -20,11 +16,6 @@ union all
 
 select *
 from {{ ref('service_category__dialysis_professional') }}
-
-union all
-
-select *
-from {{ ref('service_category__dme_professional') }}
 
 union all
 
@@ -85,3 +76,26 @@ union all
 
 select *
 from {{ ref('service_category__urgent_care_professional') }}
+)
+
+select *
+from {{ ref('service_category__dme_professional') }}
+
+union all
+
+select *
+from {{ ref('service_category__ambulance_professional') }} a
+left join from {{ ref('service_category__dme_professional') }} b
+  on a.claim_id = b.claim_id
+where b.claim_id is null
+
+union all
+
+select *
+from combined a
+left join from {{ ref('service_category__dme_professional') }} b
+  on a.claim_id = b.claim_id
+left join from {{ ref('service_category__dme_professional') }} c
+  on a.claim_id = c.claim_id
+where b.claim_id is null
+  and c.claim_id is null

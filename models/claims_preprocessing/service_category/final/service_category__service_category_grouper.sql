@@ -2,7 +2,7 @@
      enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
-with service_category_1_mapping as(
+-- with service_category_1_mapping as(
     select distinct 
         a.claim_id
         , a.claim_line_number
@@ -70,43 +70,43 @@ with service_category_1_mapping as(
     left join {{ ref('service_category__combined_institutional') }} b
     on a.claim_id = b.claim_id
     where a.claim_type = 'institutional'
-)
-, service_category_2_deduplication as(
-    select 
-        claim_id
-        , claim_line_number
-        , claim_type
-        , service_category_1
-        , service_category_2
-        , row_number() over (partition by claim_id, claim_line_number order by 
-            case
-            when service_category_2 = 'Acute Inpatient'               then 3
-            when service_category_2 = 'Ambulance'                     then 7
-            when service_category_2 = 'Ambulatory Surgery'            then 8
-            when service_category_2 = 'Dialysis'                      then 17
-            when service_category_2 = 'Durable Medical Equipment'     then 1
-            when service_category_2 = 'Emergency Department'          then 5
-            when service_category_2 = 'Home Health'                   then 9
-            when service_category_2 = 'Hospice'                       then 10
-            when service_category_2 = 'Inpatient Psychiatric'         then 11
-            when service_category_2 = 'Inpatient Rehabilitation'      then 12
-            when service_category_2 = 'Lab'                           then 13
-            when service_category_2 = 'Office Visit'                  then 4
-            when service_category_2 = 'Outpatient Hospital or Clinic' then 14
-            when service_category_2 = 'Outpatient Psychiatric'        then 15
-            when service_category_2 = 'Outpatient Rehabilitation'     then 16
-            when service_category_2 = 'Skilled Nursing'               then 6
-            when service_category_2 = 'Urgent Care'                   then 2
-            when service_category_2 is null                           then 18
-                else 99 end) as duplicate_row_number
-    from service_category_1_mapping
-)
+-- )
+-- , service_category_2_deduplication as(
+--     select 
+--         claim_id
+--         , claim_line_number
+--         , claim_type
+--         , service_category_1
+--         , service_category_2
+--         , row_number() over (partition by claim_id, claim_line_number order by 
+--             case
+--             when service_category_2 = 'Acute Inpatient'               then 3
+--             when service_category_2 = 'Ambulance'                     then 7
+--             when service_category_2 = 'Ambulatory Surgery'            then 8
+--             when service_category_2 = 'Dialysis'                      then 17
+--             when service_category_2 = 'Durable Medical Equipment'     then 1
+--             when service_category_2 = 'Emergency Department'          then 5
+--             when service_category_2 = 'Home Health'                   then 9
+--             when service_category_2 = 'Hospice'                       then 10
+--             when service_category_2 = 'Inpatient Psychiatric'         then 11
+--             when service_category_2 = 'Inpatient Rehabilitation'      then 12
+--             when service_category_2 = 'Lab'                           then 13
+--             when service_category_2 = 'Office Visit'                  then 4
+--             when service_category_2 = 'Outpatient Hospital or Clinic' then 14
+--             when service_category_2 = 'Outpatient Psychiatric'        then 15
+--             when service_category_2 = 'Outpatient Rehabilitation'     then 16
+--             when service_category_2 = 'Skilled Nursing'               then 6
+--             when service_category_2 = 'Urgent Care'                   then 2
+--             when service_category_2 is null                           then 18
+--                 else 99 end) as duplicate_row_number
+--     from service_category_1_mapping
+-- )
 
-select
-    claim_id
-    , claim_line_number
-    , claim_type
-    , service_category_1
-    , service_category_2
-from service_category_2_deduplication
-where duplicate_row_number = 1
+-- select
+--     claim_id
+--     , claim_line_number
+--     , claim_type
+--     , service_category_1
+--     , service_category_2
+-- from service_category_2_deduplication
+-- where duplicate_row_number = 1
