@@ -19,9 +19,6 @@ with demographics as (
         , dual_status
         , orec
         , institutional_status
-        , enrollment_status_default
-        , medicaid_dual_status_default
-        , institutional_status_default
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_demographic_factors') }}
@@ -66,9 +63,6 @@ with demographics as (
         , demographics.dual_status
         , demographics.orec
         , demographics.institutional_status
-        , demographics.enrollment_status_default
-        , demographics.medicaid_dual_status_default
-        , demographics.institutional_status_default
         , demographics.model_version
         , demographics.payment_year
         , hcc_hierarchy.hcc_code

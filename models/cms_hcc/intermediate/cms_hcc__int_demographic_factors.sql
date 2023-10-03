@@ -21,6 +21,7 @@ with members as (
         , institutional_status
         , enrollment_status_default
         , medicaid_dual_status_default
+        , orec_default
         , institutional_status_default
         , model_version
         , payment_year
@@ -60,6 +61,7 @@ with members as (
         , members.institutional_status
         , members.enrollment_status_default
         , members.medicaid_dual_status_default
+        , members.orec_default
         , members.institutional_status_default
         , members.model_version
         , members.payment_year
@@ -89,6 +91,7 @@ with members as (
         , members.institutional_status
         , members.enrollment_status_default
         , members.medicaid_dual_status_default
+        , members.orec_default
         , members.institutional_status_default
         , members.model_version
         , members.payment_year
@@ -124,6 +127,7 @@ with members as (
         , members.institutional_status
         , members.enrollment_status_default
         , members.medicaid_dual_status_default
+        , members.orec_default
         , members.institutional_status_default
         , members.model_version
         , members.payment_year
@@ -166,6 +170,7 @@ with members as (
         , cast(institutional_status as {{ dbt.type_string() }}) as institutional_status
         , cast(enrollment_status_default as boolean) as enrollment_status_default
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
+        , cast(orec_default as boolean) as orec_default
         , cast(institutional_status_default as boolean) as institutional_status_default
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -187,6 +192,7 @@ select
     , institutional_status
     , enrollment_status_default
     , medicaid_dual_status_default
+    , orec_default
     , institutional_status_default
     , coefficient
     , factor_type

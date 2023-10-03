@@ -17,13 +17,16 @@ models:
         description: Unique ID for the patient.
       - name: enrollment_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
       - name: medicaid_dual_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
+      - name: orec_default
+        description: >
+          Indicates the input data was missing and a default status was used.
       - name: institutional_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
       - name: risk_factor_description
         description: Description of the risk factor.
       - name: coefficient
@@ -117,13 +120,16 @@ models:
           least 90 days.
       - name: enrollment_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
       - name: medicaid_dual_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
+      - name: orec_default
+        description: >
+          Indicates the input data was missing and a default status was used.
       - name: institutional_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
       - name: coefficient
         description: >
           Relative factor value that correspond to the CMS HCC model's 
@@ -404,20 +410,24 @@ models:
       - name: orec
         description: >
           Indicates the Original Reason for Entitlement Code (OREC) 
-          "Aged", "Disabled", or "ESRD".
+          "Aged", "Disabled", or "ESRD". If available, current Medicare Status 
+          is used when OREC is missing.
       - name: institutional_status
         description: >
           Indicates whether the patient resided in an institution for at 
           least 90 days.
       - name: enrollment_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
       - name: medicaid_dual_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
+      - name: orec_default
+        description: >
+          Indicates the input data was missing and a default status was used.
       - name: institutional_status_default
         description: >
-          Indicates the input field was missing and a default status was used.
+          Indicates the input data was missing and a default status was used.
       - name: model_version
         description: CMS HCC model version.
       - name: payment_year

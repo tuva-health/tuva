@@ -44,6 +44,7 @@ with demographic_factors as (
           patient_id
         , enrollment_status_default
         , medicaid_dual_status_default
+        , orec_default
         , institutional_status_default
     from {{ ref('cms_hcc__int_demographic_factors') }}
 
@@ -136,6 +137,7 @@ with demographic_factors as (
           unioned.patient_id
         , demographic_defaults.enrollment_status_default
         , demographic_defaults.medicaid_dual_status_default
+        , demographic_defaults.orec_default
         , demographic_defaults.institutional_status_default
         , unioned.description as risk_factor_description
         , unioned.coefficient
@@ -154,6 +156,7 @@ with demographic_factors as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(enrollment_status_default as boolean) as enrollment_status_default
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
+        , cast(orec_default as boolean) as orec_default
         , cast(institutional_status_default as boolean) as institutional_status_default
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(risk_factor_description as {{ dbt.type_string() }}) as risk_factor_description
@@ -169,6 +172,7 @@ select
       patient_id
     , enrollment_status_default
     , medicaid_dual_status_default
+    , orec_default
     , institutional_status_default
     , factor_type
     , risk_factor_description
