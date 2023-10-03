@@ -69,7 +69,7 @@ union all
 
 select
   a.claim_id
-, service_category_2
+, a.service_category_2
 from combine a
 left join duplicate_bill_types b
   on a.claim_id = b.claim_id
