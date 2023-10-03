@@ -85,7 +85,7 @@ union all
 
 select *
 from {{ ref('service_category__ambulance_professional') }} a
-left join from {{ ref('service_category__dme_professional') }} b
+left join {{ ref('service_category__dme_professional') }} b
   on a.claim_id = b.claim_id
   and a.claim_line_number = b.claim_line_number
 where (b.claim_id is null and b.claim_line_number is null)
@@ -94,10 +94,10 @@ union all
 
 select *
 from combined a
-left join from {{ ref('service_category__dme_professional') }} b
+left join {{ ref('service_category__dme_professional') }} b
   on a.claim_id = b.claim_id
   and a.claim_line_number = b.claim_line_number
-left join from {{ ref('service_category__ambulance_professional') }} c
+left join {{ ref('service_category__ambulance_professional') }} c
   on a.claim_id = c.claim_id
   and a.claim_line_number = c.claim_line_number
 where (b.claim_id is null and b.claim_line_number is null)
