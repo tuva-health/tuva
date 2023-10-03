@@ -7,21 +7,24 @@ with demographic_factors as (
     select
           patient_id
         /* concatenate demographic risk factors */
-        , enrollment_status
-            || ' / '
-            || gender
-            || ' / '
+        , gender
+            || ', '
             || age_group
-            || ' / '
+            || ' Years'
+            || ', '
+            || enrollment_status
+            || ' Enrollee'
+            || ', '
             || case
                 when medicaid_status = 'Yes' then 'Medicaid'
                 else 'Non-Medicaid'
                 end
-            || ' / '
+            || ', '
             || dual_status
-            || ' / '
+            || ' Dual'
+            || ', '
             || orec
-            || ' / '
+            || ', '
             || case
                 when institutional_status = 'Yes' then 'Institutional'
                 else 'Non-Institutional'
@@ -152,9 +155,9 @@ with demographic_factors as (
         , cast(enrollment_status_default as boolean) as enrollment_status_default
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
         , cast(institutional_status_default as boolean) as institutional_status_default
+        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(risk_factor_description as {{ dbt.type_string() }}) as risk_factor_description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
-        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
         , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
@@ -167,9 +170,9 @@ select
     , enrollment_status_default
     , medicaid_dual_status_default
     , institutional_status_default
+    , factor_type
     , risk_factor_description
     , coefficient
-    , factor_type
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
