@@ -45,7 +45,7 @@ You can load all the terminology sets via SQL directly to your database.  Check 
 ## 🙋🏻‍♀️ How do I contribute?
 We created the Tuva Project to be a place where healthcare data practitioners can share their knowledge about doing healthcare analytics.  If you have ideas for improvements or find bugs, we highly encourage and welcome feedback! Feel free to create an issue or ping us on Slack.
 
-Check out our contribution guide [here](contributing.md).
+Check out our contribution guide [here](./CONTRIBUTING.md).
 <br/><br/>
 
 ## 🤝 Join our community!
