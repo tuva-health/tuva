@@ -175,15 +175,15 @@ with stg_eligibility as (
             else 'Non'
           end as dual_status
         /*
-           When OREC is missing, latest Medicare status is used.
+           The CMS-HCC model does not have factors for ESRD for these edge-cases,
+           we default to 'Aged'. When OREC is missing, latest Medicare status is
+           used, if available.
         */
         , case
-            when original_reason_entitlement_code in ('0') then 'Aged'
+            when original_reason_entitlement_code in ('0','2') then 'Aged'
             when original_reason_entitlement_code in ('1','3') then 'Disabled'
-            when original_reason_entitlement_code in ('2') then 'ESRD'
-            when medicare_status_code in ('10','11') then 'Aged'
-            when medicare_status_code in ('20','21') then 'Disabled'
-            when medicare_status_code in ('31') then 'ESRD'
+            when original_reason_entitlement_code is null and medicare_status_code in ('10','11','31') then 'Aged'
+            when original_reason_entitlement_code is null and medicare_status_code in ('20','21') then 'Disabled'
             when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 'Aged'
           end as orec
         /*
@@ -195,7 +195,12 @@ with stg_eligibility as (
             when dual_status_code is null then TRUE
             else FALSE
           end as medicaid_dual_status_default
+        /*
+           Setting default true when OREC or Medicare Status is ESRD, or null.
+        */
         , case
+            when original_reason_entitlement_code in ('2') then TRUE
+            when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
             when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
             else FALSE
           end as orec_default

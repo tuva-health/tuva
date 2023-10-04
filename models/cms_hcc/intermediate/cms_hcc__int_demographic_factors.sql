@@ -110,50 +110,11 @@ with members as (
 
 )
 
-/*
-    The CMS-HCC model does not have factors for ESRD or null medicare status
-    for these edge-cases, we default to 'Aged' and dual_status is Non or Partial.
-*/
-, other_enrollees as (
-
-    select
-          members.patient_id
-        , members.enrollment_status
-        , members.gender
-        , members.age_group
-        , members.medicaid_status
-        , members.dual_status
-        , members.orec
-        , members.institutional_status
-        , members.enrollment_status_default
-        , members.medicaid_dual_status_default
-        , members.orec_default
-        , members.institutional_status_default
-        , members.model_version
-        , members.payment_year
-        , seed_demographic_factors.factor_type
-        , seed_demographic_factors.coefficient
-    from members
-         inner join seed_demographic_factors
-         on members.enrollment_status = seed_demographic_factors.enrollment_status
-         and members.gender = seed_demographic_factors.gender
-         and members.age_group = seed_demographic_factors.age_group
-         and members.medicaid_status = seed_demographic_factors.medicaid_status
-    where seed_demographic_factors.orec = 'Aged'
-    and (members.orec = 'ESRD'
-      or members.orec is null)
-    and (seed_demographic_factors.dual_status in ('Non', 'Partial')
-      or seed_demographic_factors.dual_status is null)
-
-)
-
 , unioned as (
 
     select * from new_enrollees
     union all
     select * from continuining_enrollees
-    union all
-    select * from other_enrollees
 
 )
 
