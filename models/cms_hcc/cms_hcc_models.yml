@@ -11,22 +11,26 @@ models:
       materialized: table
     description: >
       This final model displays the full history of a patient recorded HCCs
-      with a flag for the payment year.
+      with a flag for recorded during the payment year.
     columns:
       - name: patient_id
         description: Unique ID for the patient.
-      - name: cms_hcc_v24
-        description: HCC code from CMS HCC model version 24.
-      - name: cms_hcc_v24_description
-        description: HCC description from CMS HCC model version 24.
-      - name: first_recorded
+      - name: recorded_date
+        description: Date in which the ICD-10-CM condition was recorded.
+      - name: condition_type
+        description: The type of condition.
+      - name: icd_10_cm_code
+        description: The ICD-10-CM condition code.
+      - name: hcc_code
         description: >
-          Date the ICD-10-CM code mapped to the HCC was first recorded in 
-          the patient's record.
+          HCC code from the latest CMS HCC model available in the mart.
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: first_recorded
+        description: Date the HCC was first recorded in the patient's record.
       - name: last_recorded
-        description:  >
-          Date the ICD-10-CM code mapped to the HCC was last recorded in 
-          the patient's record.
+        description: Date the HCC was last recorded in the patient's record.
       - name: payment_year_recorded
         description: >
           Flag indicating that the ICD-10-CM code mapped to the HCC was recorded
