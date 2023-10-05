@@ -24,7 +24,7 @@ with conditions as (
           diagnosis_code
         , cms_hcc_v24
     from {{ ref('cms_hcc__icd_10_cm_mappings') }}
-    where payment_year = {{ payment_year_compiled }}
+    where payment_year = (select max(payment_year) from {{ ref('cms_hcc__icd_10_cm_mappings') }})
     and cms_hcc_v24_flag = 'Yes'
 
 )
