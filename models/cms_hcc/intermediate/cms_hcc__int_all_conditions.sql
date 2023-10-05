@@ -45,10 +45,9 @@ with conditions as (
           conditions.patient_id
         , conditions.recorded_date
         , conditions.condition_type
-        , conditions.code_type
         , conditions.code
-        , seed_hcc_mapping.cms_hcc_v24
-        , seed_hcc_descriptions.description as cms_hcc_v24_description
+        , seed_hcc_mapping.cms_hcc_v24 as hcc_code
+        , seed_hcc_descriptions.description as hcc_description
     from conditions
          left join seed_hcc_mapping
          on conditions.code = seed_hcc_mapping.diagnosis_code
@@ -64,10 +63,9 @@ with conditions as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
-        , cast(code_type as {{ dbt.type_string() }}) as code_type
-        , cast(code as {{ dbt.type_string() }}) as code
-        , cast(cms_hcc_v24 as {{ dbt.type_string() }}) as cms_hcc_v24
-        , cast(cms_hcc_v24_description as {{ dbt.type_string() }}) as cms_hcc_v24_description
+        , cast(code as {{ dbt.type_string() }}) as icd_10_cm_code
+        , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
+        , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast('{{ model_version_compiled }}' as {{ dbt.type_string() }}) as model_version
         , cast({{ payment_year_compiled }} as integer) as payment_year
     from joined
@@ -78,10 +76,9 @@ select
       patient_id
     , recorded_date
     , condition_type
-    , code_type
-    , code
-    , cms_hcc_v24
-    , cms_hcc_v24_description
+    , icd_10_cm_code
+    , hcc_code
+    , hcc_description
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
