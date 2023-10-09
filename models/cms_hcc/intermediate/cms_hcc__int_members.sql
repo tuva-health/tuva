@@ -189,7 +189,7 @@ with stg_eligibility as (
         /*
            Defaulting everyone to non-institutional until logic is added
         */
-        , 'No' as institutional_status
+        , cast('No' as TEXT) as institutional_status
         , enrollment_status_default
         , case
             when dual_status_code is null then TRUE
