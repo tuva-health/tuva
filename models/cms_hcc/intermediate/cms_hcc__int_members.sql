@@ -26,9 +26,6 @@ with stg_eligibility as (
 
     select
           patient_id
-        , gender
-        , birth_date
-        , floor({{ datediff('birth_date', "'"~payment_year_age_date~"'", 'hour') }} / 8766.0) as payment_year_age
         , enrollment_start_date
         , enrollment_end_date
         , original_reason_entitlement_code
@@ -39,6 +36,18 @@ with stg_eligibility as (
             order by enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
     from {{ ref('cms_hcc__stg_core__eligibility') }}
+
+)
+
+, stg_patient as (
+
+    select
+          patient_id
+        , sex
+        , birth_date
+        , floor({{ datediff('birth_date', "'"~payment_year_age_date~"'", 'hour') }} / 8766.0) as payment_year_age
+        , death_date
+    from {{ ref('cms_hcc__stg_core__patient') }}
 
 )
 
@@ -86,8 +95,8 @@ with stg_eligibility as (
 
     select
           stg_eligibility.patient_id
-        , stg_eligibility.gender
-        , stg_eligibility.payment_year_age
+        , stg_patient.sex as gender
+        , stg_patient.payment_year_age
         , stg_eligibility.original_reason_entitlement_code
         , stg_eligibility.dual_status_code
         , stg_eligibility.medicare_status_code
@@ -104,8 +113,11 @@ with stg_eligibility as (
           end as enrollment_status_default
     from stg_eligibility
          left join add_enrollment
-         on stg_eligibility.patient_id = add_enrollment.patient_id
+            on stg_eligibility.patient_id = add_enrollment.patient_id
+         left join stg_patient
+            on stg_eligibility.patient_id = stg_patient.patient_id
     where stg_eligibility.row_num = 1
+    and stg_patient.death_date is null
 
 )
 

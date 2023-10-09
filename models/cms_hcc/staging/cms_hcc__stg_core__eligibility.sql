@@ -4,8 +4,6 @@
 }}
 select
       patient_id
-    , gender
-    , birth_date
     , enrollment_start_date
     , enrollment_end_date
     , original_reason_entitlement_code
