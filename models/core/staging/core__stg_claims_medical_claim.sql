@@ -54,7 +54,7 @@ select
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('medical_claim') }} med
-inner join {{ ref('service_category__service_category_grouper') }} srv_group
+left join {{ ref('service_category__service_category_grouper') }} srv_group
     on med.claim_id = srv_group.claim_id
     and med.claim_line_number = srv_group.claim_line_number
 left join {{ ref('acute_inpatient__encounter_id') }} enc

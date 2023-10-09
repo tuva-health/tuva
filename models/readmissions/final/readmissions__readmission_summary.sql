@@ -30,7 +30,7 @@ select
     aa.discharge_disposition_code,
     aa.facility_npi,
     aa.ms_drg_code,
-    aa.total_paid_amount,
+    aa.paid_amount,
     aa.length_of_stay,
     aa.index_admission_flag,
     aa.planned_flag,

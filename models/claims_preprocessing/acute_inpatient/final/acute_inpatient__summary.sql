@@ -120,4 +120,3 @@ left join {{ ref('terminology__ms_drg') }} j
   on c.ms_drg_code = j.ms_drg_code
 left join {{ ref('terminology__apr_drg') }} k
   on c.apr_drg_code = k.apr_drg_code
-
