@@ -1,0 +1,88 @@
+version: 2
+
+seeds:
+  - name: ed_classification__categories
+    description: A mapping of ED Classifications to human readable names
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      alias: _value_set_categories
+      tags: ed_classification
+      enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+    columns:
+      - name: classification
+        description: code for classification
+      - name: classification_name
+        description: human readable name for classification
+      - name: classification_order
+        description: Sortable column that organizes the ED classes
+
+  - name: ed_classification__icd_10_cm_to_ccs
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
+      alias: _value_set_icd_10_cm_to_ccs
+      tags: ed_classification
+      column_types:
+        icd_10_cm : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ccs_diagnosis_category : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ccs_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+
+  - name: ed_classification__johnston_icd9
+    description: A probabilistic mapping of icd9 codes to ed classification categories
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      alias: _value_set_johnston_icd9
+      tags: ed_classification
+      enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        icd9: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd9
+        tests:
+          - unique
+          - not_null
+      - name: edcnnpa
+      - name: edcnpa
+      - name: epct
+      - name: noner
+      - name: injury
+      - name: psych
+      - name: alcohol
+      - name: drug
+      
+  - name: ed_classification__johnston_icd10
+    description: A probabilistic mapping of icd9 codes to ed classification categories
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}
+      alias: _value_set_johnston_icd10
+      tags: ed_classification
+      enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        icd10: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd10
+        tests:
+          - unique
+          - not_null
+      - name: edcnnpa
+      - name: edcnpa
+      - name: epct
+      - name: noner
+      - name: injury
+      - name: psych
+      - name: alcohol
+      - name: drug

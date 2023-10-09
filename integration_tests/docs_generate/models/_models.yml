@@ -4,7 +4,7 @@ models:
   - name: eligibility
     config:
       database: tuva
-      schema: claims_data_model
+      schema: input_layer
     description: > 
      The eligibility table includes information about a patient's health insurance coverage and demographics (note: we use the word patient as a synonym for member). Every claims dataset should include some sort of eligibility data, otherwise it's impossible to calculate member months, which are needed to calculate measures like PMPM.
     columns:
@@ -37,6 +37,10 @@ models:
         description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
         meta:
           terminology: /terminology/tuva-concepts/payer-type
+      - name: original_reason_entitlement_code
+        description: Original reason for Medicare entitlement code.
+        meta:
+          terminology: /terminology/administrative-codes/medicare-orec
       - name: dual_status_code
         description: Indicates whether the patient is dually eligible for Medicare and Medicaid.
         meta:
@@ -66,7 +70,7 @@ models:
   - name: medical_claim
     config:
       database: tuva
-      schema: claims_data_model
+      schema: input_layer
     description: > 
      The medical_claim table contains information on healthcare services and supplies provided to patients, billed by providers, and paid for by health insurers. It includes information on the provider who rendered the service, the amount paid for the service by the health insurer, and the underlying reason for the service (i.e. diagnosis).
     columns:
@@ -541,7 +545,7 @@ models:
   - name: pharmacy_claim
     config:
       database: tuva
-      schema: claims_data_model
+      schema: input_layer
     description: >
       The pharmacy_claim table includes information about retail and specialty drug prescriptions that have been filled by a patient, billed by a pharmacy, and paid by an insurer.
     columns:

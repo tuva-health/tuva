@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('ccsr_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+     enabled = var('ccsr_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
 

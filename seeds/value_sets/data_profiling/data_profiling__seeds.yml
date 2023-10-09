@@ -4,10 +4,11 @@ seeds:
   - name: data_profiling__test_catalog
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_profiling{% else %}data_profiling{%- endif -%}
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{% else %}claims_preprocessing{%- endif -%}
       alias: _value_set_test_catalog
       tags:
         - data_profiling
+        - claims_preprocessing
       enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         source_table : |

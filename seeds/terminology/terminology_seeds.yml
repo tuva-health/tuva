@@ -264,6 +264,121 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
+  - name: terminology__loinc
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: loinc
+      tags:
+        - terminology
+      columns:
+        - name: loinc
+          description: The LOINC code
+        - name:  short_name
+          description: If exists, the short human readable version of the LOINC description
+        - name: long_common_name
+          description: Clinician-friendly full loinc description
+        - name: component
+          description: The substance or entity being measured or observed.  Also called the Analyte. The first of six loinc parts.
+        - name: property
+          description: The characteristic or attribute of the analyte. The second of six loinc parts.
+        - name: time_aspect
+          description: The interval of time over which an observation was made. The third of six loinc parts.
+        - name: system
+          description: The thing upon which the observation was made. Also called specimen for laboratory tests. The fourth of six loinc parts.
+        - name: scale_type
+          description: How the observation value is quantified or expressed (e.g. quantitative, ordinal, nominal, etc).  The fifth of six loinc parts.
+        - name: method_type
+          description: A high-level classification of how the observation was made. Optional; only needed when the technique affects the clinical interpretation of the results.  The sixth of six loinc parts.
+        - name: class_code
+          description: A code representing the general category of the loinc term
+        - name: class_description
+          description: The general category of the LOINC term
+        - name: class_type_code
+          description: A code representing the top level category for the test
+        - name: class_type_description
+          description: The top level category for the test; Laboratory, Clincal, Claims attachments, or Surveys
+        - name: external_copyright_notice
+          description: External copyright holders copyright notice for this LOINC code
+        - name: status
+          description: The status of the LOINC code concept. Active, Trial (experimental), Discouraged (not recommended), or Deprecated (should not be used)
+        - name: version_first_released
+          description: The first release version of LOINC that included this code
+        - name: version_last_changed
+          description: The last LOINC version in which this record was changed
+      column_types:
+        loinc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        short_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        long_common_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        component : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        property : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        time_aspect : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        system : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        scale_type : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        method_type : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        class_code : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        class_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        class_type_code : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        class_type_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        external_copyright_notice : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        status : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        version_first_released : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        version_last_changed : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
+
+  - name: terminology__loinc_deprecated_mapping
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: loinc_deprecated_mapping
+      tags:
+        - terminology
+      columns:
+        - name: loinc
+          description: The deprecated term to which the replacement term(s) apply.
+        - name: map_to
+          description: A replacement term that is to be used in place of the deprecated or discouraged term.
+        - name: comment
+          description: Narrative text that explains the rational for using the recommended replacement term.
+        - name: final_map_to
+          description: If there are multiple steps of deprecated codes, this is the final (active) code
+        - name: all_comments
+          description: An aggregation of comments for any mapping steps between the deprecated code and the active code
+        - name: depth
+          description: How many steps this mapping is to the active code
+      column_types:
+        loinc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        map_to : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        comment : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        final_map_to : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        all_comments : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        depth : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
+
+
   - name: terminology__mdc
     config:
       schema: |
@@ -292,6 +407,22 @@ seeds:
         dual_status_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
+
+  - name: terminology__medicare_orec
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: medicare_orec
+      tags:
+        - terminology
+        - claims_preprocessing
+        - data_profiling
+      column_types:
+        original_reason_entitlement_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        original_reason_entitlement_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  
 
   - name: terminology__ssa_fips_state
     config:

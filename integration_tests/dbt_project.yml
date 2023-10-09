@@ -10,15 +10,14 @@ vars:
   # otherwise set to false and set the input vars below
   test_data_override: true
 
-
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
   input_database: tuva
   input_schema: tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
-  
-  ## The Tuva Project can support claims and clinical data.  
+
+  ## The Tuva Project can support claims and clinical data.
   # By default, all models are disabled.
   # Use the vars below to enabled or disable sections of The Tuva Project.
 
@@ -29,13 +28,14 @@ vars:
   ## The vars directly below enable a single data mart.  See the Quickstart section of
   # thetuvaproject.com for instructions.
 
-  # claims_preprocessing_enabled: true
   # ccsr_enabled: true
   # cms_chronic_conditions_enabled: true
   # tuva_chronic_conditions_enabled: true
+  # claims_preprocessing_enabled: true
   # cms_hcc_enabled: true
+  # ed_classification_enabled: true
   # financial_pmpm_enabled: true
-  # quality_measures_reporting_enabled: true
+  # quality_measures_enabled: true
   # readmissions_enabled: true
 
 

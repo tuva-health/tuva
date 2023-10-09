@@ -135,4 +135,4 @@ select claim_id,
        procedure_date_24,
        procedure_date_25,
        data_source
-from tuva.tuva_synthetic.medical_claim_seed
+from tuva._tuva_synthetic.medical_claim_seed

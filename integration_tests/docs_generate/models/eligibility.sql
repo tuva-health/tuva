@@ -9,6 +9,7 @@ select patient_id,
        enrollment_end_date,
        payer,
        payer_type,
+       original_reason_entitlement_code,
        dual_status_code,
        medicare_status_code,
        first_name,
@@ -19,4 +20,4 @@ select patient_id,
        zip_code,
        phone,
        data_source
-from tuva.tuva_synthetic.eligibility_seed
+from tuva._tuva_synthetic.eligibility_seed

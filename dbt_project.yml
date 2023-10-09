@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.5.1'
+version: '0.5.8'
 config-version: 2
 require-dbt-version: ">=1.3.0"
 
@@ -34,8 +34,9 @@ vars:
     tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
     ## Quality Measure data mart vars
-    # The measurement period variable has a default of the current date
-    quality_measure_reporting_period_end: "{{ dbt_utils.pretty_time(format='%Y-%m-%d') }}"
+    # The measurement period end variable has a default of the current date
+    # this var can be used to run older performance periods
+    quality_measures_period_end: "{{ dbt_utils.pretty_time(format='%Y-%m-%d') }}"
 
 
 model-paths: ["models"]
@@ -54,6 +55,10 @@ seeds:
     terminology:
       terminology__calendar:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','calendar.csv',compression=true,null_marker=true) }}"
+      terminology__loinc:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','loinc.csv',compression=true,null_marker=true) }}"
+      terminology__loinc_deprecated_mapping:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','loinc_deprecated_mapping.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_pcs.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_cm:
@@ -68,6 +73,9 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','dxccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
         ccsr__prccsr_v2023_1_cleaned_map:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','prccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
+      ed_classification:
+        ed_classification__icd_10_cm_to_ccs:
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
       readmissions:
         readmissions__icd_10_pcs_to_ccs:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_pcs_to_ccs.csv',compression=true,null_marker=true) }}"

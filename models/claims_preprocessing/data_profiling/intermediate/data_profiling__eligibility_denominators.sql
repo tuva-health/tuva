@@ -34,6 +34,14 @@ with all_denominator as(
     from {{ ref('eligibility') }}
     where payer_type is not null
 )
+, orec_denominator as(
+    select
+        cast('orec invalid' as {{ dbt.type_string() }} ) as test_denominator_name
+        , count(distinct patient_id) as denominator
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
+    from {{ ref('eligibility') }}
+    where original_reason_entitlement_code is not null
+)
 , dual_status_denominator as(
     select
         cast('dual_status_code invalid' as {{ dbt.type_string() }} ) as test_denominator_name
@@ -57,7 +65,9 @@ union all
 select * from race_denominator
 union all 
 select * from payer_type_denominator
-union all 
+union all
+select * from orec_denominator
+union all
 select * from dual_status_denominator
 union all 
 select * from medicare_status_denominator
