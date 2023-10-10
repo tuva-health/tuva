@@ -94,8 +94,9 @@ select
 , {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race
+, c.diagnosis_code_type as primary_diagnosis_code_type
 , c.diagnosis_code_1 as primary_diagnosis_code
-, icd10cm.description as primary_diagnosis_description
+, coalesce(icd10cm.description, icd9cm.long_description) as primary_diagnosis_description
 , f.facility_npi
 , f.provider_first_name
 , f.provider_last_name
