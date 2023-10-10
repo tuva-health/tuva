@@ -16,7 +16,7 @@
 select
     cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
-    , cast(enc.encounter_id as {{ dbt.type_string() }} ) as encounter_id 
+    , cast(coalesce(ap.encounter_id,ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id 
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
     , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
@@ -57,5 +57,7 @@ from {{ ref('medical_claim') }} med
 left join {{ ref('service_category__service_category_grouper') }} srv_group
     on med.claim_id = srv_group.claim_id
     and med.claim_line_number = srv_group.claim_line_number
-left join {{ ref('acute_inpatient__encounter_id') }} enc
-    on med.claim_id = enc.claim_id
+left join {{ ref('acute_inpatient__encounter_id') }} ap
+    on med.claim_id = ap.claim_id
+left join {{ ref('emergency_department__int_encounter_id') }} ed
+    on med.claim_id = ed.claim_id

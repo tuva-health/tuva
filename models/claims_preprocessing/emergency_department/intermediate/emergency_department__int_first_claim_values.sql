@@ -15,7 +15,7 @@ with first_claim_values as(
         , ms_drg_code
         , apr_drg_code
     from {{ ref('emergency_department__int_encounter_id')}} e
-    inner join medicare_lds_five_percent._tuva_claims.medical_claim m
+    inner join {{ ref('medical_claim') }} m
         on e.claim_id = m.claim_id
 )
 
