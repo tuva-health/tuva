@@ -4,69 +4,84 @@
 }}
 
 with distinct_encounters as (
-select distinct
-  a.encounter_id
-, a.patient_id
-, b.encounter_start_date
-, b.encounter_end_date
+    select distinct
+    a.encounter_id
+    , a.patient_id
+    , b.encounter_start_date
+    , b.encounter_end_date
 from {{ ref('acute_inpatient__encounter_id') }} a
 inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
   on a.encounter_id = b.encounter_id
 )
 
 , institutional_claim_details as (
-select
-  b.encounter_id
-, max(a.facility_npi) as facility_npi
-, max(ms_drg_code) as ms_drg_code
-, max(apr_drg_code) as apr_drg_code
-, max(admit_source_code) as admit_source_code
-, max(admit_type_code) as admit_type_code
-, max(discharge_disposition_code) as discharge_disposition_code
-, sum(paid_amount) as inst_paid_amount
-, sum(allowed_amount) as inst_allowed_amount
-, sum(charge_amount) as inst_charge_amount
-, max(data_source) as data_source
-from {{ ref('medical_claim') }} a
-inner join {{ ref('acute_inpatient__encounter_id') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_type = 'institutional'
-group by 1
+    select
+        b.encounter_id
+        , first.diagnosis_code_1
+        , first.facility_npi as facility_npi
+        , first.ms_drg_code as ms_drg_code
+        , first.apr_drg_code as apr_drg_code
+        , first.admit_source_code as admit_source_code
+        , first.admit_type_code as admit_type_code
+        , last.discharge_disposition_code as discharge_disposition_code
+        , sum(paid_amount) as inst_paid_amount
+        , sum(allowed_amount) as inst_allowed_amount
+        , sum(charge_amount) as inst_charge_amount
+        , max(data_source) as data_source
+    from {{ ref('medical_claim') }} a
+    inner join {{ ref('acute_inpatient__encounter_id') }} b
+    on a.claim_id = b.claim_id
+    and a.claim_type = 'institutional'
+    inner join {{ ref('acute_inpatient__first_claim_values') }} first
+        on b.encounter_id = first.encounter_id
+        and first.claim_row = 1
+    inner join {{ ref('acute_inpatient__last_claim_values') }} last
+        on b.encounter_id = last.encounter_id
+        and first.claim_row = 1
+    group by
+        b.encounter_id
+        , first.diagnosis_code_1
+        , first.facility_npi
+        , first.ms_drg_code
+        , first.apr_drg_code
+        , first.admit_source_code
+        , first.admit_type_code
+        , last.discharge_disposition_code
 )
 
 , professional_claim_details as (
-select
-  b.encounter_id
-, sum(paid_amount) as prof_paid_amount
-, sum(allowed_amount) as prof_allowed_amount
-, sum(charge_amount) as prof_charge_amount
-from {{ ref('acute_inpatient__stg_medical_claim') }} a
-inner join {{ ref('acute_inpatient__encounter_id') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_type = 'professional'
+    select
+        b.encounter_id
+        , sum(paid_amount) as prof_paid_amount
+        , sum(allowed_amount) as prof_allowed_amount
+        , sum(charge_amount) as prof_charge_amount
+    from {{ ref('acute_inpatient__stg_medical_claim') }} a
+    inner join {{ ref('acute_inpatient__encounter_id') }} b
+    on a.claim_id = b.claim_id
+    and a.claim_type = 'professional'
 group by 1
 )
 
 , patient as (
-select distinct
-  patient_id
-, birth_date
-, gender
-, race
-from {{ ref('acute_inpatient__stg_eligibility') }}
-)
+    select distinct
+        patient_id
+        , birth_date
+        , gender
+        , race
+    from {{ ref('acute_inpatient__stg_eligibility') }}
+    )
 
 , provider as (
-select
-  a.encounter_id
-, max(a.facility_npi) as facility_npi
-, b.provider_first_name
-, b.provider_last_name
-, count(distinct facility_npi) as npi_count
-from {{ ref('acute_inpatient__institutional_encounter_id') }} a
-left join {{ ref('terminology__provider') }} b
-  on a.facility_npi = b.npi
-group by 1,3,4
+    select
+        a.encounter_id
+        , max(a.facility_npi) as facility_npi
+        , b.provider_first_name
+        , b.provider_last_name
+        , count(distinct facility_npi) as npi_count
+    from {{ ref('acute_inpatient__institutional_encounter_id') }} a
+    left join {{ ref('terminology__provider') }} b
+    on a.facility_npi = b.npi
+    group by 1,3,4
 )
 
 select
@@ -77,6 +92,8 @@ select
 , {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race
+, c.diagnosis_code_1 as primary_diagnosis_code
+, icd10cm.description as primary_diagnosis_description
 , f.facility_npi
 , f.provider_first_name
 , f.provider_last_name
@@ -120,3 +137,5 @@ left join {{ ref('terminology__ms_drg') }} j
   on c.ms_drg_code = j.ms_drg_code
 left join {{ ref('terminology__apr_drg') }} k
   on c.apr_drg_code = k.apr_drg_code
+left join {{ ref('terminology__icd_10_cm') }} icd10cm
+  on c.diagnosis_code_1 = icd10cm.icd10cm

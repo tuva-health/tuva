@@ -15,23 +15,38 @@ inner join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} 
 )
 
 , institutional_claim_details as (
-select
-  b.encounter_id
-, max(a.facility_npi) as facility_npi
-, max(ms_drg_code) as ms_drg_code
-, max(apr_drg_code) as apr_drg_code
-, max(admit_source_code) as admit_source_code
-, max(admit_type_code) as admit_type_code
-, max(discharge_disposition_code) as discharge_disposition_code
-, sum(paid_amount) as inst_paid_amount
-, sum(allowed_amount) as inst_allowed_amount
-, sum(charge_amount) as inst_charge_amount
-, max(data_source) as data_source
-from {{ ref('medical_claim') }} a
-inner join {{ ref('emergency_department__int_encounter_id') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_type = 'institutional'
-group by 1
+    select
+        b.encounter_id
+        , first.diagnosis_code_1
+        , first.facility_npi as facility_npi
+        , first.ms_drg_code as ms_drg_code
+        , first.apr_drg_code as apr_drg_code
+        , first.admit_source_code as admit_source_code
+        , first.admit_type_code as admit_type_code
+        , last.discharge_disposition_code as discharge_disposition_code
+        , sum(paid_amount) as inst_paid_amount
+        , sum(allowed_amount) as inst_allowed_amount
+        , sum(charge_amount) as inst_charge_amount
+        , max(data_source) as data_source
+    from {{ ref('medical_claim') }} a
+    inner join {{ ref('emergency_department__int_encounter_id') }} b
+        on a.claim_id = b.claim_id
+        and a.claim_type = 'institutional'
+    inner join {{ ref('emergency_department__int_first_claim_values') }} first
+        on b.encounter_id = first.encounter_id
+        and first.claim_row = 1
+    inner join {{ ref('emergency_department__int_last_claim_values') }} last
+        on b.encounter_id = last.encounter_id
+        and first.claim_row = 1
+    group by
+    b.encounter_id
+    , first.diagnosis_code_1
+    , first.facility_npi
+    , first.ms_drg_code
+    , first.apr_drg_code
+    , first.admit_source_code
+    , first.admit_type_code
+    , last.discharge_disposition_code
 )
 
 , professional_claim_details as (
@@ -70,37 +85,39 @@ group by 1,3,4
 )
 
 select
-  a.encounter_id
-, a.encounter_start_date
-, a.encounter_end_date
-, a.patient_id
-, {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
-, e.gender
-, e.race
-, f.facility_npi
-, f.provider_first_name
-, f.provider_last_name
-, c.ms_drg_code
-, j.ms_drg_description
-, j.medical_surgical
-, c.apr_drg_code
-, k.apr_drg_description
-, c.admit_source_code
-, h.admit_source_description
-, c.admit_type_code
-, i.admit_type_description
-, c.discharge_disposition_code
-, g.discharge_disposition_description
-, c.inst_paid_amount + coalesce(d.prof_paid_amount,0) as total_paid_amount
-, c.inst_allowed_amount + coalesce(d.prof_allowed_amount,0) as total_allowed_amount
-, c.inst_charge_amount + coalesce(d.prof_charge_amount,0) as total_charge_amount
-, {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }} as length_of_stay
-, case
-    when c.discharge_disposition_code = '20' then 1
-    else 0
-  end mortality_flag
-, data_source
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+    a.encounter_id
+    , a.encounter_start_date
+    , a.encounter_end_date
+    , a.patient_id
+    , {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
+    , e.gender
+    , e.race
+    , c.diagnosis_code_1 as primary_diagnosis_code
+    , icd10cm.description as primary_diagnosis_description
+    , f.facility_npi
+    , f.provider_first_name
+    , f.provider_last_name
+    , c.ms_drg_code
+    , j.ms_drg_description
+    , j.medical_surgical
+    , c.apr_drg_code
+    , k.apr_drg_description
+    , c.admit_source_code
+    , h.admit_source_description
+    , c.admit_type_code
+    , i.admit_type_description
+    , c.discharge_disposition_code
+    , g.discharge_disposition_description
+    , c.inst_paid_amount + coalesce(d.prof_paid_amount,0) as total_paid_amount
+    , c.inst_allowed_amount + coalesce(d.prof_allowed_amount,0) as total_allowed_amount
+    , c.inst_charge_amount + coalesce(d.prof_charge_amount,0) as total_charge_amount
+    , {{ dbt.datediff("a.encounter_start_date","a.encounter_end_date","day") }} as length_of_stay
+    , case
+        when c.discharge_disposition_code = '20' then 1
+        else 0
+    end mortality_flag
+    , data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from distinct_encounters a
 left join institutional_claim_details c
   on a.encounter_id = c.encounter_id
@@ -120,3 +137,5 @@ left join {{ ref('terminology__ms_drg') }} j
   on c.ms_drg_code = j.ms_drg_code
 left join {{ ref('terminology__apr_drg') }} k
   on c.apr_drg_code = k.apr_drg_code
+left join {{ ref('terminology__icd_10_cm')}} icd10cm
+  on c.diagnosis_code_1 = icd10cm.icd10cm
