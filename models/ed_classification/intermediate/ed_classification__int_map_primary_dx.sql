@@ -10,9 +10,9 @@ indicators of ED classification terminology
 {% set colnames = ["edcnnpa", "edcnpa", "epct", "noner", "injury", "psych", "alcohol", "drug"] %}
 
 with condition as (
-select * 
-from {{ ref('ed_classification__stg_encounter') }}
-where encounter_type = 'emergency department'
+    select * 
+    from {{ ref('ed_classification__stg_encounter') }}
+    where encounter_type = 'emergency department'
 )
 , icd9 as (
   select

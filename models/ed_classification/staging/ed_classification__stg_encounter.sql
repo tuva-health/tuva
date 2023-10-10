@@ -5,6 +5,7 @@
 
 select
     encounter_id
+    , encounter_type
     , patient_id
     , encounter_end_date
     , facility_npi
