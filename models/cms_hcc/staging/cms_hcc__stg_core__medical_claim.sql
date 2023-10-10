@@ -12,4 +12,4 @@ select
     , bill_type_code
     , hcpcs_code
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('medical_claim') }}
+from {{ ref('core__medical_claim') }}

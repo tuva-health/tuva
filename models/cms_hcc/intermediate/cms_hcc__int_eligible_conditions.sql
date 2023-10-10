@@ -38,7 +38,7 @@ with medical_claims as (
         , claim_end_date
         , bill_type_code
         , hcpcs_code
-    from {{ ref('cms_hcc__stg_medical_claim') }}
+    from {{ ref('cms_hcc__stg_core__medical_claim') }}
 
 )
 
@@ -151,7 +151,6 @@ with medical_claims as (
         , cast(code as {{ dbt.type_string() }}) as condition_code
         , cast('{{ model_version_compiled }}' as {{ dbt.type_string() }}) as model_version
         , cast('{{ payment_year_compiled }}' as integer) as payment_year
-        , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
     from eligible_conditions
 
 )

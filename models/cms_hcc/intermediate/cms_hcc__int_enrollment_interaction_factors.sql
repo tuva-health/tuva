@@ -19,9 +19,6 @@ with demographics as (
         , dual_status
         , orec
         , institutional_status
-        , enrollment_status_default
-        , medicaid_dual_status_default
-        , institutional_status_default
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_demographic_factors') }}
@@ -32,6 +29,7 @@ with demographics as (
 
     select
           model_version
+        , factor_type
         , gender
         , enrollment_status
         , medicaid_status
@@ -54,6 +52,7 @@ with demographics as (
           demographics.patient_id
         , demographics.model_version
         , demographics.payment_year
+        , seed_interaction_factors.factor_type
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
     from demographics
@@ -86,6 +85,7 @@ with demographics as (
           demographics.patient_id
         , demographics.model_version
         , demographics.payment_year
+        , seed_interaction_factors.factor_type
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
     from demographics
@@ -111,9 +111,9 @@ with demographics as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
-        , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
     from unioned
 
 )
@@ -122,6 +122,7 @@ select
       patient_id
     , description
     , coefficient
+    , factor_type
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
