@@ -18,6 +18,7 @@ inner join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} 
     select
         b.encounter_id
         , first.diagnosis_code_1
+        , first.diagnosis_code_type
         , first.facility_npi as facility_npi
         , first.ms_drg_code as ms_drg_code
         , first.apr_drg_code as apr_drg_code
@@ -41,6 +42,7 @@ inner join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} 
     group by
     b.encounter_id
     , first.diagnosis_code_1
+    , first.diagnosis_code_type
     , first.facility_npi
     , first.ms_drg_code
     , first.apr_drg_code
@@ -138,4 +140,8 @@ left join {{ ref('terminology__ms_drg') }} j
 left join {{ ref('terminology__apr_drg') }} k
   on c.apr_drg_code = k.apr_drg_code
 left join {{ ref('terminology__icd_10_cm')}} icd10cm
-  on c.diagnosis_code_1 = icd10cm.icd10cm
+  on c.diagnosis_code_1 = icd10cm.icd_10_cm
+  and c.diagnosis_code_type = 'icd-10-cm'
+left join {{ ref('terminology__icd_9_cm')}} icd9cm
+  on c.diagnosis_code_1 = icd9cm.icd_9_cm
+  and c.diagnosis_code_type = 'icd-9-cm'

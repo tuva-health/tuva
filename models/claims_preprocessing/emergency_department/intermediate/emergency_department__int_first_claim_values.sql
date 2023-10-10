@@ -8,6 +8,7 @@ with first_claim_values as(
         e.encounter_id
         , coalesce(claim_start_date, admission_date) as claim_start
         , diagnosis_code_1
+        , diagnosis_code_type
         , admit_source_code
         , admit_type_code
         , facility_npi
@@ -22,6 +23,7 @@ select
     encounter_id
     , claim_start
     , diagnosis_code_1
+    , diagnosis_code_type
     , admit_source_code
     , admit_type_code
     , facility_npi
