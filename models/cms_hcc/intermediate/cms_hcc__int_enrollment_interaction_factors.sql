@@ -34,7 +34,6 @@ with demographics as (
         , enrollment_status
         , medicaid_status
         , dual_status
-        , orec
         , institutional_status
         , description
         , coefficient
