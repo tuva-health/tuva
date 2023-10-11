@@ -39,13 +39,6 @@ select
     -- Claims with same end_date and same facility_npi should be merged:
     when (aa.end_date = bb.end_date
           and aa.facility_npi = bb.facility_npi) then 1
-
-    -- Claims with different end_date and start_date that are
-    -- adjacent (i.e. separated by 1 day) should be merged:
-    when (aa.end_date + 1 = bb.start_date
-          and aa.facility_npi = bb.facility_npi
-	  and aa.discharge_disposition_code = '30') then 1
-
     -- Claims with different end_date 
     -- should be merged if they overlap:
     when ( (aa.end_date <> bb.end_date) and 
