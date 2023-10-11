@@ -17,6 +17,7 @@ with first_claim_values as(
     from {{ ref('acute_inpatient__encounter_id')}} e
     inner join {{ ref('medical_claim') }} m
         on e.claim_id = m.claim_id
+    where claim_type = 'institutional'
 )
 
 select
