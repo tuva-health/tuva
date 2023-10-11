@@ -41,7 +41,7 @@ union all
 select
     cast(encounter_id as {{ dbt.type_string() }} ) as encounter_id
     , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
-    , cast('emergency_department' as {{ dbt.type_string() }} ) as encounter_type
+    , cast('emergency department' as {{ dbt.type_string() }} ) as encounter_type
     , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date
     , {{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }} as encounter_end_date
     , cast(length_of_stay as {{ dbt.type_int() }} ) as length_of_stay

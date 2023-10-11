@@ -38,7 +38,7 @@ inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
         and first.claim_row = 1
     inner join {{ ref('acute_inpatient__last_claim_values') }} last
         on b.encounter_id = last.encounter_id
-        and first.claim_row = 1
+        and last.claim_row = 1
     group by
         b.encounter_id
         , first.diagnosis_code_1

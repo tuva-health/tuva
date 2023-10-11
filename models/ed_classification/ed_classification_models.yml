@@ -70,41 +70,28 @@ models:
 
 
 # Intermediate
-  - name: ed_classification__int_by_ccs_description
+  - name: ed_classification__int_enhance_classification
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: _int_by_ccs_description
+      alias: _int_enhance_classification
       tags: ed_classification
       materialized: table
-    description: ED_Summary aggregated by year, and ccs_description
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: ccs_description_with_covid
-      - name: condition_date_year
-      - name: claim_count
-      - name: claim_paid_amount_sum
+    description: Adding patient and provider details
 
-  - name: ed_classification__int_by_patient_race
+  - name: ed_classification__int_filter_encounter_with_classification
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
-      alias: _int_by_patient_race
+      alias: _int_filter_encounter_with_classification
       tags: ed_classification
       materialized: table
-    description: ED_Summary aggregated by year, and ccs_description
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: patient_race
-      - name: condition_date_year
-      - name: claim_count
-      - name: claim_paid_amount_sum
+    description: Filter out ED visits that were not classified
 
-  - name: ed_classification__int_by_provider_parent_organization
+
+  - name: ed_classification__int_map_primary_dx
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
@@ -112,129 +99,7 @@ models:
       alias: _int_by_provider_parent_organization
       tags: ed_classification
       materialized: table
-    description: ED_Summary aggregated by year, and ccs_description
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: provider_parent_organization_with_provider_name
-      - name: condition_date_year
-      - name: claim_count
-      - name: claim_paid_amount_sum
-
-  - name: ed_classification__int_by_provider_practice_state
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_by_provider_practice_state
-      tags: ed_classification
-      materialized: table
-    description: ED_Summary aggregated by year, and ccs_description
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: provider_practice_state
-      - name: condition_date_year
-      - name: claim_count
-      - name: claim_paid_amount_sum
-
-  - name: ed_classification__int_by_year
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_by_year
-      tags: ed_classification
-      materialized: table
-    description: ED_Summary aggregated by year
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: condition_date_year
-      - name: claim_count
-      - name: claim_paid_amount_sum
-
-  - name: ed_classification__int_by_year_month
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_by_year_month
-      tags: ed_classification
-      materialized: table
-    description: ED_Summary aggregated by year month
-    columns:
-      - name: classification_order
-      - name: classification_name
-      - name: condition_date_year_month
-      - name: claim_count
-      - name: claim_paid_amount_sum
-
-  - name: ed_classification__int_condition_with_claim
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_condition_with_claim
-      tags: ed_classification
-      materialized: table
-    description: |
-      Filtered condition row table to classified ones. Includes additional
-      information from the claim header, provider and patient tables
-    columns:
-      - name: claim_id
-        tests:
-          - unique
-          - not_null
-
-  - name: ed_classification__int_condition_with_class
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_condition_with_class
-      tags: ed_classification
-      materialized: table
-    description: Filtered condition row table to classified ones.
-
-  - name: ed_classification__int_merge_condition
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_merge_condition
-      tags: ed_classification
-      materialized: table
-    description: |
-      All conditions with the classifications merged on and resolved to a single
-      category per condition row.
-
-
-  - name: ed_classification__int_patient_list
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_patient_list
-      tags: ed_classification
-      materialized: table
-    description: |
-      ED condition rows with all available patient information joined in.
-      Useful for identifying patients who have more than a certain number
-      of ED visits per time period.
-
-  - name: ed_classification__int_primary_dx_per_claim
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_primary_dx_per_claim
-      tags: ed_classification
-      materialized: table
-    description: |
-      ED condition rows with all available patient information joined in.
-      Useful for identifying patients who have more than a certain number
-      of ED visits per time period.
+    description: Map ED encounter primary dx to classification
 
 
 ##  Staging
