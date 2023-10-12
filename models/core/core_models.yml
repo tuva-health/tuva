@@ -355,6 +355,9 @@ models:
       alias: medical_claim
       tags: core
       materialized: table
+    tests:
+      - unique:
+          column_name: "(claim_id||'-'||claim_line_number)"
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

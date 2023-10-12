@@ -27,5 +27,12 @@ from add_encounter_id_to_emergency_department_encounters
 group by patient_id, encounter_id
 )
 
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run
+select 
+    patient_id
+    , encounter_id
+    , encounter_start_date
+    , encounter_end_date
+    , coalesce(encounter_start_date, encounter_end_date) as determined_encounter_start_date
+    , coalesce(encounter_end_date, encounter_start_date) as determined_encounter_end_date
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from encounter_start_and_end_dates

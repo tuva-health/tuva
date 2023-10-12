@@ -3,32 +3,6 @@
    )
 }}
 
--- *************************************************
--- This dbt model assigns professional acute inpatient
--- claims to acute inpatient encounters.
--- Some acute inpatient professional claims do not fall
--- within an acute inpatient encounter. We call these
--- orphan claims, and they do not have an encounter_id.
--- Some acute inpatient professional claims fall within
--- more than one acute inpatient encounter. Since we do not
--- know what encounter these claims should be mapped to
--- we do not assign them an encounter_id. These claims
--- have encounter_count > 1.
--- This model returns a table with 5 fields:
---      patient_id
---      claim_id
---      encounter_id (is null for orphan claims or claims
---                    that fall within more than one encounter)
---      orphan_claim_flag (is always 0 or 1)
---      encounter_count (an integer that represents the number
---                       of acute inpatient encounters this
---                       professional claim could fall into:
---                       could be 0,1,2,3,...  but is never null
---                       for acute inpatient professional claims)
--- *************************************************
-
-
-
 
 with emergency_department_professional_claim_ids as (
 select distinct claim_id
@@ -74,8 +48,8 @@ select
 from emergency_department_professional_claim_dates aa
 left join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} bb
   on aa.patient_id = bb.patient_id
-  and (coalesce(aa.start_date, aa.end_date) between bb.encounter_start_date and bb.encounter_end_date)
-  and (aa.end_date between bb.encounter_start_date and bb.encounter_end_date)
+  and (coalesce(aa.start_date, aa.end_date) between coalesce(bb.encounter_start_date, bb.determined_encounter_start_date) and coalesce(bb.encounter_end_date, bb.determined_encounter_end_date))
+  and (coalesce(aa.end_date, aa.start_date) between coalesce(bb.encounter_start_date, bb.determined_encounter_start_date) and coalesce(bb.encounter_end_date, bb.determined_encounter_end_date))
 ),
 
 professional_claims_in_more_than_one_encounter as (

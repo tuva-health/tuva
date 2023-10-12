@@ -74,8 +74,8 @@ select
 from acute_inpatient_professional_claim_dates aa
 left join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} bb
   on aa.patient_id = bb.patient_id
-  and (aa.start_date between bb.encounter_start_date and bb.encounter_end_date)
-  and (aa.end_date between bb.encounter_start_date and bb.encounter_end_date)
+  and (coalesce(aa.start_date, aa.end_date) between coalesce(bb.encounter_start_date, bb.determined_encounter_start_date) and coalesce(bb.encounter_end_date, bb.determined_encounter_end_date))
+  and (coalesce(aa.end_date, aa.start_date) between coalesce(bb.encounter_start_date, bb.determined_encounter_start_date) and coalesce(bb.encounter_end_date, bb.determined_encounter_end_date))
 ),
 
 professional_claims_in_more_than_one_encounter as (
