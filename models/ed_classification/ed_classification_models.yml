@@ -95,22 +95,7 @@ models:
 
 ##  Staging
 
-  - name: ed_classification__stg_condition
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      tags: ed_classification
-
   - name: ed_classification__stg_encounter
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      tags: ed_classification
-      materialized: ephemeral
-
-  - name: ed_classification__stg_medical_claim
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
