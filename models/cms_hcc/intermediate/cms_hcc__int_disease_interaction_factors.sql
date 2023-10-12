@@ -19,9 +19,6 @@ with demographics as (
         , dual_status
         , orec
         , institutional_status
-        , enrollment_status_default
-        , medicaid_dual_status_default
-        , institutional_status_default
         , model_version
         , payment_year
     from {{ ref('cms_hcc__int_demographic_factors') }}
@@ -41,6 +38,7 @@ with demographics as (
 
     select
           model_version
+        , factor_type
         , enrollment_status
         , medicaid_status
         , dual_status
@@ -65,9 +63,6 @@ with demographics as (
         , demographics.dual_status
         , demographics.orec
         , demographics.institutional_status
-        , demographics.enrollment_status_default
-        , demographics.medicaid_dual_status_default
-        , demographics.institutional_status_default
         , demographics.model_version
         , demographics.payment_year
         , hcc_hierarchy.hcc_code
@@ -83,6 +78,7 @@ with demographics as (
           demographics_with_hccs.patient_id
         , demographics_with_hccs.model_version
         , demographics_with_hccs.payment_year
+        , interactions_code_1.factor_type
         , interactions_code_1.description
         , interactions_code_1.hcc_code_1
         , interactions_code_1.hcc_code_2
@@ -102,6 +98,7 @@ with demographics as (
 
     select
           demographics_with_interactions.patient_id
+        , demographics_with_interactions.factor_type
         , demographics_with_interactions.hcc_code_1
         , demographics_with_interactions.hcc_code_2
         , demographics_with_interactions.description
@@ -122,9 +119,9 @@ with demographics as (
         , cast(hcc_code_2 as {{ dbt.type_string() }}) as hcc_code_2
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
-        , cast('{{ dbt_utils.pretty_time(format="%Y-%m-%d %H:%M:%S") }}' as {{ dbt.type_timestamp() }}) as date_calculated
     from disease_interactions
 
 )
@@ -135,6 +132,7 @@ select
     , hcc_code_2
     , description
     , coefficient
+    , factor_type
     , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
