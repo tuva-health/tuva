@@ -12,7 +12,7 @@
     , "strategy": "timestamp"
     , "updated_at": "tuva_last_run"
     , "unique_key": "patient_id||model_version||payment_year||tuva_last_run"
-    , "enabled": var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+    , "enabled": var('snapshots_enabled',False) == true and var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) == true | as_bool
   })
 }}
 
