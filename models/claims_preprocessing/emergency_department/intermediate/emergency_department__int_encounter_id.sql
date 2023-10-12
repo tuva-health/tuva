@@ -3,23 +3,6 @@
    )
 }}
 
--- *************************************************
--- This dbt model assigns an encounter_id to each
--- institutional or professional acute inpatient claim
--- that is eligible to be part of an encounter.
--- Professional acute inpatient claims that are
--- orphan claims (don't overlap with an institutional
--- acute inpatient claim) or that have
--- encounter_count > 1 (overlap with more than one different
--- acute inpatient encounter) are not included here.
--- It returns a table with these 3 columns:
---      patient_id
---      claim_id
---      encounter_id
--- *************************************************
-
-
-
 
 select
   patient_id,

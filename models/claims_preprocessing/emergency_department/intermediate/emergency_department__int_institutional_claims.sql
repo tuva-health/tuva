@@ -3,18 +3,8 @@
    )
 }}
 
--- *************************************************
--- This dbt model gives us all acute inpatient institutional claims.
--- We have one row per claim_id (for all claim_ids belonging to
--- acute inpatient institutinal claims).
--- The number of rows in the table is equal to the number of unique
--- claim_ids (i.e. claim_id is a primary key).
--- Note that we are assuming that a claim_id is unique across
--- all people in the datset, i.e.
--- that no two people can have the same claim_id.
--- *************************************************
 
-with acute_inpatient_claim_lines as (
+with emergency_department_claim_lines as (
 select
   mc.patient_id,
   mc.claim_id,
@@ -155,7 +145,7 @@ select
      and min(claim_type) <> 'institutional' then 1
     else 0
   end as claim_type_not_institutional
-from acute_inpatient_claim_lines
+from emergency_department_claim_lines
 group by claim_id
 ),
 
@@ -188,7 +178,7 @@ select
     else null
   end as date_used_as_end_date,
   data_source
-from acute_inpatient_claim_lines
+from emergency_department_claim_lines
 group by claim_id, data_source
 )
 

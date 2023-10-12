@@ -3,21 +3,8 @@
    )
 }}
 
--- *************************************************
--- This dbt model assigns an encounter_start_date and
--- an encounter_end_date to each acute inpatient
--- encounter_id.
--- This returns a table with 4 fields:
---      patient_id
---      encounter_id
---      encounter_start_date
---      encounter_end_date
--- The number of rows in the table should be equal
--- to the number of acute inpatient encounters.
--- *************************************************
 
-
-with add_encounter_id_to_acute_inpatient_encounters as (
+with add_encounter_id_to_emergency_department_encounters as (
 select
   aip.claim_id as claim_id,
   aip.patient_id as patient_id,
@@ -36,7 +23,7 @@ select
   encounter_id,
   min(start_date) as encounter_start_date,
   max(end_date) as encounter_end_date
-from add_encounter_id_to_acute_inpatient_encounters
+from add_encounter_id_to_emergency_department_encounters
 group by patient_id, encounter_id
 )
 

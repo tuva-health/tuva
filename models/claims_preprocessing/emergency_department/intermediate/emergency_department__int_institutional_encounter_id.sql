@@ -3,18 +3,6 @@
    )
 }}
 
--- *************************************************
--- This dbt model groups acute inpatient institutional
--- claims into encounters. It assigns an encounter_id
--- to each acute inpatient institutional claim.
--- This returns a table with 3 fields:
---      patient_id
---      claim_id
---      encounter_id
--- The number of rows in the table should be equal
--- to the number of acute inpatient institutional claims.
--- *************************************************
-
 
 with add_row_num as (
 select
