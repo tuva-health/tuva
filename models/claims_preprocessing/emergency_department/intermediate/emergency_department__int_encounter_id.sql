@@ -5,17 +5,21 @@
 
 
 select
-  patient_id,
-  claim_id,
-  encounter_id,
+  inst.patient_id,
+  inst.claim_id,
+  med.claim_line_number,
+  inst.encounter_id,
   '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('emergency_department__int_institutional_encounter_id') }}
+from {{ ref('emergency_department__int_institutional_encounter_id') }} inst
+left join {{ ref('medical_claim') }} med
+    on inst.claim_id = med.claim_id
 
 union distinct
 
 select
   patient_id,
   claim_id,
+  claim_line_number,
   encounter_id,
   '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('emergency_department__int_professional_encounter_id') }}

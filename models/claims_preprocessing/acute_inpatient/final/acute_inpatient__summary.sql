@@ -32,6 +32,7 @@ inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
     from {{ ref('medical_claim') }} a
     inner join {{ ref('acute_inpatient__encounter_id') }} b
     on a.claim_id = b.claim_id
+    and a.claim_line_number = b.claim_line_number
     and a.claim_type = 'institutional'
     inner join {{ ref('acute_inpatient__first_claim_values') }} first
         on b.encounter_id = first.encounter_id
@@ -60,6 +61,7 @@ inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
     from {{ ref('acute_inpatient__stg_medical_claim') }} a
     inner join {{ ref('acute_inpatient__encounter_id') }} b
     on a.claim_id = b.claim_id
+    and a.claim_line_number = b.claim_line_number
     and a.claim_type = 'professional'
 group by 1
 )

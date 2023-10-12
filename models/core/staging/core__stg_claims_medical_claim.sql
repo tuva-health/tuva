@@ -59,5 +59,8 @@ left join {{ ref('service_category__service_category_grouper') }} srv_group
     and med.claim_line_number = srv_group.claim_line_number
 left join {{ ref('acute_inpatient__encounter_id') }} ap
     on med.claim_id = ap.claim_id
+    and med.claim_line_number = ap.claim_line_number
 left join {{ ref('emergency_department__int_encounter_id') }} ed
     on med.claim_id = ed.claim_id
+    and med.claim_line_number = ed.claim_line_number
+
