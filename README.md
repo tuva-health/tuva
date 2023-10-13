@@ -3,20 +3,25 @@
 ![diagram](./the_tuva_project.jpg)
 
 ## 🧰  What is the Tuva Project?
-The Tuva Project code base includes a core data model, data marts, terminology sets, and data quality tests for doing healthcare analytics.
+The Tuva Project code base includes a core data model, data marts, terminology 
+sets, and data quality tests for doing healthcare analytics.
 
 **Explore the project:**
 
 - [Code](./models)
-- [Terminology Sets](seeds/terminology)
-- [Value Sets](seeds/terminology)
-- [Data Dictionaries](https://tuva-health.github.io/the_tuva_project/#!/overview/the_tuva_project)
+- [Terminology Sets](seeds/terminology)*
+- [Value Sets](seeds/value_sets)
+- [Data Dictionaries / DAG](https://tuva-health.github.io/the_tuva_project/#!/overview/the_tuva_project)
 - [Knowledge Base](https://thetuvaproject.com/)
 
-Note: In many cases the actual terminology sets are too large to maintain on GitHub, so we main them in a public AWS S3 bucket.  Executing dbt build will load the terminology sets from S3.
+*Note: In many cases the actual terminology sets are too large to maintain on 
+GitHub, so we host them in a public AWS S3 bucket. Executing dbt build will 
+load the terminology sets from S3.
+
+Check out our Quickstart guide [here](./QUICKSTART.md).
 <br/><br/>
 
-## 🔌  Supported Data Warehouses and dbt Versions
+## 🔌  Supported Data Warehouses and dbt Versions
 - BigQuery
 - Databricks (community supported)
 - Redshift
@@ -26,16 +31,15 @@ Note: In many cases the actual terminology sets are too large to maintain on Git
 This package supports dbt version `1.3.x` or higher.
 <br/><br/>
 
-## Loading Terminology via SQL
-
-You can load all the terminology sets via SQL directly to your database.  Check out the SQL for doing this [here](terminology_sql).
-<br/><br/>
-
 ## 🙋🏻‍♀️ Contributing
-We created the Tuva Project to be a place where healthcare data practitioners can share their knowledge about doing healthcare analytics.  If you have ideas for improvements or find bugs, we highly encourage and welcome feedback! Feel free to create an issue or ping us on Slack.
+We created the Tuva Project to be a place where healthcare data practitioners 
+can share their knowledge about doing healthcare analytics.  If you have ideas 
+for improvements or find bugs, we highly encourage and welcome feedback! Feel 
+free to create an issue or ping us on Slack. 
 
-Check out our contribution guide [here](./CONTRIBUTING.md).
+Check out our Contribution guide [here](./CONTRIBUTING.md).
 <br/><br/>
 
 ## 🤝 Community
 Join our growing community of healthcare data people in [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)!
+<br/><br/>
