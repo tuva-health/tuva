@@ -40,19 +40,6 @@ vars:
   # readmissions_enabled: false
 
 
-  ## CCSR data mart vars
-  # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
-  wide_condition_enabled: false
-  wide_procedure_enabled: false
-
-  # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
-  record_type: "ip"
-
-  # CCSR Version numbers from HCUP
-  dxccsr_version: "'2023.1'"
-  prccsr_version: "'2023.1'"
-
-
   ## CMS HCC data mart vars
   # The payment_year variable has a default of the current year
   cms_hcc_payment_year: 2023
@@ -77,7 +64,7 @@ dispatch:
   - macro_namespace: 'the_tuva_project'
     search_order: ['integration_tests','the_tuva_project']
 
-models:
+
 seeds:
   integration_tests:
     eligibility_seed:
