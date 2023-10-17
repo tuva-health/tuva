@@ -13,6 +13,7 @@ null as encounter_id
 , null as discharge_disposition_description
 , null as attending_provider_id
 , null as facility_npi
+, null as primary_diagnosis_code_type
 , null as primary_diagnosis_code
 , null as primary_diagnosis_description
 , null as ms_drg_code
