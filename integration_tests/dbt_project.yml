@@ -13,7 +13,7 @@ vars:
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
   input_database: tuva
-  input_schema: tuva_claims
+  input_schema: _tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
@@ -25,19 +25,27 @@ vars:
   clinical_enabled: true
   claims_enabled: true
 
-  ## The vars directly below enable a single data mart.  See the Quickstart section of
-  # thetuvaproject.com for instructions.
+  ## The vars directly below enable a single data mart.  See the Quickstart
+  # guide for instructions.
 
-  # ccsr_enabled: true
-  # cms_chronic_conditions_enabled: true
-  # tuva_chronic_conditions_enabled: true
+  # ccsr_enabled: false
+  # cms_chronic_conditions_enabled: false
+  # tuva_chronic_conditions_enabled: false
   # claims_preprocessing_enabled: true
-  # cms_hcc_enabled: true
-  # ed_classification_enabled: true
-  # financial_pmpm_enabled: true
-  # quality_measures_enabled: true
-  # readmissions_enabled: true
+  # cms_hcc_enabled: false
+  # ed_classification_enabled: false
+  # financial_pmpm_enabled: false
+  # insights_enabled: false
+  # quality_measures_enabled: false
+  # readmissions_enabled: false
 
+
+  ## CMS HCC data mart vars
+  # The payment_year variable has a default of the current year
+  cms_hcc_payment_year: 2023
+
+  # DO NOT CHANGE - Future logic to be added for selecting different HCC model versions
+  cms_hcc_model_version: CMS-HCC-V24
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]

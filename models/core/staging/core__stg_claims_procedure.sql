@@ -465,7 +465,7 @@ where procedure_code_25 is not null
 select distinct
     cast(null as {{ dbt.type_string() }} ) as procedure_id
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
-    , cast(eg.encounter_id as {{ dbt.type_string() }} ) as encounter_id
+    , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
     , {{ try_to_cast_date('unpivot_cte.procedure_date', 'YYYY-MM-DD') }} as procedure_date
     , cast(unpivot_cte.source_code_type as {{ dbt.type_string() }} ) as source_code_type
@@ -487,6 +487,7 @@ select distinct
 from unpivot_cte
   left join {{ ref('terminology__icd_10_pcs') }} as icd
     on unpivot_cte.source_code = icd.icd_10_pcs
-  left join {{ ref('acute_inpatient__encounter_data_for_medical_claims')}}  as eg
-    on  unpivot_cte.claim_id = eg.claim_id
-    and unpivot_cte.patient_id = eg.patient_id
+left join {{ ref('acute_inpatient__encounter_id')}} as ap
+    on  unpivot_cte.claim_id = ap.claim_id
+left join {{ ref('emergency_department__int_encounter_id')}} as ed
+    on  unpivot_cte.claim_id = ed.claim_id

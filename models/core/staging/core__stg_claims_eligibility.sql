@@ -15,7 +15,6 @@ select
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(birth_date as date) as birth_date
        , cast(death_date as date) as death_date
-       , cast(death_flag as integer ) as death_flag
        , cast(enrollment_start_date as date ) as enrollment_start_date
        , cast(enrollment_end_date as date ) as enrollment_end_date
        , cast(payer as {{ dbt.type_string() }} ) as payer

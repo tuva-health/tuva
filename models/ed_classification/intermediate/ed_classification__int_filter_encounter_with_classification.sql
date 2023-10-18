@@ -9,19 +9,7 @@ any rows that were not classified.
 }}
 
 select
-   a.encounter_id
-   , a.claim_id
-   , a.patient_id
-   , a.code_type
-   , a.code
-   , a.description
-   , a.ccs_description_with_covid
-   , a.recorded_date
-   , cast({{ date_part("year", "recorded_date") }} as {{ dbt.type_string() }}) as recorded_date_year
-   , cast({{ date_part("year", "recorded_date") }} as {{ dbt.type_string() }})
-     || lpad(cast({{ date_part("month", "recorded_date") }} as {{ dbt.type_string() }}), 2, '0')
-     as recorded_date_year_month
-   , a.claim_paid_amount_sum
+   a.*
    , case greatest(edcnnpa, edcnpa, epct, noner, injury, psych, alcohol, drug)
           when edcnnpa then 'edcnnpa'
           when edcnpa then 'edcnpa'
@@ -33,5 +21,5 @@ select
           when drug then 'drug'
           else 'unclassified'
    end as classification
-from {{ ref('ed_classification__int_merge_condition') }} a
+from {{ ref('ed_classification__int_map_primary_dx') }} a
 where ed_classification_capture = 1
