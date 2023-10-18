@@ -16,11 +16,12 @@ Jinja is used to set payment and collection year variables.
  - The collection year is one year prior to the payment year.
 */
 
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
-{% set payment_year_compiled = var('cms_hcc_payment_year') -%}
-{% set payment_year_age_date = payment_year_compiled ~ '-02-01' -%}
-{% set collection_year = payment_year_compiled - 1 -%}
+{% set model_version = var('cms_hcc_model_version') -%}
+{% set payment_year = var('cms_hcc_payment_year') -%}
+{% set payment_year_age_date = payment_year ~ '-02-01' -%}
+{% set collection_year = payment_year - 1 -%}
 {% set collection_year_start = collection_year ~ '-01-01' -%}
+{% set collection_year_end = collection_year ~ '-12-31' -%}
 
 with stg_eligibility as (
 
@@ -36,6 +37,10 @@ with stg_eligibility as (
             order by enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
     from {{ ref('cms_hcc__stg_core__eligibility') }}
+    where
+    /* filter to members with eligibility in collection or payment year */
+    (extract(year from enrollment_start_date) <= {{ collection_year }}
+     and extract(year from enrollment_end_date) >= {{ payment_year }})
 
 )
 
@@ -51,27 +56,36 @@ with stg_eligibility as (
 
 )
 
-, calculate_prior_coverage as (
+, cap_collection_start_end_dates as (
 
     select
           patient_id
         , enrollment_start_date
+        , enrollment_end_date
         , case
             when enrollment_start_date < '{{ collection_year_start }}'
             then '{{ collection_year_start }}'
             else enrollment_start_date
           end as proxy_enrollment_start_date
-        , enrollment_end_date
         , case
-            when enrollment_start_date < '{{ collection_year_start }}'
-            then {{ datediff("'"~collection_year_start~"'", 'enrollment_end_date', 'month') }} +1 /* include starting month */
-            else {{ datediff('enrollment_start_date', 'enrollment_end_date', 'month') }} +1  /* include starting month */
-          end as coverage_months
+            when enrollment_end_date > '{{ collection_year_end }}'
+            then '{{ collection_year_end }}'
+            else enrollment_end_date
+          end as proxy_enrollment_end_date
     from stg_eligibility
     where
-    /* coverage dates must fall within the collection year */
-    (extract(year from enrollment_start_date) = {{ collection_year }}
-     or extract(year from enrollment_start_date) = {{ collection_year }})
+    /* filter to members with eligibility in collection year */
+    (extract(year from enrollment_start_date) <= {{ collection_year }}
+     and extract(year from enrollment_end_date) >= {{ collection_year }})
+
+)
+
+, calculate_prior_coverage as (
+
+    select patient_id
+        , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
+    from cap_collection_start_end_dates
+    group by patient_id
 
 )
 
@@ -81,7 +95,7 @@ with stg_eligibility as (
 */
 , add_enrollment as (
 
-    select distinct
+    select
           patient_id
         , case
             when coverage_months < 12 then 'New'
@@ -117,7 +131,9 @@ with stg_eligibility as (
          left join stg_patient
             on stg_eligibility.patient_id = stg_patient.patient_id
     where stg_eligibility.row_num = 1
-    and stg_patient.death_date is null
+      /* filter to members with eligibility in payment year */
+      and extract(year from stg_eligibility.enrollment_start_date) <= {{ payment_year }}
+      and extract(year from stg_eligibility.enrollment_end_date) >= {{ payment_year }}
 
 )
 
@@ -239,8 +255,8 @@ with stg_eligibility as (
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
         , cast(orec_default as boolean) as orec_default
         , cast(institutional_status_default as boolean) as institutional_status_default
-        , cast('{{ model_version_compiled }}' as {{ dbt.type_string() }}) as model_version
-        , cast('{{ payment_year_compiled }}' as integer) as payment_year
+        , cast('{{ model_version }}' as {{ dbt.type_string() }}) as model_version
+        , cast('{{ payment_year }}' as integer) as payment_year
     from add_status_logic
 
 )
