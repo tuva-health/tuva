@@ -12,26 +12,19 @@ Patients with a diagnosis or past history of total colectomy or colorectal cance
 with exclusion_codes as (
     select
           code
-        , Descriptor
-        , case CodeSystemName
+        , case code_system
             when 'SNOMEDCT' then 'snomed-ct'
             when 'ICD9CM' then 'icd-9-cm'
             when 'ICD10CM' then 'icd-10-cm'
-            when 'CPT' then 'cpt'
+            when 'CPT' then 'hcpcs'
             when 'ICD10PCS' then 'icd-10-pcs'
-          else lower(codesystemname) end as code_system
-        , ValueSetName
-    From {{ref('quality_measures__value_set_codes')}}
-    where ValueSetName in  (
+          else lower(code_system) end as code_system
+        , concept_name
+    From {{ref('quality_measures__value_sets')}}
+    where concept_name in  (
          'Malignant Neoplasm of Colon'
         , 'Total Colectomy'
     )
-    union all
-    select
-          'G9711' as code
-        , 'Patients with a diagnosis or past history of total colectomy or colorectal cancer' as descriptor
-        , 'hcpcs' as code_system
-        , 'nqf past history'
 
 )
 
@@ -117,7 +110,7 @@ with exclusion_codes as (
           conditions.patient_id
         , conditions.claim_id
         , conditions.recorded_date
-        , exclusion_codes.ValueSetName as concept_name
+        , exclusion_codes.concept_name as concept_name
     from conditions
          inner join exclusion_codes
             on conditions.code = exclusion_codes.code
@@ -133,7 +126,7 @@ with exclusion_codes as (
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
         , medical_claim.hcpcs_code
-        , exclusion_codes.ValueSetName as concept_name
+        , exclusion_codes.concept_name as concept_name
     from medical_claim
          inner join exclusion_codes
             on medical_claim.hcpcs_code = exclusion_codes.code
@@ -146,7 +139,7 @@ with exclusion_codes as (
     select
           observations.patient_id
         , observations.observation_date
-        , exclusion_codes.ValueSetName as concept_name
+        , exclusion_codes.concept_name as concept_name
     from observations
          inner join exclusion_codes
              on observations.code = exclusion_codes.code
@@ -159,7 +152,7 @@ with exclusion_codes as (
     select
           procedures.patient_id
         , procedures.procedure_date
-        , exclusion_codes.ValueSetName as concept_name
+        , exclusion_codes.concept_name as concept_name
     from procedures
          inner join exclusion_codes
              on procedures.code = exclusion_codes.code

@@ -7,11 +7,7 @@ with denominator as (
 
     select
           patient_id
---         , performance_period_begin
---         , performance_period_end
---         , measure_id
---         , measure_name
---         , measure_version
+
     from {{ ref('quality_measures__int_nqf0034_denominator') }}
 
 )
@@ -19,16 +15,16 @@ with denominator as (
 (
     select
           code
-        , Descriptor
-        , case CodeSystemName
+        , case code_system
             when 'SNOMEDCT' then 'snomed-ct'
-            when 'HCPCS Level II' then 'hcpcs'
-            when 'CPT' then 'cpt'
-            when 'LOINC' then 'loinc'
-          else lower(codesystemname) end as code_system
-        , ValueSetName as concept_name
-    From {{ref('quality_measures__value_set_codes')}}
-    where ValueSetName in  (
+            when 'ICD9CM' then 'icd-9-cm'
+            when 'ICD10CM' then 'icd-10-cm'
+            when 'CPT' then 'hcpcs'
+            when 'ICD10PCS' then 'icd-10-pcs'
+          else lower(code_system) end as code_system
+        , concept_name
+    From {{ref('quality_measures__value_sets')}}
+    where concept_name in  (
         'Fecal Occult Blood Test (FOBT)' -- mp
         ,'Flexible Sigmoidoscopy' --mp+4
         ,'Colonoscopy' -- mp+9
@@ -122,7 +118,7 @@ with denominator as (
     select
           medical_claim.patient_id
         , coalesce( medical_claim.claim_start_date, medical_claim.claim_end_date) as claim_date
-    , screening_codes.descriptor
+    , screening_codes.concept_name
     from medical_claim
     inner join screening_periods
         on medical_claim.claim_start_date between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
@@ -138,7 +134,7 @@ with denominator as (
     select
           observations.patient_id
         , observations.observation_date
-    , screening_codes.descriptor
+    , screening_codes.concept_name
     from observations
     inner join screening_periods
         on observations.observation_date between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
@@ -152,7 +148,7 @@ with denominator as (
     select
           procedures.patient_id
         , procedures.procedure_date
-    , screening_codes.descriptor
+    , screening_codes.concept_name
     from procedures
     inner join screening_periods
         on procedures.procedure_date between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
@@ -166,7 +162,7 @@ with denominator as (
     select
       patient_id
     , coalesce(collection_date,result_date) as lab_date
-    , screening_codes.descriptor
+    , screening_codes.concept_name
     from labs
     inner join screening_periods
         on coalesce(labs.collection_date, labs.result_date) between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
@@ -181,7 +177,7 @@ with denominator as (
     select
           patient_id
         , claim_date as evidence_date
-        , descriptor as evidence
+        , concept_name as evidence
     from qualifying_claims
 
     union
@@ -189,7 +185,7 @@ with denominator as (
     select
           patient_id
         , observation_date as evidence_date
-        , descriptor as evidence
+        , concept_name as evidence
     from qualifying_observations
 
     union
@@ -197,7 +193,7 @@ with denominator as (
     select
           patient_id
         , procedure_date as evidence_date
-        , descriptor as evidence
+        , concept_name as evidence
     from qualifying_procedures
 
     union
@@ -205,7 +201,7 @@ with denominator as (
     select
           patient_id
         , lab_date as evidence_date
-        , descriptor as evidence
+        , concept_name as evidence
     from qualifying_labs
 
     )

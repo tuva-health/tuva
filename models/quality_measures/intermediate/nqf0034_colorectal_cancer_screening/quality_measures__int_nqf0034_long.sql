@@ -6,30 +6,27 @@
 
 {%- set measure_id -%}
 (
-    select 'NQF0034'
---     select id
--- from {{ ref('quality_measures__measures') }}
--- where id = 'NQF2372'
-
+    select id
+from {{ ref('quality_measures__measures') }}
+where id = 'NQF0034'
     )
 {%- endset -%}
 
 {%- set measure_name -%}
 (
-        select 'Colorectal Cancer Screening'
---     select name
--- from {{ ref('quality_measures__measures') }}
--- where id = 'NQF2372'
+
+    select name
+from {{ ref('quality_measures__measures') }}
+where id = 'NQF0034'
 
     )
 {%- endset -%}
 
 {%- set measure_version -%}
 (
-   select 'x'
---     select version
--- from {{ ref('quality_measures__measures') }}
--- where id = 'NQF2372'
+    select version
+from {{ ref('quality_measures__measures') }}
+where id = 'NQF0034'
 
     )
 {%- endset -%}

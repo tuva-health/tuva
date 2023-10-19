@@ -21,37 +21,22 @@ with aged_patients as (
 , exclusion_codes as (
     select
           code
-        , Descriptor
-        , case CodeSystemName
+        , case code_system
             when 'SNOMEDCT' then 'snomed-ct'
             when 'ICD9CM' then 'icd-9-cm'
             when 'ICD10CM' then 'icd-10-cm'
-            when 'CPT' then 'cpt'
+            when 'CPT' then 'hcpcs'
             when 'ICD10PCS' then 'icd-10-pcs'
-          else lower(codesystemname) end as code_system
-        , ValueSetName
-        , 0 as meets_all_criteria
-    From {{ref('quality_measures__value_set_codes')}}
-    where ValueSetName in  (
+          else lower(code_system) end as code_system
+        , concept_name
+        , case when code in ('G2100','G2101') then 1 else  0 end as meets_all_criteria
+    From {{ref('quality_measures__value_sets')}}
+    where concept_name in  (
           'Frailty Device'
         , 'Frailty Diagnosis'
         , 'Frailty Encounter'
         , 'Frailty Symptom'
     )
-    union all
-    select
-          'G2100' as code
-        , 'Patient 66 or older with a claim/encounter for frailty and dispensed medication for dementia' as descriptor
-        , 'hcpcs' as code_system
-        , 'nqf past history' as valuesetname
-        , 1 as meets_all_criteria
-    union all
-    select
-          'G2101' as code
-        , 'Patient 66 or older with a claim/encounter for frailty and one acute inpatient or two outpatient encounters for advanced illness' as descriptor
-        , 'hcpcs' as code_system
-        , 'nqf past history' as valuesetname
-        , 1 as meets_all_criteria
 
 
 
@@ -129,7 +114,6 @@ with aged_patients as (
             , source_code
           ) as code
     from {{ ref('quality_measures__stg_core__procedure') }}
- -- todo - should we qualify on normalized code AND (really OR) source code instaed of a coalesce?
 
 
 )
@@ -140,7 +124,7 @@ with aged_patients as (
           conditions.patient_id
         , conditions.claim_id
         , conditions.recorded_date
-        , exclusion_codes.ValueSetName
+        , exclusion_codes.concept_name
     from conditions
         inner join aged_patients
             on conditions.patient_id = aged_patients.patient_id
@@ -160,7 +144,7 @@ with aged_patients as (
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
         , medical_claim.hcpcs_code
-        , exclusion_codes.ValueSetName
+        , exclusion_codes.concept_name
     from medical_claim
         inner join aged_patients
             on medical_claim.patient_id = aged_patients.patient_id
@@ -178,7 +162,7 @@ with aged_patients as (
     select
           observations.patient_id
         , observations.observation_date
-        , exclusion_codes.ValueSetName
+        , exclusion_codes.concept_name
     from observations
     inner join aged_patients
         on observations.patient_id = aged_patients.patient_id
@@ -195,7 +179,7 @@ with aged_patients as (
     select
           procedures.patient_id
         , procedures.procedure_date
-        , exclusion_codes.ValueSetName
+        , exclusion_codes.concept_name
     from procedures
     inner join aged_patients
         on procedures.patient_id = aged_patients.patient_id
@@ -210,7 +194,7 @@ with aged_patients as (
 , patients_with_exclusions as(
     select patient_id
       , recorded_date as exclusion_date
-      , valuesetname as concept_name
+      , concept_name as concept_name
     from condition_exclusions
 
     union distinct
@@ -220,21 +204,21 @@ with aged_patients as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-      , valuesetname as concept_name
+      , concept_name as concept_name
     from med_claim_exclusions
 
     union distinct
 
     select patient_id
       , observation_date as exclusion_date
-      , valuesetname as concept_name
+      , concept_name as concept_name
     from observation_exclusions
 
     union distinct
 
     select patient_id
       , procedure_date as exclusion_date
-      , valuesetname as concept_name
+      , concept_name as concept_name
     from procedure_exclusions
 
 )
