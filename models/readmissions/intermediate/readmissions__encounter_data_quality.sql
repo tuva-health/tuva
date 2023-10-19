@@ -38,34 +38,22 @@ select
         when
 	    (aa.discharge_disposition_code is not null)
 	    and
-	    (cc.discharge_disposition_code is null) then 1
+	    (bb.discharge_disposition_code is null) then 1
 	else 0
     end as invalid_discharge_disposition_code_flag,
     case
-        when (  (dd.primary_dx_count is null)
-	        or
-	        (dd.primary_dx_count = 0)
-		or
-		(dd.primary_dx_count = 1 and bb.diagnosis_code is null)  )
-	     then 1
-	else 0
+      when aa.primary_diagnosis_code is null then 1
+      else 0
     end as missing_primary_diagnosis_flag,
     case
-        when dd.primary_dx_count > 1 then 1
-	else 0
-    end as multiple_primary_diagnoses_flag,
-    case
-        when bb.valid_icd_10_cm_flag = 0 then 1
+        when aa.valid_primary_diagnosis_code_flag = 0 then 1
 	else 0
     end as invalid_primary_diagnosis_code_flag,
     case
-        when (  bb.valid_icd_10_cm_flag = 1
-	        and
-	        bb.ccs_diagnosis_category is null  )
-             then 1
+        when aa.ccs_diagnosis_category is null  then 1
 	else 0
     end as no_diagnosis_ccs_flag,
-    bb.ccs_diagnosis_category as diagnosis_ccs,
+    aa.ccs_diagnosis_category as diagnosis_ccs,
     case
         when aa.encounter_id in (select distinct encounter_id_A
 	                         from {{ ref('readmissions__encounter_overlap') }} )
@@ -80,17 +68,13 @@ select
 	else 0
     end as missing_ms_drg_flag,
     case
-        when ee.ms_drg_code is null then 1
+        when cc.ms_drg_code is null then 1
 	else 0
     end as invalid_ms_drg_flag
 
-from {{ ref('readmissions__encounter') }} aa
-     left join {{ ref('readmissions__diagnosis_ccs') }} bb
-     on aa.encounter_id = bb.encounter_id
+from {{ ref('readmissions__encounter_with_ccs') }} aa
      left join {{ ref('terminology__discharge_disposition') }} cc
      on aa.discharge_disposition_code = cc.discharge_disposition_code
-     left join {{ ref('readmissions__primary_diagnosis_count') }} dd
-     on aa.encounter_id = dd.encounter_id
      left join {{ ref('terminology__ms_drg') }} ee
      on aa.ms_drg_code = ee.ms_drg_code
 ),
@@ -118,8 +102,6 @@ select
 	    or
 	    (missing_primary_diagnosis_flag = 1)
 	    or
-	    (multiple_primary_diagnoses_flag =1)
-	    or
 	    (invalid_primary_diagnosis_code_flag = 1)
 	    or
 	    (no_diagnosis_ccs_flag = 1)
@@ -138,7 +120,6 @@ select
     missing_discharge_disposition_code_flag,
     invalid_discharge_disposition_code_flag,
     missing_primary_diagnosis_flag,
-    multiple_primary_diagnoses_flag,
     invalid_primary_diagnosis_code_flag,
     no_diagnosis_ccs_flag,
     overlaps_with_another_encounter_flag,
