@@ -8,21 +8,22 @@ vars:
 
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
-  test_data_override: true
+  test_data_override: false
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva
-  input_schema: tuva_claims
+  input_database: medicare_lds_five_percent
+  input_schema: _tuva_claims
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+  quality_measures_period_end: "2020-12-31"
 
   ## The Tuva Project can support claims and clinical data.
   # By default, all models are disabled.
   # Use the vars below to enabled or disable sections of The Tuva Project.
 
   ## The vars directly below enable all models related to the type of healthcare data being used
-  clinical_enabled: true
+#  clinical_enabled: true
   claims_enabled: true
 
   ## The vars directly below enable a single data mart.  See the Quickstart section of

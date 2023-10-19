@@ -4,8 +4,19 @@
 }}
 
 /*
-DENOMINATOR EXCLUSIONS:
-Patients with a diagnosis or past history of total colectomy or colorectal cancer: G9711
+DENOMINATOR:
+Patients 45-75 years of age with a visit during the measurement period
+DENOMINATOR NOTE: To assess the age for exclusions, the patient’s age on the date of the encounter
+should be used
+*Signifies that this CPT Category I code is a non-covered service under the Medicare Part B Physician Fee
+Schedule (PFS). These non-covered services should be counted in the denominator population for MIPS
+CQMs.
+Denominator Criteria (Eligible Cases):
+Patients 45 to 75 years of age on date of encounter
+AND
+Patient encounter during the performance period (CPT or HCPCS): 99202, 99203, 99204, 99205,
+99212, 99213, 99214, 99215, 99341, 99342, 99344, 99345, 99347, 99348, 99349, 99350, 99386*, 99387*,
+99396*, 99397*, G0438, G0439
 */
 
 
@@ -17,11 +28,36 @@ Patients with a diagnosis or past history of total colectomy or colorectal cance
 {%- endset -%}
 
 
+/*
+-- todo: which encounter_types to use?
+with cte as (select $1 as cpt
+             From (values ('99202'), ('99203'), ('99204'), ('99205')
+                        , ('99212'), ('99213'), ('99214'), ('99215')
+                        , ('99341'), ('99342'), ('99344'), ('99345')
+                        , ('99347'), ('99348'), ('99349'), ('99350')
+                        , ('99386'), ('99387')) -- these are the values in https://qpp.cms.gov/docs/QPP_quality_measure_specifications/CQM-Measures/2023_Measure_113_MIPSCQM.pdf
+             )
+select ValueSetName, count_if(cpt is null) ctnull,count_if(cpt is not null) ctnotnull, count(*) ctall
+From value_sets.value_set_codes vsc
+left join cte on cte.cpt = vsc.Code
+where CodeSystemName in (
+'CPT'
+,'HCPCS Level II'
+) -- these are all of the value sets from cms
+group by ValueSetName
+having ctnotnull > 0
+order by ValueSetName, count(*) desc
+
+select * From terminology.encounter_type
+ */
+
 
 with visits_encounters as (
-    select PATIENT_ID, ENCOUNTER_START_DATE as min_date, ENCOUNTER_END_DATE as max_date
-    From TUVA_TEST.core.ENCOUNTER
-    inner join {{ref('quality_measures__int_nqf0034_performance_period')}} as pp on 1=1
+    select PATIENT_ID
+         , coalesce(ENCOUNTER.ENCOUNTER_START_DATE,ENCOUNTER.ENCOUNTER_END_DATE) as min_date
+         , coalesce(ENCOUNTER.ENCOUNTER_END_DATE,ENCOUNTER.ENCOUNTER_START_DATE) as max_date
+    From {{ref('quality_measures__stg_core__encounter')}} encounter
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}} as pp on 1=1
     where ENCOUNTER_TYPE in (
           'home health'
         , 'office visit'
@@ -49,22 +85,25 @@ proc_codes as (select $1 as cpt
 
 ,procedure_encounters as (
     select patient_id, PROCEDURE_DATE as min_date, PROCEDURE_DATE as max_date
-    from TUVA_TEST.CORE.PROCEDURE
-    inner join {{ref('quality_measures__int_nqf0034_performance_period')}}  as pp on 1=1
+    from {{ref('quality_measures__stg_core__procedure')}} procedure
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}}  as pp on 1=1
     inner join  proc_codes  -- todo: should it be this (proc codes from measure definition), or should it be from the value set codes?
-        on procedure.code = proc_codes.cpt
+        on coalesce(procedure.normalized_code,procedure.source_code) = proc_codes.cpt
  where PROCEDURE_DATE between pp.performance_period_begin and  pp.performance_period_end
 
 )
 ,
 claims_encounters as (
-    select PATIENT_ID, CLAIM_START_DATE as min_date,CLAIM_END_DATE as max_date
-    from tuva_test.core.MEDICAL_CLAIM
-    inner join {{ref('quality_measures__int_nqf0034_performance_period')}}  as pp on 1=1
+    select PATIENT_ID
+    , coalesce(CLAIM_START_DATE,CLAIM_END_DATE) as min_date
+    , coalesce(CLAIM_END_DATE,CLAIM_START_DATE) as max_date
+    from {{ref('quality_measures__stg_medical_claim')}} medical_claim
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}}  as pp on
+        coalesce(CLAIM_END_DATE,CLAIM_START_DATE)  >=  pp.performance_period_begin
+         and coalesce(CLAIM_START_DATE,CLAIM_END_DATE) <=  pp.performance_period_end
     inner join proc_codes
         on MEDICAL_CLAIM.HCPCS_CODE = proc_codes.cpt
-            where coalesce(MEDICAL_CLAIM.CLAIM_END_DATE,MEDICAL_CLAIM.CLAIM_START_DATE) >=  pp.performance_period_begin
-         and coalesce(MEDICAL_CLAIM.CLAIM_END_DATE,MEDICAL_CLAIM.CLAIM_END_DATE) <=  pp.performance_period_end
+
 
 )
 
@@ -97,7 +136,8 @@ claims_encounters as (
         , datediff('year',p.BIRTH_DATE,e.min_date) as min_age
         , max_date
         , datediff('year',p.BIRTH_DATE,e.max_date) as max_age
-    from TUVA_TEST.core.PATIENT p
+        , qualifying_types
+    from {{ref('quality_measures__stg_core__patient')}} p
     inner join encounters_by_patient e
         on p.PATIENT_ID = e.PATIENT_ID
     where p.BIRTH_DATE is not null
@@ -107,5 +147,6 @@ claims_encounters as (
 select PATIENT_ID,
        min_age,
        max_age,
-       case when max_age >= 45 and min_age <=  75 then 1 else 0 end as age_qualifies
+       qualifying_types
 From patients_with_age
+where max_age >= 45 and min_age <=  75
