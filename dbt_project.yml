@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.5.9'
+version: '0.5.10'
 config-version: 2
 require-dbt-version: ">=1.3.0"
 
@@ -9,9 +9,6 @@ profile: default
 vars:
 
     ## CCSR data mart vars
-    # These vars enable the wide tables - disabling will exclude wide tables from dbt runs
-    wide_condition_enabled: True
-    wide_procedure_enabled: True
 
     # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
     record_type: "ip"

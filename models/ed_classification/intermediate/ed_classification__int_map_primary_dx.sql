@@ -10,7 +10,9 @@ indicators of ED classification terminology
 {% set colnames = ["edcnnpa", "edcnpa", "epct", "noner", "injury", "psych", "alcohol", "drug"] %}
 
 with condition as (
-select * from {{ ref('ed_classification__int_primary_dx_per_claim') }}
+    select * 
+    from {{ ref('ed_classification__stg_encounter') }}
+    where encounter_type = 'emergency department'
 )
 , icd9 as (
   select
@@ -39,8 +41,11 @@ select
    , coalesce(icd10.ed_classification_capture, 0) as ed_classification_capture
 from condition a
 left join icd10
-on a.code = icd10.code and a.code_type = 'icd-10-cm'
+    on a.primary_diagnosis_code = icd10.code 
+    and a.primary_diagnosis_code_type = 'icd-10-cm'
+
 union all
+
 select
    a.*
    {% for colname in colnames %}
@@ -49,4 +54,5 @@ select
    , coalesce(icd9.ed_classification_capture, 0) ed_classification_capture
 from condition a
 inner join icd9
-on a.code = icd9.code and a.code_type = 'icd-9-cm'
+    on a.primary_diagnosis_code = icd9.code 
+    and a.primary_diagnosis_code_type = 'icd-9-cm'

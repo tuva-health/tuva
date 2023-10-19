@@ -88,21 +88,10 @@ models:
         description: >
           Identifier that links a patient to a particular insurance product or health plan. A patient can have more than
            one member_id because they can have more than one insurance product/plan.
-      - name: gender
-        description: Biological sex of the patient.
-        meta:
-          terminology: /terminology/demographics/gender
-      - name: race
-        description: Race of the patient.
-        meta:
-          terminology: /terminology/demographics/race
       - name: birth_date
         description: Date the patient was born.
       - name: death_date
         description: Date the patient died.
-      - name: death_flag
-        description: Indicates whether the patient has died.
-        data_type: boolean
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
       - name: enrollment_end_date
@@ -125,20 +114,6 @@ models:
         description: Indicates how the patient became eligible for Medicare.
         meta:
           terminology: /terminology/administrative-codes/medicare-status
-      - name: first_name
-        description: Patient's first name.
-      - name: last_name
-        description: Patient's last name.
-      - name: address
-        description: Patient's street address.
-      - name: city
-        description: Patient's city of address.
-      - name: state
-        description: State the patient lives in (most recent known address).
-      - name: zip_code
-        description: Zip code the patient lives in (most recent known address).
-      - name: phone
-        description: Patient's phone number.
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
@@ -355,6 +330,9 @@ models:
       alias: medical_claim
       tags: core
       materialized: table
+    tests:
+      - unique:
+          column_name: "(claim_id||'-'||claim_line_number)"
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

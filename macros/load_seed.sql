@@ -135,6 +135,7 @@ FROM (
     {{ cols }}
 
   FROM '{{ s3_path }}'
+  {% if env_var('AWS_SESSION_TOKEN', False) %}
   WITH (
     CREDENTIAL (
       AWS_ACCESS_KEY = "{{ env_var('AWS_ACCESS_KEY') }}",
@@ -142,6 +143,7 @@ FROM (
       AWS_SESSION_TOKEN = "{{ env_var('AWS_SESSION_TOKEN') }}"
     )
   )
+  {% endif %}
 )
 FILEFORMAT = CSV
 PATTERN = '{{ pattern }}*'
