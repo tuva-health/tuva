@@ -158,7 +158,13 @@ with patient as (
           patient_id
         , encounter_start_date
     from encounters
-    where lower(encounter_type) = 'office visit'
+    where lower(encounter_type) in (
+          'home health'
+        , 'office visit'
+        , 'outpatient'
+        , 'outpatient rehabilitation'
+        , 'telehealth'
+        )
 
 )
 
