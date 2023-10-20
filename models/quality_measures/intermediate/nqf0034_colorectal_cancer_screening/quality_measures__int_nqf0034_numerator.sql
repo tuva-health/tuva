@@ -29,7 +29,7 @@ with denominator as (
         ,'Flexible Sigmoidoscopy' --mp+4
         ,'Colonoscopy' -- mp+9
         ,'CT Colonography' -- mp+4
-        ,'FIT DNA' -- mp+2
+        ,'sDNA FIT Test' -- mp+2
     )
 )
 , screening_periods  as (
@@ -39,7 +39,7 @@ with denominator as (
             when 'Flexible Sigmoidoscopy' then pp.performance_period_begin_4yp --mp+4
             when 'Colonoscopy' then pp.performance_period_begin_9yp -- mp+9
             when 'CT Colonography' then pp.performance_period_begin_4yp -- mp+4
-            when 'FIT DNA' then pp.performance_period_begin_2yp -- mp+2
+            when 'sDNA FIT Test' then pp.performance_period_begin_2yp -- mp+2
         else pp.performance_period_begin end as effective_performance_period_begin
 
     from screening_codes
