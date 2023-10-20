@@ -3,25 +3,32 @@
    )
 }}
 
-    select *
-    From {{ref('quality_measures__int_nqf0034_exclude_advanced_illness')}}
+with exclusions as (
+select *
+From {{ref('quality_measures__int_nqf0034_exclude_advanced_illness')}}
 
-    union all
+union all
 
-    select *
-    From {{ref('quality_measures__int_nqf0034_exclude_colectomy_cancer')}}
+select *
+From {{ref('quality_measures__int_nqf0034_exclude_colectomy_cancer')}}
 
-    union all
+union all
 
-    select *
-    From {{ref('quality_measures__int_nqf0034_exclude_dementia')}}
+select *
+From {{ref('quality_measures__int_nqf0034_exclude_dementia')}}
 
-    union all
+union all
 
-    select *
-    From {{ref('quality_measures__int_nqf0034_exclude_hospice_palliative')}}
+select *
+From {{ref('quality_measures__int_nqf0034_exclude_hospice_palliative')}}
 
-    union all
+union all
 
-    select *
-    From {{ref('quality_measures__int_nqf0034_exclude_institutional_snp')}}
+select *
+From {{ref('quality_measures__int_nqf0034_exclude_institutional_snp')}}
+)
+
+select exclusions.*
+from exclusions
+inner join {{ref('quality_measures__int_nqf0034_denominator')}} p
+    on exclusions.patient_id = p.patient_id

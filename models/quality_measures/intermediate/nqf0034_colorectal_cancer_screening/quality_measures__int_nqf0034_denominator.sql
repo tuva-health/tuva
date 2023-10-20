@@ -91,21 +91,21 @@ claims_encounters as (
 )
 
 ,all_encounters as (
-    select *, 'v' as visit_enc,cast(null as varchar) as proc_enc, cast(null as varchar) as claim_enc
+    select *, 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from visits_encounters
     union all
-    select *, cast(null as varchar) as visit_enc, 'p' as proc_enc, cast(null as varchar) as claim_enc
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc, 'p' as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from procedure_encounters
     union all
-    select *, cast(null as varchar) as visit_enc,cast(null as varchar) as proc_enc, 'c' as claim_enc
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
 )
 
 , encounters_by_patient as (
     select patient_id,min(min_date) min_date, max(max_date) max_date,
-        concat(
+        concat(concat(
             coalesce(min(visit_enc),'')
-            ,coalesce(min(proc_enc),'')
+            ,coalesce(min(proc_enc),''))
             ,coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
@@ -116,9 +116,9 @@ claims_encounters as (
     select
           p.PATIENT_ID
         , min_date
-        , datediff('year',p.BIRTH_DATE,e.min_date) as min_age
+        , floor({{ datediff('birth_date', 'e.min_date', 'hour') }} / 8766.0)  as min_age
         , max_date
-        , datediff('year',p.BIRTH_DATE,e.max_date) as max_age
+        ,floor({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8766.0) as max_age
         , qualifying_types
     from {{ref('quality_measures__stg_core__patient')}} p
     inner join encounters_by_patient e

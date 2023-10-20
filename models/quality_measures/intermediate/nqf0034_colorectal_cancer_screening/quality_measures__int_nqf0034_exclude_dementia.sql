@@ -154,5 +154,5 @@ select
     , exclusion_date
     , exclusion_reason
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from frailty_with_dementia
+from frailty_with_dementia d
 qualify row_number() over (partition by patient_id order by exclusion_date )  = 1

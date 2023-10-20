@@ -142,7 +142,7 @@ with encounter_exclusion_codes as (
     union all
         select
           observations.patient_id
-        , cast(null as varchar) as claim_id
+        , cast(null as {{ dbt.type_string() }}) as claim_id
         , observations.observation_date
         , condition_exclusion_codes.concept_name
     from observations
@@ -311,7 +311,7 @@ from {{ref('quality_measures__int_nqf0034__frailty')}}
       patient_id
     , exclusion_date
     , exclusion_reason
-from encounters_with_conditions
+from encounters_with_conditions e
 qualify dense_rank() over(partition by patient_id,concept_category order by exclusion_date) >= qualifying_count
 )
 

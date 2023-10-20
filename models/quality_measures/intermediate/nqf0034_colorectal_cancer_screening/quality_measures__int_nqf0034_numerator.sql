@@ -180,7 +180,7 @@ with denominator as (
         , concept_name as evidence
     from qualifying_claims
 
-    union
+    union all
 
     select
           patient_id
@@ -188,7 +188,7 @@ with denominator as (
         , concept_name as evidence
     from qualifying_observations
 
-    union
+    union all
 
     select
           patient_id
@@ -196,7 +196,7 @@ with denominator as (
         , concept_name as evidence
     from qualifying_procedures
 
-    union
+    union all
 
     select
           patient_id
@@ -207,10 +207,11 @@ with denominator as (
     )
 
 select
-    cast (patient_id as varchar) patient_id
+    cast (qualifying_events.patient_id as {{ dbt.type_string() }}) patient_id
     ,cast( evidence_date as date) as evidence_date
-    ,cast( evidence as varchar) as evidence
+    ,cast( evidence as {{ dbt.type_string() }}) as evidence
 
 from qualifying_events
-
+inner join denominator
+    on qualifying_events.patient_id = denominator.patient_id
 
