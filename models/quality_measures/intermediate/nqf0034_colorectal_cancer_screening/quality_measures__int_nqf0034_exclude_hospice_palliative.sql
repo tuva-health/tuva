@@ -5,7 +5,7 @@
 
 /*
 DENOMINATOR EXCLUSIONS:
-Patients with a diagnosis or past history of total colectomy or colorectal cancer: G9711
+Patient was provided hospice services any time during the measurement period: G9710
 */
 
 

@@ -320,4 +320,3 @@ select
     , exclusion_reason
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from qualifying_encounters
--- qualify row_number() over (partition by patient_id order by exclusion_date) = 1

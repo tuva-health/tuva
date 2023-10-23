@@ -3,6 +3,19 @@
    )
 }}
 
+/*
+Patients with one or more screenings for colorectal cancer. Appropriate screenings are defined by any one of the
+following criteria:
+- Fecal occult blood test (FOBT) during the measurement period
+- Flexible sigmoidoscopy during the measurement period or the four years prior to the measurement period
+- Colonoscopy during the measurement period or the nine years prior to the measurement period
+- Computed tomography (CT) colonography during the measurement period or the four years prior to the
+measurement period.
+- Fecal immunochemical DNA test (FIT-DNA) during the measurement period or the two years prior to the
+measurement period.
+
+*/
+
 with denominator as (
 
     select
