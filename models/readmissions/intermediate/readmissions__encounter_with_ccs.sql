@@ -23,7 +23,7 @@ select
     case
       when bb.icd_10_cm is not null then 1
       else 0
-    valid_primary_diagnosis_code_flag,
+    end as valid_primary_diagnosis_code_flag,
 
     cc.ccs_diagnosis_category,
 

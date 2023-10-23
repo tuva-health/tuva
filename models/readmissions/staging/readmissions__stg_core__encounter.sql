@@ -12,6 +12,7 @@ select
     facility_npi,
     ms_drg_code,
     paid_amount,
+    primary_diagnosis_code,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__encounter') }}
 where encounter_type = 'acute inpatient'

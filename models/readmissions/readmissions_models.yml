@@ -202,28 +202,6 @@ models:
 ##### Intermediate
 
 
-  - name: readmissions__diagnosis_ccs
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_diagnosis_ccs
-      tags: readmissions
-      materialized: view
-    description: "This model includes all encounter_ids from the stg_diagnosis table that have one and only one primary diagnosis code associated with them. There is one row for each of these encounters, namely, the row corresponding to the unique primary diagnosis code of the encounter. Therefore, the number of rows in this model is equal to the number of encounter_ids in the stg_diagnosis model that have one and only one primary diagnosis code. We add a valid_icd_10_cm_flag to indicate if the primary diagnosis code for the encounter is a valid ICD-10-CM code. We also add the CCS diagnosis category associated with the primary diagnosis code of the encounter."
-    columns:
-      - name: encounter_id
-        description: "The unique identifier for the encounter"
-      - name: diagnosis_code
-        description: "An ICD-10-CM diagnosis code associated with this encounter_id"
-      - name: diagnosis_rank
-        description: "A positive integer giving the diagnosis ranking for the encounter"
-      - name: valid_icd_10_cm_flag
-        description: "A flag indicating if the ICD-10-CM diagnosis code given is valid"
-      - name: ccs_diagnosis_category
-        description: "The CCS code associated with the given ICD-10-CM diagnosis"
-
-
   - name: readmissions__encounter_data_quality
     config:
       schema: |
@@ -366,21 +344,6 @@ models:
         description: "The unique identifier for the encounter"
 
 
-  - name: readmissions__primary_diagnosis_count
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_primary_diagnosis_count
-      tags: readmissions
-      materialized: view
-    description: "This model includes a count of primary diagnoses related to each encounter_id in the stg_diagnosis model. In theory, each encounter_id should only have a single primary diagnosis, but this model checks how many primary diagnoses each encounter_id has in the dataset."
-    columns:
-      - name: encounter_id
-        description: "The unique identifier for the encounter"
-      - name: primary_dx_count
-        description: "A positive integer giving the count of primary diagnoses for the encounter"
-
 
   - name: readmissions__procedure_ccs
     config:
@@ -427,23 +390,6 @@ models:
         description: "A flag to indicate whether the encounter had a 30-day readmission"
 
 
-
-  - name: readmissions__diagnosis
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_stg_diagnosis
-      tags: readmissions
-      materialized: view
-    description: "This is a staging table for the input layer. Each row represents a unique diagnosis a patient got in an encouter. All diagnoses available in the input data set are present here."
-    columns:
-      - name: encounter_id
-        description: "The unique identifier for the encounter"
-      - name: diagnosis_code
-        description: "An ICD-10-CM diagnosis code associated with this encounter_id"
-      - name: diagnosis_rank
-        description: "A positive integer giving the diagnosis ranking for the encounter"
 
   - name: readmissions__encounter
     config:
