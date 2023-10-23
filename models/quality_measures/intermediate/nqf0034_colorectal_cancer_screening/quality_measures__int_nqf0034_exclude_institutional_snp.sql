@@ -50,7 +50,6 @@ with aged_patients as (
 
     where place_of_service_code in ('32', '33', '34', '54', '56')
     and {{ datediff('medical_claim.claim_start_date', 'medical_claim.claim_end_date', 'day') }} >= 90
---todo: would one institutional long-term care always be fully on one claim?  or do we need to group them?
 )
 
 select

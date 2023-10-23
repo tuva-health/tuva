@@ -126,8 +126,7 @@ with encounter_exclusion_codes as (
 )
 
 , condition_exclusions as (
- -- todo: not sure if mammogram is doing observations right?
-    select
+     select
           conditions.patient_id
         , conditions.claim_id
         , conditions.recorded_date
