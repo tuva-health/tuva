@@ -47,7 +47,7 @@ with cohort_ranks as (
 
     --encounter ids in diagnosis based cohorts
     select diag.encounter_id, cohort_ranks.c_rank
-    from {{ ref('readmissions__diagnosis_ccs') }} diag
+    from {{ ref('readmissions__encounter_with_ccs') }} diag
     inner join {{ ref('readmissions__specialty_cohort') }} sc
         on diag.ccs_diagnosis_category = sc.ccs and sc.procedure_or_diagnosis = 'Diagnosis'
     inner join cohort_ranks

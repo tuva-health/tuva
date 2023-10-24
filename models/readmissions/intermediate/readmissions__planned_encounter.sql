@@ -23,7 +23,7 @@ inner join {{ ref('readmissions__always_planned_ccs_procedure_category') }} apc
 -- that is only present for planned encounters
 always_planned_dx as (
 select distinct encounter_id
-from {{ ref('readmissions__diagnosis_ccs') }} dccs
+from {{ ref('readmissions__encounter_with_ccs') }} dccs
 inner join {{ ref('readmissions__always_planned_ccs_diagnosis_category') }} apd
     on dccs.ccs_diagnosis_category = apd.ccs_diagnosis_category
 ),
@@ -57,9 +57,9 @@ inner join  {{ ref('readmissions__potentially_planned_icd_10_pcs') }} pps
 -- on their primary diagnosis code or their CCS diagnosis category
 acute_encounters as (
 select distinct encounter_id
-from {{ ref('readmissions__diagnosis_ccs') }} dccs
+from {{ ref('readmissions__encounter_with_ccs') }} dccs
 left join {{ ref('readmissions__acute_diagnosis_icd_10_cm') }} adi
-    on dccs.diagnosis_code = adi.icd_10_cm
+    on dccs.primary_diagnosis_code = adi.icd_10_cm
 left join {{ ref('readmissions__acute_diagnosis_ccs') }} adc
     on dccs.ccs_diagnosis_category = adc.ccs_diagnosis_category
 where adi.icd_10_cm is not null or adc.ccs_diagnosis_category is not null
