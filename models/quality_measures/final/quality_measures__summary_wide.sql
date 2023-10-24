@@ -36,15 +36,33 @@ with measures_long as (
     where measure_id = 'NQF2372'
 
 )
+, nqf_0034 as (
 
+    select
+          patient_id
+        , case
+            when denominator_flag = 1
+            then
+                case
+                    when exclusion_flag = 1 then null
+                    when exclusion_flag = 0  then numerator_flag
+            else null
+                end
+          end as flag
+    from measures_long
+    where measure_id = 'NQF0034'
+
+)
 , joined as (
 
     select
           measures_long.patient_id
         , nqf_2372.flag as nqf_2372
     from measures_long
-         left join nqf_2372
+    left join nqf_2372
          on measures_long.patient_id = nqf_2372.patient_id
+    left join nqf_0034
+         on measures_long.patient_id = nqf_0034.patient_id
 
 )
 
