@@ -4,7 +4,9 @@
 }}
 
 /*
-    Patients that had a mastectomy performed or who have a history of mastectomy
+    Women who had a bilateral mastectomy or who have a history of a bilateral
+    mastectomy or for whom there is evidence of a right and a left
+    unilateral mastectomy
 */
 
 with denominator as (
@@ -137,7 +139,7 @@ with denominator as (
 
 )
 
-, mastectomy as (
+, all_mastectomy as (
 
     select
           denominator.patient_id
@@ -169,9 +171,102 @@ with denominator as (
 
 )
 
+/*
+    Women who had a bilateral mastectomy or who have a history of a bilateral
+    mastectomy
+*/
+, bilateral_mastectomy as (
+
+    select
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from all_mastectomy
+    where exclusion_reason in (
+          'Bilateral Mastectomy'
+        , 'History of bilateral mastectomy'
+    )
+
+)
+
+, right_mastectomy as (
+
+    select
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from all_mastectomy
+    where exclusion_reason in (
+          'Status Post Right Mastectomy'
+        , 'Unilateral Mastectomy Right'
+    )
+
+)
+
+, left_mastectomy as (
+
+    select
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from all_mastectomy
+    where exclusion_reason in (
+          'Status Post Left Mastectomy'
+        , 'Unilateral Mastectomy Left'
+    )
+
+)
+
+, unspecified_mastectomy as (
+
+    select
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from all_mastectomy
+    where exclusion_reason in (
+        'Unilateral Mastectomy, Unspecified Laterality'
+    )
+
+)
+
+/*
+    Women for whom there is evidence of a right AND a left unilateral mastectomy
+    or unspecific mastectomies on different dates
+*/
+, unilateral_mastectomy as (
+
+    select
+          right_mastectomy.patient_id
+        , right_mastectomy.exclusion_date
+        , right_mastectomy.exclusion_reason
+    from right_mastectomy
+         inner join left_mastectomy
+            on right_mastectomy.patient_id = left_mastectomy.patient_id
+
+    union all
+
+    select
+          unspecified_mastectomy.patient_id
+        , unspecified_mastectomy.exclusion_date
+        , unspecified_mastectomy.exclusion_reason
+    from unspecified_mastectomy
+         inner join unspecified_mastectomy as self_join
+            on unspecified_mastectomy.patient_id = self_join.patient_id
+            and unspecified_mastectomy.exclusion_date <> self_join.exclusion_date
+
+)
+
+, unioned as (
+
+    select * from bilateral_mastectomy
+    union all
+    select * from unilateral_mastectomy
+)
+
 select
       patient_id
     , exclusion_date
     , exclusion_reason
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from mastectomy
+from unioned
