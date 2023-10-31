@@ -14,14 +14,15 @@
     measurement period or the year prior to measurement period
 */
 
-with denominator as (
+with patients_with_frailty as (
 
     select
           patient_id
-        , age
         , performance_period_begin
         , performance_period_end
-    from {{ ref('quality_measures__int_nqf2372_denominator') }}
+        , exclusion_date
+        , exclusion_reason
+    from {{ ref('quality_measures__int_nqf2372__frailty') }}
 
 )
 
@@ -33,11 +34,7 @@ with denominator as (
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
-          'Frailty Device'
-        , 'Frailty Diagnosis'
-        , 'Frailty Encounter'
-        , 'Frailty Symptom'
-        , 'Advanced Illness'
+          'Advanced Illness'
         , 'Acute Inpatient'
         , 'Encounter Inpatient'
         , 'Outpatient'
@@ -79,27 +76,6 @@ with denominator as (
         , hcpcs_code
         , place_of_service_code
     from {{ ref('quality_measures__stg_medical_claim') }}
-
-)
-
-, observations as (
-
-    select
-          patient_id
-        , observation_date
-        , coalesce (
-              normalized_code_type
-            , case
-                when lower(source_code_type) = 'cpt' then 'hcpcs'
-                when lower(source_code_type) = 'snomed' then 'snomed-ct'
-                else lower(source_code_type)
-              end
-          ) as code_type
-        , coalesce (
-              normalized_code
-            , source_code
-          ) as code
-    from {{ ref('quality_measures__stg_core__observation') }}
 
 )
 
@@ -154,19 +130,6 @@ with denominator as (
 
 )
 
-, observation_exclusions as (
-
-    select
-          observations.patient_id
-        , observations.observation_date
-        , exclusion_codes.concept_name
-    from observations
-         inner join exclusion_codes
-             on observations.code = exclusion_codes.code
-             and observations.code_type = exclusion_codes.code_system
-
-)
-
 , procedure_exclusions as (
 
     select
@@ -177,97 +140,6 @@ with denominator as (
          inner join exclusion_codes
              on procedures.code = exclusion_codes.code
              and procedures.code_type = exclusion_codes.code_system
-
-)
-
-/*
-    Patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-*/
-, patients_with_frailty as (
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-    from denominator
-         inner join condition_exclusions
-            on denominator.patient_id = condition_exclusions.patient_id
-    where denominator.age >= 66
-        and condition_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
-        )
-        and condition_exclusions.recorded_date
-            between denominator.performance_period_begin
-            and denominator.performance_period_end
-
-    union all
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-    from denominator
-         inner join med_claim_exclusions
-            on denominator.patient_id = med_claim_exclusions.patient_id
-    where denominator.age >= 66
-        and med_claim_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
-        )
-        and (
-            med_claim_exclusions.claim_start_date
-                between denominator.performance_period_begin
-                and denominator.performance_period_end
-            or med_claim_exclusions.claim_end_date
-                between denominator.performance_period_begin
-                and denominator.performance_period_end
-        )
-
-    union all
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-    from denominator
-         inner join observation_exclusions
-            on denominator.patient_id = observation_exclusions.patient_id
-    where denominator.age >= 66
-        and observation_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
-        )
-        and observation_exclusions.observation_date
-            between denominator.performance_period_begin
-            and denominator.performance_period_end
-
-    union all
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-    from denominator
-         inner join procedure_exclusions
-            on denominator.patient_id = procedure_exclusions.patient_id
-    where denominator.age >= 66
-        and procedure_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
-        )
-        and procedure_exclusions.procedure_date
-            between denominator.performance_period_begin
-            and denominator.performance_period_end
 
 )
 
@@ -286,8 +158,10 @@ with denominator as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , med_claim_exclusions.concept_name
+        , patients_with_frailty.exclusion_reason
             || ' with '
+            || med_claim_exclusions.concept_name
+            || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
     from patients_with_frailty
@@ -310,24 +184,13 @@ with denominator as (
 
     select distinct
           patients_with_frailty.patient_id
-        , observation_exclusions.observation_date as exclusion_date
-        , observation_exclusions.concept_name as exclusion_reason
-    from patients_with_frailty
-         inner join observation_exclusions
-         on patients_with_frailty.patient_id = observation_exclusions.patient_id
-    where observation_exclusions.concept_name = 'Acute Inpatient'
-    and (
-        observation_exclusions.observation_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
-
-    union all
-
-    select distinct
-          patients_with_frailty.patient_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , procedure_exclusions.concept_name as exclusion_reason
+        , patients_with_frailty.exclusion_reason
+            || ' with '
+            || procedure_exclusions.concept_name
+            || ' and '
+            || condition_exclusions.concept_name
+          as exclusion_reason
     from patients_with_frailty
          inner join procedure_exclusions
          on patients_with_frailty.patient_id = procedure_exclusions.patient_id
@@ -360,8 +223,10 @@ with denominator as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , med_claim_exclusions.concept_name
+        , patients_with_frailty.exclusion_reason
             || ' with '
+            || med_claim_exclusions.concept_name
+            || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
     from patients_with_frailty
@@ -390,30 +255,13 @@ with denominator as (
 
     select distinct
           patients_with_frailty.patient_id
-        , observation_exclusions.observation_date as exclusion_date
-        , observation_exclusions.concept_name as exclusion_reason
-    from patients_with_frailty
-         inner join observation_exclusions
-         on patients_with_frailty.patient_id = observation_exclusions.patient_id
-    where observation_exclusions.concept_name in (
-          'Encounter Inpatient'
-        , 'Outpatient'
-        , 'Observation'
-        , 'Emergency Department Visit'
-        , 'Nonacute Inpatient'
-    )
-    and (
-        observation_exclusions.observation_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
-
-    union all
-
-    select distinct
-          patients_with_frailty.patient_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , procedure_exclusions.concept_name as exclusion_reason
+        , patients_with_frailty.exclusion_reason
+            || ' with '
+            || procedure_exclusions.concept_name
+            || ' and '
+            || condition_exclusions.concept_name
+          as exclusion_reason
     from patients_with_frailty
          inner join procedure_exclusions
          on patients_with_frailty.patient_id = procedure_exclusions.patient_id
