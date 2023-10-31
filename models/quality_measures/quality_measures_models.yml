@@ -118,6 +118,26 @@ models:
 
 ## Intermediate
 ### Breast Cancer Screening
+  - name: quality_measures__int_nqf2372__performance_period
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf2372__performance_period
+      tags: quality_measures
+      materialized: view
+    description: >
+      Performance Period definition for Breast Cancer screening.
+
+  - name: quality_measures__int_nqf2372__frailty
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf2372__frailty
+      tags: quality_measures
+      materialized: view
+    description: >
+      Exclusion logic for patients with frailty used by other exclusion models.
+
   - name: quality_measures__int_nqf2372_denominator
     config:
       schema: |
@@ -398,7 +418,7 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-### Colorectal Cancer Screening
+  ### Colorectal Cancer Screening
   - name: quality_measures__int_nqf0034_denominator
     config:
       schema: |
@@ -407,7 +427,7 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of NQF 0034, Breast Cancer 
+      Denominator logic for the reporting version of NQF 0034, Colorectal Cancer 
       Screening.    
 
   - name: quality_measures__int_nqf0034_exclude_advanced_illness
@@ -442,7 +462,6 @@ models:
     description: >
       Exclusion logic for patients with frailty and taking dementia medications
       for the reporting version of NQF 0034, Colorectal Cancer Screening.
-      
 
   - name: quality_measures__int_nqf0034_exclude_hospice_palliative
     config:
@@ -509,7 +528,6 @@ models:
     description: >
       Frailty definition for nqf 0034 colorectal cancer screening used in multiple exclusions
 
-
   - name: quality_measures__int_nqf0034__performance_period
     config:
       schema: |
@@ -518,7 +536,7 @@ models:
       tags: quality_measures
       materialized: view
     description: >
-      Performance Period definition fot nqf 0034 Colorectal Cancer screening.
+      Performance Period definition for NQF 0034 Colorectal Cancer screening.
 
 ## Staging
   - name: quality_measures__stg_core__condition
