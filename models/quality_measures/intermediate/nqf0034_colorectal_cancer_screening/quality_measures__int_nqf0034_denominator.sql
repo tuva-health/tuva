@@ -19,17 +19,6 @@ Patient encounter during the performance period (CPT or HCPCS): 99202, 99203, 99
 99396*, 99397*, G0438, G0439
 */
 
-
-
-{%- set performance_period_end = var('quality_measures_period_end') -%}
-
-{%- set performance_period_begin -%}
-{{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="'"~performance_period_end~"'") }}
-{%- endset -%}
-
-
-
-
 with  visit_codes as (
 
     select

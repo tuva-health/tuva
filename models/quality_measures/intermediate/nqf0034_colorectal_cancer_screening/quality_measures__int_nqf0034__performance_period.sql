@@ -9,11 +9,11 @@
 with period_end as (
 
     select
-        {%- if var('quality_measures_period_end',False) == False -%}
+        {% if var('quality_measures_period_end',False) == False -%}
         {{ last_day(dbt.current_timestamp(), 'year') }}
-        {%- else -%}
+        {% else -%}
         '{{ var('quality_measures_period_end') }}'
-        {%- endif -%}
+        {%- endif %}
          as performance_period_end
 )
 
