@@ -89,7 +89,7 @@ with demographics as (
         , model_version
         , payment_year
         , case
-            when hcc_count > 10 then '>=10'
+            when hcc_count >= 10 then '>=10'
             else cast(hcc_count as {{ dbt.type_string() }})
           end as hcc_count_string
     from demographics_with_hcc_counts

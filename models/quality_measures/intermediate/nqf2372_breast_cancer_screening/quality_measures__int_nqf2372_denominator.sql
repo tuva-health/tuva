@@ -2,39 +2,27 @@
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
-{%- set performance_period_end = var('quality_measures_period_end') -%}
 
-{%- set performance_period_begin -%}
-{{ dbt.dateadd(datepart="month", interval=-27, from_date_or_timestamp="'"~performance_period_end~"'") }}
-{%- endset -%}
+with performance_period as (
 
-{%- set measure_id -%}
-(select id
-from {{ ref('quality_measures__measures') }}
-where id = 'NQF2372')
-{%- endset -%}
+    select
+          measure_id
+        , measure_name
+        , measure_version
+        , performance_period_end
+        , performance_period_begin
+        , performance_period_lookback
+    from {{ ref('quality_measures__int_nqf2372__performance_period') }}
 
-{%- set measure_name -%}
-(select name
-from {{ ref('quality_measures__measures') }}
-where id = 'NQF2372')
-{%- endset -%}
+)
 
-{%- set measure_version -%}
-(select version
-from {{ ref('quality_measures__measures') }}
-where id = 'NQF2372')
-{%- endset -%}
-
-with patient as (
+, patient as (
 
     select
           patient_id
         , sex
         , birth_date
         , death_date
-        , cast({{ performance_period_begin }} as date) as performance_period_begin
-        , cast('{{ performance_period_end }}'as date) as performance_period_end
     from {{ ref('quality_measures__stg_core__patient') }}
 
 )
@@ -102,14 +90,19 @@ with patient as (
 , patient_with_age as (
 
     select
-          patient_id
-        , sex
-        , birth_date
-        , death_date
-        , performance_period_begin
-        , performance_period_end
-        , floor({{ datediff('birth_date', 'performance_period_begin', 'hour') }} / 8766.0) as age
+          patient.patient_id
+        , patient.sex
+        , patient.birth_date
+        , patient.death_date
+        , performance_period.measure_id
+        , performance_period.measure_name
+        , performance_period.measure_version
+        , performance_period.performance_period_begin
+        , performance_period.performance_period_end
+        , performance_period.performance_period_lookback
+        , floor({{ datediff('patient.birth_date', 'performance_period.performance_period_end', 'hour') }} / 8766.0) as age
     from patient
+         cross join performance_period
 
 )
 
@@ -122,8 +115,12 @@ with patient as (
     select
           patient_id
         , age
+        , measure_id
+        , measure_name
+        , measure_version
         , performance_period_begin
         , performance_period_end
+        , performance_period_lookback
         , 1 as denominator_flag
     from patient_with_age
     where lower(sex) = 'female'
@@ -192,8 +189,12 @@ with patient as (
     select
           patient_filtered.patient_id
         , patient_filtered.age
+        , patient_filtered.measure_id
+        , patient_filtered.measure_name
+        , patient_filtered.measure_version
         , patient_filtered.performance_period_begin
         , patient_filtered.performance_period_end
+        , performance_period_lookback
         , patient_filtered.denominator_flag
     from patient_filtered
          left join visit_claims
@@ -226,9 +227,10 @@ with patient as (
         , cast(age as integer) as age
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
-        , cast({{ measure_id }} as {{ dbt.type_string() }}) as measure_id
-        , cast({{ measure_name }} as {{ dbt.type_string() }}) as measure_name
-        , cast({{ measure_version }} as {{ dbt.type_string() }}) as measure_version
+        , cast(performance_period_lookback as date) as performance_period_lookback
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(denominator_flag as integer) as denominator_flag
     from eligible_population
 
@@ -239,6 +241,7 @@ with patient as (
     , age
     , performance_period_begin
     , performance_period_end
+    , performance_period_lookback
     , measure_id
     , measure_name
     , measure_version

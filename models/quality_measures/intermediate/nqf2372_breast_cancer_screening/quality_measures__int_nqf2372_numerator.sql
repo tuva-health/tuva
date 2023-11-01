@@ -12,6 +12,7 @@ with denominator as (
           patient_id
         , performance_period_begin
         , performance_period_end
+        , performance_period_lookback
         , measure_id
         , measure_name
         , measure_version
@@ -130,43 +131,44 @@ with denominator as (
           denominator.patient_id
         , denominator.performance_period_begin
         , denominator.performance_period_end
+        , denominator.performance_period_lookback
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
         , case
             when qualifying_claims.claim_start_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then qualifying_claims.claim_start_date
             when qualifying_claims.claim_end_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then qualifying_claims.claim_end_date
             when qualifying_observations.observation_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then qualifying_observations.observation_date
             when qualifying_procedures.procedure_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then qualifying_procedures.procedure_date
             else null
           end as evidence_date
         , case
             when qualifying_claims.claim_start_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then 1
             when qualifying_claims.claim_end_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then 1
             when qualifying_observations.observation_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then 1
             when qualifying_procedures.procedure_date
-                between denominator.performance_period_begin
+                between denominator.performance_period_lookback
                 and denominator.performance_period_end
                 then 1
             else 0

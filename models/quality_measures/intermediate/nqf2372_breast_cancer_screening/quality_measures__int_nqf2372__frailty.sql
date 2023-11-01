@@ -2,17 +2,16 @@
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
-
 /*
-    Women who had a bilateral mastectomy or who have a history of a bilateral
-    mastectomy or for whom there is evidence of a right and a left
-    unilateral mastectomy
+    This concept is used in multiple exclusions. Patients greater than
+    or equal to 66 with at least one claim/encounter for frailty during
+    the measurement period.
 */
-
 with denominator as (
 
     select
           patient_id
+        , age
         , performance_period_begin
         , performance_period_end
     from {{ ref('quality_measures__int_nqf2372_denominator') }}
@@ -27,13 +26,10 @@ with denominator as (
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
-          'Bilateral Mastectomy'
-        , 'History of bilateral mastectomy'
-        , 'Status Post Left Mastectomy'
-        , 'Status Post Right Mastectomy'
-        , 'Unilateral Mastectomy Left'
-        , 'Unilateral Mastectomy Right'
-        , 'Unilateral Mastectomy, Unspecified Laterality'
+          'Frailty Device'
+        , 'Frailty Diagnosis'
+        , 'Frailty Encounter'
+        , 'Frailty Symptom'
     )
 
 )
@@ -50,11 +46,23 @@ with denominator as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce(
+        , coalesce (
               normalized_code
             , source_code
           ) as code
     from {{ ref('quality_measures__stg_core__condition') }}
+
+)
+
+, medical_claim as (
+
+    select
+          patient_id
+        , claim_start_date
+        , claim_end_date
+        , hcpcs_code
+        , place_of_service_code
+    from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
 
@@ -71,7 +79,7 @@ with denominator as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce(
+        , coalesce (
               normalized_code
             , source_code
           ) as code
@@ -92,7 +100,7 @@ with denominator as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce(
+        , coalesce (
               normalized_code
             , source_code
           ) as code
@@ -110,6 +118,21 @@ with denominator as (
          inner join exclusion_codes
              on conditions.code = exclusion_codes.code
              and conditions.code_type = exclusion_codes.code_system
+
+)
+
+, med_claim_exclusions as (
+
+    select
+          medical_claim.patient_id
+        , medical_claim.claim_start_date
+        , medical_claim.claim_end_date
+        , medical_claim.hcpcs_code
+        , exclusion_codes.concept_name
+    from medical_claim
+         inner join exclusion_codes
+            on medical_claim.hcpcs_code = exclusion_codes.code
+    where exclusion_codes.code_system = 'hcpcs'
 
 )
 
@@ -139,134 +162,109 @@ with denominator as (
 
 )
 
-, all_mastectomy as (
+, patients_with_frailty as (
 
     select
           denominator.patient_id
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
         , condition_exclusions.recorded_date as exclusion_date
         , condition_exclusions.concept_name as exclusion_reason
     from denominator
          inner join condition_exclusions
             on denominator.patient_id = condition_exclusions.patient_id
+    where denominator.age >= 66
+        and condition_exclusions.concept_name in (
+              'Frailty Device'
+            , 'Frailty Diagnosis'
+            , 'Frailty Encounter'
+            , 'Frailty Symptom'
+        )
+        and condition_exclusions.recorded_date
+            between denominator.performance_period_begin
+            and denominator.performance_period_end
 
     union all
 
     select
           denominator.patient_id
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
+        , coalesce(
+              med_claim_exclusions.claim_start_date
+            , med_claim_exclusions.claim_end_date
+          ) as exclusion_date
+        , med_claim_exclusions.concept_name as exclusion_reason
+    from denominator
+         inner join med_claim_exclusions
+            on denominator.patient_id = med_claim_exclusions.patient_id
+    where denominator.age >= 66
+        and med_claim_exclusions.concept_name in (
+              'Frailty Device'
+            , 'Frailty Diagnosis'
+            , 'Frailty Encounter'
+            , 'Frailty Symptom'
+        )
+        and (
+            med_claim_exclusions.claim_start_date
+                between denominator.performance_period_begin
+                and denominator.performance_period_end
+            or med_claim_exclusions.claim_end_date
+                between denominator.performance_period_begin
+                and denominator.performance_period_end
+        )
+
+    union all
+
+    select
+          denominator.patient_id
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
         , observation_exclusions.observation_date as exclusion_date
         , observation_exclusions.concept_name as exclusion_reason
     from denominator
          inner join observation_exclusions
             on denominator.patient_id = observation_exclusions.patient_id
+    where denominator.age >= 66
+        and observation_exclusions.concept_name in (
+              'Frailty Device'
+            , 'Frailty Diagnosis'
+            , 'Frailty Encounter'
+            , 'Frailty Symptom'
+        )
+        and observation_exclusions.observation_date
+            between denominator.performance_period_begin
+            and denominator.performance_period_end
 
     union all
 
     select
           denominator.patient_id
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
         , procedure_exclusions.procedure_date as exclusion_date
         , procedure_exclusions.concept_name as exclusion_reason
     from denominator
          inner join procedure_exclusions
             on denominator.patient_id = procedure_exclusions.patient_id
+    where denominator.age >= 66
+        and procedure_exclusions.concept_name in (
+              'Frailty Device'
+            , 'Frailty Diagnosis'
+            , 'Frailty Encounter'
+            , 'Frailty Symptom'
+        )
+        and procedure_exclusions.procedure_date
+            between denominator.performance_period_begin
+            and denominator.performance_period_end
 
-)
-
-/*
-    Women who had a bilateral mastectomy or who have a history of a bilateral
-    mastectomy
-*/
-, bilateral_mastectomy as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from all_mastectomy
-    where exclusion_reason in (
-          'Bilateral Mastectomy'
-        , 'History of bilateral mastectomy'
-    )
-
-)
-
-, right_mastectomy as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from all_mastectomy
-    where exclusion_reason in (
-          'Status Post Right Mastectomy'
-        , 'Unilateral Mastectomy Right'
-    )
-
-)
-
-, left_mastectomy as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from all_mastectomy
-    where exclusion_reason in (
-          'Status Post Left Mastectomy'
-        , 'Unilateral Mastectomy Left'
-    )
-
-)
-
-, unspecified_mastectomy as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from all_mastectomy
-    where exclusion_reason in (
-        'Unilateral Mastectomy, Unspecified Laterality'
-    )
-
-)
-
-/*
-    Women for whom there is evidence of a right AND a left unilateral mastectomy
-    or unspecific mastectomies on different dates
-*/
-, unilateral_mastectomy as (
-
-    select
-          right_mastectomy.patient_id
-        , right_mastectomy.exclusion_date
-        , right_mastectomy.exclusion_reason
-    from right_mastectomy
-         inner join left_mastectomy
-            on right_mastectomy.patient_id = left_mastectomy.patient_id
-
-    union all
-
-    select
-          unspecified_mastectomy.patient_id
-        , unspecified_mastectomy.exclusion_date
-        , unspecified_mastectomy.exclusion_reason
-    from unspecified_mastectomy
-         inner join unspecified_mastectomy as self_join
-            on unspecified_mastectomy.patient_id = self_join.patient_id
-            and unspecified_mastectomy.exclusion_date <> self_join.exclusion_date
-
-)
-
-, unioned as (
-
-    select * from bilateral_mastectomy
-    union all
-    select * from unilateral_mastectomy
 )
 
 select
       patient_id
+    , performance_period_begin
+    , performance_period_end
     , exclusion_date
     , exclusion_reason
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from unioned
+from patients_with_frailty
