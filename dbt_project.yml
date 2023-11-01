@@ -30,11 +30,6 @@ vars:
     # Default timezone is UTC
     tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
-    ## Quality Measure data mart vars
-    # The measurement period end variable has a default of the current date
-    # this var can be used to run older performance periods
-    quality_measures_period_end: "{{ dbt_utils.pretty_time(format='%Y-%m-%d') }}"
-
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
