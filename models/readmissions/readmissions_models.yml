@@ -1,7 +1,7 @@
 version: 2
 
 models:
-
+## Final
   - name: readmissions__encounter_augmented
     config:
       schema: |
@@ -272,6 +272,16 @@ models:
         description: "The unique identifier for the encounter"
       - name: specialty_cohort
         description: "The specialty cohort associated with the encounter"
+
+
+  - name: readmissions__encounter_with_ccs
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}
+      alias: _int_encounter_with_ccs
+      tags: readmissions
+      materialized: view
 
 
   - name: readmissions__exclusion
