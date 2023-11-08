@@ -30,7 +30,7 @@ with period_end as (
         {% if var('quality_measures_period_end',False) == False -%}
         {{ last_day(dbt.current_timestamp(), 'year') }}
         {% else -%}
-        '{{ var('quality_measures_period_end') }}'
+        cast('{{ var('quality_measures_period_end') }}' as date)
         {%- endif %}
          as performance_period_end
 )
