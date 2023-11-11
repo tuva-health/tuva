@@ -26,8 +26,10 @@
   select
       *
     from
-      read_csv_auto('s3://{{ uri }}/{{ pattern }}',
-      {% if headers == true %} header = true {% else %} {% endif %}
+      read_csv_auto(
+        {% if compression == true %} 's3://{{ uri }}/{{ pattern }}.gz',
+        {% else %} 's3://{{ uri }}/{{ pattern }}', {% endif %}
+      {% if headers == true %} header = true {% else %} header = false {% endif %}
     )
 
 {% endset %}
