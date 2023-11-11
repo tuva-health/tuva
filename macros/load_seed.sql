@@ -17,6 +17,34 @@
 {% endmacro %}
 
 
+{% macro duckdb__load_seed(uri,pattern,compression,headers,null_marker) %}
+{% set sql %}
+  set s3_access_key_id='AKIA2EPVNTV4FLAEBFGE';
+  set s3_secret_access_key='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';
+  set s3_region='us-east-1';
+  insert into {{this}}
+  select
+      *
+    from
+      read_csv_auto('s3://{{ uri }}/{{ pattern }}',
+      {% if headers == true %} header = true {% else %} {% endif %}
+    )
+
+{% endset %}
+
+{% call statement('redsql',fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% if execute %}
+{# debugging { log(sql, True)} #}
+{% set results = load_result('redsql') %}
+{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ,True) }}
+{# debugging { log(results, True) } #}
+{% endif %}
+
+{% endmacro %}
+
 
 {% macro redshift__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% set sql %}
