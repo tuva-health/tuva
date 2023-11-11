@@ -26,21 +26,18 @@
   select
       *
     from
-      read_csv_auto(
-        {% if compression == true %} 's3://{{ uri }}/{{ pattern }}.gz',
-        {% else %} 's3://{{ uri }}/{{ pattern }}', {% endif %}
-      {% if headers == true %} header = true {% else %} header = false {% endif %}
-    )
+        read_csv_auto('s3://{{ uri }}/{{ pattern }}*',
+        {% if null_marker == true %} nullstr = '\N' {% else %} nullstr = '' {% endif %} )
 
 {% endset %}
 
-{% call statement('redsql',fetch_result=true) %}
+{% call statement('ducksql',fetch_result=true) %}
 {{ sql }}
 {% endcall %}
 
 {% if execute %}
 {# debugging { log(sql, True)} #}
-{% set results = load_result('redsql') %}
+{% set results = load_result('ducksql') %}
 {{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ,True) }}
 {# debugging { log(results, True) } #}
 {% endif %}
