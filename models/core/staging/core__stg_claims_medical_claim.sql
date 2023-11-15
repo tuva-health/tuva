@@ -52,6 +52,9 @@ select
     , cast(med.paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
     , cast(med.allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
     , cast(med.charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
+    , cast(med.coinsurance_amount as {{ dbt.type_numeric() }} ) as coinsurance_amount
+    , cast(med.copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
+    , cast(med.deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
     , cast(med.total_cost_amount as {{ dbt.type_numeric() }} ) as total_cost_amount
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
