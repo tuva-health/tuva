@@ -115,9 +115,12 @@ seeds:
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
         paid_date: date
         paid_amount: float
-        total_cost_amount: float
         allowed_amount: float
         charge_amount: float
+        coinsurance_amount: float
+        copayment_amount: float
+        deductible_amount: float
+        total_cost_amount: float
         diagnosis_code_type: |
           {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
         diagnosis_code_1: |

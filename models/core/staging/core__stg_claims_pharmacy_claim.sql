@@ -28,6 +28,9 @@ select
        , cast(paid_date as date ) as paid_date
        , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount
        , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
+       , cast(coinsurance_amount as {{ dbt.type_numeric() }} ) as coinsurance_amount
+       , cast(copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
+       , cast(deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy_claim') }} 

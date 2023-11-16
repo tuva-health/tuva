@@ -14,5 +14,8 @@ select claim_id,
        paid_date,
        paid_amount,
        allowed_amount,
+       coinsurance_amount,
+       copayment_amount,
+       deductible_amount,
        data_source
 from tuva._tuva_synthetic.pharmacy_claim_seed
