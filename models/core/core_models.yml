@@ -102,6 +102,8 @@ models:
         description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
         meta:
           terminology: /terminology/tuva-concepts/payer-type
+      - name: plan
+        description: Name of the plan (i.e. sub contract) providing coverage.
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code.
         meta:
@@ -347,6 +349,10 @@ models:
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: payer
+        description: Name of the payer
+      - name: plan
+        description: Name of the plan
       - name: claim_start_date
         description: Start date for the claim.
       - name: claim_end_date
@@ -437,6 +443,12 @@ models:
       - name: allowed_amount
         description: The total amount allowed (includes amount paid by the insurer and patient) on the claim.
       - name: charge_amount
+        description: The total amount charged on the claim by the provider.
+      - name: coinsurance_amount
+        description: The total coinsurance charged on the claim by the provider.
+      - name: copayment_amount
+        description: The total copayment charged on the claim by the provider.
+      - name: deductible_amount
         description: The total amount charged on the claim by the provider.
       - name: total_cost_amount
         description: The total amount paid on the claim by different parties.
@@ -640,6 +652,10 @@ models:
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: payer
+        description: Name of the payer
+      - name: plan
+        description: Name of the plan
       - name: prescribing_provider_npi
         description: NPI for the provider that wrote the prescription (e.g. priamry care physician).
         meta:
@@ -667,6 +683,14 @@ models:
         description: Amount paid by the health insurer for the claim.
       - name: allowed_amount
         description: Contractual amount allowed to be paid by the payer + patient.
+      - name: coinsurance_amount
+        description: The total coinsurance charged on the claim by the provider.
+      - name: copayment_amount
+        description: The total copayment charged on the claim by the provider.
+      - name: deductible_amount
+        description: The total amount charged on the claim by the provider.
+      - name: total_cost_amount
+        description: The total amount paid on the claim by different parties.
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run

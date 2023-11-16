@@ -37,6 +37,8 @@ models:
         description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
         meta:
           terminology: /terminology/tuva-concepts/payer-type
+      - name: plan
+        description: Name of the plan
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code.
         meta:
@@ -87,6 +89,11 @@ models:
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: plan
+        description: Name of the plan
+      - name: original_reason_entitlement_code
       - name: claim_start_date
         description: Start date for the claim.
       - name: claim_end_date
@@ -558,6 +565,10 @@ models:
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: plan
+        description: Name of the plan
       - name: prescribing_provider_npi
         description: NPI for the provider that wrote the prescription (e.g. priamry care physician).
         meta:

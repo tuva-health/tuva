@@ -1,7 +1,8 @@
 {{ config(
-     enabled = true
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
+
 
 /*
 Patients with one or more screenings for colorectal cancer. Appropriate screenings are defined by any one of the

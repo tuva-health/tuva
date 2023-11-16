@@ -4,6 +4,9 @@
 
 SELECT 
   year_month,
+  payer,
+  plan,
+  data_source,
   count(1) as member_months,
   SUM(total_paid) / COUNT(1) AS total_paid,
   SUM(medical_paid) / COUNT(1) AS medical_paid,
@@ -57,4 +60,4 @@ SELECT
   SUM(urgent_care_allowed) / COUNT(1) AS urgent_care_allowed,
   '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('financial_pmpm__pmpm_prep') }} a
-GROUP BY 1
+GROUP BY 1,2,3,4
