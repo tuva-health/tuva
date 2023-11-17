@@ -1281,3 +1281,31 @@ models:
       tags: 
         - service_category_grouper
         - claims_preprocessing
+
+
+###  Header validation
+
+  - name: header_validation__diagnosis_normalize
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: header_validation_diagnosis_normalize
+      materialized: table
+      tags: 
+        - header_validation
+        - claims_preprocessing
+
+  - name: header_validation__diagnosis_unique
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: header_validation_diagnosis_unique
+      materialized: table
+      tags: 
+        - header_validation
+        - claims_preprocessing
+
