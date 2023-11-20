@@ -4,8 +4,8 @@ with normalize as(
         , med.data_source
         , disch.discharge_disposition_code
     from {{ ref('medical_claim') }} med
-    inner join terminology.discharge_disposition disch
-        on med.bill_type_code = disch.discharge_disposition_code
+    inner join {{ ref('terminology__discharge_disposition') }} disch
+        on med.discharge_disposition_code = disch.discharge_disposition_code
     where claim_type = 'institutional'
 )
 , distinct_counts as(

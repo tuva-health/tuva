@@ -4,7 +4,7 @@ with normalize as(
         , med.data_source
         , ms.ms_drg_code
     from {{ ref('medical_claim') }} med
-    inner join terminology.ms_drg ms
+    inner join {{ ref('terminology__ms_drg') }} ms
         on med.bill_type_code = ms.ms_drg_code
     where claim_type = 'institutional'
 )

@@ -31,7 +31,7 @@ select
     , max(case when diagnosis_column = 'DIAGNOSIS_POA_23' then normalized_code else null end) as diagnosis_poa_23
     , max(case when diagnosis_column = 'DIAGNOSIS_POA_24' then normalized_code else null end) as diagnosis_poa_24
     , max(case when diagnosis_column = 'DIAGNOSIS_POA_14' then normalized_code else null end) as diagnosis_poa_25
-from {{ ref('header_validation__int_diagnosis_poa_voting') }}
+from {{ ref('header_validation__int_present_on_admission_voting') }}
 where (occurrence_row_count = 1
         and diagnosis_poa_occurrence_count > next_occurrence_count)
 group by
