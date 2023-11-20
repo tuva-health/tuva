@@ -1285,37 +1285,50 @@ models:
 
 ###  Header validation
 
-  - name: header_validation__diagnosis_normalize
+  - name: header_validation__int_diagnosis_final
     description: N/A
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: header_validation_diagnosis_normalize
+      alias: _int_header_validation_diagnosis_final
       materialized: table
       tags: 
         - header_validation
         - claims_preprocessing
 
-  - name: header_validation__diagnosis_unique_count
+
+  - name: header_validation__int_diagnosis_normalize
     description: N/A
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: header_validation_diagnosis_unique_count
+      alias: _int_header_validation_diagnosis_normalize
       materialized: table
       tags: 
         - header_validation
         - claims_preprocessing
 
-  - name: header_validation__diagnosis_voting
+  - name: header_validation__int_diagnosis_unique_count
     description: N/A
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: header_validation_diagnosis_voting
+      alias: _int_header_validation_diagnosis_unique_count
+      materialized: table
+      tags: 
+        - header_validation
+        - claims_preprocessing
+
+  - name: header_validation__int_diagnosis_voting
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_header_validation_diagnosis_voting
       materialized: table
       tags: 
         - header_validation
