@@ -143,7 +143,7 @@ select
 	, procedure_date_25
 	, data_source
 from {{ ref('medical_claim') }} med
-left join {{ref('header_validation__int_diagnosis_final') }} diag
+left join {{ref('header_validation__int_diagnosis_code_final') }} diag
  on med.claim_id = diag.claim_id
 left join {{ref('header_validation__int_admit_source_final') }} admit
  on med.claim_id = diag.claim_id
