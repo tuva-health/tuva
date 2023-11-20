@@ -121,7 +121,7 @@ with pivot_procedure as(
             , 'procedure_code_25'
             ],
     field_name='procedure_column',
-    value_name='procedure_code'
+    value_name='procedure_date'
 
 ) }}
 )
@@ -131,18 +131,12 @@ select
     , data_source
     , procedure_code_type
     , procedure_column
-    , coalesce(icd_9.icd_9_cm,icd_10.icd_10_cm) as normalized_procedure_code
-    , count(*) as procedure_code_occurrence_count
+    , procedure_date
+    , count(*) as procedure_date_occurrence_count
 from pivot_procedure piv
-left join {{ ref('terminology__icd_10_pcs') }} icd_10
-    on replace(piv.procedure_code,'.','') = icd_10.icd_10_cm
-    and piv.procedure_code_type = 'icd_10_pcs'
-left join {{ ref('terminology__icd_9_pcs') }} icd_9
-    on replace(piv.procedure_code,'.','') = icd_9.icd_9_cm
-    and piv.procedure_code_type = 'icd_9_pcs'
 group by 
     claim_id
     , data_source
     , procedure_code_type
     , procedure_column
-    , coalesce(icd_9.icd_9_cm,icd_10.icd_10_cm)
+    , procedure_date
