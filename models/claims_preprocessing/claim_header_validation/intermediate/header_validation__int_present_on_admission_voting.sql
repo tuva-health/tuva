@@ -22,11 +22,11 @@ select
     , norm.data_source
     , norm.diagnosis_column
     , norm.normalized_present_on_admission_code
-    , norm.procedure_code_occurrence_count
+    , norm.present_on_admission_occurrence_count
     , coalesce(lead(present_on_admission_occurrence_count) 
         over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by present_on_admission_occurrence_count desc),0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by present_on_admission_occurrence_count desc) as occurrence_row_count
-from {{ ref('header_validation__int_procedure_code_normalize') }} norm
+from {{ ref('header_validation__int_present_on_admission_normalize') }} norm
 inner join distinct_count dist
     on norm.claim_id = dist.claim_id
     and norm.data_source = dist.data_source

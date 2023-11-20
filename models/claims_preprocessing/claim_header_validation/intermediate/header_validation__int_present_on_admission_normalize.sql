@@ -129,7 +129,7 @@ with pivot_poa as(
 select
     claim_id
     , data_source
-    , column_name
+    , diagnosis_column
     , poa.present_on_admit_code as normalized_present_on_admission_code
     , count(*) as present_on_admission_occurrence_count
 from pivot_poa piv
@@ -138,5 +138,5 @@ left join {{ ref('terminology__present_on_admission') }} poa
 group by 
     claim_id
     , data_source
-    , column_name
+    , diagnosis_column
     , poa.present_on_admit_code

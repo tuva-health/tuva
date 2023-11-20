@@ -27,7 +27,7 @@ with normalize as(
         claim_id
         , data_source
         , admit_type_code
-        , admit_source_occurrence_count
+        , admit_type_occurrence_count
         , coalesce(lead(admit_type_occurrence_count) 
             over (partition by claim_id, data_source order by admit_type_occurrence_count desc),0) as next_occurrence_count
         , row_number() over (partition by claim_id, data_source order by admit_type_occurrence_count desc) as occurrence_row_count

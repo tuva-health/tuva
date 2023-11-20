@@ -5,7 +5,7 @@ with normalize as(
         , apr.apr_drg_code
     from {{ ref('medical_claim') }} med
     inner join terminology.apr_drg apr
-        on med.apr_drg_code = apr.apr_drg
+        on med.apr_drg_code = apr.apr_drg_code
     where claim_type = 'institutional'
 )
 , distinct_counts as(

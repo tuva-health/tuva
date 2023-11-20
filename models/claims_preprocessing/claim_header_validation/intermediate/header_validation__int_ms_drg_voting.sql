@@ -4,7 +4,7 @@ with normalize as(
         , med.data_source
         , ms.ms_drg_code
     from {{ ref('medical_claim') }} med
-    inner join terminology.bill_type ms
+    inner join terminology.ms_drg ms
         on med.bill_type_code = ms.ms_drg_code
     where claim_type = 'institutional'
 )
@@ -13,7 +13,7 @@ with normalize as(
         claim_id
         , data_source
         , ms_drg_code
-        , count(*) as bill_type_occurrence_count
+        , count(*) as ms_drg_occurrence_count
     from normalize
     where ms_drg_code is not null
     group by 

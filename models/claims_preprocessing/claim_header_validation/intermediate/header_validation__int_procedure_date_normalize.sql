@@ -129,7 +129,6 @@ with pivot_procedure as(
 select
     claim_id
     , data_source
-    , procedure_code_type
     , procedure_column
     , procedure_date
     , count(*) as procedure_date_occurrence_count
@@ -137,6 +136,5 @@ from pivot_procedure piv
 group by 
     claim_id
     , data_source
-    , procedure_code_type
     , procedure_column
     , procedure_date
