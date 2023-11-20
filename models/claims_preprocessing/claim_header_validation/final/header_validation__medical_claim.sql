@@ -12,7 +12,7 @@ select
 	, claim_line_end_date
 	, admission_date
 	, discharge_date
-	, admit_source_code
+	, admit.admit_source_code
 	, admit_type_code
 	, discharge_disposition_code
 	, place_of_service_code
@@ -144,4 +144,6 @@ select
 	, data_source
 from {{ ref('medical_claim') }} med
 left join {{ref('header_validation__int_diagnosis_final') }} diag
+ on med.claim_id = diag.claim_id
+left join {{ref('header_validation__int_admit_source_final') }} admit
  on med.claim_id = diag.claim_id

@@ -3,6 +3,19 @@
    )
 }}
 
+with distinct_count as(
+    select
+        claim_id
+        , data_source
+        , diagnosis_column
+        , count(*) as distinct_count
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
+    from {{ ref('header_validation__int_diagnosis_normalize') }}
+    group by
+        claim_id
+        , data_source
+        , diagnosis_column
+)
 
 select 
     norm.claim_id
@@ -14,7 +27,7 @@ select
         over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by diagnosis_code_occurrence_count desc),0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by diagnosis_code_occurrence_count desc) as occurrence_row_count
 from {{ ref('header_validation__int_diagnosis_normalize') }} norm
-inner join {{ ref('header_validation__int_diagnosis_unique_count') }} uni
-    on norm.claim_id = uni.claim_id
-    and norm.data_source = uni.data_source
-    and norm.diagnosis_column = uni.diagnosis_column
+inner join distinct_count dist
+    on norm.claim_id = dist.claim_id
+    and norm.data_source = dist.data_source
+    and norm.diagnosis_column = dist.diagnosis_column
