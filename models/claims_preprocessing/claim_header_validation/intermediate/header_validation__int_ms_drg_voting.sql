@@ -28,7 +28,7 @@ with normalize as(
         , data_source
         , 'ms_drg_code' as column_name
         , ms_drg_code as normalized_code
-        , ms_drg_occurrence_count
+        , ms_drg_occurrence_count as occurrence_count
         , coalesce(lead(ms_drg_occurrence_count) 
             over (partition by claim_id, data_source order by ms_drg_occurrence_count desc),0) as next_occurrence_count
         , row_number() over (partition by claim_id, data_source order by ms_drg_occurrence_count desc) as occurrence_row_count

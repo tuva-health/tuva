@@ -22,7 +22,7 @@ select
     , norm.data_source
     , norm.diagnosis_column as column_name
     , norm.normalized_diagnosis_code as normalized_code
-    , norm.diagnosis_code_occurrence_count
+    , norm.diagnosis_code_occurrence_count as occurrence_count
     , coalesce(lead(diagnosis_code_occurrence_count) 
         over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by diagnosis_code_occurrence_count desc),0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by diagnosis_code_occurrence_count desc) as occurrence_row_count

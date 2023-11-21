@@ -33,7 +33,7 @@ select
     , max(case when column_name = 'PROCEDURE_CODE_14' then normalized_code else null end) as procedure_code_25
 from {{ ref('header_validation__int_procedure_code_voting') }}
 where (occurrence_row_count = 1
-        and procedure_code_occurrence_count > next_occurrence_count)
+        and occurrence_count > next_occurrence_count)
 group by
     claim_id
     , data_source
