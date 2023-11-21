@@ -121,7 +121,7 @@ with pivot_poa as(
             ,'procedure_date_25'
             ],
     field_name='diagnosis_column',
-    value_name='present_on_admission_code'
+    value_name='present_on_admit_code'
 
 ) }}
 )
@@ -130,11 +130,11 @@ select
     claim_id
     , data_source
     , diagnosis_column
-    , poa.present_on_admit_code
-    , count(*) as present_on_admission_occurrence_count
+    , poa.present_on_admit_code as normalized_present_on_admit_code
+    , count(*) as present_on_admit_occurrence_count
 from pivot_poa piv
 left join {{ ref('terminology__present_on_admission') }} poa
-    on replace(piv.present_on_admission_code,'.','') = poa.present_on_admit_code
+    on replace(piv.present_on_admit_code,'.','') = poa.present_on_admit_code
 group by 
     claim_id
     , data_source
