@@ -26,7 +26,8 @@ with normalize as(
     select
         claim_id
         , data_source
-        , admit_type_code
+        , 'admit_type_code' as column_name
+        , admit_type_code as normalized_code
         , admit_type_occurrence_count
         , coalesce(lead(admit_type_occurrence_count) 
             over (partition by claim_id, data_source order by admit_type_occurrence_count desc),0) as next_occurrence_count

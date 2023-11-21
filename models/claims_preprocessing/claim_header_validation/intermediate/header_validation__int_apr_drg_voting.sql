@@ -26,7 +26,8 @@ with normalize as(
     select
         claim_id
         , data_source
-        , apr_drg_code
+        , 'apr_drg_code' as column_name
+        , apr_drg_code as normalized_code
         , apr_drg_occurrence_count
         , coalesce(lead(apr_drg_occurrence_count) 
             over (partition by claim_id, data_source order by apr_drg_occurrence_count desc),0) as next_occurrence_count

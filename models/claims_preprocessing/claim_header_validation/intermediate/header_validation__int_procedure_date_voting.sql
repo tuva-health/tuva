@@ -20,8 +20,8 @@ with distinct_count as(
 select 
     norm.claim_id
     , norm.data_source
-    , norm.procedure_column
-    , norm.procedure_date
+    , norm.procedure_column as column_name
+    , norm.procedure_date as normalized_code
     , norm.procedure_date_occurrence_count
     , coalesce(lead(procedure_date_occurrence_count) 
         over (partition by norm.claim_id, norm.data_source, norm.procedure_column order by procedure_date_occurrence_count desc),0) as next_occurrence_count
