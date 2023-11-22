@@ -18,6 +18,16 @@
 
 
 {% macro duckdb__load_seed(uri,pattern,compression,headers,null_marker) %}
+{%- set columns = adapter.get_columns_in_relation(this) -%}
+{%- set collist = [] -%}
+
+{% for col in columns %}
+  {% do collist.append("'" ~col.name~"'" ~ ": " ~ "'"~col.dtype~"'") %}
+{% endfor %}
+
+{%- set cols = collist|join(',') -%}
+{# { log( cols,true) } #}
+
 {% set sql %}
   set s3_access_key_id='AKIA2EPVNTV4FLAEBFGE';
   set s3_secret_access_key='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';
@@ -26,8 +36,9 @@
   select
       *
     from
-        read_csv_auto('s3://{{ uri }}/{{ pattern }}*',
-        {% if null_marker == true %} nullstr = '\N' {% else %} nullstr = '' {% endif %} )
+        read_csv('s3://{{ uri }}/{{ pattern }}*',
+        {% if null_marker == true %} nullstr = '\N' {% else %} nullstr = '' {% endif %},
+         columns= { {{ cols }} } )
 
 {% endset %}
 
