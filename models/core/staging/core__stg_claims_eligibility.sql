@@ -19,6 +19,7 @@ select
        , cast(enrollment_end_date as date ) as enrollment_end_date
        , cast(payer as {{ dbt.type_string() }} ) as payer
        , cast(payer_type as {{ dbt.type_string() }} ) as payer_type
+       , cast(plan as {{ dbt.type_string() }} ) as plan
        , cast(original_reason_entitlement_code as {{ dbt.type_string() }} ) as original_reason_entitlement_code
        , cast(dual_status_code as {{ dbt.type_string() }} ) as dual_status_code
        , cast(medicare_status_code as {{ dbt.type_string() }} ) as medicare_status_code

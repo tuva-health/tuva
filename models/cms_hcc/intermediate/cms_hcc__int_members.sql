@@ -39,8 +39,8 @@ with stg_eligibility as (
     from {{ ref('cms_hcc__stg_core__eligibility') }}
     where
     /* filter to members with eligibility in collection or payment year */
-    (extract(year from enrollment_start_date) <= {{ collection_year }}
-     and extract(year from enrollment_end_date) >= {{ payment_year }})
+    (extract(year from enrollment_start_date) >= {{ collection_year }}
+     or extract(year from enrollment_end_date) <= {{ payment_year }})
 
 )
 
@@ -75,8 +75,8 @@ with stg_eligibility as (
     from stg_eligibility
     where
     /* filter to members with eligibility in collection year */
-    (extract(year from enrollment_start_date) <= {{ collection_year }}
-     and extract(year from enrollment_end_date) >= {{ collection_year }})
+    (extract(year from enrollment_start_date) = {{ collection_year }}
+     or extract(year from enrollment_end_date) = {{ collection_year }})
 
 )
 
