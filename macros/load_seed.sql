@@ -22,7 +22,7 @@
   set s3_access_key_id='AKIA2EPVNTV4FLAEBFGE';
   set s3_secret_access_key='TARgblERrFP81Op+52KZW7HrP1Om6ObEDQAUVN2u';
   set s3_region='us-east-1';
-  insert into {{this}}
+  create or replace table {{this}} as
   select
       *
     from
