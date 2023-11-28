@@ -170,14 +170,16 @@ models:
         description: attending provider for the encounter.
         meta:
           terminology: /terminology/providers/provider
-      - name: billing_npi
-        description: Billing NPI for the encounter (typically represents organization billing the claim).
-        meta:
-          terminology: /terminology/providers/provider
       - name: facility_npi
         description: Facility NPI for the encounter (typically represents the facility where services were performed).
         meta:
           terminology: /terminology/providers/provider
+      - name: primary_diagnosis_code_type
+        description: >
+          The type of condition code reported in the source system e.g. 
+          ICD-10-CM.
+        meta:
+          terminology: /terminology/tuva-concepts/code-type
       - name: primary_diagnosis_code
         description: >
           Primary diagnosis code for the encounter.  If from claims the primary diagnosis code comes from the institutional
@@ -196,16 +198,12 @@ models:
           terminology: /terminology/conditions-and-procedures/apr-drg
       - name: apr_drg_description
         description: Description of the APR-DRG code.
-      - name: paid_date
-        description: The date when the last claim for the encounter was paid.
       - name: paid_amount
         description: The total amount paid for the encounter by the insurer.
       - name: allowed_amount
         description: The total amount allowed (includes amount paid by the insurer and patient) on the encounter.
       - name: charge_amount
         description: The total amount charged on the encounter by the provider.
-      - name: total_cost_amount
-        description: The total amount paid on the encounter by different parties.
       - name: data_source
         description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
