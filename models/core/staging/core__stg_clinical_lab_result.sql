@@ -31,5 +31,5 @@ select
     , cast(specimen as {{ dbt.type_string() }} ) as specimen
     , cast(ordering_practitioner_id as {{ dbt.type_string() }} ) as ordering_practitioner_id
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
-    , cast(tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('lab_result') }}
