@@ -158,11 +158,7 @@ from files (format = 'csv',
 {%- set collist = [] -%}
 
 {% for col in columns %}
-  {% if headers == true %}
-    {% do collist.append(col.name ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
-  {% else %}
-    {% do collist.append("_c" ~ loop.index0 ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
-  {% endif %}
+  {% do collist.append("_c" ~ loop.index0 ~ "::" ~ col.dtype ~ " AS " ~ col.name ) %}
 {% endfor %}
 
 {%- set cols = collist|join(',\n    ') -%}
@@ -187,7 +183,7 @@ FROM (
 FILEFORMAT = CSV
 PATTERN = '{{ pattern }}*'
 FORMAT_OPTIONS (
-  {% if headers == true %} 'header' = 'true', {% else %} 'header' = 'false', {% endif %}
+  {% if headers == true %} 'skipRows' = '1', {% else %} 'skipRows' = '0', {% endif %}
   {% if null_marker == true %} 'nullValue' = '\\N', {% else %} {% endif %}
   'enforceSchema' = 'true',
   'inferSchema' = 'false',

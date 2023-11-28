@@ -189,7 +189,7 @@ seeds:
         recid : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(2000) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
         short_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
@@ -488,13 +488,13 @@ seeds:
       alias: other_provider_taxonomy
       column_types:
         npi: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
         taxonomy_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
         medicare_specialty_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(173) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
         description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(101) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(101) {%- endif -%}
         primary_flag:  integer
 
         
@@ -548,37 +548,37 @@ seeds:
       alias: provider
       column_types:
         npi: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
         entity_type_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(26) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(26) {%- endif -%}
         entity_type_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(37) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(37) {%- endif -%}
         primary_taxonomy_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(35) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
         primary_specialty_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(173) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
         provider_first_name: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         provider_last_name: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         provider_organization_name: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         parent_organization_name: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(95) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         practice_address_line_1: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
         practice_address_line_2: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
         practice_city: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(65) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
         practice_state: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(65) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
         practice_zip_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(42) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
         last_updated: date
         deactivation_date: date
         deactivation_flag: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(80) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
 
   - name: terminology__race
     config:
