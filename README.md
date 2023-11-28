@@ -24,6 +24,7 @@ Check out our Quickstart guide [here](./QUICKSTART.md).
 ## 🔌  Supported Data Warehouses and dbt Versions
 - BigQuery
 - Databricks (community supported)
+- DuckDB (community supported)
 - Redshift
 - Snowflake
 
