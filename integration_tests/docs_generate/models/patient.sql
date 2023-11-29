@@ -1,19 +1,18 @@
 select
-null as patient_id
-, null as first_name
-, null as last_name
-, null as sex
-, null as race
-, null as birth_date
-, null as death_date
-, null as death_flag
-, null as address
-, null as city
-, null as state
-, null as zip_code
-, null as county
-, null as latitude
-, null as longitude
-, null as data_source
-, null as tuva_last_run
+      cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as first_name
+    , cast(null as {{ dbt.type_string() }} ) as last_name
+    , cast(null as {{ dbt.type_string() }} ) as sex
+    , cast(null as {{ dbt.type_string() }} ) as race
+    , cast(null as date) as birth_date
+    , cast(null as date) as death_date
+    , cast(null as {{ dbt.type_int() }} ) as death_flag
+    , cast(null as {{ dbt.type_string() }} ) as address
+    , cast(null as {{ dbt.type_string() }} ) as city
+    , cast(null as {{ dbt.type_string() }} ) as state
+    , cast(null as {{ dbt.type_string() }} ) as zip_code
+    , cast(null as {{ dbt.type_string() }} ) as county
+    , cast(null as {{ dbt.type_float() }} ) as latitude
+    , cast(null as {{ dbt.type_float() }} ) as longitude
+    , cast(null as {{ dbt.type_string() }} ) as data_source
 limit 0

@@ -29,5 +29,5 @@ select
     , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
     , cast(charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
-    , cast(tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('encounter') }}
