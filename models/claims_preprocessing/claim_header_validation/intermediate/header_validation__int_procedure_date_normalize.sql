@@ -2,10 +2,9 @@ with pivot_procedure as(
     {{ dbt_utils.unpivot(
         relation=ref('medical_claim'),
         cast_to='string',
-        exclude=['claim_id','data_source'],
+        exclude=['claim_id','data_source','claim_type'],
         remove=[
             'claim_line_number'
-            , 'claim_type'
             , 'patient_id'
             , 'member_id'
             , 'payer'
@@ -133,6 +132,7 @@ select
     , procedure_date
     , count(*) as procedure_date_occurrence_count
 from pivot_procedure piv
+where claim_type = 'institutional'
 group by 
     claim_id
     , data_source

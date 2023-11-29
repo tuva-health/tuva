@@ -2,10 +2,9 @@ with pivot_procedure as(
     {{ dbt_utils.unpivot(
         relation=ref('medical_claim'),
         cast_to='string',
-        exclude=['claim_id','data_source','procedure_code_type'],
+        exclude=['claim_id','data_source','procedure_code_type','claim_type'],
         remove=[
             'claim_line_number'
-            , 'claim_type'
             , 'patient_id'
             , 'member_id'
             , 'payer'
@@ -139,6 +138,7 @@ left join {{ ref('terminology__icd_10_pcs') }} icd_10
 left join {{ ref('terminology__icd_9_pcs') }} icd_9
     on replace(piv.procedure_code,'.','') = icd_9.icd_9_pcs
     and piv.procedure_code_type = 'icd-9-pcs'
+where claim_type = 'institutional'
 group by 
     claim_id
     , data_source
