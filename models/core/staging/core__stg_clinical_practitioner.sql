@@ -12,5 +12,5 @@ select
     , cast(specialty as {{ dbt.type_string() }} ) as specialty
     , cast(sub_specialty as {{ dbt.type_string() }} ) as sub_specialty
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
-    , cast(tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('practitioner') }}

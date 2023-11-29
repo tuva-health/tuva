@@ -1,23 +1,22 @@
 select
-null as observation_id
-, null as patient_id
-, null as encounter_id
-, null as panel_id
-, null as observation_date
-, null as observation_type
-, null as source_code_type
-, null as source_code
-, null as source_description
-, null as normalized_code_type
-, null as normalized_code
-, null as normalized_description
-, null as result
-, null as source_units
-, null as normalized_units
-, null as source_reference_range_low
-, null as source_reference_range_high
-, null as normalized_reference_range_low
-, null as normalized_reference_range_high
-, null as data_source
-, null as tuva_last_run
+      cast(null as {{ dbt.type_string() }} ) as observation_id
+    , cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as encounter_id
+    , cast(null as {{ dbt.type_string() }} ) as panel_id
+    , cast(null as date) as observation_date
+    , cast(null as {{ dbt.type_string() }} ) as observation_type
+    , cast(null as {{ dbt.type_string() }} ) as source_code_type
+    , cast(null as {{ dbt.type_string() }} ) as source_code
+    , cast(null as {{ dbt.type_string() }} ) as source_description
+    , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
+    , cast(null as {{ dbt.type_string() }} ) as normalized_code
+    , cast(null as {{ dbt.type_string() }} ) as normalized_description
+    , cast(null as {{ dbt.type_string() }} ) as result
+    , cast(null as {{ dbt.type_string() }} ) as source_units
+    , cast(null as {{ dbt.type_string() }} ) as normalized_units
+    , cast(null as {{ dbt.type_string() }} ) as source_reference_range_low
+    , cast(null as {{ dbt.type_string() }} ) as source_reference_range_high
+    , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_low
+    , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_high
+    , cast(null as {{ dbt.type_string() }} ) as data_source
 limit 0

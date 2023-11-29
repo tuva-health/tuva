@@ -1,22 +1,21 @@
 select
- null as condition_id
-, null as patient_id
-, null as encounter_id
-, null as claim_id
-, null as recorded_date
-, null as onset_date
-, null as resolved_date
-, null as status
-, null as condition_type
-, null as source_code_type
-, null as source_code
-, null as source_description
-, null as normalized_code_type
-, null as normalized_code
-, null as normalized_description
-, null as condition_rank
-, null as present_on_admit_code
-, null as present_on_admit_description
-, null as data_source
-, null as tuva_last_run
+      cast(null as {{ dbt.type_string() }} ) as condition_id
+    , cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as encounter_id
+    , cast(null as {{ dbt.type_string() }} ) as claim_id
+    , cast(null as date) as recorded_date
+    , cast(null as date) as onset_date
+    , cast(null as date) as resolved_date
+    , cast(null as {{ dbt.type_string() }} ) as status
+    , cast(null as {{ dbt.type_string() }} ) as condition_type
+    , cast(null as {{ dbt.type_string() }} ) as source_code_type
+    , cast(null as {{ dbt.type_string() }} ) as source_code
+    , cast(null as {{ dbt.type_string() }} ) as source_description
+    , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
+    , cast(null as {{ dbt.type_string() }} ) as normalized_code
+    , cast(null as {{ dbt.type_string() }} ) as normalized_description
+    , cast(null as {{ dbt.type_int() }} ) as condition_rank
+    , cast(null as {{ dbt.type_string() }} ) as present_on_admit_code
+    , cast(null as {{ dbt.type_string() }} ) as present_on_admit_description
+    , cast(null as {{ dbt.type_string() }} ) as data_source
 limit 0

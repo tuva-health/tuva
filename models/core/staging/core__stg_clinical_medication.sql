@@ -25,5 +25,5 @@ select
     , cast(days_supply as {{ dbt.type_int() }} ) as days_supply
     , cast(practitioner_id as {{ dbt.type_string() }} ) as practitioner_id
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
-    , cast(tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('medication') }}
