@@ -1285,298 +1285,296 @@ models:
 
 
 
-###   Header validation
+###   Normalized Claim Input Layer
 ##    Final
-  - name: header_validation__medical_claim
+  - name: normalized_input__medical_claim
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: header_validation_medical_claim
+      alias: normalized_input_medical_claim
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
-    tests:
-      - header_validation__claim_counts
 
 ##    Intermediate
 
-  - name: header_validation__int_admit_source_final
+  - name: normalized_input__int_admit_source_final
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_admit_source_final
+      alias: _int_normalized_input_admit_source_final
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_admit_source_voting
+  - name: normalized_input__int_admit_source_voting
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_admit_source_voting
+      alias: _int_normalized_input_admit_source_voting
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_admit_type_final
+  - name: normalized_input__int_admit_type_final
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_admit_type_final
+      alias: _int_normalized_input_admit_type_final
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_admit_type_voting
+  - name: normalized_input__int_admit_type_voting
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_admit_type_normalize_voting
+      alias: _int_normalized_input_admit_type_normalize_voting
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_apr_drg_final
+  - name: normalized_input__int_apr_drg_final
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_apr_drg_final
+      alias: _int_normalized_input_apr_drg_final
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_apr_drg_voting
+  - name: normalized_input__int_apr_drg_voting
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_apr_drg_voting
+      alias: _int_normalized_input_apr_drg_voting
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_bill_type_final
+  - name: normalized_input__int_bill_type_final
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_bill_type_final
+      alias: _int_normalized_input_bill_type_final
       materialized: table
       tags: 
-        - header_validation
-        - claims_preprocessing
-
-
-  - name: header_validation__int_bill_type_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_bill_type_voting
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_date_aggregation
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_date_aggregation
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_diagnosis_code_final
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_diagnosis_code_final
-      materialized: table
-      tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
 
-  - name: header_validation__int_diagnosis_code_normalize
+  - name: normalized_input__int_bill_type_voting
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_diagnosis_code_normalize
+      alias: _int_normalized_input_bill_type_voting
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_diagnosis_code_voting
+  - name: normalized_input__int_date_aggregation
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_diagnosis_code_voting
+      alias: _int_normalized_input_date_aggregation
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_discharge_disposition_final
+  - name: normalized_input__int_diagnosis_code_final
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_discharge_disposition_final
+      alias: _int_normalized_input_diagnosis_code_final
       materialized: table
       tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_discharge_disposition_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_discharge_disposition_voting
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_ms_drg_final
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_ms_drg_final
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_ms_drg_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_ms_drg_voting
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_present_on_admit_final
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_present_on_admit_final
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_present_on_admit_normalize
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_present_on_admit_normalize
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_present_on_admit_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_present_on_admit_voting
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_procedure_code_final
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_procedure_code_final
-      materialized: table
-      tags: 
-        - header_validation
-        - claims_preprocessing
-
-  - name: header_validation__int_procedure_code_normalize
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_procedure_code_normalize
-      materialized: table
-      tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
 
-  - name: header_validation__int_procedure_code_voting
+  - name: normalized_input__int_diagnosis_code_normalize
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_procedure_code_voting
+      alias: _int_normalized_input_diagnosis_code_normalize
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_procedure_date_final
+  - name: normalized_input__int_diagnosis_code_voting
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_procedure_date_final
+      alias: _int_normalized_input_diagnosis_code_voting
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_discharge_disposition_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_discharge_disposition_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_discharge_disposition_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_discharge_disposition_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_ms_drg_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_ms_drg_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_ms_drg_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_ms_drg_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_present_on_admit_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_present_on_admit_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_present_on_admit_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_present_on_admit_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_present_on_admit_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_present_on_admit_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_code_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_code_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_code_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_code_normalize
+      materialized: table
+      tags: 
+        - normalized_input
         - claims_preprocessing
 
 
-  - name: header_validation__int_procedure_date_normalize
+  - name: normalized_input__int_procedure_code_voting
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_procedure_date_normalize
+      alias: _int_normalized_input_procedure_code_voting
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
         - claims_preprocessing
 
-  - name: header_validation__int_procedure_date_voting
+  - name: normalized_input__int_procedure_date_final
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_header_validation_procedure_date_voting
+      alias: _int_normalized_input_procedure_date_final
       materialized: table
       tags: 
-        - header_validation
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_procedure_date_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_date_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_date_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_date_voting
+      materialized: table
+      tags: 
+        - normalized_input
         - claims_preprocessing

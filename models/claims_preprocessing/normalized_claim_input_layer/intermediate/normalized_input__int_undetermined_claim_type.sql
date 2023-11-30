@@ -142,4 +142,4 @@ select
     , procedure_date_25
     , data_source
 from {{ ref('medical_claim') }}
-where claim_type in ('undetermined','dental','vision')
+where claim_type in ('undetermined')

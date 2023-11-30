@@ -10,7 +10,7 @@ with distinct_count as(
         , diagnosis_column
         , count(*) as distinct_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('header_validation__int_present_on_admit_normalize') }}
+    from {{ ref('normalized_input__int_present_on_admit_normalize') }}
     group by
         claim_id
         , data_source
@@ -26,7 +26,7 @@ select
     , coalesce(lead(present_on_admit_occurrence_count) 
         over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by present_on_admit_occurrence_count desc),0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.diagnosis_column order by present_on_admit_occurrence_count desc) as occurrence_row_count
-from {{ ref('header_validation__int_present_on_admit_normalize') }} norm
+from {{ ref('normalized_input__int_present_on_admit_normalize') }} norm
 inner join distinct_count dist
     on norm.claim_id = dist.claim_id
     and norm.data_source = dist.data_source

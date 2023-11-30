@@ -31,7 +31,7 @@ select
     , max(case when column_name = 'PROCEDURE_CODE_23' then normalized_code else null end) as procedure_code_23
     , max(case when column_name = 'PROCEDURE_CODE_24' then normalized_code else null end) as procedure_code_24
     , max(case when column_name = 'PROCEDURE_CODE_14' then normalized_code else null end) as procedure_code_25
-from {{ ref('header_validation__int_procedure_code_voting') }}
+from {{ ref('normalized_input__int_procedure_code_voting') }}
 where (occurrence_row_count = 1
         and occurrence_count > next_occurrence_count)
 group by
