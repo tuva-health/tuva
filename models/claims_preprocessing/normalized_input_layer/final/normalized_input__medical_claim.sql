@@ -15,11 +15,11 @@ select
 	, coalesce(ad_source.normalized_code, other.admit_source_code) as admit_source_code
 	, coalesce(ad_type.normalized_code, other.admit_type_code) as admit_type_code
 	, coalesce(disch_disp.normalized_code, other.discharge_disposition_code) as discharge_disposition_code
-	, lpad(med.place_of_service_code,2,'0') as place_of_service_code
+	, pos.normalized_code as place_of_service_code
 	, coalesce(bill.normalized_code, other.bill_type_code) as bill_type_code
 	, coalesce(ms.normalized_code, other.ms_drg_code) as ms_drg_code
 	, coalesce(apr.normalized_code, other.apr_drg_code) as apr_drg_code
-	, lpad(med.revenue_center_code,4,'0') as revenue_center_code
+	, rev.normalized_code as revenue_center_code
 	, med.service_unit_quantity
 	, med.hcpcs_code
 	, med.hcpcs_modifier_1
@@ -163,6 +163,10 @@ left join {{ref('normalized_input__int_discharge_disposition_final') }} disch_di
 left join {{ref('normalized_input__int_ms_drg_final') }} ms
     on med.claim_id = ms.claim_id
     and med.data_source = ms.data_source
+left join {{ref('normalized_input__int_place_of_service_normalize') }} pos
+    on med.claim_id = pos.claim_id
+    and med.claim_line_number = pos.claim_line_number
+    and med.data_source = pos.data_source
 left join {{ref('normalized_input__int_diagnosis_code_final') }} dx_code
     on med.claim_id = dx_code.claim_id
     and med.data_source = dx_code.data_source
@@ -175,6 +179,10 @@ left join {{ref('normalized_input__int_procedure_code_final') }} px_code
 left join {{ref('normalized_input__int_procedure_date_final') }} px_date
     on med.claim_id = px_date.claim_id
     and med.data_source = px_date.data_source
+left join {{ref('normalized_input__int_revenue_center_normalize') }} rev
+    on med.claim_id = rev.claim_id
+    and med.claim_line_number = rev.claim_line_number
+    and med.data_source = rev.data_source
 left join {{ref('normalized_input__int_undetermined_claim_type') }} other
     on med.claim_id = other.claim_id
     and med.data_source = other.data_source
