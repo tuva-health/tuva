@@ -11,7 +11,7 @@ select distinct
         , patient_id
         , test_category
         , test_name 
-    from {{ ref('data_profiling__eligibility_duplicates') }}
+    from {{ ref('data_quality__claims_preprocessing_eligibility_duplicates') }}
     union all
     select distinct
         source_table
@@ -20,7 +20,7 @@ select distinct
         , patient_id
         , test_category
         , test_name 
-    from {{ ref('data_profiling__eligibility_missing_values') }}
+    from {{ ref('data_quality__claims_preprocessing_eligibility_missing_values') }}
     union all
     select distinct
         source_table
@@ -29,7 +29,7 @@ select distinct
         , patient_id
         , test_category
         , test_name 
-    from {{ ref('data_profiling__eligibility_invalid_values') }}
+    from {{ ref('data_quality__claims_preprocessing_eligibility_invalid_values') }}
     union all
     select distinct
         source_table
@@ -38,4 +38,4 @@ select distinct
         , patient_id
         , test_category
         , test_name 
-    from {{ ref('data_profiling__eligibility_plausibility') }}
+    from {{ ref('data_quality__claims_preprocessing_eligibility_plausibility') }}

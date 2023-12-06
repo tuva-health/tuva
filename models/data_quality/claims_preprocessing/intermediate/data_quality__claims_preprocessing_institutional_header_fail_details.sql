@@ -128,7 +128,7 @@
 
 with institutional_header_duplicates as(
 
- {{ header_duplicate_check(builtins.ref('data_profiling__institutional_header_failures'), institutional_header_column_list, 'institutional') }}
+ {{ header_duplicate_check(builtins.ref('data_quality__claims_preprocessing_institutional_header_failures'), institutional_header_column_list, 'institutional') }}
 
 )
 

@@ -19,7 +19,7 @@ with pharmacy_claim_denominator as(
         , test_name
         , claim_type
         , count(distinct foreign_key) as failures
-    from {{ ref('data_profiling__test_detail') }}
+    from {{ ref('data_quality__claims_preprocessing_test_detail') }}
     where source_table = 'pharmacy_claim'
     group by
         source_table

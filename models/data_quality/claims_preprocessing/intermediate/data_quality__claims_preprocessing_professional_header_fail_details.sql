@@ -44,7 +44,7 @@
 
 with professional_header_duplicates as(
 
- {{ header_duplicate_check(builtins.ref('data_profiling__professional_header_failures'), professional_header_column_list, 'professional') }}
+ {{ header_duplicate_check(builtins.ref('data_quality__claims_preprocessing_professional_header_failures'), professional_header_column_list, 'professional') }}
 
 )
 

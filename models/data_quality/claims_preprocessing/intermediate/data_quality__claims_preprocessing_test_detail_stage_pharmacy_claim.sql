@@ -10,7 +10,7 @@ select distinct
     , claim_id
     , test_category
     , test_name 
-from {{ ref('data_profiling__pharmacy_claim_duplicates') }}
+from {{ ref('data_quality__claims_preprocessing_pharmacy_claim_duplicates') }}
 union all
 select distinct
     source_table
@@ -19,4 +19,4 @@ select distinct
     , claim_id
     , test_category
     , test_name 
-from {{ ref('data_profiling__pharmacy_claim_missing_values') }}
+from {{ ref('data_quality__claims_preprocessing_pharmacy_claim_missing_values') }}

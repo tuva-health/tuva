@@ -5,11 +5,11 @@
 
 with test_detail_union as(
 
-select * from {{ ref('data_profiling__test_detail_stage_medical_claim') }}
+select * from {{ ref('data_quality__claims_preprocessing_test_detail_stage_medical_claim') }}
 union all
-select * from {{ ref('data_profiling__test_detail_stage_eligibility') }}
+select * from {{ ref('data_quality__claims_preprocessing_test_detail_stage_eligibility') }}
 union all
-select * from {{ ref('data_profiling__test_detail_stage_pharmacy_claim') }}
+select * from {{ ref('data_quality__claims_preprocessing_test_detail_stage_pharmacy_claim') }}
 
 
 )

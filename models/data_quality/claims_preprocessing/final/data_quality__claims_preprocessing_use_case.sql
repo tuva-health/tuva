@@ -9,7 +9,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('medical_claim') }}) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('revenue_center_code missing'
                     ,'revenue_center_code invalid'
@@ -42,7 +42,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('revenue_center_code missing'
                     ,'revenue_center_code invalid'
@@ -69,7 +69,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('diagnosis_code_1 missing'
                     ,'diagnosis_code_1 invalid'
@@ -104,7 +104,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
                     ,'claim_start_date missing'
@@ -125,7 +125,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('pharmacy_claim') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
                     ,'dispensing_date missing'
@@ -146,7 +146,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct patient_id) from {{ ref('eligibility') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
                     ,'enrollment_start_date missing'
@@ -168,7 +168,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('diagnosis_code_1 missing'
                     ,'diagnosis_code_1 invalid'
@@ -216,7 +216,7 @@ with use_case_stage as(
         , test_name
         , count(distinct foreign_key) as failures
         , (select count(distinct claim_id) from {{ ref('pharmacy_claim') }} ) as denominator
-    from {{ ref('data_profiling__test_detail')}}
+    from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('ndc_code missing'
                     ,'patient_id missing'

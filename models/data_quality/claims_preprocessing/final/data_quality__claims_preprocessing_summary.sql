@@ -9,7 +9,7 @@ with test_failure_summary as (
       , cast(grain as {{ dbt.type_string() }} ) as grain
       , cast(test_category as {{ dbt.type_string() }} ) as test_category
       , cast(count(distinct foreign_key) as int) as counts
-  from {{ ref('data_profiling__test_detail' )}} 
+  from {{ ref('data_quality__claims_preprocessing_test_detail' )}}
   group by
       source_table
       ,grain
@@ -34,7 +34,7 @@ with test_failure_summary as (
             , cast('duplicate_claims' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__medical_claim_duplicates' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_medical_claim_duplicates' )}} )
     union all
     select * from (
         select
@@ -43,10 +43,10 @@ with test_failure_summary as (
             , cast('claim_type' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts 
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__claim_type_mapping_failures' )}} )
-    and not exists (select 1 from {{ ref('data_profiling__claim_type_unmapped' )}} )
-    and not exists (select 1 from {{ ref('data_profiling__medical_claim_inst_missing_values' )}} where test_category = 'claim_type')
-    and not exists (select 1 from {{ ref('data_profiling__medical_claim_prof_missing_values' )}} where test_category = 'claim_type')
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_claim_type_mapping_failures' )}} )
+    and not exists (select 1 from {{ ref('data_quality__claims_preprocessing_claim_type_unmapped' )}} )
+    and not exists (select 1 from {{ ref('data_quality__claims_preprocessing_medical_claim_inst_missing_values' )}} where test_category = 'claim_type')
+    and not exists (select 1 from {{ ref('data_quality__claims_preprocessing_medical_claim_prof_missing_values' )}} where test_category = 'claim_type')
     union all
     select * from (
         select
@@ -55,8 +55,8 @@ with test_failure_summary as (
             , cast('header' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__institutional_header_fail_details' )}} )
-    and not exists (select 1 from {{ ref('data_profiling__professional_header_fail_details' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_institutional_header_fail_details' )}} )
+    and not exists (select 1 from {{ ref('data_quality__claims_preprocessing_professional_header_fail_details' )}} )
     union all
     select * from (
         select
@@ -65,7 +65,7 @@ with test_failure_summary as (
             , cast('invalid_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__medical_claim_invalid_values' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_medical_claim_invalid_values' )}} )
     union all
     select * from (
         select
@@ -74,8 +74,8 @@ with test_failure_summary as (
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__medical_claim_inst_missing_values' )}} )
-    and not exists (select 1 from {{ ref('data_profiling__medical_claim_prof_missing_values' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_medical_claim_inst_missing_values' )}} )
+    and not exists (select 1 from {{ ref('data_quality__claims_preprocessing_medical_claim_prof_missing_values' )}} )
 
     /****  eligibility  ****/
     union all
@@ -86,7 +86,7 @@ with test_failure_summary as (
             , cast('duplicate_eligibility' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__eligibility_duplicates' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_eligibility_duplicates' )}} )
     union all
     select * from (
         select
@@ -95,7 +95,7 @@ with test_failure_summary as (
             , cast('invalid_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__eligibility_invalid_values' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_eligibility_invalid_values' )}} )
     union all
     select * from (
         select
@@ -104,7 +104,7 @@ with test_failure_summary as (
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__eligibility_missing_values' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_eligibility_missing_values' )}} )
 
     /****  pharmacy_claim  ****/
     union all
@@ -115,7 +115,7 @@ with test_failure_summary as (
             , cast('duplicate_claims' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__pharmacy_claim_duplicates' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_pharmacy_claim_duplicates' )}} )
     union all
     select * from (
         select
@@ -124,7 +124,7 @@ with test_failure_summary as (
             , cast('missing_values' as {{ dbt.type_string() }} ) as test_category
             , cast(0 as int) as counts
     ) failure_stub
-    where not exists (select 1 from {{ ref('data_profiling__pharmacy_claim_missing_values' )}} )
+    where not exists (select 1 from {{ ref('data_quality__claims_preprocessing_pharmacy_claim_missing_values' )}} )
 )
 
 select 
