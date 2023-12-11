@@ -1287,12 +1287,34 @@ models:
 
 ###   Normalized Claim Input Layer
 ##    Final
-  - name: normalized__medical_claim
+  - name: normalized_input__eligibility
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: normalized_input_eligibility
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__medical_claim
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
       alias: normalized_input_medical_claim
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__pharmacy_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: normalized_input_pharmacy_claim
       materialized: table
       tags: 
         - normalized_input
