@@ -7,10 +7,11 @@ with eligibility as (
 
     select
           patient_id
-        , enrollment_start_date
-        , enrollment_end_date
+        , member_id
         , payer
         , plan
+        , enrollment_start_date
+        , enrollment_end_date
         , data_source
     from {{ ref('eligibility') }}
 
@@ -42,10 +43,11 @@ from eligibility
        and test_catalog.source_table = 'eligibility'
 group by
       eligibility.patient_id
-    , eligibility.enrollment_start_date
-    , eligibility.enrollment_end_date
+    , eligibility.member_id
     , eligibility.payer
     , eligibility.plan
+    , eligibility.enrollment_start_date
+    , eligibility.enrollment_end_date
     , eligibility.data_source
     , test_catalog.source_table
     , test_catalog.test_category

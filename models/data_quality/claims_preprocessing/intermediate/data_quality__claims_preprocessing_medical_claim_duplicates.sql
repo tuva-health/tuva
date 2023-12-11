@@ -30,6 +30,7 @@ from {{ ref('medical_claim') }}
 group by
       claim_id
     , claim_line_number
+    , data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name
