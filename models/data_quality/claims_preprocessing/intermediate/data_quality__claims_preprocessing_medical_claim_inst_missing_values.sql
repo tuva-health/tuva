@@ -4,10 +4,12 @@
 }}
 
 {% set institutional_missing_column_list = [
-    'claim_id'
+      'claim_id'
     , 'claim_line_number'
     , 'patient_id'
     , 'member_id'
+    , 'payer'
+    , 'plan'
     , 'claim_start_date'
     , 'claim_end_date'
     , 'bill_type_code'
@@ -23,21 +25,39 @@
     , 'data_source'
 ] -%}
 
-with institutional_missing as(
+with institutional_missing as (
 
  {{ medical_claim_missing_column_check(builtins.ref('medical_claim'), institutional_missing_column_list, 'institutional') }}
 
 )
 
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
 select
-      'medical_claim' as source_table
+      test_catalog.source_table
     , 'institutional' as claim_type
     , 'claim_id' as grain
-    ,  claim_id    
-    , 'missing_values' as test_category
-    , column_checked||' missing' as test_name
+    , institutional_missing.claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from institutional_missing
+     left join test_catalog
+       on test_catalog.test_name = institutional_missing.column_checked||' missing'
+       and test_catalog.source_table = 'medical_claim'
 group by
-    claim_id
-    , column_checked||' missing'
+      institutional_missing.claim_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

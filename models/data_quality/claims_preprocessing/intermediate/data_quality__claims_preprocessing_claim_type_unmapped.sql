@@ -3,15 +3,43 @@
    )
 }}
 
+with medical_claim as (
+
+    select
+          claim_id
+        , claim_type
+    from {{ ref('medical_claim') }}
+
+)
+
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
 select
-    'medical_claim' as source_table
-  , 'all' as claim_type
-  , 'claim_id' as grain
-  ,  claim_id    
-  , 'claim_type' as test_category
-  , 'claim_type missing' as test_name
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('medical_claim') }} 
-where claim_type is null
+      test_catalog.source_table
+    , 'all' as claim_type
+    , 'claim_id' as grain
+    , medical_claim.claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from medical_claim
+     left join test_catalog
+       on test_catalog.test_name = 'claim_type missing'
+       and test_catalog.source_table = 'medical_claim'
+where medical_claim.claim_type is null
 group by
-    claim_id
+      medical_claim.claim_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

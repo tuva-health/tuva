@@ -8,6 +8,8 @@
     , 'claim_type'
     , 'patient_id'
     , 'member_id'
+    , 'payer'
+    , 'plan'
     , 'claim_start_date'
     , 'claim_end_date'
     , 'admission_date'
@@ -132,16 +134,35 @@ with institutional_header_duplicates as(
 
 )
 
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+        , claim_type
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
 select
-      'medical_claim' as source_table
+      test_catalog.source_table
     , 'institutional' as claim_type
     , 'claim_id' as grain
-    ,  claim_id
-    , 'header' as test_category
-    , column_checked||' duplicated' as test_name
+    , institutional_header_duplicates.claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from institutional_header_duplicates
+     left join test_catalog
+       on test_catalog.test_name = institutional_header_duplicates.column_checked||' duplicated'
+       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.claim_type = 'institutional'
 group by 
-    claim_id
-    , column_checked||' duplicated'
-
+      institutional_header_duplicates.claim_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

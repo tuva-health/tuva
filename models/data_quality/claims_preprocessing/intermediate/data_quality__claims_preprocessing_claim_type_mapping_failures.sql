@@ -3,9 +3,10 @@
    )
 }}
 
-with claim_type_mapping as(
+with claim_type_mapping as (
+
     select 
-        claim_id
+          claim_id
         , claim_line_number
         , claim_type as source_claim_type
         , case
@@ -14,19 +15,39 @@ with claim_type_mapping as(
             when place_of_service_code is not null
                 then 'professional'
             else null
-        end as data_profiling_claim_type
+          end as data_profiling_claim_type
     from {{ ref('medical_claim') }} 
-    )
+
+)
+
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
 
 select
-    'medical_claim' as source_table
-  , 'all' as claim_type
-  , 'claim_id' as grain
-  ,  claim_id    
-  , 'claim_type' as test_category
-  , 'claim_type mapping incorrect' as test_name
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
+      test_catalog.source_table
+    , 'all' as claim_type
+    , 'claim_id' as grain
+    , claim_type_mapping.claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from claim_type_mapping
-where source_claim_type <> data_profiling_claim_type
+     left join test_catalog
+       on test_catalog.test_name = 'claim_type mapping incorrect'
+       and test_catalog.source_table = 'medical_claim'
+where claim_type_mapping.source_claim_type <> claim_type_mapping.data_profiling_claim_type
 group by
-    claim_id
+      claim_type_mapping.claim_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

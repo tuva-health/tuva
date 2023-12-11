@@ -4,7 +4,7 @@
 }}
 
 {% set eligibility_missing_column_list = [
-    'patient_id'
+      'patient_id'
     , 'member_id'
     , 'gender'
     , 'race'
@@ -27,24 +27,39 @@
     , 'data_source'
 ] -%}
 
-
-
 with eligibility_missing as(
 
  {{ eligibility_missing_column_check(builtins.ref('eligibility'), eligibility_missing_column_list) }}
 
 )
 
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
 
 select
-      'eligibility' as source_table
+      test_catalog.source_table
     , 'all' as claim_type
     , 'patient_id' as grain
-    ,  patient_id    
-    , 'missing_values' as test_category
-    , column_checked||' missing' as test_name
+    , eligibility_missing.patient_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from eligibility_missing
+     left join test_catalog
+       on test_catalog.test_name = eligibility_missing.column_checked||' missing'
+       and test_catalog.source_table = 'eligibility'
 group by
-    patient_id
-    , column_checked||' missing'
+      eligibility_missing.patient_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

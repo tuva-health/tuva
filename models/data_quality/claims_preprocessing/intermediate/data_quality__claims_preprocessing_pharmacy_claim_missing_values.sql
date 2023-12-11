@@ -4,7 +4,7 @@
 }}
 
 {% set pharmacy_claim_missing_column_list = [
-    'claim_id'
+      'claim_id'
     , 'claim_line_number'
     , 'patient_id'
     , 'member_id'
@@ -21,24 +21,39 @@
     , 'data_source'
 ] -%}
 
-
-
-with eligibility_missing as(
+with pharmacy_claim_missing as (
 
  {{ pharmacy_claim_missing_column_check(builtins.ref('pharmacy_claim'), pharmacy_claim_missing_column_list) }}
 
 )
 
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
 
 select
-      'pharmacy_claim' as source_table
+      test_catalog.source_table
     , 'all' as claim_type
     , 'claim_id' as grain
-    ,  claim_id    
-    , 'missing_values' as test_category
-    , column_checked||' missing' as test_name
+    , pharmacy_claim_missing.claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from eligibility_missing
+from pharmacy_claim_missing
+     left join test_catalog
+       on test_catalog.test_name = pharmacy_claim_missing.column_checked||' missing'
+       and test_catalog.source_table = 'pharmacy_claim'
 group by
-    claim_id
-    , column_checked||' missing'
+      pharmacy_claim_missing.claim_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

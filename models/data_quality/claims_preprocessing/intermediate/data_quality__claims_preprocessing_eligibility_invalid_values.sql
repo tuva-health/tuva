@@ -3,126 +3,210 @@
    )
 }}
 
-with valid_gender as(
+with eligiblity as (
+
+    select *
+    from {{ ref('eligibility') }}
+
+)
+
+, test_catalog as (
+
     select
-        'gender invalid' as test_name
-        , 'eligibility' as source_table
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
+, valid_gender as (
+
+    select
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'invalid_values' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
-        , elig.gender
-        , count(elig.gender) as filled_row_count
+        , eligiblity.patient_id
+        , eligiblity.gender
+        , count(eligiblity.gender) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__gender') }} gender
-        on elig.gender = gender.gender
+    from eligiblity
+         left join {{ ref('terminology__gender') }} gender
+           on eligiblity.gender = gender.gender
+         left join test_catalog
+           on test_catalog.test_name = 'gender invalid'
+           and test_catalog.source_table = 'eligibility'
     where gender.gender is null
-    and elig.gender is not null
+    and eligiblity.gender is not null
     group by
-        patient_id
-        , elig.gender
+          eligiblity.patient_id
+        , eligiblity.gender
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
-, valid_race as(
+
+, valid_race as (
+
     select
-        'race invalid' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'invalid_values' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
-        , elig.race
-        , count(elig.race) as filled_row_count
+        , eligiblity.patient_id
+        , eligiblity.race
+        , count(eligiblity.race) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__race') }} race
-        on elig.race = race.description
+    from eligiblity
+         left join {{ ref('terminology__race') }} race
+           on eligiblity.race = race.description
+         left join test_catalog
+           on test_catalog.test_name = 'race invalid'
+           and test_catalog.source_table = 'eligibility'
     where race.description is null
-    and elig.race is not null
+    and eligiblity.race is not null
     group by
-        patient_id
-        , elig.race
+          eligiblity.patient_id
+        , eligiblity.race
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
-, valid_payer_type as(
+
+, valid_payer_type as (
+
     select
-        'payer_type invalid' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'invalid_values' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
-        , elig.payer_type
-        , count(elig.payer_type) as filled_row_count
+        , eligiblity.patient_id
+        , eligiblity.payer_type
+        , count(eligiblity.payer_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__payer_type') }} payer
-        on elig.payer_type = payer.payer_type
+    from eligiblity
+         left join {{ ref('terminology__payer_type') }} payer
+           on eligiblity.payer_type = payer.payer_type
+         left join test_catalog
+           on test_catalog.test_name = 'payer_type invalid'
+           and test_catalog.source_table = 'eligibility'
     where payer.payer_type is null
-    and elig.payer_type is not null
+    and eligiblity.payer_type is not null
     group by
-        patient_id
-        , elig.payer_type
+          eligiblity.patient_id
+        , eligiblity.payer_type
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
-, valid_orec as(
+
+, valid_orec as (
+
     select
-        'orec invalid' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'invalid_values' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
-        , elig.original_reason_entitlement_code
-        , count(elig.original_reason_entitlement_code) as filled_row_count
+        , eligiblity.patient_id
+        , eligiblity.original_reason_entitlement_code
+        , count(eligiblity.original_reason_entitlement_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__medicare_orec') }} orec
-        on elig.original_reason_entitlement_code = orec.original_reason_entitlement_code
+    from eligiblity
+         left join {{ ref('terminology__medicare_orec') }} orec
+           on eligiblity.original_reason_entitlement_code = orec.original_reason_entitlement_code
+         left join test_catalog
+           on test_catalog.test_name = 'orec invalid'
+           and test_catalog.source_table = 'eligibility'
     where orec.original_reason_entitlement_code is null
-    and elig.original_reason_entitlement_code is not null
+    and eligiblity.original_reason_entitlement_code is not null
     group by
-        patient_id
-        , elig.original_reason_entitlement_code
+          eligiblity.patient_id
+        , eligiblity.original_reason_entitlement_code
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
-, valid_dual_status_code as(
+
+, valid_dual_status_code as (
+
     select
-        'dual_status_code invalid' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'invalid_values' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
-        , elig.dual_status_code
-        , count(elig.dual_status_code) as filled_row_count
+        , eligiblity.patient_id
+        , eligiblity.dual_status_code
+        , count(eligiblity.dual_status_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__medicare_dual_eligibility') }} dual
-        on elig.dual_status_code = dual.dual_status_code
+    from eligiblity
+         left join {{ ref('terminology__medicare_dual_eligibility') }} dual
+           on eligiblity.dual_status_code = dual.dual_status_code
+         left join test_catalog
+           on test_catalog.test_name = 'dual_status_code invalid'
+           and test_catalog.source_table = 'eligibility'
     where dual.dual_status_code is null
-    and elig.dual_status_code is not null
+    and eligiblity.dual_status_code is not null
     group by
-        patient_id
-        , elig.dual_status_code
+          eligiblity.patient_id
+        , eligiblity.dual_status_code
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
-, valid_medicare_status_code as(
+
+, valid_medicare_status_code as (
+
     select
-        'medicare_status_code invalid' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'invalid_values' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
-        , elig.medicare_status_code
-        , count(elig.medicare_status_code) as filled_row_count
+        , eligiblity.patient_id
+        , eligiblity.medicare_status_code
+        , count(eligiblity.medicare_status_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} elig
-    left join {{ ref('terminology__medicare_status') }} status
-        on elig.medicare_status_code = status.medicare_status_code
+    from eligiblity
+         left join {{ ref('terminology__medicare_status') }} status
+           on eligiblity.medicare_status_code = status.medicare_status_code
+         left join test_catalog
+           on test_catalog.test_name = 'medicare_status_code invalid'
+           and test_catalog.source_table = 'eligibility'
     where status.medicare_status_code is null
-    and elig.medicare_status_code is not null
+    and eligiblity.medicare_status_code is not null
     group by
-        patient_id
-        , elig.medicare_status_code
+          eligiblity.patient_id
+        , eligiblity.medicare_status_code
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
+
 select * from valid_gender
 union all
 select * from valid_race

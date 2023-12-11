@@ -8,6 +8,8 @@
     , 'claim_line_number'
     , 'patient_id'
     , 'member_id'
+    , 'payer'
+    , 'plan'
     , 'claim_start_date'
     , 'claim_end_date'
     , 'place_of_service_code'
@@ -21,21 +23,39 @@
     , 'data_source'
 ] -%}
 
-with professional_missing as(
+with professional_missing as (
 
  {{ medical_claim_missing_column_check(builtins.ref('medical_claim'), professional_missing_column_list, 'professional') }}
 
 )
 
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
 select
-      'medical_claim' as source_table
+      test_catalog.source_table
     , 'professional' as claim_type
     , 'claim_id' as grain
-    ,  claim_id    
-    , 'missing_values' as test_category
-    , column_checked||' missing' as test_name
+    ,  professional_missing.claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from professional_missing
+     left join test_catalog
+       on test_catalog.test_name = professional_missing.column_checked||' missing'
+       and test_catalog.source_table = 'medical_claim'
 group by
-    claim_id
-    , column_checked||' missing'
+      professional_missing.claim_id
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test

@@ -3,9 +3,10 @@
    )
 }}
 
-with stage as(
+with stage as (
+
   select distinct
-        claim_id
+          claim_id
         , claim_type
         , patient_id
         , member_id
@@ -41,14 +42,18 @@ with stage as(
         , data_source
   from {{ ref('medical_claim') }} med
   where claim_type = 'professional'
-  )  
+
+)
+
 , claims_with_duplicates as (
-select 
-      claim_id
-    , 1 as invalid_header
-from stage
-group by claim_id
-having count(*) > 1
+
+    select
+          claim_id
+        , 1 as invalid_header
+    from stage
+    group by claim_id
+    having count(*) > 1
+
 )
 
 select med.*, '{{ var('tuva_last_run')}}' as tuva_last_run from claims_with_duplicates dupe

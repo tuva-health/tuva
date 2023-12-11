@@ -3,16 +3,35 @@
    )
 }}
 
+with test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
 select distinct
-    'medical_claim' as source_table
-  , 'all' as claim_type
-  , 'claim_id' as grain
-  ,  claim_id    
-  , 'duplicate_values' as test_category
-  , 'duplicate medical claims' as test_name
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('medical_claim') }} 
+      test_catalog.source_table
+    , 'all' as claim_type
+    , 'claim_id' as grain
+    , claim_id
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from {{ ref('medical_claim') }}
+     left join test_catalog
+       on test_catalog.test_name = 'duplicate medical claims'
+       and test_catalog.source_table = 'medical_claim'
 group by
-    claim_id
+      claim_id
     , claim_line_number
+    , test_catalog.source_table
+    , test_catalog.test_category
+    , test_catalog.test_name
+    , test_catalog.pipeline_test
 having count(*) > 1

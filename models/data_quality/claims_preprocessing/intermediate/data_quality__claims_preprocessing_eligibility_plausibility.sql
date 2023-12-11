@@ -3,77 +3,149 @@
    )
 }}
 
-with multiple_genders_test as (
-    select
-        'multiple genders' as test_name
-        , 'eligibility' as source_table
-        , 'all' as claim_type
-        , 'plausibility' as test_category
-        , 'patient_id' as grain
-        , patient_id
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
+with eligiblity as (
+
+    select *
     from {{ ref('eligibility') }}
-    group by
-        patient_id
-    having count(distinct gender) > 1
+
 )
+
+, test_catalog as (
+
+    select
+          source_table
+        , test_category
+        , test_name
+        , pipeline_test
+    from {{ ref('data_quality__test_catalog') }}
+
+)
+
+, multiple_genders_test as (
+
+    select
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
+        , 'all' as claim_type
+        , test_catalog.test_category
+        , 'patient_id' as grain
+        , eligiblity.patient_id
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
+    from eligiblity
+         left join test_catalog
+           on test_catalog.test_name = 'multiple genders'
+           and test_catalog.source_table = 'eligibility'
+    group by
+          eligiblity.patient_id
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+    having count(distinct eligiblity.gender) > 1
+
+)
+
 , multiple_races_test as(
+
     select
-        'multiple races' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'plausibility' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
+        , eligiblity.patient_id
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }} 
+    from eligiblity
+         left join test_catalog
+           on test_catalog.test_name = 'multiple races'
+           and test_catalog.source_table = 'eligibility'
     group by
-        patient_id
-    having count(distinct race) > 1
+          eligiblity.patient_id
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+    having count(distinct eligiblity.race) > 1
+
 )
+
 , multiple_birth_dates_test as(
+
     select
-        'multiple birth dates' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'plausibility' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
+        , eligiblity.patient_id
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }}
+    from eligiblity
+         left join test_catalog
+           on test_catalog.test_name = 'multiple birth dates'
+           and test_catalog.source_table = 'eligibility'
     group by
-        patient_id
-    having count(distinct birth_date) > 1
+          eligiblity.patient_id
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+    having count(distinct eligiblity.birth_date) > 1
+
 )
+
 , multiple_death_dates_test as(
+
     select
-        'multiple death dates' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'plausibility' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
+        , eligiblity.patient_id
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }}
+    from eligiblity
+         left join test_catalog
+           on test_catalog.test_name = 'multiple death dates'
+           and test_catalog.source_table = 'eligibility'
     group by
-        patient_id
-    having count(distinct death_date) > 1
+          eligiblity.patient_id
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+    having count(distinct eligiblity.death_date) > 1
+
 )
+
 , birth_date_after_death_date as(
+
     select
-        'birth date after death date' as test_name
-        , 'eligibility' as source_table
+          test_catalog.test_name
+        , test_catalog.pipeline_test
+        , test_catalog.source_table
         , 'all' as claim_type
-        , 'plausibility' as test_category
+        , test_catalog.test_category
         , 'patient_id' as grain
-        , patient_id
+        , eligiblity.patient_id
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }}
-    where birth_date > death_date
+    from eligiblity
+         left join test_catalog
+           on test_catalog.test_name = 'birth date after death date'
+           and test_catalog.source_table = 'eligibility'
+    where eligiblity.birth_date > eligiblity.death_date
     group by
-        patient_id
-    having count(distinct gender) > 1
+          eligiblity.patient_id
+        , test_catalog.source_table
+        , test_catalog.test_category
+        , test_catalog.test_name
+        , test_catalog.pipeline_test
+
 )
+
 select * from multiple_genders_test
 union all
 select * from multiple_races_test
