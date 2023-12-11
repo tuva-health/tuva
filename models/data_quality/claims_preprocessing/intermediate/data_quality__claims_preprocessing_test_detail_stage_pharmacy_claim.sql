@@ -9,7 +9,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_pharmacy_claim_duplicates') }}
 union all
 select distinct
@@ -18,5 +19,6 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_pharmacy_claim_missing_values') }}

@@ -18,6 +18,7 @@ with pharmacy_claim_denominator as(
         , test_category
         , test_name
         , claim_type
+        , pipeline_test
         , count(distinct foreign_key) as failures
     from {{ ref('data_quality__claims_preprocessing_test_detail') }}
     where source_table = 'pharmacy_claim'
@@ -27,6 +28,7 @@ with pharmacy_claim_denominator as(
         , test_category
         , test_name
         , claim_type
+        , pipeline_test
     )
 
   select
@@ -35,6 +37,7 @@ with pharmacy_claim_denominator as(
     , claim.test_category
     , claim.test_name
     , claim.claim_type
+    , pipeline_test
     , claim.failures
     , elig.count as denominator
     , tuva_last_run
@@ -47,8 +50,7 @@ with pharmacy_claim_denominator as(
     , claim.test_category
     , claim.test_name
     , claim.claim_type
+    , pipeline_test
     , claim.failures
     , elig.count
     , tuva_last_run
-
-

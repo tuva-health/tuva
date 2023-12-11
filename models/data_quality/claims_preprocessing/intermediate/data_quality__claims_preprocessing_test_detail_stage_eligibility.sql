@@ -5,37 +5,41 @@
 
 
 select distinct
-        source_table
-        , claim_type
-        , grain
-        , patient_id
-        , test_category
-        , test_name 
-    from {{ ref('data_quality__claims_preprocessing_eligibility_duplicates') }}
-    union all
-    select distinct
-        source_table
-        , claim_type
-        , grain
-        , patient_id
-        , test_category
-        , test_name 
-    from {{ ref('data_quality__claims_preprocessing_eligibility_missing_values') }}
-    union all
-    select distinct
-        source_table
-        , claim_type
-        , grain
-        , patient_id
-        , test_category
-        , test_name 
-    from {{ ref('data_quality__claims_preprocessing_eligibility_invalid_values') }}
-    union all
-    select distinct
-        source_table
-        , claim_type
-        , grain
-        , patient_id
-        , test_category
-        , test_name 
-    from {{ ref('data_quality__claims_preprocessing_eligibility_plausibility') }}
+    source_table
+    , claim_type
+    , grain
+    , patient_id
+    , test_category
+    , test_name
+    , pipeline_test
+from {{ ref('data_quality__claims_preprocessing_eligibility_duplicates') }}
+union all
+select distinct
+    source_table
+    , claim_type
+    , grain
+    , patient_id
+    , test_category
+    , test_name
+    , pipeline_test
+from {{ ref('data_quality__claims_preprocessing_eligibility_missing_values') }}
+union all
+select distinct
+    source_table
+    , claim_type
+    , grain
+    , patient_id
+    , test_category
+    , test_name
+    , pipeline_test
+from {{ ref('data_quality__claims_preprocessing_eligibility_invalid_values') }}
+union all
+select distinct
+    source_table
+    , claim_type
+    , grain
+    , patient_id
+    , test_category
+    , test_name
+    , pipeline_test
+from {{ ref('data_quality__claims_preprocessing_eligibility_plausibility') }}

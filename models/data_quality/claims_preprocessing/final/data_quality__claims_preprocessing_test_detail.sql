@@ -48,6 +48,7 @@ select
     , test_name 
     , grain
     , claim_type
+    , pipeline_test
     , claim_id as foreign_key
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from test_detail_union

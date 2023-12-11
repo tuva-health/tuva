@@ -9,6 +9,7 @@ select
     , test_category
     , test_name
     , claim_type
+    , pipeline_test
     , count(distinct foreign_key) as failures
     , denom.denominator
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -23,6 +24,7 @@ group by
     , test_category
     , test_name
     , claim_type
+    , pipeline_test
     , denom.denominator
 
 union all
@@ -33,6 +35,7 @@ select
     , test_category
     , test_name
     , claim_type
+    , pipeline_test
     , count(distinct foreign_key) as failures
     , denom.denominator
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -47,5 +50,5 @@ group by
     , test_category
     , test_name
     , claim_type
+    , pipeline_test
     , denom.denominator
-

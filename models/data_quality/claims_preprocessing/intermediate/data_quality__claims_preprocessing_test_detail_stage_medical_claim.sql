@@ -9,7 +9,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_institutional_header_fail_details') }}
 union all
 select distinct
@@ -18,7 +19,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_professional_header_fail_details') }}
 union all
 select distinct
@@ -27,7 +29,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_medical_claim_inst_missing_values') }}
 union all
 select distinct
@@ -36,7 +39,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_medical_claim_prof_missing_values') }}
 union all
 select distinct
@@ -45,7 +49,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_medical_claim_invalid_values') }}
 union all
 select distinct
@@ -54,7 +59,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_claim_type_unmapped') }}
 union all
 select distinct
@@ -63,7 +69,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_claim_type_mapping_failures') }}
 union all
 select distinct
@@ -72,7 +79,8 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_medical_claim_duplicates') }}
 union all
 select distinct
@@ -81,5 +89,6 @@ select distinct
     , grain
     , claim_id
     , test_category
-    , test_name 
+    , test_name
+    , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_medical_claim_plausibility') }}
