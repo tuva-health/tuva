@@ -13,6 +13,8 @@ models:
         - data_quality
         - claims_preprocessing
       materialized: table
+    tests:
+      - claims_preprocessing_pipeline_checks
     columns:
       - name: source_table
         description: Table this test category is in reference to
