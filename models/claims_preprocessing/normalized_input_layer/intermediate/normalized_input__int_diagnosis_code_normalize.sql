@@ -139,6 +139,7 @@ left join {{ ref('terminology__icd_10_cm') }} icd_10
 left join {{ ref('terminology__icd_9_cm') }} icd_9
     on replace(piv.diagnosis_code,'.','') = icd_9.icd_9_cm
     and piv.diagnosis_code_type = 'icd-9-cm'
+where claim_type <> 'undetermined'
 group by 
     claim_id
     , data_source
