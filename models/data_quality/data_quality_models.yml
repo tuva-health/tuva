@@ -197,28 +197,6 @@ models:
         - claims_preprocessing
       materialized: table
 
-  - name: data_quality__claims_preprocessing_institutional_header_failures
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _int_claims_preprocessing_institutional_header_failures
-      tags:
-        - data_quality
-        - claims_preprocessing
-      materialized: table
-
-  - name: data_quality__claims_preprocessing_professional_header_failures
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _int_claims_preprocessing_professional_header_failures
-      tags:
-        - data_quality
-        - claims_preprocessing
-      materialized: table
-
   - name: data_quality__claims_preprocessing_institutional_header_fail_details
     config:
       schema: |
@@ -236,6 +214,17 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: _int_claims_preprocessing_professional_header_fail_details
+      tags:
+        - data_quality
+        - claims_preprocessing
+      materialized: table
+
+  - name: data_quality__claims_preprocessing_pharmacy_header_fail_details
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _int_claims_preprocessing_pharmacy_header_fail_details
       tags:
         - data_quality
         - claims_preprocessing
