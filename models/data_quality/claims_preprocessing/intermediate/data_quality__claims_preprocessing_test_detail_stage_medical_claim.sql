@@ -122,3 +122,13 @@ select distinct
     , test_name
     , pipeline_test
 from {{ ref('data_quality__claims_preprocessing_medical_claim_line_numbers') }}
+union all
+select distinct
+    source_table
+    , claim_type
+    , grain
+    , claim_id
+    , test_category
+    , test_name
+    , pipeline_test
+from {{ ref('data_quality__claims_preprocessing_medical_claim_invalid_npi') }}
