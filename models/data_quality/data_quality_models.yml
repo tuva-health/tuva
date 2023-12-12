@@ -241,12 +241,34 @@ models:
         - claims_preprocessing
       materialized: table
 
+  - name: data_quality__claims_preprocessing_medical_claim_line_numbers
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _int_claims_preprocessing_medical_claim_line_numbers
+      tags:
+        - data_quality
+        - claims_preprocessing
+      materialized: table
+
   - name: data_quality__claims_preprocessing_medical_claim_inst_missing_values
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: _int_claims_preprocessing_medical_claim_inst_missing_values
+      tags:
+        - data_quality
+        - claims_preprocessing
+      materialized: table
+
+  - name: data_quality__claims_preprocessing_medical_claim_invalid_npi
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _int_claims_preprocessing_medical_claim_invalid_npi
       tags:
         - data_quality
         - claims_preprocessing
@@ -358,6 +380,17 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: _int_claims_preprocessing_pharmacy_claim_duplicates
+      tags:
+        - data_quality
+        - claims_preprocessing
+      materialized: table
+
+  - name: data_quality__claims_preprocessing_pharmacy_claim_line_numbers
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _int_claims_preprocessing_pharmacy_claim_line_numbers
       tags:
         - data_quality
         - claims_preprocessing
