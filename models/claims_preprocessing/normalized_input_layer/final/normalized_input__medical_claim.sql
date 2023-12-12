@@ -154,7 +154,7 @@ left join {{ref('normalized_input__int_apr_drg_final') }} apr
 left join {{ref('normalized_input__int_bill_type_final') }} bill
     on med.claim_id = bill.claim_id
     and med.data_source = bill.data_source
-left join {{ref('normalized_input__int_date_aggregation') }} dates
+left join {{ref('normalized_input__int_medical_date_aggregation') }} dates
     on med.claim_id = dates.claim_id
     and med.data_source = dates.data_source
 left join {{ref('normalized_input__int_discharge_disposition_final') }} disch_disp
