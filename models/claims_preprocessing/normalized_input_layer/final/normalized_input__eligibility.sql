@@ -3,11 +3,11 @@ select
     , elig.member_id
     , elig.gender
     , elig.race
-    , date_norm.birth_date
-    , date_norm.death_date
+    , date_norm.normalized_birth_date as birth_date
+    , date_norm.normalized_death_date as death_date
     , elig.death_flag
-    , date_norm.enrollment_start_date
-    , date_norm.enrollment_end_date
+    , date_norm.normalized_enrollment_start_date as enrollment_end_date
+    , date_norm.normalized_enrollment_end_date as enrollment_start_date
     , elig.payer
     , elig.payer_type
     , elig.plan
