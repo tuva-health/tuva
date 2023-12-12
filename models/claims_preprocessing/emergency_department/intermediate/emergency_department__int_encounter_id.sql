@@ -11,7 +11,7 @@ select
   inst.encounter_id,
   '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('emergency_department__int_institutional_encounter_id') }} inst
-left join {{ ref('medical_claim') }} med
+left join {{ ref('emergency_department__stg_medical_claim') }} med
     on inst.claim_id = med.claim_id
 
 union distinct

@@ -33,4 +33,4 @@ select
        , cast(deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
        , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('pharmacy_claim') }} 
+from {{ ref('normalized_input__pharmacy_claim') }} 
