@@ -27,7 +27,7 @@
     , 'data_source'
 ] -%}
 
-with eligibility_missing as(
+with eligibility_missing as (
 
  {{ eligibility_missing_column_check(builtins.ref('eligibility'), eligibility_missing_column_list) }}
 

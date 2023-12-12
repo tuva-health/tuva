@@ -318,6 +318,28 @@ models:
         - claims_preprocessing
       materialized: table
 
+  - name: data_quality__claims_preprocessing_medical_claim_dates
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _int_claims_preprocessing_medical_claim_dates
+      tags:
+        - data_quality
+        - claims_preprocessing
+      materialized: table
+
+  - name: data_quality__claims_preprocessing_medical_claim_dates_inst
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: _int_claims_preprocessing_medical_claim_dates_inst
+      tags:
+        - data_quality
+        - claims_preprocessing
+      materialized: table
+
   - name: data_quality__claims_preprocessing_test_detail_stage_medical_claim
     config:
       schema: |
