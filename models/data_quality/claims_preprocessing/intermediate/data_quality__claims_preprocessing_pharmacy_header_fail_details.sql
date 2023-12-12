@@ -3,29 +3,18 @@
    )
 }}
 
-{% set pharmacy_claim_missing_column_list = [
+{% set pharmacy_header_column_list = [
       'claim_id'
-    , 'claim_line_number'
     , 'patient_id'
     , 'member_id'
     , 'payer'
     , 'plan'
-    , 'prescribing_provider_npi'
-    , 'dispensing_provider_npi'
-    , 'dispensing_date'
-    , 'ndc_code'
-    , 'quantity'
-    , 'days_supply'
-    , 'refills'
-    , 'paid_date'
-    , 'paid_amount'
-    , 'allowed_amount'
     , 'data_source'
 ] -%}
 
-with pharmacy_claim_missing as (
+with pharmacy_header_duplicates as (
 
- {{ pharmacy_claim_missing_column_check(builtins.ref('pharmacy_claim'), pharmacy_claim_missing_column_list) }}
+ {{ pharmacy_claim_header_duplicate_check(builtins.ref('pharmacy_claim'), pharmacy_header_column_list) }}
 
 )
 
@@ -36,6 +25,7 @@ with pharmacy_claim_missing as (
         , test_category
         , test_name
         , pipeline_test
+        , claim_type
     from {{ ref('data_quality__test_catalog') }}
 
 )
@@ -44,17 +34,17 @@ select
       test_catalog.source_table
     , 'all' as claim_type
     , 'claim_id' as grain
-    , pharmacy_claim_missing.claim_id
+    , pharmacy_header_duplicates.claim_id
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from pharmacy_claim_missing
+from pharmacy_header_duplicates
      left join test_catalog
-       on test_catalog.test_name = pharmacy_claim_missing.column_checked||' missing'
+       on test_catalog.test_name = pharmacy_header_duplicates.column_checked||' non-unique'
        and test_catalog.source_table = 'pharmacy_claim'
-group by
-      pharmacy_claim_missing.claim_id
+group by 
+      pharmacy_header_duplicates.claim_id
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

@@ -128,9 +128,9 @@
 ] -%}
 
 
-with institutional_header_duplicates as(
+with institutional_header_duplicates as (
 
- {{ header_duplicate_check(builtins.ref('data_quality__claims_preprocessing_institutional_header_failures'), institutional_header_column_list, 'institutional') }}
+ {{ medical_claim_header_duplicate_check(builtins.ref('medical_claim'), institutional_header_column_list, 'institutional') }}
 
 )
 
@@ -157,7 +157,7 @@ select
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from institutional_header_duplicates
      left join test_catalog
-       on test_catalog.test_name = institutional_header_duplicates.column_checked||' duplicated'
+       on test_catalog.test_name = institutional_header_duplicates.column_checked||' non-unique'
        and test_catalog.source_table = 'medical_claim'
        and test_catalog.claim_type = 'institutional'
 group by 
