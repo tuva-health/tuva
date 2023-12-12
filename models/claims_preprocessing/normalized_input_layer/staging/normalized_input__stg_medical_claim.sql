@@ -1,5 +1,5 @@
 select
-    claim_id
+      claim_id
     , claim_line_number
     , claim_type
     , patient_id
@@ -141,5 +141,4 @@ select
     , procedure_date_24
     , procedure_date_25
     , data_source
-from {{ ref('normalized_input__stg_medical_claim') }}
-where claim_type in ('undetermined')
+from {{ ref('medical_claim') }}

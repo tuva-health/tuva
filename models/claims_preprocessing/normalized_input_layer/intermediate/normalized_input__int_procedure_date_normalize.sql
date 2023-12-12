@@ -1,6 +1,6 @@
 with pivot_procedure as(
     {{ dbt_utils.unpivot(
-        relation=ref('medical_claim'),
+        relation=ref('normalized_input__stg_medical_claim'),
         cast_to='string',
         exclude=['claim_id','data_source','claim_type'],
         remove=[

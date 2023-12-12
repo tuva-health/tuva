@@ -3,7 +3,7 @@ with normalize as(
         med.claim_id
         , med.data_source
         , admit.admit_source_code
-    from {{ ref('medical_claim') }} med
+    from {{ ref('normalized_input__stg_medical_claim') }} med
     inner join {{ ref('terminology__admit_source') }} admit
         on med.admit_source_code = admit.admit_source_code
     where claim_type = 'institutional'
