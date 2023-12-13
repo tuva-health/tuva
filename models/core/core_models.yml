@@ -672,11 +672,11 @@ models:
       - name: sex
         description: The gender of the patient.
         meta:
-          terminology: /terminology/demographics/gender
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: race
         description: The race of the patient.
         meta:
-          terminology: /terminology/demographics/race
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
       - name: birth_date
         description: The birth date of the patient.
       - name: death_date
@@ -747,12 +747,13 @@ models:
           NPI for the provider that wrote the prescription (e.g. priamry care 
           physician).
         meta:
-          terminology: /terminology/providers/provider
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
       - name: dispensing_provider_npi
         description: >
           NPI for the provider that dispensed the prescription (e.g. pharmacy).
         meta:
-          terminology: /terminology/providers/provider
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded directly as a seed and is loaded from S3 or a GCS bucket depending on your adapter"
       - name: dispensing_date
         description: Date the prescription was filled.
       - name: ndc_code
