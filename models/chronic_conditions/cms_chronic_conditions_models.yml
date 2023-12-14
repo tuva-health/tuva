@@ -284,18 +284,18 @@ models:
             The type of chronic condition as defined by CMS. 
             ('Common' or 'Other chronic or potentially disabling conditions')
           meta:
-            terminology: /value-sets/chronic-conditions/cms-chronic-conditions
+            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__cms_chronic_conditions_hierarchy.csv
         - name: condition_category
           description: >
             The category of the condition (e.g. Cardiovascular Disease).
           meta:
-            terminology: /value-sets/chronic-conditions/cms-chronic-conditions
+            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__cms_chronic_conditions_hierarchy.csv
         - name: condition
           description: The name of the chronic condition.
           tests:
             - not_null
           meta:
-            terminology: /value-sets/chronic-conditions/cms-chronic-conditions
+            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__cms_chronic_conditions_hierarchy.csv
         - name: data_source
           description: >
             Indicates the name of the source dataset (e.g. Medicare Claims).
