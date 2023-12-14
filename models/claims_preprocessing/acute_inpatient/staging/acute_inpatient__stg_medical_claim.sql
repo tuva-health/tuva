@@ -21,6 +21,7 @@ select
     , paid_amount
     , allowed_amount
     , charge_amount
+    , diagnosis_code_type
     , diagnosis_code_1
     , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
