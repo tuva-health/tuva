@@ -2,6 +2,13 @@
      enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
+/*
+    Tests with the category 'invalid_values' are joined to the denominator model
+    on test_name since that denominator logic is dependent on whether that
+    specific field is populated or not.
+
+    All other tests are joined to the denominator model on claim_type.
+*/
 
 select
     source_table
@@ -17,7 +24,7 @@ from {{ ref('data_quality__claims_preprocessing_test_detail') }} det
 inner join {{ ref('data_quality__claims_preprocessing_eligibility_denominators') }} denom
     on det.claim_type = denom.test_denominator_name
 where source_table = 'eligibility'
-and test_name not like '%invalid'
+and test_category <> 'invalid_values'
 group by
     source_table
     , grain
@@ -43,7 +50,7 @@ from {{ ref('data_quality__claims_preprocessing_test_detail') }} det
 inner join {{ ref('data_quality__claims_preprocessing_eligibility_denominators') }} denom
     on det.test_name = denom.test_denominator_name
 where source_table = 'eligibility'
-and test_name like '%invalid'
+and test_category = 'invalid_values'
 group by
     source_table
     , grain
