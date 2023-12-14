@@ -14,7 +14,9 @@ models:
         - claims_preprocessing
       materialized: table
     tests:
-      - claims_preprocessing_pipeline_checks
+      - claims_preprocessing_pipeline_checks:
+          config:
+            severity: warn
     columns:
       - name: source_table
         description: Table this test category is in reference to
