@@ -141,6 +141,7 @@ select
 	, coalesce(px_date.procedure_date_24, other.procedure_date_24) as procedure_date_24
 	, coalesce(px_date.procedure_date_25, other.procedure_date_25) as procedure_date_25
 	, med.data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }} med
 left join {{ref('normalized_input__int_admit_source_final') }} ad_source
     on med.claim_id = ad_source.claim_id

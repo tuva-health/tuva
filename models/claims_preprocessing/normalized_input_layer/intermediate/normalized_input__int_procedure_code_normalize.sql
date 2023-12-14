@@ -299,6 +299,7 @@ select
     , procedure_column
     , coalesce(icd_9.icd_9_pcs,icd_10.icd_10_pcs) as normalized_procedure_code
     , count(*) as procedure_code_occurrence_count
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from pivot_procedure piv
 left join {{ ref('terminology__icd_10_pcs') }} icd_10
     on replace(piv.procedure_code,'.','') = icd_10.icd_10_pcs

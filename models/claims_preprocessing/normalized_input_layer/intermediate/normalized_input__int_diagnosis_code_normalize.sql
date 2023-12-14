@@ -299,6 +299,7 @@ select
     , diagnosis_column
     , coalesce(icd_9.icd_9_cm,icd_10.icd_10_cm) as normalized_diagnosis_code
     , count(*) as diagnosis_code_occurrence_count
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from pivot_diagnosis piv
 left join {{ ref('terminology__icd_10_cm') }} icd_10
     on replace(piv.diagnosis_code,'.','') = icd_10.icd_10_cm

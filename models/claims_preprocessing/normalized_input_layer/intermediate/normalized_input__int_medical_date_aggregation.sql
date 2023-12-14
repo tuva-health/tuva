@@ -53,5 +53,6 @@ select
         when maximum_discharge_date > minimum_calendar_date or maximum_discharge_date < maximum_calendar_date
             then maximum_discharge_date
     end as maximum_discharge_date
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from claim_dates
 join terminology_calendar s

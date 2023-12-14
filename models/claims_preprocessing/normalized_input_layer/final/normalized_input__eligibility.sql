@@ -22,6 +22,7 @@ select
     , elig.zip_code
     , elig.phone
     , elig.data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility') }} elig
 left join {{ ref('normalized_input__int_eligibility_dates_normalize') }} date_norm
     on elig.patient_id = date_norm.patient_id

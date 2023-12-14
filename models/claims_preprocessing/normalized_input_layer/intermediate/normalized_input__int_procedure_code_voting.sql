@@ -26,6 +26,7 @@ select
     , coalesce(lead(procedure_code_occurrence_count) 
         over (partition by norm.claim_id, norm.data_source, norm.procedure_column order by procedure_code_occurrence_count desc),0) as next_occurrence_count
     , row_number() over (partition by norm.claim_id, norm.data_source, norm.procedure_column order by procedure_code_occurrence_count desc) as occurrence_row_count
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__int_procedure_code_normalize') }} norm
 inner join distinct_count dist
     on norm.claim_id = dist.claim_id

@@ -19,4 +19,5 @@ select
     , copayment_amount
     , deductible_amount
     , data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy_claim') }}
