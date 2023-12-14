@@ -2,100 +2,37 @@
      enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
+/*
+    Denominator logic for invalid value tests is dependent on whether that
+    specific field is populated or not. For new invalid value tests, add the
+    column to this list and a macro will generate the necessary CTE. These
+    tests must have a test_category = 'invalid_values' in the catalog seed.
+*/
+{% set column_list = [
+      'dual_status_code'
+    , 'gender'
+    , 'medicare_status_code'
+    , 'original_reason_entitlement_code'
+    , 'payer_type'
+    , 'race'
+] -%}
 
-with eligibility as (
-
-    select *
-    from {{ ref('eligibility') }}
-
-)
-
-, all_denominator as(
+with all_denominator as (
 
     select
         cast('all' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
+    from {{ ref('eligibility') }}
 
 )
 
-, gender_denominator as(
+, invalid_value_denominators as (
 
-    select
-        cast('gender invalid' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
-    where gender is not null
-
-)
-
-, race_denominator as(
-
-    select
-        cast('race invalid' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
-    where race is not null
-
-)
-
-, payer_type_denominator as(
-
-    select
-        cast('payer_type invalid' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
-    where payer_type is not null
-
-)
-
-, orec_denominator as(
-
-    select
-        cast('orec invalid' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
-    where original_reason_entitlement_code is not null
-
-)
-
-, dual_status_denominator as(
-
-    select
-        cast('dual_status_code invalid' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
-    where dual_status_code is not null
-
-)
-
-, medicare_status_denominator as(
-
-    select
-        cast('medicare_status_code invalid' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from eligibility
-    where medicare_status_code is not null
+    {{ eligibility_denominator_invalid_values(builtins.ref('eligibility'), column_list) }}
 
 )
 
 select * from all_denominator
 union all
-select * from gender_denominator
-union all 
-select * from race_denominator
-union all 
-select * from payer_type_denominator
-union all
-select * from orec_denominator
-union all
-select * from dual_status_denominator
-union all 
-select * from medicare_status_denominator
+select * from invalid_value_denominators
