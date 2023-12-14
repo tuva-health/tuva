@@ -131,7 +131,7 @@ with eligiblity as (
          left join {{ ref('terminology__medicare_orec') }} orec
            on eligiblity.original_reason_entitlement_code = orec.original_reason_entitlement_code
          left join test_catalog
-           on test_catalog.test_name = 'orec invalid'
+           on test_catalog.test_name = 'original_reason_entitlement_code invalid'
            and test_catalog.source_table = 'eligibility'
     where orec.original_reason_entitlement_code is null
     and eligiblity.original_reason_entitlement_code is not null
