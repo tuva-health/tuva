@@ -8,8 +8,8 @@ select
 	, med.plan 
 	, dates.minimum_claim_start_date as claim_start_date
 	, dates.maximum_claim_end_date as claim_end_date
-	, med.claim_line_start_date
-	, med.claim_line_end_date
+	, claim_line_dates.normalized_claim_line_start_date as claim_line_start_date
+	, claim_line_dates.normalized_claim_line_end_date as claim_line_end_date
 	, dates.minimum_admission_date as admission_date
 	, dates.maximum_discharge_date as discharge_date
 	, coalesce(ad_source.normalized_code, other.admit_source_code) as admit_source_code
@@ -155,6 +155,9 @@ left join {{ref('normalized_input__int_apr_drg_final') }} apr
 left join {{ref('normalized_input__int_bill_type_final') }} bill
     on med.claim_id = bill.claim_id
     and med.data_source = bill.data_source
+left join {{ref('normalized_input__int_medical_claim_date_normalize') }} claim_line_dates
+    on med.claim_id = claim_line_dates.claim_id
+    and med.data_source = claim_line_dates.data_source
 left join {{ref('normalized_input__int_medical_date_aggregation') }} dates
     on med.claim_id = dates.claim_id
     and med.data_source = dates.data_source
