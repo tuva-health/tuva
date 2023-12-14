@@ -4,29 +4,10 @@
 }}
 /*
     Denominator logic for invalid value tests is dependent on whether that
-    specific field is populated or not. For new invalid value tests, add the
-    column to this list and a macro will generate the necessary CTE. These
-    tests must have a test_category = 'invalid_values' in the catalog seed.
+    specific field is populated or not. We created a macro to automatically
+    generate the CTE. All invalid value tests must have a
+    test_category = 'invalid_values' in the catalog seed.
 */
-{% set column_list = [
-      'admit_source_code'
-    , 'admit_type_code'
-    , 'apr_drg_code'
-    , 'bill_type_code'
-    , 'billing_npi'
-    , 'claim_type'
-    , 'diagnosis_code_1'
-    , 'diagnosis_code_type'
-    , 'diagnosis_poa_1'
-    , 'discharge_disposition_code'
-    , 'facility_npi'
-    , 'ms_drg_code'
-    , 'place_of_service_code'
-    , 'procedure_code_type'
-    , 'rendering_npi'
-    , 'revenue_center_code'
-] -%}
-
 with professional_denominator as (
 
     select
@@ -62,7 +43,7 @@ with professional_denominator as (
 
 , invalid_value_denominators as (
 
-    {{ medical_claim_denominator_invalid_values(builtins.ref('medical_claim'), column_list) }}
+    {{ medical_claim_denominator_invalid_values(builtins.ref('medical_claim')) }}
 
 )
 

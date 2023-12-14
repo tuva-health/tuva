@@ -4,19 +4,10 @@
 }}
 /*
     Denominator logic for invalid value tests is dependent on whether that
-    specific field is populated or not. For new invalid value tests, add the
-    column to this list and a macro will generate the necessary CTE. These
-    tests must have a test_category = 'invalid_values' in the catalog seed.
+    specific field is populated or not. We created a macro to automatically
+    generate the CTE. All invalid value tests must have a
+    test_category = 'invalid_values' in the catalog seed.
 */
-{% set column_list = [
-      'dual_status_code'
-    , 'gender'
-    , 'medicare_status_code'
-    , 'original_reason_entitlement_code'
-    , 'payer_type'
-    , 'race'
-] -%}
-
 with all_denominator as (
 
     select
@@ -29,7 +20,7 @@ with all_denominator as (
 
 , invalid_value_denominators as (
 
-    {{ eligibility_denominator_invalid_values(builtins.ref('eligibility'), column_list) }}
+    {{ eligibility_denominator_invalid_values(builtins.ref('eligibility')) }}
 
 )
 
