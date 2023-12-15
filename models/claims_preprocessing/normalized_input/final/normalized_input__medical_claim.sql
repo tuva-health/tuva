@@ -27,9 +27,9 @@ select
 	, med.hcpcs_modifier_3
 	, med.hcpcs_modifier_4
 	, med.hcpcs_modifier_5
-	, coalesce(med_npi.normalized_rendering_npi, other.rendering_npi) as rendering_npi
-	, coalesce(med_npi.normalized_billing_npi, other.billing_npi) as billing_npi
-	, coalesce(med_npi.normalized_facility_npi, other.facility_npi) as facility_npi
+	, coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as rendering_npi
+	, coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as billing_npi
+	, coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as facility_npi
 	, med.paid_date
 	, med.paid_amount
 	, med.allowed_amount
@@ -162,8 +162,8 @@ left join {{ref('normalized_input__int_medical_date_aggregation') }} dates
     on med.claim_id = dates.claim_id
     and med.data_source = dates.data_source
 left join {{ref('normalized_input__int_medical_npi_normalize') }} med_npi
-    on med.claim_id = dates.claim_id
-    and med.data_source = dates.data_source
+    on med.claim_id = med_npi.claim_id
+    and med.data_source = med_npi.data_source
 left join {{ref('normalized_input__int_discharge_disposition_final') }} disch_disp
     on med.claim_id = disch_disp.claim_id
     and med.data_source = disch_disp.data_source
