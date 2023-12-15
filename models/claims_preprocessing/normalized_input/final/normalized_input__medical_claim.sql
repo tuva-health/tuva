@@ -163,6 +163,7 @@ left join {{ref('normalized_input__int_medical_date_aggregation') }} dates
     and med.data_source = dates.data_source
 left join {{ref('normalized_input__int_medical_npi_normalize') }} med_npi
     on med.claim_id = med_npi.claim_id
+    and med.claim_line_number = med_npi.claim_line_number
     and med.data_source = med_npi.data_source
 left join {{ref('normalized_input__int_discharge_disposition_final') }} disch_disp
     on med.claim_id = disch_disp.claim_id
