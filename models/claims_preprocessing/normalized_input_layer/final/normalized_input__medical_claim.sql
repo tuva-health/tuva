@@ -6,20 +6,20 @@ select
 	, med.member_id
 	, med.payer
 	, med.plan 
-	, dates.minimum_claim_start_date as claim_start_date
-	, dates.maximum_claim_end_date as claim_end_date
-	, claim_line_dates.normalized_claim_line_start_date as claim_line_start_date
-	, claim_line_dates.normalized_claim_line_end_date as claim_line_end_date
-	, dates.minimum_admission_date as admission_date
-	, dates.maximum_discharge_date as discharge_date
-	, coalesce(ad_source.normalized_code, other.admit_source_code) as admit_source_code
-	, coalesce(ad_type.normalized_code, other.admit_type_code) as admit_type_code
-	, coalesce(disch_disp.normalized_code, other.discharge_disposition_code) as discharge_disposition_code
-	, pos.normalized_code as place_of_service_code
-	, coalesce(bill.normalized_code, other.bill_type_code) as bill_type_code
-	, coalesce(ms.normalized_code, other.ms_drg_code) as ms_drg_code
-	, coalesce(apr.normalized_code, other.apr_drg_code) as apr_drg_code
-	, rev.normalized_code as revenue_center_code
+	, coalesce(dates.minimum_claim_start_date, undetermined.claim_start_date) as claim_start_date
+	, coalesce(dates.maximum_claim_end_date, undetermined.claim_start_date) as claim_end_date
+	, coalesce(claim_line_dates.normalized_claim_line_start_date, undetermined.claim_line_start_date) as claim_line_start_date
+	, coalesce(claim_line_dates.normalized_claim_line_end_date, undetermined.claim_line_end_date) as claim_line_end_date
+	, coalesce(dates.minimum_admission_date, undetermined.admission_date) as admission_date
+	, coalesce(dates.maximum_discharge_date, undetermined.discharge_date) as discharge_date
+	, coalesce(ad_source.normalized_code, undetermined.admit_source_code) as admit_source_code
+	, coalesce(ad_type.normalized_code, undetermined.admit_type_code) as admit_type_code
+	, coalesce(disch_disp.normalized_code, undetermined.discharge_disposition_code) as discharge_disposition_code
+	, coalesce(pos.normalized_code, undetermined.place_of_service_code) as place_of_service_code
+	, coalesce(bill.normalized_code, undetermined.bill_type_code) as bill_type_code
+	, coalesce(ms.normalized_code, undetermined.ms_drg_code) as ms_drg_code
+	, coalesce(apr.normalized_code, undetermined.apr_drg_code) as apr_drg_code
+	, coalesce(rev.normalized_code, undetermined.revenue_center_code) as revenue_center_code
 	, med.service_unit_quantity
 	, med.hcpcs_code
 	, med.hcpcs_modifier_1
@@ -27,9 +27,9 @@ select
 	, med.hcpcs_modifier_3
 	, med.hcpcs_modifier_4
 	, med.hcpcs_modifier_5
-	, med.rendering_npi
-	, med.billing_npi
-	, med.facility_npi
+	, coalesce(med_npi.normalized_rendering_npi, other.rendering_npi) as rendering_npi
+	, coalesce(med_npi.normalized_billing_npi, other.billing_npi) as billing_npi
+	, coalesce(med_npi.normalized_facility_npi, other.facility_npi) as facility_npi
 	, med.paid_date
 	, med.paid_amount
 	, med.allowed_amount
@@ -39,107 +39,107 @@ select
 	, med.deductible_amount
 	, med.total_cost_amount
 	, med.diagnosis_code_type
-	, coalesce(dx_code.diagnosis_code_1, other.diagnosis_code_1) as diagnosis_code_1
-	, coalesce(dx_code.diagnosis_code_2, other.diagnosis_code_2) as diagnosis_code_2
-	, coalesce(dx_code.diagnosis_code_3, other.diagnosis_code_3) as diagnosis_code_3
-	, coalesce(dx_code.diagnosis_code_4, other.diagnosis_code_4) as diagnosis_code_4
-	, coalesce(dx_code.diagnosis_code_5, other.diagnosis_code_5) as diagnosis_code_5
-	, coalesce(dx_code.diagnosis_code_6, other.diagnosis_code_6) as diagnosis_code_6
-	, coalesce(dx_code.diagnosis_code_7, other.diagnosis_code_7) as diagnosis_code_7
-	, coalesce(dx_code.diagnosis_code_8, other.diagnosis_code_8) as diagnosis_code_8
-	, coalesce(dx_code.diagnosis_code_9, other.diagnosis_code_9) as diagnosis_code_9
-	, coalesce(dx_code.diagnosis_code_10, other.diagnosis_code_10) as diagnosis_code_10
-	, coalesce(dx_code.diagnosis_code_11, other.diagnosis_code_11) as diagnosis_code_11
-	, coalesce(dx_code.diagnosis_code_12, other.diagnosis_code_12) as diagnosis_code_12
-	, coalesce(dx_code.diagnosis_code_13, other.diagnosis_code_13) as diagnosis_code_13
-	, coalesce(dx_code.diagnosis_code_14, other.diagnosis_code_14) as diagnosis_code_14
-	, coalesce(dx_code.diagnosis_code_15, other.diagnosis_code_15) as diagnosis_code_15
-	, coalesce(dx_code.diagnosis_code_16, other.diagnosis_code_16) as diagnosis_code_16
-	, coalesce(dx_code.diagnosis_code_17, other.diagnosis_code_17) as diagnosis_code_17
-	, coalesce(dx_code.diagnosis_code_18, other.diagnosis_code_18) as diagnosis_code_18
-	, coalesce(dx_code.diagnosis_code_19, other.diagnosis_code_19) as diagnosis_code_19
-	, coalesce(dx_code.diagnosis_code_20, other.diagnosis_code_20) as diagnosis_code_20
-	, coalesce(dx_code.diagnosis_code_21, other.diagnosis_code_21) as diagnosis_code_21
-	, coalesce(dx_code.diagnosis_code_22, other.diagnosis_code_22) as diagnosis_code_22
-	, coalesce(dx_code.diagnosis_code_23, other.diagnosis_code_23) as diagnosis_code_23
-	, coalesce(dx_code.diagnosis_code_24, other.diagnosis_code_24) as diagnosis_code_24
-	, coalesce(dx_code.diagnosis_code_25, other.diagnosis_code_25) as diagnosis_code_25
-	, coalesce(poa.diagnosis_poa_1, other.diagnosis_poa_1) as diagnosis_poa_1
-	, coalesce(poa.diagnosis_poa_2, other.diagnosis_poa_2) as diagnosis_poa_2
-	, coalesce(poa.diagnosis_poa_3, other.diagnosis_poa_3) as diagnosis_poa_3
-	, coalesce(poa.diagnosis_poa_4, other.diagnosis_poa_4) as diagnosis_poa_4
-	, coalesce(poa.diagnosis_poa_5, other.diagnosis_poa_5) as diagnosis_poa_5
-	, coalesce(poa.diagnosis_poa_6, other.diagnosis_poa_6) as diagnosis_poa_6
-	, coalesce(poa.diagnosis_poa_7, other.diagnosis_poa_7) as diagnosis_poa_7
-	, coalesce(poa.diagnosis_poa_8, other.diagnosis_poa_8) as diagnosis_poa_8
-	, coalesce(poa.diagnosis_poa_9, other.diagnosis_poa_9) as diagnosis_poa_9
-	, coalesce(poa.diagnosis_poa_10, other.diagnosis_poa_10) as diagnosis_poa_10
-	, coalesce(poa.diagnosis_poa_11, other.diagnosis_poa_11) as diagnosis_poa_11
-	, coalesce(poa.diagnosis_poa_12, other.diagnosis_poa_12) as diagnosis_poa_12
-	, coalesce(poa.diagnosis_poa_13, other.diagnosis_poa_13) as diagnosis_poa_13
-	, coalesce(poa.diagnosis_poa_14, other.diagnosis_poa_14) as diagnosis_poa_14
-	, coalesce(poa.diagnosis_poa_15, other.diagnosis_poa_15) as diagnosis_poa_15
-	, coalesce(poa.diagnosis_poa_16, other.diagnosis_poa_16) as diagnosis_poa_16
-	, coalesce(poa.diagnosis_poa_17, other.diagnosis_poa_17) as diagnosis_poa_17
-	, coalesce(poa.diagnosis_poa_18, other.diagnosis_poa_18) as diagnosis_poa_18
-	, coalesce(poa.diagnosis_poa_19, other.diagnosis_poa_19) as diagnosis_poa_19
-	, coalesce(poa.diagnosis_poa_20, other.diagnosis_poa_20) as diagnosis_poa_20
-	, coalesce(poa.diagnosis_poa_21, other.diagnosis_poa_21) as diagnosis_poa_21
-	, coalesce(poa.diagnosis_poa_22, other.diagnosis_poa_22) as diagnosis_poa_22
-	, coalesce(poa.diagnosis_poa_23, other.diagnosis_poa_23) as diagnosis_poa_23
-	, coalesce(poa.diagnosis_poa_24, other.diagnosis_poa_24) as diagnosis_poa_24
-	, coalesce(poa.diagnosis_poa_25, other.diagnosis_poa_25) as diagnosis_poa_25
+	, coalesce(dx_code.diagnosis_code_1, undetermined.diagnosis_code_1) as diagnosis_code_1
+	, coalesce(dx_code.diagnosis_code_2, undetermined.diagnosis_code_2) as diagnosis_code_2
+	, coalesce(dx_code.diagnosis_code_3, undetermined.diagnosis_code_3) as diagnosis_code_3
+	, coalesce(dx_code.diagnosis_code_4, undetermined.diagnosis_code_4) as diagnosis_code_4
+	, coalesce(dx_code.diagnosis_code_5, undetermined.diagnosis_code_5) as diagnosis_code_5
+	, coalesce(dx_code.diagnosis_code_6, undetermined.diagnosis_code_6) as diagnosis_code_6
+	, coalesce(dx_code.diagnosis_code_7, undetermined.diagnosis_code_7) as diagnosis_code_7
+	, coalesce(dx_code.diagnosis_code_8, undetermined.diagnosis_code_8) as diagnosis_code_8
+	, coalesce(dx_code.diagnosis_code_9, undetermined.diagnosis_code_9) as diagnosis_code_9
+	, coalesce(dx_code.diagnosis_code_10, undetermined.diagnosis_code_10) as diagnosis_code_10
+	, coalesce(dx_code.diagnosis_code_11, undetermined.diagnosis_code_11) as diagnosis_code_11
+	, coalesce(dx_code.diagnosis_code_12, undetermined.diagnosis_code_12) as diagnosis_code_12
+	, coalesce(dx_code.diagnosis_code_13, undetermined.diagnosis_code_13) as diagnosis_code_13
+	, coalesce(dx_code.diagnosis_code_14, undetermined.diagnosis_code_14) as diagnosis_code_14
+	, coalesce(dx_code.diagnosis_code_15, undetermined.diagnosis_code_15) as diagnosis_code_15
+	, coalesce(dx_code.diagnosis_code_16, undetermined.diagnosis_code_16) as diagnosis_code_16
+	, coalesce(dx_code.diagnosis_code_17, undetermined.diagnosis_code_17) as diagnosis_code_17
+	, coalesce(dx_code.diagnosis_code_18, undetermined.diagnosis_code_18) as diagnosis_code_18
+	, coalesce(dx_code.diagnosis_code_19, undetermined.diagnosis_code_19) as diagnosis_code_19
+	, coalesce(dx_code.diagnosis_code_20, undetermined.diagnosis_code_20) as diagnosis_code_20
+	, coalesce(dx_code.diagnosis_code_21, undetermined.diagnosis_code_21) as diagnosis_code_21
+	, coalesce(dx_code.diagnosis_code_22, undetermined.diagnosis_code_22) as diagnosis_code_22
+	, coalesce(dx_code.diagnosis_code_23, undetermined.diagnosis_code_23) as diagnosis_code_23
+	, coalesce(dx_code.diagnosis_code_24, undetermined.diagnosis_code_24) as diagnosis_code_24
+	, coalesce(dx_code.diagnosis_code_25, undetermined.diagnosis_code_25) as diagnosis_code_25
+	, coalesce(poa.diagnosis_poa_1, undetermined.diagnosis_poa_1) as diagnosis_poa_1
+	, coalesce(poa.diagnosis_poa_2, undetermined.diagnosis_poa_2) as diagnosis_poa_2
+	, coalesce(poa.diagnosis_poa_3, undetermined.diagnosis_poa_3) as diagnosis_poa_3
+	, coalesce(poa.diagnosis_poa_4, undetermined.diagnosis_poa_4) as diagnosis_poa_4
+	, coalesce(poa.diagnosis_poa_5, undetermined.diagnosis_poa_5) as diagnosis_poa_5
+	, coalesce(poa.diagnosis_poa_6, undetermined.diagnosis_poa_6) as diagnosis_poa_6
+	, coalesce(poa.diagnosis_poa_7, undetermined.diagnosis_poa_7) as diagnosis_poa_7
+	, coalesce(poa.diagnosis_poa_8, undetermined.diagnosis_poa_8) as diagnosis_poa_8
+	, coalesce(poa.diagnosis_poa_9, undetermined.diagnosis_poa_9) as diagnosis_poa_9
+	, coalesce(poa.diagnosis_poa_10, undetermined.diagnosis_poa_10) as diagnosis_poa_10
+	, coalesce(poa.diagnosis_poa_11, undetermined.diagnosis_poa_11) as diagnosis_poa_11
+	, coalesce(poa.diagnosis_poa_12, undetermined.diagnosis_poa_12) as diagnosis_poa_12
+	, coalesce(poa.diagnosis_poa_13, undetermined.diagnosis_poa_13) as diagnosis_poa_13
+	, coalesce(poa.diagnosis_poa_14, undetermined.diagnosis_poa_14) as diagnosis_poa_14
+	, coalesce(poa.diagnosis_poa_15, undetermined.diagnosis_poa_15) as diagnosis_poa_15
+	, coalesce(poa.diagnosis_poa_16, undetermined.diagnosis_poa_16) as diagnosis_poa_16
+	, coalesce(poa.diagnosis_poa_17, undetermined.diagnosis_poa_17) as diagnosis_poa_17
+	, coalesce(poa.diagnosis_poa_18, undetermined.diagnosis_poa_18) as diagnosis_poa_18
+	, coalesce(poa.diagnosis_poa_19, undetermined.diagnosis_poa_19) as diagnosis_poa_19
+	, coalesce(poa.diagnosis_poa_20, undetermined.diagnosis_poa_20) as diagnosis_poa_20
+	, coalesce(poa.diagnosis_poa_21, undetermined.diagnosis_poa_21) as diagnosis_poa_21
+	, coalesce(poa.diagnosis_poa_22, undetermined.diagnosis_poa_22) as diagnosis_poa_22
+	, coalesce(poa.diagnosis_poa_23, undetermined.diagnosis_poa_23) as diagnosis_poa_23
+	, coalesce(poa.diagnosis_poa_24, undetermined.diagnosis_poa_24) as diagnosis_poa_24
+	, coalesce(poa.diagnosis_poa_25, undetermined.diagnosis_poa_25) as diagnosis_poa_25
 	, med.procedure_code_type
-	, coalesce(px_code.procedure_code_1, other.procedure_code_1) as procedure_code_1
-	, coalesce(px_code.procedure_code_2, other.procedure_code_2) as procedure_code_2
-	, coalesce(px_code.procedure_code_3, other.procedure_code_3) as procedure_code_3
-	, coalesce(px_code.procedure_code_4, other.procedure_code_4) as procedure_code_4
-	, coalesce(px_code.procedure_code_5, other.procedure_code_5) as procedure_code_5
-	, coalesce(px_code.procedure_code_6, other.procedure_code_6) as procedure_code_6
-	, coalesce(px_code.procedure_code_7, other.procedure_code_7) as procedure_code_7
-	, coalesce(px_code.procedure_code_8, other.procedure_code_8) as procedure_code_8
-	, coalesce(px_code.procedure_code_9, other.procedure_code_9) as procedure_code_9
-	, coalesce(px_code.procedure_code_10, other.procedure_code_10) as procedure_code_10
-	, coalesce(px_code.procedure_code_11, other.procedure_code_11) as procedure_code_11
-	, coalesce(px_code.procedure_code_12, other.procedure_code_12) as procedure_code_12
-	, coalesce(px_code.procedure_code_13, other.procedure_code_13) as procedure_code_13
-	, coalesce(px_code.procedure_code_14, other.procedure_code_14) as procedure_code_14
-	, coalesce(px_code.procedure_code_15, other.procedure_code_15) as procedure_code_15
-	, coalesce(px_code.procedure_code_16, other.procedure_code_16) as procedure_code_16
-	, coalesce(px_code.procedure_code_17, other.procedure_code_17) as procedure_code_17
-	, coalesce(px_code.procedure_code_18, other.procedure_code_18) as procedure_code_18
-	, coalesce(px_code.procedure_code_19, other.procedure_code_19) as procedure_code_19
-	, coalesce(px_code.procedure_code_20, other.procedure_code_20) as procedure_code_20
-	, coalesce(px_code.procedure_code_21, other.procedure_code_21) as procedure_code_21
-	, coalesce(px_code.procedure_code_22, other.procedure_code_22) as procedure_code_22
-	, coalesce(px_code.procedure_code_23, other.procedure_code_23) as procedure_code_23
-	, coalesce(px_code.procedure_code_24, other.procedure_code_24) as procedure_code_24
-	, coalesce(px_code.procedure_code_25, other.procedure_code_25) as procedure_code_25
-	, coalesce(px_date.procedure_date_1, other.procedure_date_1) as procedure_date_1
-	, coalesce(px_date.procedure_date_2, other.procedure_date_2) as procedure_date_2
-	, coalesce(px_date.procedure_date_3, other.procedure_date_3) as procedure_date_3
-	, coalesce(px_date.procedure_date_4, other.procedure_date_4) as procedure_date_4
-	, coalesce(px_date.procedure_date_5, other.procedure_date_5) as procedure_date_5
-	, coalesce(px_date.procedure_date_6, other.procedure_date_6) as procedure_date_6
-	, coalesce(px_date.procedure_date_7, other.procedure_date_7) as procedure_date_7
-	, coalesce(px_date.procedure_date_8, other.procedure_date_8) as procedure_date_8
-	, coalesce(px_date.procedure_date_9, other.procedure_date_9) as procedure_date_9
-	, coalesce(px_date.procedure_date_10, other.procedure_date_10) as procedure_date_10
-	, coalesce(px_date.procedure_date_11, other.procedure_date_11) as procedure_date_11
-	, coalesce(px_date.procedure_date_12, other.procedure_date_12) as procedure_date_12
-	, coalesce(px_date.procedure_date_13, other.procedure_date_13) as procedure_date_13
-	, coalesce(px_date.procedure_date_14, other.procedure_date_14) as procedure_date_14
-	, coalesce(px_date.procedure_date_15, other.procedure_date_15) as procedure_date_15
-	, coalesce(px_date.procedure_date_16, other.procedure_date_16) as procedure_date_16
-	, coalesce(px_date.procedure_date_17, other.procedure_date_17) as procedure_date_17
-	, coalesce(px_date.procedure_date_18, other.procedure_date_18) as procedure_date_18
-	, coalesce(px_date.procedure_date_19, other.procedure_date_19) as procedure_date_19
-	, coalesce(px_date.procedure_date_20, other.procedure_date_20) as procedure_date_20
-	, coalesce(px_date.procedure_date_21, other.procedure_date_21) as procedure_date_21
-	, coalesce(px_date.procedure_date_22, other.procedure_date_22) as procedure_date_22
-	, coalesce(px_date.procedure_date_23, other.procedure_date_23) as procedure_date_23
-	, coalesce(px_date.procedure_date_24, other.procedure_date_24) as procedure_date_24
-	, coalesce(px_date.procedure_date_25, other.procedure_date_25) as procedure_date_25
+	, coalesce(px_code.procedure_code_1, undetermined.procedure_code_1) as procedure_code_1
+	, coalesce(px_code.procedure_code_2, undetermined.procedure_code_2) as procedure_code_2
+	, coalesce(px_code.procedure_code_3, undetermined.procedure_code_3) as procedure_code_3
+	, coalesce(px_code.procedure_code_4, undetermined.procedure_code_4) as procedure_code_4
+	, coalesce(px_code.procedure_code_5, undetermined.procedure_code_5) as procedure_code_5
+	, coalesce(px_code.procedure_code_6, undetermined.procedure_code_6) as procedure_code_6
+	, coalesce(px_code.procedure_code_7, undetermined.procedure_code_7) as procedure_code_7
+	, coalesce(px_code.procedure_code_8, undetermined.procedure_code_8) as procedure_code_8
+	, coalesce(px_code.procedure_code_9, undetermined.procedure_code_9) as procedure_code_9
+	, coalesce(px_code.procedure_code_10, undetermined.procedure_code_10) as procedure_code_10
+	, coalesce(px_code.procedure_code_11, undetermined.procedure_code_11) as procedure_code_11
+	, coalesce(px_code.procedure_code_12, undetermined.procedure_code_12) as procedure_code_12
+	, coalesce(px_code.procedure_code_13, undetermined.procedure_code_13) as procedure_code_13
+	, coalesce(px_code.procedure_code_14, undetermined.procedure_code_14) as procedure_code_14
+	, coalesce(px_code.procedure_code_15, undetermined.procedure_code_15) as procedure_code_15
+	, coalesce(px_code.procedure_code_16, undetermined.procedure_code_16) as procedure_code_16
+	, coalesce(px_code.procedure_code_17, undetermined.procedure_code_17) as procedure_code_17
+	, coalesce(px_code.procedure_code_18, undetermined.procedure_code_18) as procedure_code_18
+	, coalesce(px_code.procedure_code_19, undetermined.procedure_code_19) as procedure_code_19
+	, coalesce(px_code.procedure_code_20, undetermined.procedure_code_20) as procedure_code_20
+	, coalesce(px_code.procedure_code_21, undetermined.procedure_code_21) as procedure_code_21
+	, coalesce(px_code.procedure_code_22, undetermined.procedure_code_22) as procedure_code_22
+	, coalesce(px_code.procedure_code_23, undetermined.procedure_code_23) as procedure_code_23
+	, coalesce(px_code.procedure_code_24, undetermined.procedure_code_24) as procedure_code_24
+	, coalesce(px_code.procedure_code_25, undetermined.procedure_code_25) as procedure_code_25
+	, coalesce(px_date.procedure_date_1, undetermined.procedure_date_1) as procedure_date_1
+	, coalesce(px_date.procedure_date_2, undetermined.procedure_date_2) as procedure_date_2
+	, coalesce(px_date.procedure_date_3, undetermined.procedure_date_3) as procedure_date_3
+	, coalesce(px_date.procedure_date_4, undetermined.procedure_date_4) as procedure_date_4
+	, coalesce(px_date.procedure_date_5, undetermined.procedure_date_5) as procedure_date_5
+	, coalesce(px_date.procedure_date_6, undetermined.procedure_date_6) as procedure_date_6
+	, coalesce(px_date.procedure_date_7, undetermined.procedure_date_7) as procedure_date_7
+	, coalesce(px_date.procedure_date_8, undetermined.procedure_date_8) as procedure_date_8
+	, coalesce(px_date.procedure_date_9, undetermined.procedure_date_9) as procedure_date_9
+	, coalesce(px_date.procedure_date_10, undetermined.procedure_date_10) as procedure_date_10
+	, coalesce(px_date.procedure_date_11, undetermined.procedure_date_11) as procedure_date_11
+	, coalesce(px_date.procedure_date_12, undetermined.procedure_date_12) as procedure_date_12
+	, coalesce(px_date.procedure_date_13, undetermined.procedure_date_13) as procedure_date_13
+	, coalesce(px_date.procedure_date_14, undetermined.procedure_date_14) as procedure_date_14
+	, coalesce(px_date.procedure_date_15, undetermined.procedure_date_15) as procedure_date_15
+	, coalesce(px_date.procedure_date_16, undetermined.procedure_date_16) as procedure_date_16
+	, coalesce(px_date.procedure_date_17, undetermined.procedure_date_17) as procedure_date_17
+	, coalesce(px_date.procedure_date_18, undetermined.procedure_date_18) as procedure_date_18
+	, coalesce(px_date.procedure_date_19, undetermined.procedure_date_19) as procedure_date_19
+	, coalesce(px_date.procedure_date_20, undetermined.procedure_date_20) as procedure_date_20
+	, coalesce(px_date.procedure_date_21, undetermined.procedure_date_21) as procedure_date_21
+	, coalesce(px_date.procedure_date_22, undetermined.procedure_date_22) as procedure_date_22
+	, coalesce(px_date.procedure_date_23, undetermined.procedure_date_23) as procedure_date_23
+	, coalesce(px_date.procedure_date_24, undetermined.procedure_date_24) as procedure_date_24
+	, coalesce(px_date.procedure_date_25, undetermined.procedure_date_25) as procedure_date_25
 	, med.data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }} med
@@ -159,6 +159,9 @@ left join {{ref('normalized_input__int_medical_claim_date_normalize') }} claim_l
     on med.claim_id = claim_line_dates.claim_id
     and med.data_source = claim_line_dates.data_source
 left join {{ref('normalized_input__int_medical_date_aggregation') }} dates
+    on med.claim_id = dates.claim_id
+    and med.data_source = dates.data_source
+left join {{ref('normalized_input__int_medical_npi_normalize') }} med_npi
     on med.claim_id = dates.claim_id
     and med.data_source = dates.data_source
 left join {{ref('normalized_input__int_discharge_disposition_final') }} disch_disp
@@ -187,7 +190,7 @@ left join {{ref('normalized_input__int_revenue_center_normalize') }} rev
     on med.claim_id = rev.claim_id
     and med.claim_line_number = rev.claim_line_number
     and med.data_source = rev.data_source
-left join {{ref('normalized_input__int_undetermined_claim_type') }} other
-    on med.claim_id = other.claim_id
-    and med.data_source = other.data_source
+left join {{ref('normalized_input__int_undetermined_claim_type') }} undetermined
+    on med.claim_id = undetermined.claim_id
+    and med.data_source = undetermined.data_source
 
