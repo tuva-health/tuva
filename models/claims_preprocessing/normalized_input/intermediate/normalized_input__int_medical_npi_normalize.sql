@@ -1,5 +1,6 @@
 select distinct
   med.claim_id
+  , med.claim_line_number
   , med.claim_type
   , med.data_source
   , rend_prov.npi as normalized_rendering_npi
