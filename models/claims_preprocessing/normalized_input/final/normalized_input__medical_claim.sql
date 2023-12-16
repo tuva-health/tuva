@@ -27,9 +27,9 @@ select
 	, cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }} ) as hcpcs_modifier_3
 	, cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }} ) as hcpcs_modifier_4
 	, cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }} ) as hcpcs_modifier_5
-	, cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi as {{ dbt.type_string() }} )) as rendering_npi
-	, cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi as {{ dbt.type_string() }} )) as billing_npi
-	, cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi as {{ dbt.type_string() }} )) as facility_npi
+	, cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as {{ dbt.type_string() }} ) as rendering_npi
+	, cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }} ) as billing_npi
+	, cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }} ) as facility_npi
 	, cast(med.paid_date as date ) as paid_date
 	, cast(med.paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
 	, cast(med.allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
@@ -38,7 +38,7 @@ select
 	, cast(med.copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
 	, cast(med.deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
 	, cast(med.total_cost_amount as {{ dbt.type_numeric() }} ) as total_cost_amount
-	, cast(med.diagnosis_code_type as {{ dbt.type_numeric() }} ) as diagnosis_code_type
+	, cast(med.diagnosis_code_type as {{ dbt.type_string() }} ) as diagnosis_code_type
 	, cast(coalesce(dx_code.diagnosis_code_1, undetermined.diagnosis_code_1) as {{ dbt.type_string() }} ) as diagnosis_code_1
 	, cast(coalesce(dx_code.diagnosis_code_2, undetermined.diagnosis_code_2) as {{ dbt.type_string() }} ) as diagnosis_code_2
 	, cast(coalesce(dx_code.diagnosis_code_3, undetermined.diagnosis_code_3) as {{ dbt.type_string() }} ) as diagnosis_code_3
