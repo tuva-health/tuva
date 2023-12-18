@@ -8,7 +8,7 @@ with emergency_department_professional_claim_ids as (
 select 
     claim_id
     , claim_line_number
-from {{ ref('service_category__service_category_grouper') }} 
+from {{ ref('emergency_department__stg_service_category') }} 
 where claim_type = 'professional'
   and service_category_2 = 'Emergency Department'
 ),
@@ -20,7 +20,7 @@ select
   , mc.patient_id
   , mc.claim_start_date as start_date
   , mc.claim_end_date as end_date	   
-from {{ ref('medical_claim') }} mc
+from {{ ref('emergency_department__stg_medical_claim') }} mc
 inner join emergency_department_professional_claim_ids prof
   on mc.claim_id = prof.claim_id
   and mc.claim_line_number = prof.claim_line_number

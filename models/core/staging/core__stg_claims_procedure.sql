@@ -25,7 +25,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_1 is not null
     
 union distinct
@@ -43,7 +43,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_2 is not null
 
 union distinct
@@ -61,7 +61,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_3 is not null
 
 union distinct
@@ -79,7 +79,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_4 is not null
 
 union distinct
@@ -97,7 +97,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_5 is not null
 
 union distinct
@@ -115,7 +115,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_6 is not null
 
 union distinct
@@ -133,7 +133,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_7 is not null
 
 union distinct
@@ -151,7 +151,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_8 is not null
 
 union distinct
@@ -169,7 +169,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_9 is not null
 
 union distinct
@@ -187,7 +187,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_10 is not null
 
 union distinct
@@ -205,7 +205,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_11 is not null
 union distinct
 
@@ -222,7 +222,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_12 is not null
 
 union distinct
@@ -240,7 +240,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_13 is not null
 
 union distinct
@@ -258,7 +258,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_14 is not null
 
 union distinct
@@ -276,7 +276,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_15 is not null
 
 union distinct
@@ -294,7 +294,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_16 is not null
     
 union distinct
@@ -312,7 +312,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_17 is not null
 
 union distinct
@@ -330,7 +330,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_18 is not null
 
 union distinct
@@ -348,7 +348,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_19 is not null
 
 union distinct
@@ -366,7 +366,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_20 is not null
 
 union distinct
@@ -384,7 +384,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_21 is not null
 
 union distinct
@@ -402,7 +402,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_22 is not null
 
 union distinct
@@ -420,7 +420,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_23 is not null
 
 union distinct
@@ -438,7 +438,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_24 is not null
 
 union distinct
@@ -456,7 +456,7 @@ select
   , hcpcs_modifier_4 as modifier_4
   , hcpcs_modifier_5 as modifier_5
   , data_source as data_source
-from {{ ref('medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_25 is not null
 
 )

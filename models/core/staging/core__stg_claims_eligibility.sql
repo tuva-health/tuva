@@ -25,4 +25,4 @@ select
        , cast(medicare_status_code as {{ dbt.type_string() }} ) as medicare_status_code
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
        , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('eligibility') }} 
+from {{ ref('normalized_input__eligibility') }} 

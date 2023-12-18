@@ -9,7 +9,7 @@ with first_claim_values as(
         , coalesce(claim_start_date, admission_date) as claim_start
         , discharge_disposition_code
     from {{ ref('acute_inpatient__encounter_id')}} e
-    inner join {{ ref('medical_claim') }} m
+    inner join {{ ref('acute_inpatient__stg_medical_claim') }} m
         on e.claim_id = m.claim_id
     where claim_type = 'institutional'
 )
