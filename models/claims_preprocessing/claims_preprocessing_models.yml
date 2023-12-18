@@ -29,11 +29,11 @@ models:
       - name: gender
         description: The gender of the patient.
         meta:
-          terminology: /terminology/demographics/gender
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: race
         description: The race of the patient.
         meta:
-          terminology: /terminology/demographics/race
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
       - name: facility_npi
         description: The NPI for the facility where the encounter occurred.
       - name: provider_first_name
@@ -43,47 +43,37 @@ models:
       - name: ms_drg_code
         description: The MS-DRG code associted with the inpatient visit
         meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: ms_drg_description
         description: The MS-DRG description associted with the inpatient visit
-        meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
       - name: medical_surgical
         description: Indicates whether the MS-DRG is medical or surgical in nature.
         meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: apr_drg_code
         description: The APR-DRG code associted with the inpatient visit
         meta:
-          terminology: /terminology/conditions-and-procedures/apr-drg
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: apr_drg_description
         description: The APR-DRG description associted with the inpatient visit
-        meta:
-          terminology: /terminology/conditions-and-procedures/apr-drg
       - name: admit_source_code
         description: Admission source code for the encounter.
         meta:
-          terminology: /terminology/administrative-codes/admit-source
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
       - name: admit_source_description
         description: Admission source description for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/admit-source
       - name: admit_type_code
         description: Admission type code for the encounter.
         meta:
-          terminology: /terminology/administrative-codes/admit-type
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
       - name: admit_type_description
         description: Admission type description for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/admit-type
       - name: discharge_disposition_code
         description: Discharge disposition code for the encounter.
         meta:
-          terminology: /terminology/administrative-codes/discharge-disposition
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
       - name: discharge_disposition_description
         description: Discharge disposition description for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/discharge-disposition
       - name: total_paid_amount
         description: The total paid amount across all claims for the encounter.
       - name: total_allowed_amount
@@ -91,7 +81,7 @@ models:
       - name: total_charge_amount
         description: The total charge amount across all claims for the encounter.
       - name: length_of_stay
-        description: The length of stay for the encoujnter.
+        description: The length of stay for the encounter.
       - name: mortality_flag
         description: 1 if a patient died during the encounter, 0 otherwise.
       - name: data_source
@@ -224,7 +214,7 @@ models:
 
   - name: acute_inpatient__stg_eligibility
     config:
-      alias: _stg_eligibility
+      alias: acute_inpatient__stg_eligibility
       tags: 
         - acute_inpatient
         - claims_preprocessing
@@ -232,7 +222,7 @@ models:
 
   - name: acute_inpatient__stg_medical_claim
     config:
-      alias: _stg_medical_claim
+      alias: acute_inpatient__stg_medical_claim
       tags: 
         - acute_inpatient
         - claims_preprocessing
@@ -240,7 +230,7 @@ models:
 
   - name: acute_inpatient__stg_service_category
     config:
-      alias: _stg_service_category
+      alias: acute_inpatient__stg_service_category
       tags: 
         - acute_inpatient
         - claims_preprocessing
@@ -430,6 +420,31 @@ models:
         - claims_preprocessing
       materialized: table
 
+## Staging
+
+  - name: emergency_department__stg_eligibility
+    config:
+      alias: emergency_department__stg_eligibility
+      tags: 
+        - emergency_department
+        - claims_preprocessing
+      materialized: ephemeral
+
+  - name: emergency_department__stg_medical_claim
+    config:
+      alias: emergency_department__stg_medical_claim
+      tags: 
+        - emergency_department
+        - claims_preprocessing
+      materialized: ephemeral
+
+  - name: emergency_department__stg_service_category
+    config:
+      alias: emergency_department__stg_service_category
+      tags: 
+        - emergency_department
+        - claims_preprocessing
+      materialized: ephemeral
 
 
 
@@ -882,4 +897,700 @@ models:
       materialized: table
       tags: 
         - service_category_grouper
+        - claims_preprocessing
+
+
+
+
+###   Normalized Claim Input Layer
+##    Final
+  - name: normalized_input__eligibility
+    description: |
+        The eligibility table contains information on patient health plan and 
+        supplemental insurance eligibility.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: normalized_input_eligibility
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: >
+          Identifier that links a patient to a particular insurance product or 
+          health plan. A patient can have more than one member_id because they 
+          can have more than one insurance product/plan.
+      - name: birth_date
+        description: Date the patient was born.
+      - name: death_date
+        description: Date the patient died.
+      - name: enrollment_start_date
+        description: Date the patient's insurance eligibility began.
+      - name: enrollment_end_date
+        description: Date the patient's insurance eligibility ended.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: payer_type
+        description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__payer_type.csv
+      - name: plan
+        description: Name of the plan (i.e. sub contract) providing coverage.
+      - name: original_reason_entitlement_code
+        description: Original reason for Medicare entitlement code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_orec.csv
+      - name: dual_status_code
+        description: >
+          Indicates whether the patient is dually eligible for Medicare and 
+          Medicaid.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_dual_eligibility.csv
+      - name: medicare_status_code
+        description: Indicates how the patient became eligible for Medicare.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: tuva_last_run
+        description: >
+          The last time the data was refreshed.  Generated by 
+          `dbt_utils.pretty_time` as the local time of the `dbt run` 
+          environment.  Timezone is configurable via the `tuva_last_run` var.
+
+
+  - name: normalized_input__medical_claim
+    description: |
+      The medical claim table contains information on services rendered to 
+      patients and billed by the provider to the insurer as claims.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: normalized_input_medical_claim
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+    tests:
+      - unique:
+          column_name: "(claim_id||'-'||claim_line_number)"
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: >
+          Indicates the line number for the particular line of the claim.
+        data_type: integer
+      - name: claim_type
+        description: >
+          Indicates whether the claim is professional (CMS-1500), institutional 
+          (UB-04), dental, or vision.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__claim_type.csv
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: >
+          Identifier that links a patient to a particular insurance product or 
+          health plan. A patient can have more than one member_id because they 
+          can have more than one insurance product/plan.
+      - name: payer
+        description: Name of the payer
+      - name: plan
+        description: Name of the plan
+      - name: claim_start_date
+        description: Start date for the claim.
+      - name: claim_end_date
+        description: End date for the claim.
+      - name: claim_line_start_date
+        description: Start date for the claim line.
+      - name: claim_line_end_date
+        description: End date for the claim line.
+      - name: admission_date
+        description: Admission date for the claim (inpatient claims only).
+      - name: discharge_date
+        description: Discharge date for the claim (inpatient claims only).
+      - name: admit_source_code
+        description: >
+          Indicates where the patient was before the healthcare encounter 
+          (inpatient claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_type_code
+        description: Indicates the type of admission (inpatient claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: discharge_disposition_code
+        description: >
+          Indicates the type of setting the patient was discharged to 
+          (institutional inpatient claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: place_of_service_code
+        description: Place of service for the claim (professional claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__place_of_service.csv
+      - name: bill_type_code
+        description: Bill type code for the claim (institutional claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__bill_type.csv
+      - name: ms_drg_code
+        description: MS-DRG for the claim (inpatient claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: APR-DRG for the claim (inpatient claims only).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: revenue_center_code
+        description: >
+          Revenue center code for the claim line (institutional only and 
+          typically multiple codes per claim).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__revenue_center.csv
+      - name: service_unit_quantity
+        description: The number of units for the particular revenue center code.
+        data_type: integer
+      - name: hcpcs_code
+        description: HCPCS level 1 or level 2 code for the claim line.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+      - name: hcpcs_modifier_1
+        description: 1st modifier for HCPCS code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+      - name: hcpcs_modifier_2
+        description: 2nd modifier for HCPCS code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+      - name: hcpcs_modifier_3
+        description: 3rd modifier for HCPCS code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+      - name: hcpcs_modifier_4
+        description: 4th modifier for HCPCS code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+      - name: hcpcs_modifier_5
+        description: 5th modifier for HCPCS code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+      - name: rendering_npi
+        description: >
+          Rendering NPI for the claim (typically represents the physician or 
+          entity providing services).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: billing_npi
+        description: >
+          Billing NPI for the claim (typically represents organization billing 
+          the claim).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: facility_npi
+        description: >
+          Facility NPI for the claim (typically represents the facility where 
+          services were performed).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: paid_date
+        description: The date the claim was paid.
+      - name: paid_amount
+        description: The total amount paid on the claim by the insurer.
+      - name: allowed_amount
+        description: >
+          The total amount allowed (includes amount paid by the insurer and 
+          patient) on the claim.
+      - name: charge_amount
+        description: The total amount charged on the claim by the provider.
+      - name: coinsurance_amount
+        description: The total coinsurance charged on the claim by the provider.
+      - name: copayment_amount
+        description: The total copayment charged on the claim by the provider.
+      - name: deductible_amount
+        description: The total amount charged on the claim by the provider.
+      - name: total_cost_amount
+        description: The total amount paid on the claim by different parties.
+      - name: encounter_type
+        description: The type of encounter this claim belongs to.
+      - name: encounter_id
+        description: >
+          The encounter_id for the encounter that this claims belongs to.
+      - name: service_category_1
+        description: The broader service category this claim belongs to.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+      - name: service_category_2
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+        description: The more specific service category this claim belongs to.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: tuva_last_run
+        description: >
+          The last time the data was refreshed.  Generated by 
+          `dbt_utils.pretty_time` as the local time of the `dbt run` 
+          environment.  Timezone is configurable via the `tuva_last_run` var.
+
+
+  - name: normalized_input__pharmacy_claim
+    description: |
+      The pharmacy claim table contains information on prescription drugs that 
+      were filled and billed to the insurer.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: normalized_input_pharmacy_claim
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: Indicates the line number for the particular line of the claim.
+        data_type: integer
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: >
+          Identifier that links a patient to a particular insurance product or 
+          health plan. A patient can have more than one member_id because they 
+          can have more than one insurance product/plan.
+      - name: payer
+        description: Name of the payer
+      - name: plan
+        description: Name of the plan
+      - name: prescribing_provider_npi
+        description: >
+          NPI for the provider that wrote the prescription (e.g. priamry care 
+          physician).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: dispensing_provider_npi
+        description: >
+          NPI for the provider that dispensed the prescription (e.g. pharmacy).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: dispensing_date
+        description: Date the prescription was filled.
+      - name: ndc_code
+        description: National drug code on the claim.
+        meta:
+          terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+      - name: quantity
+        description: Number of doses.
+        data_type: integer
+      - name: days_supply
+        description: Number of days supply.
+        data_type: integer
+      - name: refills
+        description: Number of refills for the prescription.
+        data_type: integer
+      - name: paid_date
+        description: Date the claim was paid.
+      - name: paid_amount
+        description: Amount paid by the health insurer for the claim.
+      - name: allowed_amount
+        description: >
+          Contractual amount allowed to be paid by the payer + patient.
+      - name: coinsurance_amount
+        description: The total coinsurance charged on the claim by the provider.
+      - name: copayment_amount
+        description: The total copayment charged on the claim by the provider.
+      - name: deductible_amount
+        description: The total amount charged on the claim by the provider.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: tuva_last_run
+        description: >
+          The last time the data was refreshed.  Generated by 
+          `dbt_utils.pretty_time` as the local time of the `dbt run` 
+          environment.  Timezone is configurable via the `tuva_last_run` var.
+
+
+
+
+##    Intermediate
+
+  - name: normalized_input__int_admit_source_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_admit_source_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_admit_source_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_admit_source_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_admit_type_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_admit_type_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_admit_type_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_admit_type_normalize_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_apr_drg_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_apr_drg_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_apr_drg_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_apr_drg_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_bill_type_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_bill_type_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_bill_type_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_bill_type_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_diagnosis_code_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_diagnosis_code_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_diagnosis_code_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_diagnosis_code_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_diagnosis_code_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_diagnosis_code_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_discharge_disposition_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_discharge_disposition_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_discharge_disposition_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_discharge_disposition_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_eligibility_dates_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_eligibility_dates_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_medical_date_aggregation
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_medical_date_aggregation
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_medical_npi_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_medical_npi_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+
+  - name: normalized_input__int_ms_drg_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_ms_drg_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_ms_drg_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_ms_drg_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_place_of_service_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_place_of_service_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_present_on_admit_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_present_on_admit_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_present_on_admit_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_present_on_admit_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_present_on_admit_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_present_on_admit_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_code_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_code_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_code_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_code_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_procedure_code_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_code_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_date_final
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_date_final
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_procedure_date_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_date_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_procedure_date_voting
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_procedure_date_voting
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_revenue_center_normalize
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_revenue_center_normalize
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__int_undetermined_claim_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_normalized_input_undetermined_claim_type
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+
+
+##    Staging
+  - name: normalized_input__stg_eligibility
+    config:
+      materialized: ephemeral
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__stg_medical_claim
+    config:
+      materialized: ephemeral
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: normalized_input__stg_pharmacy_claim
+    config:
+      materialized: ephemeral
+      tags: 
+        - normalized_input
         - claims_preprocessing

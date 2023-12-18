@@ -19,8 +19,8 @@ select
   mc.facility_npi,
   mc.claim_type,
   mc.data_source
-from {{ ref('medical_claim') }} mc
-inner join {{ ref('service_category__service_category_grouper')}} sc
+from {{ ref('emergency_department__stg_medical_claim') }} mc
+inner join {{ ref('emergency_department__stg_service_category')}} sc
   on mc.claim_id = sc.claim_id
 where mc.claim_type = 'institutional'
   and sc.service_category_2 = 'Emergency Department'

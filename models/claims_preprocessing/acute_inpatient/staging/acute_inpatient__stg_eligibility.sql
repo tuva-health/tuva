@@ -4,9 +4,9 @@
 }}
 
 select
-  patient_id
-, birth_date
-, gender
-, race
-, '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('eligibility') }}
+    patient_id
+    , birth_date
+    , gender
+    , race
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from {{ ref('normalized_input__eligibility') }}
