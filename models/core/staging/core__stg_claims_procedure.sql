@@ -1,3 +1,5 @@
+-- depends_on: {{ ref('data_quality__claims_preprocessing_summary') }}
+
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False))
    )
