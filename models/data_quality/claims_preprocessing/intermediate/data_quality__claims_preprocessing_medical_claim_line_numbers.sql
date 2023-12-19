@@ -8,6 +8,7 @@ with medical_claim as (
     select
           claim_id
         , claim_line_number
+        , data_source
     from {{ ref('normalized_input__medical_claim') }}
 
 )
@@ -27,9 +28,10 @@ with medical_claim as (
 
     select
           claim_id
+        , data_source
         , claim_line_number
         , row_number() over (
-            partition by claim_id
+            partition by claim_id, data_source
             order by claim_line_number
           ) as expected_line_number
     from medical_claim
@@ -40,11 +42,13 @@ with medical_claim as (
 
     select
           add_row_num.claim_id
+        , add_row_num.data_source
         , add_row_num.claim_line_number
         , add_row_num.expected_line_number
     from add_row_num
          left join medical_claim
            on add_row_num.claim_id = medical_claim.claim_id
+           and add_row_num.data_source = medical_claim.data_source
            and add_row_num.expected_line_number = medical_claim.claim_line_number
     where medical_claim.claim_line_number is null
 
@@ -55,6 +59,7 @@ select
     , 'all' as claim_type
     , 'claim_id' as grain
     , line_num_check.claim_id
+    , line_num_check.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -65,6 +70,7 @@ from line_num_check
        and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       line_num_check.claim_id
+    , line_num_check.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

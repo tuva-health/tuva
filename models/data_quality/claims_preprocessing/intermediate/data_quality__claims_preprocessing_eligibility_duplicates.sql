@@ -32,7 +32,8 @@ select distinct
       test_catalog.source_table
     , 'all' as claim_type
     , 'patient_id' as grain
-    ,  patient_id
+    , patient_id
+    , data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test

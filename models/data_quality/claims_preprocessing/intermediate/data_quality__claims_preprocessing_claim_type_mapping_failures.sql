@@ -8,6 +8,7 @@ with claim_type_mapping as (
     select 
           claim_id
         , claim_line_number
+        , data_source
         , claim_type as source_claim_type
         , case
             when bill_type_code is not null or revenue_center_code is not null 
@@ -36,6 +37,7 @@ select
     , 'all' as claim_type
     , 'claim_id' as grain
     , claim_type_mapping.claim_id
+    , claim_type_mapping.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -47,6 +49,7 @@ from claim_type_mapping
 where claim_type_mapping.source_claim_type <> claim_type_mapping.data_profiling_claim_type
 group by
       claim_type_mapping.claim_id
+    , claim_type_mapping.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

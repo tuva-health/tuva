@@ -7,8 +7,8 @@ with use_case_stage as(
         'encounters' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('revenue_center_code missing'
@@ -40,8 +40,8 @@ with use_case_stage as(
         'service_grouper' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('revenue_center_code missing'
@@ -67,8 +67,8 @@ with use_case_stage as(
         'readmissions' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('diagnosis_code_1 missing'
@@ -102,8 +102,8 @@ with use_case_stage as(
         'pmpm' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
@@ -123,8 +123,8 @@ with use_case_stage as(
         'readmissions' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__pharmacy_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__pharmacy_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
@@ -144,8 +144,8 @@ with use_case_stage as(
         'member_months' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct patient_id) from {{ ref('normalized_input__eligibility') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct patient_id,data_source) from {{ ref('normalized_input__eligibility') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
@@ -166,8 +166,8 @@ with use_case_stage as(
         'chronic_conditions' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('diagnosis_code_1 missing'
@@ -214,8 +214,8 @@ with use_case_stage as(
         'chronic_conditions' as use_case
         , source_table
         , test_name
-        , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('normalized_input__pharmacy_claim') }} ) as denominator
+        , count(distinct foreign_key,data_source) as failures
+        , (select count(distinct claim_id,data_source) from {{ ref('normalized_input__pharmacy_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('ndc_code missing'

@@ -44,11 +44,12 @@ select
         when source_table = 'normalized_input__pharmacy_claim' and test_category = 'plausibility'
             then '3_plausibility'
         else test_category 
-    end as test_category
+      end as test_category
     , test_name 
     , grain
     , claim_type
     , pipeline_test
-    , claim_id as foreign_key
+    , foreign_key
+    , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from test_detail_union

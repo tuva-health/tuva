@@ -8,7 +8,8 @@
 {% macro medical_claim_date_check(relation, column_list, claim_type=false) %}
     {%- for column_item in column_list -%}
     select
-        claim_id
+          claim_id
+        , data_source
         , '{{ column_item }}' as column_checked
     from {{ relation }} as rel
          left join {{ ref('terminology__calendar') }} as cal

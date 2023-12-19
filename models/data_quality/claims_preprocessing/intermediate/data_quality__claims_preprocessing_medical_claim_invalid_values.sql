@@ -31,6 +31,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.bill_type_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -44,6 +45,7 @@ with medical_claim as (
     and medical_claim.bill_type_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -61,6 +63,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.revenue_center_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -74,6 +77,7 @@ with medical_claim as (
     and medical_claim.revenue_center_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -91,6 +95,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.discharge_disposition_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -104,6 +109,7 @@ with medical_claim as (
     and medical_claim.discharge_disposition_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -121,6 +127,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.admit_source_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -134,6 +141,7 @@ with medical_claim as (
     and medical_claim.admit_source_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -151,6 +159,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.admit_type_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -164,6 +173,7 @@ with medical_claim as (
     and medical_claim.admit_type_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -181,6 +191,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.ms_drg_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -194,6 +205,7 @@ with medical_claim as (
     and medical_claim.ms_drg_code is not null
     group by
            medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -211,6 +223,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.apr_drg_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -225,6 +238,7 @@ with medical_claim as (
     and medical_claim.apr_drg_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -242,6 +256,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.diagnosis_poa_1) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -255,6 +270,7 @@ with medical_claim as (
     and medical_claim.diagnosis_poa_1 is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -272,6 +288,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.procedure_code_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -285,6 +302,7 @@ with medical_claim as (
     and medical_claim.procedure_code_type is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -302,6 +320,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.place_of_service_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -315,6 +334,7 @@ with medical_claim as (
     and medical_claim.place_of_service_code is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -332,6 +352,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.diagnosis_code_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -344,6 +365,7 @@ with medical_claim as (
     and medical_claim.diagnosis_code_type is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -361,6 +383,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.diagnosis_code_1) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -374,6 +397,7 @@ with medical_claim as (
     and medical_claim.diagnosis_code_1 is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -391,6 +415,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.claim_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -403,6 +428,7 @@ with medical_claim as (
     and medical_claim.claim_type is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name

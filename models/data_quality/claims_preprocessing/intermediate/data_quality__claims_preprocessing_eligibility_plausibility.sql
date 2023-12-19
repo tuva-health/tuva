@@ -31,6 +31,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from eligiblity
          left join test_catalog
@@ -38,6 +39,7 @@ with eligiblity as (
            and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -56,6 +58,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from eligiblity
          left join test_catalog
@@ -63,6 +66,7 @@ with eligiblity as (
            and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -81,6 +85,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from eligiblity
          left join test_catalog
@@ -88,6 +93,7 @@ with eligiblity as (
            and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -106,6 +112,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from eligiblity
          left join test_catalog
@@ -113,6 +120,7 @@ with eligiblity as (
            and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -131,6 +139,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from eligiblity
          left join test_catalog
@@ -139,6 +148,7 @@ with eligiblity as (
     where eligiblity.birth_date > eligiblity.death_date
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name

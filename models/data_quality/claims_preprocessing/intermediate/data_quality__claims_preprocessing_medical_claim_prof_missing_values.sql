@@ -44,7 +44,8 @@ select
       test_catalog.source_table
     , 'professional' as claim_type
     , 'claim_id' as grain
-    ,  professional_missing.claim_id
+    , professional_missing.claim_id
+    , professional_missing.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -55,6 +56,7 @@ from professional_missing
        and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       professional_missing.claim_id
+    , professional_missing.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

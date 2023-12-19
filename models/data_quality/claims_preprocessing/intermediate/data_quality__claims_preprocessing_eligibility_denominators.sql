@@ -20,7 +20,7 @@ with all_denominator as (
 
 , invalid_value_denominators as (
 
-    {{ denominator_invalid_values(builtins.ref('normalized_input__eligibility'),'normalized_input__eligibility') }}
+    {{ eligibility_denominator_invalid_values(builtins.ref('normalized_input__eligibility')) }}
 
 )
 

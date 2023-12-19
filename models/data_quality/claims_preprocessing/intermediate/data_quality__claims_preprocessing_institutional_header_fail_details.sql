@@ -151,6 +151,7 @@ select
     , 'institutional' as claim_type
     , 'claim_id' as grain
     , institutional_header_duplicates.claim_id
+    , institutional_header_duplicates.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -162,6 +163,7 @@ from institutional_header_duplicates
        and test_catalog.claim_type = 'institutional'
 group by 
       institutional_header_duplicates.claim_id
+    , institutional_header_duplicates.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

@@ -45,6 +45,7 @@ select
     , 'all' as claim_type
     , 'claim_id' as grain
     , pharmacy_claim_missing.claim_id
+    , pharmacy_claim_missing.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -55,6 +56,7 @@ from pharmacy_claim_missing
        and test_catalog.source_table = 'normalized_input__pharmacy_claim'
 group by
       pharmacy_claim_missing.claim_id
+    , pharmacy_claim_missing.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

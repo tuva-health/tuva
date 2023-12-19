@@ -47,6 +47,7 @@ select
     , 'institutional' as claim_type
     , 'claim_id' as grain
     , institutional_missing.claim_id
+    , institutional_missing.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -57,6 +58,7 @@ from institutional_missing
        and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       institutional_missing.claim_id
+    , institutional_missing.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

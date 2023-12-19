@@ -8,7 +8,8 @@
 {% macro pharmacy_claim_missing_column_check(relation, column_list) %}
     {%- for column_item in column_list %}
         select
-            claim_id
+              claim_id
+            , data_source
             , '{{ column_item }}' as column_checked
         from {{ relation }}
         where {{ column_item }} is null

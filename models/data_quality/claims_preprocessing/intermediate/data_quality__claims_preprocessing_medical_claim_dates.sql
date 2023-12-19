@@ -58,6 +58,7 @@ select
     , 'all' as claim_type
     , 'claim_id' as grain
     , claim_dates.claim_id
+    , claim_dates.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -68,6 +69,7 @@ from claim_dates
        and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       claim_dates.claim_id
+    , claim_dates.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

@@ -31,6 +31,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.gender
         , count(eligiblity.gender) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -44,6 +45,7 @@ with eligiblity as (
     and eligiblity.gender is not null
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.gender
         , test_catalog.source_table
         , test_catalog.test_category
@@ -62,6 +64,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.race
         , count(eligiblity.race) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -75,6 +78,7 @@ with eligiblity as (
     and eligiblity.race is not null
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.race
         , test_catalog.source_table
         , test_catalog.test_category
@@ -93,6 +97,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.payer_type
         , count(eligiblity.payer_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -106,6 +111,7 @@ with eligiblity as (
     and eligiblity.payer_type is not null
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.payer_type
         , test_catalog.source_table
         , test_catalog.test_category
@@ -124,6 +130,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.original_reason_entitlement_code
         , count(eligiblity.original_reason_entitlement_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -137,6 +144,7 @@ with eligiblity as (
     and eligiblity.original_reason_entitlement_code is not null
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.original_reason_entitlement_code
         , test_catalog.source_table
         , test_catalog.test_category
@@ -155,6 +163,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.dual_status_code
         , count(eligiblity.dual_status_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -168,6 +177,7 @@ with eligiblity as (
     and eligiblity.dual_status_code is not null
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.dual_status_code
         , test_catalog.source_table
         , test_catalog.test_category
@@ -186,6 +196,7 @@ with eligiblity as (
         , test_catalog.test_category
         , 'patient_id' as grain
         , eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.medicare_status_code
         , count(eligiblity.medicare_status_code) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -199,6 +210,7 @@ with eligiblity as (
     and eligiblity.medicare_status_code is not null
     group by
           eligiblity.patient_id
+        , eligiblity.data_source
         , eligiblity.medicare_status_code
         , test_catalog.source_table
         , test_catalog.test_category

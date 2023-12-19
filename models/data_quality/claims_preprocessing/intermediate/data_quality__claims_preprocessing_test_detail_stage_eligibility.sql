@@ -8,7 +8,8 @@ select distinct
     source_table
     , claim_type
     , grain
-    , patient_id
+    , patient_id as foreign_key
+    , data_source
     , test_category
     , test_name
     , pipeline_test
@@ -18,7 +19,8 @@ select distinct
     source_table
     , claim_type
     , grain
-    , patient_id
+    , patient_id as foreign_key
+    , data_source
     , test_category
     , test_name
     , pipeline_test
@@ -28,7 +30,8 @@ select distinct
     source_table
     , claim_type
     , grain
-    , patient_id
+    , patient_id as foreign_key
+    , data_source
     , test_category
     , test_name
     , pipeline_test
@@ -38,7 +41,8 @@ select distinct
     source_table
     , claim_type
     , grain
-    , patient_id
+    , patient_id as foreign_key
+    , data_source
     , test_category
     , test_name
     , pipeline_test

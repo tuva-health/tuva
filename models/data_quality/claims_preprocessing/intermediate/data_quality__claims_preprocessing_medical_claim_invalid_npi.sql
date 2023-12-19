@@ -31,6 +31,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.billing_npi) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -43,6 +44,7 @@ with medical_claim as (
     and medical_claim.billing_npi is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -60,6 +62,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.facility_npi) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -72,6 +75,7 @@ with medical_claim as (
     and medical_claim.facility_npi is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name
@@ -89,6 +93,7 @@ with medical_claim as (
         , test_catalog.test_category
         , 'claim_id' as grain
         , medical_claim.claim_id
+        , medical_claim.data_source
         , count(medical_claim.rendering_npi) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
@@ -101,6 +106,7 @@ with medical_claim as (
     and medical_claim.rendering_npi is not null
     group by
           medical_claim.claim_id
+        , medical_claim.data_source
         , test_catalog.source_table
         , test_catalog.test_category
         , test_catalog.test_name

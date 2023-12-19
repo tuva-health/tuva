@@ -49,6 +49,7 @@ select
     , 'all' as claim_type
     , 'patient_id' as grain
     , eligibility_missing.patient_id
+    , eligibility_missing.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -59,6 +60,7 @@ from eligibility_missing
        and test_catalog.source_table = 'normalized_input__eligibility'
 group by
       eligibility_missing.patient_id
+    , eligibility_missing.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

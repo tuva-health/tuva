@@ -19,6 +19,7 @@ select distinct
     , 'all' as claim_type
     , 'claim_id' as grain
     , claim_id
+    , data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test

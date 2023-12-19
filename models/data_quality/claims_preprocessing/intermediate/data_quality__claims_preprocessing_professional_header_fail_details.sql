@@ -66,7 +66,8 @@ select
       test_catalog.source_table
     , 'professional' as claim_type
     , 'claim_id' as grain
-    ,  professional_header_duplicates.claim_id
+    , professional_header_duplicates.claim_id
+    , professional_header_duplicates.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -78,6 +79,7 @@ from professional_header_duplicates
        and test_catalog.claim_type = 'professional'
 group by 
       professional_header_duplicates.claim_id
+    , professional_header_duplicates.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

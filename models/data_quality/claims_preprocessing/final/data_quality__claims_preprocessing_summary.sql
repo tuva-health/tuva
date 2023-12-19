@@ -8,7 +8,7 @@ with test_failure_summary as (
       cast(source_table as {{ dbt.type_string() }} ) as source_table
       , cast(grain as {{ dbt.type_string() }} ) as grain
       , cast(test_category as {{ dbt.type_string() }} ) as test_category
-      , cast(count(distinct foreign_key) as int) as counts
+      , cast(count(distinct foreign_key,data_source) as int) as counts
   from {{ ref('data_quality__claims_preprocessing_test_detail' )}}
   group by
       source_table

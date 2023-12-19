@@ -35,6 +35,7 @@ select
     , 'all' as claim_type
     , 'claim_id' as grain
     , pharmacy_header_duplicates.claim_id
+    , pharmacy_header_duplicates.data_source
     , test_catalog.test_category
     , test_catalog.test_name
     , test_catalog.pipeline_test
@@ -45,6 +46,7 @@ from pharmacy_header_duplicates
        and test_catalog.source_table = 'normalized_input__pharmacy_claim'
 group by 
       pharmacy_header_duplicates.claim_id
+    , pharmacy_header_duplicates.data_source
     , test_catalog.source_table
     , test_catalog.test_category
     , test_catalog.test_name

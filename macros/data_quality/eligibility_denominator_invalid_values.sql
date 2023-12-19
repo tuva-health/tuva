@@ -1,8 +1,8 @@
 {#
-    Required variable input: relation and source_table
+    Required variable input: relation
 
     The first step of this macro is to query the test catalog to retrieve
-    the test_field for all invalid_value tests for the source table.
+    the test_field for all invalid_value tests for eligibility.
 
     The second step uses the get_query_results_as_dict from dbt_utils to take
     the results of that query and create a dictionary.
@@ -11,12 +11,11 @@
     statements for the CTE that builds the denominators for invalid value tests.
 #}
 
-{% macro denominator_invalid_values(relation,source_table) %}
-
+{% macro eligibility_denominator_invalid_values(relation) %}
 {%- set sql_statement -%}
     select test_field as TEST_FIELD
     from {{ ref('data_quality__test_catalog') }}
-    where source_table = '{{ source_table }}'
+    where source_table = 'normalized_input__eligibility'
     and test_category = 'invalid_values'
 {%- endset -%}
 
@@ -30,7 +29,7 @@
     from {{ relation }} as rel
          left join {{ ref('data_quality__test_catalog') }} as cat
            on cat.test_category = 'invalid_values'
-           and cat.source_table = '{{ source_table }}'
+           and cat.source_table = 'normalized_input__eligibility'
            and cat.test_field = '{{ test_field }}'
     where rel.{{ test_field }} is not null
     group by cat.test_name
@@ -38,5 +37,4 @@
     union all
     {% endif -%}
     {%- endfor -%}
-
 {% endmacro %}
