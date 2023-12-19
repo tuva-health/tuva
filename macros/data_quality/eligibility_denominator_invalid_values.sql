@@ -9,9 +9,13 @@
 
     The last step is to loop through the dictionary and generate the SQL
     statements for the CTE that builds the denominators for invalid value tests.
+
+    Note: an "if" statement has been included in the logic, due to how the
+    snowflake adapter stores column names.
 #}
 
 {% macro eligibility_denominator_invalid_values(relation) %}
+
 {%- set sql_statement -%}
     select test_field
     from {{ ref('data_quality__test_catalog') }}
@@ -20,6 +24,8 @@
 {%- endset -%}
 
 {%- set dict = dbt_utils.get_query_results_as_dict(sql_statement) -%}
+
+{%- if target.type in ("snowflake") -%}
 
     {%- for test_field in dict['TEST_FIELD'] -%}
     select
@@ -37,4 +43,26 @@
     union all
     {% endif -%}
     {%- endfor -%}
+
+{%- else -%}
+
+    {%- for test_field in dict['test_field'] -%}
+    select
+          cat.test_name
+        , count(distinct rel.patient_id) as denominator
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
+    from {{ relation }} as rel
+         left join {{ ref('data_quality__test_catalog') }} as cat
+           on cat.test_category = 'invalid_values'
+           and cat.source_table = 'eligibility'
+           and cat.test_field = '{{ test_field }}'
+    where rel.{{ test_field }} is not null
+    group by cat.test_name
+    {% if not loop.last -%}
+    union all
+    {% endif -%}
+    {%- endfor -%}
+
+{%- endif -%}
+
 {% endmacro %}

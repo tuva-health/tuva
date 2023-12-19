@@ -21,6 +21,8 @@
 
 {%- set dict = dbt_utils.get_query_results_as_dict(sql_statement) -%}
 
+{%- if target.type in ("snowflake") -%}
+
     {%- for test_field in dict['TEST_FIELD'] -%}
     select
           cat.test_name
@@ -37,4 +39,26 @@
     union all
     {% endif -%}
     {%- endfor -%}
+
+{%- else -%}
+
+    {%- for test_field in dict['test_field'] -%}
+    select
+          cat.test_name
+        , count(distinct rel.claim_id) as denominator
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
+    from {{ relation }} as rel
+         left join {{ ref('data_quality__test_catalog') }} as cat
+           on cat.test_category = 'invalid_values'
+           and cat.source_table = 'medical_claim'
+           and cat.test_field = '{{ test_field }}'
+    where rel.{{ test_field }} is not null
+    group by cat.test_name
+    {% if not loop.last -%}
+    union all
+    {% endif -%}
+    {%- endfor -%}
+
+{%- endif -%}
+
 {% endmacro %}
