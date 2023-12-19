@@ -10,7 +10,7 @@
 
 with claim_dates as (
 
- {{ medical_claim_date_check(builtins.ref('medical_claim'), claim_date_column_list, 'institutional') }}
+ {{ medical_claim_date_check(builtins.ref('normalized_input__medical_claim'), claim_date_column_list, 'institutional') }}
 
 )
 
@@ -37,7 +37,7 @@ select
 from claim_dates
      left join test_catalog
        on test_catalog.test_name = claim_dates.column_checked||' invalid'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       claim_dates.claim_id
     , test_catalog.source_table

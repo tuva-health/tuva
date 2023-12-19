@@ -29,7 +29,7 @@
 
 with eligibility_missing as (
 
- {{ eligibility_missing_column_check(builtins.ref('eligibility'), eligibility_missing_column_list) }}
+ {{ eligibility_missing_column_check(builtins.ref('normalized_input__eligibility'), eligibility_missing_column_list) }}
 
 )
 
@@ -56,7 +56,7 @@ select
 from eligibility_missing
      left join test_catalog
        on test_catalog.test_name = eligibility_missing.column_checked||' missing'
-       and test_catalog.source_table = 'eligibility'
+       and test_catalog.source_table = 'normalized_input__eligibility'
 group by
       eligibility_missing.patient_id
     , test_catalog.source_table

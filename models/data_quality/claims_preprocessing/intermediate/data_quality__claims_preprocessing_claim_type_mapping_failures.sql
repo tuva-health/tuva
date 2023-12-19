@@ -16,7 +16,7 @@ with claim_type_mapping as (
                 then 'professional'
             else null
           end as data_profiling_claim_type
-    from {{ ref('medical_claim') }} 
+    from {{ ref('normalized_input__medical_claim') }}
 
 )
 
@@ -43,7 +43,7 @@ select
 from claim_type_mapping
      left join test_catalog
        on test_catalog.test_name = 'claim_type mapping incorrect'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
 where claim_type_mapping.source_claim_type <> claim_type_mapping.data_profiling_claim_type
 group by
       claim_type_mapping.claim_id

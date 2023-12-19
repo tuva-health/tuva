@@ -6,7 +6,7 @@
 with eligiblity as (
 
     select *
-    from {{ ref('eligibility') }}
+    from {{ ref('normalized_input__eligibility') }}
 
 )
 
@@ -35,7 +35,7 @@ with eligiblity as (
     from eligiblity
          left join test_catalog
            on test_catalog.test_name = 'multiple genders'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
         , test_catalog.source_table
@@ -60,7 +60,7 @@ with eligiblity as (
     from eligiblity
          left join test_catalog
            on test_catalog.test_name = 'multiple races'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
         , test_catalog.source_table
@@ -85,7 +85,7 @@ with eligiblity as (
     from eligiblity
          left join test_catalog
            on test_catalog.test_name = 'multiple birth dates'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
         , test_catalog.source_table
@@ -110,7 +110,7 @@ with eligiblity as (
     from eligiblity
          left join test_catalog
            on test_catalog.test_name = 'multiple death dates'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     group by
           eligiblity.patient_id
         , test_catalog.source_table
@@ -135,7 +135,7 @@ with eligiblity as (
     from eligiblity
          left join test_catalog
            on test_catalog.test_name = 'birth date after death date'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where eligiblity.birth_date > eligiblity.death_date
     group by
           eligiblity.patient_id

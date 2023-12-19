@@ -6,7 +6,7 @@
 with medical_claim as (
 
     select *
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
 
 )
 
@@ -36,7 +36,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'claim_start_date after claim_end_date'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_start_date > medical_claim.claim_end_date
     group by
           medical_claim.claim_id
@@ -62,7 +62,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'admission_date after discharge_date'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and medical_claim.admission_date > medical_claim.discharge_date
     group by
@@ -89,7 +89,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'admission_date incorrectly populated'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'professional'
     and medical_claim.admission_date is not null
     group by
@@ -116,7 +116,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'discharge_date incorrectly populated'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'professional'
     and medical_claim.discharge_date is not null
     group by
@@ -143,7 +143,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'revenue_center_code incorrectly populated'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'professional'
     and medical_claim.revenue_center_code is not null
     group by
@@ -170,7 +170,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'institutional header-level fields incorrectly populated'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'professional'
     and (
         medical_claim.admit_type_code is not null
@@ -205,7 +205,7 @@ with medical_claim as (
     from medical_claim
          left join test_catalog
            on test_catalog.test_name = 'place_of_service_code incorrectly populated'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and medical_claim.place_of_service_code is not null
     group by

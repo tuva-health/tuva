@@ -14,7 +14,7 @@
 
 with pharmacy_header_duplicates as (
 
- {{ pharmacy_claim_header_duplicate_check(builtins.ref('pharmacy_claim'), pharmacy_header_column_list) }}
+ {{ pharmacy_claim_header_duplicate_check(builtins.ref('normalized_input__pharmacy_claim'), pharmacy_header_column_list) }}
 
 )
 
@@ -42,7 +42,7 @@ select
 from pharmacy_header_duplicates
      left join test_catalog
        on test_catalog.test_name = pharmacy_header_duplicates.column_checked||' non-unique'
-       and test_catalog.source_table = 'pharmacy_claim'
+       and test_catalog.source_table = 'normalized_input__pharmacy_claim'
 group by 
       pharmacy_header_duplicates.claim_id
     , test_catalog.source_table

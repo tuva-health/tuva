@@ -46,7 +46,7 @@
 
 with professional_header_duplicates as (
 
- {{ medical_claim_header_duplicate_check(builtins.ref('medical_claim'), professional_header_column_list, 'professional') }}
+ {{ medical_claim_header_duplicate_check(builtins.ref('normalized_input__medical_claim'), professional_header_column_list, 'professional') }}
 
 )
 
@@ -74,7 +74,7 @@ select
 from professional_header_duplicates
      left join test_catalog
        on test_catalog.test_name = professional_header_duplicates.column_checked||' non-unique'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
        and test_catalog.claim_type = 'professional'
 group by 
       professional_header_duplicates.claim_id

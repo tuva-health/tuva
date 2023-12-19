@@ -14,7 +14,7 @@ with professional_denominator as (
           cast('professional' as {{ dbt.type_string() }} ) as test_denominator_name
         , cast(count(distinct claim_id) as int) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
     where claim_type = 'professional'
 
 )
@@ -25,7 +25,7 @@ with professional_denominator as (
           cast('institutional' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct claim_id) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
     where claim_type = 'institutional'
 
 )
@@ -36,14 +36,14 @@ with professional_denominator as (
           cast('all' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct claim_id) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
     where claim_type is not null
 
 )
 
 , invalid_value_denominators as (
 
-    {{ denominator_invalid_values(builtins.ref('medical_claim'),'medical_claim') }}
+    {{ denominator_invalid_values(builtins.ref('normalized_input__medical_claim'),'normalized_input__medical_claim') }}
 
 )
 

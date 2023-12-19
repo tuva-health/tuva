@@ -8,7 +8,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('medical_claim') }}) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('revenue_center_code missing'
@@ -29,7 +29,7 @@ with use_case_stage as(
                     ,'claim_end_date missing'
                     ,'facility_npi missing'
                     )
-    and source_table = 'medical_claim'
+    and source_table = 'normalized_input__medical_claim'
     group by
         source_table
         , test_name
@@ -41,7 +41,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('revenue_center_code missing'
@@ -56,7 +56,7 @@ with use_case_stage as(
                     ,'patient_id missing'
                     ,'hcpcs_code missing'
                     )
-    and source_table = 'medical_claim'
+    and source_table = 'normalized_input__medical_claim'
     group by
         source_table
         , test_name
@@ -68,7 +68,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('diagnosis_code_1 missing'
@@ -91,7 +91,7 @@ with use_case_stage as(
                     ,'claim_end_date missing'
                     ,'facility_npi missing'
                     )
-    and source_table = 'medical_claim'
+    and source_table = 'normalized_input__medical_claim'
     group by
         source_table
         , test_name
@@ -103,7 +103,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
@@ -112,7 +112,7 @@ with use_case_stage as(
                     ,'claim_type missing'
 
                     )
-    and source_table = 'medical_claim'
+    and source_table = 'normalized_input__medical_claim'
     group by
         source_table
         , test_name
@@ -124,7 +124,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('pharmacy_claim') }} ) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__pharmacy_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
@@ -133,7 +133,7 @@ with use_case_stage as(
                     ,'claim_type missing'
                     ,'paid_amount missing'
                     )
-    and source_table = 'pharmacy_claim'
+    and source_table = 'normalized_input__pharmacy_claim'
     group by
         source_table
         , test_name
@@ -145,7 +145,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct patient_id) from {{ ref('eligibility') }} ) as denominator
+        , (select count(distinct patient_id) from {{ ref('normalized_input__eligibility') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('patient_id missing'
@@ -155,7 +155,7 @@ with use_case_stage as(
                     ,'payer missing'
                     ,'payer_type invalid'
                     )
-    and source_table = 'eligibility'
+    and source_table = 'normalized_input__eligibility'
     group by
         source_table
         , test_name
@@ -167,7 +167,7 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('medical_claim') }} ) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__medical_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('diagnosis_code_1 missing'
@@ -203,7 +203,7 @@ with use_case_stage as(
                     ,'claim_end_date missing'
                     ,'facility_npi missing'
                     )
-    and source_table = 'medical_claim'
+    and source_table = 'normalized_input__medical_claim'
     group by
         source_table
         , test_name
@@ -215,14 +215,14 @@ with use_case_stage as(
         , source_table
         , test_name
         , count(distinct foreign_key) as failures
-        , (select count(distinct claim_id) from {{ ref('pharmacy_claim') }} ) as denominator
+        , (select count(distinct claim_id) from {{ ref('normalized_input__pharmacy_claim') }} ) as denominator
     from {{ ref('data_quality__claims_preprocessing_test_detail')}}
     where 1=1
     and test_name in ('ndc_code missing'
                     ,'patient_id missing'
                     ,'paid_date missing'
                     )
-    and source_table = 'pharmacy_claim'
+    and source_table = 'normalized_input__pharmacy_claim'
     group by
         source_table
         , test_name

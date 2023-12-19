@@ -27,7 +27,7 @@
 
 with institutional_missing as (
 
- {{ medical_claim_missing_column_check(builtins.ref('medical_claim'), institutional_missing_column_list, 'institutional') }}
+ {{ medical_claim_missing_column_check(builtins.ref('normalized_input__medical_claim'), institutional_missing_column_list, 'institutional') }}
 
 )
 
@@ -54,7 +54,7 @@ select
 from institutional_missing
      left join test_catalog
        on test_catalog.test_name = institutional_missing.column_checked||' missing'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       institutional_missing.claim_id
     , test_catalog.source_table

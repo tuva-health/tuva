@@ -23,7 +23,7 @@ select
 from {{ ref('data_quality__claims_preprocessing_test_detail') }} det
 inner join {{ ref('data_quality__claims_preprocessing_medical_claim_denominators') }} denom
     on det.claim_type = denom.test_denominator_name
-where source_table = 'medical_claim'
+where source_table = 'normalized_input__medical_claim'
 and test_category <> 'invalid_values'
 group by
     source_table
@@ -49,7 +49,7 @@ select
 from {{ ref('data_quality__claims_preprocessing_test_detail') }} det
 inner join {{ ref('data_quality__claims_preprocessing_medical_claim_denominators') }} denom
     on det.test_name = denom.test_denominator_name
-where source_table = 'medical_claim'
+where source_table = 'normalized_input__medical_claim'
 and test_category = 'invalid_values'
 group by
     source_table

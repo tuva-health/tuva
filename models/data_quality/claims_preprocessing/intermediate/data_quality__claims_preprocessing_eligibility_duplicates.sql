@@ -13,7 +13,7 @@ with eligibility as (
         , enrollment_start_date
         , enrollment_end_date
         , data_source
-    from {{ ref('eligibility') }}
+    from {{ ref('normalized_input__eligibility') }}
 
 )
 
@@ -40,7 +40,7 @@ select distinct
 from eligibility
      left join test_catalog
        on test_catalog.test_name = 'duplicate eligibility'
-       and test_catalog.source_table = 'eligibility'
+       and test_catalog.source_table = 'normalized_input__eligibility'
 group by
       eligibility.patient_id
     , eligibility.member_id

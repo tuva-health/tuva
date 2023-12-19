@@ -6,7 +6,7 @@
 with medical_claim as (
 
     select *
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
 
 )
 
@@ -38,7 +38,7 @@ with medical_claim as (
            on medical_claim.bill_type_code = tob.bill_type_code
          left join test_catalog
            on test_catalog.test_name = 'bill_type_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and tob.bill_type_code is null
     and medical_claim.bill_type_code is not null
@@ -68,7 +68,7 @@ with medical_claim as (
            on medical_claim.revenue_center_code = rev.revenue_center_code
          left join test_catalog
            on test_catalog.test_name = 'revenue_center_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and rev.revenue_center_code is null
     and medical_claim.revenue_center_code is not null
@@ -98,7 +98,7 @@ with medical_claim as (
            on medical_claim.discharge_disposition_code = discharge.discharge_disposition_code
          left join test_catalog
            on test_catalog.test_name = 'discharge_disposition_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and discharge.discharge_disposition_code is null
     and medical_claim.discharge_disposition_code is not null
@@ -128,7 +128,7 @@ with medical_claim as (
            on medical_claim.admit_source_code = adsource.admit_source_code
          left join test_catalog
            on test_catalog.test_name = 'admit_source_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and adsource.admit_source_code is null
     and medical_claim.admit_source_code is not null
@@ -158,7 +158,7 @@ with medical_claim as (
            on medical_claim.admit_type_code = adtype.admit_type_code
          left join test_catalog
            on test_catalog.test_name = 'admit_type_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and adtype.admit_type_code is null
     and medical_claim.admit_type_code is not null
@@ -188,7 +188,7 @@ with medical_claim as (
            on medical_claim.ms_drg_code = msdrg.ms_drg_code
          left join test_catalog
            on test_catalog.test_name = 'ms_drg_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and msdrg.ms_drg_code is null
     and medical_claim.ms_drg_code is not null
@@ -219,7 +219,7 @@ with medical_claim as (
            and severity = '1'
          left join test_catalog
            on test_catalog.test_name = 'apr_drg_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and aprdrg.apr_drg_code is null
     and medical_claim.apr_drg_code is not null
@@ -249,7 +249,7 @@ with medical_claim as (
            on medical_claim.diagnosis_poa_1 = poa.present_on_admit_code
          left join test_catalog
            on test_catalog.test_name = 'diagnosis_poa_1 invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where medical_claim.claim_type = 'institutional'
     and poa.present_on_admit_code is null
     and medical_claim.diagnosis_poa_1 is not null
@@ -279,7 +279,7 @@ with medical_claim as (
            on medical_claim.procedure_code_type = codetype.code_type
          left join test_catalog
            on test_catalog.test_name = 'procedure_code_type invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where claim_type = 'institutional'
     and codetype.code_type is null
     and medical_claim.procedure_code_type is not null
@@ -309,7 +309,7 @@ with medical_claim as (
            on medical_claim.place_of_service_code = pos.place_of_service_code
          left join test_catalog
            on test_catalog.test_name = 'place_of_service_code invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where claim_type = 'professional'
     and pos.place_of_service_code is null
     and medical_claim.place_of_service_code is not null
@@ -339,7 +339,7 @@ with medical_claim as (
            on medical_claim.diagnosis_code_type = codetype.code_type
          left join test_catalog
            on test_catalog.test_name = 'diagnosis_code_type invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where codetype.code_type is null
     and medical_claim.diagnosis_code_type is not null
     group by
@@ -368,7 +368,7 @@ with medical_claim as (
            on medical_claim.diagnosis_code_1 = icd.icd_10_cm
          left join test_catalog
            on test_catalog.test_name = 'diagnosis_code_1 invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where diagnosis_code_type = 'icd-10-cm'
     and icd.icd_10_cm is null
     and medical_claim.diagnosis_code_1 is not null
@@ -398,7 +398,7 @@ with medical_claim as (
            on medical_claim.claim_type = claimtype.claim_type
          left join test_catalog
            on test_catalog.test_name = 'claim_type invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where claimtype.claim_type is null
     and medical_claim.claim_type is not null
     group by

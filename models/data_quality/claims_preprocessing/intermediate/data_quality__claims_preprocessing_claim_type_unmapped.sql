@@ -8,7 +8,7 @@ with medical_claim as (
     select
           claim_id
         , claim_type
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
 
 )
 
@@ -35,7 +35,7 @@ select
 from medical_claim
      left join test_catalog
        on test_catalog.test_name = 'claim_type missing'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
 where medical_claim.claim_type is null
 group by
       medical_claim.claim_id

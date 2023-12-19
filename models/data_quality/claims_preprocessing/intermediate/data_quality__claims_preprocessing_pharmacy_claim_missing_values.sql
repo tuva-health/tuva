@@ -25,7 +25,7 @@
 
 with pharmacy_claim_missing as (
 
- {{ pharmacy_claim_missing_column_check(builtins.ref('pharmacy_claim'), pharmacy_claim_missing_column_list) }}
+ {{ pharmacy_claim_missing_column_check(builtins.ref('normalized_input__pharmacy_claim'), pharmacy_claim_missing_column_list) }}
 
 )
 
@@ -52,7 +52,7 @@ select
 from pharmacy_claim_missing
      left join test_catalog
        on test_catalog.test_name = pharmacy_claim_missing.column_checked||' missing'
-       and test_catalog.source_table = 'pharmacy_claim'
+       and test_catalog.source_table = 'normalized_input__pharmacy_claim'
 group by
       pharmacy_claim_missing.claim_id
     , test_catalog.source_table

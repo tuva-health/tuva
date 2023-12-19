@@ -6,7 +6,7 @@
 with medical_claim as (
 
     select *
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
 
 )
 
@@ -38,7 +38,7 @@ with medical_claim as (
            on medical_claim.billing_npi = pro.npi
          left join test_catalog
            on test_catalog.test_name = 'billing_npi invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where pro.npi is null
     and medical_claim.billing_npi is not null
     group by
@@ -67,7 +67,7 @@ with medical_claim as (
            on medical_claim.facility_npi = pro.npi
          left join test_catalog
            on test_catalog.test_name = 'facility_npi invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where pro.npi is null
     and medical_claim.facility_npi is not null
     group by
@@ -96,7 +96,7 @@ with medical_claim as (
            on medical_claim.rendering_npi = pro.npi
          left join test_catalog
            on test_catalog.test_name = 'rendering_npi invalid'
-           and test_catalog.source_table = 'medical_claim'
+           and test_catalog.source_table = 'normalized_input__medical_claim'
     where pro.npi is null
     and medical_claim.rendering_npi is not null
     group by

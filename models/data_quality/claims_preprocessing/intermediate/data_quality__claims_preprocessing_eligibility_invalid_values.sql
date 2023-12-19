@@ -6,7 +6,7 @@
 with eligiblity as (
 
     select *
-    from {{ ref('eligibility') }}
+    from {{ ref('normalized_input__eligibility') }}
 
 )
 
@@ -39,7 +39,7 @@ with eligiblity as (
            on eligiblity.gender = gender.gender
          left join test_catalog
            on test_catalog.test_name = 'gender invalid'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where gender.gender is null
     and eligiblity.gender is not null
     group by
@@ -70,7 +70,7 @@ with eligiblity as (
            on eligiblity.race = race.description
          left join test_catalog
            on test_catalog.test_name = 'race invalid'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where race.description is null
     and eligiblity.race is not null
     group by
@@ -101,7 +101,7 @@ with eligiblity as (
            on eligiblity.payer_type = payer.payer_type
          left join test_catalog
            on test_catalog.test_name = 'payer_type invalid'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where payer.payer_type is null
     and eligiblity.payer_type is not null
     group by
@@ -132,7 +132,7 @@ with eligiblity as (
            on eligiblity.original_reason_entitlement_code = orec.original_reason_entitlement_code
          left join test_catalog
            on test_catalog.test_name = 'original_reason_entitlement_code invalid'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where orec.original_reason_entitlement_code is null
     and eligiblity.original_reason_entitlement_code is not null
     group by
@@ -163,7 +163,7 @@ with eligiblity as (
            on eligiblity.dual_status_code = dual.dual_status_code
          left join test_catalog
            on test_catalog.test_name = 'dual_status_code invalid'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where dual.dual_status_code is null
     and eligiblity.dual_status_code is not null
     group by
@@ -194,7 +194,7 @@ with eligiblity as (
            on eligiblity.medicare_status_code = status.medicare_status_code
          left join test_catalog
            on test_catalog.test_name = 'medicare_status_code invalid'
-           and test_catalog.source_table = 'eligibility'
+           and test_catalog.source_table = 'normalized_input__eligibility'
     where status.medicare_status_code is null
     and eligiblity.medicare_status_code is not null
     group by

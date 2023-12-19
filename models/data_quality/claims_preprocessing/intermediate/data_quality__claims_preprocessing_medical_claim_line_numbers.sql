@@ -8,7 +8,7 @@ with medical_claim as (
     select
           claim_id
         , claim_line_number
-    from {{ ref('medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
 
 )
 
@@ -62,7 +62,7 @@ select
 from line_num_check
      left join test_catalog
        on test_catalog.test_name = 'claim_line_number non-sequential'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       line_num_check.claim_id
     , test_catalog.source_table

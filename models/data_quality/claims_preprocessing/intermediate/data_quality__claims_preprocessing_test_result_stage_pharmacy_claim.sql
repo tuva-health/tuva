@@ -8,7 +8,7 @@ with pharmacy_claim_denominator as(
     cast('all' as {{ dbt.type_string() }} ) as claim_type
     , cast(count(distinct claim_id) as int) as count
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_string() }} ) as tuva_last_run
-  from {{ ref('pharmacy_claim') }}
+  from {{ ref('normalized_input__pharmacy_claim') }}
 )
 
 , distinct_patient_per_category as(
@@ -21,7 +21,7 @@ with pharmacy_claim_denominator as(
         , pipeline_test
         , count(distinct foreign_key) as failures
     from {{ ref('data_quality__claims_preprocessing_test_detail') }}
-    where source_table = 'pharmacy_claim'
+    where source_table = 'normalized_input__pharmacy_claim'
     group by
         source_table
         , grain

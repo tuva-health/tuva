@@ -130,7 +130,7 @@
 
 with institutional_header_duplicates as (
 
- {{ medical_claim_header_duplicate_check(builtins.ref('medical_claim'), institutional_header_column_list, 'institutional') }}
+ {{ medical_claim_header_duplicate_check(builtins.ref('normalized_input__medical_claim'), institutional_header_column_list, 'institutional') }}
 
 )
 
@@ -158,7 +158,7 @@ select
 from institutional_header_duplicates
      left join test_catalog
        on test_catalog.test_name = institutional_header_duplicates.column_checked||' non-unique'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
        and test_catalog.claim_type = 'institutional'
 group by 
       institutional_header_duplicates.claim_id

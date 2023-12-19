@@ -25,7 +25,7 @@
 
 with professional_missing as (
 
- {{ medical_claim_missing_column_check(builtins.ref('medical_claim'), professional_missing_column_list, 'professional') }}
+ {{ medical_claim_missing_column_check(builtins.ref('normalized_input__medical_claim'), professional_missing_column_list, 'professional') }}
 
 )
 
@@ -52,7 +52,7 @@ select
 from professional_missing
      left join test_catalog
        on test_catalog.test_name = professional_missing.column_checked||' missing'
-       and test_catalog.source_table = 'medical_claim'
+       and test_catalog.source_table = 'normalized_input__medical_claim'
 group by
       professional_missing.claim_id
     , test_catalog.source_table

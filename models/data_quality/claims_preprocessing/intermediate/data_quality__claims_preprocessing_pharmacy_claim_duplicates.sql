@@ -23,10 +23,10 @@ select distinct
     , test_catalog.test_name
     , test_catalog.pipeline_test
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('pharmacy_claim') }}
+from {{ ref('normalized_input__pharmacy_claim') }}
      left join test_catalog
        on test_catalog.test_name = 'duplicate pharmacy claims'
-       and test_catalog.source_table = 'pharmacy_claim'
+       and test_catalog.source_table = 'normalized_input__pharmacy_claim'
 group by
       claim_id
     , claim_line_number

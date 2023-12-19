@@ -14,13 +14,13 @@ with all_denominator as (
         cast('all' as {{ dbt.type_string() }} ) as test_denominator_name
         , count(distinct patient_id) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('eligibility') }}
+    from {{ ref('normalized_input__eligibility') }}
 
 )
 
 , invalid_value_denominators as (
 
-    {{ denominator_invalid_values(builtins.ref('eligibility'),'eligibility') }}
+    {{ denominator_invalid_values(builtins.ref('normalized_input__eligibility'),'normalized_input__eligibility') }}
 
 )
 
