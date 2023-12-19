@@ -1,31 +1,26 @@
 {#
-    Required variable input: relation
+    Required variable input: relation and source_table
 
     The first step of this macro is to query the test catalog to retrieve
-    the test_field for all invalid_value tests for eligibility.
+    the test_field for all invalid_value tests for the source table.
 
     The second step uses the get_query_results_as_dict from dbt_utils to take
     the results of that query and create a dictionary.
 
     The last step is to loop through the dictionary and generate the SQL
     statements for the CTE that builds the denominators for invalid value tests.
-
-    Note: an "if" statement has been included in the logic, due to how the
-    snowflake adapter stores column names.
 #}
 
-{% macro eligibility_denominator_invalid_values(relation) %}
+{% macro denominator_invalid_values(relation,source_table) %}
 
 {%- set sql_statement -%}
-    select test_field
+    select test_field as TEST_FIELD
     from {{ ref('data_quality__test_catalog') }}
-    where source_table = 'eligibility'
+    where source_table = '{{ source_table }}'
     and test_category = 'invalid_values'
 {%- endset -%}
 
 {%- set dict = dbt_utils.get_query_results_as_dict(sql_statement) -%}
-
-{%- if target.type in ("snowflake") -%}
 
     {%- for test_field in dict['TEST_FIELD'] -%}
     select
@@ -35,7 +30,7 @@
     from {{ relation }} as rel
          left join {{ ref('data_quality__test_catalog') }} as cat
            on cat.test_category = 'invalid_values'
-           and cat.source_table = 'eligibility'
+           and cat.source_table = '{{ source_table }}'
            and cat.test_field = '{{ test_field }}'
     where rel.{{ test_field }} is not null
     group by cat.test_name
@@ -43,26 +38,5 @@
     union all
     {% endif -%}
     {%- endfor -%}
-
-{%- else -%}
-
-    {%- for test_field in dict['test_field'] -%}
-    select
-          cat.test_name
-        , count(distinct rel.patient_id) as denominator
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ relation }} as rel
-         left join {{ ref('data_quality__test_catalog') }} as cat
-           on cat.test_category = 'invalid_values'
-           and cat.source_table = 'eligibility'
-           and cat.test_field = '{{ test_field }}'
-    where rel.{{ test_field }} is not null
-    group by cat.test_name
-    {% if not loop.last -%}
-    union all
-    {% endif -%}
-    {%- endfor -%}
-
-{%- endif -%}
 
 {% endmacro %}

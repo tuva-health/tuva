@@ -43,7 +43,7 @@ with professional_denominator as (
 
 , invalid_value_denominators as (
 
-    {{ medical_claim_denominator_invalid_values(builtins.ref('medical_claim')) }}
+    {{ denominator_invalid_values(builtins.ref('medical_claim'),'medical_claim') }}
 
 )
 

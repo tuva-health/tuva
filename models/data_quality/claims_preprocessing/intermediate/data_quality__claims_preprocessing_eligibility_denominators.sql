@@ -20,7 +20,7 @@ with all_denominator as (
 
 , invalid_value_denominators as (
 
-    {{ eligibility_denominator_invalid_values(builtins.ref('eligibility')) }}
+    {{ denominator_invalid_values(builtins.ref('eligibility'),'eligibility') }}
 
 )
 
