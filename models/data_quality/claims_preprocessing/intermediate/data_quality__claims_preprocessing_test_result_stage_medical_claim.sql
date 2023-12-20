@@ -17,7 +17,7 @@ select
     , test_name
     , claim_type
     , pipeline_test
-    , count(distinct foreign_key,data_source) as failures
+    , count(distinct foreign_key||data_source) as failures
     , denom.denominator
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__claims_preprocessing_test_detail') }} det
@@ -43,7 +43,7 @@ select
     , test_name
     , claim_type
     , pipeline_test
-    , count(distinct foreign_key,data_source) as failures
+    , count(distinct foreign_key||data_source) as failures
     , denom.denominator
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__claims_preprocessing_test_detail') }} det

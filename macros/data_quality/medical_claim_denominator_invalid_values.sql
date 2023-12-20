@@ -29,7 +29,7 @@
     {%- for test_field in results_list -%}
     select
           cat.test_name
-        , count(distinct rel.claim_id,rel.data_source) as denominator
+        , count(distinct rel.claim_id||rel.data_source) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ relation }} as rel
          left join {{ ref('data_quality__test_catalog') }} as cat

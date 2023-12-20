@@ -12,7 +12,7 @@ with professional_denominator as (
 
     select
           cast('professional' as {{ dbt.type_string() }} ) as test_denominator_name
-        , cast(count(distinct claim_id, data_source) as int) as denominator
+        , cast(count(distinct claim_id||data_source) as int) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ ref('normalized_input__medical_claim') }}
     where claim_type = 'professional'
@@ -23,7 +23,7 @@ with professional_denominator as (
 
     select
           cast('institutional' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct claim_id, data_source) as denominator
+        , count(distinct claim_id||data_source) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ ref('normalized_input__medical_claim') }}
     where claim_type = 'institutional'
@@ -34,7 +34,7 @@ with professional_denominator as (
 
     select
           cast('all' as {{ dbt.type_string() }} ) as test_denominator_name
-        , count(distinct claim_id, data_source) as denominator
+        , count(distinct claim_id||data_source) as denominator
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ ref('normalized_input__medical_claim') }}
     where claim_type is not null
