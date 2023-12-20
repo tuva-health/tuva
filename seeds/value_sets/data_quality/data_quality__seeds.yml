@@ -1,0 +1,24 @@
+version: 2
+
+seeds:
+  - name: data_quality__test_catalog
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality{% else %}data_quality{%- endif -%}
+      alias: _value_set_test_catalog
+      tags:
+        - data_quality
+        - claims_preprocessing
+      enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        source_table : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        test_category : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        test_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        test_field: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        claim_type : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        pipeline_test: integer
