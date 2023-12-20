@@ -12,7 +12,7 @@ with source as(
     select
         data_source
         , count(distinct claim_id) as distinct_claim_count
-    from {{ ref('header_validation__medical_claim') }}
+    from {{ ref('normalized_input__medical_claim') }}
     group by
         data_source
 
