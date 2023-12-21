@@ -6,6 +6,7 @@
 
 select distinct
   med.claim_id
+  , med.claim_line_number
   , med.claim_type
   , med.data_source
   , cal_claim_start.full_date as normalized_claim_start_date

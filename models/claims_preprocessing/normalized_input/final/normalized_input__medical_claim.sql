@@ -163,6 +163,7 @@ left join {{ref('normalized_input__int_bill_type_final') }} bill
     and med.data_source = bill.data_source
 left join {{ref('normalized_input__int_medical_claim_date_normalize') }} claim_line_dates
     on med.claim_id = claim_line_dates.claim_id
+    and med.claim_line_number = claim_line_dates.claim_line_number
     and med.data_source = claim_line_dates.data_source
 left join {{ref('normalized_input__int_medical_date_aggregation') }} dates
     on med.claim_id = dates.claim_id
