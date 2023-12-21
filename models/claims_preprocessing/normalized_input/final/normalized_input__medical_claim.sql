@@ -1,3 +1,9 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
+
+
 select
 	cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
 	, cast(med.claim_line_number as int ) as claim_line_number
