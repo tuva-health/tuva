@@ -142,7 +142,7 @@ select
 	, cast(coalesce(px_date.procedure_date_25, undetermined.procedure_date_25) as date ) as procedure_date_25
 	, cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_string() }} ) as tuva_last_run
-from {{ ref('medical_claim') }} med
+from {{ ref('normalized_input__stg_medical_claim') }} med
 left join {{ref('normalized_input__int_admit_source_final') }} ad_source
     on med.claim_id = ad_source.claim_id
     and med.data_source = ad_source.data_source
