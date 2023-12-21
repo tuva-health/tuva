@@ -1,3 +1,9 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
+
+
 select
     cast(elig.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(elig.member_id as {{ dbt.type_string() }} ) as member_id

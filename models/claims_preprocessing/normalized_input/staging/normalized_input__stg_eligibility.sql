@@ -1,3 +1,9 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+   )
+}}
+
+
 select
       patient_id
     , patient_id||data_source||payer||plan||enrollment_start_date||enrollment_end_date as patient_id_key
