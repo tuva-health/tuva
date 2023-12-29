@@ -229,7 +229,6 @@ with medical_claim as (
     from medical_claim
          left join {{ ref('terminology__apr_drg') }} aprdrg
            on medical_claim.apr_drg_code = aprdrg.apr_drg_code
-           and severity = '1'
          left join test_catalog
            on test_catalog.test_name = 'apr_drg_code invalid'
            and test_catalog.source_table = 'normalized_input__medical_claim'
