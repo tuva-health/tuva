@@ -11,14 +11,14 @@
 --     loa (0 or 1 flag, indicates if the rev code is a 'leave of absence' code)
 --     behavioral (0 or 1 flag, indicates if the rev code is a 'behavioral' code)
 
--- This model has one row per rev code present in the input layer 'medical_claim'
+-- This model has one row per rev code present in the core.medical_claim
 -- table that is between '0100' and '0219' or between '1000' and '1002'
 -- (those are the ranges of rev codes that are considered 'Room & Board' codes,
 --  but note that there may be codes in that range that are not in terminology,
 --  so they are therefore invalid codes, which is why we have a valid_rev_code
 --  flag)
 
--- Note that we may multiple room and board rev codes per claim_id.
+-- Note that we may have multiple room and board rev codes per claim_id.
 
 
 

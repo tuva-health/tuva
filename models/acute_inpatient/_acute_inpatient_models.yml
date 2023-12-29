@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: all_line_level_room_and_board_rev_codes
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: bill
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: drg
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: rb_claims
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: types_of_room_and_board_rev_codes_on_claims
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: distinct_room_and_board_rev_codes_per_claim
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: aip_venn_diagram
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: aip_venn_diagram_summary
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
+
+  - name: acute_inpatient_institutional_claims
+    config:
+      schema: acute_inpatient
+      materialized: table
+      tags: aip_mart
