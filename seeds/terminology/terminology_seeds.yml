@@ -43,6 +43,7 @@ seeds:
       tags:
         - terminology
         - data_profiling
+        - aip_mart
       column_types:
         bill_type_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -465,6 +466,7 @@ seeds:
         - readmissions
         - data_profiling
         - claims_preprocessing
+        - aip_mart
       column_types:
         ms_drg_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -602,6 +604,7 @@ seeds:
         - terminology
         - claims_preprocessing
         - data_profiling
+        - aip_mart
       column_types:
         revenue_center_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -615,6 +618,7 @@ seeds:
       tags:
         - terminology
         - data_profiling
+        - aip_mart
       column_types:
         apr_drg_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
