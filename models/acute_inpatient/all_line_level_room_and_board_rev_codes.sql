@@ -1,24 +1,31 @@
 
 
-
--- This dbt model has these columns:
---     claim_id
---     revenue_center_code
---     valid_rev_code (0 or 1 flag, indicates if the code is from terminology)
---     revenue_center_description
---     basic (0 or 1 flag, indicates if the rev code is a 'basic' code)
---     hospice (0 or 1 flag, indicates if the rev code is a 'hospice' code)
---     loa (0 or 1 flag, indicates if the rev code is a 'leave of absence' code)
---     behavioral (0 or 1 flag, indicates if the rev code is a 'behavioral' code)
+--This dbt model lists all claim lines with a room & board rev code. It has these columns:
+--   claim_id
+--   revenue_center_code
+--   valid_rev_code (0 or 1 flag, indicates if the code is from the latest version of terminology)
+--   revenue_center_description
+--   basic (0 or 1 flag, indicates if the rev code is a 'basic' code)
+--   hospice (0 or 1 flag, indicates if the rev code is a 'hospice' code)
+--   loa (0 or 1 flag, indicates if the rev code is a 'leave of absence' code)
+--   behavioral (0 or 1 flag, indicates if the rev code is a 'behavioral' code)
 
 -- This model has one row per rev code present in the core.medical_claim
 -- table that is between '0100' and '0219' or between '1000' and '1002'
--- (those are the ranges of rev codes that are considered 'Room & Board' codes,
---  but note that there may be codes in that range that are not in terminology,
---  so they are therefore invalid codes, which is why we have a valid_rev_code
---  flag)
+-- (those are the ranges of rev codes that are considered 'Room & Board'
+-- codes, but note that there may be codes in that range that are not in
+-- the latest version of terminology, so they are therefore "invalid
+-- codes", which is why we have a valid_rev_code flag)
 
--- Note that we may have multiple room and board rev codes per claim_id.
+-- Note that we may have multiple room and board rev codes per claim_id,
+-- and each rev code is a separate row on this table.
+
+-- Note that all revenue center codes that are between '0100' and '0219'
+-- or between '1000' and '1002' must fall into one of these 4 categories:
+-- 'basic', 'hospice', 'leave of absence', 'behavioral', as can be seen
+-- on the list shown here.  In the Tuva Project we currently say that
+-- claim meets the "room & board" requirement if and only if it has at
+-- least one 'basic' room & board code.
 
 
 

@@ -8,12 +8,12 @@ vars:
 
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
-  test_data_override: false
+  test_data_override: true
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva_project_demo
-  input_schema: tuva_synthetic
+  input_database: tuva
+  input_schema: input_layer
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
@@ -65,12 +65,6 @@ dispatch:
     search_order: ['integration_tests','the_tuva_project']
 
 
-models:
-  integration_tests:
-    +database: dev_coco
-  the_tuva_project:
-    +database: dev_coco
-
 seeds:
   integration_tests:
     eligibility_seed:
@@ -79,5 +73,3 @@ seeds:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','medical_claim.csv',headers=true) }}"
     pharmacy_claim_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"
-  the_tuva_project:
-    +database: dev_coco

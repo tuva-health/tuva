@@ -1,27 +1,27 @@
 
--- This dbt model has these columns:
---     claim_id
---     rb (0 or 1 flag, indicates if the claim meets the room & board requirement:
---                      at least one Room & Board rev code)
---     drg (0 or 1 flag, indicates if the claim meets the DRG requirement:
---                       has at least one valid MD-DRG or APR-DRG)
---     bill (0 or 1 flag, indicates if the claim meets the bill type requirement:
---                        has at least one bill type starting with '11' or '12')
---     rb_drg (0 or 1 flag, indicates if the claim meets both the room & board and
---                          the DRG requirements)
---     rb_bill (0 or 1 flag, indicates if the claim meets both the room & board and
---                           the bill type requirement)
---     drg_bill (0 or 1 flag, indicates if the claim meets both the DRG and the
---                            bill type requirements)
---     rb_drg_bill (0 or 1 flag, indicates if the claim meets the room & board,
---                               the DRG, and the bill type requirements)
+-- This dbt model lists all claims that meet at least one of the 3
+-- requirements that may be used to classify a claim as an acute
+-- inpatient claim (the DRG requirement, the bill type requirement, and
+-- the room & board requirement). That is, this dbt model lists the union
+-- of all distinct claims that are in one of these 3 previous models:
+-- 'bill', 'drg', 'rb_claims'. For each claim, there are flags that
+-- indicate what requirements that claim meets.
+-- It has these columns:
+--   rb (0 or 1 flag, indicates if the claim meets the
+--       room & board requirement: at least one Room & Board rev code)
+--   drg (0 or 1 flag, indicates if the claim meets the DRG
+--        requirement: has at least one valid MD-DRG or APR-DRG)
+--   bill (0 or 1 flag, indicates if the claim meets the bill type
+--         requirement: has at least one bill type starting with '11' or '12')
+--   rb_drg (0 or 1 flag, indicates if the claim meets both the room & board
+--           and the DRG requirements)
+--   rb_bill (0 or 1 flag, indicates if the claim meets both the room & board
+--            and the bill type requirement)
+--   drg_bill (0 or 1 flag, indicates if the claim meets both the DRG and
+--             the bill type requirements)
+--   rb_drg_bill (0 or 1 flag, indicates if the claim meets the room & board,
+--                the DRG, and the bill type requirements)
 
-
--- This dbt model has one row for each unique claim_id in the core.medical_claim
--- table that meets at least one of the 3 requirements:
---          The Room & Board Requirement
---          The DRG Requirement
---          The Bill Type Requirement
 
 
 with rb as (

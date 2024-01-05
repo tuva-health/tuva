@@ -1,8 +1,11 @@
 
--- This dbt model has one column:
---     claim_id
 
--- There is one row per distinct claim_id from the core.medical_claim table
+-- This dbt model lists all claims with an inpatient bill type.
+-- It has these columns:
+--    claim_id
+
+-- There is one row per distinct claim_id from
+-- the core.medical_claim table
 -- that has at least one bill_type_code
 -- that starts with '11' or '12'.
 

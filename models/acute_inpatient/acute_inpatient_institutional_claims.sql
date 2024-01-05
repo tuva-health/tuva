@@ -1,7 +1,88 @@
 
+-- This dbt model lists all acute inpatient institutional claims together
+-- with relevant fields and data quality flags for those claims. In this
+-- model we define the logic for what constitutes an acute inpatient
+-- institutional claim by pulling all claim_ids from the
+-- 'aip_venn_diagram' model that meet the logic we have chosen (e.g. all
+-- claims from the 'aip_venn_diagram' model with flag rb_drg_bill = 1).
+
+-- By default this model is written so that an acute inpatient
+-- institutional claim is one that meets the 3 requirements (DRG
+-- requirement, bill type requirement, and room & board requirement),
+-- i.e. a claim that has rb_drg_bill = 1 in the 'aip_venn_diagram'
+-- model. This logic can be modified inside this model if, for example,
+-- we are missing a key field in the data source.
+
+-- This dbt model has these columns:
+--     claim_id
+--     patient_id
+--     claim_start_date
+--     claim_end_date
+--     admission_date
+--     discharge_date
+--     admit_source_code
+--     admit_type_code
+--     discharge_disposition_code
+--     facility_npi
+--     claim_type
+--     ms_drg_code
+--     apr_drg_code
+--     rendering_npi,
+--     diagnosis_code_1
+--     start_date
+--     end_date
+--     date_used_as_start_date
+--     date_used_as_end_date
+--     patient_id_missing,
+--     claim_start_date_missing
+--     claim_end_date_missing
+--     claim_start_date_after_claim_end_date
+--     admission_date_missing
+--     discharge_date_missing
+--     admission_date_after_discharge_date
+--     admit_type_code_missing,
+--     admit_source_code_missing,
+--     discharge_disposition_code_missing
+--     facility_npi_missing
+--     claim_type_missing
+--     claim_type_not_institutional
+--     ms_drg_code_missing
+--     apr_drg_code_missing
+--     diagnosis_code_1_missing
+--     rendering_npi_missing
 
 
-with rb_drg_bill_claim_lines as (
+
+
+
+
+-- Relevant fields for each claim_id (at the claim_id grain):
+with medical_claims_relevant_fields as (
+select
+  claim_id,
+  max(patient_id) as patient_id,
+  max(claim_start_date) as claim_start_date,
+  max(claim_end_date) as claim_end_date,
+  max(admission_date) as admission_date,
+  max(discharge_date) as discharge_date,
+  max(admit_source_code) as admit_source_code,
+  max(admit_type_code) as admit_type_code,
+  max(discharge_disposition_code) as discharge_disposition_code,
+  max(facility_npi) as facility_npi,
+  max(claim_type) as claim_type,
+  max(ms_drg_code) as ms_drg_code,
+  max(apr_drg_code) as apr_drg_code,
+  max(rendering_npi) as rendering_npi
+
+from {{ ref('core__medical_claim') }} aa
+
+group by claim_id
+),
+
+
+-- Grab only acute inpatient institutional claims
+-- by left joining with relevant rows of 'aip_venn_diagram'.
+aip_inst_claims as (
 select
   aa.claim_id,
   bb.patient_id,
@@ -16,360 +97,205 @@ select
   bb.claim_type,
   bb.ms_drg_code,
   bb.apr_drg_code,
-  cc.normalized_code as diagnosis_code_1,
   bb.rendering_npi
 
 from {{ ref('aip_venn_diagram') }} aa
 
-left join {{ ref('core__medical_claim') }} bb
+left join medical_claims_relevant_fields bb 
 on aa.claim_id = bb.claim_id
-
-left join {{ ref('core__condition') }} cc
-on aa.claim_id = cc.claim_id
 
 -- ********************************************************************
 -- Here we define the logic for what part of the Venn Diagram
 -- determines which claims are tagged as institutional acute IP claims:
 -- ********************************************************************
 where aa.rb_drg_bill = 1
-and cc.condition_rank = 1
---where aa.drg = 1
 ),
 
 
-rb_drg_bill_data_quality_flags as (
+
+-- Grab primary diagnosis code from the 'core.condition' table:
+add_primary_dx as (
 select
-  claim_id,
--- patient_id_not_unique:
-  case
-    when count(distinct patient_id) > 1 then 1
-    else 0
-  end as patient_id_not_unique,
--- patient_id_missing:  
-  case
-    when max(patient_id) is null then 1
-    else 0
-  end as patient_id_missing,  
--- claim_start_date_not_unique:
-  case
-    when count(distinct claim_start_date) > 1 then 1
-    else 0
-  end as claim_start_date_not_unique,
--- claim_start_date_missing:  
-  case
-    when max(claim_start_date) is null then 1
-    else 0
-  end as claim_start_date_missing,
--- claim_end_date_not_unique:
-  case
-    when count(distinct claim_end_date) > 1 then 1
-    else 0
-  end as claim_end_date_not_unique,
--- claim_end_date_missing:  
-  case
-    when max(claim_end_date) is null then 1
-    else 0
-  end as claim_end_date_missing,
--- claim_start_date_after_claim_end_date:
-  case
-    when min(claim_start_date) > max(claim_end_date) then 1
-    else 0
-  end as claim_start_date_after_claim_end_date,
--- admission_date_not_unique:
-  case
-    when count(distinct admission_date) > 1 then 1
-    else 0
-  end as admission_date_not_unique,
--- admission_date_missing:  
-  case
-    when max(admission_date) is null then 1
-    else 0
-  end as admission_date_missing,
--- discharge_date_not_unique:
-  case
-    when count(distinct discharge_date) > 1 then 1
-    else 0
-  end as discharge_date_not_unique,
--- discharge_date_missing:  
-  case
-    when max(discharge_date) is null then 1
-    else 0
-  end as discharge_date_missing,
--- admission_date_after_discharge_date:
-  case
-    when min(admission_date) > max(discharge_date) then 1
-    else 0
-  end as admission_date_after_discharge_date,
--- admit_type_code_not_unique:
-  case
-    when count(distinct admit_type_code) > 1 then 1
-    else 0
-  end as admit_type_code_not_unique,
--- admit_type_code_missing:  
-  case
-    when max(admit_type_code) is null then 1
-    else 0
-  end as admit_type_code_missing,  
--- admit_source_code_not_unique:
-  case
-    when count(distinct admit_source_code) > 1 then 1
-    else 0
-  end as admit_source_code_not_unique,
--- admit_source_code_missing:  
-  case
-    when max(admit_source_code) is null then 1
-    else 0
-  end as admit_source_code_missing,  
--- discharge_disposition_code_not_unique:
-  case
-    when count(distinct discharge_disposition_code) > 1 then 1
-    else 0
-  end as discharge_disposition_code_not_unique,
--- discharge_disposition_code_missing:  
-  case
-    when max(discharge_disposition_code) is null then 1
-    else 0
-  end as discharge_disposition_code_missing,
--- facility_npi_not_unique:
-  case
-    when count(distinct facility_npi) > 1 then 1
-    else 0
-  end as facility_npi_not_unique,
--- facility_npi_missing:  
-  case
-    when max(facility_npi) is null then 1
-    else 0
-  end as facility_npi_missing,
--- claim_type_not_unique:
-  case
-    when count(distinct claim_type) > 1 then 1
-    else 0
-  end as claim_type_not_unique,
--- claim_type_missing:  
-  case
-    when max(claim_type) is null then 1
-    else 0
-  end as claim_type_missing,
--- claim_type_not_institutional:
-  case
-    when max(claim_type) <> 'institutional'
-     or  min(claim_type) <> 'institutional' then 1
-    else 0
-  end as claim_type_not_institutional,
--- ms_drg_code_not_unique:
-  case
-    when count(distinct ms_drg_code) > 1 then 1
-    else 0
-  end as ms_drg_code_not_unique,
--- ms_drg_code_missing:  
-  case
-    when max(ms_drg_code) is null then 1
-    else 0
-  end as ms_drg_code_missing,
--- apr_drg_code_not_unique:
-  case
-    when count(distinct apr_drg_code) > 1 then 1
-    else 0
-  end as apr_drg_code_not_unique,
--- apr_drg_code_missing:  
-  case
-    when max(apr_drg_code) is null then 1
-    else 0
-  end as apr_drg_code_missing,
--- diagnosis_code_1_not_unique:
-  case
-    when count(distinct diagnosis_code_1) > 1 then 1
-    else 0
-  end as diagnosis_code_1_not_unique,
--- diagnosis_code_1_missing:  
-  case
-    when max(diagnosis_code_1) is null then 1
-    else 0
-  end as diagnosis_code_1_missing,
+  aa.claim_id,
+  aa.patient_id,
+  aa.claim_start_date,
+  aa.claim_end_date,
+  aa.admission_date,
+  aa.discharge_date,
+  aa.admit_source_code,
+  aa.admit_type_code,
+  aa.discharge_disposition_code,
+  aa.facility_npi,
+  aa.claim_type,
+  aa.ms_drg_code,
+  aa.apr_drg_code,
+  aa.rendering_npi,
+  bb.normalized_code as diagnosis_code_1
 
--- rendering_npi_not_unique:
-  case
-    when count(distinct rendering_npi) > 1 then 1
-    else 0
-  end as rendering_npi_not_unique,
--- rendering_npi_missing:  
-  case
-    when max(rendering_npi) is null then 1
-    else 0
-  end as rendering_npi_missing
-
-from rb_drg_bill_claim_lines
-group by claim_id
+from aip_inst_claims aa 
+left join {{ ref('core__condition') }} bb
+on aa.claim_id = bb.claim_id
+where bb.condition_rank = 1
 ),
 
 
-rb_drg_bill_header_level_values as (
+-- Define start and end dates for each claim:
+add_start_and_end_dates as (
 select
   claim_id,
-  max(patient_id) as patient_id,
-  min(claim_start_date) as claim_start_date,
-  max(claim_end_date) as claim_end_date,
-  min(admission_date) as admission_date,
-  max(discharge_date) as discharge_date,
-  max(admit_source_code) as admit_source_code,
-  max(admit_type_code) as admit_type_code,
-  max(discharge_disposition_code) as discharge_disposition_code,
-  max(facility_npi) as facility_npi,
-  max(claim_type) as claim_type,
-  coalesce(min(admission_date),
-           min(claim_start_date) ) as start_date,
-  coalesce(max(discharge_date),
-           max(claim_end_date) ) as end_date,
+  patient_id,
+  claim_start_date,
+  claim_end_date,
+  admission_date,
+  discharge_date,
+  admit_source_code,
+  admit_type_code,
+  discharge_disposition_code,
+  facility_npi,
+  claim_type,
+  ms_drg_code,
+  apr_drg_code,
+  rendering_npi,  
+  diagnosis_code_1,
+
+  coalesce(admission_date,claim_start_date) as start_date,
+  coalesce(discharge_date,claim_end_date) as end_date,
+  
   case
-    when min(admission_date) is not null then 'admission_date'
-    when min(claim_start_date) is not null then 'claim_start_date'
+    when admission_date is not null then 'admission_date'
+    when claim_start_date is not null then 'claim_start_date'
     else null
   end as date_used_as_start_date,
   
   case
-    when max(discharge_date) is not null then 'discharge_date'
-    when max(claim_end_date) is not null then 'claim_end_date'
+    when discharge_date is not null then 'discharge_date'
+    when claim_end_date is not null then 'claim_end_date'
     else null
-  end as date_used_as_end_date,
+  end as date_used_as_end_date
 
-  max(ms_drg_code) as ms_drg_code,
-  max(apr_drg_code) as apr_drg_code,
-  max(diagnosis_code_1) as diagnosis_code_1,
-  max(rendering_npi) as rendering_npi
-  
-from rb_drg_bill_claim_lines
-group by claim_id
+from add_primary_dx
 ),
 
 
-rb_drg_bill_header_level_values_plus_dq_flags as (
+
+-- Add data quality flags:
+add_dq_flags as (
 select
-  h.patient_id as patient_id,
-  h.claim_id as claim_id,  
-  h.claim_start_date as claim_start_date,
-  h.claim_end_date as claim_end_date,
-  h.admission_date as admission_date,
-  h.discharge_date as discharge_date,
-  h.admit_source_code as admit_source_code,
-  h.admit_type_code as admit_type_code,
-  h.discharge_disposition_code as discharge_disposition_code,
-  h.facility_npi as facility_npi,
-  h.claim_type as claim_type,
-  h.start_date as start_date,
-  h.end_date as end_date,
-  h.date_used_as_start_date,
-  h.date_used_as_end_date,
-  h.ms_drg_code as ms_drg_code,
-  h.apr_drg_code as apr_drg_code,
-  h.diagnosis_code_1,
-  h.rendering_npi,
-
-  case
-    when
-      ( (dq.patient_id_not_unique = 1) or
-        (dq.patient_id_missing = 1) or
-        (dq.discharge_disposition_code_not_unique = 1) or
-        (dq.discharge_disposition_code_missing = 1) or
-        (dq.facility_npi_not_unique = 1) or
-        (dq.facility_npi_missing = 1) or
-        (h.date_used_as_start_date is null) or
-	(h.date_used_as_end_date is null) or
-	(h.start_date > h.end_date) or
-	(dq.ms_drg_code_not_unique = 1) or
-	(dq.apr_drg_code_not_unique = 1) or
-	(dq.ms_drg_code_missing = 1 and dq.apr_drg_code_missing = 1) or
-	(dq.diagnosis_code_1_not_unique = 1) or
-	(dq.diagnosis_code_1_missing = 1)
-      ) then 1
-    else 0
-  end as dq_problem,
-
-  case
-    when
-      ( (dq.claim_start_date_not_unique = 1) or
-	(dq.claim_start_date_missing = 1) or
-        (dq.claim_end_date_not_unique = 1) or
-        (dq.claim_end_date_missing = 1) or
-        (dq.claim_start_date_after_claim_end_date = 1) or
-        (dq.admission_date_not_unique = 1) or
-        (dq.admission_date_missing = 1) or
-        (dq.discharge_date_not_unique = 1) or
-        (dq.discharge_date_missing = 1) or
-        (dq.admission_date_after_discharge_date = 1) or
-        (dq.admit_type_code_not_unique = 1) or
-        (dq.admit_type_code_missing = 1) or
-        (dq.admit_source_code_not_unique = 1) or
-        (dq.admit_source_code_missing = 1) or	
-        (dq.claim_type_not_unique = 1) or
-        (dq.claim_type_missing = 1) or
-        (dq.claim_type_not_institutional = 1) or
-	(dq.ms_drg_code_missing = 0 and dq.apr_drg_code_missing = 0) or
-	(dq.rendering_npi_missing = 1) or
-	(dq.rendering_npi_not_unique = 1)
-      ) then 1
-    else 0
-  end as dq_insight,
-
-  case
-    when (h.date_used_as_start_date is null) then 1
-    else 0
-  end as start_date_not_determined,
+  claim_id,
+  patient_id,
+  claim_start_date,
+  claim_end_date,
+  admission_date,
+  discharge_date,
+  admit_source_code,
+  admit_type_code,
+  discharge_disposition_code,
+  facility_npi,
+  claim_type,
+  ms_drg_code,
+  apr_drg_code,
+  rendering_npi,  
+  diagnosis_code_1,
+  start_date,
+  end_date,
+  date_used_as_start_date,
+  date_used_as_end_date,
   
-  case
-    when (h.date_used_as_end_date is null) then 1
-    else 0
-  end as end_date_not_determined,
+-- Here we add the DQ flags:
 
+-- patient_id_missing:  
   case
-    when (h.start_date > h.end_date) then 1
+    when patient_id is null then 1
     else 0
-  end as start_date_after_end_date,
-  
-  dq.patient_id_not_unique as patient_id_not_unique,
-  dq.patient_id_missing as patient_id_missing,
-  dq.claim_start_date_not_unique as claim_start_date_not_unique,
-  dq.claim_start_date_missing as claim_start_date_missing,
-  dq.claim_end_date_not_unique as claim_end_date_not_unique,
-  dq.claim_end_date_missing as claim_end_date_missing,
-  dq.claim_start_date_after_claim_end_date
-       as claim_start_date_after_claim_end_date,
-  dq.admission_date_not_unique as admission_date_not_unique,
-  dq.admission_date_missing as admission_date_missing,
-  dq.discharge_date_not_unique as discharge_date_not_unique,
-  dq.discharge_date_missing as discharge_date_missing,
-  dq.admission_date_after_discharge_date
-       as admission_date_after_discharge_date,
-  dq.admit_type_code_not_unique
-       as admit_type_code_not_unique,
-  dq.admit_type_code_missing
-       as admit_type_code_missing,
-  dq.admit_source_code_not_unique
-       as admit_source_code_not_unique,
-  dq.admit_source_code_missing
-       as admit_source_code_missing,
-  dq.discharge_disposition_code_not_unique
-       as discharge_disposition_code_not_unique,
-  dq.discharge_disposition_code_missing
-       as discharge_disposition_code_missing,
-  dq.facility_npi_not_unique as facility_npi_not_unique,
-  dq.facility_npi_missing as facility_npi_missing,
-  dq.claim_type_not_unique as claim_type_not_unique,
-  dq.claim_type_missing as claim_type_missing,
-  dq.claim_type_not_institutional as claim_type_not_institutional,
-  dq.ms_drg_code_missing as ms_drg_code_missing,
-  dq.ms_drg_code_not_unique as ms_drg_code_not_unique,
-  dq.apr_drg_code_missing as apr_drg_code_missing,
-  dq.apr_drg_code_not_unique as apr_drg_code_not_unique,
-  dq.diagnosis_code_1_missing as diagnosis_code_1_missing,
-  dq.diagnosis_code_1_not_unique as diagnosis_code_1_not_unique,
-  dq.rendering_npi_missing as rendering_npi_missing,
-  dq.rendering_npi_not_unique as rendering_npi_not_unique
+  end as patient_id_missing,  
+-- claim_start_date_missing:  
+  case
+    when claim_start_date is null then 1
+    else 0
+  end as claim_start_date_missing,
+-- claim_end_date_missing:  
+  case
+    when claim_end_date is null then 1
+    else 0
+  end as claim_end_date_missing,
+-- claim_start_date_after_claim_end_date:
+  case
+    when claim_start_date > claim_end_date then 1
+    else 0
+  end as claim_start_date_after_claim_end_date,
+-- admission_date_missing:  
+  case
+    when admission_date is null then 1
+    else 0
+  end as admission_date_missing,
+-- discharge_date_missing:  
+  case
+    when discharge_date is null then 1
+    else 0
+  end as discharge_date_missing,
+-- admission_date_after_discharge_date:
+  case
+    when admission_date > discharge_date then 1
+    else 0
+  end as admission_date_after_discharge_date,
+-- admit_type_code_missing:  
+  case
+    when admit_type_code is null then 1
+    else 0
+  end as admit_type_code_missing,  
+-- admit_source_code_missing:  
+  case
+    when admit_source_code is null then 1
+    else 0
+  end as admit_source_code_missing,  
+-- discharge_disposition_code_missing:  
+  case
+    when discharge_disposition_code is null then 1
+    else 0
+  end as discharge_disposition_code_missing,
+-- facility_npi_missing:  
+  case
+    when facility_npi is null then 1
+    else 0
+  end as facility_npi_missing,
+-- claim_type_missing:  
+  case
+    when claim_type is null then 1
+    else 0
+  end as claim_type_missing,
+-- claim_type_not_institutional:
+  case
+    when claim_type <> 'institutional' then 1
+    else 0
+  end as claim_type_not_institutional,
+-- ms_drg_code_missing:  
+  case
+    when ms_drg_code is null then 1
+    else 0
+  end as ms_drg_code_missing,
+-- apr_drg_code_missing:  
+  case
+    when apr_drg_code is null then 1
+    else 0
+  end as apr_drg_code_missing,
+-- diagnosis_code_1_missing:  
+  case
+    when diagnosis_code_1 is null then 1
+    else 0
+  end as diagnosis_code_1_missing,
+-- rendering_npi_missing:  
+  case
+    when rendering_npi is null then 1
+    else 0
+  end as rendering_npi_missing
 
-from rb_drg_bill_header_level_values h
-left join rb_drg_bill_data_quality_flags dq
-on h.claim_id = dq.claim_id
+from add_start_and_end_dates
+
 )
 
 
+
+
 select *
-from rb_drg_bill_header_level_values_plus_dq_flags
+from add_dq_flags
+

@@ -1,11 +1,12 @@
 
 
--- This dbt model has one column:
---     claim_id
+-- This dbt model lists all claims with at least one DRG code.
+-- It has these columns:
+--   claim_id
 
 -- There is one row per distinct claim_id from the core.medical_claim
--- table that has at least one valid MS-DRG code (from terminology)
--- or at least one valid APR-DRG code (from terminology).
+-- table that has at least one valid MS-DRG code (from terminology) or at
+-- least one valid APR-DRG code (from terminology).
 
 
 

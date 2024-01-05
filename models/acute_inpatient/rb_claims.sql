@@ -1,23 +1,23 @@
 
-
--- This dbt model has these columns:
---     claim_id
---     distinct_rev_code_count (positive integer: count of distinct R&B rev codes this claim has)
---     has_a_valid_rev_code (0 or 1 flag, indicates if the claim has at least one valid rev code)
---     has_an_invalid_rev_code (0 or 1 flag, indicates if the
---                                           claim has at least one invalid rev code)
---     basic (0 or 1 flag, indicates if the claim has at least one basic rev code)
---     hospice (0 or 1 flag, indicates if the claim has at least one hospice rev code)
---     loa (0 or 1 flag, indicates if the claim has at least one leave of absence rev code)
---     behavioral (0 or 1 flag indicates if the claim has at least one behavioral rev code)
-
+-- This dbt model lists all claims with at least one room & board rev code.
+-- It has these columns:
+--   claim_id
+--   distinct_rev_code_count (positive integer: count of distinct R&B rev codes this claim has)
+--   has_a_valid_rev_code (0 or 1 flag, indicates if the claim has at least one valid rev code)
+--   has_an_invalid_rev_code (0 or 1 flag, indicates if the claim has at
+--                            least one invalid rev code)
+--   basic (0 or 1 flag, indicates if the claim has at least one basic rev code)
+--   hospice (0 or 1 flag, indicates if the claim has at least one hospice rev code)
+--   loa (0 or 1 flag, indicates if the claim has at least one leave of absence rev code)
+--   behavioral (0 or 1 flag indicates if the claim has at least one behavioral rev code)
 
 -- This dbt model has one row per claim_id that is in the
--- core.medical_claim table that has a
--- room & board rev code (i.e. a rev code that is
--- between '0100' and '0219' or between '1000' and '1002').
--- Note that some of the codes in this range might not be from terminology
--- so they might be invalid. That is why we have the 'has_valid_rev_code' flag.
+-- core.medical_claim table that has at least one room & board rev code
+-- (i.e. a rev code that is between '0100' and '0219' or between '1000'
+-- and '1002').
+-- Note that some of the codes in this range might not be
+-- from the latest terminology so they might be invalid. That is why we
+-- have the 'has_valid_rev_code' flag.
 
 
 
