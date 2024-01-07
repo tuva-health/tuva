@@ -200,5 +200,6 @@ left join {{ref('normalized_input__int_revenue_center_normalize') }} rev
     and med.data_source = rev.data_source
 left join {{ref('normalized_input__int_undetermined_claim_type') }} undetermined
     on med.claim_id = undetermined.claim_id
+    and med.claim_line_number = undetermined.claim_line_number
     and med.data_source = undetermined.data_source
 
