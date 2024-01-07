@@ -15,8 +15,6 @@ select
     as year_month
     , class.primary_diagnosis_code
     , class.primary_diagnosis_description
-    , ccsr.ccsr_category as primary_ccsr_code
-    , ccsr.ccsr_category_description as primary_ccsr_description
     , class.paid_amount
     , class.allowed_amount
     , class.charge_amount
@@ -40,6 +38,3 @@ left join {{ ref('terminology__provider') }} fac_prov
     on class.facility_npi = fac_prov.npi
 left join {{ ref('ed_classification__stg_patient') }} pat
     on class.patient_id = pat.patient_id
-left join {{ ref('ccsr__long_condition_category') }} ccsr
-    on class.encounter_id = ccsr.encounter_id
-    and class.primary_diagnosis_code = ccsr.normalized_code
