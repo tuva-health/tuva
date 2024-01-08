@@ -465,7 +465,7 @@ where procedure_code_25 is not null
 
 
 select distinct
-    cast(null as {{ dbt.type_string() }} ) as procedure_id
+    cast(unpivot_cte.data_source||'_'||unpivot_cte.claim_id||'_'||unpivot_cte.source_code as {{ dbt.type_string() }} ) as procedure_id
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
