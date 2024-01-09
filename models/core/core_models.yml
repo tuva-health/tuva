@@ -17,6 +17,8 @@ models:
     columns:
       - name: condition_id
         description: Unique identifier for each condition in the table.
+        tests:
+          - unique
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -893,6 +895,8 @@ models:
     columns:
       - name: procedure_id
         description: The unique identifier for the performed procedure.
+        tests:
+          - unique
       - name: encounter_id
         description: >
           The encounter_id for the encounter where this procedure was performed.
