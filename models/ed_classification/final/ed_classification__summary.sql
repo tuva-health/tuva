@@ -23,10 +23,10 @@ select
     , practice_state as facility_state
     , practice_city as facility_city
     , practice_zip_code as facility_zip_code
-    , null as facility_latitude
-    , null as facility_longitude
+--     , null as facility_latitude
+--     , null as facility_longitude
     , pat.sex as patient_sex
-    , floor({{ datediff('pat.birth_date', 'current_date', 'hour') }} / 8766.0) as patient_age
+    , floor({{ datediff('pat.birth_date', 'class.encounter_end_date', 'hour') }} / 8766.0) as patient_age
     , zip_code as patient_zip_code
     , latitude as patient_latitude
     , longitude as patient_longitude

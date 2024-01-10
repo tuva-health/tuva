@@ -15,58 +15,70 @@ models:
     description: |
       ED Classification as a cube that can be summarized
     columns:
-      - name: classification
-        description: ED classification categories
-      - name: claim_id
-        description: Unique identifier for each claim
+      - name: encounter_id
+        description: Unique identifier for the emergency_department encounter.
+      - name: ed_classification_description
+        description: ED classification category.
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/ed_classification/ed_classification__categories.csv
+      - name: ed_classification_order
+        description: The order of the classification.
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/ed_classification/ed_classification__categories.csv
       - name: patient_id
-        description: Unique identifier for each person across all datasets
-      - name: recorded_date 
-        description: Date on which the condition was recorded
-      - name: code
-        description: The normalized condition code
-      - name: description
-        description: The normalized description of the condition code
-      - name: ccs_description_with_covid
-        description: The condition category with covid
-      - name: recorded_date_year
-        description: The year of the condition recorded date
-      - name: recorded_date_year_month
-        description: The year and month of the condition recorded date
-      - name: claim_paid_amount_sum
-        description: The sum of the claim paid amount lines
-      - name: service_category_1
-        description: The broader service category the claim belongs to
-      - name: service_category_2
-        description: The more specific service category the claim belongs to
-      - name: provider_parent_organization_name_with_provider_name
-        description: The parent organization and provider name associate with the claim
-      - name: provider_first_name
-        description: The provider first name
-      - name: provider_last_name
-        description: The provider last name
-      - name: provider_organization_name
-        description: The provider organization
-      - name: provider_practice_state
-        description: The provider practice state
-      - name: provider_practice_zip_code
-        description: The provider practice zip code
-      - name: patient_gender
-        description: The patient gender
-      - name: patient_birth_date
-        description: The patient date of birth
+        description: Unique identifier for each patient in the dataset.
+      - name: encounter_end_date
+        description: Date when the patient was discharged.
+      - name: year_month
+        description: Year and month of the encounter end date.
+      - name: primary_diagnosis_code
+        description: >
+          Primary diagnosis code for the encounter. If from claims the primary 
+          diagnosis code comes from the institutional claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: primary_diagnosis_description
+        description: Description of the primary diagnosis code.
+      - name: paid_amount
+        description: The total paid amount across all claims for the encounter.
+      - name: allowed_amount
+        description: The total allowed amount across all claims for the encounter.
+      - name: charge_amount
+        description: The total charge amount across all claims for the encounter.
+      - name: facility_npi
+        description: The NPI for the facility where the encounter occurred.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: facility_name
+        description: The name of the facility.
+      - name: facility_state
+        description: The state of the facility.
+      - name: facility_city
+        description: The city of the facility.
+      - name: facility_zip_code
+        description: The zip code of the facility.
+#      - name: facility_latitude
+#        description: The latitude of the facility.
+#      - name: facility_longitude
+#        description: The longitude of the facility.
+      - name: patient_sex
+        description: The sex of the patient.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: patient_age
-        description: The patient age as of now
+        description: The age of the patient at the time of the encounter.
+      - name: patient_zip_code
+        description: The zip code for the patient.
+      - name: patient_latitude
+        description: The latitude for the patient.
+      - name: patient_longitude
+        description: The longitude for the patient.
       - name: patient_race
-        description: The patient race
-      - name: patient_state
-        description: The patient state
-      - name: classification_name
-        description: Human readable name of the classification
-      - name: classification_order
-        description: The order of the classification
-      - name: classification_column
-        description: A short hand name of the classification
+        description: The race of the patient.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
 
 
 # Intermediate
