@@ -12,8 +12,8 @@ select
     , cast(date_norm.normalized_birth_date as date ) as birth_date
     , cast(date_norm.normalized_death_date as date ) as death_date
     , cast(elig.death_flag as int ) as death_flag
-    , cast(date_norm.normalized_enrollment_start_date as date ) as enrollment_end_date
-    , cast(date_norm.normalized_enrollment_end_date as date ) as enrollment_start_date
+    , cast(date_norm.normalized_enrollment_start_date as date ) as enrollment_start_date
+    , cast(date_norm.normalized_enrollment_end_date as date ) as enrollment_end_date
     , cast(elig.payer as {{ dbt.type_string() }} ) as payer
     , cast(elig.payer_type as {{ dbt.type_string() }} ) as payer_type
     , cast(elig.plan as {{ dbt.type_string() }} ) as plan
