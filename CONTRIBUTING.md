@@ -57,11 +57,13 @@ Join our [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61
 The easiest way to test your changes is to use the dbt project inside the package called [integration_tests](https://github.com/tuva-health/the_tuva_project/tree/main/integration_tests).
 
 1. Set the project subdirectory to “integration_tests” if using dbt cloud or change directory (`cd integration_tests`) if using CLI.
-2. *(Optional)* The project will run by default with synthetic demo data. To use your own data sources, update the vars in [integration_tests/dbt_project.yml](https://github.com/tuva-health/the_tuva_project/blob/main/integration_tests/dbt_project.yml): 
-   1. Set `test_data_override` to false  
-   2. Set `input_database` and `input_schema` to your testing sources
-3. Run `dbt deps`.
-4. Run `dbt build`.
+2. Choose a data source:
+   1. To use synthetic demo data:
+        -  Set test_data_override to true
+   3. To use your own data sources, update the vars in integration_tests/dbt_project.yml:
+        - Set input_database and input_schema to your testing sources
+4. Run `dbt deps`.
+5. Run `dbt build`.
 
 You only need to test your changes in one data warehouse. When you submit your pull request, we will use our automated CI testing workflows to test all of our supported data warehouses.
 
