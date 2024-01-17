@@ -11,7 +11,7 @@ sets, and data quality tests for doing healthcare analytics.
 - [Code](./models)
 - [Terminology Sets](seeds/terminology)*
 - [Value Sets](seeds/value_sets)
-- [Data Dictionaries / DAG](https://tuva-health.github.io/the_tuva_project/#!/overview/the_tuva_project)
+- [Data Dictionaries / DAG](https://tuva-health.github.io/tuva/#!/overview/)
 - [Knowledge Base](https://thetuvaproject.com/)
 
 *Note: In many cases the actual terminology sets are too large to maintain on 

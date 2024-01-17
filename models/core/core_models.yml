@@ -975,7 +975,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_medical_claim
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_encounter
     description: Staging core claims encounters
@@ -985,7 +985,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_encounter
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_location
     description: Staging core claims locations
@@ -995,7 +995,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_location
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_patient
     description: Staging core claims patients
@@ -1005,7 +1005,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_patient
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_condition
     description: Staging core claims conditions
@@ -1015,7 +1015,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_condition
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_procedure
     description: Staging core claims procedures
@@ -1025,7 +1025,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_procedure
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_pharmacy_claim
     description: Staging core pharmacy claims
@@ -1035,7 +1035,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_pharmacy_claim
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_eligibility
     description: Staging core eligibility
@@ -1045,7 +1045,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_eligibility
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
   - name: core__stg_claims_practitioner
     description: Staging core providers in the claims dataset
@@ -1055,7 +1055,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_practitioner
       tags: core_stage_claims
-      materialized: view
+      materialized: table
 
 ## Staging - Clinical
   - name: core__stg_clinical_condition
