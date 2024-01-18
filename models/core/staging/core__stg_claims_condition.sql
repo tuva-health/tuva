@@ -16,10 +16,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -37,10 +35,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
 	       , discharge_date
 	       , claim_end_date
-	       , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -58,10 +54,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -79,10 +73,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -100,10 +92,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -121,10 +111,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -142,10 +130,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -163,10 +149,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -184,10 +168,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -205,10 +187,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -226,10 +206,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -247,10 +225,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -268,10 +244,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -289,10 +263,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -310,10 +282,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -331,10 +301,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -352,10 +320,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -373,10 +339,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -394,10 +358,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -415,10 +377,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -436,10 +396,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -457,10 +415,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -478,10 +434,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -499,10 +453,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
@@ -520,10 +472,8 @@ select
   , patient_id
   , coalesce(admission_date
            , claim_start_date
-           , claim_line_start_date
            , discharge_date
            , claim_end_date
-           , claim_line_end_date
     ) as condition_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
