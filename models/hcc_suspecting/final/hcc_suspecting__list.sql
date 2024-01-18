@@ -10,7 +10,12 @@ with hcc_history_suspects as (
         , hcc_code
         , hcc_description
         , 'Prior coding history' as reason
-        , icd_10_cm_code || ' last billed on ' || last_billed as contributing_factor
+        , icd_10_cm_code
+            || case
+                when last_billed is not null then ' last billed on ' || last_billed
+                when last_billed is null and last_recorded is not null then ' last recorded on ' || last_recorded
+                else ' (missing recorded and billing dates) '
+          end as contributing_factor
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
     where current_year_billed = false
 
