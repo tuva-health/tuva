@@ -1,0 +1,119 @@
+version: 2
+
+models:
+## Final
+  - name: hcc_suspecting__summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: summary
+      tags: hcc_suspecting
+      materialized: table
+    description: >
+      This final model displays the summary of suspecting conditions per patient 
+      with the reason.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: reason
+        description: Contributing factor for the suspecting condition.
+      - name: tuva_last_run
+        description: The date the model was run.
+
+## Intermediate
+  - name: hcc_suspecting__int_all_conditions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _int_all_conditions
+      tags: hcc_suspecting
+      materialized: table
+    description: All historical conditions mapped to HCCs.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: recorded_date
+        description: Date in which the condition was recorded.
+      - name: condition_type
+        description: The type of condition.
+      - name: icd_10_cm_code
+        description: The ICD-10-CM condition code.
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: tuva_last_run
+        description: The date the model was run.
+
+  - name: hcc_suspecting__int_patient_hcc_history
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _int_patient_hcc_history
+      tags: hcc_suspecting
+      materialized: table
+    description: >
+      This intermediate model displays the full history of a patient's recorded HCCs
+      with a flag for recorded during the current year.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: recorded_date
+        description: Date in which the ICD-10-CM condition was recorded.
+      - name: condition_type
+        description: The type of condition.
+      - name: icd_10_cm_code
+        description: The ICD-10-CM condition code.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: first_recorded
+        description: Date the HCC was first recorded in the patient's record.
+      - name: last_recorded
+        description: Date the HCC was last recorded in the patient's record.
+      - name: current_year_recorded
+        description: >
+          Flag indicating that the ICD-10-CM code mapped to the HCC was recorded
+          during the payment year.
+      - name: tuva_last_run
+        description: The date the model was run.
+
+  ## Staging
+  - name: hcc_suspecting__stg_core__condition
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _stg_condition
+      tags: hcc_suspecting
+      materialized: ephemeral
+    description: Staging conditions from core.
+    columns:
+      - name: claim_id
+        description: Unique claim_id for each claim.
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: recorded_date
+        description: Date in which the condition was recorded.
+      - name: condition_type
+        description: The type of condition.
+      - name: code_type
+        description: The type of condition code.
+      - name: code
+        description: The condition code.
