@@ -17,7 +17,7 @@ with all_conditions as (
 
 )
 
-, grouped as (
+, hcc_grouped as (
 
     select
           patient_id
@@ -34,20 +34,41 @@ with all_conditions as (
 
 )
 
-, add_flag as (
+, hcc_billed as (
 
     select
           patient_id
         , hcc_code
         , hcc_description
-        , first_recorded
-        , last_recorded
+        , max(recorded_date) as last_billed
+    from all_conditions
+    where hcc_code is not null
+    and lower(condition_type) <> 'problem'
+    group by
+          patient_id
+        , hcc_code
+        , hcc_description
+
+)
+
+, add_flag as (
+
+    select
+          hcc_grouped.patient_id
+        , hcc_grouped.hcc_code
+        , hcc_grouped.hcc_description
+        , hcc_grouped.first_recorded
+        , hcc_grouped.last_recorded
+        , hcc_billed.last_billed
         , case
-            when extract(year from last_recorded) = extract(year from {{ dbt.current_timestamp() }} )
+            when extract(year from hcc_billed.last_billed) = extract(year from {{ dbt.current_timestamp() }} )
             then 1
             else 0
-          end as current_year_recorded
-    from grouped
+          end as current_year_billed
+    from hcc_grouped
+         left join hcc_billed
+         on hcc_grouped.patient_id = hcc_billed.patient_id
+         and hcc_grouped.hcc_code = hcc_billed.hcc_code
 
 )
 
@@ -62,7 +83,8 @@ with all_conditions as (
         , all_conditions.hcc_description
         , add_flag.first_recorded
         , add_flag.last_recorded
-        , add_flag.current_year_recorded
+        , add_flag.last_billed
+        , add_flag.current_year_billed
     from all_conditions
          left join add_flag
             on all_conditions.patient_id = add_flag.patient_id
@@ -81,7 +103,8 @@ with all_conditions as (
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(first_recorded as date) as first_recorded
         , cast(last_recorded as date) as last_recorded
-        , cast(current_year_recorded as boolean) as current_year_recorded
+        , cast(last_billed as date) as last_billed
+        , cast(current_year_billed as boolean) as current_year_billed
     from all_conditions_with_flag
 
 )
@@ -95,6 +118,7 @@ select
     , hcc_description
     , first_recorded
     , last_recorded
-    , current_year_recorded
+    , last_billed
+    , current_year_billed
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
