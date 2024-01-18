@@ -3,21 +3,39 @@
    )
 }}
 
-with hcc_history_suspects as (
+with patients as (
 
-    select distinct
+    select
           patient_id
-        , hcc_code
-        , hcc_description
-        , 'Previously recorded HCC not documented in current year' as reason
-    from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
-    where current_year_recorded = false
+        , sex
+        , birth_date
+        , floor({{ datediff('birth_date', 'current_date', 'hour') }} / 8766.0) as age
+    from {{ ref('hcc_suspecting__stg_core__patient') }}
+    where death_date is null
 
 )
 
-, unioned as (
+, suspecting_list as (
 
-    select * from hcc_history_suspects
+      select
+          patient_id
+        , count(*) as gaps
+    from {{ ref('hcc_suspecting__list') }}
+    group by patient_id
+
+)
+
+, joined as (
+
+    select
+          patients.patient_id
+        , patients.sex
+        , patients.birth_date
+        , patients.age
+        , suspecting_list.gaps
+    from patients
+         inner join suspecting_list
+         on patients.patient_id = suspecting_list.patient_id
 
 )
 
@@ -25,17 +43,19 @@ with hcc_history_suspects as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
-        , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
-        , cast(reason as {{ dbt.type_string() }}) as reason
-    from unioned
+        , cast(sex as {{ dbt.type_string() }}) as patient_sex
+        , cast(birth_date as date) as patient_birth_date
+        , cast(age as integer) as patient_age
+        , cast(gaps as integer) as suspecting_gaps
+    from joined
 
 )
 
 select
       patient_id
-    , hcc_code
-    , hcc_description
-    , reason
+    , patient_sex
+    , patient_birth_date
+    , patient_age
+    , suspecting_gaps
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
