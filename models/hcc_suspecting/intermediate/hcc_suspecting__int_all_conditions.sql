@@ -11,6 +11,7 @@ with conditions as (
         , condition_type
         , code_type
         , code
+        , data_source
     from {{ ref('hcc_suspecting__stg_core__condition') }}
 
 )
@@ -41,6 +42,7 @@ with conditions as (
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code
+        , conditions.data_source
         , seed_hcc_mapping.hcc_code
         , seed_hcc_descriptions.hcc_description
     from conditions
@@ -61,6 +63,7 @@ with conditions as (
         , cast(code as {{ dbt.type_string() }}) as icd_10_cm_code
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
+        , cast(data_source as {{ dbt.type_string() }}) as data_source
     from joined
 
 )
@@ -72,5 +75,6 @@ select
     , icd_10_cm_code
     , hcc_code
     , hcc_description
+    , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

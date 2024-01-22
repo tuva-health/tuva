@@ -7,6 +7,7 @@ with hcc_history_suspects as (
 
     select distinct
           patient_id
+        , data_source
         , hcc_code
         , hcc_description
         , 'Prior coding history' as reason
@@ -31,6 +32,7 @@ with hcc_history_suspects as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
+        , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(reason as {{ dbt.type_string() }}) as reason
@@ -41,6 +43,7 @@ with hcc_history_suspects as (
 
 select
       patient_id
+    , data_source
     , hcc_code
     , hcc_description
     , reason
