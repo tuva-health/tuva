@@ -131,9 +131,6 @@ with stg_eligibility as (
          left join stg_patient
             on stg_eligibility.patient_id = stg_patient.patient_id
     where stg_eligibility.row_num = 1
-      /* filter to members with eligibility in payment year */
-      and extract(year from stg_eligibility.enrollment_start_date) <= {{ payment_year }}
-      and extract(year from stg_eligibility.enrollment_end_date) >= {{ payment_year }}
 
 )
 
