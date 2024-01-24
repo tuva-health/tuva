@@ -1,0 +1,46 @@
+version: 2
+
+seeds:
+  - name: hcc_suspecting__hcc_descriptions
+    description: >
+      Disease factors by model version and risk segment. Extracted from rate 
+      announcement documents on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _value_set_hcc_descriptions
+      tags: hcc_suspecting
+      enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcc_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        hcc_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
+  - name: hcc_suspecting__icd_10_cm_mappings
+    description: >
+      ICD-10 to HCC mapping by payment year and model version. Combined and 
+      cleaned version of code files on cms.gov.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _value_set_icd_10_cm_mappings
+      tags: hcc_suspecting
+      enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        diagnosis_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        cms_hcc_esrd_v21: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        cms_hcc_esrd_v24: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        cms_hcc_v22: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        cms_hcc_v24: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        cms_hcc_v28: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        rx_hcc_v05: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        rx_hcc_v08: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
