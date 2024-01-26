@@ -47,7 +47,7 @@ models:
       materialized: view
 
   - name: lab_result
-    description: Created using empty table logic.
+    description: Created from seed or source data depending on test_data_override variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
