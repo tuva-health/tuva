@@ -1,6 +1,21 @@
 version: 2
 
 seeds:
+  - name: terminology__ndc_to_rxnorm
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: ndc_to_rxnorm
+      tags:
+        - terminology
+      column_types:
+        ndc : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        rxcui : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
   - name: terminology__admit_source
     config:
       schema: |
