@@ -15,11 +15,15 @@ models:
     columns:
       - name: patient_id
         description: Unique ID for the patient.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
       - name: hcc_code
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -80,6 +84,10 @@ models:
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: The date the model was run.
 
@@ -96,6 +104,10 @@ models:
     columns:
       - name: patient_id
         description: Unique ID for the patient.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
       - name: recorded_date
         description: Date in which the ICD-10-CM condition was recorded.
       - name: condition_type
@@ -103,12 +115,12 @@ models:
       - name: icd_10_cm_code
         description: The ICD-10-CM condition code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__icd_10_cm_mappings.csv
       - name: hcc_code
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
