@@ -114,7 +114,7 @@ with
     select
           patient_id
         , exclusion_date
-        , concept_name
+        , exclusion_reason
 from {{ref('quality_measures__int_nqf0034__frailty')}}
 
 )
@@ -124,7 +124,7 @@ from {{ref('quality_measures__int_nqf0034__frailty')}}
     select
           patients_with_frailty.patient_id
         , patients_with_frailty.exclusion_date
-        , patients_with_frailty.concept_name
+        , patients_with_frailty.exclusion_reason
             || ' with '
             || pharmacy_claim_exclusions.concept_name
           as exclusion_reason
@@ -138,7 +138,7 @@ from {{ref('quality_measures__int_nqf0034__frailty')}}
     select
           patients_with_frailty.patient_id
         , medication_exclusions.dispensing_date as exclusion_date
-        , patients_with_frailty.concept_name
+        , patients_with_frailty.exclusion_reason
             || ' with '
             || medication_exclusions.concept_name
           as exclusion_reason
