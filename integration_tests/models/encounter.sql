@@ -13,6 +13,7 @@ cast(null as {{ dbt.type_string() }} ) as encounter_id
 , cast(null as {{ dbt.type_string() }} ) as discharge_disposition_description
 , cast(null as {{ dbt.type_string() }} ) as attending_provider_id
 , cast(null as {{ dbt.type_string() }} ) as facility_npi
+, cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_code_type
 , cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_code
 , cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_description
 , cast(null as {{ dbt.type_string() }} ) as ms_drg_code

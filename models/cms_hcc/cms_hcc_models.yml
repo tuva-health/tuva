@@ -2,51 +2,6 @@ version: 2
 
 models:
 ## Final
-  - name: cms_hcc__patient_hcc_history
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: patient_hcc_history
-      tags: cms_hcc
-      materialized: table
-    description: >
-      This final model displays the full history of a patient's recorded HCCs
-      with a flag for recorded during the payment year.
-    columns:
-      - name: patient_id
-        description: Unique ID for the patient.
-      - name: recorded_date
-        description: Date in which the ICD-10-CM condition was recorded.
-      - name: condition_type
-        description: The type of condition.
-      - name: icd_10_cm_code
-        description: The ICD-10-CM condition code.
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
-      - name: hcc_code
-        description: >
-          HCC code from the latest CMS HCC model available in the mart.
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/cms_hcc/cms_hcc__icd_10_cm_mappings.csv
-      - name: hcc_description
-        description: >
-          HCC description from the latest CMS HCC model available in the mart.
-      - name: first_recorded
-        description: Date the HCC was first recorded in the patient's record.
-      - name: last_recorded
-        description: Date the HCC was last recorded in the patient's record.
-      - name: payment_year_recorded
-        description: >
-          Flag indicating that the ICD-10-CM code mapped to the HCC was recorded
-          during the payment year.
-      - name: model_version
-        description: CMS HCC model version.
-      - name: payment_year
-        description: >
-          The payment year the HCC and risk scores are being calculated for.
-      - name: tuva_last_run
-        description: The date the model was run.
-
   - name: cms_hcc__patient_risk_factors
     config:
       schema: |
@@ -125,37 +80,6 @@ models:
         description: The date the model was run.
 
 ## Intermediate
-  - name: cms_hcc__int_all_conditions
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_all_conditions
-      tags: cms_hcc
-      materialized: table
-    description: All historical conditions mapped to HCCs.
-    columns:
-      - name: patient_id
-        description: Unique ID for the patient.
-      - name: recorded_date
-        description: Date in which the condition was recorded.
-      - name: condition_type
-        description: The type of condition.
-      - name: icd_10_cm_code
-        description: The ICD-10-CM condition code.
-      - name: hcc_code
-        description: >
-          HCC code from the latest CMS HCC model available in the mart.
-      - name: hcc_description
-        description: >
-          HCC description from the latest CMS HCC model available in the mart.
-      - name: model_version
-        description: CMS HCC model version.
-      - name: payment_year
-        description: >
-          The payment year the HCC and risk scores are being calculated for.
-      - name: tuva_last_run
-        description: The date the model was run.
-
   - name: cms_hcc__int_demographic_factors
     config:
       schema: |
