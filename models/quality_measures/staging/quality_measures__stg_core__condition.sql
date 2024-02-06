@@ -5,6 +5,7 @@
 select
       patient_id
     , claim_id
+    , encounter_id
     , recorded_date
     , source_code_type
     , source_code

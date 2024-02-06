@@ -55,6 +55,9 @@ with period_end as (
 )
 
 select
-      cast(performance_period_begin as date) as performance_period_begin
+      cast({{ measure_id }} as {{ dbt.type_string() }}) as measure_id
+    , cast({{ measure_name }} as {{ dbt.type_string() }}) as measure_name
+    , cast({{ measure_version }} as {{ dbt.type_string() }}) as measure_version
+    , cast(performance_period_begin as date) as performance_period_begin
     , cast(performance_period_end as date) as performance_period_end
 from period_begin
