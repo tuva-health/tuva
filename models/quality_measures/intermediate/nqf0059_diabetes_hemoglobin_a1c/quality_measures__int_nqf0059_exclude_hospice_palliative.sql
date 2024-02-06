@@ -5,7 +5,7 @@
 
 /*
 DENOMINATOR EXCLUSIONS:
-Patient was provided hospice services any time during the measurement period: G9710
+Patient was provided hospice services any time during the measurement period: G9687
 */
 
 
