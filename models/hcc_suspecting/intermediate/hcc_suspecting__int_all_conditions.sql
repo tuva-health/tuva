@@ -12,7 +12,7 @@ with conditions as (
         , code_type
         , code
         , data_source
-    from {{ ref('hcc_suspecting__stg_core__condition') }}
+    from {{ ref('hcc_suspecting__int_prep_conditions') }}
 
 )
 
