@@ -71,6 +71,7 @@ with performance_period as (
 
     select
           patient_id
+        , encounter_id
         , encounter_type
         , encounter_start_date
     from {{ ref('quality_measures__stg_core__encounter') }}
@@ -108,7 +109,6 @@ with performance_period as (
 
 )
 
-
 , diabetics_codes as (
 
     select
@@ -127,6 +127,7 @@ with performance_period as (
     select
           patient_id
         , claim_id
+        , encounter_id
         , recorded_date
         , source_code
         , source_code_type
@@ -139,11 +140,12 @@ with performance_period as (
 , diabetic_conditions as (
 
     select
-          patient_id
-        , claim_id
-        , recorded_date
-        , source_code
-        , source_code_type
+          conditions.patient_id
+        , conditions.claim_id
+        , conditions.encounter_id
+        , conditions.recorded_date
+        , conditions.source_code
+        , conditions.source_code_type
     from conditions
     inner join diabetics_codes
         on conditions.source_code_type = diabetics_codes.code_system
@@ -151,34 +153,113 @@ with performance_period as (
 
 )
 
-, patient_with_age as (
+, patients_with_age as (
 
     select
           visit_encounters.patient_id
+        , visit_encounters.encounter_id
         , visit_encounters.encounter_type
         , visit_encounters.encounter_start_date
+        , performance_period.measure_id
+        , performance_period.measure_name
+        , performance_period.measure_version
+        , performance_period.performance_period_begin
+        , performance_period.performance_period_end
         , patients.birth_date
         , floor({{ datediff('patients.birth_date', 'visit_encounters.encounter_start_date', 'hour') }} / 8760.0) as age
     from visit_encounters
     left join patients
         on visit_encounters.patient_id = patients.patient_id
+    cross join performance_period
     where patients.death_date is null
+
+)
+
+, filtered_patients as (
+
+    select
+          diabetic_conditions.*
+        , patients_with_age.measure_id
+        , patients_with_age.measure_name
+        , patients_with_age.measure_version
+        , patients_with_age.encounter_type
+        , patients_with_age.encounter_start_date
+        , patients_with_age.performance_period_begin
+        , patients_with_age.performance_period_end
+        , patients_with_age.age
+        , 1 as denominator_flag
+    from diabetic_conditions
+    left join patients_with_age
+        on diabetic_conditions.encounter_id = patients_with_age.encounter_id
+            and diabetic_conditions.patient_id = patients_with_age.patient_id
+    where age between 18 and 75
 
 )
 
 , eligible_population as (
 
-    select
-          diabetic_conditions.patient_id
-        , diabetic_conditions.claim_id
-        , diabetic_conditions.recorded_date
-        , patient_with_age
-    from diabetic_conditions
-    inner join patient_with_age
-        on diabetic_conditions.patient_id = patient_with_age.patient_id
+   select
+          filtered_patients.patient_id
+        , filtered_patients.age
+        , filtered_patients.measure_id
+        , filtered_patients.measure_name
+        , filtered_patients.measure_version
+        , filtered_patients.performance_period_begin
+        , filtered_patients.performance_period_end
+        , filtered_patients.denominator_flag
+    from filtered_patients
+    left join visit_claims
+        on filtered_patients.patient_id = visit_claims.patient_id
+    left join visit_procedures
+        on filtered_patients.patient_id = visit_procedures.patient_id
+    left join visit_encounters
+        on filtered_patients.patient_id = visit_encounters.patient_id
+    where 
+    (
+        true
+        -- visit_claims.claim_start_date
+        --     between filtered_patients.performance_period_begin
+        --     and filtered_patients.performance_period_end
+        -- or visit_claims.claim_end_date
+        --     between filtered_patients.performance_period_begin
+        --     and filtered_patients.performance_period_end
+        -- or visit_procedures.procedure_date
+        --     between filtered_patients.performance_period_begin
+        --     and filtered_patients.performance_period_end
+        -- or visit_encounters.encounter_start_date
+        --     between filtered_patients.performance_period_begin
+        --     and filtered_patients.performance_period_end
 
+    )
+   
 
 )
 
+, add_data_types as (
 
-select * from patient_with_age
+    select distinct
+          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+        , cast(age as integer) as age
+        , cast(performance_period_begin as date) as performance_period_begin
+        , cast(performance_period_end as date) as performance_period_end
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+        , cast(denominator_flag as integer) as denominator_flag
+    from eligible_population
+
+)
+
+--  select distinct
+--       patient_id
+--     , age
+--     , performance_period_begin
+--     , performance_period_end
+--     , measure_id
+--     , measure_name
+--     , measure_version
+--     , denominator_flag
+--     , '{{ var('tuva_last_run')}}' as tuva_last_run
+-- from add_data_types
+
+select * from eligible_population
