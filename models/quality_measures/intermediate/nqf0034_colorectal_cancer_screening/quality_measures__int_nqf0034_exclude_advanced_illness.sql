@@ -14,21 +14,29 @@
     measurement period or the year prior to measurement period
 */
 
-with patients_with_frailty as (
+with encounter_exclusion_codes as (
 
     select
-          patient_id
-        , performance_period_begin
-        , performance_period_end
-        , exclusion_date
-        , exclusion_reason
-    from {{ ref('quality_measures__int_nqf0034__frailty') }}
-    inner join {{ref('quality_measures__int_nqf0034__performance_period')}}
-        on 1=1
+          code
+        , code_system
+        , concept_name
+        , case when concept_name = 'Acute Inpatient' then 'Acute Inpatient'
+            else 'Other Encounter' end as concept_category
+        , case when concept_name = 'Acute Inpatient' then 1
+            else 2 end as qualifying_count
+    from {{ ref('quality_measures__value_sets') }}
+    where concept_name in (
+         'Acute Inpatient'
+        , 'Encounter Inpatient'
+        , 'Outpatient'
+        , 'Observation'
+        , 'Emergency Department Visit'
+        , 'Nonacute Inpatient'
+    )
 
 )
 
-, exclusion_codes as (
+, condition_exclusion_codes as (
 
     select
           code
@@ -36,13 +44,7 @@ with patients_with_frailty as (
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
-          'Advanced Illness'
-        , 'Acute Inpatient'
-        , 'Encounter Inpatient'
-        , 'Outpatient'
-        , 'Observation'
-        , 'Emergency Department Visit'
-        , 'Nonacute Inpatient'
+         'Advanced Illness'
     )
 
 )
@@ -80,7 +82,28 @@ with patients_with_frailty as (
     from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
+/* -- observation based exclusions removed until we have better testing data
+, observations as (
 
+    select
+          patient_id
+        , observation_date
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce (
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures__stg_core__observation') }}
+
+)
+*/
 , procedures as (
 
     select
@@ -103,16 +126,34 @@ with patients_with_frailty as (
 )
 
 , condition_exclusions as (
-
-    select
+     select
           conditions.patient_id
         , conditions.claim_id
         , conditions.recorded_date
-        , exclusion_codes.concept_name
+        , condition_exclusion_codes.concept_name
     from conditions
-         inner join exclusion_codes
-            on conditions.code = exclusion_codes.code
-            and conditions.code_type = exclusion_codes.code_system
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
+        on conditions.recorded_date between pp.performance_period_begin_1yp and pp.performance_period_end
+    inner join condition_exclusion_codes
+        on conditions.code = condition_exclusion_codes.code
+        and conditions.code_type = condition_exclusion_codes.code_system
+
+/* --  observations temporarily removed until we have better testing data
+    union all
+        select
+          observations.patient_id
+        , cast(null as {{ dbt.type_string() }}) as claim_id
+        , observations.observation_date
+        , condition_exclusion_codes.concept_name
+    from observations
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
+        on observations.observation_date between pp.performance_period_begin_1yp and pp.performance_period_end
+    inner join condition_exclusion_codes
+        on observations.code = condition_exclusion_codes.code
+        and observations.code_type = condition_exclusion_codes.code_system
+*/
+
+
 
 )
 
@@ -124,24 +165,68 @@ with patients_with_frailty as (
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
         , medical_claim.hcpcs_code
-        , exclusion_codes.concept_name
+        , encounter_exclusion_codes.concept_name
+        , encounter_exclusion_codes.concept_category
+        , encounter_exclusion_codes.qualifying_count
     from medical_claim
-         inner join exclusion_codes
-            on medical_claim.hcpcs_code = exclusion_codes.code
-    where exclusion_codes.code_system = 'hcpcs'
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
+        on coalesce(medical_claim.claim_start_date,medical_claim.claim_end_date) between pp.performance_period_begin_1yp and pp.performance_period_end
+         inner join encounter_exclusion_codes
+            on medical_claim.hcpcs_code = encounter_exclusion_codes.code
+    where encounter_exclusion_codes.code_system = 'hcpcs'
 
 )
 
+/* -- observations temporarily removed until we get better testing data
+, observation_exclusions as (
+
+
+    select
+          observations.patient_id
+        , observations.observation_date
+        , encounter_exclusion_codes.concept_name
+        , encounter_exclusion_codes.concept_category
+        , encounter_exclusion_codes.qualifying_count
+    from observations
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
+        on observations.observation_date between pp.performance_period_begin_1yp and pp.performance_period_end
+
+    inner join encounter_exclusion_codes
+        on observations.code = encounter_exclusion_codes.code
+        and observations.code_type = encounter_exclusion_codes.code_system
+
+)
+*/
 , procedure_exclusions as (
 
     select
           procedures.patient_id
         , procedures.procedure_date
-        , exclusion_codes.concept_name
+        , encounter_exclusion_codes.concept_name
+        , encounter_exclusion_codes.concept_category
+        , encounter_exclusion_codes.qualifying_count
     from procedures
-         inner join exclusion_codes
-             on procedures.code = exclusion_codes.code
-             and procedures.code_type = exclusion_codes.code_system
+    inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
+        on procedures.procedure_date between pp.performance_period_begin_1yp and pp.performance_period_end
+
+         inner join encounter_exclusion_codes
+             on procedures.code = encounter_exclusion_codes.code
+             and procedures.code_type = encounter_exclusion_codes.code_system
+
+)
+
+/*
+    Patients greater than or equal to 66 with at least one claim/encounter for
+    frailty during the measurement period
+*/
+, patients_with_frailty as (
+
+    select
+          patient_id
+        , exclusion_date
+        , concept_name
+from {{ref('quality_measures__int_nqf0034__frailty')}}
+
 
 )
 
@@ -152,7 +237,7 @@ with patients_with_frailty as (
     AND one acute inpatient encounter with a diagnosis of advanced illness
     during measurement period or the year prior to measurement period
 */
-, acute_inpatient as (
+, encounters_with_conditions as (
 
     select distinct
           patients_with_frailty.patient_id
@@ -160,52 +245,50 @@ with patients_with_frailty as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , patients_with_frailty.exclusion_reason
+        , med_claim_exclusions.concept_name
             || ' with '
-            || med_claim_exclusions.concept_name
-            || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
+        , med_claim_exclusions.concept_category
+        , med_claim_exclusions.qualifying_count
     from patients_with_frailty
          inner join med_claim_exclusions
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
-    where med_claim_exclusions.concept_name = 'Acute Inpatient'
-        and condition_exclusions.concept_name = 'Advanced Illness'
-        and (
-            med_claim_exclusions.claim_start_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-            or med_claim_exclusions.claim_end_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-        )
+
 
     union all
 
+/* -- observations temporarily removed until we get better testing data
+    select distinct
+          patients_with_frailty.patient_id
+        , observation_exclusions.observation_date as exclusion_date
+        , observation_exclusions.concept_name as exclusion_reason
+        , observation_exclusions.concept_category
+        , observation_exclusions.qualifying_count
+    from patients_with_frailty
+         inner join observation_exclusions
+            on patients_with_frailty.patient_id = observation_exclusions.patient_id
+         inner join condition_exclusions
+             on observation_exclusions.patient_id = condition_exclusions.patient_id
+             and observation_exclusions.observation_date = condition_exclusions.recorded_date
+
+    union all
+*/
     select distinct
           patients_with_frailty.patient_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || procedure_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
+        , procedure_exclusions.concept_name as exclusion_reason
+        , procedure_exclusions.concept_category
+        , procedure_exclusions.qualifying_count
     from patients_with_frailty
          inner join procedure_exclusions
          on patients_with_frailty.patient_id = procedure_exclusions.patient_id
          inner join condition_exclusions
          on procedure_exclusions.patient_id = condition_exclusions.patient_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
-    where procedure_exclusions.concept_name = 'Acute Inpatient'
-    and condition_exclusions.concept_name = 'Advanced Illness'
-    and (
-        procedure_exclusions.procedure_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
+
 
 )
 
@@ -217,141 +300,21 @@ with patients_with_frailty as (
     on different dates of service with an advanced illness diagnosis during
     measurement period or the year prior to measurement period
 */
-, nonacute_outpatient as (
-
-    select distinct
-          patients_with_frailty.patient_id
-        , coalesce(
-              med_claim_exclusions.claim_start_date
-            , med_claim_exclusions.claim_end_date
-          ) as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || med_claim_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
-    from patients_with_frailty
-         inner join med_claim_exclusions
-            on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
-         inner join condition_exclusions
-            on med_claim_exclusions.claim_id = condition_exclusions.claim_id
-    where med_claim_exclusions.concept_name in (
-              'Encounter Inpatient'
-            , 'Outpatient'
-            , 'Observation'
-            , 'Emergency Department Visit'
-            , 'Nonacute Inpatient'
-        )
-        and condition_exclusions.concept_name = 'Advanced Illness'
-        and (
-            med_claim_exclusions.claim_start_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-            or med_claim_exclusions.claim_end_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-        )
-
-    union all
-
-    select distinct
-          patients_with_frailty.patient_id
-        , procedure_exclusions.procedure_date as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || procedure_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
-    from patients_with_frailty
-         inner join procedure_exclusions
-         on patients_with_frailty.patient_id = procedure_exclusions.patient_id
-         inner join condition_exclusions
-         on procedure_exclusions.patient_id = condition_exclusions.patient_id
-         and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
-    where procedure_exclusions.concept_name in (
-          'Encounter Inpatient'
-        , 'Outpatient'
-        , 'Observation'
-        , 'Emergency Department Visit'
-        , 'Nonacute Inpatient'
-    )
-    and condition_exclusions.concept_name = 'Advanced Illness'
-    and (
-        procedure_exclusions.procedure_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
-
-)
 
 /*
     Filter to patients who have had one acute inpatient encounter or
     two nonacute outpatient encounters
 */
-, acute_inpatient_counts as (
+
+
+, qualifying_encounters as (
 
     select
-          patient_id
-        , count(*) as encounter_count
-    from acute_inpatient
-    group by patient_id
-
-)
-
-, nonacute_outpatient_counts as (
-
-    select
-          patient_id
-        , count(*) as encounter_count
-    from nonacute_outpatient
-    group by patient_id
-
-)
-
-, eligible_acute_inpatient as (
-
-    select
-          acute_inpatient.patient_id
-        , acute_inpatient.exclusion_date
-        , acute_inpatient.exclusion_reason
-    from acute_inpatient
-         left join acute_inpatient_counts
-         on acute_inpatient.patient_id = acute_inpatient_counts.patient_id
-    where acute_inpatient_counts.encounter_count >= 1
-
-)
-
-, eligible_nonacute_outpatient as (
-
-    select
-          nonacute_outpatient.patient_id
-        , nonacute_outpatient.exclusion_date
-        , nonacute_outpatient.exclusion_reason
-    from nonacute_outpatient
-         left join nonacute_outpatient_counts
-         on nonacute_outpatient.patient_id = nonacute_outpatient_counts.patient_id
-    where nonacute_outpatient_counts.encounter_count >= 2
-
-)
-
-, exclusions_unioned as (
-
-    select
-          eligible_acute_inpatient.patient_id
-        , eligible_acute_inpatient.exclusion_date
-        , eligible_acute_inpatient.exclusion_reason
-    from eligible_acute_inpatient
-
-    union all
-
-    select
-          eligible_nonacute_outpatient.patient_id
-        , eligible_nonacute_outpatient.exclusion_date
-        , eligible_nonacute_outpatient.exclusion_reason
-    from eligible_nonacute_outpatient
-
+      patient_id
+    , exclusion_date
+    , exclusion_reason
+from encounters_with_conditions e
+qualify dense_rank() over(partition by patient_id,concept_category order by exclusion_date) >= qualifying_count
 )
 
 select
@@ -359,4 +322,4 @@ select
     , exclusion_date
     , exclusion_reason
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from exclusions_unioned
+from qualifying_encounters

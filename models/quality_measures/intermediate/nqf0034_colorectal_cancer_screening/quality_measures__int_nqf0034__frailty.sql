@@ -225,12 +225,12 @@ with aged_patients as (
 , ordered_exclusions as (
     select patient_id
         , exclusion_date
-        , concept_name as exclusion_reason
+        , concept_name
         , row_number() over (partition by patient_id order by exclusion_date) as exclusion_row
     from patients_with_exclusions
     )
 
 select  patient_id
     , exclusion_date
-    , exclusion_reason
+    , concept_name
 from ordered_exclusions
