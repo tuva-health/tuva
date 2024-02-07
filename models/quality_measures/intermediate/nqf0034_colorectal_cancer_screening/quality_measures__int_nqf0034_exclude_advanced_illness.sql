@@ -82,7 +82,7 @@ with encounter_exclusion_codes as (
     from {{ ref('quality_measures__stg_medical_claim') }}
 
 )
-
+/* -- observation based exclusions removed until we have better testing data
 , observations as (
 
     select
@@ -103,7 +103,7 @@ with encounter_exclusion_codes as (
     from {{ ref('quality_measures__stg_core__observation') }}
 
 )
-
+*/
 , procedures as (
 
     select
@@ -138,6 +138,7 @@ with encounter_exclusion_codes as (
         on conditions.code = condition_exclusion_codes.code
         and conditions.code_type = condition_exclusion_codes.code_system
 
+/* --  observations temporarily removed until we have better testing data
     union all
         select
           observations.patient_id
@@ -147,11 +148,10 @@ with encounter_exclusion_codes as (
     from observations
     inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
         on observations.observation_date between pp.performance_period_begin_1yp and pp.performance_period_end
-
     inner join condition_exclusion_codes
         on observations.code = condition_exclusion_codes.code
         and observations.code_type = condition_exclusion_codes.code_system
-
+*/
 
 
 
@@ -177,7 +177,9 @@ with encounter_exclusion_codes as (
 
 )
 
+/* -- observations temporarily removed until we get better testing data
 , observation_exclusions as (
+
 
     select
           observations.patient_id
@@ -194,7 +196,7 @@ with encounter_exclusion_codes as (
         and observations.code_type = encounter_exclusion_codes.code_system
 
 )
-
+*/
 , procedure_exclusions as (
 
     select
@@ -258,6 +260,7 @@ from {{ref('quality_measures__int_nqf0034__frailty')}}
 
     union all
 
+/* -- observations temporarily removed until we get better testing data
     select distinct
           patients_with_frailty.patient_id
         , observation_exclusions.observation_date as exclusion_date
@@ -272,7 +275,7 @@ from {{ref('quality_measures__int_nqf0034__frailty')}}
              and observation_exclusions.observation_date = condition_exclusions.recorded_date
 
     union all
-
+*/
     select distinct
           patients_with_frailty.patient_id
         , procedure_exclusions.procedure_date as exclusion_date
