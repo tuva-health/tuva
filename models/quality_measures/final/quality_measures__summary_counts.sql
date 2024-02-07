@@ -14,12 +14,13 @@ with summary_long as (
         , denominator_flag
         , numerator_flag
         , exclusion_flag
+        , performance_flag
     from {{ ref('quality_measures__summary_long') }}
     where measure_id is not null
 
 )
 
-, sum_flags as (
+, calculate_performance_rate  as (
 
     select
           measure_id
@@ -30,6 +31,10 @@ with summary_long as (
         , sum(denominator_flag) as denominator_sum
         , sum(numerator_flag) as numerator_sum
         , sum(exclusion_flag) as exclusion_sum
+        , (
+            cast(sum(performance_flag) as {{ dbt.type_numeric() }}) /
+                (cast(count(performance_flag) as {{ dbt.type_numeric() }}) )
+          )*100 as performance_rate
     from summary_long
     group by
           measure_id
@@ -37,25 +42,6 @@ with summary_long as (
         , measure_version
         , performance_period_begin
         , performance_period_end
-
-)
-
-, calculate_performance_rate as (
-
-    select
-          measure_id
-        , measure_name
-        , measure_version
-        , performance_period_begin
-        , performance_period_end
-        , denominator_sum
-        , numerator_sum
-        , exclusion_sum
-        , (
-            cast(numerator_sum as {{ dbt.type_numeric() }}) /
-                (cast(denominator_sum as {{ dbt.type_numeric() }}) - cast(exclusion_sum as {{ dbt.type_numeric() }}))
-          )*100 as performance_rate
-    from sum_flags
 
 )
 

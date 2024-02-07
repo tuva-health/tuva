@@ -292,7 +292,7 @@ with patients_with_frailty as (
 
     select
           patient_id
-        , count(*) as encounter_count
+        , count(distinct exclusion_date) as encounter_count
     from acute_inpatient
     group by patient_id
 
@@ -302,7 +302,7 @@ with patients_with_frailty as (
 
     select
           patient_id
-        , count(*) as encounter_count
+        , count(distinct exclusion_date) as encounter_count
     from nonacute_outpatient
     group by patient_id
 
