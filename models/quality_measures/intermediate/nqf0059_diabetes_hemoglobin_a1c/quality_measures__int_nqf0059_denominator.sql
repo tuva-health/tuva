@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+   )
+}}
 with performance_period as (
 
     select
@@ -59,10 +63,12 @@ with performance_period as (
         , code_system
     from {{ ref('quality_measures__value_sets') }}
     where concept_name in (
-        'Annual Wellness Visit'
-        ,'Home Healthcare Services'
-        ,'Office Visit'
-        ,'Outpatient'
+          'Office Visit'
+        , 'Home Healthcare Services'
+        , 'Preventive Care Services Established Office Visit, 18 and Up'
+        , 'Preventive Care Services Initial Office Visit, 18 and Up'
+        , 'Annual Wellness Visit'
+        , 'Telephone Visits'
     )
 
 )   
@@ -80,7 +86,7 @@ with performance_period as (
     --     , 'office visit'
     --     , 'outpatient'
     --     , 'outpatient rehabilitation'
-    -- ) TBD
+    -- )
 )
 
 , visit_claims as (
@@ -216,20 +222,18 @@ with performance_period as (
         on filtered_patients.patient_id = visit_encounters.patient_id
     where 
     (
-        true
-        -- visit_claims.claim_start_date
-        --     between filtered_patients.performance_period_begin
-        --     and filtered_patients.performance_period_end
-        -- or visit_claims.claim_end_date
-        --     between filtered_patients.performance_period_begin
-        --     and filtered_patients.performance_period_end
-        -- or visit_procedures.procedure_date
-        --     between filtered_patients.performance_period_begin
-        --     and filtered_patients.performance_period_end
-        -- or visit_encounters.encounter_start_date
-        --     between filtered_patients.performance_period_begin
-        --     and filtered_patients.performance_period_end
-
+        visit_claims.claim_start_date
+            between filtered_patients.performance_period_begin
+            and filtered_patients.performance_period_end
+        or visit_claims.claim_end_date
+            between filtered_patients.performance_period_begin
+            and filtered_patients.performance_period_end
+        or visit_procedures.procedure_date
+            between filtered_patients.performance_period_begin
+            and filtered_patients.performance_period_end
+        or visit_encounters.encounter_start_date
+            between filtered_patients.performance_period_begin
+            and filtered_patients.performance_period_end
     )
    
 
@@ -250,16 +254,14 @@ with performance_period as (
 
 )
 
---  select distinct
---       patient_id
---     , age
---     , performance_period_begin
---     , performance_period_end
---     , measure_id
---     , measure_name
---     , measure_version
---     , denominator_flag
---     , '{{ var('tuva_last_run')}}' as tuva_last_run
--- from add_data_types
-
-select * from eligible_population
+ select distinct
+      patient_id
+    , age
+    , performance_period_begin
+    , performance_period_end
+    , measure_id
+    , measure_name
+    , measure_version
+    , denominator_flag
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from add_data_types
