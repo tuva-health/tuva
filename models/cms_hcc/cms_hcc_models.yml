@@ -54,11 +54,12 @@ models:
     description: >
       This final model calculates the CMS HCC raw risk score, normalized risk 
       score, and payment risk score for each enrollee in the payment year.
+    tests:
+      - unique:
+          column_name: "(patient_id||'-'||model_version)"
     columns:
       - name: patient_id
         description: Unique ID for the patient.
-        tests:
-          - unique
       - name: raw_risk_score
         description: The sum of all patient risk factors.
       - name: normalized_risk_score
@@ -90,11 +91,12 @@ models:
     description: >
       Demographic and enrollment risk relative factor values for the 
       corresponding HCC model version and payment year.
+    tests:
+      - unique:
+          column_name: "(patient_id||'-'||model_version)"
     columns:
       - name: patient_id
         description: Unique ID for the patient.
-        tests:
-          - unique
       - name: enrollment_status
         description: >
           Indicates whether the patient is a "Continuing" or "New" enrollee.

@@ -2,11 +2,6 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
-/*
-The hcc_model_version var has been set here so it gets compiled.
-*/
-
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
 
 with demographics as (
 
@@ -37,7 +32,6 @@ with demographics as (
         , description
         , coefficient
     from {{ ref('cms_hcc__payment_hcc_count_factors') }}
-    where model_version = '{{ model_version_compiled }}'
 
 )
 
@@ -46,13 +40,14 @@ with demographics as (
     select
           patient_id
         , hcc_code
+        , model_version
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
 
 )
 
 , demographics_with_hcc_counts as (
 
-        select
+    select
           demographics.patient_id
         , demographics.enrollment_status
         , demographics.medicaid_status
@@ -63,8 +58,9 @@ with demographics as (
         , demographics.payment_year
         , count(hcc_hierarchy.hcc_code) as hcc_count
     from demographics
-         inner join hcc_hierarchy
-         on demographics.patient_id = hcc_hierarchy.patient_id
+        inner join hcc_hierarchy
+            on demographics.patient_id = hcc_hierarchy.patient_id
+            and demographics.model_version = hcc_hierarchy.model_version
     group by
           demographics.patient_id
         , demographics.enrollment_status
@@ -106,13 +102,14 @@ with demographics as (
         , seed_payment_hcc_count_factors.description
         , seed_payment_hcc_count_factors.coefficient
     from hcc_counts_normalized
-         inner join seed_payment_hcc_count_factors
-         on hcc_counts_normalized.enrollment_status = seed_payment_hcc_count_factors.enrollment_status
-         and hcc_counts_normalized.medicaid_status = seed_payment_hcc_count_factors.medicaid_status
-         and hcc_counts_normalized.dual_status = seed_payment_hcc_count_factors.dual_status
-         and hcc_counts_normalized.orec = seed_payment_hcc_count_factors.orec
-         and hcc_counts_normalized.institutional_status = seed_payment_hcc_count_factors.institutional_status
-         and hcc_counts_normalized.hcc_count_string = seed_payment_hcc_count_factors.payment_hcc_count
+        inner join seed_payment_hcc_count_factors
+            on hcc_counts_normalized.enrollment_status = seed_payment_hcc_count_factors.enrollment_status
+            and hcc_counts_normalized.medicaid_status = seed_payment_hcc_count_factors.medicaid_status
+            and hcc_counts_normalized.dual_status = seed_payment_hcc_count_factors.dual_status
+            and hcc_counts_normalized.orec = seed_payment_hcc_count_factors.orec
+            and hcc_counts_normalized.institutional_status = seed_payment_hcc_count_factors.institutional_status
+            and hcc_counts_normalized.hcc_count_string = seed_payment_hcc_count_factors.payment_hcc_count
+            and hcc_counts_normalized.model_version = seed_payment_hcc_count_factors.model_version
 
 )
 

@@ -5,18 +5,16 @@
 /*
 Steps for transforming eligibility data into member demographics:
     1) Determine enrollment status using eligibility from the collection year.
-    2) Roll up to latest eligibility record.
+    2) Roll up to latest eligibility record for enrollment statuses.
     3) Add age groups based on the payment year.
     4) Determine other statuses.
 
-Jinja is used to set payment and collection year variables.
- - The hcc_model_version and payment_year vars have been set here
-   so they get compiled.
+Jinja is used to set payment year variable.
+ - The payment_year var has been set here so it gets compiled.
  - CMS guidance: Age is calculated as of Feb 1 of the payment year.
  - The collection year is one year prior to the payment year.
 */
 
-{% set model_version = var('cms_hcc_model_version') -%}
 {% set payment_year = var('cms_hcc_payment_year') -%}
 {% set payment_year_age_date = payment_year ~ '-02-01' -%}
 {% set collection_year = payment_year - 1 -%}
@@ -56,6 +54,7 @@ with stg_eligibility as (
 
 )
 
+/* filter to members with eligibility in collection year */
 , cap_collection_start_end_dates as (
 
     select
@@ -73,10 +72,10 @@ with stg_eligibility as (
             else enrollment_end_date
           end as proxy_enrollment_end_date
     from stg_eligibility
-    where
-    /* filter to members with eligibility in collection year */
-    (extract(year from enrollment_start_date) = {{ collection_year }}
-     or extract(year from enrollment_end_date) = {{ collection_year }})
+    where (
+        extract(year from enrollment_start_date) = {{ collection_year }}
+        or extract(year from enrollment_end_date) = {{ collection_year }}
+    )
 
 )
 
@@ -126,9 +125,9 @@ with stg_eligibility as (
             else FALSE
           end as enrollment_status_default
     from stg_eligibility
-         left join add_enrollment
+        left join add_enrollment
             on stg_eligibility.patient_id = add_enrollment.patient_id
-         left join stg_patient
+        left join stg_patient
             on stg_eligibility.patient_id = stg_patient.patient_id
     where stg_eligibility.row_num = 1
 
@@ -252,7 +251,6 @@ with stg_eligibility as (
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
         , cast(orec_default as boolean) as orec_default
         , cast(institutional_status_default as boolean) as institutional_status_default
-        , cast('{{ model_version }}' as {{ dbt.type_string() }}) as model_version
         , cast('{{ payment_year }}' as integer) as payment_year
     from add_status_logic
 
@@ -271,7 +269,6 @@ select
     , medicaid_dual_status_default
     , orec_default
     , institutional_status_default
-    , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
