@@ -172,7 +172,7 @@ with performance_period as (
         , performance_period.performance_period_begin
         , performance_period.performance_period_end
         , patients.birth_date
-        , floor({{ datediff('patients.birth_date', 'visit_encounters.encounter_start_date', 'hour') }} / 8760.0) as age
+        , floor({{ datediff('patients.birth_date', 'performance_period.performance_period_end', 'hour') }} / 8760.0) as age
     from visit_encounters
     left join patients
         on visit_encounters.patient_id = patients.patient_id
