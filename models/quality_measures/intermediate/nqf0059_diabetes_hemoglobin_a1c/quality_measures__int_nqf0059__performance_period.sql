@@ -46,7 +46,7 @@ with period_end as (
             , from_date_or_timestamp =
                 dbt.dateadd (
                       datepart = "year"
-                    , interval = -10
+                    , interval = -1
                     , from_date_or_timestamp = "performance_period_end"
             )
           ) }} as performance_period_begin
