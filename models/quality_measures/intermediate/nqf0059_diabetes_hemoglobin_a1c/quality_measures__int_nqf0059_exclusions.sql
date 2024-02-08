@@ -4,23 +4,25 @@
 }}
 
 with exclusions as (
--- select *
--- From {{ref('quality_measures__int_nqf0059_exclude_advanced_illness')}}
-
--- union all
-
--- select *
--- From {{ref('quality_measures__int_nqf0059_exclude_dementia')}}
-
--- union all
 
 select *
-From {{ref('quality_measures__int_nqf0059_exclude_hospice_palliative')}}
+from {{ref('quality_measures__int_nqf0059_exclude_advanced_illness')}}
 
 union all
 
 select *
-From {{ref('quality_measures__int_nqf0059_exclude_institutional_snp')}}
+from {{ref('quality_measures__int_nqf0059_exclude_dementia')}}
+
+union all
+
+select *
+from {{ref('quality_measures__int_nqf0059_exclude_hospice_palliative')}}
+
+union all
+
+select *
+from {{ref('quality_measures__int_nqf0059_exclude_institutional_snp')}}
+
 )
 
 select exclusions.*
