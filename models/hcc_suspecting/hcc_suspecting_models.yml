@@ -139,6 +139,31 @@ models:
       - name: tuva_last_run
         description: The date the model was run.
 
+  - name: hcc_suspecting__int_prep_conditions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _int_prep_conditions
+      tags: hcc_suspecting
+      materialized: table
+    description: Preparing conditions; mapping snomed-ct conditions to icd-10-cm.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: recorded_date
+        description: Date in which the condition was recorded.
+      - name: condition_type
+        description: The type of condition.
+      - name: code_type
+        description: >
+          The type of condition code reported in the source system e.g. 
+          ICD-10-CM.
+      - name: code
+        description: >
+          The condition code in the source system e.g. the ICD-10 code.
+      - name: tuva_last_run
+        description: The date the model was run.
+
   ## Staging
   - name: hcc_suspecting__stg_core__condition
     config:

@@ -78,13 +78,17 @@ with patient as (
             else null
           end as denominator_flag
         , case
-            when numerator.patient_id is not null
+            when numerator.patient_id is not null and denominator.patient_id is not null
             then 1
+            when denominator.patient_id is not null
+            then 0
             else null
           end as numerator_flag
         , case
-            when exclusions.patient_id is not null
+            when exclusions.patient_id is not null and denominator.patient_id is not null
             then 1
+            when denominator.patient_id is not null
+            then 0
             else null
           end as exclusion_flag
         , numerator.evidence_date
