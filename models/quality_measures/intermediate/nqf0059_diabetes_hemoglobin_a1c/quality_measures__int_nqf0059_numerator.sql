@@ -101,7 +101,7 @@ with denominator as (
     from qualifying_patients
     where 
         (evidence_date not between performance_period_begin and performance_period_end)
-        or evidence_date is null
+        -- or evidence_date is null
 
 )
 
@@ -142,7 +142,7 @@ with denominator as (
         , measure_version
         , evidence_date
         , 0 as performance_flag
-        , 1 as numerator_flag
+        , 0 as numerator_flag
     from valid_patients
     where result < 7.0
 
@@ -159,7 +159,7 @@ with denominator as (
         , measure_version
         , evidence_date
         , 0 as performance_flag
-        , 1 as numerator_flag
+        , 0 as numerator_flag
     from valid_patients
     where result between 7.0 and 8.0
 
@@ -175,7 +175,7 @@ with denominator as (
         , measure_version
         , evidence_date
         , 0 as performance_flag
-        , 1 as numerator_flag
+        , 0 as numerator_flag
     from valid_patients
     where result between 8.0 and 9.0
 
