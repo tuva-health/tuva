@@ -9,13 +9,7 @@ Steps for staging the medical claim data:
     3) Map and filter diagnosis codes to HCCs for each CMS model version
     4) Union results from each CMS model version
        (note: some payment years may not have results for v28)
-
-Jinja is used to set payment year variable.
- - The payment_year var has been set here so it gets compiled.
- - The collection year is one year prior to the payment year.
 */
-
-{% set payment_year_compiled = var('cms_hcc_payment_year') -%}
 
 with conditions as (
 
@@ -30,13 +24,13 @@ with conditions as (
 , seed_hcc_mapping as (
 
     select
-          diagnosis_code
+          payment_year
+        , diagnosis_code
         , cms_hcc_v24
         , cms_hcc_v24_flag
         , cms_hcc_v28
         , cms_hcc_v28_flag
     from {{ ref('cms_hcc__icd_10_cm_mappings') }}
-    where payment_year = {{ payment_year_compiled }}
 
 )
 
@@ -52,6 +46,7 @@ with conditions as (
     from conditions
         inner join seed_hcc_mapping
             on conditions.condition_code = seed_hcc_mapping.diagnosis_code
+            and conditions.payment_year = seed_hcc_mapping.payment_year
     where cms_hcc_v24_flag = 'Yes'
 
 )
@@ -67,6 +62,7 @@ with conditions as (
     from conditions
         inner join seed_hcc_mapping
             on conditions.condition_code = seed_hcc_mapping.diagnosis_code
+            and conditions.payment_year = seed_hcc_mapping.payment_year
     where cms_hcc_v28_flag = 'Yes'
 
 )

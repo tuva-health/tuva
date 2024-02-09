@@ -71,7 +71,7 @@ models:
           If payment year >= 2024 then the score may be weighted following 
           CMS's transition plan.
       - name: blended_risk_score
-        description: v24_risk_score plus v28_risk_score.
+        description: The of sum v24_risk_score and v28_risk_score.
       - name: normalized_risk_score
         description: >
           The blended risk score divided by the normalization adjustment factor 
@@ -81,7 +81,7 @@ models:
         description: >
           The normalized risk score multiplied by the MA coding pattern 
           adjustment factor for the corresponding HCC model version 
-          and payment years rate announcement from CMS.
+          and payment year's rate announcement from CMS.
       - name: payment_year
         description: >
           The payment year the HCC and risk scores are being calculated for.
