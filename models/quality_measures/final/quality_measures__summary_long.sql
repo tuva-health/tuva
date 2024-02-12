@@ -8,8 +8,9 @@ with measures_unioned as (
 
     select * from {{ ref('quality_measures__int_nqf2372_long') }}
     union all
-
     select * from {{ ref('quality_measures__int_nqf0034_long') }}
+    union all
+    select * from {{ ref('quality_measures__int_nqf0059_long') }}
 )
 
 , add_data_types as (
