@@ -62,13 +62,13 @@ with performance_period as (
           code
         , code_system
     from {{ ref('quality_measures__value_sets') }}
-    where concept_name in (
-          'Office Visit'
-        , 'Home Healthcare Services'
-        , 'Preventive Care Services Established Office Visit, 18 and Up'
-        , 'Preventive Care Services Initial Office Visit, 18 and Up'
-        , 'Annual Wellness Visit'
-        , 'Telephone Visits'
+    where lower(concept_name) in (
+          'office visit'
+        , 'home healthcare services'
+        , 'preventive care services established office visit, 18 and up'
+        , 'preventive care services initial office visit, 18 and up'
+        , 'annual wellness visit'
+        , 'telephone visits'
     )
 
 )   
@@ -81,12 +81,12 @@ with performance_period as (
         , encounter_type
         , encounter_start_date
     from {{ ref('quality_measures__stg_core__encounter') }}
-    -- where lower(encounter_type) in (
-    --       'home health'
-    --     , 'office visit'
-    --     , 'outpatient'
-    --     , 'outpatient rehabilitation'
-    -- )
+    where lower(encounter_type) in (
+          'home health'
+        , 'office visit'
+        , 'outpatient'
+        , 'outpatient rehabilitation'
+    )
 )
 
 , visit_claims as (
@@ -121,10 +121,10 @@ with performance_period as (
           code
         , code_system
     from {{ ref('quality_measures__value_sets') }}
-    where concept_name in (
-        'Diabetes',
-        'HbA1c Laboratory Test',
-        'Nutrition Services'
+    where lower(concept_name) in (
+        'diabetes',
+        'hba1c laboratory test',
+        'nutrition services'
     )
 )
 
@@ -162,20 +162,14 @@ with performance_period as (
 , patients_with_age as (
 
     select
-          visit_encounters.patient_id
-        , visit_encounters.encounter_id
-        , visit_encounters.encounter_type
-        , visit_encounters.encounter_start_date
+          patients.patient_id
         , performance_period.measure_id
         , performance_period.measure_name
         , performance_period.measure_version
         , performance_period.performance_period_begin
         , performance_period.performance_period_end
-        , patients.birth_date
         , floor({{ datediff('patients.birth_date', 'performance_period.performance_period_end', 'hour') }} / 8760.0) as age
     from patients
-    left join visit_encounters
-        on visit_encounters.patient_id = patients.patient_id
     cross join performance_period
     where patients.death_date is null
 
@@ -188,16 +182,13 @@ with performance_period as (
         , patients_with_age.measure_id
         , patients_with_age.measure_name
         , patients_with_age.measure_version
-        , patients_with_age.encounter_type
-        , patients_with_age.encounter_start_date
         , patients_with_age.performance_period_begin
         , patients_with_age.performance_period_end
         , patients_with_age.age
         , 1 as denominator_flag
     from diabetic_conditions
     left join patients_with_age
-        on diabetic_conditions.encounter_id = patients_with_age.encounter_id
-            and diabetic_conditions.patient_id = patients_with_age.patient_id
+        on diabetic_conditions.patient_id = patients_with_age.patient_id
     where age between 18 and 75
 
 )
