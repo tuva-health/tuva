@@ -101,7 +101,7 @@ with denominator as (
     from qualifying_patients
     where 
         (evidence_date not between performance_period_begin and performance_period_end)
-        -- or evidence_date is null
+        or evidence_date is null
 
 )
 
