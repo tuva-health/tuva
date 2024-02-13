@@ -22,8 +22,8 @@ Jinja is used to set payment year variable.
  - The collection year is one year prior to the payment year.
 */
 
-{% set payment_year_compiled = var('cms_hcc_payment_year') -%}
-{% set collection_year = payment_year_compiled - 1 -%}
+{% set payment_year = var('cms_hcc_payment_year') | int() -%}
+{% set collection_year = payment_year - 1 -%}
 
 with medical_claims as (
 
@@ -76,7 +76,7 @@ with medical_claims as (
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'professional'
         and extract(year from claim_end_date) = {{ collection_year }}
-        and cpt_hcpcs_list.payment_year = {{ payment_year_compiled }}
+        and cpt_hcpcs_list.payment_year = {{ payment_year }}
 
 )
 
@@ -114,7 +114,7 @@ with medical_claims as (
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'institutional'
         and extract(year from claim_end_date) = {{ collection_year }}
-        and cpt_hcpcs_list.payment_year = {{ payment_year_compiled }}
+        and cpt_hcpcs_list.payment_year = {{ payment_year }}
         and left(bill_type_code,2) in ('12','13','43','71','73','76','77','85')
 
 )
@@ -147,7 +147,7 @@ with medical_claims as (
     select distinct
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
-        , cast('{{ payment_year_compiled }}' as integer) as payment_year
+        , cast('{{ payment_year }}' as integer) as payment_year
     from eligible_conditions
 
 )
