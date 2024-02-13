@@ -28,7 +28,7 @@ with seed_adjustment_rates as (
 
     select
           patient_id
-        , round(cast(sum(coefficient) as {{ dbt.type_numeric() }}),3) as risk_score
+        , sum(coefficient) as risk_score
         , model_version
         , payment_year
     from risk_factors
@@ -58,16 +58,16 @@ with seed_adjustment_rates as (
           patient_id
         , risk_score
         , case
-            when payment_year <= 2023 and model_version = 'CMS-HCC-V24' then round(cast(risk_score as numeric(28,6)),3)
-            when payment_year = 2024 and model_version = 'CMS-HCC-V24' then round(cast(risk_score * 0.67 as numeric(28,6)),3)
-            when payment_year = 2025 and model_version = 'CMS-HCC-V24' then round(cast(risk_score * 0.33 as numeric(28,6)),3)
-            when payment_year >= 2026 and model_version = 'CMS-HCC-V24' then round(cast(0 as numeric(28,6)),3)
+            when payment_year <= 2023 and model_version = 'CMS-HCC-V24' then risk_score
+            when payment_year = 2024 and model_version = 'CMS-HCC-V24' then risk_score * 0.67
+            when payment_year = 2025 and model_version = 'CMS-HCC-V24' then risk_score * 0.33
+            when payment_year >= 2026 and model_version = 'CMS-HCC-V24' then 0
             end as v24_risk_score
         , case
-            when payment_year <= 2023 and model_version = 'CMS-HCC-V28' then round(cast(0 as numeric(28,6)),3)
-            when payment_year = 2024 and model_version = 'CMS-HCC-V28' then round(cast(risk_score * 0.33 as numeric(28,6)),3)
-            when payment_year = 2025 and model_version = 'CMS-HCC-V28' then round(cast(risk_score * 0.67 as numeric(28,6)),3)
-            when payment_year >= 2026 and model_version = 'CMS-HCC-V28' then round(cast(risk_score as numeric(28,6)),3)
+            when payment_year <= 2023 and model_version = 'CMS-HCC-V28' then 0
+            when payment_year = 2024 and model_version = 'CMS-HCC-V28' then risk_score * 0.33
+            when payment_year = 2025 and model_version = 'CMS-HCC-V28' then risk_score * 0.67
+            when payment_year >= 2026 and model_version = 'CMS-HCC-V28' then risk_score
             end as v28_risk_score
         , model_version
         , payment_year
@@ -98,7 +98,7 @@ with seed_adjustment_rates as (
           patient_id
         , v24_risk_score
         , v28_risk_score
-        , round(cast(v24_risk_score + v28_risk_score as numeric(28,6)),3) as blended_risk_score
+        , v24_risk_score + v28_risk_score as blended_risk_score
         , payment_year
     from transition_scores_grouped
 
@@ -111,7 +111,7 @@ with seed_adjustment_rates as (
         , blended.v24_risk_score
         , blended.v28_risk_score
         , blended.blended_risk_score
-        , round(cast(blended.blended_risk_score / seed_adjustment_rates.normalization_factor as numeric(28,6)),3) as normalized_risk_score
+        , blended.blended_risk_score / seed_adjustment_rates.normalization_factor as normalized_risk_score
         , blended.payment_year
     from blended
         left join seed_adjustment_rates
@@ -127,7 +127,7 @@ with seed_adjustment_rates as (
         , normalized.v28_risk_score
         , normalized.blended_risk_score
         , normalized.normalized_risk_score
-        , round(cast(normalized.normalized_risk_score * (1 - seed_adjustment_rates.ma_coding_pattern_adjustment) as numeric(28,6)),3) as payment_risk_score
+        , normalized.normalized_risk_score * (1 - seed_adjustment_rates.ma_coding_pattern_adjustment) as payment_risk_score
         , normalized.payment_year
     from normalized
         left join seed_adjustment_rates
