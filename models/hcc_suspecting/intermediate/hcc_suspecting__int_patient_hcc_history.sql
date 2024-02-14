@@ -81,7 +81,7 @@ with all_conditions as (
 
 , all_conditions_with_flag as (
 
-    select
+    select distinct
           all_conditions.patient_id
         , all_conditions.data_source
         , all_conditions.recorded_date
