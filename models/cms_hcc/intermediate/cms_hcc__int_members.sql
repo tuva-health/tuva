@@ -5,19 +5,17 @@
 /*
 Steps for transforming eligibility data into member demographics:
     1) Determine enrollment status using eligibility from the collection year.
-    2) Roll up to latest eligibility record.
+    2) Roll up to latest eligibility record for enrollment statuses.
     3) Add age groups based on the payment year.
     4) Determine other statuses.
 
-Jinja is used to set payment and collection year variables.
- - The hcc_model_version and payment_year vars have been set here
-   so they get compiled.
+Jinja is used to set payment year variable.
+ - The payment_year var has been set here so it gets compiled.
  - CMS guidance: Age is calculated as of Feb 1 of the payment year.
  - The collection year is one year prior to the payment year.
 */
 
-{% set model_version = var('cms_hcc_model_version') -%}
-{% set payment_year = var('cms_hcc_payment_year') -%}
+{% set payment_year = var('cms_hcc_payment_year') | int() -%}
 {% set payment_year_age_date = payment_year ~ '-02-01' -%}
 {% set collection_year = payment_year - 1 -%}
 {% set collection_year_start = collection_year ~ '-01-01' -%}
@@ -37,10 +35,15 @@ with stg_eligibility as (
             order by enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
     from {{ ref('cms_hcc__stg_core__eligibility') }}
-    where
-    /* filter to members with eligibility in collection or payment year */
-    (extract(year from enrollment_start_date) >= {{ collection_year }}
-     or extract(year from enrollment_end_date) <= {{ payment_year }})
+    where (
+        /* filter to members with eligibility in collection or payment year */
+        extract(year from enrollment_start_date)
+            between {{ collection_year }}
+            and {{ payment_year }}
+        or extract(year from enrollment_end_date)
+            between {{ collection_year }}
+            and {{ payment_year }}
+    )
 
 )
 
@@ -56,6 +59,7 @@ with stg_eligibility as (
 
 )
 
+/* create proxy enrollment dates if outside of the collection year */
 , cap_collection_start_end_dates as (
 
     select
@@ -73,10 +77,15 @@ with stg_eligibility as (
             else enrollment_end_date
           end as proxy_enrollment_end_date
     from stg_eligibility
-    where
-    /* filter to members with eligibility in collection year */
-    (extract(year from enrollment_start_date) = {{ collection_year }}
-     or extract(year from enrollment_end_date) = {{ collection_year }})
+    where (
+        /* filter to members with eligibility in collection or payment year */
+        extract(year from enrollment_start_date)
+            between {{ collection_year }}
+            and {{ payment_year }}
+        or extract(year from enrollment_end_date)
+            between {{ collection_year }}
+            and {{ payment_year }}
+    )
 
 )
 
@@ -114,9 +123,7 @@ with stg_eligibility as (
         , stg_eligibility.original_reason_entitlement_code
         , stg_eligibility.dual_status_code
         , stg_eligibility.medicare_status_code
-        /*
-           Defaulting to "New" enrollment status when missing.
-        */
+        /* Defaulting to "New" enrollment status when missing */
         , case
             when add_enrollment.enrollment_status is null then 'New'
             else add_enrollment.enrollment_status
@@ -126,9 +133,9 @@ with stg_eligibility as (
             else FALSE
           end as enrollment_status_default
     from stg_eligibility
-         left join add_enrollment
+        left join add_enrollment
             on stg_eligibility.patient_id = add_enrollment.patient_id
-         left join stg_patient
+        left join stg_patient
             on stg_eligibility.patient_id = stg_patient.patient_id
     where stg_eligibility.row_num = 1
 
@@ -211,27 +218,21 @@ with stg_eligibility as (
             when original_reason_entitlement_code is null and medicare_status_code in ('20','21') then 'Disabled'
             when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 'Aged'
           end as orec
-        /*
-           Defaulting everyone to non-institutional until logic is added
-        */
+        /* Defaulting everyone to non-institutional until logic is added */
         , cast('No' as {{ dbt.type_string() }}) as institutional_status
         , enrollment_status_default
         , case
             when dual_status_code is null then TRUE
             else FALSE
           end as medicaid_dual_status_default
-        /*
-           Setting default true when OREC or Medicare Status is ESRD, or null.
-        */
+        /* Setting default true when OREC or Medicare Status is ESRD, or null */
         , case
             when original_reason_entitlement_code in ('2') then TRUE
             when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
             when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
             else FALSE
           end as orec_default
-        /*
-           Setting default true until institutional logic is added
-        */
+        /* Setting default true until institutional logic is added */
         , TRUE as institutional_status_default
     from add_age_group
 
@@ -252,7 +253,6 @@ with stg_eligibility as (
         , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
         , cast(orec_default as boolean) as orec_default
         , cast(institutional_status_default as boolean) as institutional_status_default
-        , cast('{{ model_version }}' as {{ dbt.type_string() }}) as model_version
         , cast('{{ payment_year }}' as integer) as payment_year
     from add_status_logic
 
@@ -271,7 +271,6 @@ select
     , medicaid_dual_status_default
     , orec_default
     , institutional_status_default
-    , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

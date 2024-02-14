@@ -17,15 +17,13 @@ Claims filtering logic:
     - Bill type code in (12X, 13X, 43X, 71X, 73X, 76X, 77X, 85X)
     - CPT/HCPCS in CPT/HCPCS seed file from CMS
 
-Jinja is used to set payment and collection year variables.
- - The hcc_model_version and payment_year vars have been set here
-   so they get compiled.
+Jinja is used to set payment year variable.
+ - The payment_year var has been set here so it gets compiled.
  - The collection year is one year prior to the payment year.
 */
 
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
-{% set payment_year_compiled = var('cms_hcc_payment_year') -%}
-{% set collection_year = payment_year_compiled - 1 -%}
+{% set payment_year = var('cms_hcc_payment_year') | int() -%}
+{% set collection_year = payment_year - 1 -%}
 
 with medical_claims as (
 
@@ -74,11 +72,11 @@ with medical_claims as (
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
     from medical_claims
-         inner join cpt_hcpcs_list
-         on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+        inner join cpt_hcpcs_list
+            on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'professional'
-    and extract(year from claim_end_date) = {{ collection_year }}
-    and cpt_hcpcs_list.payment_year = {{ payment_year_compiled }}
+        and extract(year from claim_end_date) = {{ collection_year }}
+        and cpt_hcpcs_list.payment_year = {{ payment_year }}
 
 )
 
@@ -95,8 +93,8 @@ with medical_claims as (
         , medical_claims.hcpcs_code
     from medical_claims
     where claim_type = 'institutional'
-    and extract(year from claim_end_date) = {{ collection_year }}
-    and left(bill_type_code,2) in ('11','41')
+        and extract(year from claim_end_date) = {{ collection_year }}
+        and left(bill_type_code,2) in ('11','41')
 
 )
 
@@ -112,12 +110,12 @@ with medical_claims as (
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
     from medical_claims
-         inner join cpt_hcpcs_list
-         on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+        inner join cpt_hcpcs_list
+            on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'institutional'
-    and extract(year from claim_end_date) = {{ collection_year }}
-    and cpt_hcpcs_list.payment_year = {{ payment_year_compiled }}
-    and left(bill_type_code,2) in ('12','13','43','71','73','76','77','85')
+        and extract(year from claim_end_date) = {{ collection_year }}
+        and cpt_hcpcs_list.payment_year = {{ payment_year }}
+        and left(bill_type_code,2) in ('12','13','43','71','73','76','77','85')
 
 )
 
@@ -138,9 +136,9 @@ with medical_claims as (
         , eligible_claims.patient_id
         , conditions.code
     from eligible_claims
-         inner join conditions
-         on eligible_claims.claim_id = conditions.claim_id
-         and eligible_claims.patient_id = conditions.patient_id
+        inner join conditions
+            on eligible_claims.claim_id = conditions.claim_id
+            and eligible_claims.patient_id = conditions.patient_id
 
 )
 
@@ -149,8 +147,7 @@ with medical_claims as (
     select distinct
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
-        , cast('{{ model_version_compiled }}' as {{ dbt.type_string() }}) as model_version
-        , cast('{{ payment_year_compiled }}' as integer) as payment_year
+        , cast('{{ payment_year }}' as integer) as payment_year
     from eligible_conditions
 
 )
@@ -158,7 +155,6 @@ with medical_claims as (
 select
       patient_id
     , condition_code
-    , model_version
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
