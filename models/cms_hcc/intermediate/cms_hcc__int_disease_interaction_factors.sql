@@ -2,11 +2,6 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
-/*
-The hcc_model_version var has been set here so it gets compiled.
-*/
-
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
 
 with demographics as (
 
@@ -30,6 +25,7 @@ with demographics as (
     select
           patient_id
         , hcc_code
+        , model_version
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
 
 )
@@ -50,7 +46,6 @@ with demographics as (
         , hcc_code_2
         , coefficient
     from {{ ref('cms_hcc__disease_interaction_factors') }}
-    where model_version = '{{ model_version_compiled }}'
 
 )
 
@@ -67,8 +62,9 @@ with demographics as (
         , demographics.payment_year
         , hcc_hierarchy.hcc_code
     from demographics
-         inner join hcc_hierarchy
-         on demographics.patient_id = hcc_hierarchy.patient_id
+        inner join hcc_hierarchy
+            on demographics.patient_id = hcc_hierarchy.patient_id
+            and demographics.model_version = hcc_hierarchy.model_version
 
 )
 
@@ -84,13 +80,14 @@ with demographics as (
         , interactions_code_1.hcc_code_2
         , interactions_code_1.coefficient
     from demographics_with_hccs
-         inner join seed_interaction_factors as interactions_code_1
-         on demographics_with_hccs.enrollment_status = interactions_code_1.enrollment_status
-         and demographics_with_hccs.medicaid_status = interactions_code_1.medicaid_status
-         and demographics_with_hccs.dual_status = interactions_code_1.dual_status
-         and demographics_with_hccs.orec = interactions_code_1.orec
-         and demographics_with_hccs.institutional_status = interactions_code_1.institutional_status
-         and demographics_with_hccs.hcc_code = interactions_code_1.hcc_code_1
+        inner join seed_interaction_factors as interactions_code_1
+            on demographics_with_hccs.enrollment_status = interactions_code_1.enrollment_status
+            and demographics_with_hccs.medicaid_status = interactions_code_1.medicaid_status
+            and demographics_with_hccs.dual_status = interactions_code_1.dual_status
+            and demographics_with_hccs.orec = interactions_code_1.orec
+            and demographics_with_hccs.institutional_status = interactions_code_1.institutional_status
+            and demographics_with_hccs.hcc_code = interactions_code_1.hcc_code_1
+            and demographics_with_hccs.model_version = interactions_code_1.model_version
 
 )
 
@@ -107,8 +104,9 @@ with demographics as (
         , demographics_with_interactions.payment_year
     from demographics_with_interactions
         inner join demographics_with_hccs as interactions_code_2
-        on demographics_with_interactions.patient_id = interactions_code_2.patient_id
-        and demographics_with_interactions.hcc_code_2 = interactions_code_2.hcc_code
+            on demographics_with_interactions.patient_id = interactions_code_2.patient_id
+            and demographics_with_interactions.hcc_code_2 = interactions_code_2.hcc_code
+            and demographics_with_interactions.model_version = interactions_code_2.model_version
 )
 
 , add_data_types as (

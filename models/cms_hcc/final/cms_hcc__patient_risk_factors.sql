@@ -42,6 +42,7 @@ with demographic_factors as (
 
     select
           patient_id
+        , model_version
         , enrollment_status_default
         , medicaid_dual_status_default
         , orec_default
@@ -145,8 +146,9 @@ with demographic_factors as (
         , unioned.model_version
         , unioned.payment_year
     from unioned
-         left join demographic_defaults
-         on unioned.patient_id = demographic_defaults.patient_id
+        left join demographic_defaults
+            on unioned.patient_id = demographic_defaults.patient_id
+            and unioned.model_version = demographic_defaults.model_version
 
 )
 
