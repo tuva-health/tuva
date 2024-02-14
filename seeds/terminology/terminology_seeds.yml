@@ -36,6 +36,7 @@ seeds:
 
 
   - name: terminology__all_ndc_descriptions
+    description: This file collects all ndcs collected by the fda and rxnorm, and compiles them into one list.  The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -54,6 +55,7 @@ seeds:
 
 
   - name: terminology__atc_codes_to_rxnorm_products
+    description: This file maps atc classes to rxcui.  The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
