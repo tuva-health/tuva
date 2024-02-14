@@ -2,61 +2,8 @@
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
    )
 }}
-with performance_period as (
 
-    select
-          measure_id
-        , measure_name
-        , measure_version
-        , performance_period_begin
-        , performance_period_end
-    from {{ ref('quality_measures__int_nqf0059__performance_period')}}
-
-)
-
-, patients as (
-
-    select
-          patient_id
-        , birth_date
-        , death_date
-    from {{ ref('quality_measures__stg_core__patient') }}
-
-)
-
-, medical_claim as (
-
-    select
-          patient_id
-        , claim_start_date
-        , claim_end_date
-        , hcpcs_code
-    from {{ ref('quality_measures__stg_medical_claim') }}
-
-)
-
-, procedures as (
-
-    select
-          patient_id
-        , procedure_date
-        , coalesce (
-              normalized_code_type
-            , case
-                when lower(source_code_type) = 'cpt' then 'hcpcs'
-                when lower(source_code_type) = 'snomed' then 'snomed-ct'
-                else lower(source_code_type)
-              end
-          ) as code_type
-        , coalesce (
-              normalized_code
-            , source_code
-          ) as code
-    from {{ ref('quality_measures__stg_core__procedure') }}
-
-)
-
-, visit_codes as (
+with  visit_codes as (
 
     select
           code
@@ -71,48 +18,66 @@ with performance_period as (
         , 'telephone visits'
     )
 
-)   
-
-, visit_encounters as (
-
-    select
-          patient_id
-        , encounter_id
-        , encounter_type
-        , encounter_start_date
-    from {{ ref('quality_measures__stg_core__encounter') }}
+), visits_encounters as (
+    select patient_id
+         , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
+         , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
+    from {{ref('quality_measures__stg_core__encounter')}} encounter
+    inner join {{ref('quality_measures__int_nqf0059__performance_period')}} as pp
+        on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
+        and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
           'home health'
         , 'office visit'
         , 'outpatient'
         , 'outpatient rehabilitation'
-    )
+     )
 )
 
-, visit_claims as (
+,procedure_encounters as (
+    select patient_id, procedure_date as min_date, procedure_date as max_date
+    from {{ref('quality_measures__stg_core__procedure')}} proc
+    inner join {{ref('quality_measures__int_nqf0059__performance_period')}}  as pp
+        on procedure_date between pp.performance_period_begin and  pp.performance_period_end
+    inner join  visit_codes
+        on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
 
-    select
-          medical_claim.patient_id
-        , medical_claim.claim_start_date
-        , medical_claim.claim_end_date
-        , medical_claim.hcpcs_code
-    from medical_claim
-        inner join visit_codes
-            on medical_claim.hcpcs_code = visit_codes.code
-    where visit_codes.code_system = 'hcps'
+
+)
+, claims_encounters as (
+    select patient_id
+    , coalesce(claim_start_date,claim_end_date) as min_date
+    , coalesce(claim_end_date,claim_start_date) as max_date
+    from {{ref('quality_measures__stg_medical_claim')}} medical_claim
+    inner join {{ref('quality_measures__int_nqf0059__performance_period')}}  as pp on
+        coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
+         and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
+    inner join  visit_codes
+        on medical_claim.hcpcs_code= visit_codes.code
+
 
 )
 
-, visit_procedures as (
+,all_encounters as (
+    select *, 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
+    from visits_encounters
+    union all
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc, 'p' as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
+    from procedure_encounters
+    union all
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
+    from claims_encounters
+)
 
-    select
-          procedures.patient_id
-        , procedures.procedure_date
-    from procedures
-         inner join visit_codes
-             on procedures.code = visit_codes.code
-             and procedures.code_type = visit_codes.code_system
-
+, encounters_by_patient as (
+    select patient_id,min(min_date) min_date, max(max_date) max_date,
+        concat(concat(
+            coalesce(min(visit_enc),'')
+            ,coalesce(min(proc_enc),''))
+            ,coalesce(min(claim_enc),'')
+            ) as qualifying_types
+    from all_encounters
+    group by patient_id
 )
 
 , diabetics_codes as (
@@ -160,94 +125,46 @@ with performance_period as (
 )
 
 , patients_with_age as (
-
     select
-          patients.patient_id
-        , performance_period.measure_id
-        , performance_period.measure_name
-        , performance_period.measure_version
-        , performance_period.performance_period_begin
-        , performance_period.performance_period_end
-        , floor({{ datediff('patients.birth_date', 'performance_period.performance_period_end', 'hour') }} / 8760.0) as age
-    from patients
-    cross join performance_period
-    where patients.death_date is null
+          p.patient_id
+        , min_date
+        , floor({{ datediff('birth_date', 'e.min_date', 'hour') }} / 8760.0)  as min_age
+        , max_date
+        , floor({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0) as max_age
+        , qualifying_types
+    from {{ref('quality_measures__stg_core__patient')}} p
+    inner join encounters_by_patient e
+        on p.patient_id = e.patient_id
+    where p.death_date is null
+
 
 )
 
-, filtered_patients as (
+, qualifying_patients as (
 
     select
-          diabetic_conditions.*
-        , patients_with_age.measure_id
-        , patients_with_age.measure_name
-        , patients_with_age.measure_version
-        , patients_with_age.performance_period_begin
-        , patients_with_age.performance_period_end
-        , patients_with_age.age
+        distinct
+          diabetic_conditions.patient_id
+        , patients_with_age.* exclude patient_id
+        , pp.performance_period_begin
+        , pp.performance_period_end
+        , pp.measure_id
+        , pp.measure_name
+        , pp.measure_version
         , 1 as denominator_flag
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
     from diabetic_conditions
     left join patients_with_age
         on diabetic_conditions.patient_id = patients_with_age.patient_id
-    where age between 18 and 75
+    cross join {{ref('quality_measures__int_nqf0059__performance_period')}} pp
+    where max_age >= 18 and min_age <=  75
 
 )
 
-, eligible_population as (
-
-   select
-          filtered_patients.patient_id
-        , filtered_patients.age
-        , filtered_patients.measure_id
-        , filtered_patients.measure_name
-        , filtered_patients.measure_version
-        , filtered_patients.performance_period_begin
-        , filtered_patients.performance_period_end
-        , filtered_patients.denominator_flag
-    from filtered_patients
-    left join visit_claims
-        on filtered_patients.patient_id = visit_claims.patient_id
-    left join visit_procedures
-        on filtered_patients.patient_id = visit_procedures.patient_id
-    left join visit_encounters
-        on filtered_patients.patient_id = visit_encounters.patient_id
-    where 
-    (
-        visit_claims.claim_start_date
-            between filtered_patients.performance_period_begin
-            and filtered_patients.performance_period_end
-        or visit_claims.claim_end_date
-            between filtered_patients.performance_period_begin
-            and filtered_patients.performance_period_end
-        or visit_procedures.procedure_date
-            between filtered_patients.performance_period_begin
-            and filtered_patients.performance_period_end
-        or visit_encounters.encounter_start_date
-            between filtered_patients.performance_period_begin
-            and filtered_patients.performance_period_end
-    )
-   
-
-)
-
-, add_data_types as (
-
-    select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(age as integer) as age
-        , cast(performance_period_begin as date) as performance_period_begin
-        , cast(performance_period_end as date) as performance_period_end
-        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
-        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
-        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
-        , cast(denominator_flag as integer) as denominator_flag
-    from eligible_population
-
-)
-
- select distinct
-      patient_id
-    , age
+select 
+    patient_id
+    , max_age as age
+    , qualifying_types
     , performance_period_begin
     , performance_period_end
     , measure_id
@@ -255,4 +172,4 @@ with performance_period as (
     , measure_version
     , denominator_flag
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from add_data_types
+from qualifying_patients
