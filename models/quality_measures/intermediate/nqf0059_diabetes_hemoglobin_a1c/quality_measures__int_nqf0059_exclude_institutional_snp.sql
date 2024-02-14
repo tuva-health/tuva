@@ -1,13 +1,13 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false))))
    )
 }}
 
 /*
-    Patients greater than or equal to 66 in Institutional Special Needs Plans (SNP)
+    patients greater than or equal to 66 in institutional special needs plans (snp)
     or residing in long term care
 
-    Future enhancement: group claims into encounters
+    future enhancement: group claims into encounters
 */
 
 with denominator as (
@@ -41,7 +41,7 @@ with denominator as (
               medical_claim.claim_start_date
             , medical_claim.claim_end_date
           ) as exclusion_date
-        , 'Institutional or Long Term Care' as exclusion_reason
+        , 'institutional or long term care' as exclusion_reason
     from denominator
          inner join medical_claim
          on denominator.patient_id = medical_claim.patient_id

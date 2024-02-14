@@ -1,15 +1,15 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false))))
    )
 }}
 /*
-    Patients greater than or equal to 66 with at least one claim/encounter for
+    patients greater than or equal to 66 with at least one claim/encounter for
     frailty during the measurement period
 
-    AND either one acute inpatient encounter with a diagnosis of advanced
+    and either one acute inpatient encounter with a diagnosis of advanced
     illness
 
-    OR two outpatient, observation, ED or nonacute inpatient encounters on
+    or two outpatient, observation, ed or nonacute inpatient encounters on
     different dates of service with an advanced illness diagnosis during
     measurement period or the year prior to measurement period
 */
@@ -33,14 +33,14 @@ with patients_with_frailty as (
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
-    where concept_name in (
-          'Advanced Illness'
-        , 'Acute Inpatient'
-        , 'Encounter Inpatient'
-        , 'Outpatient'
-        , 'Observation'
-        , 'Emergency Department Visit'
-        , 'Nonacute Inpatient'
+    where lower(concept_name) in (
+          'advanced illness'
+        , 'acute inpatient'
+        , 'encounter inpatient'
+        , 'outpatient'
+        , 'observation'
+        , 'emergency department visit'
+        , 'nonacute inpatient'
     )
 
 )
@@ -144,10 +144,10 @@ with patients_with_frailty as (
 )
 
 /*
-    Patients greater than or equal to 66 with at least one claim/encounter for
+    patients greater than or equal to 66 with at least one claim/encounter for
     frailty during the measurement period
 
-    AND one acute inpatient encounter with a diagnosis of advanced illness
+    and one acute inpatient encounter with a diagnosis of advanced illness
     during measurement period or the year prior to measurement period
 */
 , acute_inpatient as (
@@ -169,8 +169,8 @@ with patients_with_frailty as (
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
-    where med_claim_exclusions.concept_name = 'Acute Inpatient'
-        and condition_exclusions.concept_name = 'Advanced Illness'
+    where med_claim_exclusions.concept_name = 'acute inpatient'
+        and condition_exclusions.concept_name = 'advanced illness'
         and (
             med_claim_exclusions.claim_start_date
                 between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -197,8 +197,8 @@ with patients_with_frailty as (
          inner join condition_exclusions
          on procedure_exclusions.patient_id = condition_exclusions.patient_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
-    where procedure_exclusions.concept_name = 'Acute Inpatient'
-    and condition_exclusions.concept_name = 'Advanced Illness'
+    where lower(procedure_exclusions.concept_name) = 'acute inpatient'
+    and lower(condition_exclusions.concept_name) = 'advanced illness'
     and (
         procedure_exclusions.procedure_date
             between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -208,10 +208,10 @@ with patients_with_frailty as (
 )
 
 /*
-    Patients greater than or equal to 66 with at least one claim/encounter for
+    patients greater than or equal to 66 with at least one claim/encounter for
     frailty during the measurement period
 
-    AND two outpatient, observation, ED or nonacute inpatient encounters
+    and two outpatient, observation, ed or nonacute inpatient encounters
     on different dates of service with an advanced illness diagnosis during
     measurement period or the year prior to measurement period
 */
@@ -234,14 +234,14 @@ with patients_with_frailty as (
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
-    where med_claim_exclusions.concept_name in (
-              'Encounter Inpatient'
-            , 'Outpatient'
-            , 'Observation'
-            , 'Emergency Department Visit'
-            , 'Nonacute Inpatient'
+    where lower(med_claim_exclusions.concept_name) in (
+              'encounter inpatient'
+            , 'outpatient'
+            , 'observation'
+            , 'emergency department visit'
+            , 'nonacute inpatient'
         )
-        and condition_exclusions.concept_name = 'Advanced Illness'
+        and condition_exclusions.concept_name = 'advanced illness'
         and (
             med_claim_exclusions.claim_start_date
                 between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -268,14 +268,14 @@ with patients_with_frailty as (
          inner join condition_exclusions
          on procedure_exclusions.patient_id = condition_exclusions.patient_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
-    where procedure_exclusions.concept_name in (
-          'Encounter Inpatient'
-        , 'Outpatient'
-        , 'Observation'
-        , 'Emergency Department Visit'
-        , 'Nonacute Inpatient'
+    where lower(procedure_exclusions.concept_name) in (
+          'encounter inpatient'
+        , 'outpatient'
+        , 'observation'
+        , 'emergency department visit'
+        , 'nonacute inpatient'
     )
-    and condition_exclusions.concept_name = 'Advanced Illness'
+    and condition_exclusions.concept_name = 'advanced illness'
     and (
         procedure_exclusions.procedure_date
             between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -285,7 +285,7 @@ with patients_with_frailty as (
 )
 
 /*
-    Filter to patients who have had one acute inpatient encounter or
+    filter to patients who have had one acute inpatient encounter or
     two nonacute outpatient encounters
 */
 , acute_inpatient_counts as (

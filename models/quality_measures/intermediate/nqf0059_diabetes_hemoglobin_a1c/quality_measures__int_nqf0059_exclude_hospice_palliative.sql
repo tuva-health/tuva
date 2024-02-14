@@ -21,9 +21,9 @@ with exclusion_codes as (
           else lower(code_system) end as code_system
         , concept_name
     From {{ref('quality_measures__value_sets')}}
-    where concept_name in  (
-           'Hospice Encounter'
-          ,'Palliative Care Encounter'
+    where lower(concept_name) in  (
+           'hospice encounter'
+          ,'palliative care encounter'
     )
 
 

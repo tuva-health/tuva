@@ -1,11 +1,11 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false))))
    )
 }}
 
 /*
-    Patients greater than or equal to 66 with at least one claim/encounter for frailty
-    during the measurement period AND a dispensed medication for dementia during the measurement period
+    patients greater than or equal to 66 with at least one claim/encounter for frailty
+    during the measurement period and a dispensed medication for dementia during the measurement period
     or year prior to measurement period
 */
 
@@ -28,8 +28,8 @@ with patients_with_frailty as (
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
-    where concept_name in (
-        'Dementia Medications'
+    where lower(concept_name) in (
+        'dementia medications'
     )
 
 )

@@ -25,11 +25,11 @@ with denominator as (
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
-    where concept_name in (
-          'Frailty Device'
-        , 'Frailty Diagnosis'
-        , 'Frailty Encounter'
-        , 'Frailty Symptom'
+    where lower(concept_name) in (
+          'frailty device'
+        , 'frailty diagnosis'
+        , 'frailty encounter'
+        , 'frailty symptom'
     )
 
 )
@@ -174,11 +174,11 @@ with denominator as (
          inner join condition_exclusions
             on denominator.patient_id = condition_exclusions.patient_id
     where denominator.age >= 66
-        and condition_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
+        and lower(condition_exclusions.concept_name) in (
+              'frailty device'
+            , 'frailty diagnosis'
+            , 'frailty encounter'
+            , 'frailty symptom'
         )
         and condition_exclusions.recorded_date
             between denominator.performance_period_begin
@@ -199,11 +199,11 @@ with denominator as (
          inner join med_claim_exclusions
             on denominator.patient_id = med_claim_exclusions.patient_id
     where denominator.age >= 66
-        and med_claim_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
+        and lower(med_claim_exclusions.concept_name) in (
+              'frailty device'
+            , 'frailty diagnosis'
+            , 'frailty encounter'
+            , 'frailty symptom'
         )
         and (
             med_claim_exclusions.claim_start_date
@@ -226,11 +226,11 @@ with denominator as (
          inner join observation_exclusions
             on denominator.patient_id = observation_exclusions.patient_id
     where denominator.age >= 66
-        and observation_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
+        and lower(observation_exclusions.concept_name) in (
+              'frailty device'
+            , 'frailty diagnosis'
+            , 'frailty encounter'
+            , 'frailty symptom'
         )
         and observation_exclusions.observation_date
             between denominator.performance_period_begin
@@ -248,11 +248,11 @@ with denominator as (
          inner join procedure_exclusions
             on denominator.patient_id = procedure_exclusions.patient_id
     where denominator.age >= 66
-        and procedure_exclusions.concept_name in (
-              'Frailty Device'
-            , 'Frailty Diagnosis'
-            , 'Frailty Encounter'
-            , 'Frailty Symptom'
+        and lower(procedure_exclusions.concept_name) in (
+              'frailty device'
+            , 'frailty diagnosis'
+            , 'frailty encounter'
+            , 'frailty symptom'
         )
         and procedure_exclusions.procedure_date
             between denominator.performance_period_begin
