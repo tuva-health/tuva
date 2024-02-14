@@ -35,12 +35,12 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
-  - name: terminology__all_ndc_descriptions
+  - name: terminology__ndc
     description: This file collects all ndcs collected by the fda and rxnorm, and compiles them into one list.  The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: all_ndc_descriptions
+      alias: ndc
       tags:
         - terminology
       column_types:
@@ -54,12 +54,12 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
 
-  - name: terminology__atc_codes_to_rxnorm_products
+  - name: terminology__rxnorm_to_atc
     description: This file maps atc classes to rxcui.  The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: atc_codes_to_rxnorm_products
+      alias: rxnorm_to_atc
       tags:
         - terminology
       column_types:

@@ -48,10 +48,6 @@ clean-targets:
 seeds:
   the_tuva_project:
     terminology:
-      terminology__all_ndc_descriptions:
-        +post-hook: "{{ load_seed('tuva-public-resources/terminology','all_ndc_descriptions.csv',compression=true,null_marker=true) }}"
-      terminology__atc_codes_to_rxnorm_products:
-        +post-hook: "{{ load_seed('tuva-public-resources/terminology','atc_codes_to_rxnorm_products.csv',compression=true,null_marker=true) }}"
       terminology__calendar:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','calendar.csv',compression=true,null_marker=true) }}"
       terminology__loinc:
@@ -64,8 +60,12 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
         +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
+      terminology__ndc:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','ndc.csv',compression=true,null_marker=true) }}"
       terminology__provider:
         +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv',compression=true,null_marker=true) }}"
+      terminology__rxnorm_to_atc:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__snomed_icd_10_map:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','snomed_icd_10_map.csv',compression=true,null_marker=true) }}"
     value_sets:
