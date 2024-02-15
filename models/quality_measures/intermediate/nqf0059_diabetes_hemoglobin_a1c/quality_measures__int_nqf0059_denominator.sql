@@ -32,10 +32,11 @@ with  visit_codes as (
         , 'office visit'
         , 'outpatient'
         , 'outpatient rehabilitation'
+        , 'telehealth'
      )
 )
 
-,procedure_encounters as (
+, procedure_encounters as (
     select 
           patient_id
         , procedure_date as min_date
@@ -62,7 +63,7 @@ with  visit_codes as (
 
 )
 
-,all_encounters as (
+, all_encounters as (
     select *, 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from visits_encounters
     union all
