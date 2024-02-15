@@ -81,8 +81,9 @@ with denominator as (
 , qualifying_patients as (
 
     select
-        denominator.*
-        , recent_readings.* exclude patient_id
+          denominator.*
+        , recent_readings.evidence_date
+        , recent_readings.result
     from denominator
     left join recent_readings
         on denominator.patient_id = recent_readings.patient_id
