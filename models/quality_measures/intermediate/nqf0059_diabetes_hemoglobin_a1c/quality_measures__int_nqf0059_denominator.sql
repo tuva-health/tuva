@@ -35,7 +35,10 @@ with  visit_codes as (
 )
 
 ,procedure_encounters as (
-    select patient_id, procedure_date as min_date, procedure_date as max_date
+    select 
+          patient_id
+        , procedure_date as min_date
+        , procedure_date as max_date
     from {{ref('quality_measures__stg_core__procedure')}} proc
     inner join {{ref('quality_measures__int_nqf0059__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
