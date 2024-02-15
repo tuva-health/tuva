@@ -168,7 +168,6 @@ with  visit_codes as (
 select 
     patient_id
     , max_age as age
-    , qualifying_types
     , performance_period_begin
     , performance_period_end
     , measure_id

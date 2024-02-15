@@ -33,8 +33,8 @@ with denominator as (
         , code_system
         , concept_name
     From {{ref('quality_measures__value_sets')}}
-    where concept_name in  (
-        'HbA1c Laboratory Test'
+    where lower(concept_name) in  (
+        'hba1c laboratory test'
     )
 )
 
@@ -65,6 +65,7 @@ with denominator as (
       or ( labs.source_code = hba1c_test_code.code
        and labs.source_code_type = hba1c_test_code.code_system )
     where coalesce(collection_date,result_date) < {{ performance_period_end }}
+        and regexp_like(labs.result, '[+-]?([0-9]*[.])?[0-9]+')
 
 )
 
