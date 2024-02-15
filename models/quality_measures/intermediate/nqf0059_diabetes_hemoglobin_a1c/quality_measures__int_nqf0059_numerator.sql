@@ -100,7 +100,6 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
-        , 1 as performance_flag
         , 1 as numerator_flag
     from qualifying_patients
     where 
@@ -128,7 +127,6 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
-        , 1 as performance_flag
         , 1 as numerator_flag
     from valid_patients
     where result > 9.0
@@ -145,7 +143,6 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
-        , 0 as performance_flag
         , 0 as numerator_flag
     from valid_patients
     where result < 7.0
@@ -162,7 +159,6 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
-        , 0 as performance_flag
         , 0 as numerator_flag
     from valid_patients
     where result between 7.0 and 8.0
@@ -178,7 +174,6 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
-        , 0 as performance_flag
         , 0 as numerator_flag
     from valid_patients
     where result between 8.0 and 9.0
@@ -218,7 +213,6 @@ with denominator as (
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(evidence_date as date) as evidence_date
         , cast(numerator_flag as integer) as numerator_flag
-        , cast(performance_flag as integer) as performance_flag
     from numerator
 
 )
