@@ -3,16 +3,6 @@
    )
 }}
 
-{%- set performance_period_end -%}
-(
-
-    select 
-        performance_period_end
-    from {{ ref('quality_measures__int_nqf0059__performance_period') }}
-
-)
-{%- endset -%}
-
 with denominator as (
 
     select
@@ -64,7 +54,9 @@ with denominator as (
        and labs.normalized_code_type = hba1c_test_code.code_system )
       or ( labs.source_code = hba1c_test_code.code
        and labs.source_code_type = hba1c_test_code.code_system )
-    where coalesce(collection_date,result_date) < {{ performance_period_end }}
+    left join denominator
+        on labs.patient_id = denominator.patient_id
+    where coalesce(collection_date,result_date) <= denominator.performance_period_end
         and regexp_like(labs.result, '[+-]?([0-9]*[.])?[0-9]+')
 
 )
