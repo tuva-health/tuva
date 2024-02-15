@@ -111,90 +111,25 @@ with denominator as (
 , valid_patients as (
 
     select
-        *
+          patient_id
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
+        , evidence_date
+        , case
+            when cast(result as {{ dbt.type_numeric() }}) > 9.0 then 1 
+            else 0
+          end as numerator_flag
     from qualifying_patients
     where evidence_date between performance_period_begin and performance_period_end
 
 )
 
-, readings_exceeding_9 as (
-
-    select
-          patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
-        , evidence_date
-        , 1 as numerator_flag
-    from valid_patients
-    where result > 9.0
-
-)
-
-, readings_less_than_7 as (
-
-    select
-          patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
-        , evidence_date
-        , 0 as numerator_flag
-    from valid_patients
-    where result < 7.0
-
-)
-
-, readings_between_7_and_8 as (
-
-    select
-         patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
-        , evidence_date
-        , 0 as numerator_flag
-    from valid_patients
-    where result between 7.0 and 8.0
-
-)
-, readings_between_8_and_9 as (
-
-    select
-         patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
-        , evidence_date
-        , 0 as numerator_flag
-    from valid_patients
-    where result between 8.0 and 9.0
-
-)
-
 , numerator as (
 
-    select * from readings_less_than_7
-
-    union all
-
-    select * from readings_between_7_and_8
-
-    union all
-
-    select * from readings_between_8_and_9
-
-    union all
-
-    select * from readings_exceeding_9
+    select * from valid_patients
 
     union all
         
