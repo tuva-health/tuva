@@ -3,36 +3,6 @@
    )
 }}
 
-
-{%- set measure_id -%}
-(
-    select id
-from {{ ref('quality_measures__measures') }}
-where id = 'NQF0059'
-    )
-{%- endset -%}
-
-{%- set measure_name -%}
-(
-
-    select name
-from {{ ref('quality_measures__measures') }}
-where id = 'NQF0059'
-
-    )
-{%- endset -%}
-
-{%- set measure_version -%}
-(
-    select version
-from {{ ref('quality_measures__measures') }}
-where id = 'NQF0059'
-
-    )
-{%- endset -%}
-
-
-
 /* selecting the full patient population as the grain of this table */
 with patient as (
 
@@ -44,7 +14,7 @@ with patient as (
 , denominator as (
 
     select
-          patient_id
+          *
     from {{ ref('quality_measures__int_nqf0059_denominator') }}
 
 )
@@ -95,14 +65,12 @@ with patient as (
         , numerator.evidence_date
         , exclusions.exclusion_date
         , exclusions.exclusion_reason
-        , pp.performance_period_begin
-        , pp.performance_period_end
-        , {{ measure_id }}  as measure_id
-        , {{ measure_name }}  as measure_name
-        , {{ measure_version }}  as measure_version
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
+        , denominator.measure_id
+        , denominator.measure_name
+        , denominator.measure_version
     from patient
-    inner join {{ref('quality_measures__int_nqf0059__performance_period')}} pp
-        on 1 = 1
         left join denominator
             on patient.patient_id = denominator.patient_id
         left join numerator
