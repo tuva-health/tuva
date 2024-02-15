@@ -16,6 +16,7 @@ with  visit_codes as (
         , 'preventive care services initial office visit, 18 and up'
         , 'annual wellness visit'
         , 'telephone visits'
+        , 'nutrition services'
     )
 
 ), visits_encounters as (
@@ -90,9 +91,8 @@ with  visit_codes as (
         , code_system
     from {{ ref('quality_measures__value_sets') }}
     where lower(concept_name) in (
-        'diabetes',
-        'hba1c laboratory test',
-        'nutrition services'
+          'diabetes'
+        , 'hba1c laboratory test'
     )
 )
 
