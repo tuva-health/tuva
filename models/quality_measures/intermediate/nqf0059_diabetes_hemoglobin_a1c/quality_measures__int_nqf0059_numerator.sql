@@ -217,4 +217,13 @@ with denominator as (
 
 )
 
-select * from add_data_types
+select
+      patient_id
+    , performance_period_begin
+    , performance_period_end
+    , measure_id
+    , measure_name
+    , measure_version
+    , evidence_date
+    , numerator_flag
+from add_data_types
