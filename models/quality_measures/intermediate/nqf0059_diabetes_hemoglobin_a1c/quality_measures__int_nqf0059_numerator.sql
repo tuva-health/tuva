@@ -66,8 +66,9 @@ with denominator as (
           patient_id
         , evidence_date
         , result
+        , row_number() over(partition by patient_id order by evidence_date desc) as rn
     from qualifying_labs
-    qualify row_number() over(partition by patient_id order by evidence_date desc) = 1
+    where rn = 1 
 
 )
 

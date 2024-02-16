@@ -98,8 +98,7 @@ with patient as (
         , measure_id
         , measure_name
         , measure_version
-    from measure_flags
-    qualify (row_number() over(
+        , (row_number() over(
             partition by
                   patient_id
                 , performance_period_begin
@@ -109,7 +108,9 @@ with patient as (
             order by
                   evidence_date desc nulls last
                 , exclusion_date desc nulls last
-          )) = 1 
+          )) as rn
+    from measure_flags
+    where rn = 1
 
 )
 
