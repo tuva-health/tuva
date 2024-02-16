@@ -149,7 +149,7 @@ with  visit_codes as (
     select
         distinct
           diabetic_conditions.patient_id
-        , patients_with_age.* exclude patient_id
+        , patients_with_age.max_age as age
         , pp.performance_period_begin
         , pp.performance_period_end
         , pp.measure_id
@@ -166,8 +166,8 @@ with  visit_codes as (
 )
 
 select 
-    patient_id
-    , max_age as age
+      patient_id
+    , age
     , performance_period_begin
     , performance_period_end
     , measure_id
