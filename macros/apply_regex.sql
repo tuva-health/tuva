@@ -30,6 +30,6 @@
 
 {%- macro redshift__apply_regex(column_name, regex) -%}
 
-     {{ column_name }} ~ '{{ regex }}'
+     {{ column_name }} similar to '{{ regex }}'
 
 {%- endmacro -%}
