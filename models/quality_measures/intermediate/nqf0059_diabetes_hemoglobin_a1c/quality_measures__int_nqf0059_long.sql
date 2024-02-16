@@ -70,6 +70,17 @@ with patient as (
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
+        , (row_number() over(
+            partition by
+                  patient.patient_id
+                , denominator.performance_period_begin
+                , denominator.performance_period_end
+                , denominator.measure_id
+                , denominator.measure_name
+            order by
+                  numerator.evidence_date desc nulls last
+                , exclusions.exclusion_date desc nulls last
+          )) as rn
     from patient
         left join denominator
             on patient.patient_id = denominator.patient_id
@@ -98,17 +109,6 @@ with patient as (
         , measure_id
         , measure_name
         , measure_version
-        , (row_number() over(
-            partition by
-                  patient_id
-                , performance_period_begin
-                , performance_period_end
-                , measure_id
-                , measure_name
-            order by
-                  evidence_date desc nulls last
-                , exclusion_date desc nulls last
-          )) as rn
     from measure_flags
     where rn = 1
 
