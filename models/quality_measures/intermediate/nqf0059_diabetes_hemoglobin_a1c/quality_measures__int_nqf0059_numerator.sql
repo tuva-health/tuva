@@ -57,7 +57,7 @@ with denominator as (
     left join denominator
         on labs.patient_id = denominator.patient_id
     where coalesce(collection_date,result_date) <= denominator.performance_period_end
-        and regexp_like(labs.result, '[+-]?([0-9]*[.])?[0-9]+')
+        and {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
 
 )
 
