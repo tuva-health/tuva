@@ -48,6 +48,7 @@ with denominator as (
     , labs.result
     , coalesce(collection_date,result_date) as evidence_date
     , hba1c_test_code.concept_name
+    , row_number() over(partition by labs.patient_id order by coalesce(collection_date,result_date) desc) as rn
     from labs
     inner join hba1c_test_code
       on ( labs.normalized_code = hba1c_test_code.code
@@ -57,7 +58,7 @@ with denominator as (
     left join denominator
         on labs.patient_id = denominator.patient_id
     where coalesce(collection_date,result_date) <= denominator.performance_period_end
-        and regexp_like(labs.result, '[+-]?([0-9]*[.])?[0-9]+')
+        and {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
 
 )
 
@@ -67,7 +68,7 @@ with denominator as (
         , evidence_date
         , result
     from qualifying_labs
-    qualify row_number() over(partition by patient_id order by evidence_date desc) = 1
+    where rn = 1 
 
 )
 

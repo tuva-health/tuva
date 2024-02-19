@@ -10,6 +10,7 @@ Patient was provided hospice services any time during the measurement period: G9
 
 
 with exclusion_codes as (
+
     select
           code
         , case code_system
@@ -22,11 +23,12 @@ with exclusion_codes as (
         , concept_name
     From {{ref('quality_measures__value_sets')}}
     where lower(concept_name) in  (
-           'hospice encounter'
-          ,'palliative care encounter'
+            'hospice encounter'
+          , 'palliative care encounter'
+          , 'hospice care ambulatory'
+          , 'hospice diagnosis'
+          , 'palliative care diagnosis'
     )
-
-
 )
 
 , conditions as (
@@ -46,7 +48,9 @@ with exclusion_codes as (
               normalized_code
             , source_code
           ) as code
-    from {{ ref('quality_measures__stg_core__condition') }} )
+    from {{ ref('quality_measures__stg_core__condition') }} 
+
+)
 
 , medical_claim as (
 
@@ -194,8 +198,6 @@ with exclusion_codes as (
     from procedure_exclusions
 
 )
-
-
 
 select
       patient_id

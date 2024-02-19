@@ -111,6 +111,7 @@ with patients_with_frailty as (
          inner join exclusion_codes
             on conditions.code = exclusion_codes.code
             and conditions.code_type = exclusion_codes.code_system
+    where lower(exclusion_codes.concept_name) = 'advanced illness'
 
 )
 
@@ -170,7 +171,6 @@ with patients_with_frailty as (
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
     where med_claim_exclusions.concept_name = 'acute inpatient'
-        and condition_exclusions.concept_name = 'advanced illness'
         and (
             med_claim_exclusions.claim_start_date
                 between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -198,7 +198,6 @@ with patients_with_frailty as (
          on procedure_exclusions.patient_id = condition_exclusions.patient_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
     where lower(procedure_exclusions.concept_name) = 'acute inpatient'
-    and lower(condition_exclusions.concept_name) = 'advanced illness'
     and (
         procedure_exclusions.procedure_date
             between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -241,7 +240,6 @@ with patients_with_frailty as (
             , 'emergency department visit'
             , 'nonacute inpatient'
         )
-        and condition_exclusions.concept_name = 'advanced illness'
         and (
             med_claim_exclusions.claim_start_date
                 between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
@@ -275,7 +273,6 @@ with patients_with_frailty as (
         , 'emergency department visit'
         , 'nonacute inpatient'
     )
-    and condition_exclusions.concept_name = 'advanced illness'
     and (
         procedure_exclusions.procedure_date
             between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}

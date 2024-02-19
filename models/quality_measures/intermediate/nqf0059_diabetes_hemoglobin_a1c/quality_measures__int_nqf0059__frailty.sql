@@ -174,12 +174,6 @@ with denominator as (
          inner join condition_exclusions
             on denominator.patient_id = condition_exclusions.patient_id
     where denominator.age >= 66
-        and lower(condition_exclusions.concept_name) in (
-              'frailty device'
-            , 'frailty diagnosis'
-            , 'frailty encounter'
-            , 'frailty symptom'
-        )
         and condition_exclusions.recorded_date
             between denominator.performance_period_begin
             and denominator.performance_period_end
@@ -199,12 +193,6 @@ with denominator as (
          inner join med_claim_exclusions
             on denominator.patient_id = med_claim_exclusions.patient_id
     where denominator.age >= 66
-        and lower(med_claim_exclusions.concept_name) in (
-              'frailty device'
-            , 'frailty diagnosis'
-            , 'frailty encounter'
-            , 'frailty symptom'
-        )
         and (
             med_claim_exclusions.claim_start_date
                 between denominator.performance_period_begin
@@ -226,12 +214,6 @@ with denominator as (
          inner join observation_exclusions
             on denominator.patient_id = observation_exclusions.patient_id
     where denominator.age >= 66
-        and lower(observation_exclusions.concept_name) in (
-              'frailty device'
-            , 'frailty diagnosis'
-            , 'frailty encounter'
-            , 'frailty symptom'
-        )
         and observation_exclusions.observation_date
             between denominator.performance_period_begin
             and denominator.performance_period_end
@@ -248,12 +230,6 @@ with denominator as (
          inner join procedure_exclusions
             on denominator.patient_id = procedure_exclusions.patient_id
     where denominator.age >= 66
-        and lower(procedure_exclusions.concept_name) in (
-              'frailty device'
-            , 'frailty diagnosis'
-            , 'frailty encounter'
-            , 'frailty symptom'
-        )
         and procedure_exclusions.procedure_date
             between denominator.performance_period_begin
             and denominator.performance_period_end
