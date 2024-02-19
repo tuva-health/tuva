@@ -156,12 +156,27 @@ with  visit_codes as (
         , pp.measure_name
         , pp.measure_version
         , 1 as denominator_flag
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
     from diabetic_conditions
     left join patients_with_age
         on diabetic_conditions.patient_id = patients_with_age.patient_id
     cross join {{ref('quality_measures__int_nqf0059__performance_period')}} pp
     where max_age >= 18 and min_age <=  75
+
+)
+
+, add_data_types as (
+
+    select
+          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+        , cast(age as integer) as age
+        , cast(performance_period_begin as date) as performance_period_begin
+        , cast(performance_period_end as date) as performance_period_end
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+        , cast(denominator_flag as integer) as denominator_flag
+    from qualifying_patients
+
 
 )
 
@@ -175,4 +190,4 @@ select
     , measure_version
     , denominator_flag
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from qualifying_patients
+from add_data_types
