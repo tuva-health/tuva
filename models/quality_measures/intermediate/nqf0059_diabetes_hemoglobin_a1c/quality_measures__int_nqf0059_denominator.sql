@@ -177,7 +177,6 @@ with  visit_codes as (
         , cast(denominator_flag as integer) as denominator_flag
     from qualifying_patients
 
-
 )
 
 select 
