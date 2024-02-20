@@ -18,11 +18,10 @@ vars:
 
 
     ## CMS HCC data mart vars
-    # The payment_year variable has a default of the current year
-    cms_hcc_payment_year: 2023
+    # The payment_year variable has a default of the current year, this can be
+    # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
+    cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
 
-    # DO NOT CHANGE - Future logic to be added for selecting different HCC model versions
-    cms_hcc_model_version: CMS-HCC-V24
 
     ## Quality Measures period var
     # to run quality measueres for a period other than current year, add the below variable uncommented to your project
@@ -61,8 +60,12 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
         +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
+      terminology__ndc:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','ndc.csv',compression=true,null_marker=true) }}"
       terminology__provider:
         +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv',compression=true,null_marker=true) }}"
+      terminology__rxnorm_to_atc:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__snomed_icd_10_map:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','snomed_icd_10_map.csv',compression=true,null_marker=true) }}"
     value_sets:

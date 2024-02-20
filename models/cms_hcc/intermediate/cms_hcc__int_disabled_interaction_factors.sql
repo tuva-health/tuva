@@ -2,11 +2,6 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
-/*
-The hcc_model_version var has been set here so it gets compiled.
-*/
-
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
 
 with demographics as (
 
@@ -25,6 +20,7 @@ with demographics as (
     select
           patient_id
         , hcc_code
+        , model_version
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
 
 )
@@ -41,7 +37,6 @@ with demographics as (
         , hcc_code
         , coefficient
     from {{ ref('cms_hcc__disabled_interaction_factors') }}
-    where model_version = '{{ model_version_compiled }}'
 
 )
 
@@ -55,8 +50,9 @@ with demographics as (
         , demographics.payment_year
         , hcc_hierarchy.hcc_code
     from demographics
-         inner join hcc_hierarchy
-         on demographics.patient_id = hcc_hierarchy.patient_id
+        inner join hcc_hierarchy
+            on demographics.patient_id = hcc_hierarchy.patient_id
+            and demographics.model_version = hcc_hierarchy.model_version
 
 )
 
@@ -70,10 +66,11 @@ with demographics as (
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
     from demographics_with_hccs
-         inner join seed_interaction_factors
-         on demographics_with_hccs.enrollment_status = seed_interaction_factors.enrollment_status
-         and demographics_with_hccs.institutional_status = seed_interaction_factors.institutional_status
-         and demographics_with_hccs.hcc_code = seed_interaction_factors.hcc_code
+        inner join seed_interaction_factors
+            on demographics_with_hccs.enrollment_status = seed_interaction_factors.enrollment_status
+            and demographics_with_hccs.institutional_status = seed_interaction_factors.institutional_status
+            and demographics_with_hccs.hcc_code = seed_interaction_factors.hcc_code
+            and demographics_with_hccs.model_version = seed_interaction_factors.model_version
 
 )
 

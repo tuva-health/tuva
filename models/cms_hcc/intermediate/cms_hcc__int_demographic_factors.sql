@@ -2,11 +2,6 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
-/*
-The hcc_model_version var has been set here so it gets compiled.
-*/
-
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
 
 with members as (
 
@@ -23,7 +18,6 @@ with members as (
         , medicaid_dual_status_default
         , orec_default
         , institutional_status_default
-        , model_version
         , payment_year
     from {{ ref('cms_hcc__int_members') }}
 
@@ -44,11 +38,10 @@ with members as (
         , coefficient
     from {{ ref('cms_hcc__demographic_factors') }}
     where plan_segment is null /* data not available */
-    and model_version = '{{ model_version_compiled }}'
 
 )
 
-, new_enrollees as (
+, v24_new_enrollees as (
 
     select
           members.patient_id
@@ -63,22 +56,23 @@ with members as (
         , members.medicaid_dual_status_default
         , members.orec_default
         , members.institutional_status_default
-        , members.model_version
         , members.payment_year
+        , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
     from members
-         inner join seed_demographic_factors
-         on members.enrollment_status = seed_demographic_factors.enrollment_status
-         and members.gender = seed_demographic_factors.gender
-         and members.age_group = seed_demographic_factors.age_group
-         and members.medicaid_status = seed_demographic_factors.medicaid_status
-         and members.orec = seed_demographic_factors.orec
+        inner join seed_demographic_factors
+            on members.enrollment_status = seed_demographic_factors.enrollment_status
+            and members.gender = seed_demographic_factors.gender
+            and members.age_group = seed_demographic_factors.age_group
+            and members.medicaid_status = seed_demographic_factors.medicaid_status
+            and members.orec = seed_demographic_factors.orec
     where members.enrollment_status = 'New'
+        and seed_demographic_factors.model_version = 'CMS-HCC-V24'
 
 )
 
-, continuining_enrollees as (
+, v24_continuining_enrollees as (
 
     select
           members.patient_id
@@ -93,28 +87,97 @@ with members as (
         , members.medicaid_dual_status_default
         , members.orec_default
         , members.institutional_status_default
-        , members.model_version
         , members.payment_year
+        , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
     from members
-         inner join seed_demographic_factors
-         on members.enrollment_status = seed_demographic_factors.enrollment_status
-         and members.gender = seed_demographic_factors.gender
-         and members.age_group = seed_demographic_factors.age_group
-         and members.medicaid_status = seed_demographic_factors.medicaid_status
-         and members.dual_status = seed_demographic_factors.dual_status
-         and members.orec = seed_demographic_factors.orec
-         and members.institutional_status = seed_demographic_factors.institutional_status
+        inner join seed_demographic_factors
+            on members.enrollment_status = seed_demographic_factors.enrollment_status
+            and members.gender = seed_demographic_factors.gender
+            and members.age_group = seed_demographic_factors.age_group
+            and members.medicaid_status = seed_demographic_factors.medicaid_status
+            and members.dual_status = seed_demographic_factors.dual_status
+            and members.orec = seed_demographic_factors.orec
+            and members.institutional_status = seed_demographic_factors.institutional_status
     where members.enrollment_status = 'Continuing'
+        and seed_demographic_factors.model_version = 'CMS-HCC-V24'
+
+)
+
+, v28_new_enrollees as (
+
+    select
+          members.patient_id
+        , members.enrollment_status
+        , members.gender
+        , members.age_group
+        , members.medicaid_status
+        , members.dual_status
+        , members.orec
+        , members.institutional_status
+        , members.enrollment_status_default
+        , members.medicaid_dual_status_default
+        , members.orec_default
+        , members.institutional_status_default
+        , members.payment_year
+        , seed_demographic_factors.model_version
+        , seed_demographic_factors.factor_type
+        , seed_demographic_factors.coefficient
+    from members
+        inner join seed_demographic_factors
+            on members.enrollment_status = seed_demographic_factors.enrollment_status
+            and members.gender = seed_demographic_factors.gender
+            and members.age_group = seed_demographic_factors.age_group
+            and members.medicaid_status = seed_demographic_factors.medicaid_status
+            and members.orec = seed_demographic_factors.orec
+    where members.enrollment_status = 'New'
+        and seed_demographic_factors.model_version = 'CMS-HCC-V28'
+
+)
+
+, v28_continuining_enrollees as (
+
+    select
+          members.patient_id
+        , members.enrollment_status
+        , members.gender
+        , members.age_group
+        , members.medicaid_status
+        , members.dual_status
+        , members.orec
+        , members.institutional_status
+        , members.enrollment_status_default
+        , members.medicaid_dual_status_default
+        , members.orec_default
+        , members.institutional_status_default
+        , members.payment_year
+        , seed_demographic_factors.model_version
+        , seed_demographic_factors.factor_type
+        , seed_demographic_factors.coefficient
+    from members
+        inner join seed_demographic_factors
+            on members.enrollment_status = seed_demographic_factors.enrollment_status
+            and members.gender = seed_demographic_factors.gender
+            and members.age_group = seed_demographic_factors.age_group
+            and members.medicaid_status = seed_demographic_factors.medicaid_status
+            and members.dual_status = seed_demographic_factors.dual_status
+            and members.orec = seed_demographic_factors.orec
+            and members.institutional_status = seed_demographic_factors.institutional_status
+    where members.enrollment_status = 'Continuing'
+        and seed_demographic_factors.model_version = 'CMS-HCC-V28'
 
 )
 
 , unioned as (
 
-    select * from new_enrollees
+    select * from v24_new_enrollees
     union all
-    select * from continuining_enrollees
+    select * from v24_continuining_enrollees
+    union all
+    select * from v28_new_enrollees
+    union all
+    select * from v28_continuining_enrollees
 
 )
 

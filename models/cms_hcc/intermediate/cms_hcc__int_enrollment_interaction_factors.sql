@@ -2,11 +2,6 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
    )
 }}
-/*
-The hcc_model_version var has been set here so it gets compiled.
-*/
-
-{% set model_version_compiled = var('cms_hcc_model_version') -%}
 
 with demographics as (
 
@@ -38,7 +33,6 @@ with demographics as (
         , description
         , coefficient
     from {{ ref('cms_hcc__enrollment_interaction_factors') }}
-    where model_version = '{{ model_version_compiled }}'
 
 )
 
@@ -55,23 +49,24 @@ with demographics as (
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
     from demographics
-         inner join seed_interaction_factors
-         on demographics.gender = seed_interaction_factors.gender
-         and demographics.enrollment_status = seed_interaction_factors.enrollment_status
-         and demographics.medicaid_status = seed_interaction_factors.medicaid_status
-         and demographics.dual_status = seed_interaction_factors.dual_status
-         and demographics.institutional_status = seed_interaction_factors.institutional_status
+        inner join seed_interaction_factors
+            on demographics.gender = seed_interaction_factors.gender
+            and demographics.enrollment_status = seed_interaction_factors.enrollment_status
+            and demographics.medicaid_status = seed_interaction_factors.medicaid_status
+            and demographics.dual_status = seed_interaction_factors.dual_status
+            and demographics.institutional_status = seed_interaction_factors.institutional_status
+            and demographics.model_version = seed_interaction_factors.model_version
     where demographics.institutional_status = 'No'
-    and demographics.orec = 'Disabled'
-    and demographics.age_group in (
-          '65-69'
-        , '70-74'
-        , '75-79'
-        , '80-84'
-        , '85-89'
-        , '90-94'
-        , '>=95'
-    )
+        and demographics.orec = 'Disabled'
+        and demographics.age_group in (
+              '65-69'
+            , '70-74'
+            , '75-79'
+            , '80-84'
+            , '85-89'
+            , '90-94'
+            , '>=95'
+        )
 
 )
 
@@ -88,11 +83,12 @@ with demographics as (
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
     from demographics
-         inner join seed_interaction_factors
-         on demographics.enrollment_status = seed_interaction_factors.enrollment_status
-         and demographics.institutional_status = seed_interaction_factors.institutional_status
+        inner join seed_interaction_factors
+            on demographics.enrollment_status = seed_interaction_factors.enrollment_status
+            and demographics.institutional_status = seed_interaction_factors.institutional_status
+            and demographics.model_version = seed_interaction_factors.model_version
     where demographics.institutional_status = 'Yes'
-    and demographics.medicaid_status = 'Yes'
+        and demographics.medicaid_status = 'Yes'
 
 )
 
