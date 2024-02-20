@@ -18,7 +18,7 @@
 
 {%- macro bigquery__apply_regex(column_name, regex) -%}
 
-    regexp_contains(column_name, r'{{ regex }}')
+    regexp_contains({{ column_name }}, r'{{ regex }}')
 
 {%- endmacro -%}
 
