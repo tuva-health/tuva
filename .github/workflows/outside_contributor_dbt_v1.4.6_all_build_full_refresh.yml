@@ -113,7 +113,7 @@ jobs:
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.4.6
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"tuva_database":"dev-ci-testing","input_database":"dev-ci-testing","input_schema":"connector"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"tuva_database":"dev-ci-testing","input_database":"dev-ci-testing","input_schema":"claims_common"}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
