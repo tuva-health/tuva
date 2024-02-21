@@ -7,6 +7,7 @@
 
 select
       patient_id
+    , result
     , result_date
     , collection_date
     , source_code_type
@@ -20,6 +21,7 @@ from {{ ref('core__lab_result') }}
 
 select
       patient_id
+    , result
     , result_date
     , collection_date
     , source_code_type
@@ -33,6 +35,7 @@ from {{ ref('core__lab_result') }}
 
 select
       cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as result
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
     ,  {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
