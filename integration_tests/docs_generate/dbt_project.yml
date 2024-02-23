@@ -7,7 +7,6 @@ profile: default
 vars:
   test_data_override: true
 
-
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
   #input_database: tuva
@@ -20,8 +19,8 @@ vars:
   # Use the vars below to enabled or disable sections of The Tuva Project.
 
   ## The vars directly below enable all models related to the type of healthcare data being used
-  # clinical_enabled: true
-#  claims_enabled: true
+  #clinical_enabled: true
+  #claims_enabled: true
   tuva_marts_enabled: true
 
 
@@ -46,85 +45,24 @@ clean-targets:
 
 models:
   +bind: false
-  claims_data_model:
-    +materialized: view
+
+  input_layer:
     +docs:
-      node_color: "#1a0707"
+      node_color: "#A91A4D"
+
   the_tuva_project:
-    claims_preprocessing:
-      acute_inpatient:
-        +docs:
-          node_color: "#0f3d0b"
-#        staging:
-#          +docs:
-#            show: false
-#        intermediate:
-#          +docs:
-#            show: false
-      input_layer:
-        +docs:
-          node_color: "#0f3d0b"
-#          staging:
-#            +docs:
-#              show: false
-#        intermediate:
-#          +docs:
-#            show: false
-#    analytics:
+    +docs:
+      node_color: "#1a7aa9"
     core:
       +docs:
-        node_color: "#0f3d0b"
-
-    chronic_conditions:
-      +docs:
-        node_color: "#2e0e0e"
-#        staging:
-#          +docs:
-#            show: false
-    data_quality:
-      +docs:
-        node_color: "#141161"
-#        staging:
-#          +docs:
-#            show: false
-#        intermediate:
-#          +docs:
-#            show: false
-    financial_pmpm:
-      +docs:
-        node_color: "#abab26"
-#        intermediate:
-#          +docs:
-#            show: false
-    readmissions:
-      +docs:
-        node_color: "#161a7d"
-#        staging:
-#          +docs:
-#            show: false
-#        intermediate:
-#          +docs:
-#            show: false
-
-
+        node_color: "#1A9A89"
 
 seeds:
   the_tuva_project:
-    terminology:
-      +docs:
-        node_color: "#460d4f"
-    value_sets:
-      data_quality:
-        +docs:
-          node_color: "#141161"
-      chronic_conditions:
-        +docs:
-          node_color: "#804912"
-      readmissions:
-        +docs:
-          node_color: "#161a7d"
+    +docs:
+      node_color: "#cf751b"
 
-#snapshots:
-#  data_profiling:
-#    +docs:
-#      show: false
+snapshots:
+  the_tuva_project:
+    +docs:
+      node_color: "#64b0e1"
