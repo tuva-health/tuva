@@ -26,8 +26,8 @@ select
     , cast(source_reference_range_high as {{ dbt.type_string() }} ) as source_reference_range_high
     , cast(normalized_reference_range_low as {{ dbt.type_string() }} ) as normalized_reference_range_low
     , cast(normalized_reference_range_high as {{ dbt.type_string() }} ) as normalized_reference_range_high
-    , cast(source_abnormal_flag as {{ dbt.type_int() }} ) as source_abnormal_flag
-    , cast(normalized_abnormal_flag as {{ dbt.type_int() }} ) as normalized_abnormal_flag
+    , cast(source_abnormal_flag as {{ dbt.type_string() }} ) as source_abnormal_flag
+    , cast(normalized_abnormal_flag as {{ dbt.type_string() }} ) as normalized_abnormal_flag
     , cast(specimen as {{ dbt.type_string() }} ) as specimen
     , cast(ordering_practitioner_id as {{ dbt.type_string() }} ) as ordering_practitioner_id
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
