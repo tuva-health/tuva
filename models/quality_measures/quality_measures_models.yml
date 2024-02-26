@@ -932,6 +932,7 @@ models:
           from the measure.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
+  
   - name: quality_measures__int_cqm236_exclude_advanced_illness
     config:
       schema: |
@@ -942,6 +943,43 @@ models:
     description: >
       Exclusion logic for patients with frailty and advanced illness for 
       the reporting version of CQM 236, Controlling Blood Pressure.
+
+  - name: quality_measures__int_cqm236_exclusions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm236_exclusions
+      tags: quality_measures
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of CQM 236, Controlling Blood Pressure.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
 
 ## Staging
   - name: quality_measures__stg_core__condition
