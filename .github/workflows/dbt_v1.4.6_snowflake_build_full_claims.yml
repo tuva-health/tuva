@@ -37,7 +37,7 @@ jobs:
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.4.6
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":0,"claims_enabled":1}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"False","claims_enabled":"True"}'
           dbt_project_folder: "integration_tests"
 
 
