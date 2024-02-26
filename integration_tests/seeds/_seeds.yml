@@ -60,57 +60,57 @@ seeds:
         {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         lab_result_id: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         patient_id: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         encounter_id: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         accession_number: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_code_type: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_component: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_code_type: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_code: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_description: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_component: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         status: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         result: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         result_date: date
         collection_date: date
         source_units: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_units: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_reference_range_low: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_reference_range_high: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_reference_range_low: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_reference_range_high: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         source_abnormal_flag: integer
         normalized_abnormal_flag: integer
         specimen: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ordering_practitioner_id: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         data_source: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         tuva_last_run: |
-          {%- if target.type == "bigquery" -%} string {%- else -%} varchar(255) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
   - name: medical_claim_seed
     config:
@@ -361,6 +361,54 @@ seeds:
         procedure_date_23: date
         procedure_date_24: date
         procedure_date_25: date
+        data_source: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+
+  - name: observation_seed
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
+        {% else %}_tuva_synthetic{%- endif -%}
+      enabled: |
+        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+      column_types:
+        observation_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        patient_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        encounter_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        panel_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        observation_date: date
+        observation_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_code_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_code_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        result: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_units: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_units: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_reference_range_low: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        source_reference_range_high: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_reference_range_low: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        normalized_reference_range_high: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
