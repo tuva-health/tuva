@@ -863,7 +863,30 @@ models:
       materialized: table
     description: >
       Exclusion logic for patients using hospice and palliative services for the reporting 
-      version of CQM 236, Diabetes Hemoglobin a1c.
+      version of CQM 236, Controlling Blood Pressure.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm236_exclude_institutional_snp
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm236_exclude_institutional_snp
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients staying in an institution for the reporting 
+      version of CQM 236, Controlling Blood Pressure.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
