@@ -66,5 +66,7 @@ seeds:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','lab_result.csv',headers=true) }}"
     medical_claim_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','medical_claim.csv',headers=true) }}"
+    observation_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','observation.csv',headers=true) }}"
     pharmacy_claim_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"

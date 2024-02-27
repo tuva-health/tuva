@@ -1,3 +1,11 @@
+{# logic to use the seed data or an empty table -#}
+
+{% if var('test_data_override') == true -%}
+
+select * from {{ ref('observation_seed') }}
+
+{%- else -%}
+
 select
 cast(null as {{ dbt.type_string() }} ) as observation_id
 , cast(null as {{ dbt.type_string() }} ) as patient_id
@@ -21,3 +29,5 @@ cast(null as {{ dbt.type_string() }} ) as observation_id
 , cast(null as {{ dbt.type_string() }} ) as data_source
 , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 limit 0
+
+{%- endif %}
