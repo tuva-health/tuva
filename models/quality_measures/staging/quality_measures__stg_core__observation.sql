@@ -8,10 +8,12 @@
 select
       patient_id
     , observation_date
+    , result
     , source_code_type
     , source_code
     , normalized_code_type
     , normalized_code
+    , normalized_description
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__observation') }}
 
@@ -20,10 +22,12 @@ from {{ ref('core__observation') }}
 select
       patient_id
     , observation_date
+    , result
     , source_code_type
     , source_code
     , normalized_code_type
     , normalized_code
+    , normalized_description
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__observation') }}
 
@@ -32,10 +36,12 @@ from {{ ref('core__observation') }}
 select
       cast(null as {{ dbt.type_string() }} ) as patient_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as observation_date
+    , cast(null as {{ dbt.type_string() }} ) as result
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
     , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
     , cast(null as {{ dbt.type_string() }} ) as normalized_code
+    , cast(null as {{ dbt.type_string() }} ) as normalized_description
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 limit 0
 
