@@ -16,7 +16,7 @@ with denominator as (
         , observation_date
         , result
         , row_number() over(partition by patient_id, observation_date order by observation_date desc, result asc) as rn
-    from tuva_synthetic.core.observation
+    from {{ref('quality_measures__stg_core__observation')}}
     where lower(normalized_description) = 'systolic blood pressure'
 
 )
@@ -28,7 +28,7 @@ with denominator as (
         , observation_date
         , result
         , row_number() over(partition by patient_id, observation_date order by observation_date desc, result asc) as rn
-    from tuva_synthetic.core.observation
+    from {{ref('quality_measures__stg_core__observation')}}
     where lower(normalized_description) = 'diastolic blood pressure'
 
 )
@@ -74,7 +74,7 @@ with denominator as (
         on denominator.patient_id = least_diastolic_bp_per_day.patient_id
     where (least_systolic_bp_per_day.observation_date between denominator.performance_period_begin and denominator.performance_period_end)
         and (least_diastolic_bp_per_day.observation_date between denominator.performance_period_begin and denominator.performance_period_end)
-
+        and least_systolic_bp_per_day.observation_date = least_diastolic_bp_per_day.observation_date
 )
 
 , numerator as (
