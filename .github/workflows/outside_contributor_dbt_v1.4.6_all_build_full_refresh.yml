@@ -25,63 +25,88 @@ env:
   TUVA_BIGQUERY_PROJECT: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
   
 jobs:
-  snowflake_claims:
+  snowflake_claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
-  
+      - uses: actions/checkout@v2
+
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"false","claims_enabled":"true"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":false,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
+
+  snowflake_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
+          dbt_project_folder: "integration_tests"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: [claims_enabled, clinical_enabled]
     
-  snowflake_claims_clinical:
-    runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
-  
+      - uses: actions/checkout@v2
+
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"true","claims_enabled":"true"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
@@ -89,156 +114,118 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  snowflake_clinical:
+  redshift_claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
-  
-      - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
-        with:
-          dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
-
-      - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
-        with:
-          dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
-
-      - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
-        with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"true","claims_enabled":"false"}'
-          dbt_project_folder: "integration_tests"
-
-      - name: Get the result
-        if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
-        shell: bash
-
-  redshift_claims:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+      - uses: actions/checkout@v2
 
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"false","claims_enabled":"true"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":false,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
+
       - name: Get the result
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  redshift_claims_clinical:
+  redshift_clinical_enabled:
     runs-on: ubuntu-latest
+    needs: claims_enabled
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+      - uses: actions/checkout@v2
 
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"true","claims_enabled":"true"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
           dbt_project_folder: "integration_tests"
+
       - name: Get the result
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  redshift_clinical:
+  redshift_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
+    needs: [claims_enabled, clinical_enabled]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+      - uses: actions/checkout@v2
 
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":"true","claims_enabled":"false"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
+
       - name: Get the result
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
-        shell: bash      
+        shell: bash   
         
-  bigquery_claims:
+
+  bigquery_claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+      - uses: actions/checkout@v2
 
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
- 
+
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":"false","claims_enabled":"true"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":false,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
@@ -246,31 +233,29 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  bigquery_claims_clinical:
+  bigquery_clinical_enabled:
     runs-on: ubuntu-latest
+    needs: claims_enabled
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+      - uses: actions/checkout@v2
 
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
- 
+
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":"true","claims_enabled":"true"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
@@ -278,31 +263,29 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  bigquery_clinical:
+  bigquery_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
+    needs: [claims_enabled, clinical_enabled]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+      - uses: actions/checkout@v2
 
       - name: dbt-deps
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
- 
+
       - name: dbt-debug
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
 
       - name: dbt-build
-        uses: mwhitaker/dbt-action@v1.4.6
+        uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":"true","claims_enabled":"false"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
