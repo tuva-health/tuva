@@ -25,7 +25,7 @@ seeds:
         additional_logic : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}  
         claims_qualification : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}  
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1024) {%- endif -%}  
         inclusion_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}  
         code_system : |
