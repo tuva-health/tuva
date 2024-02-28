@@ -46,6 +46,7 @@ jobs:
 
   clinical_enabled:
     runs-on: ubuntu-latest
+    needs: claims_enabled
 
     steps:
       - uses: actions/checkout@v2
@@ -75,7 +76,8 @@ jobs:
 
   clinical_and_claims_enabled:
     runs-on: ubuntu-latest
-
+    needs: [claims_enabled, clinical_enabled]
+    
     steps:
       - uses: actions/checkout@v2
 
