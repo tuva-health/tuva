@@ -93,7 +93,7 @@ jobs:
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt run--profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
+          dbt_command: 'dbt run --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
