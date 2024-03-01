@@ -33,6 +33,10 @@ with exclusions as (
     from {{ref('quality_measures__int_cqm236__frailty')}}
     where is_patient_older_than_80 = 1
 
+    union all
+
+    select * from {{ref('quality_measures__int_cqm236_exclude_procedures_observations')}}
+
 )
 
 , valid_exclusions as (

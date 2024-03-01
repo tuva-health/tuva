@@ -159,8 +159,6 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
-    , performance_period_begin
-    , performance_period_end
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     exclusions_filtered
