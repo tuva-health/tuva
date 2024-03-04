@@ -158,6 +158,7 @@ with  visit_codes as (
     select
         distinct
           hypertension_conditions.patient_id
+        , hypertension_conditions.recorded_date
         , patients_with_age.max_age as age
         , pp.performance_period_begin
         , pp.performance_period_end
@@ -170,7 +171,19 @@ with  visit_codes as (
         on hypertension_conditions.patient_id = patients_with_age.patient_id
     cross join {{ref('quality_measures__int_cqm236__performance_period')}} pp
     where max_age >= 18 and min_age <=  85
-
+        and hypertension_conditions.recorded_date between
+            {{ dbt.dateadd (
+              datepart = "month"
+            , interval = -12
+            , from_date_or_timestamp = "performance_period_begin"
+            )
+            }}
+            and 
+            {{ dbt.dateadd (
+              datepart = "month"
+            , interval = +6
+            , from_date_or_timestamp = "performance_period_begin"
+            )}}
 )
 
 , add_data_types as (

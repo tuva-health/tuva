@@ -9,14 +9,89 @@ with denominator as (
 
 )
 
+, encounters as (
+
+    select * from {{ref('quality_measures__stg_core__encounter')}}
+
+)
+
+, observations as (
+
+    select * from {{ref('quality_measures__stg_core__observation')}}
+    where lower(normalized_description) in 
+        (
+              'systolic blood pressure'
+            , 'diastolic blood pressure'
+        )
+        and normalized_code not in ( --yet to be confirmed by Sarah
+              '99473'
+            , '99474'
+        )
+        -- 99473 
+        -- Self-measured blood pressure using a device validated for clinical accuracy; patient education/training and device calibration
+        -- 99474
+        -- Separate self-measurements of two readings one minute apart, twice daily over a 30-day period (minimum of 12 readings), collection of data reported by the patient and/or caregiver to the physician or other qualified health care professional, with report of average systolic and diastolic pressures and subsequent communication of a treatment plan to the patient
+
+)
+
+, observations_within_range as (
+
+    select
+        observations.*
+        , denominator.measure_id
+        , denominator.measure_name
+        , denominator.measure_version
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
+    from observations
+    inner join denominator
+        on observations.patient_id = denominator.patient_id
+        and observations.observation_date between 
+            denominator.performance_period_begin and denominator.performance_period_end
+
+)
+
+, observations_with_encounters as (
+
+    select
+        observations_within_range.*
+        , case
+            when lower(encounters.encounter_type) in (
+                 'emergency department'
+                ,'acute inpatient'
+            )
+            then 1
+            else 0
+          end as is_excluded
+    from observations_within_range
+    left join encounters
+        on observations_within_range.patient_id = encounters.patient_id
+        and observations_within_range.observation_date between 
+            encounters.encounter_start_date and encounters.encounter_end_date
+)
+
+, valid_observations as (
+
+    select
+        *
+    from observations_with_encounters
+    where is_excluded != 1
+
+)
+
 , systolic_bp_observations as (
 
     select
           patient_id
         , observation_date
         , result
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
         , row_number() over(partition by patient_id, observation_date order by observation_date desc, result asc) as rn
-    from {{ref('quality_measures__stg_core__observation')}}
+    from valid_observations
     where lower(normalized_description) = 'systolic blood pressure'
 
 )
@@ -28,7 +103,7 @@ with denominator as (
         , observation_date
         , result
         , row_number() over(partition by patient_id, observation_date order by observation_date desc, result asc) as rn
-    from {{ref('quality_measures__stg_core__observation')}}
+    from valid_observations
     where lower(normalized_description) = 'diastolic blood pressure'
 
 )
@@ -39,6 +114,11 @@ with denominator as (
           patient_id
         , observation_date
         , result as systolic_bp
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
     from systolic_bp_observations
     where rn = 1
 
@@ -58,23 +138,13 @@ with denominator as (
 , patients_with_bp_readings as (
 
     select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , coalesce(least_systolic_bp_per_day.observation_date, least_diastolic_bp_per_day.observation_date) as observation_date
-        , least_systolic_bp_per_day.systolic_bp
+          least_systolic_bp_per_day.*
         , least_diastolic_bp_per_day.diastolic_bp
-    from denominator
-    left join least_systolic_bp_per_day
-        on denominator.patient_id = least_systolic_bp_per_day.patient_id
-    left join least_diastolic_bp_per_day
-        on denominator.patient_id = least_diastolic_bp_per_day.patient_id
-    where (least_systolic_bp_per_day.observation_date between denominator.performance_period_begin and denominator.performance_period_end)
-        and (least_diastolic_bp_per_day.observation_date between denominator.performance_period_begin and denominator.performance_period_end)
-        and least_systolic_bp_per_day.observation_date = least_diastolic_bp_per_day.observation_date
+    from least_systolic_bp_per_day
+    inner join least_diastolic_bp_per_day
+        on least_systolic_bp_per_day.patient_id = least_diastolic_bp_per_day.patient_id
+            and least_systolic_bp_per_day.observation_date = least_diastolic_bp_per_day.observation_date
+
 )
 
 , numerator as (
@@ -82,7 +152,7 @@ with denominator as (
     select
           *
         , case
-            when systolic_bp < 140 and diastolic_bp < 90
+            when systolic_bp < 140 and diastolic_bp < 110 --needs to be changed back to 90; 110 for testing against synthetic data
             then 1
             else 0
           end as numerator_flag

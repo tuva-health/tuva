@@ -7,6 +7,7 @@
 
 select
       patient_id
+    , encounter_id
     , observation_date
     , result
     , source_code_type
@@ -21,6 +22,7 @@ from {{ ref('core__observation') }}
 
 select
       patient_id
+    , encounter_id
     , observation_date
     , result
     , source_code_type
@@ -35,6 +37,7 @@ from {{ ref('core__observation') }}
 
 select
       cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as observation_date
     , cast(null as {{ dbt.type_string() }} ) as result
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
