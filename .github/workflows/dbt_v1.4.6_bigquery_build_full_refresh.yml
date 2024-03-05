@@ -2,9 +2,7 @@ name: dbt_v1.4.6_bigquery_build_full_refresh
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
+
 
 env:
   DBT_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
@@ -12,7 +10,7 @@ env:
 
   
 jobs:
-  action:
+  claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,7 +22,6 @@ jobs:
           dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
           dbt_project_folder: "integration_tests"
 
-          
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.4.6
         with:
@@ -34,9 +31,66 @@ jobs:
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.4.6
         with:
-          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery  --vars {"tuva_database":"dev-ci-testing","input_database":"dev-ci-testing","input_schema":"claims_common"}'
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":false,"claims_enabled":true}'
           dbt_project_folder: "integration_tests"
 
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  clinical_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.4.6
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.4.6
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.4.6
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
+          dbt_project_folder: "integration_tests"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.4.6
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.4.6
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.4.6
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt_project_folder: "integration_tests"
 
       - name: Get the result
         if: ${{ always() }}
