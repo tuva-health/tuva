@@ -1,0 +1,46 @@
+name: dbt_v1.6.3_redshift_build_full_claims
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+
+env:
+  DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
+  DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
+  DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+  DBT_REDSHIFT_CI_PORT: ${{ secrets.DBT_REDSHIFT_CI_PORT }}
+
+  
+jobs:
+
+  clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "integration_tests"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt_project_folder: "integration_tests"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
