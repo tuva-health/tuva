@@ -47,6 +47,7 @@ with denominator as (
       labs.patient_id
     , labs.result
     , coalesce(collection_date,result_date) as evidence_date
+    , result as evidence_value
     , hba1c_test_code.concept_name
     , row_number() over(partition by labs.patient_id order by coalesce(collection_date,result_date) desc) as rn
     from labs
@@ -66,6 +67,7 @@ with denominator as (
     select
           patient_id
         , evidence_date
+        , evidence_value
         , result
     from qualifying_labs
     where rn = 1 
@@ -77,6 +79,7 @@ with denominator as (
     select
           denominator.*
         , recent_readings.evidence_date
+        , recent_readings.evidence_value
         , recent_readings.result
     from denominator
     left join recent_readings
@@ -94,6 +97,7 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
+        , evidence_value
         , 1 as numerator_flag
     from qualifying_patients
     where 
@@ -112,6 +116,7 @@ with denominator as (
         , measure_name
         , measure_version
         , evidence_date
+        , evidence_value
         , case
             when cast(result as {{ dbt.type_numeric() }}) > 9.0 then 1 
             else 0
@@ -141,6 +146,7 @@ with denominator as (
         , cast(measure_name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(evidence_date as date) as evidence_date
+        , cast(evidence_value as {{ dbt.type_string() }}) as evidence_value
         , cast(numerator_flag as integer) as numerator_flag
     from numerator
 
@@ -154,5 +160,6 @@ select
     , measure_name
     , measure_version
     , evidence_date
+    , evidence_value
     , numerator_flag
 from add_data_types
