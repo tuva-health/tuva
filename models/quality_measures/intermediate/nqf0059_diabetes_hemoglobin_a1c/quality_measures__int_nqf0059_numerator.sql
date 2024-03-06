@@ -45,9 +45,8 @@ with denominator as (
 , qualifying_labs as (
     select
       labs.patient_id
-    , labs.result
+    , labs.result as evidence_value
     , coalesce(collection_date,result_date) as evidence_date
-    , result as evidence_value
     , hba1c_test_code.concept_name
     , row_number() over(partition by labs.patient_id order by coalesce(collection_date,result_date) desc) as rn
     from labs
