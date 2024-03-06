@@ -67,7 +67,6 @@ with denominator as (
           patient_id
         , evidence_date
         , evidence_value
-        , result
     from qualifying_labs
     where rn = 1 
 
@@ -79,7 +78,6 @@ with denominator as (
           denominator.*
         , recent_readings.evidence_date
         , recent_readings.evidence_value
-        , recent_readings.result
     from denominator
     left join recent_readings
         on denominator.patient_id = recent_readings.patient_id
@@ -117,7 +115,7 @@ with denominator as (
         , evidence_date
         , evidence_value
         , case
-            when cast(result as {{ dbt.type_numeric() }}) > 9.0 then 1 
+            when cast(evidence_value as {{ dbt.type_numeric() }}) > 9.0 then 1
             else 0
           end as numerator_flag
     from qualifying_patients
