@@ -16,7 +16,6 @@ with  visit_codes as (
         , 'preventive care services initial office visit, 18 and up'
         , 'annual wellness visit'
         , 'telephone visits'
-        , 'nutrition services'
     )
 
 ), visits_encounters as (
@@ -33,8 +32,6 @@ with  visit_codes as (
           'home health'
         , 'office visit'
         , 'outpatient'
-        , 'outpatient rehabilitation'
-        , 'telehealth'
      )
 
 )
