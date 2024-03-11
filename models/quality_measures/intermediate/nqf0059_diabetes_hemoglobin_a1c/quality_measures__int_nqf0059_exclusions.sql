@@ -16,12 +16,12 @@ from {{ref('quality_measures__int_nqf0059_exclude_dementia')}}
 union all
 
 select *
-from {{ref('quality_measures__int_nqf0059_exclude_hospice_palliative')}}
+from {{ref('shared_exclusions__exclude_hospice_palliative')}}
 
 union all
 
 select *
-from {{ref('quality_measures__int_nqf0059_exclude_institutional_snp')}}
+from {{ref('shared_exclusions__exclude_institutional_snp')}}
 
 )
 
@@ -32,6 +32,7 @@ from {{ref('quality_measures__int_nqf0059_exclude_institutional_snp')}}
   from exclusions
   inner join {{ref('quality_measures__int_nqf0059_denominator')}} p
       on exclusions.patient_id = p.patient_id
+  where exclusions.exclusion_date between p.performance_period_begin and p.performance_period_end
 
 )
 
