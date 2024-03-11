@@ -23,14 +23,10 @@ with denominator as (
               'systolic blood pressure'
             , 'diastolic blood pressure'
         )
-        and normalized_code not in ( --yet to be confirmed by Sarah
-              '99473'
-            , '99474'
+        and normalized_code not in (
+              '99473' -- Self-measured blood pressure using a device validated for clinical accuracy; patient education/training and device calibration
+            , '99474' -- Separate self-measurements of two readings one minute apart, twice daily over a 30-day period (minimum of 12 readings), collection of data reported by the patient and/or caregiver to the physician or other qualified health care professional, with report of average systolic and diastolic pressures and subsequent communication of a treatment plan to the patient
         )
-        -- 99473 
-        -- Self-measured blood pressure using a device validated for clinical accuracy; patient education/training and device calibration
-        -- 99474
-        -- Separate self-measurements of two readings one minute apart, twice daily over a 30-day period (minimum of 12 readings), collection of data reported by the patient and/or caregiver to the physician or other qualified health care professional, with report of average systolic and diastolic pressures and subsequent communication of a treatment plan to the patient
 
 )
 

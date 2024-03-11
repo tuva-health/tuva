@@ -153,6 +153,7 @@ with  visit_codes as (
 
 )
 
+-- Patients 18-85 years of age who had a visit and diagnosis of essential hypertension starting before and continuing into, or starting during the first six months of the measurement period.
 , qualifying_patients as (
 
     select

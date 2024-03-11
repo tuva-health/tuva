@@ -22,6 +22,7 @@ with exclusion_codes as (
           , 'hospice care ambulatory'
           , 'hospice diagnosis'
           , 'palliative care diagnosis'
+          , 'palliative care intervention'
     )
 )
 
