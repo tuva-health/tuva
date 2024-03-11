@@ -60,9 +60,9 @@ with denominator as (
                  'emergency department'
                 ,'acute inpatient'
             )
-            then 1
-            else 0
-          end as is_excluded
+            then 0
+            else 1
+          end as is_valid_encounter_observation
     from observations_within_range
     left join encounters
         on observations_within_range.patient_id = encounters.patient_id
@@ -73,24 +73,25 @@ with denominator as (
 , valid_observations as (
 
     select
-        *
+          patient_id
+        , observation_date
+        , cast(result as {{ dbt.type_float() }}) as bp_reading
+        , normalized_description
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
     from observations_with_encounters
-    where is_excluded != 1
+    where is_valid_encounter_observation = 1
 
 )
 
 , systolic_bp_observations as (
 
     select
-          patient_id
-        , observation_date
-        , result
-        , measure_id
-        , measure_name
-        , measure_version
-        , performance_period_begin
-        , performance_period_end
-        , row_number() over(partition by patient_id, observation_date order by observation_date desc, result asc) as rn
+          *
+        , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
     from valid_observations
     where lower(normalized_description) = 'systolic blood pressure'
 
@@ -101,19 +102,19 @@ with denominator as (
     select
           patient_id
         , observation_date
-        , result
-        , row_number() over(partition by patient_id, observation_date order by observation_date desc, result asc) as rn
+        , bp_reading
+        , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
     from valid_observations
     where lower(normalized_description) = 'diastolic blood pressure'
 
 )
 
-, least_systolic_bp_per_day as (
+, least_recent_systolic_bp as (
 
     select
           patient_id
         , observation_date
-        , result as systolic_bp
+        , bp_reading as systolic_bp
         , measure_id
         , measure_name
         , measure_version
@@ -124,13 +125,13 @@ with denominator as (
 
 )
 
-, least_diastolic_bp_per_day as (
+, least_recent_diastolic_bp as (
 
     select
           patient_id
         , observation_date
-        , result as diastolic_bp
-    from systolic_bp_observations
+        , bp_reading as diastolic_bp
+    from diastolic_bp_observations
     where rn = 1
 
 )
@@ -138,12 +139,12 @@ with denominator as (
 , patients_with_bp_readings as (
 
     select
-          least_systolic_bp_per_day.*
-        , least_diastolic_bp_per_day.diastolic_bp
-    from least_systolic_bp_per_day
-    inner join least_diastolic_bp_per_day
-        on least_systolic_bp_per_day.patient_id = least_diastolic_bp_per_day.patient_id
-            and least_systolic_bp_per_day.observation_date = least_diastolic_bp_per_day.observation_date
+          least_recent_systolic_bp.*
+        , least_recent_diastolic_bp.diastolic_bp
+    from least_recent_systolic_bp
+    inner join least_recent_diastolic_bp
+        on least_recent_systolic_bp.patient_id = least_recent_diastolic_bp.patient_id
+            and least_recent_systolic_bp.observation_date = least_recent_diastolic_bp.observation_date
 
 )
 
@@ -152,7 +153,7 @@ with denominator as (
     select
           *
         , case
-            when systolic_bp < 140 and diastolic_bp < 110 --needs to be changed back to 90; 110 for testing against synthetic data
+            when systolic_bp < 140.0 and diastolic_bp < 90.0
             then 1
             else 0
           end as numerator_flag
