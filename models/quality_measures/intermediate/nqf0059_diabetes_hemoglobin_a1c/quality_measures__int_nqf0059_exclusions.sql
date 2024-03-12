@@ -6,11 +6,13 @@
 with exclusions as (
 
 select *
+  , 'advanced_illness' as exclusion_type
 from {{ref('quality_measures__int_nqf0059_exclude_advanced_illness')}}
 
 union all
 
 select *
+  , 'dementia' as exclusion_type
 from {{ref('quality_measures__int_nqf0059_exclude_dementia')}}
 
 union all
@@ -25,14 +27,32 @@ from {{ref('shared_exclusions__exclude_institutional_snp')}}
 
 )
 
-, valid_exclusions as (
+, combined_exclusions as (
 
   select 
-    exclusions.*
+      exclusions.*
+    , denominator.age
   from exclusions
-  inner join {{ref('quality_measures__int_nqf0059_denominator')}} p
-      on exclusions.patient_id = p.patient_id
-  where exclusions.exclusion_date between p.performance_period_begin and p.performance_period_end
+  inner join {{ref('quality_measures__int_nqf0059_denominator')}} as denominator
+      on exclusions.patient_id = denominator.patient_id
+  where exclusions.exclusion_date between denominator.performance_period_begin and denominator.performance_period_end
+
+)
+
+, valid_exclusions as (
+
+  select
+    *
+  from combined_exclusions
+  where exclusion_type != 'hospice_palliative'
+    and age >= 66
+
+  union all
+
+  select
+    *
+  from combined_exclusions
+  where exclusion_type = 'hospice_palliative'
 
 )
 
