@@ -17,6 +17,7 @@ with  visit_codes as (
         , 'preventive care services initial office visit, 18 and up'
         , 'annual wellness visit'
         , 'telephone visits'
+        , 'emergency department evaluation and management visit'
     )
 
 ), visits_encounters as (
@@ -31,8 +32,11 @@ with  visit_codes as (
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
           'home health'
-        , 'office visit'
         , 'outpatient'
+        , 'nonacute inpatient'
+        , 'encounter inpatient'
+        , 'acute_inpatient'
+        , 'emergency_department'
      )
 
 )
