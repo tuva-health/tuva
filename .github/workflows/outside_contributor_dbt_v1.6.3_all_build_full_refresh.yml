@@ -283,7 +283,7 @@ jobs:
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt run--profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
+          dbt_command: 'dbt run --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
           dbt_project_folder: "integration_tests"
 
       - name: Get the result
@@ -293,7 +293,17 @@ jobs:
 
 
   post_status:
-    needs: [snowflake, redshift, bigquery]
+    needs: [
+      snowflake_clinical_and_claims_enabled,
+      snowflake_claims_enabled,
+      snowflake_clinical_enabled,
+      redshift_clinical_and_claims_enabled,
+      redshift_claims_enabled,
+      redshift_clinical_enabled,
+      bigquery_clinical_and_claims_enabled,
+      bigquery_claims_enabled,
+      bigquery_clinical_enabled
+    ]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -302,7 +312,7 @@ jobs:
         
       - name: Post comment on PR
         run: |
-          PR_COMMENT="Workflow has finished with the following statuses:<ul><li>Snowflake: ${{ needs.snowflake.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery.result }}</li></ul>"
+          PR_COMMENT="Workflow has finished with the following statuses:<ul><li>Snowflake: ${{ needs.snowflake_clinical_and_claims_enabled.result }}</li></ul><ul><li>Snowflake: ${{ needs.snowflake_claims_enabled.result }}</li></ul><ul><li>Snowflake: ${{ needs.snowflake_clinical_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_clinical_and_claims_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_claims_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_clinical_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_clinical_and_claims_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_claims_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_clinical_enabled.result }}</li></ul>"
           PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
           gh pr comment $PR_ID --body "$PR_COMMENT"
         env:
