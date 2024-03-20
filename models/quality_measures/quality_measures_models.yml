@@ -128,6 +128,57 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
+## Shared Exclusions
+  - name: shared_exclusions__frailty
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+      alias: _frailty
+      tags: shared_exclusions
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty used by other exclusion models.
+
+  - name: shared_exclusions__exclude_advanced_illness
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+      alias: _advanced_illness
+      tags: shared_exclusions
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty and advanced illness for entire patient population.
+
+  - name: shared_exclusions__exclude_dementia
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+      alias: _dementia
+      tags: shared_exclusions
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty and taking dementia medications for entire patient population.
+
+  - name: shared_exclusions__exclude_hospice_palliative
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+      alias: _hospice_palliative
+      tags: shared_exclusions
+      materialized: table
+    description: >
+      Exclusion logic for patients using hospice or palliative services for the reporting for entire patient population.
+
+  - name: shared_exclusions__exclude_institutional_snp
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+      alias: _institutional_snp
+      tags: shared_exclusions
+      materialized: table
+    description: >
+      Exclusion logic for patients staying in an institution for the reporting for entire patient population. 
+
 ## Intermediate
 ### Breast Cancer Screening
   - name: quality_measures__int_nqf2372__performance_period

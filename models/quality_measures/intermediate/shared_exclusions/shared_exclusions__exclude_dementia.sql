@@ -110,17 +110,11 @@ with patients_with_frailty as (
             || ' with '
             || pharmacy_claim_exclusions.concept_name
           as exclusion_reason
+        , pharmacy_claim_exclusions.dispensing_date
+        , pharmacy_claim_exclusions.paid_date
     from patients_with_frailty
          inner join pharmacy_claim_exclusions
             on patients_with_frailty.patient_id = pharmacy_claim_exclusions.patient_id
-    where (
-        pharmacy_claim_exclusions.dispensing_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-        or pharmacy_claim_exclusions.paid_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
 
     union all
 
@@ -131,12 +125,11 @@ with patients_with_frailty as (
             || ' with '
             || medication_exclusions.concept_name
           as exclusion_reason
+        , medication_exclusions.dispensing_date
+        , null as paid_date
     from patients_with_frailty
          inner join medication_exclusions
          on patients_with_frailty.patient_id = medication_exclusions.patient_id
-    where medication_exclusions.dispensing_date
-        between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-        and patients_with_frailty.performance_period_end
 
 )
 
@@ -144,5 +137,8 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
+    , 'dementia' as exclusion_type
+    , dispensing_date
+    , paid_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from frailty_with_dementia
