@@ -16,13 +16,13 @@ with conditions as (
 
 )
 
-, value_sets as (
+, clinical_concepts as (
 
     select
           concept_name
         , code
         , code_system
-    from {{ ref('hcc_suspecting__value_sets') }}
+    from {{ ref('hcc_suspecting__clinical_concepts') }}
 
 )
 
@@ -47,7 +47,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
-        , value_sets.concept_name
+        , clinical_concepts.concept_name
         , row_number() over (
             partition by
                   conditions.patient_id
@@ -57,10 +57,10 @@ with conditions as (
                 , conditions.code desc
           ) as row_num
     from conditions
-        inner join value_sets
-            on conditions.code_type = value_sets.code_system
-            and conditions.code = value_sets.code
-    where lower(value_sets.concept_name) in (
+        inner join clinical_concepts
+            on conditions.code_type = clinical_concepts.code_system
+            and conditions.code = clinical_concepts.code
+    where lower(clinical_concepts.concept_name) in (
           'chronic kidney disease, stage 1'
         , 'chronic kidney disease, stage 2'
     )
@@ -91,7 +91,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
-        , value_sets.concept_name
+        , clinical_concepts.concept_name
         , row_number() over (
             partition by
                   conditions.patient_id
@@ -101,10 +101,10 @@ with conditions as (
                 , conditions.code desc
           ) as row_num
     from conditions
-        inner join value_sets
-            on conditions.code_type = value_sets.code_system
-            and conditions.code = value_sets.code
-    where lower(value_sets.concept_name) = 'diabetes'
+        inner join clinical_concepts
+            on conditions.code_type = clinical_concepts.code_system
+            and conditions.code = clinical_concepts.code
+    where lower(clinical_concepts.concept_name) = 'diabetes'
 )
 
 , diabetes_dedupe as (
