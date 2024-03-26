@@ -31,7 +31,7 @@ with list as (
         , hcc_description
         , reason
         , contributing_factor
-        , condition_date
+        , condition_date as latest_condition_date
     from list
     where row_num = 1
 
@@ -45,7 +45,7 @@ with list as (
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
-        , cast(condition_date as date) as condition_date
+        , cast(latest_condition_date as date) as latest_condition_date
     from list_dedupe
 
 )
@@ -56,6 +56,6 @@ select
     , hcc_description
     , reason
     , contributing_factor
-    , condition_date
+    , latest_condition_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
