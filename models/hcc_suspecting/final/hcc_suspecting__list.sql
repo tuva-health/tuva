@@ -22,9 +22,25 @@ with hcc_history_suspects as (
 
 )
 
+, comorbidity_suspects as (
+
+    select distinct
+          patient_id
+        , data_source
+        , hcc_code
+        , hcc_description
+        , reason
+        , contributing_factor
+    from {{ ref('hcc_suspecting__int_comorbidity_suspects') }}
+    where current_year_billed = false
+
+)
+
 , unioned as (
 
     select * from hcc_history_suspects
+    union all
+    select * from comorbidity_suspects
 
 )
 
