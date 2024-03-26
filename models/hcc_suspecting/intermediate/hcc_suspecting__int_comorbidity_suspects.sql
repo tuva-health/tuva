@@ -16,13 +16,22 @@ with conditions as (
 
 )
 
-, clinical_concepts as (
+, seed_clinical_concepts as (
 
     select
           concept_name
         , code
         , code_system
     from {{ ref('hcc_suspecting__clinical_concepts') }}
+
+)
+
+, seed_hcc_descriptions as (
+
+    select distinct
+          hcc_code
+        , hcc_description
+    from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
 
@@ -47,7 +56,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
-        , clinical_concepts.concept_name
+        , seed_clinical_concepts.concept_name
         , row_number() over (
             partition by
                   conditions.patient_id
@@ -57,10 +66,10 @@ with conditions as (
                 , conditions.code desc
           ) as row_num
     from conditions
-        inner join clinical_concepts
-            on conditions.code_type = clinical_concepts.code_system
-            and conditions.code = clinical_concepts.code
-    where lower(clinical_concepts.concept_name) in (
+        inner join seed_clinical_concepts
+            on conditions.code_type = seed_clinical_concepts.code_system
+            and conditions.code = seed_clinical_concepts.code
+    where lower(seed_clinical_concepts.concept_name) in (
           'chronic kidney disease, stage 1'
         , 'chronic kidney disease, stage 2'
     )
@@ -91,7 +100,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
-        , clinical_concepts.concept_name
+        , seed_clinical_concepts.concept_name
         , row_number() over (
             partition by
                   conditions.patient_id
@@ -101,10 +110,10 @@ with conditions as (
                 , conditions.code desc
           ) as row_num
     from conditions
-        inner join clinical_concepts
-            on conditions.code_type = clinical_concepts.code_system
-            and conditions.code = clinical_concepts.code
-    where lower(clinical_concepts.concept_name) = 'diabetes'
+        inner join seed_clinical_concepts
+            on conditions.code_type = seed_clinical_concepts.code_system
+            and conditions.code = seed_clinical_concepts.code
+    where lower(seed_clinical_concepts.concept_name) = 'diabetes'
 )
 
 , diabetes_dedupe as (
@@ -127,8 +136,8 @@ with conditions as (
     select
           diabetes_dedupe.patient_id
         , diabetes_dedupe.data_source
-        , '37' as hcc_code
-        , 'Diabetes with Chronic Complications Logic' as hcc_description
+        , seed_hcc_descriptions.hcc_code
+        , seed_hcc_descriptions.hcc_description
         , 'Comorbidity suspect' as reason
         , diabetes_dedupe.concept_name
             || ' and '
@@ -140,6 +149,8 @@ with conditions as (
             on diabetes_dedupe.patient_id = ckd_stage_1_or_2_dedupe.patient_id
             /* ensure conditions overlap in the same year */
             and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
+        inner join seed_hcc_descriptions
+            on hcc_code = '37'
 
 )
 /* END HCC 37 logic */
