@@ -138,7 +138,7 @@ with conditions as (
         , diabetes_dedupe.data_source
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
-        , 'Comorbidity suspect' as reason
+        , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
         , diabetes_dedupe.concept_name
             || ' and '
             || ckd_stage_1_or_2_dedupe.concept_name
