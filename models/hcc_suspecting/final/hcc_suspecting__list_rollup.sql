@@ -3,29 +3,9 @@
    )
 }}
 
-with hcc_history_suspects as (
+with list as (
 
-    select distinct
-          patient_id
-        , data_source
-        , hcc_code
-        , hcc_description
-        , 'Prior coding history' as reason
-        , icd_10_cm_code
-            || case
-                when last_billed is not null then ' last billed on ' || last_billed
-                when last_billed is null and last_recorded is not null then ' last recorded on ' || last_recorded
-                else ' (missing recorded and billing dates) '
-          end as contributing_factor
-        , coalesce(last_billed, last_recorded) as condition_date
-    from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
-    where current_year_billed = false
-
-)
-
-, comorbidity_suspects as (
-
-    select distinct
+    select
           patient_id
         , data_source
         , hcc_code
@@ -33,16 +13,27 @@ with hcc_history_suspects as (
         , reason
         , contributing_factor
         , condition_date
-    from {{ ref('hcc_suspecting__int_comorbidity_suspects') }}
-    where current_year_billed = false
+        , row_number() over (
+            partition by
+                  patient_id
+                , hcc_code
+            order by condition_date desc
+          ) as row_num
+    from {{ ref('hcc_suspecting__list') }}
 
 )
 
-, unioned as (
+, list_dedupe as (
 
-    select * from hcc_history_suspects
-    union all
-    select * from comorbidity_suspects
+    select
+          patient_id
+        , hcc_code
+        , hcc_description
+        , reason
+        , contributing_factor
+        , condition_date
+    from list
+    where row_num = 1
 
 )
 
@@ -50,19 +41,17 @@ with hcc_history_suspects as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
         , cast(condition_date as date) as condition_date
-    from unioned
+    from list_dedupe
 
 )
 
 select
       patient_id
-    , data_source
     , hcc_code
     , hcc_description
     , reason
