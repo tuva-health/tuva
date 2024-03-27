@@ -10,7 +10,7 @@ with hcc_history_suspects as (
         , data_source
         , hcc_code
         , hcc_description
-        , 'Prior coding history' as reason
+        , cast('Prior coding history' as {{ dbt.type_string() }}) as reason
         , icd_10_cm_code
             || case
                 when last_billed is not null then ' last billed on ' || last_billed
@@ -30,9 +30,22 @@ with hcc_history_suspects as (
         , data_source
         , hcc_code
         , hcc_description
-        , reason
-        , contributing_factor
-        , condition_date
+        , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
+        , condition_1_concept_name
+            || ' ('
+            || condition_1_code
+            || ' on '
+            || condition_1_recorded_date
+            || ')'
+            || ' and '
+            || condition_2_concept_name
+            || ' ('
+            || condition_2_code
+            || ' on '
+            || condition_2_recorded_date
+            || ')'
+          as contributing_factor
+        , condition_1_recorded_date as condition_date
     from {{ ref('hcc_suspecting__int_comorbidity_suspects') }}
     where current_year_billed = false
 

@@ -138,15 +138,16 @@ with conditions as (
         , diabetes_dedupe.data_source
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
-        , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
-        , diabetes_dedupe.concept_name
-            || ' and '
-            || ckd_stage_1_or_2_dedupe.concept_name
-            as contributing_factor
-        , diabetes_dedupe.recorded_date
+        , diabetes_dedupe.concept_name as condition_1_concept_name
+        , diabetes_dedupe.code as condition_1_code
+        , diabetes_dedupe.recorded_date as condition_1_recorded_date
+        , ckd_stage_1_or_2_dedupe.concept_name as condition_2_concept_name
+        , ckd_stage_1_or_2_dedupe.code as condition_2_code
+        , ckd_stage_1_or_2_dedupe.recorded_date as condition_2_recorded_date
     from diabetes_dedupe
         inner join ckd_stage_1_or_2_dedupe
             on diabetes_dedupe.patient_id = ckd_stage_1_or_2_dedupe.patient_id
+            and diabetes_dedupe.data_source = ckd_stage_1_or_2_dedupe.data_source
             /* ensure conditions overlap in the same year */
             and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
         inner join seed_hcc_descriptions
@@ -168,9 +169,12 @@ with conditions as (
         , unioned.data_source
         , unioned.hcc_code
         , unioned.hcc_description
-        , unioned.reason
-        , unioned.contributing_factor
-        , unioned.recorded_date
+        , unioned.condition_1_concept_name
+        , unioned.condition_1_code
+        , unioned.condition_1_recorded_date
+        , unioned.condition_2_concept_name
+        , unioned.condition_2_code
+        , unioned.condition_2_recorded_date
         , billed_hccs.current_year_billed
     from unioned
         left join billed_hccs
@@ -187,9 +191,12 @@ with conditions as (
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
-        , cast(reason as {{ dbt.type_string() }}) as reason
-        , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
-        , cast(recorded_date as date) as condition_date
+        , cast(condition_1_concept_name as {{ dbt.type_string() }}) as condition_1_concept_name
+        , cast(condition_1_code as {{ dbt.type_string() }}) as condition_1_code
+        , cast(condition_1_recorded_date as date) as condition_1_recorded_date
+        , cast(condition_2_concept_name as {{ dbt.type_string() }}) as condition_2_concept_name
+        , cast(condition_2_code as {{ dbt.type_string() }}) as condition_2_code
+        , cast(condition_2_recorded_date as date) as condition_2_recorded_date
         , cast(current_year_billed as boolean) as current_year_billed
     from add_billed_flag
 
@@ -200,9 +207,12 @@ select
     , data_source
     , hcc_code
     , hcc_description
-    , reason
-    , contributing_factor
-    , condition_date
+    , condition_1_concept_name
+    , condition_1_code
+    , condition_1_recorded_date
+    , condition_2_concept_name
+    , condition_2_code
+    , condition_2_recorded_date
     , current_year_billed
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
