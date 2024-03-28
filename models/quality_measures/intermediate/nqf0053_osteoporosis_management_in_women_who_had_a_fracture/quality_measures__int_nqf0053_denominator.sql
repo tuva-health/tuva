@@ -4,23 +4,21 @@
    )
 }}
 
-with valid_concept_names as (
-
-    select
-        distinct concept_name
-    from {{ ref('quality_measures__concepts')}}
-    where measure_id = 'NQF0053'
-
-)
-
-, visit_codes as (
+with visit_codes as (
 
     select
           code
         , code_system
     from {{ ref('quality_measures__value_sets') }} as value_sets
-    inner join valid_concept_names
-        on lower(value_sets.concept_name) = lower(valid_concept_names.concept_name)
+    where concept_name in (
+          'office visit'
+        , 'home healthcare services'
+        , 'preventive care services established office visit, 18 and up'
+        , 'preventive care services initial office visit, 18 and up'
+        , 'annual wellness visit'
+        , 'emergency department evaluation and management visit'
+        , 'emergency department visit'
+    )
 
 )
 
@@ -31,12 +29,16 @@ with valid_concept_names as (
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ref('quality_measures__stg_core__encounter')}} as encounter
-    inner join valid_concept_names
-        on lower(encounter.encounter_type) = lower(valid_concept_names.concept_name)
     inner join {{ ref('quality_measures__int_cqm236__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
-
+    where lower(encounter_type) in (
+          'home health'
+        , 'office visit'
+        , 'outpatient'
+        , 'outpatient rehabilitation'
+        , 'acute inpatient'
+    )
 )
 
 , procedure_encounters as (
@@ -65,6 +67,7 @@ with valid_concept_names as (
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join  visit_codes
         on medical_claim.hcpcs_code= visit_codes.code
+    where medical_claim.place_of_service_code not in ('21')
 
 
 )
@@ -95,12 +98,13 @@ with valid_concept_names as (
 
 )
 
-, fracture_codes as (
+, bone_fracture_codes as (
 
     select
           code
         , code_system
     from {{ ref('quality_measures__value_sets') }}
+    where lower(concept_name) = 'fracture diagnoses'
 
 )
 
@@ -119,7 +123,7 @@ with valid_concept_names as (
 
 )
 
-, hypertension_conditions as (
+, bone_fracture_conditions as (
 
     select
           conditions.patient_id
@@ -129,15 +133,16 @@ with valid_concept_names as (
         , conditions.source_code
         , conditions.source_code_type
     from conditions
-    inner join hypertension_codes
-        on conditions.source_code_type = hypertension_codes.code_system
-            and conditions.source_code = hypertension_codes.code
+    inner join bone_fracture_codes
+        on conditions.source_code_type = bone_fracture_codes.code_system
+            and conditions.source_code = bone_fracture_codes.code
 
 )
 
 , patients_with_age as (
     select
           p.patient_id
+        , p.sex
         , min_date
         , floor({{ datediff('birth_date', 'e.min_date', 'hour') }} / 8760.0)  as min_age
         , max_date
@@ -155,8 +160,8 @@ with valid_concept_names as (
 
     select
         distinct
-          hypertension_conditions.patient_id
-        , hypertension_conditions.recorded_date
+          bone_fracture_conditions.patient_id
+        , bone_fracture_conditions.recorded_date
         , patients_with_age.max_age as age
         , pp.performance_period_begin
         , pp.performance_period_end
@@ -164,24 +169,22 @@ with valid_concept_names as (
         , pp.measure_name
         , pp.measure_version
         , 1 as denominator_flag
-    from hypertension_conditions
+    from bone_fracture_conditions
     left join patients_with_age
-        on hypertension_conditions.patient_id = patients_with_age.patient_id
-    cross join {{ref('quality_measures__int_cqm236__performance_period')}} pp
-    where max_age >= 18 and min_age <=  85
-        and hypertension_conditions.recorded_date between
+        on bone_fracture_conditions.patient_id = patients_with_age.patient_id
+    cross join {{ref('quality_measures__int_nqf0053__performance_period')}} pp
+    where max_age >= 50 and min_age <=  85
+        and bone_fracture_conditions.recorded_date between
             {{ dbt.dateadd (
               datepart = "month"
-            , interval = -12
-            , from_date_or_timestamp = "performance_period_begin"
+            , interval = -6
+            , from_date_or_timestamp = "lookback_period"
             )
             }}
-            and 
-            {{ dbt.dateadd (
-              datepart = "month"
-            , interval = +6
-            , from_date_or_timestamp = "performance_period_begin"
-            )}}
+            and
+                pp.lookback_period
+        and lower(patients_with_age.sex) = 'female'
+
 )
 
 , add_data_types as (
