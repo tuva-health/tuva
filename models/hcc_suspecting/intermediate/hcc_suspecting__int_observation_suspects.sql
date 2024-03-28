@@ -82,6 +82,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
+        , seed_clinical_concepts.concept_name
     from conditions
         inner join seed_clinical_concepts
             on conditions.code_type = seed_clinical_concepts.code_system
@@ -99,6 +100,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
+        , seed_clinical_concepts.concept_name
     from conditions
         inner join seed_clinical_concepts
             on conditions.code_type = seed_clinical_concepts.code_system
@@ -116,6 +118,7 @@ with conditions as (
         , conditions.code_type
         , conditions.code
         , conditions.data_source
+        , seed_clinical_concepts.concept_name
     from conditions
         inner join seed_clinical_concepts
             on conditions.code_type = seed_clinical_concepts.code_system
@@ -134,6 +137,7 @@ with conditions as (
         , numeric_observations.result as observation_result
         , obstructive_sleep_apnea.code as condition_code
         , obstructive_sleep_apnea.recorded_date as condition_date
+        , obstructive_sleep_apnea.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -142,7 +146,6 @@ with conditions as (
             and numeric_observations.code = seed_clinical_concepts.code
         inner join obstructive_sleep_apnea
             on numeric_observations.patient_id = obstructive_sleep_apnea.patient_id
-            and numeric_observations.data_source = obstructive_sleep_apnea.data_source
             /* ensure bmi and condition overlaps in the same year */
             and extract(year from numeric_observations.observation_date) = extract(year from obstructive_sleep_apnea.recorded_date)
         inner join seed_hcc_descriptions
@@ -161,6 +164,7 @@ with conditions as (
         , numeric_observations.result as observation_result
         , diabetes.code as condition_code
         , diabetes.recorded_date as condition_date
+        , diabetes.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -169,7 +173,6 @@ with conditions as (
             and numeric_observations.code = seed_clinical_concepts.code
         inner join diabetes
             on numeric_observations.patient_id = diabetes.patient_id
-            and numeric_observations.data_source = diabetes.data_source
             /* ensure bmi and condition overlaps in the same year */
             and extract(year from numeric_observations.observation_date) = extract(year from diabetes.recorded_date)
         inner join seed_hcc_descriptions
@@ -188,6 +191,7 @@ with conditions as (
         , numeric_observations.result as observation_result
         , hypertension.code as condition_code
         , hypertension.recorded_date as condition_date
+        , hypertension.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -196,7 +200,6 @@ with conditions as (
             and numeric_observations.code = seed_clinical_concepts.code
         inner join hypertension
             on numeric_observations.patient_id = hypertension.patient_id
-            and numeric_observations.data_source = hypertension.data_source
             /* ensure bmi and condition overlaps in the same year */
             and extract(year from numeric_observations.observation_date) = extract(year from hypertension.recorded_date)
         inner join seed_hcc_descriptions
@@ -215,6 +218,7 @@ with conditions as (
         , numeric_observations.result as observation_result
         , null as condition_code
         , null as condition_date
+        , null as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -256,6 +260,7 @@ with conditions as (
         , unioned.observation_result
         , unioned.condition_code
         , unioned.condition_date
+        , unioned.condition_concept_name
         , unioned.hcc_code
         , unioned.hcc_description
         , billed_hccs.current_year_billed
@@ -276,6 +281,7 @@ with conditions as (
         , cast(observation_result as {{ dbt.type_string() }}) as observation_result
         , cast(condition_code as {{ dbt.type_string() }}) as condition_code
         , cast(condition_date as date) as condition_date
+        , cast(condition_concept_name as {{ dbt.type_string() }}) as condition_concept_name
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(current_year_billed as boolean) as current_year_billed
@@ -290,6 +296,7 @@ select
     , observation_result
     , condition_code
     , condition_date
+    , condition_concept_name
     , hcc_code
     , hcc_description
     , current_year_billed
