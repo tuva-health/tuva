@@ -135,7 +135,7 @@ models:
   - name: shared_exclusions__frailty
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _frailty
       tags: shared_exclusions
       materialized: table
@@ -145,7 +145,7 @@ models:
   - name: shared_exclusions__exclude_advanced_illness
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _advanced_illness
       tags: shared_exclusions
       materialized: table
@@ -155,7 +155,7 @@ models:
   - name: shared_exclusions__exclude_dementia
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _dementia
       tags: shared_exclusions
       materialized: table
@@ -165,7 +165,7 @@ models:
   - name: shared_exclusions__exclude_hospice_palliative
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _hospice_palliative
       tags: shared_exclusions
       materialized: table
@@ -175,7 +175,7 @@ models:
   - name: shared_exclusions__exclude_institutional_snp
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_shared_exclusions{% else %}shared_exclusions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}shared_exclusions{%- endif -%}
       alias: _institutional_snp
       tags: shared_exclusions
       materialized: table
