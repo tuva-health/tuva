@@ -226,13 +226,10 @@ with visit_codes as (
 , qualifying_patients_w_encounter as (
 
     select
-        distinct
         qualifying_patients_w_fractures.*
     from qualifying_patients_w_fractures
     inner join visits_encounters
         on qualifying_patients_w_fractures.patient_id = visits_encounters.patient_id
-    inner join claims_encounters
-        on qualifying_patients_w_fractures.patient_id = claims_encounters.patient_id
     where 
         lower(visits_encounters.encounter_type) in (
              'home health'
@@ -241,7 +238,6 @@ with visit_codes as (
             , 'outpatient rehabilitation'
             , 'acute inpatient'
         )
-        and place_of_service_code not in ('21')
 
 )
 
@@ -258,14 +254,19 @@ with visit_codes as (
 , qualifying_patients as (
 
     select
+        distinct
         qualifying_patients_w_encounter.*
     from qualifying_patients_w_encounter
     left join qualifying_patients_w_procedure
         on qualifying_patients_w_encounter.patient_id = qualifying_patients_w_procedure.patient_id
+    inner join claims_encounters
+        on qualifying_patients_w_encounter.patient_id = claims_encounters.patient_id
+    where claims_encounters.place_of_service_code not in ('21')
 
     union all
 
     select
+        distinct
         qualifying_patients_w_procedure.*
     from qualifying_patients_w_procedure
     left join qualifying_patients_w_encounter
