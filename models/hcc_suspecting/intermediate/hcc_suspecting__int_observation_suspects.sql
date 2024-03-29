@@ -34,12 +34,12 @@ with conditions as (
     select
           patient_id
         , observation_date
-        , result
+        , cast(result as numeric) as result
         , code_type
         , code
         , data_source
     from observations
-    where {{ apply_regex('result', '[+-]?([0-9]*[.])?[0-9]+') }}
+    where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
 
 )
 
@@ -149,7 +149,7 @@ with conditions as (
             /* ensure bmi and condition overlaps in the same year */
             and extract(year from numeric_observations.observation_date) = extract(year from obstructive_sleep_apnea.recorded_date)
         inner join seed_hcc_descriptions
-            on hcc_code = 48
+            on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 30
 
@@ -176,7 +176,7 @@ with conditions as (
             /* ensure bmi and condition overlaps in the same year */
             and extract(year from numeric_observations.observation_date) = extract(year from diabetes.recorded_date)
         inner join seed_hcc_descriptions
-            on hcc_code = 48
+            on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 35
 
@@ -203,7 +203,7 @@ with conditions as (
             /* ensure bmi and condition overlaps in the same year */
             and extract(year from numeric_observations.observation_date) = extract(year from hypertension.recorded_date)
         inner join seed_hcc_descriptions
-            on hcc_code = 48
+            on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 35
 
@@ -216,9 +216,9 @@ with conditions as (
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
-        , null as condition_code
-        , null as condition_date
-        , null as condition_concept_name
+        , cast(null as {{ dbt.type_string() }}) as condition_code
+        , cast(null as date) as condition_date
+        , cast(null as {{ dbt.type_string() }}) as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -226,7 +226,7 @@ with conditions as (
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
         inner join seed_hcc_descriptions
-            on hcc_code = 48
+            on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 40
 
