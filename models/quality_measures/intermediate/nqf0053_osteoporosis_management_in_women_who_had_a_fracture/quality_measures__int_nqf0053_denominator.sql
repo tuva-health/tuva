@@ -9,16 +9,25 @@ with visit_codes as (
     select
           code
         , code_system
+        , concept_name
     from {{ ref('quality_measures__value_sets') }} as value_sets
-    where concept_name in (
-          'office visit'
-        , 'home healthcare services'
-        , 'preventive care services established office visit, 18 and up'
-        , 'preventive care services initial office visit, 18 and up'
-        , 'annual wellness visit'
-        , 'emergency department evaluation and management visit'
-        , 'emergency department visit'
-    )
+    -- where concept_name in (
+    --       'office visit'
+    --     , 'home healthcare services'
+    --     , 'preventive care services established office visit, 18 and up'
+    --     , 'preventive care services initial office visit, 18 and up'
+    --     , 'annual wellness visit'
+    --     , 'emergency department evaluation and management visit'
+    --     , 'emergency department visit'
+    -- )
+
+)
+
+, procedures as (
+
+    select
+        *
+    from {{ ref('quality_measures__stg_core__procedure')}}
 
 )
 
@@ -28,17 +37,18 @@ with visit_codes as (
            patient_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
+         , encounter_type
     from {{ref('quality_measures__stg_core__encounter')}} as encounter
     inner join {{ ref('quality_measures__int_cqm236__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
-    where lower(encounter_type) in (
-          'home health'
-        , 'office visit'
-        , 'outpatient'
-        , 'outpatient rehabilitation'
-        , 'acute inpatient'
-    )
+    -- where lower(encounter_type) in (
+    --       'home health'
+    --     , 'office visit'
+    --     , 'outpatient'
+    --     , 'outpatient rehabilitation'
+    --     , 'acute inpatient'
+    -- )
 )
 
 , procedure_encounters as (
@@ -61,25 +71,36 @@ with visit_codes as (
           patient_id
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
+        , place_of_service_code
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
     inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join  visit_codes
         on medical_claim.hcpcs_code= visit_codes.code
-    where medical_claim.place_of_service_code not in ('21')
-
 
 )
 
 , all_encounters as (
-    select *, 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
+    select
+          patient_id
+        , min_date
+        , max_date
+        , 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from visits_encounters
     union all
-    select *, cast(null as {{ dbt.type_string() }}) as visit_enc, 'p' as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
+    select
+          patient_id
+        , min_date
+        , max_date
+        , cast(null as {{ dbt.type_string() }}) as visit_enc, 'p' as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from procedure_encounters
     union all
-    select *, cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
+    select
+          patient_id
+        , min_date
+        , max_date
+        , cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
 )
 
@@ -155,8 +176,7 @@ with visit_codes as (
 
 )
 
--- Patients 18-85 years of age who had a visit and diagnosis of essential hypertension starting before and continuing into, or starting during the first six months of the measurement period.
-, qualifying_patients as (
+, qualifying_patients_w_fractures as (
 
     select
         distinct
@@ -184,6 +204,73 @@ with visit_codes as (
             and
                 pp.lookback_period
         and lower(patients_with_age.sex) = 'female'
+
+)
+
+, fracture_procedures as (
+
+    select
+        procedures.*
+    from procedures
+    inner join visit_codes
+        on procedures.source_code = visit_codes.code
+            and procedures.source_code_type = visit_codes.code_system
+    inner join {{ ref('quality_measures__int_cqm236__performance_period') }} as pp
+        on procedures.procedure_date 
+            between pp.performance_period_begin and pp.performance_period_end
+    where lower(visit_codes.concept_name) = 'fracture procedures'
+
+)
+
+
+, qualifying_patients_w_encounter as (
+
+    select
+        distinct
+        qualifying_patients_w_fractures.*
+    from qualifying_patients_w_fractures
+    inner join visits_encounters
+        on qualifying_patients_w_fractures.patient_id = visits_encounters.patient_id
+    inner join claims_encounters
+        on qualifying_patients_w_fractures.patient_id = claims_encounters.patient_id
+    where 
+        lower(visits_encounters.encounter_type) in (
+             'home health'
+            , 'office visit'
+            , 'outpatient'
+            , 'outpatient rehabilitation'
+            , 'acute inpatient'
+        )
+        and place_of_service_code not in ('21')
+
+)
+
+, qualifying_patients_w_procedure as (
+
+    select
+        qualifying_patients_w_fractures.*
+    from qualifying_patients_w_fractures
+    inner join fracture_procedures
+        on qualifying_patients_w_fractures.patient_id = fracture_procedures.patient_id
+
+)
+
+, qualifying_patients as (
+
+    select
+        qualifying_patients_w_encounter.*
+    from qualifying_patients_w_encounter
+    left join qualifying_patients_w_procedure
+        on qualifying_patients_w_encounter.patient_id = qualifying_patients_w_procedure.patient_id
+
+    union all
+
+    select
+        qualifying_patients_w_procedure.*
+    from qualifying_patients_w_procedure
+    left join qualifying_patients_w_encounter
+        on qualifying_patients_w_encounter.patient_id = qualifying_patients_w_procedure.patient_id
+    where qualifying_patients_w_encounter.patient_id is null
 
 )
 
