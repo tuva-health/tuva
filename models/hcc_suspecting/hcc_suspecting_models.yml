@@ -10,8 +10,9 @@ models:
       tags: hcc_suspecting
       materialized: table
     description: >
-      This final model displays the list of suspecting conditions per patient 
-      with the reason and contributing factors.
+      This final model displays the list of suspecting conditions per patient, 
+      data_source, hcc, and diagnosis code with the reason and contributing 
+      factors.
     columns:
       - name: patient_id
         description: Unique ID for the patient.
@@ -32,6 +33,39 @@ models:
       - name: contributing_factor
         description: >
           Description of the contributing factor(s) for the suspecting condition.
+      - name: condition_date
+        description: Date when the condition was recorded or billed.
+      - name: tuva_last_run
+        description: The date the model was run.
+
+  - name: hcc_suspecting__list_rollup
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: list_rollup
+      tags: hcc_suspecting
+      materialized: table
+    description: >
+      This final model displays the list of suspecting conditions per patient 
+      and hcc with the latest contributing factor rolled up.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: reason
+        description: Standardized reason for the suspecting condition.
+      - name: contributing_factor
+        description: >
+          Description of the contributing factor(s) for the suspecting condition.
+      - name: latest_condition_date
+        description: Date when the condition was recorded or billed.
       - name: tuva_last_run
         description: The date the model was run.
 
@@ -91,6 +125,42 @@ models:
       - name: tuva_last_run
         description: The date the model was run.
 
+  - name: hcc_suspecting__int_comorbidity_suspects
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _int_comorbidity_suspects
+      tags: hcc_suspecting
+      materialized: table
+    description: Comorbidity suspecting conditions.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: reason
+        description: Standardized reason for the suspecting condition.
+      - name: contributing_factor
+        description: >
+          Description of the contributing factor(s) for the suspecting condition.
+      - name: condition_date
+        description: Date when the condition was recorded or billed.
+      - name: current_year_billed
+        description: >
+          Flag indicating that the HCC has been billed during the payment year.
+      - name: tuva_last_run
+        description: The date the model was run.
+
   - name: hcc_suspecting__int_patient_hcc_history
     config:
       schema: |
@@ -134,8 +204,8 @@ models:
           condition_type <> 'problem').
       - name: current_year_billed
         description: >
-          Flag indicating that the ICD-10-CM code mapped to the HCC was billed
-          during the payment year.
+          Flag indicating that the ICD-10-CM code mapped to the HCC has been
+          billed during the payment year.
       - name: tuva_last_run
         description: The date the model was run.
 
