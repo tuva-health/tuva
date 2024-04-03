@@ -1090,6 +1090,16 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
+  - name: quality_measures__int_nqf0053_numerator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_numerator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Numerator logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture
+
 ## Staging
   - name: quality_measures__stg_core__condition
     config:
