@@ -77,7 +77,12 @@ osteo_codes as (
 
 proc_osteo as (
 
-    select * 
+    select
+        patient_id
+      , encounter_id
+      , procedure_date
+      , source_code_type
+      , source_code
     from {{ref('quality_measures__stg_core__procedure')}} as procs
 
     inner join osteo_codes
@@ -128,7 +133,7 @@ bone_fracture_codes as (
           code
         , code_system
     from {{ ref('quality_measures__value_sets') }}
-    where lower(concept_name) = 'fracture diagnoses'
+    where lower(concept_name) = 'fracture procedures'
 
 )
 
