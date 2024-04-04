@@ -65,17 +65,26 @@ pharma_osteo as (
 -- ),
 */
 
-osteo_codes as (
-
+value_sets as (
     select
           code
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
-    where lower(concept_name) in ('osteoporosis medication', 'bone mineral density test')
-),
+)
 
-proc_osteo as (
+, osteo_proccodes as (
+
+    select
+          code
+        , code_system
+        , concept_name
+    from value_sets
+    where lower(concept_name) in ('bone mineral density test')
+)
+
+
+, proc_osteo as (
 
     select
         patient_id
@@ -85,9 +94,9 @@ proc_osteo as (
       , source_code
     from {{ref('quality_measures__stg_core__procedure')}} as procs
 
-    inner join osteo_codes
-        on procs.source_code = osteo_codes.code
-        and procs.source_code_type = osteo_codes.code_system
+    inner join osteo_proccodes
+        on procs.source_code = osteo_proccodes.code
+        and procs.source_code_type = osteo_proccodes.code_system
 
     -- where lower(source_description) in 
     --     (
@@ -98,9 +107,10 @@ proc_osteo as (
     --     'peripheral dual-energy x-ray absorptiometry (dxa)' 
     --     )
     -- or lower(source_description) like '%bone mineral density test%'
-),
+)
 
-proc_osteo_within_range as (
+
+, proc_osteo_within_range as (
 
     select proc_osteo.*
         , denominator.measure_id
@@ -114,25 +124,31 @@ proc_osteo_within_range as (
         and proc_osteo.procedure_date between 
             denominator.performance_period_begin and denominator.performance_period_end
 
-),
+)
 
-patients_proc_osteo_not_taken as (
+, patients_proc_osteo_not_taken as (
     
-    select denominator.patient_id
+    select 
+          denominator.patient_id
+        , denominator.measure_id
+        , denominator.measure_name
+        , denominator.measure_version
+        , denominator.performance_period_begin
+        , denominator.performance_period_end  
     from denominator
     left join proc_osteo_within_range 
     on denominator.patient_id = proc_osteo_within_range.patient_id
     where proc_osteo_within_range.patient_id is null
 
-),
+)
 
 -------------------------------------------------------------------------
-bone_fracture_codes as (
+, bone_fracture_codes as (
 
     select
           code
         , code_system
-    from {{ ref('quality_measures__value_sets') }}
+    from value_sets
     where lower(concept_name) = 'fracture procedures'
 
 )
@@ -183,9 +199,9 @@ bone_fracture_codes as (
         on proc_osteo_within_range.patient_id = bone_fracture_conditions.patient_id
         and proc_osteo_within_range.encounter_id = bone_fracture_conditions.encounter_id
 
-),
+)
 
-osteo_proc_within_6_months as (
+, osteo_proc_within_6_months as (
 
     select 
         *        
@@ -193,19 +209,122 @@ osteo_proc_within_6_months as (
     where datediff(month, recorded_date, procedure_date) <= 6
 )
 
+, osteo_pharmacy_codes as (
+
+    select
+          code
+        , code_system
+        , concept_name
+    from value_sets
+    where lower(concept_name) in ('osteoporosis medications for urology care')
+    /*No other method to figure out vitamins/minerals CAN BE CHANGED TO osteoporosis medication for urology care to match the drugs in CMS doc*/
+)
+
+, pharm_claim_osteo as (
+
+    select
+        patient_id
+      , dispensing_date
+      , ndc_code  
+    from {{ref('quality_measures__stg_pharmacy_claim')}} as pharmacy_claims
+    inner join osteo_pharmacy_codes
+    on pharmacy_claims.ndc_code = osteo_pharmacy_codes.code
+        -- and pharmacy_claims.code_system = osteo_pharmacy_codes.code_system
+        /* this is commented out as their is only NDC code system in pharmacy_claims */
+)
+
+, pharmacy_claim_osteo_within_range as (
+
+    select pharm_claim_osteo.*
+        , patients_proc_osteo_not_taken.measure_id
+        , patients_proc_osteo_not_taken.measure_name
+        , patients_proc_osteo_not_taken.measure_version
+        , patients_proc_osteo_not_taken.performance_period_begin
+        , patients_proc_osteo_not_taken.performance_period_end
+    from pharm_claim_osteo
+    inner join patients_proc_osteo_not_taken
+        on pharm_claim_osteo.patient_id = patients_proc_osteo_not_taken.patient_id
+        and pharm_claim_osteo.dispensing_date between 
+            patients_proc_osteo_not_taken.performance_period_begin and patients_proc_osteo_not_taken.performance_period_end
+            
+)
+
+, bone_fracture_codes_pharmacy as (
+
+    select
+          code
+        , code_system
+    from value_sets
+    where lower(concept_name) = 'fracture diagnoses'
+)
+
+, bone_fracture_conditions_pharmacy as (
+    select
+          conditions.patient_id
+        , conditions.claim_id
+        , conditions.encounter_id
+        , conditions.recorded_date
+        , conditions.source_code
+        , conditions.source_code_type
+    from conditions
+    inner join bone_fracture_codes_pharmacy
+        on conditions.source_code_type = bone_fracture_codes_pharmacy.code_system
+            and conditions.source_code = bone_fracture_codes_pharmacy.code
+
+)
+
+--------------------------
+
+, osteo_pharmacy_for_bone_fracture as (
+
+    select 
+          pharmacy_claim_osteo_within_range.*
+        , bone_fracture_conditions_pharmacy.claim_id
+        , bone_fracture_conditions_pharmacy.recorded_date
+    from 
+        pharmacy_claim_osteo_within_range
+    inner join bone_fracture_conditions_pharmacy
+        on pharmacy_claim_osteo_within_range.patient_id = bone_fracture_conditions_pharmacy.patient_id
+
+)
+
+, osteo_pharmacy_within_6_months as (
+
+    select 
+        *        
+    from osteo_pharmacy_for_bone_fracture
+    where datediff(month, dispensing_date, recorded_date) <= 6
+)
+
+--------------------------
+
 
 , numerator as (
     select
-          patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
-        , procedure_date as evidence_date
+          osteo_proc_within_6_months.patient_id
+        , osteo_proc_within_6_months.performance_period_begin
+        , osteo_proc_within_6_months.performance_period_end
+        , osteo_proc_within_6_months.measure_id
+        , osteo_proc_within_6_months.measure_name
+        , osteo_proc_within_6_months.measure_version
+        , osteo_proc_within_6_months.procedure_date as evidence_date
         , 'DXA Yes' as evidence_value
         , 1 as numerator_flag
     from osteo_proc_within_6_months
+
+    union all
+
+    select 
+          osteo_pharmacy_within_6_months.patient_id
+        , osteo_pharmacy_within_6_months.performance_period_begin
+        , osteo_pharmacy_within_6_months.performance_period_end
+        , osteo_pharmacy_within_6_months.measure_id
+        , osteo_pharmacy_within_6_months.measure_name
+        , osteo_pharmacy_within_6_months.measure_version
+        , osteo_pharmacy_within_6_months.dispensing_date as evidence_date
+        , 'Pharmacy_claims' as evidence_value
+        , 1 as numerator_flag
+    from osteo_pharmacy_within_6_months
 )
 
 , add_data_types as (
