@@ -39,7 +39,7 @@ with visit_codes as (
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
          , encounter_type
     from {{ref('quality_measures__stg_core__encounter')}} as encounter
-    inner join {{ ref('quality_measures__int_cqm236__performance_period') }} as pp
+    inner join {{ ref('quality_measures__int_nqf0053__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     -- where lower(encounter_type) in (
@@ -58,7 +58,7 @@ with visit_codes as (
         , procedure_date as min_date
         , procedure_date as max_date
     from {{ref('quality_measures__stg_core__procedure')}} proc
-    inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp
+    inner join {{ref('quality_measures__int_nqf0053__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join  visit_codes
         on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
@@ -73,7 +73,7 @@ with visit_codes as (
         , coalesce(claim_end_date,claim_start_date) as max_date
         , place_of_service_code
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
-    inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp on
+    inner join {{ref('quality_measures__int_nqf0053__performance_period')}}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join  visit_codes
@@ -198,7 +198,7 @@ with visit_codes as (
             {{ dbt.dateadd (
               datepart = "month"
             , interval = -6
-            , from_date_or_timestamp = "lookback_period"
+            , from_date_or_timestamp = "performance_period_begin"
             )
             }}
             and
@@ -215,7 +215,7 @@ with visit_codes as (
     inner join visit_codes
         on procedures.source_code = visit_codes.code
             and procedures.source_code_type = visit_codes.code_system
-    inner join {{ ref('quality_measures__int_cqm236__performance_period') }} as pp
+    inner join {{ ref('quality_measures__int_nqf0053__performance_period') }} as pp
         on procedures.procedure_date 
             between pp.performance_period_begin and pp.performance_period_end
     where lower(visit_codes.concept_name) = 'fracture procedures'
