@@ -232,11 +232,15 @@ with visit_codes as (
         on qualifying_patients_w_fractures.patient_id = visits_encounters.patient_id
     where 
         lower(visits_encounters.encounter_type) in (
-             'home health'
-            , 'office visit'
-            , 'outpatient'
-            , 'outpatient rehabilitation'
-            , 'acute inpatient'
+              'Acute Inpatient'
+            , 'Annual Wellness Visit'
+            , 'Emergency Department Visit'
+            , 'Home Healthcare Services'
+            , 'Office Visit'
+            , 'Preventive Care Services Established Office Visit, 18 and Up'
+            , 'Preventive Care Services Initial Office Visit, 18 and Up'
+            , 'Emergency Department Evaluation and Management Visit'
+            , 'Outpatient'
         )
 
 )
