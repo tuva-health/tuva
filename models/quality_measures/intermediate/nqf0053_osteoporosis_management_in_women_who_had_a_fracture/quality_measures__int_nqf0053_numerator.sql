@@ -26,7 +26,7 @@ with denominator as (
     from {{ ref('quality_measures__value_sets') }}
 )
 
-, osteo_proccodes as (
+, osteo_procedurecodes as (
 
     select
           code
@@ -47,8 +47,7 @@ with denominator as (
     )
 )
 
-
-, proc_osteo as (
+, procedures_osteo_related as (
 
     select
         patient_id
@@ -57,26 +56,25 @@ with denominator as (
       , source_code_type
       , source_code
     from {{ref('quality_measures__stg_core__procedure')}} as procs
-
-    inner join osteo_proccodes
-        on procs.source_code = osteo_proccodes.code
-        and procs.source_code_type = osteo_proccodes.code_system
+    inner join osteo_procedurecodes
+        on procs.source_code = osteo_procedurecodes.code
+        and procs.source_code_type = osteo_procedurecodes.code_system
 )
 
+, qualifying_procedures as (
 
-, proc_osteo_within_range as (
-
-    select proc_osteo.*
+    select procedures_osteo_related.*
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
+        , denominator.recorded_date
         , denominator.performance_period_begin
         , denominator.performance_period_end
-    from proc_osteo
+    from procedures_osteo_related
     inner join denominator
-        on proc_osteo.patient_id = denominator.patient_id
+        on procedures_osteo_related.patient_id = denominator.patient_id
         and 
-            proc_osteo.procedure_date between
+            procedures_osteo_related.procedure_date between
             denominator.recorded_date 
             and
             {{dbt.dateadd (
@@ -87,7 +85,7 @@ with denominator as (
             }} 
 )
 
-, patients_proc_osteo_not_taken as (
+, denominator_patients_disqualified_from_procedure as (
     
     select 
           denominator.patient_id
@@ -98,15 +96,15 @@ with denominator as (
         , denominator.performance_period_begin
         , denominator.performance_period_end  
     from denominator
-    left join proc_osteo_within_range 
-    on denominator.patient_id = proc_osteo_within_range.patient_id
-    where proc_osteo_within_range.patient_id is null
+    left join qualifying_procedures 
+    on denominator.patient_id = qualifying_procedures.patient_id
+    where qualifying_procedures.patient_id is null
 
 )
 
 -- pharmacy_claim begin
 
-, osteo_pharmacy_codes as (
+, osteo_rx_codes as (
 
     select
           code
@@ -118,59 +116,43 @@ with denominator as (
         ( 
           'osteoporosis medications for urology care'
         , 'osteoporosis medication'
+        , 'bisphosphonates'
         )
 )
 
-, pharm_claim_osteo as (
+, pharmacy_claims_osteo_related as (
 
     select
         patient_id
       , dispensing_date
       , ndc_code  
     from {{ref('quality_measures__stg_pharmacy_claim')}} as pharmacy_claims
-    inner join osteo_pharmacy_codes
-    on pharmacy_claims.ndc_code = osteo_pharmacy_codes.code
-        and lower(osteo_pharmacy_codes.code_system) = 'ndc'
+    inner join osteo_rx_codes
+    on pharmacy_claims.ndc_code = osteo_rx_codes.code
+        and lower(osteo_rx_codes.code_system) = 'ndc'
 )
 
-, pharmacy_claim_osteo_within_range as (
+, qualifying_pharmacy_claims as (
 
-    select pharm_claim_osteo.*
-        , patients_proc_osteo_not_taken.measure_id
-        , patients_proc_osteo_not_taken.measure_name
-        , patients_proc_osteo_not_taken.measure_version
-        , patients_proc_osteo_not_taken.performance_period_begin
-        , patients_proc_osteo_not_taken.performance_period_end
-    from pharm_claim_osteo
-    inner join patients_proc_osteo_not_taken
-        on pharm_claim_osteo.patient_id = patients_proc_osteo_not_taken.patient_id
-        and pharm_claim_osteo.dispensing_date 
+    select pharmacy_claims_osteo_related.*
+        , denominator_patients_disqualified_from_procedure.measure_id
+        , denominator_patients_disqualified_from_procedure.measure_name
+        , denominator_patients_disqualified_from_procedure.measure_version
+        , denominator_patients_disqualified_from_procedure.recorded_date
+        , denominator_patients_disqualified_from_procedure.performance_period_begin
+        , denominator_patients_disqualified_from_procedure.performance_period_end
+    from pharmacy_claims_osteo_related
+    inner join denominator_patients_disqualified_from_procedure
+        on pharmacy_claims_osteo_related.patient_id = denominator_patients_disqualified_from_procedure.patient_id
+        and pharmacy_claims_osteo_related.dispensing_date 
             between 
-            patients_proc_osteo_not_taken.performance_period_begin and patients_proc_osteo_not_taken.recorded_date
+            denominator_patients_disqualified_from_procedure.performance_period_begin and denominator_patients_disqualified_from_procedure.recorded_date
 
 )
-
--------------------------------------------------------
 
 -- medication begin
 
-, osteo_medication_codes as (
-
-    select
-          code
-        , code_system
-        , concept_name
-    from value_sets
-    where lower(concept_name)
-        in 
-        ( 
-          'osteoporosis medications for urology care'
-        , 'osteoporosis medication'
-        )
-    /*osteoporosis medication to match the code in CMS doc*/
-)
-
-, medication_osteo as (
+, medication_osteo_related as (
 
     select
         patient_id
@@ -182,124 +164,73 @@ with denominator as (
       , rxnorm_code
   
     from {{ref('quality_measures__stg_core__medication')}} as medications
-    inner join osteo_medication_codes
-    on medications.source_code = osteo_medication_codes.code
-    and medications.source_code_type = osteo_medication_codes.code_system
+    inner join osteo_rx_codes
+    on medications.source_code = osteo_rx_codes.code
+    and medications.source_code_type = osteo_rx_codes.code_system
 
 )
 
-, medication_osteo_within_range as (
+, qualifying_medications as (
 
-    select medication_osteo.*
-        , patients_proc_osteo_not_taken.measure_id
-        , patients_proc_osteo_not_taken.measure_name
-        , patients_proc_osteo_not_taken.measure_version
-        , patients_proc_osteo_not_taken.performance_period_begin
-        , patients_proc_osteo_not_taken.performance_period_end
-    from medication_osteo
-    inner join patients_proc_osteo_not_taken
-        on medication_osteo.patient_id = patients_proc_osteo_not_taken.patient_id
-        and medication_osteo.prescribing_date between 
-            patients_proc_osteo_not_taken.recorded_date 
+    select medication_osteo_related.*
+        , denominator_patients_disqualified_from_procedure.measure_id
+        , denominator_patients_disqualified_from_procedure.measure_name
+        , denominator_patients_disqualified_from_procedure.measure_version
+        , denominator_patients_disqualified_from_procedure.recorded_date
+        , denominator_patients_disqualified_from_procedure.performance_period_begin
+        , denominator_patients_disqualified_from_procedure.performance_period_end
+    from medication_osteo_related
+    inner join denominator_patients_disqualified_from_procedure
+        on medication_osteo_related.patient_id = denominator_patients_disqualified_from_procedure.patient_id
+        and medication_osteo_related.prescribing_date between 
+            denominator_patients_disqualified_from_procedure.recorded_date 
             and 
             {{ dbt.dateadd (
               datepart = "month"
             , interval = +6
-            , from_date_or_timestamp = "patients_proc_osteo_not_taken.recorded_date"
+            , from_date_or_timestamp = "denominator_patients_disqualified_from_procedure.recorded_date"
             )
             }}
 
 )
 
-------- repeat codes ---------------
--- , bone_fracture_codes_medication as (
-
---     select
---           code
---         , code_system
---     from value_sets
---     where lower(concept_name) = 'fracture diagnoses'
--- )
-
--- , bone_fracture_conditions_medication as (
---     select
---           conditions.patient_id
---         , conditions.claim_id
---         , conditions.encounter_id
---         , conditions.recorded_date
---         , conditions.source_code
---         , conditions.source_code_type
---     from conditions
---     inner join bone_fracture_codes_medication
---         on conditions.source_code_type = bone_fracture_codes_medication.code_system
---             and conditions.source_code = bone_fracture_codes_medication.code
---     inner join {{ ref('quality_measures__int_nqf0053__performance_period') }} as pp
---         on conditions.recorded_date 
---             between pp.performance_period_begin and pp.performance_period_end
-
--- )
-------- repeat codes ---------------
-
-, osteo_medication_for_bone_fracture as (
-
-    select 
-          medication_osteo_within_range.*
-        , bone_fracture_conditions.claim_id
-        , bone_fracture_conditions.recorded_date
-    from 
-        medication_osteo_within_range
-    inner join bone_fracture_conditions
-        on medication_osteo_within_range.patient_id = bone_fracture_conditions.patient_id
-            and medication_osteo_within_range.encounter_id = bone_fracture_conditions.encounter_id
-
-
-)
-
-, osteo_medication_within_6_months as (
-
-    select 
-        *        
-    from osteo_medication_for_bone_fracture
-    where datediff(month, recorded_date, prescribing_date) <= 6
-)
-
---------------------------------------------------------------------------------------------------------------
-
-
 , numerator as (
     select
-          proc_osteo_within_range.patient_id
-        , proc_osteo_within_range.performance_period_begin
-        , proc_osteo_within_range.performance_period_end
-        , proc_osteo_within_range.measure_id
-        , proc_osteo_within_range.measure_name
-        , proc_osteo_within_range.measure_version
+          qualifying_procedures.patient_id
+        , qualifying_procedures.performance_period_begin
+        , qualifying_procedures.performance_period_end
+        , qualifying_procedures.measure_id
+        , qualifying_procedures.measure_name
+        , qualifying_procedures.measure_version
+        , recorded_date as evidence_date
         , 1 as numerator_flag
-    from proc_osteo_within_range
+    from qualifying_procedures
 
     union all
 
     select 
-          pharmacy_claim_osteo_within_range.patient_id
-        , pharmacy_claim_osteo_within_range.performance_period_begin
-        , pharmacy_claim_osteo_within_range.performance_period_end
-        , pharmacy_claim_osteo_within_range.measure_id
-        , pharmacy_claim_osteo_within_range.measure_name
-        , pharmacy_claim_osteo_within_range.measure_version
+          qualifying_pharmacy_claims.patient_id
+        , qualifying_pharmacy_claims.performance_period_begin
+        , qualifying_pharmacy_claims.performance_period_end
+        , qualifying_pharmacy_claims.measure_id
+        , qualifying_pharmacy_claims.measure_name
+        , qualifying_pharmacy_claims.measure_version
+        , recorded_date as evidence_date
         , 1 as numerator_flag
-    from pharmacy_claim_osteo_within_range
+    from qualifying_pharmacy_claims
 
     union all
 
     select 
-          medication_osteo_within_range.patient_id
-        , medication_osteo_within_range.performance_period_begin
-        , medication_osteo_within_range.performance_period_end
-        , medication_osteo_within_range.measure_id
-        , medication_osteo_within_range.measure_name
-        , medication_osteo_within_range.measure_version
+          qualifying_medications.patient_id
+        , qualifying_medications.performance_period_begin
+        , qualifying_medications.performance_period_end
+        , qualifying_medications.measure_id
+        , qualifying_medications.measure_name
+        , qualifying_medications.measure_version
+        , recorded_date as evidence_date
         , 1 as numerator_flag
-    from medication_osteo_within_range
+    from qualifying_medications
 )
 
 , add_data_types as (
@@ -311,6 +242,8 @@ with denominator as (
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
         , cast(measure_name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+        , cast(evidence_date as date) as evidence_date
+        , cast(null as {{ dbt.type_string() }} ) as evidence_value
         , cast(numerator_flag as integer) as numerator_flag
     from numerator
 )
@@ -322,5 +255,7 @@ select
     , measure_id
     , measure_name
     , measure_version
+    , evidence_date
+    , evidence_value
     , numerator_flag
 from add_data_types

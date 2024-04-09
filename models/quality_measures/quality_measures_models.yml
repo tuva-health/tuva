@@ -1110,7 +1110,32 @@ models:
     description: >
       Exclusion logic for patients with certain procedures and medicatons for 
       the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture.
-
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
 
 ## Staging
   - name: quality_measures__stg_core__condition
