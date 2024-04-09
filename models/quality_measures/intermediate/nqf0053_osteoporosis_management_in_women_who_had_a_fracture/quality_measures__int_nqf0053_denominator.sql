@@ -235,7 +235,6 @@ with visit_codes as (
               'acute inpatient'
             , 'annual wellness visit'
             , 'emergency department visit'
-            , 'emergency department'
             , 'home healthcare services'
             , 'office visit'
             , 'preventive care services established office visit, 18 and up'
