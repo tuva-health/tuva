@@ -284,6 +284,7 @@ with visit_codes as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
+        ,  recorded_date
         , cast(age as integer) as age
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
@@ -297,6 +298,7 @@ with visit_codes as (
 
 select 
       patient_id
+    , recorded_date  
     , age
     , performance_period_begin
     , performance_period_end
