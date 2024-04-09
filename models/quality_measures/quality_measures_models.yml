@@ -1100,6 +1100,18 @@ models:
     description: >
       Numerator logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture
 
+  - name: quality_measures__int_nqf0053_exclude_procedures_medications
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_exclude_procedures_medications
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients with certain procedures and medicatons for 
+      the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture.
+
+
 ## Staging
   - name: quality_measures__stg_core__condition
     config:
