@@ -35,8 +35,7 @@ with patient as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures__int_nqf0053_exclude_procedures_medications') }}
-    -- Update this exclusion to whole exclusion
+    from {{ ref('quality_measures__int_nqf0053_exclusions') }}
 
 )
 
