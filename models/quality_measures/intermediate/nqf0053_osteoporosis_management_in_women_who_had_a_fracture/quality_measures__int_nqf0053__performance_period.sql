@@ -68,7 +68,7 @@ with period_end as (
         when performance_period_end >= cast(extract(year from performance_period_end) || '-06-30' as date)
             then extract(year from performance_period_end) || '-06-30'
         else extract(year from performance_period_begin) || '-06-30'
-      end as lookback_period_july
+      end as lookback_period_june
     , case
         when performance_period_end >= cast(extract(year from performance_period_end) || '-12-31' as date)
             then extract(year from performance_period_end) || '-12-31'
@@ -84,6 +84,6 @@ select
     , cast({{ measure_version }} as {{ dbt.type_string() }}) as measure_version
     , cast(performance_period_begin as date) as performance_period_begin
     , cast(performance_period_end as date) as performance_period_end
-    , cast(lookback_period_july as date) as lookback_period_july
+    , cast(lookback_period_june as date) as lookback_period_june
     , cast(lookback_period_december as date) as lookback_period_december
 from lookback_period

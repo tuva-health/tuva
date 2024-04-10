@@ -202,7 +202,7 @@ with visit_codes as (
             )
             }}
             and
-                pp.lookback_period_july
+                pp.lookback_period_june
         and lower(patients_with_age.sex) = 'female'
 
 )
@@ -266,7 +266,7 @@ with visit_codes as (
         on qualifying_patients_w_encounter.patient_id = qualifying_patients_w_procedure.patient_id
     inner join claims_encounters
         on qualifying_patients_w_encounter.patient_id = claims_encounters.patient_id
-    where claims_encounters.place_of_service_code not in ('21')
+    where cast(claims_encounters.place_of_service_code as {{ dbt.type_string() }}) not in ('21')
 
     union all
 
