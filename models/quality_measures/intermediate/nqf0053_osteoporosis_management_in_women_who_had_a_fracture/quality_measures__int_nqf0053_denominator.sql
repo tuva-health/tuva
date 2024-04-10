@@ -202,7 +202,7 @@ with visit_codes as (
             )
             }}
             and
-                pp.lookback_period
+                pp.lookback_period_july
         and lower(patients_with_age.sex) = 'female'
 
 )
