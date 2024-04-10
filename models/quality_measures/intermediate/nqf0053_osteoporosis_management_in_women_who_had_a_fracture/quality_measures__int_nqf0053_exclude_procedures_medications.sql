@@ -74,22 +74,6 @@ with denominator as (
 
 )
 
-, osteoporosis_pharmacy_claims_codes as (
-
-    select
-          code
-        , code_system
-        , concept_name
-    from value_sets
-    where lower(concept_name) 
-        in 
-        ( 
-          'osteoporosis medications for urology care'
-        , 'osteoporosis medication'
-        , 'bisphosphonates'
-        )
-)
-
 , osteoporosis_medication_codes as (
 
     select
@@ -127,11 +111,11 @@ with denominator as (
         pharmacy_claims.patient_id
       , pharmacy_claims.dispensing_date
       , pharmacy_claims.ndc_code
-      , osteoporosis_pharmacy_claims_codes.concept_name
+      , osteoporosis_medication_codes.concept_name
     from pharmacy_claims
-    inner join osteoporosis_pharmacy_claims_codes
-        on pharmacy_claims.ndc_code = osteoporosis_pharmacy_claims_codes.code
-            and lower(osteoporosis_pharmacy_claims_codes.code_system) = 'ndc'
+    inner join osteoporosis_medication_codes
+        on pharmacy_claims.ndc_code = osteoporosis_medication_codes.code
+            and lower(osteoporosis_medication_codes.code_system) = 'ndc'
 )
 
 , osteoporosis_medications as (
