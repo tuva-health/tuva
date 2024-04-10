@@ -243,7 +243,7 @@ with denominator as (
         , cast(measure_name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(evidence_date as date) as evidence_date
-        , cast(null as {{ dbt.type_string() }} ) as evidence_value
+        , null as evidence_value
         , cast(numerator_flag as integer) as numerator_flag
     from numerator
 )
