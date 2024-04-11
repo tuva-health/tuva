@@ -54,7 +54,7 @@ with lab_result as (
         , code_type
         , code
         , result_date
-        , cast(result as float) as result
+        , cast(result as {{ dbt.type_numeric() }}) as result
     from egfr_labs
     where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
 
@@ -76,7 +76,7 @@ with lab_result as (
             when result like '%@%' then trim(replace(result,'@',''))
             when result like '%mL/min/1.73m2%' then trim(replace(result,'mL/min/1.73m2',''))
             else null
-          end as float) as clean_result
+          end as {{ dbt.type_numeric() }}) as clean_result
     from egfr_labs
     where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }} = False
 
@@ -115,7 +115,7 @@ with lab_result as (
         , cast(code_type as {{ dbt.type_string() }}) as code_type
         , cast(code as {{ dbt.type_string() }}) as code
         , cast(result_date as date) as result_date
-        , cast(result as float) as result
+        , cast(result as {{ dbt.type_numeric() }}) as result
     from unioned_labs
 
 )

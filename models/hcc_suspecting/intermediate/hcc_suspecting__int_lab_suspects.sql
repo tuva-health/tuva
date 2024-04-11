@@ -160,7 +160,7 @@ with egfr_labs as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(result_date as date) as result_date
-        , cast(result as float) as result
+        , cast(result as {{ dbt.type_numeric() }}) as result
         , cast(lab_code as {{ dbt.type_string() }}) as lab_code
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
