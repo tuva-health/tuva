@@ -206,6 +206,7 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
+    , 'measure specific exclusion for procedure medication' as exclusion_type
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     valid_exclusions
