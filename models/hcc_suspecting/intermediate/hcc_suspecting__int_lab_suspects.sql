@@ -87,12 +87,15 @@ with egfr_labs as (
         , egfr_labs.result_date
         , egfr_labs.result
         , row_number() over (
-            partition by egfr_labs.patient_id
+            partition by
+                  egfr_labs.patient_id
+                , egfr_labs.data_source
             order by egfr_labs.result desc
         ) as row_num
     from egfr_labs
         inner join lab_lookback
         on egfr_labs.patient_id = lab_lookback.patient_id
+        and egfr_labs.data_source = lab_lookback.data_source
     where egfr_labs.result_date >= lab_lookback.lookback_result_date
 
 )
