@@ -2,27 +2,14 @@
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false)))) | as_bool
    )
 }}
-/*
-    patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-
-    and either one acute inpatient encounter with a diagnosis of advanced
-    illness
-
-    or two outpatient, observation, ed or nonacute inpatient encounters on
-    different dates of service with an advanced illness diagnosis during
-    measurement period or the year prior to measurement period
-*/
 
 with patients_with_frailty as (
 
     select
           patient_id
-        , performance_period_begin
-        , performance_period_end
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures__int_nqf0059__frailty') }}
+    from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
 
 )
 
@@ -144,13 +131,6 @@ with patients_with_frailty as (
 
 )
 
-/*
-    patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-
-    and one acute inpatient encounter with a diagnosis of advanced illness
-    during measurement period or the year prior to measurement period
-*/
 , acute_inpatient as (
 
     select distinct
@@ -165,20 +145,15 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
+        , null as procedure_date
+        , med_claim_exclusions.claim_start_date
+        , med_claim_exclusions.claim_end_date
     from patients_with_frailty
          inner join med_claim_exclusions
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
     where med_claim_exclusions.concept_name = 'acute inpatient'
-        and (
-            med_claim_exclusions.claim_start_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-            or med_claim_exclusions.claim_end_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-        )
 
     union all
 
@@ -191,6 +166,9 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
+        , null as claim_start_date
+        , null as claim_end_date
+        , procedure_exclusions.procedure_date
     from patients_with_frailty
          inner join procedure_exclusions
          on patients_with_frailty.patient_id = procedure_exclusions.patient_id
@@ -198,22 +176,9 @@ with patients_with_frailty as (
          on procedure_exclusions.patient_id = condition_exclusions.patient_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
     where lower(procedure_exclusions.concept_name) = 'acute inpatient'
-    and (
-        procedure_exclusions.procedure_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
 
 )
 
-/*
-    patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-
-    and two outpatient, observation, ed or nonacute inpatient encounters
-    on different dates of service with an advanced illness diagnosis during
-    measurement period or the year prior to measurement period
-*/
 , nonacute_outpatient as (
 
     select distinct
@@ -228,6 +193,9 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
+        , null as procedure_date
+        , med_claim_exclusions.claim_start_date
+        , med_claim_exclusions.claim_end_date
     from patients_with_frailty
          inner join med_claim_exclusions
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
@@ -239,14 +207,6 @@ with patients_with_frailty as (
             , 'observation'
             , 'emergency department visit'
             , 'nonacute inpatient'
-        )
-        and (
-            med_claim_exclusions.claim_start_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
-            or med_claim_exclusions.claim_end_date
-                between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-                and patients_with_frailty.performance_period_end
         )
 
     union all
@@ -260,6 +220,9 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
+        , null as claim_start_date
+        , null as claim_end_date
+        , procedure_exclusions.procedure_date
     from patients_with_frailty
          inner join procedure_exclusions
          on patients_with_frailty.patient_id = procedure_exclusions.patient_id
@@ -273,79 +236,32 @@ with patients_with_frailty as (
         , 'emergency department visit'
         , 'nonacute inpatient'
     )
-    and (
-        procedure_exclusions.procedure_date
-            between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
-            and patients_with_frailty.performance_period_end
-    )
-
-)
-
-/*
-    filter to patients who have had one acute inpatient encounter or
-    two nonacute outpatient encounters
-*/
-, acute_inpatient_counts as (
-
-    select
-          patient_id
-        , count(distinct exclusion_date) as encounter_count
-    from acute_inpatient
-    group by patient_id
-
-)
-
-, nonacute_outpatient_counts as (
-
-    select
-          patient_id
-        , count(distinct exclusion_date) as encounter_count
-    from nonacute_outpatient
-    group by patient_id
-
-)
-
-, eligible_acute_inpatient as (
-
-    select
-          acute_inpatient.patient_id
-        , acute_inpatient.exclusion_date
-        , acute_inpatient.exclusion_reason
-    from acute_inpatient
-         left join acute_inpatient_counts
-         on acute_inpatient.patient_id = acute_inpatient_counts.patient_id
-    where acute_inpatient_counts.encounter_count >= 1
-
-)
-
-, eligible_nonacute_outpatient as (
-
-    select
-          nonacute_outpatient.patient_id
-        , nonacute_outpatient.exclusion_date
-        , nonacute_outpatient.exclusion_reason
-    from nonacute_outpatient
-         left join nonacute_outpatient_counts
-         on nonacute_outpatient.patient_id = nonacute_outpatient_counts.patient_id
-    where nonacute_outpatient_counts.encounter_count >= 2
 
 )
 
 , exclusions_unioned as (
 
     select
-          eligible_acute_inpatient.patient_id
-        , eligible_acute_inpatient.exclusion_date
-        , eligible_acute_inpatient.exclusion_reason
-    from eligible_acute_inpatient
+          acute_inpatient.patient_id
+        , acute_inpatient.exclusion_date
+        , acute_inpatient.exclusion_reason
+        , acute_inpatient.claim_start_date
+        , acute_inpatient.claim_end_date
+        , acute_inpatient.procedure_date
+        , 'acute_inpatient' as patient_type
+    from acute_inpatient
 
     union all
 
     select
-          eligible_nonacute_outpatient.patient_id
-        , eligible_nonacute_outpatient.exclusion_date
-        , eligible_nonacute_outpatient.exclusion_reason
-    from eligible_nonacute_outpatient
+          nonacute_outpatient.patient_id
+        , nonacute_outpatient.exclusion_date
+        , nonacute_outpatient.exclusion_reason
+        , nonacute_outpatient.claim_start_date
+        , nonacute_outpatient.claim_end_date
+        , nonacute_outpatient.procedure_date
+        , 'nonacute_outpatient' as patient_type
+    from nonacute_outpatient
 
 )
 
@@ -353,5 +269,10 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
+    , 'advanced_illness' as exclusion_type
+    , claim_start_date
+    , claim_end_date
+    , procedure_date
+    , patient_type
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from exclusions_unioned
