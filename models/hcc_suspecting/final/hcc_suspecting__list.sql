@@ -19,7 +19,8 @@ with hcc_history_suspects as (
           end as contributing_factor
         , coalesce(last_billed, last_recorded) as condition_date
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
-    where current_year_billed = false
+    where (current_year_billed = false
+        or current_year_billed is null)
 
 )
 
@@ -47,7 +48,36 @@ with hcc_history_suspects as (
           as contributing_factor
         , condition_1_recorded_date as condition_date
     from {{ ref('hcc_suspecting__int_comorbidity_suspects') }}
-    where current_year_billed = false
+    where (current_year_billed = false
+        or current_year_billed is null)
+
+)
+
+, observation_suspects as (
+
+    select distinct
+          patient_id
+        , data_source
+        , hcc_code
+        , hcc_description
+        , cast('Observation suspect' as {{ dbt.type_string() }}) as reason
+        , 'BMI result '
+            || cast(observation_result as {{ dbt.type_string() }})
+            || case
+                when condition_code is null then ''
+                else ' with '
+                    || condition_concept_name
+                    || ' ('
+                    || condition_code
+                    || ' on '
+                    || condition_date
+                    || ')'
+                end
+          as contributing_factor
+        , observation_date as condition_date
+    from {{ ref('hcc_suspecting__int_observation_suspects') }}
+    where (current_year_billed = false
+        or current_year_billed is null)
 
 )
 
@@ -56,6 +86,8 @@ with hcc_history_suspects as (
     select * from hcc_history_suspects
     union all
     select * from comorbidity_suspects
+    union all
+    select * from observation_suspects
 
 )
 
