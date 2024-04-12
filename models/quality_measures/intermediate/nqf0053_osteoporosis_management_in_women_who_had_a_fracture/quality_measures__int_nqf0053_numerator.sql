@@ -19,14 +19,16 @@ with denominator as (
 )
 
 , value_sets as (
+
     select
           code
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
+    
 )
 
-, osteo_procedurecodes as (
+, osteo_procedure_codes as (
 
     select
           code
@@ -45,6 +47,7 @@ with denominator as (
         , 'ct bone density axial'
         , 'peripheral dual-energy x-ray absorptiometry (dxa)'
     )
+
 )
 
 , procedures_osteo_related as (
@@ -56,9 +59,10 @@ with denominator as (
       , source_code_type
       , source_code
     from {{ref('quality_measures__stg_core__procedure')}} as procs
-    inner join osteo_procedurecodes
-        on procs.source_code = osteo_procedurecodes.code
-        and procs.source_code_type = osteo_procedurecodes.code_system
+    inner join osteo_procedure_codes
+        on procs.source_code = osteo_procedure_codes.code
+        and procs.source_code_type = osteo_procedure_codes.code_system
+
 )
 
 , qualifying_procedures as (
@@ -81,8 +85,9 @@ with denominator as (
                       datepart = "month"
                     , interval = +6
                     , from_date_or_timestamp = "denominator.recorded_date"
-            )
+                          )
             }} 
+
 )
 
 , denominator_patients_disqualified_from_procedure as (
@@ -118,6 +123,7 @@ with denominator as (
         , 'osteoporosis medication'
         , 'bisphosphonates'
         )
+
 )
 
 , pharmacy_claims_osteo_related as (
@@ -130,6 +136,7 @@ with denominator as (
     inner join osteo_rx_codes
     on pharmacy_claims.ndc_code = osteo_rx_codes.code
         and lower(osteo_rx_codes.code_system) = 'ndc'
+
 )
 
 , qualifying_pharmacy_claims as (
@@ -162,11 +169,10 @@ with denominator as (
       , source_code_type
       , ndc_code
       , rxnorm_code
-  
     from {{ref('quality_measures__stg_core__medication')}} as medications
     inner join osteo_rx_codes
-    on medications.source_code = osteo_rx_codes.code
-    and medications.source_code_type = osteo_rx_codes.code_system
+        on medications.source_code = osteo_rx_codes.code
+        and medications.source_code_type = osteo_rx_codes.code_system
 
 )
 
@@ -195,6 +201,7 @@ with denominator as (
 )
 
 , numerator as (
+
     select
           qualifying_procedures.patient_id
         , qualifying_procedures.performance_period_begin
@@ -231,6 +238,7 @@ with denominator as (
         , recorded_date as evidence_date
         , 1 as numerator_flag
     from qualifying_medications
+
 )
 
 , add_data_types as (
@@ -246,6 +254,7 @@ with denominator as (
         , cast(null as {{ dbt.type_string() }}) as evidence_value
         , cast(numerator_flag as integer) as numerator_flag
     from numerator
+
 )
 
 select

@@ -11,15 +11,6 @@ with visit_codes as (
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }} as value_sets
-    -- where concept_name in (
-    --       'office visit'
-    --     , 'home healthcare services'
-    --     , 'preventive care services established office visit, 18 and up'
-    --     , 'preventive care services initial office visit, 18 and up'
-    --     , 'annual wellness visit'
-    --     , 'emergency department evaluation and management visit'
-    --     , 'emergency department visit'
-    -- )
 
 )
 
@@ -42,13 +33,7 @@ with visit_codes as (
     inner join {{ ref('quality_measures__int_nqf0053__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
-    -- where lower(encounter_type) in (
-    --       'home health'
-    --     , 'office visit'
-    --     , 'outpatient'
-    --     , 'outpatient rehabilitation'
-    --     , 'acute inpatient'
-    -- )
+
 )
 
 , procedure_encounters as (
@@ -82,6 +67,7 @@ with visit_codes as (
 )
 
 , all_encounters as (
+
     select
           patient_id
         , min_date
@@ -102,9 +88,11 @@ with visit_codes as (
         , max_date
         , cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
+
 )
 
 , encounters_by_patient as (
+
     select
           patient_id
         , min(min_date) min_date
@@ -161,18 +149,19 @@ with visit_codes as (
 )
 
 , patients_with_age as (
+
     select
-          p.patient_id
-        , p.sex
+          patient.patient_id
+        , patient.sex
         , min_date
         , floor({{ datediff('birth_date', 'e.min_date', 'hour') }} / 8760.0)  as min_age
         , max_date
         , floor({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0) as max_age
         , qualifying_types
-    from {{ref('quality_measures__stg_core__patient')}} p
+    from {{ref('quality_measures__stg_core__patient')}} patient
     inner join encounters_by_patient e
-        on p.patient_id = e.patient_id
-    where p.death_date is null
+        on patient.patient_id = e.patient_id
+    where patient.death_date is null
 
 )
 
@@ -222,7 +211,6 @@ with visit_codes as (
 
 )
 
-
 , qualifying_patients_w_encounter as (
 
     select
@@ -243,7 +231,6 @@ with visit_codes as (
             , 'emergency department evaluation and management visit'
             , 'outpatient'
         )
-
 )
 
 , qualifying_patients_w_procedure as (

@@ -91,8 +91,6 @@ with denominator as (
 
 )
 
-
-
 , bone_density_test_procedures as (
 
     select
@@ -116,6 +114,7 @@ with denominator as (
     inner join osteoporosis_medication_codes
         on pharmacy_claims.ndc_code = osteoporosis_medication_codes.code
             and lower(osteoporosis_medication_codes.code_system) = 'ndc'
+            
 )
 
 , osteoporosis_medications as (

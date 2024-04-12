@@ -34,7 +34,9 @@
 with frailty as (
 
     select
-        *
+        patient_id
+      , exclusion_date
+      , exclusion_reason
     from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
     where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
@@ -43,14 +45,17 @@ with frailty as (
 , frailty_within_defined_window as (
 
   select
-    *
+      patient_id
+    , exclusion_date
+    , exclusion_reason
   from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
   where exclusion_date between 
     {{ dbt.dateadd (
         datepart = "month"
         , interval = -6
         , from_date_or_timestamp = performance_period_begin
-    ) }}
+        ) 
+    }}
     and {{ lookback_period_december }}
 
 )
@@ -87,7 +92,6 @@ with frailty as (
     , exclusion_type
   from {{ref('quality_measures__int_shared_exclusions_institutional_snp')}}
   where exclusion_date between 
-
     {{dbt.dateadd(
                       datepart = "month"
                     , interval = -6
