@@ -660,16 +660,6 @@ models:
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -1038,6 +1028,197 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
+### Osteoporosis Management in women who had a fracture
+  - name: quality_measures__int_nqf0053__performance_period
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053__performance_period
+      tags: quality_measures
+      materialized: view
+    description: >
+      Performance Period definition for Osteoporosis Management in women who had a fracture
+
+  - name: quality_measures__int_nqf0053_denominator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_denominator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Denominator logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: age
+        description: Patient's age as of the performance_period_begin date.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_nqf0053_numerator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_numerator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Numerator logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_nqf0053_exclusions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_exclusions
+      tags: quality_measures
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+        
+  - name: quality_measures__int_nqf0053_exclude_procedures_medications
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_exclude_procedures_medications
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients with certain procedures and medicatons for 
+      the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_nqf0053_long
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_long
+      tags: quality_measures
+      materialized: table
+    description: >
+      Final preparation of the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture before combining with other measures.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
 ## Staging
   - name: quality_measures__stg_core__condition
     config:
@@ -1092,6 +1273,8 @@ models:
         tests:
           - not_null:
               severity: warn
+      - name: encounter_id
+      - name: prescribing_date
       - name: dispensing_date
       - name: ndc_code
       - name: rxnorm_code

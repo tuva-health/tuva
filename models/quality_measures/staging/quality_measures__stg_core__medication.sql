@@ -7,6 +7,8 @@
 
 select
       patient_id
+    , encounter_id
+    , prescribing_date  
     , dispensing_date
     , source_code_type
     , source_code
@@ -19,6 +21,8 @@ from {{ ref('core__medication') }}
 
 select
       patient_id
+    , encounter_id
+    , prescribing_date   
     , dispensing_date
     , source_code_type
     , source_code
@@ -31,6 +35,8 @@ from {{ ref('core__medication') }}
 
 select
       cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as encounter_id
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as prescribing_date  
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
