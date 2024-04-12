@@ -9,7 +9,7 @@ with patients_with_frailty as (
           patient_id
         , exclusion_date
         , exclusion_reason
-    from {{ ref('shared_exclusions__frailty') }}
+    from {{ ref('quality_measures__shared_exclusions_frailty') }}
 
 )
 
