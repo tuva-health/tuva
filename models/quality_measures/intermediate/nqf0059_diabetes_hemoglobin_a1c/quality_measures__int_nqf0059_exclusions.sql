@@ -25,7 +25,7 @@ with frailty as (
 
   select
     *
-  from {{ ref('shared_exclusions__frailty') }}
+  from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
   where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
@@ -34,7 +34,7 @@ with frailty as (
 
   select
     source.*
-  from {{ ref('shared_exclusions__exclude_advanced_illness') }} as source
+  from {{ ref('quality_measures__int_shared_exclusions_advanced_illness') }} as source
   inner join frailty
     on source.patient_id = frailty.patient_id
   where source.exclusion_date
@@ -119,7 +119,7 @@ with frailty as (
     , source.exclusion_date
     , source.exclusion_reason
     , source.exclusion_type
-  from {{ref('shared_exclusions__exclude_dementia')}} source
+  from {{ref('quality_measures__int_shared_exclusions_dementia')}} source
   inner join frailty
     on source.patient_id = frailty.patient_id
   where (
@@ -140,7 +140,7 @@ with frailty as (
     , exclusion_date
     , exclusion_reason
     , exclusion_type
-  from {{ref('shared_exclusions__exclude_hospice_palliative')}}
+  from {{ref('quality_measures__int_shared_exclusions_hospice_palliative')}}
   where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
@@ -152,7 +152,7 @@ with frailty as (
     , exclusion_date
     , exclusion_reason
     , exclusion_type
-  from {{ref('shared_exclusions__exclude_institutional_snp')}}
+  from {{ref('quality_measures__int_shared_exclusions_institutional_snp')}}
   where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
