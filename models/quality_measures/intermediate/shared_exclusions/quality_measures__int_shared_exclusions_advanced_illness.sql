@@ -145,9 +145,9 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
-        , null as procedure_date
         , med_claim_exclusions.claim_start_date
         , med_claim_exclusions.claim_end_date
+        , cast(null as date) as procedure_date
     from patients_with_frailty
          inner join med_claim_exclusions
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
@@ -166,8 +166,8 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
-        , null as claim_start_date
-        , null as claim_end_date
+        , cast(null as date) as claim_start_date
+        , cast(null as date) as claim_end_date
         , procedure_exclusions.procedure_date
     from patients_with_frailty
          inner join procedure_exclusions
@@ -193,9 +193,9 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
-        , null as procedure_date
         , med_claim_exclusions.claim_start_date
         , med_claim_exclusions.claim_end_date
+        , cast(null as date) as procedure_date
     from patients_with_frailty
          inner join med_claim_exclusions
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
@@ -220,8 +220,8 @@ with patients_with_frailty as (
             || ' and '
             || condition_exclusions.concept_name
           as exclusion_reason
-        , null as claim_start_date
-        , null as claim_end_date
+        , cast(null as date) as claim_start_date
+        , cast(null as date) as claim_end_date
         , procedure_exclusions.procedure_date
     from patients_with_frailty
          inner join procedure_exclusions
