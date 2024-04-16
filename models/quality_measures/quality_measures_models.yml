@@ -131,6 +131,57 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
+## Shared Exclusions
+  - name: quality_measures__int_shared_exclusions_frailty
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_shared_exclusions_frailty
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty used by other exclusion models.
+
+  - name: quality_measures__int_shared_exclusions_advanced_illness
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_shared_exclusions_advanced_illness
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty and advanced illness for entire patient population.
+
+  - name: quality_measures__int_shared_exclusions_dementia
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_shared_exclusions_dementia
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients with frailty and taking dementia medications for entire patient population.
+
+  - name: quality_measures__int_shared_exclusions_hospice_palliative
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_shared_exclusions_hospice_palliative
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients using hospice or palliative services for the reporting for entire patient population.
+
+  - name: quality_measures__int_shared_exclusions_institutional_snp
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_shared_exclusions_institutional_snp
+      tags: quality_measures
+      materialized: table
+    description: >
+      Exclusion logic for patients staying in an institution for the reporting for entire patient population. 
+
 ## Intermediate
 ### Breast Cancer Screening
   - name: quality_measures__int_nqf2372__performance_period
@@ -566,16 +617,6 @@ models:
     description: >
       Performance Period definition for Diabetes Hemoglobin a1c.
 
-  - name: quality_measures__int_nqf0059__frailty
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0059__frailty
-      tags: quality_measures
-      materialized: view
-    description: >
-      Exclusion logic for patients with frailty used by other exclusion models.
-
   - name: quality_measures__int_nqf0059_denominator
     config:
       schema: |
@@ -604,98 +645,6 @@ models:
         description: >
           The denominator is associated with a given patient population that 
           may be counted as eligible to meet a measure’s inclusion requirements.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_nqf0059_exclude_advanced_illness
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0059_exclude_advanced_illness
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 0059, Diabetes Hemoglobin a1c.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_nqf0059_exclude_dementia
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0059_exclude_dementia
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and taking dementia medications
-      for the reporting version of NQF 0059, Diabetes Hemoglobin a1c.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_nqf0059_exclude_hospice_palliative
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0059_exclude_hospice_palliative
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using hospice and palliative services for the reporting 
-      version of NQF 0059, Diabetes Hemoglobin a1c.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_nqf0059_exclude_institutional_snp
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0059_exclude_institutional_snp
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients staying in an institution for the reporting 
-      version of NQF 0059, Diabetes Hemoglobin a1c.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 

@@ -4,20 +4,21 @@
 }}
 
 /*
-    patients greater than or equal to 66 in institutional special needs plans (snp)
+    patients in institutional special needs plans (snp)
     or residing in long term care
+
+    while referencing this model, patients greater or equal than 66 years of age should be taken
+
+    filtering out age from this model has been stripped out as different measures calculate age varingly
 
     future enhancement: group claims into encounters
 */
 
-with denominator as (
+with patients as (
 
     select
           patient_id
-        , age
-        , performance_period_begin
-        , performance_period_end
-    from {{ ref('quality_measures__int_nqf0059_denominator') }}
+    from {{ ref('quality_measures__stg_core__patient') }}
 
 )
 
@@ -36,25 +37,16 @@ with denominator as (
 , exclusions as (
 
     select
-          denominator.patient_id
+          patients.patient_id
         , coalesce(
               medical_claim.claim_start_date
             , medical_claim.claim_end_date
           ) as exclusion_date
         , 'institutional or long term care' as exclusion_reason
-    from denominator
+    from patients
          inner join medical_claim
-         on denominator.patient_id = medical_claim.patient_id
-    where denominator.age >= 66
-    and (
-        medical_claim.claim_start_date
-            between denominator.performance_period_begin
-            and denominator.performance_period_end
-        or medical_claim.claim_end_date
-            between denominator.performance_period_begin
-            and denominator.performance_period_end
-    )
-    and place_of_service_code in ('32', '33', '34', '54', '56')
+         on patients.patient_id = medical_claim.patient_id
+    where place_of_service_code in ('32', '33', '34', '54', '56')
     and {{ datediff('medical_claim.claim_start_date', 'medical_claim.claim_end_date', 'day') }} >= 90
 
 )
@@ -63,5 +55,6 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
+    , 'institutional_snp' as exclusion_type
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from exclusions
