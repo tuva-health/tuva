@@ -175,6 +175,7 @@ with frailty as (
     , exclusion_date
     , exclusion_reason
     , exclusion_type
+    , age
   from {{ref('quality_measures__int_cqm236_exclude_procedures_observations')}}
 
 )
