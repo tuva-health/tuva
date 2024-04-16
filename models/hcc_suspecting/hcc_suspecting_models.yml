@@ -166,6 +166,42 @@ models:
       - name: tuva_last_run
         description: The date the model was run.
 
+  - name: hcc_suspecting__int_lab_suspects
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _int_lab_suspects
+      tags: hcc_suspecting
+      materialized: table
+    description: Suspecting conditions based on labs.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: result_date
+        description: Date of the test result.
+      - name: result
+        description: Cleaned numeric result of the lab test.
+      - name: lab_code
+        description: The normalized code or source code.
+      - name: hcc_code
+        description: >
+          HCC code from the latest CMS HCC model available in the mart.
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+      - name: hcc_description
+        description: >
+          HCC description from the latest CMS HCC model available in the mart.
+      - name: current_year_billed
+        description: >
+          Flag indicating that the ICD-10-CM code mapped to the HCC has been
+          billed during the payment year.
+      - name: tuva_last_run
+        description: The date the model was run.
+
   - name: hcc_suspecting__int_observation_suspects
     config:
       schema: |
@@ -276,8 +312,36 @@ models:
       - name: code
         description: >
           The condition code in the source system e.g. the ICD-10 code.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: The date the model was run.
+
+  - name: hcc_suspecting__int_prep_egfr_labs
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _int_prep_egfr_labs
+      tags: hcc_suspecting
+      materialized: table
+    description: Preparing eGFR labs with clean numeric results.
+    columns:
+      - name: patient_id
+        description: Unique ID for the patient.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: code_type
+        description: The normalized code type or source code type.
+      - name: code
+        description: The normalized code or source code.
+      - name: result_date
+        description: Date of the test result.
+      - name: result
+        description: Cleaned numeric result of the lab test.
 
   ## Staging
   - name: hcc_suspecting__stg_core__condition
@@ -295,6 +359,25 @@ models:
       - name: condition_type
       - name: code_type
       - name: code
+      - name: data_source
+
+  - name: hcc_suspecting__stg_core__lab_result
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+      alias: _stg_lab_result
+      tags: hcc_suspecting
+      materialized: ephemeral
+    description: Staging conditions from core.
+    columns:
+      - name: lab_result_id
+      - name: patient_id
+      - name: code_type
+      - name: code
+      - name: status
+      - name: result
+      - name: result_date
+      - name: data_source
 
   - name: hcc_suspecting__stg_core__observation
     config:
@@ -310,6 +393,7 @@ models:
       - name: result
       - name: code_type
       - name: code
+      - name: data_source
 
   - name: hcc_suspecting__stg_core__patient
     config:

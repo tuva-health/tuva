@@ -81,6 +81,28 @@ with hcc_history_suspects as (
 
 )
 
+, lab_suspects as (
+
+    select distinct
+          patient_id
+        , data_source
+        , hcc_code
+        , hcc_description
+        , cast('Lab result suspect' as {{ dbt.type_string() }}) as reason
+        , 'eGFR ('
+            || lab_code
+            || ') result '
+            || cast(result as {{ dbt.type_string() }})
+            || ' on '
+            || result_date
+          as contributing_factor
+        , result_date as condition_date
+    from {{ ref('hcc_suspecting__int_lab_suspects') }}
+    where (current_year_billed = false
+        or current_year_billed is null)
+
+)
+
 , unioned as (
 
     select * from hcc_history_suspects
@@ -88,6 +110,8 @@ with hcc_history_suspects as (
     select * from comorbidity_suspects
     union all
     select * from observation_suspects
+    union all
+    select * from lab_suspects
 
 )
 
