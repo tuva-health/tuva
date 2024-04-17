@@ -4,6 +4,7 @@
 }}
 select
       patient_id
+    , encounter_id
     , procedure_date
     , source_code_type
     , source_code
