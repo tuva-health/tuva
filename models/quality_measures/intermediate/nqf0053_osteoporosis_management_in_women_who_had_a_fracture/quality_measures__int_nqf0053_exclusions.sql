@@ -269,7 +269,11 @@ with frailty as (
     select 
         *
     from combined_exclusions
-    where exclusion_type in ('advanced_illness', 'dementia')
+    where exclusion_type in
+    (
+        'advanced_illness'
+      , 'dementia'
+    ) 
     and age between 66 and 80
 
     union all 
@@ -285,7 +289,11 @@ with frailty as (
     select 
         *
     from combined_exclusions
-    where exclusion_type not in ('institutional_snp', 'advanced_illness', 'dementia')
+    where exclusion_type in
+    (
+        'measure specific exclusion for procedure medication'
+      , 'hospice_palliative'
+    )
 
 )
 

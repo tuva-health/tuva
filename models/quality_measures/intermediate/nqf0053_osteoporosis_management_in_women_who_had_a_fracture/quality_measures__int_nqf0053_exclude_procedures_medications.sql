@@ -51,6 +51,7 @@ with denominator as (
         patient_id
       , encounter_id
       , prescribing_date
+      , dispensing_date
       , source_code
       , source_code_type
     from {{ ref('quality_measures__stg_core__medication') }}
@@ -81,8 +82,7 @@ with denominator as (
         , code_system
         , concept_name
     from value_sets
-    where lower(concept_name)
-        in 
+    where lower(concept_name) in 
         ( 
           'osteoporosis medications for urology care'
         , 'osteoporosis medication'
@@ -123,6 +123,7 @@ with denominator as (
         medications.patient_id
       , medications.encounter_id
       , medications.prescribing_date
+      , medications.dispensing_date
       , medications.source_code
       , medications.source_code_type
       , osteoporosis_medication_codes.concept_name
@@ -156,18 +157,18 @@ with denominator as (
     select
           denominator.patient_id
         , osteoporosis_medications.concept_name as exclusion_reason
-        , osteoporosis_medications.prescribing_date as exclusion_date
+        , coalesce(osteoporosis_medications.prescribing_date, osteoporosis_medications.dispensing_date) as exclusion_date
     from denominator
     inner join osteoporosis_medications
         on denominator.patient_id = osteoporosis_medications.patient_id
-    where osteoporosis_medications.prescribing_date
-        between
-            {{ dbt.dateadd (
-                      datepart = "month"
-                    , interval = -12
-                    , from_date_or_timestamp = "denominator.performance_period_begin"
-            )}}
-            and denominator.performance_period_begin
+            and coalesce(osteoporosis_medications.prescribing_date, osteoporosis_medications.dispensing_date)
+            between
+                {{ dbt.dateadd (
+                        datepart = "month"
+                        , interval = -12
+                        , from_date_or_timestamp = "denominator.performance_period_begin"
+                )}}
+                and denominator.performance_period_begin
 
 )
 
