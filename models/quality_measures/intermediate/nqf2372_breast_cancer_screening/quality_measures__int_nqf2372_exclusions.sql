@@ -7,7 +7,7 @@
 (
   select 
     performance_period_begin
-  from {{ ref('quality_measures__int_nqf0059__performance_period') }}
+  from {{ ref('quality_measures__int_nqf2372__performance_period') }}
 
 )
 {%- endset -%}
@@ -16,7 +16,7 @@
 (
   select 
     performance_period_end
-  from {{ ref('quality_measures__int_nqf0059__performance_period') }}
+  from {{ ref('quality_measures__int_nqf2372__performance_period') }}
 
 )
 {%- endset -%}
