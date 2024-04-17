@@ -251,9 +251,10 @@ with visit_codes as (
     from qualifying_patients_w_encounter
     left join qualifying_patients_w_procedure
         on qualifying_patients_w_encounter.patient_id = qualifying_patients_w_procedure.patient_id
-    inner join claims_encounters
+    left join claims_encounters
         on qualifying_patients_w_encounter.patient_id = claims_encounters.patient_id
-    where cast(claims_encounters.place_of_service_code as {{ dbt.type_string() }}) not in ('21')
+    where (cast(claims_encounters.place_of_service_code as {{ dbt.type_string() }}) not in ('21')
+        or claims_encounters.patient_id is null)
 
     union all
 

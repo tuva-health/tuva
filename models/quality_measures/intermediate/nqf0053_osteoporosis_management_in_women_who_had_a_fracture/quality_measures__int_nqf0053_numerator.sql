@@ -46,6 +46,7 @@ with denominator as (
         , 'ultrasonography for densitometry' 
         , 'ct bone density axial'
         , 'peripheral dual-energy x-ray absorptiometry (dxa)'
+        , 'osteoporosis medication'
     )
 
 )
@@ -67,7 +68,9 @@ with denominator as (
 
 , qualifying_procedures as (
 
-    select procedures_osteo_related.*
+    select
+          procedures_osteo_related.patient_id
+        , procedures_osteo_related.procedure_date
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
@@ -141,7 +144,10 @@ with denominator as (
 
 , qualifying_pharmacy_claims as (
 
-    select pharmacy_claims_osteo_related.*
+    select 
+          pharmacy_claims_osteo_related.patient_id
+        , pharmacy_claims_osteo_related.dispensing_date
+        , pharmacy_claims_osteo_related.ndc_code
         , denominator_patients_disqualified_from_procedure.measure_id
         , denominator_patients_disqualified_from_procedure.measure_name
         , denominator_patients_disqualified_from_procedure.measure_version
@@ -152,9 +158,15 @@ with denominator as (
     inner join denominator_patients_disqualified_from_procedure
         on pharmacy_claims_osteo_related.patient_id = denominator_patients_disqualified_from_procedure.patient_id
         and pharmacy_claims_osteo_related.dispensing_date 
-            between 
-            denominator_patients_disqualified_from_procedure.performance_period_begin and denominator_patients_disqualified_from_procedure.recorded_date
-
+            between             
+            denominator_patients_disqualified_from_procedure.recorded_date 
+                and 
+                {{ dbt.dateadd (
+                datepart = "month"
+                , interval = +6
+                , from_date_or_timestamp = "denominator_patients_disqualified_from_procedure.recorded_date"
+                )
+                }}
 )
 
 -- medication begin
@@ -165,6 +177,7 @@ with denominator as (
         patient_id
       , encounter_id
       , prescribing_date
+      , dispensing_date
       , source_code
       , source_code_type
       , ndc_code
@@ -178,7 +191,9 @@ with denominator as (
 
 , qualifying_medications as (
 
-    select medication_osteo_related.*
+    select
+          medication_osteo_related.patient_id
+        , medication_osteo_related.encounter_id
         , denominator_patients_disqualified_from_procedure.measure_id
         , denominator_patients_disqualified_from_procedure.measure_name
         , denominator_patients_disqualified_from_procedure.measure_version
@@ -188,15 +203,15 @@ with denominator as (
     from medication_osteo_related
     inner join denominator_patients_disqualified_from_procedure
         on medication_osteo_related.patient_id = denominator_patients_disqualified_from_procedure.patient_id
-        and medication_osteo_related.prescribing_date between 
-            denominator_patients_disqualified_from_procedure.recorded_date 
-            and 
-            {{ dbt.dateadd (
-              datepart = "month"
-            , interval = +6
-            , from_date_or_timestamp = "denominator_patients_disqualified_from_procedure.recorded_date"
-            )
-            }}
+            and coalesce(medication_osteo_related.prescribing_date, medication_osteo_related.dispensing_date) between 
+                denominator_patients_disqualified_from_procedure.recorded_date 
+                and 
+                {{ dbt.dateadd (
+                datepart = "month"
+                , interval = +6
+                , from_date_or_timestamp = "denominator_patients_disqualified_from_procedure.recorded_date"
+                )
+                }}
 
 )
 
