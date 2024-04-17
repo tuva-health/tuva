@@ -43,13 +43,13 @@ select
     , denominator_flag
     , numerator_flag
     , exclusion_flag
-    , evidence_date
-    , evidence_value
     , case
         when exclusion_flag = 1 then null
         when numerator_flag = 1 then 1
         when denominator_flag = 1 then 0
         else null end as performance_flag
+    , evidence_date
+    , evidence_value
     , exclusion_date
     , exclusion_reason
     , performance_period_begin
