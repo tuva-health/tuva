@@ -76,6 +76,10 @@ models:
           Specifications of those characteristics that would cause groups of 
           individuals to be removed from the numerator and/or denominator of 
           a measure although they experience the denominator index event.
+      - name: performance_flag
+        description: >
+          Performance flag calculated by using exclusion, numerator, and 
+          denominator flags. When excluded from a measure the flag is null.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -125,9 +129,26 @@ models:
         description: Unique patient_id for each person.
       - name: nqf_2372
         description: >
-          Each measure has a boolean flag which is the result of evaluating 
-          the denominator, numerator, and exclusion indicators for the patient.
-          A null indicates that the measure was not applicable for the patient.
+          Performance flag for NQF2372, Breast Cancer Screening. A null 
+          indicates that the measure was not applicable for the patient.
+      - name: nqf_0034
+        description: >
+          Performance flag for NQF0034, Colorectal Cancer Screening. A null 
+          indicates that the measure was not applicable for the patient.
+      - name: nqf_0059
+        description: >
+          Performance flag for NQF0059, Diabetes: Hemoglobin A1c (HbA1c) Poor 
+          Control (> 9%). A null indicates that the measure was not applicable 
+          for the patient.
+      - name: cqm_236
+        description: >
+          Performance flag for CQM236, Controlling High Blood Pressure. A null 
+          indicates that the measure was not applicable for the patient.
+      - name: nqf_0053
+        description: >
+          Performance flag for NQF0053, Osteoporosis Management in Women Who 
+          Had a Fracture. A null indicates that the measure was not applicable 
+          for the patient.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
