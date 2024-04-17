@@ -26,6 +26,7 @@ with denominator as (
     where concept_name in (
           'Palliative Care Encounter'
         , 'Palliative Care Intervention'
+        , 'Palliative Care Diagnosis'
     )
 
 )
