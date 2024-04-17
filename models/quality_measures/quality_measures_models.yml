@@ -194,16 +194,6 @@ models:
     description: >
       Performance Period definition for Breast Cancer screening.
 
-  - name: quality_measures__int_nqf2372__frailty
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372__frailty
-      tags: quality_measures
-      materialized: view
-    description: >
-      Exclusion logic for patients with frailty used by other exclusion models.
-
   - name: quality_measures__int_nqf2372_denominator
     config:
       schema: |
@@ -236,90 +226,6 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  - name: quality_measures__int_nqf2372_exclude_advanced_illness
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_advanced_illness
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_dementia
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_dementia
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and taking dementia medications
-      for the reporting version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_hospice
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_hospice
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using hospice services for the reporting 
-      version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_institutional
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_institutional
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients staying in an institution for the reporting 
-      version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
   - name: quality_measures__int_nqf2372_exclude_mastectomy
     config:
       schema: |
@@ -329,27 +235,6 @@ models:
       materialized: table
     description: >
       Exclusion logic for patients with a mastectomy for the reporting 
-      version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_palliative
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_palliative
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using palliative services for the reporting 
       version of NQF 2372, Breast Cancer Screening.
     columns:
       - name: patient_id
@@ -375,16 +260,6 @@ models:
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
