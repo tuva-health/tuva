@@ -9,7 +9,7 @@ select
       patient_id
     , observation_date
     , result
-    , coalesce(normalized_code_type,source_code_type) as code_type
+    , lower(coalesce(normalized_code_type,source_code_type)) as code_type
     , coalesce(normalized_code,source_code) as code
     , data_source
 from {{ ref('core__observation') }}
@@ -20,7 +20,7 @@ select
       patient_id
     , observation_date
     , result
-    , coalesce(normalized_code_type,source_code_type) as code_type
+    , lower(coalesce(normalized_code_type,source_code_type)) as code_type
     , coalesce(normalized_code,source_code) as code
     , data_source
 from {{ ref('core__observation') }}
