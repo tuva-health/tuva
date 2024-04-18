@@ -487,7 +487,7 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  ### Colorectal Cancer Screening
+### Colorectal Cancer Screening
   - name: quality_measures__int_nqf0034_denominator
     config:
       schema: |
@@ -497,18 +497,7 @@ models:
       materialized: table
     description: >
       Denominator logic for the reporting version of NQF 0034, Colorectal Cancer 
-      Screening.    
-
-  - name: quality_measures__int_nqf0034_exclude_advanced_illness
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_advanced_illness
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 0034, Colorectal Cancer Screening.     
+      Screening.       
 
   - name: quality_measures__int_nqf0034_exclude_colectomy_cancer
     config:
@@ -519,41 +508,7 @@ models:
       materialized: table
     description: >
       Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 0034, Colorectal Cancer Screening.     
-
-  - name: quality_measures__int_nqf0034_exclude_dementia
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_dementia
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and taking dementia medications
-      for the reporting version of NQF 0034, Colorectal Cancer Screening.
-
-  - name: quality_measures__int_nqf0034_exclude_hospice_palliative
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_hospice_palliative
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using hospice or palliative services for the reporting 
-      version of NQF 0034, Colorectal Cancer Screening.     
-
-  - name: quality_measures__int_nqf0034_exclude_institutional_snp
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_institutional_snp
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients staying in an institution for the reporting 
-      version of NQF 0034, Colorectal Cancer Screening.      
-      
+      the reporting version of NQF 0034, Colorectal Cancer Screening.    
 
   - name: quality_measures__int_nqf0034_exclusions
     config:
@@ -586,16 +541,6 @@ models:
     description: >
       Numerator logic for the reporting version of NQF 0034,
       Colorectal Cancer Screening
-
-  - name: quality_measures__int_nqf0034__frailty
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034__frailty
-      tags: quality_measures
-      materialized: view
-    description: >
-      Frailty definition for nqf 0034 colorectal cancer screening used in multiple exclusions
 
   - name: quality_measures__int_nqf0034__performance_period
     config:
