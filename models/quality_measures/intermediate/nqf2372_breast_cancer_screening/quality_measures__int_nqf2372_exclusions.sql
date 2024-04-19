@@ -47,7 +47,14 @@ with frailty as (
     , exclusion_reason
     , exclusion_type
   from {{ref('quality_measures__int_shared_exclusions_hospice_palliative')}}
-  where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
+  where exclusion_reason in 
+  (
+        'Palliative Care Encounter'
+      , 'Palliative Care Intervention'
+      , 'Hospice Care Ambulatory'
+      , 'Hospice Encounter'
+  )
+  exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
