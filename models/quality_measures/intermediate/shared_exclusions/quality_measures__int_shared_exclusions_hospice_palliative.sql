@@ -24,10 +24,11 @@ with exclusion_codes as (
     From {{ref('quality_measures__value_sets')}}
     where lower(concept_name) in  (
             'hospice encounter'
-          , 'palliative care encounter'
           , 'hospice care ambulatory'
           , 'hospice diagnosis'
+          , 'palliative care encounter'
           , 'palliative care diagnosis'
+          , 'palliative care intervention'
     )
 )
 
