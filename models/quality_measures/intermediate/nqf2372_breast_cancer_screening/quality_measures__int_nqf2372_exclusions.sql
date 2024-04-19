@@ -54,6 +54,7 @@ with frailty as (
       , 'Hospice Care Ambulatory'
       , 'Hospice Encounter'
   )
+  and
   exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
