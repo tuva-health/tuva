@@ -393,8 +393,17 @@ models:
       materialized: table
     description: >
       Denominator logic for the reporting version of NQF 0034, Colorectal Cancer 
-      Screening.       
-
+      Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: min_age
+        description: Patient's minumum age during encounter as of the performance_period.
+      - name: max_age
+        description: Patient's maximum age during encounter as of the performance_period.
+      - name: qualifying_types
+        description: Indicative letter of patient's type of encounter.
+      
   - name: quality_measures__int_nqf0034_exclude_colectomy_cancer
     config:
       schema: |
@@ -404,7 +413,19 @@ models:
       materialized: table
     description: >
       Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 0034, Colorectal Cancer Screening.    
+      the reporting version of NQF 0034, Colorectal Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_type
+        description: Measure specific exclusion for historical record of colectomy cancer
+      - name: tuva_last_run 
+        desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0034_exclusions
     config:
@@ -415,6 +436,23 @@ models:
       materialized: table
     description: >
       Combined exclusion logic for the reporting version of NQF 0034, Colorectal Cancer Screening.      
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0034_long
     config:
@@ -425,8 +463,50 @@ models:
       materialized: table
     description: >
       Final preparation of the reporting version of NQF 0034, Colorectal Cancer Screening
-      before combining with other measures.      
-
+      before combining with other measures.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+      
   - name: quality_measures__int_nqf0034_numerator
     config:
       schema: |
@@ -437,6 +517,15 @@ models:
     description: >
       Numerator logic for the reporting version of NQF 0034,
       Colorectal Cancer Screening
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence
+        description: Reason (usually the value set concept name) that includes patient 
+          from the measure.
 
   - name: quality_measures__int_nqf0034__performance_period
     config:
@@ -447,6 +536,7 @@ models:
       materialized: view
     description: >
       Performance Period definition for NQF 0034 Colorectal Cancer screening.
+    
 ### Diabetes Hemoglobin a1c
   - name: quality_measures__int_nqf0059__performance_period
     config:
