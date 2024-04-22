@@ -177,7 +177,7 @@ with egfr_labs as (
         , hcc_description
         , contributing_factor
         , current_year_billed
-        , 'Lab result suspect' as reason
+        , cast('Lab result suspect' as {{ dbt.type_string() }}) as reason
         , result_date as suspect_date
     from add_billed_flag
 

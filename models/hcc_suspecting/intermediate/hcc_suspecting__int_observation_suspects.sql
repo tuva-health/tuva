@@ -409,7 +409,7 @@ with conditions as (
         , hcc_description
         , contributing_factor
         , current_year_billed
-        , 'Observation suspect' as reason
+        , cast('Observation suspect' as {{ dbt.type_string() }}) as reason
         , observation_date as suspect_date
     from add_billed_flag
 

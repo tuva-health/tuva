@@ -67,7 +67,11 @@ with all_medications as (
         inner join seed_hcc_descriptions
             on hcc_code = '155'
     where lower(seed_clinical_concepts.concept_name) = 'antidepressant medication'
-    and all_medications.dispensing_date >= {{ dbt.dateadd("year", -5, "cast(convert_timezone('UTC', current_timestamp()) as date)") }}
+    and all_medications.dispensing_date >= {{ dbt.dateadd (
+              datepart = "year"
+            , interval = -5
+            , from_date_or_timestamp = dbt.current_timestamp()
+        ) }}
 
 )
 /* END HCC 155 logic */
@@ -106,7 +110,7 @@ with all_medications as (
         , dispensing_date
         , drug_code
         , current_year_billed
-        , 'Medication suspect' as reason
+        , cast('Medication suspect' as {{ dbt.type_string() }}) as reason
         , concept_name
             || ' ('
             || drug_code
