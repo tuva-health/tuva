@@ -4,11 +4,11 @@
 }}
 
 select
-  patient_id
-, enrollment_start_date
-, enrollment_end_date
-, payer
-, plan
-, data_source
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+    patient_id
+    , enrollment_start_date
+    , enrollment_end_date
+    , payer
+    , plan
+    , data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__eligibility') }} 
