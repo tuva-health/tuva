@@ -67,6 +67,22 @@ with hcc_history_suspects as (
 
 )
 
+, medication_suspects as (
+
+    select distinct
+          patient_id
+        , data_source
+        , hcc_code
+        , hcc_description
+        , reason
+        , contributing_factor
+        , suspect_date
+    from {{ ref('hcc_suspecting__int_medication_suspects') }}
+    where (current_year_billed = false
+        or current_year_billed is null)
+
+)
+
 , unioned as (
 
     select * from hcc_history_suspects
@@ -76,6 +92,8 @@ with hcc_history_suspects as (
     select * from observation_suspects
     union all
     select * from lab_suspects
+    union all
+    select * from medication_suspects
 
 )
 

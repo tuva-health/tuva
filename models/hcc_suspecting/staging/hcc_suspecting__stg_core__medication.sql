@@ -6,7 +6,6 @@
 
 select
       patient_id
-    , prescribing_date
     , dispensing_date
     , source_code
     , source_code_type
@@ -19,7 +18,6 @@ from {{ ref('core__medication') }}
 
 select
       patient_id
-    , prescribing_date
     , dispensing_date
     , source_code
     , source_code_type
@@ -32,7 +30,6 @@ from {{ ref('core__medication') }}
 
 select
       cast(null as {{ dbt.type_string() }} ) as patient_id
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as prescribing_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
     , cast(null as {{ dbt.type_string() }} ) as ndc_code
     , cast(null as {{ dbt.type_string() }} ) as rxnorm_code
