@@ -3,5 +3,9 @@
    )
 }}
 
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run
+select 
+    encounter_id
+    , patient_id
+    , normalized_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__procedure') }}
