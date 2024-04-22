@@ -297,29 +297,6 @@ with conditions as (
    to determine a positive PHQ-9 assessment, we look at the past 3 screenings
    for a patient and take the highest result
 */
-, distinct_depression_assessments as (
-
-    select distinct
-          patient_id
-        , data_source
-        , observation_date
-    from depression_assessment
-
-)
-
-, depression_assessment_count as (
-
-    select distinct
-          patient_id
-        , data_source
-        , count(*) as assessment_count
-    from distinct_depression_assessments
-    group by
-      patient_id
-    , data_source
-
-)
-
 , eligible_depression_assessments as (
 
     select
@@ -337,10 +314,6 @@ with conditions as (
             order by depression_assessment.observation_date desc nulls last
         ) as assessment_order
     from depression_assessment
-        inner join depression_assessment_count
-            on depression_assessment.patient_id = depression_assessment_count.patient_id
-            and depression_assessment.data_source = depression_assessment_count.data_source
-    where depression_assessment_count.assessment_count >= 3 --at least 3 assessments are required
 
 )
 
