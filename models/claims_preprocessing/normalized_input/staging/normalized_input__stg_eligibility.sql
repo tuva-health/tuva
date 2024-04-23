@@ -6,7 +6,7 @@
 
 select
       patient_id
-    , patient_id||data_source||payer||plan||enrollment_start_date||enrollment_end_date as patient_id_key
+    , patient_id||coalesce(data_source,'')||coalesce(payer,'')||coalesce(plan,'')||coalesce(enrollment_start_date,'')||coalesce(enrollment_end_date,'') as patient_id_key
     , member_id
     , gender
     , race
