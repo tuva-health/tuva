@@ -16,6 +16,7 @@ select
     , medicare_status_code
     , first_name
     , last_name
+    , social_security_number
     , address
     , city
     , state
