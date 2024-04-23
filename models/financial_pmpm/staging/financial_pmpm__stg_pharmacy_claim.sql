@@ -5,12 +5,12 @@
 
 
 SELECT
-  patient_id
-, dispensing_date
-, paid_amount
-, allowed_amount
-, payer
-, plan
-, data_source
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+    patient_id
+    , dispensing_date
+    , paid_amount
+    , allowed_amount
+    , payer
+    , plan
+    , data_source
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }}
