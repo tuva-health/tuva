@@ -181,7 +181,7 @@ with frailty as (
       , exclusion_date
       , exclusion_reason
       , 'mastectomy_performed' as exclusion_type
-    from {{ ref('quality_measures__int_nqf2372_exclude_mastectomy') }}
+    from valid_mastectomy_patients
 )
 
 , exclusions as (
