@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('hcc_suspecting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('hcc_suspecting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
 select
@@ -7,5 +7,4 @@ select
     , sex
     , birth_date
     , death_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__patient') }}

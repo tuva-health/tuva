@@ -1,13 +1,8 @@
 {{ config(
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     | as_bool
    )
 }}
-
-/*
-DENOMINATOR EXCLUSIONS:
-Patient was provided hospice services any time during the measurement period: G9687
-*/
-
 
 with exclusion_codes as (
 
@@ -28,6 +23,7 @@ with exclusion_codes as (
           , 'hospice care ambulatory'
           , 'hospice diagnosis'
           , 'palliative care diagnosis'
+          , 'palliative care intervention'
     )
 )
 
@@ -118,7 +114,7 @@ with exclusion_codes as (
          inner join exclusion_codes
             on conditions.code = exclusion_codes.code
             and conditions.code_type = exclusion_codes.code_system
-    inner join {{ref('quality_measures__int_nqf0059__performance_period')}} as pp
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}} as pp
         on recorded_date between pp.performance_period_begin and pp.performance_period_end
 
 )
@@ -135,7 +131,7 @@ with exclusion_codes as (
     from medical_claim
          inner join exclusion_codes
             on medical_claim.hcpcs_code = exclusion_codes.code
-    inner join {{ref('quality_measures__int_nqf0059__performance_period')}} as pp on 1=1
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}} as pp on 1=1
     where exclusion_codes.code_system = 'hcpcs'
     and claim_start_date between pp.performance_period_begin and pp.performance_period_end
 )
@@ -150,7 +146,7 @@ with exclusion_codes as (
     inner join exclusion_codes
         on observations.code = exclusion_codes.code
         and observations.code_type = exclusion_codes.code_system
-    inner join {{ref('quality_measures__int_nqf0059__performance_period')}} as pp on 1=1
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}} as pp on 1=1
     where observation_date between pp.performance_period_begin and pp.performance_period_end
 
 )
@@ -165,7 +161,7 @@ with exclusion_codes as (
          inner join exclusion_codes
              on procedures.code = exclusion_codes.code
              and procedures.code_type = exclusion_codes.code_system
-    inner join {{ref('quality_measures__int_nqf0059__performance_period')}} as pp on 1=1
+    inner join {{ref('quality_measures__int_cqm236__performance_period')}} as pp on 1=1
     where procedure_date between pp.performance_period_begin and pp.performance_period_end
 
 )

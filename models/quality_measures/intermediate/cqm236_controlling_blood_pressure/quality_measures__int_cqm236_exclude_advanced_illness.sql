@@ -1,18 +1,8 @@
 {{ config(
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false))))
+     | as_bool
    )
 }}
-/*
-    patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-
-    and either one acute inpatient encounter with a diagnosis of advanced
-    illness
-
-    or two outpatient, observation, ed or nonacute inpatient encounters on
-    different dates of service with an advanced illness diagnosis during
-    measurement period or the year prior to measurement period
-*/
 
 with patients_with_frailty as (
 
@@ -22,7 +12,8 @@ with patients_with_frailty as (
         , performance_period_end
         , exclusion_date
         , exclusion_reason
-    from {{ ref('quality_measures__int_nqf0059__frailty') }}
+    from {{ ref('quality_measures__int_cqm236__frailty') }}
+    where is_patient_older_than_80 = 0
 
 )
 
@@ -144,13 +135,6 @@ with patients_with_frailty as (
 
 )
 
-/*
-    patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-
-    and one acute inpatient encounter with a diagnosis of advanced illness
-    during measurement period or the year prior to measurement period
-*/
 , acute_inpatient as (
 
     select distinct
@@ -206,14 +190,6 @@ with patients_with_frailty as (
 
 )
 
-/*
-    patients greater than or equal to 66 with at least one claim/encounter for
-    frailty during the measurement period
-
-    and two outpatient, observation, ed or nonacute inpatient encounters
-    on different dates of service with an advanced illness diagnosis during
-    measurement period or the year prior to measurement period
-*/
 , nonacute_outpatient as (
 
     select distinct
@@ -278,13 +254,8 @@ with patients_with_frailty as (
             between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp="patients_with_frailty.performance_period_begin") }}
             and patients_with_frailty.performance_period_end
     )
-
 )
 
-/*
-    filter to patients who have had one acute inpatient encounter or
-    two nonacute outpatient encounters
-*/
 , acute_inpatient_counts as (
 
     select

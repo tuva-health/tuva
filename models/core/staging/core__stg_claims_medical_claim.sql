@@ -1,7 +1,7 @@
 -- depends_on: {{ ref('data_quality__claims_preprocessing_summary') }}
 
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+     enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
    )
 }}
 
@@ -40,7 +40,7 @@ select
     , cast(med.ms_drg_code as {{ dbt.type_string() }} ) as ms_drg_code
     , cast(med.apr_drg_code as {{ dbt.type_string() }} ) as apr_drg_code
     , cast(med.revenue_center_code as {{ dbt.type_string() }} ) as revenue_center_code
-    , cast(med.service_unit_quantity as {{ dbt.type_int() }} ) as service_unit_quantity
+    , cast(med.service_unit_quantity as {{ dbt.type_numeric() }} ) as service_unit_quantity
     , cast(med.hcpcs_code as {{ dbt.type_string() }} ) as hcpcs_code
     , cast(med.hcpcs_modifier_1 as {{ dbt.type_string() }} ) as hcpcs_modifier_1
     , cast(med.hcpcs_modifier_2 as {{ dbt.type_string() }} ) as hcpcs_modifier_2

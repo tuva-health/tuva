@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
 
@@ -189,6 +189,7 @@ select
     , numerator_flag
     , exclusion_flag
     , evidence_date
+    , cast(null as {{ dbt.type_string() }}) as evidence_value
     , exclusion_date
     , exclusion_reason
     , performance_period_begin

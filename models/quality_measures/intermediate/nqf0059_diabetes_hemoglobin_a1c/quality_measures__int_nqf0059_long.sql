@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
 
@@ -24,6 +24,7 @@ with patient as (
     select
           patient_id
         , evidence_date
+        , evidence_value
     from {{ ref('quality_measures__int_nqf0059_numerator') }}
     where numerator_flag = 1
 
@@ -63,6 +64,7 @@ with patient as (
             else null
           end as exclusion_flag
         , numerator.evidence_date
+        , numerator.evidence_value
         , exclusions.exclusion_date
         , exclusions.exclusion_reason
         , denominator.performance_period_begin
@@ -102,6 +104,7 @@ with patient as (
         , numerator_flag
         , exclusion_flag
         , evidence_date
+        , evidence_value
         , exclusion_date
         , exclusion_reason
         , performance_period_begin
@@ -122,6 +125,7 @@ with patient as (
         , cast(numerator_flag as integer) as numerator_flag
         , cast(exclusion_flag as integer) as exclusion_flag
         , cast(evidence_date as date) as evidence_date
+        , cast(evidence_value as {{ dbt.type_string() }}) as evidence_value
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , cast(performance_period_begin as date) as performance_period_begin
@@ -139,6 +143,7 @@ select
     , numerator_flag
     , exclusion_flag
     , evidence_date
+    , evidence_value
     , exclusion_date
     , exclusion_reason
     , performance_period_begin

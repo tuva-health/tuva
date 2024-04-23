@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
+     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
 
@@ -49,6 +49,26 @@ with measures_long as (
 
 )
 
+, cqm_236 as (
+
+    select
+          patient_id
+        , performance_flag
+    from measures_long
+    where measure_id = 'CQM236'
+
+)
+
+,nqf_0053 as (
+
+    select
+          patient_id
+        , performance_flag
+    from measures_long
+    where measure_id = 'NQF0053'
+
+)
+
 , joined as (
 
     select
@@ -56,6 +76,8 @@ with measures_long as (
         , nqf_2372.performance_flag as nqf_2372
         , nqf_0034.performance_flag as nqf_0034
         , nqf_0059.performance_flag as nqf_0059
+        , cqm_236.performance_flag as cqm_236
+        , nqf_0053.performance_flag as nqf_0053
     from measures_long
     left join nqf_2372
          on measures_long.patient_id = nqf_2372.patient_id
@@ -63,6 +85,10 @@ with measures_long as (
          on measures_long.patient_id = nqf_0034.patient_id
     left join nqf_0059
          on measures_long.patient_id = nqf_0059.patient_id
+    left join cqm_236
+         on measures_long.patient_id = cqm_236.patient_id
+    left join nqf_0053
+         on measures_long.patient_id = nqf_0053.patient_id
 
 )
 
@@ -73,6 +99,8 @@ with measures_long as (
         , cast(nqf_2372 as integer) as nqf_2372
         , cast(nqf_0034 as integer) as nqf_0034
         , cast(nqf_0059 as integer) as nqf_0059
+        , cast(cqm_236 as integer) as cqm_236
+        , cast(nqf_0053 as integer) as nqf_0053
     from joined
 
 )
@@ -82,5 +110,7 @@ select
     , nqf_2372
     , nqf_0034
     , nqf_0059
+    , cqm_236
+    , nqf_0053
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

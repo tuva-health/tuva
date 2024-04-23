@@ -1,14 +1,8 @@
 {{ config(
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false))))
+     | as_bool
    )
 }}
-
-/*
-    patients greater than or equal to 66 in institutional special needs plans (snp)
-    or residing in long term care
-
-    future enhancement: group claims into encounters
-*/
 
 with denominator as (
 
@@ -17,7 +11,7 @@ with denominator as (
         , age
         , performance_period_begin
         , performance_period_end
-    from {{ ref('quality_measures__int_nqf0059_denominator') }}
+    from {{ ref('quality_measures__int_cqm236_denominator') }}
 
 )
 

@@ -131,7 +131,8 @@ from files (format = 'csv',
     {% if compression == true %} compression = 'GZIP', {% else %} {% endif %}
     {% if headers == true %} skip_leading_rows = 1, {% else %} {% endif %}
     {% if null_marker == true %} null_marker = '\\N', {% else %} {% endif %}
-    quote = '"'
+    quote = '"',
+    allow_quoted_newlines = True
     )
 {% endset %}
 
