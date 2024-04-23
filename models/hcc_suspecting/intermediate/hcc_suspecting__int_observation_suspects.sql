@@ -73,21 +73,21 @@ with conditions as (
 
 )
 
-, obstructive_sleep_apnea as (
+, depression_assessment as (
 
-     select
-          conditions.patient_id
-        , conditions.recorded_date
-        , conditions.condition_type
-        , conditions.code_type
-        , conditions.code
-        , conditions.data_source
+    select
+          numeric_observations.patient_id
+        , numeric_observations.observation_date
+        , numeric_observations.result
+        , numeric_observations.code_type
+        , numeric_observations.code
+        , numeric_observations.data_source
         , seed_clinical_concepts.concept_name
-    from conditions
+    from numeric_observations
         inner join seed_clinical_concepts
-            on conditions.code_type = seed_clinical_concepts.code_system
-            and conditions.code = seed_clinical_concepts.code
-    where lower(seed_clinical_concepts.concept_name) = 'obstructive sleep apnea'
+            on numeric_observations.code_type = seed_clinical_concepts.code_system
+            and numeric_observations.code = seed_clinical_concepts.code
+    where lower(seed_clinical_concepts.concept_name) = 'depression assessment (phq-9)'
 
 )
 
@@ -127,7 +127,25 @@ with conditions as (
 
 )
 
-/* BEGIN HCC 48 logic */
+, obstructive_sleep_apnea as (
+
+     select
+          conditions.patient_id
+        , conditions.recorded_date
+        , conditions.condition_type
+        , conditions.code_type
+        , conditions.code
+        , conditions.data_source
+        , seed_clinical_concepts.concept_name
+    from conditions
+        inner join seed_clinical_concepts
+            on conditions.code_type = seed_clinical_concepts.code_system
+            and conditions.code = seed_clinical_concepts.code
+    where lower(seed_clinical_concepts.concept_name) = 'obstructive sleep apnea'
+
+)
+
+/* BEGIN HCC 48 logic (Morbid Obesity) */
 , bmi_over_30_with_osa as (
 
     select
@@ -232,7 +250,7 @@ with conditions as (
 
 )
 
-, hcc_48_suspect as (
+, hcc_48_unioned as (
 
     select * from bmi_over_30_with_osa
     union all
@@ -243,11 +261,115 @@ with conditions as (
     select * from bmi_over_40
 
 )
+
+, hcc_48_suspect as (
+
+    select
+          patient_id
+        , data_source
+        , observation_date
+        , observation_result
+        , condition_code
+        , condition_date
+        , condition_concept_name
+        , hcc_code
+        , hcc_description
+        , 'BMI result '
+            || cast(observation_result as {{ dbt.type_string() }})
+            || case
+                when condition_code is null then ''
+                else ' with '
+                    || condition_concept_name
+                    || ' ('
+                    || condition_code
+                    || ' on '
+                    || condition_date
+                    || ')'
+                end
+          as contributing_factor
+    from hcc_48_unioned
+
+)
 /* END HCC 48 logic */
+
+/* BEGIN HCC 155 logic (Major Depression, Moderate or Severe, without Psychosis)
+
+   to determine a positive PHQ-9 assessment, we look at the past 3 screenings
+   for a patient and take the highest result
+*/
+, eligible_depression_assessments as (
+
+    select
+          depression_assessment.patient_id
+        , depression_assessment.observation_date
+        , depression_assessment.result
+        , depression_assessment.code_type
+        , depression_assessment.code
+        , depression_assessment.data_source
+        , depression_assessment.concept_name
+        , row_number() over (
+            partition by
+                  depression_assessment.patient_id
+                , depression_assessment.data_source
+            order by depression_assessment.observation_date desc nulls last
+        ) as assessment_order
+    from depression_assessment
+
+)
+
+, depression_assessments_ordered as (
+
+    select
+          patient_id
+        , observation_date
+        , code_type
+        , code
+        , data_source
+        , concept_name
+        , result
+        , row_number() over (
+            partition by
+                  patient_id
+                , data_source
+            order by result desc nulls last
+        ) as result_order --order the last three assessments by result value
+    from eligible_depression_assessments
+    where assessment_order <= 3
+
+)
+
+, hcc_155_suspect as (
+
+    select
+          depression_assessments_ordered.patient_id
+        , depression_assessments_ordered.data_source
+        , depression_assessments_ordered.observation_date
+        , depression_assessments_ordered.result as observation_result
+        , cast(null as {{ dbt.type_string() }}) as condition_code
+        , cast(null as date) as condition_date
+        , depression_assessments_ordered.concept_name as condition_concept_name
+        , seed_hcc_descriptions.hcc_code
+        , seed_hcc_descriptions.hcc_description
+        , 'PHQ-9 result '
+            || cast(depression_assessments_ordered.result as {{ dbt.type_string() }})
+            || ' on '
+            || depression_assessments_ordered.observation_date
+          as contributing_factor
+    from depression_assessments_ordered
+        inner join seed_hcc_descriptions
+            on hcc_code = '155'
+    where result_order = 1
+    and result >= 15
+
+)
+
+/* END HCC 155 logic */
 
 , unioned as (
 
     select * from hcc_48_suspect
+    union all
+    select * from hcc_155_suspect
 
 )
 
@@ -263,12 +385,33 @@ with conditions as (
         , unioned.condition_concept_name
         , unioned.hcc_code
         , unioned.hcc_description
+        , unioned.contributing_factor
         , billed_hccs.current_year_billed
     from unioned
         left join billed_hccs
             on unioned.patient_id = billed_hccs.patient_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
+
+)
+
+, add_standard_fields as (
+
+    select
+          patient_id
+        , data_source
+        , observation_date
+        , observation_result
+        , condition_code
+        , condition_date
+        , condition_concept_name
+        , hcc_code
+        , hcc_description
+        , contributing_factor
+        , current_year_billed
+        , cast('Observation suspect' as {{ dbt.type_string() }}) as reason
+        , observation_date as suspect_date
+    from add_billed_flag
 
 )
 
@@ -285,7 +428,10 @@ with conditions as (
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(current_year_billed as boolean) as current_year_billed
-    from add_billed_flag
+        , cast(reason as {{ dbt.type_string() }}) as reason
+        , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
+        , cast(suspect_date as date) as suspect_date
+    from add_standard_fields
 
 )
 
@@ -300,5 +446,8 @@ select
     , hcc_code
     , hcc_description
     , current_year_billed
+    , reason
+    , contributing_factor
+    , suspect_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
