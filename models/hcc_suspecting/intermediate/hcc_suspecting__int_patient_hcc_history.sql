@@ -93,11 +93,45 @@ with all_conditions as (
         , add_flag.last_recorded
         , add_flag.last_billed
         , add_flag.current_year_billed
+        , cast('Prior coding history' as {{ dbt.type_string() }}) as reason
+        , icd_10_cm_code
+            || case
+                when last_billed is not null then ' last billed on ' || last_billed
+                when last_billed is null and last_recorded is not null then ' last recorded on ' || last_recorded
+                else ' (missing recorded and billing dates) '
+          end as contributing_factor
+        , coalesce(last_billed, last_recorded) as condition_date
     from all_conditions
          left join add_flag
             on all_conditions.patient_id = add_flag.patient_id
             and all_conditions.hcc_code = add_flag.hcc_code
             and all_conditions.data_source = add_flag.data_source
+
+)
+
+, add_standard_fields as (
+
+    select distinct
+          patient_id
+        , data_source
+        , recorded_date
+        , condition_type
+        , icd_10_cm_code
+        , hcc_code
+        , hcc_description
+        , first_recorded
+        , last_recorded
+        , last_billed
+        , current_year_billed
+        , 'Prior coding history' as reason
+        , icd_10_cm_code
+            || case
+                when last_billed is not null then ' last billed on ' || last_billed
+                when last_billed is null and last_recorded is not null then ' last recorded on ' || last_recorded
+                else ' (missing recorded and billing dates) '
+          end as contributing_factor
+        , coalesce(last_billed, last_recorded) as suspect_date
+    from all_conditions_with_flag
 
 )
 
@@ -115,7 +149,10 @@ with all_conditions as (
         , cast(last_recorded as date) as last_recorded
         , cast(last_billed as date) as last_billed
         , cast(current_year_billed as boolean) as current_year_billed
-    from all_conditions_with_flag
+        , cast(reason as {{ dbt.type_string() }}) as reason
+        , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
+        , cast(suspect_date as date) as suspect_date
+    from add_standard_fields
 
 )
 
@@ -131,5 +168,8 @@ select
     , last_recorded
     , last_billed
     , current_year_billed
+    , reason
+    , contributing_factor
+    , suspect_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
