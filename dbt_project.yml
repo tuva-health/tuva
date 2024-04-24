@@ -102,5 +102,9 @@ seeds:
         readmissions__icd_10_cm_to_ccs:
           +post-hook: "{{ load_seed('tuva-public-resources/value-sets','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
       clinical_concept_library:
-        clinical_concepts:
-          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','clinical_concepts.csv',compression=true,null_marker=true) }}"
+        tuva_clinical_concepts:
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','tuva_clinical_concepts.csv',compression=true,null_marker=true) }}"
+        tuva_value_set_members:
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','tuva_value_set_members.csv',compression=true,null_marker=true) }}"
+        tuva_coding_systems:
+          +post-hook: "{{ load_seed('tuva-public-resources/value-sets','tuva_coding_systems.csv',compression=true,null_marker=true) }}"
