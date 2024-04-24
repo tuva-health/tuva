@@ -6,7 +6,7 @@
 
 select distinct
   elig.patient_id
-  , elig.patient_id||elig.data_source||elig.payer||elig.plan||elig.enrollment_start_date||elig.enrollment_end_date as patient_id_key
+  , elig.patient_id||coalesce(elig.data_source,'')||coalesce(elig.payer,'')||coalesce(elig.plan,'')||coalesce(cast(elig.enrollment_start_date as {{ dbt.type_string() }}),'')||coalesce(cast(elig.enrollment_end_date as {{ dbt.type_string() }}),'') as patient_id_key
   , cal_dob.full_date as normalized_birth_date
   , cal_death.full_date as normalized_death_date
   , cal_enroll_start.full_date as normalized_enrollment_start_date

@@ -184,6 +184,41 @@ with conditions as (
 
 )
 
+, add_standard_fields as (
+
+    select
+          patient_id
+        , data_source
+        , hcc_code
+        , hcc_description
+        , condition_1_concept_name
+        , condition_1_code
+        , condition_1_recorded_date
+        , condition_2_concept_name
+        , condition_2_code
+        , condition_2_recorded_date
+        , current_year_billed
+        , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
+        , condition_1_concept_name
+            || ' ('
+            || condition_1_code
+            || ' on '
+            || condition_1_recorded_date
+            || ')'
+            || ' and '
+            || condition_2_concept_name
+            || ' ('
+            || condition_2_code
+            || ' on '
+            || condition_2_recorded_date
+            || ')'
+          as contributing_factor
+        , condition_1_recorded_date as suspect_date
+    from add_billed_flag
+
+)
+
+
 , add_data_types as (
 
     select
@@ -198,7 +233,10 @@ with conditions as (
         , cast(condition_2_code as {{ dbt.type_string() }}) as condition_2_code
         , cast(condition_2_recorded_date as date) as condition_2_recorded_date
         , cast(current_year_billed as boolean) as current_year_billed
-    from add_billed_flag
+        , cast(reason as {{ dbt.type_string() }}) as reason
+        , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
+        , cast(suspect_date as date) as suspect_date
+    from add_standard_fields
 
 )
 
@@ -214,5 +252,8 @@ select
     , condition_2_code
     , condition_2_recorded_date
     , current_year_billed
+    , reason
+    , contributing_factor
+    , suspect_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

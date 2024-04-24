@@ -8,7 +8,7 @@
 select
       lab_result_id
     , patient_id
-    , coalesce(normalized_code_type,source_code_type) as code_type
+    , lower(coalesce(normalized_code_type,source_code_type)) as code_type
     , coalesce(normalized_code,source_code) as code
     , status
     , result
@@ -21,7 +21,7 @@ from {{ ref('core__lab_result') }}
 select
       lab_result_id
     , patient_id
-    , coalesce(normalized_code_type,source_code_type) as code_type
+    , lower(coalesce(normalized_code_type,source_code_type)) as code_type
     , coalesce(normalized_code,source_code) as code
     , status
     , result
