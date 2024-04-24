@@ -7,6 +7,7 @@ select
     , cast(null as date) as birth_date
     , cast(null as date) as death_date
     , cast(null as {{ dbt.type_int() }} ) as death_flag
+    , cast(null as {{ dbt.type_string() }} ) as social_security_number
     , cast(null as {{ dbt.type_string() }} ) as address
     , cast(null as {{ dbt.type_string() }} ) as city
     , cast(null as {{ dbt.type_string() }} ) as state
