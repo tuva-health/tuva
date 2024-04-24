@@ -12,6 +12,7 @@ select
     , {{ try_to_cast_date('birth_date', 'YYYY-MM-DD') }} as birth_date
     , {{ try_to_cast_date('death_date', 'YYYY-MM-DD') }} as death_date
     , cast(death_flag as {{ dbt.type_int() }} ) as death_flag
+    , cast(social_security_number as {{ dbt.type_string() }} ) as social_security_number
     , cast(address as {{ dbt.type_string() }} ) as address
     , cast(city as {{ dbt.type_string() }} ) as city
     , cast(state as {{ dbt.type_string() }} ) as state
