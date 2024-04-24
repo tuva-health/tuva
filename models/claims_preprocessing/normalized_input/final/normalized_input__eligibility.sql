@@ -8,6 +8,7 @@
 select
     cast(elig.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(elig.member_id as {{ dbt.type_string() }} ) as member_id
+    , cast(elig.subscriber_id as {{ dbt.type_string() }} ) as subscriber_id
     , cast(elig.gender as {{ dbt.type_string() }} ) as gender
     , cast(elig.race as {{ dbt.type_string() }} ) as race
     , cast(date_norm.normalized_birth_date as date ) as birth_date
@@ -24,6 +25,7 @@ select
     , cast(elig.first_name as {{ dbt.type_string() }} ) as first_name
     , cast(elig.last_name as {{ dbt.type_string() }} ) as last_name
     , cast(elig.social_security_number as {{ dbt.type_string() }} ) as social_security_number
+    , cast(elig.subscriber_relation as {{ dbt.type_string() }} ) as subscriber_relation
     , cast(elig.address as {{ dbt.type_string() }} ) as address
     , cast(elig.city as {{ dbt.type_string() }} ) as city
     , cast(elig.state as {{ dbt.type_string() }} ) as state

@@ -1,6 +1,7 @@
 select
       patient_id
     , member_id
+    , subscriber_id
     , gender
     , race
     , birth_date
@@ -17,6 +18,7 @@ select
     , first_name
     , last_name
     , social_security_number
+    , subscriber_relation
     , address
     , city
     , state
