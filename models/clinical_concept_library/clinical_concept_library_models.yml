@@ -1,0 +1,27 @@
+version: 2
+
+models:
+
+  - name: value_set_member_relevant_fields
+    description: >
+      This model creates one record per value set member, but it includes
+      relevant fields for each value set member taken from the clnical_concepts
+      and coding_systems tables.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library
+        {% else %}clinical_concept_library{%- endif -%}
+      alias: value_set_member_relevant_fields
+      tags:
+        - clinical_concept_library
+      materialized: table
+    columns:
+        - name: concept_id
+        - name: concept_name
+        - name: concept_type
+        - name: value_set_member_id
+        - name: code
+        - name: coding_system_id
+        - name: include_descendants
+        - name: coding_system_name
+
