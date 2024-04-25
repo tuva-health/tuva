@@ -200,10 +200,6 @@ with frailty as (
 
     select * from valid_hospice_palliative
 
-    union all
-
-    select * from valid_mastectomy_patients_with_exclusion_type
-
 )
 
 , combined_exclusions as (
@@ -220,23 +216,35 @@ with frailty as (
 , valid_exclusions as (
 
   select
-    *
+        patient_id
+      , exclusion_date
+      , exclusion_reason
+      , exclusion_type
   from combined_exclusions
-  where exclusion_type not in 
-    (   'hospice_palliative'
-      , 'mastectomy_performed' 
-    )
+  where exclusion_type != 'hospice_palliative' 
     and age >= 66
 
   union all
 
   select
-    *
+        patient_id
+      , exclusion_date
+      , exclusion_reason
+      , exclusion_type
   from combined_exclusions
-  where exclusion_type in
-    (   'hospice_palliative'
-      , 'mastectomy_performed' 
-    )
+  where exclusion_type = 'hospice_palliative'
+
+)
+
+, valid_exclusions_with_mastectomy as (
+
+    select *
+    from valid_exclusions
+
+    union all
+
+    select *
+    from valid_mastectomy_patients_with_exclusion_type
 
 )
 
@@ -248,7 +256,7 @@ with frailty as (
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , 1 as exclusion_flag
-    from valid_exclusions
+    from valid_exclusions_with_mastectomy
 
 )
 
