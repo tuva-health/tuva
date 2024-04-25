@@ -61,7 +61,7 @@ seeds:
         code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         code_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
         coding_system_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coding_system_version: |
@@ -69,7 +69,7 @@ seeds:
         include_descendants: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         comment: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
 
 
   - name: coding_systems
