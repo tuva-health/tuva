@@ -178,7 +178,7 @@ with frailty as (
   from exclusions
   inner join {{ref('quality_measures__int_cbe0055__denominator')}} as denominator
       on exclusions.patient_id = denominator.patient_id
-    -- EDIT THIS
+
 )
 
 , valid_exclusions as (

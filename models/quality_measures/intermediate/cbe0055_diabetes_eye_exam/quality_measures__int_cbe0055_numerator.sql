@@ -13,7 +13,7 @@ with denominator as (
         , measure_name
         , measure_version
     from {{ ref('quality_measures__int_cbe0055__denominator') }}
-    /*EDIT THIS*/
+
 )
 
 , retina_test_code as (
