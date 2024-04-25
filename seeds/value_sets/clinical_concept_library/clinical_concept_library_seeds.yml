@@ -7,7 +7,6 @@ seeds:
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
       alias: clinical_concepts
       tags: clinical_concept_library
-      quote_columns: true
       column_types:
         concept_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -17,8 +16,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         concept_oid: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}	  
-        last_update_date: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        last_update_date: date
         last_update_note: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         concept_type: |
@@ -54,8 +52,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        last_update_date: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        last_update_date: date
         last_update_note: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         code: |
