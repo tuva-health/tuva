@@ -232,13 +232,19 @@ with frailty as (
 , valid_exclusions as (
 
   select * from combined_exclusions
-  where exclusion_type != 'hospice_palliative'
+  where exclusion_type not in (
+      'measure specific exclusion for historical record of colectomy cancer'
+    , 'hospice_palliative'
+    ) 
     and age >= 66
 
   union all
 
-  select * from combined_exclusions
-  where exclusion_type = 'hospice_palliative'
+  select * from combined_exclusions --age irrelvant exclusions
+  where exclusion_type in (
+      'measure specific exclusion for historical record of colectomy cancer'
+    , 'hospice_palliative'
+    ) 
 
 )
 
