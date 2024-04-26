@@ -24,6 +24,18 @@ with seed_adjustment_rates as (
 
 )
 
+, member_months as (
+
+    select
+        patient_id
+        , cast(substr(year_month, 1, 4) as integer) as eligible_year
+        , COUNT(1) as member_months
+    from  {{ ref('financial_pmpm__member_months') }}
+    group by
+        patient_id
+        , cast(substr(year_month, 1, 4) as integer)
+)
+
 , raw_score as (
 
     select
@@ -135,6 +147,24 @@ with seed_adjustment_rates as (
 
 )
 
+, weighted_score as (
+
+    select
+        payment.patient_id
+        , payment.v24_risk_score
+        , payment.v28_risk_score
+        , payment.blended_risk_score
+        , payment.normalized_risk_score
+        , payment.payment_risk_score
+        , member_months.member_months
+        , payment.payment_risk_score * member_months.member_months as payment_risk_score_weighted_by_months
+        , payment.payment_year
+    from payment
+    left join member_months
+            on payment.patient_id = member_months.patient_id
+            and payment.payment_year = member_months.eligible_year
+)
+
 , add_data_types as (
 
     select
@@ -144,8 +174,10 @@ with seed_adjustment_rates as (
         , round(cast(blended_risk_score as {{ dbt.type_numeric() }}),3) as blended_risk_score
         , round(cast(normalized_risk_score as {{ dbt.type_numeric() }}),3) as normalized_risk_score
         , round(cast(payment_risk_score as {{ dbt.type_numeric() }}),3) as payment_risk_score
+        , round(cast(payment_risk_score_weighted_by_months as {{ dbt.type_numeric() }}),3) as payment_risk_score_weighted_by_months
+        , cast(member_months as integer) as member_months
         , cast(payment_year as integer) as payment_year
-    from payment
+    from weighted_score
 
 )
 
@@ -156,6 +188,8 @@ select
     , blended_risk_score
     , normalized_risk_score
     , payment_risk_score
+    , payment_risk_score_weighted_by_months
+    , member_months
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
