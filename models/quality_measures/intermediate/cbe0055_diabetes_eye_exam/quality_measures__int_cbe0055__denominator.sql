@@ -3,7 +3,7 @@
    )
 }}
 
-with  visit_codes as (
+with visit_codes as (
 
     select
           code
@@ -16,13 +16,15 @@ with  visit_codes as (
         , 'preventive care services initial office visit, 18 and up'
         , 'annual wellness visit'
         , 'telephone visits'
-        , 'nutrition services'
         , 'emergency department evaluation and management visit'
         , 'outpatient'
         , 'observation'
     )
 
-), visits_encounters as (
+)
+
+, visits_encounters as (
+
     select patient_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
@@ -37,9 +39,11 @@ with  visit_codes as (
         , 'outpatient rehabilitation'
         , 'telehealth'
      )
+
 )
 
 , procedure_encounters as (
+
     select 
           patient_id
         , procedure_date as min_date
@@ -47,12 +51,13 @@ with  visit_codes as (
     from {{ref('quality_measures__stg_core__procedure')}} proc
     inner join {{ref('quality_measures__int_cbe0055__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
-    inner join  visit_codes
+    inner join visit_codes
         on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
 
-
 )
+
 , claims_encounters as (
+    
     select patient_id
     , coalesce(claim_start_date,claim_end_date) as min_date
     , coalesce(claim_end_date,claim_start_date) as max_date
@@ -63,10 +68,10 @@ with  visit_codes as (
     inner join  visit_codes
         on medical_claim.hcpcs_code= visit_codes.code
 
-
 )
 
 , all_encounters as (
+
     select *, 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from visits_encounters
     union all
@@ -75,9 +80,11 @@ with  visit_codes as (
     union all
     select *, cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
+
 )
 
 , encounters_by_patient as (
+
     select patient_id,min(min_date) min_date, max(max_date) max_date,
         concat(concat(
             coalesce(min(visit_enc),'')
@@ -86,6 +93,7 @@ with  visit_codes as (
             ) as qualifying_types
     from all_encounters
     group by patient_id
+
 )
 
 , diabetics_codes as (
@@ -98,6 +106,7 @@ with  visit_codes as (
           'diabetes visit'
         , 'diabetes'
     )
+
 )
 
 , conditions as (
@@ -132,6 +141,7 @@ with  visit_codes as (
 )
 
 , patients_with_age as (
+
     select
           p.patient_id
         , min_date
@@ -143,7 +153,6 @@ with  visit_codes as (
     inner join encounters_by_patient e
         on p.patient_id = e.patient_id
     where p.death_date is null
-
 
 )
 

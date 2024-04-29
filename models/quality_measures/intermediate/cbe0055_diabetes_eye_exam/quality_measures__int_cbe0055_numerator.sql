@@ -91,7 +91,7 @@ with denominator as (
 
 )
 
-, no_retinopathy_last_year as (
+, retinopathy_last_year as (
 
     select 
           conditions.patient_id
@@ -116,6 +116,20 @@ with denominator as (
 
 )
 
+, no_retinopathy_last_year as (
+
+    select 
+        patient_id
+      , recorded_date
+      , code_type
+      , code
+    from denominator
+    left join retinopathy_last_year
+    on retinopathy_last_year.patient_id = denominator.patient_id
+    and retinopathy_last_year is null
+
+)
+
 , qualifying_patients as (
 
     select 
@@ -135,12 +149,13 @@ with denominator as (
 , qualifying_patients_with_denominator as (
 
     select 
-          qualifying_patients.*
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
+          qualifying_patients.patient_id
+        , qualifying_patients.evidence_date
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
+        , denominator.measure_id
+        , denominator.measure_name
+        , denominator.measure_version
         , '1' as numerator_flag
     from qualifying_patients
     inner join denominator
