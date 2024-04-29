@@ -3,6 +3,8 @@ version: 2
 models:
   - name: medical_claim_expanded
     config:
-      schema: claims_expanded
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_expanded
+        {% else %}claims_expanded{%- endif -%}
       materialized: table
       tags: claims_expanded
