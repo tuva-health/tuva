@@ -12,3 +12,4 @@ select
     , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__procedure') }}
+where claim_id is not null

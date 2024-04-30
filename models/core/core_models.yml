@@ -103,6 +103,8 @@ models:
           Identifier that links a patient to a particular insurance product or 
           health plan. A patient can have more than one member_id because they 
           can have more than one insurance product/plan.
+      - name: subscriber_id
+        description: Identifier that links a patient to a particular insurance product or health plan.
       - name: birth_date
         description: Date the patient was born.
       - name: death_date
@@ -133,6 +135,8 @@ models:
         description: Indicates how the patient became eligible for Medicare.
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
+      - name: subscriber_relation
+        description: Identifier that links a patient to a particular insurance product or health plan.
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically 
@@ -737,6 +741,8 @@ models:
         description: The first name of the patient.
       - name: last_name
         description: The last name of the patient.
+      - name: social_security_number
+        description: The social security number of the patient.
       - name: address
         description: The address of the patient.
       - name: city
