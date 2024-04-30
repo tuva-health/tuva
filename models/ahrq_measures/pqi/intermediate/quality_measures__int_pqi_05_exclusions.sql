@@ -1,0 +1,39 @@
+with resp_an as (
+    select distinct
+        encounter_id
+      , data_source
+      , 'cystic fibrosis' as exclusion_reason
+    from {{ ref('core__condition') }} as c
+    inner join {{ ref('pqi__value_sets') }} as pqi
+      on c.normalized_code = pqi.code
+      and c.normalized_code_type = 'icd-10-cm'
+      and pqi.value_set_name = 'cystic_fibrosis_and_anomalies_of_the_respiratory_system'
+      and pqi_number = '05'
+    where c.encounter_id is not null
+),
+
+union_cte as (
+    select
+        encounter_id
+      , data_source
+      , exclusion_reason
+    from {{ ref('quality_measures__int_pqi_shared_exclusion_union') }}
+
+    union all
+
+    select
+        encounter_id
+      , data_source
+      , exclusion_reason
+    from resp_an
+)
+
+select
+    encounter_id
+  , data_source
+  , exclusion_reason
+  , row_number() over (
+      partition by encounter_id, data_source 
+      order by exclusion_reason
+    ) as exclusion_number
+from union_cte

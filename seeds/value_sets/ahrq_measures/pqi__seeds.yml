@@ -1,0 +1,37 @@
+version: 2
+
+seeds:
+  - name: pqi__value_sets
+    description: values sets from AHRQ for each of the published PQI measures
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _value_set_pqi
+      tags:
+        - pqi
+      enabled: "{{ var('quality_measures_pqi',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        code_value : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        value_set_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        pqi_number : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
+  - name: pqi__measures
+    description: names and descriptions of each of the PQI measures
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _value_set_pqi_measures
+      tags:
+        - pqi
+      enabled: "{{ var('quality_measures_pqi',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        pqi_number : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        pqi_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        pqi_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+                                
