@@ -119,14 +119,12 @@ with denominator as (
 , no_retinopathy_last_year as (
 
     select 
-        patient_id
-      , recorded_date
-      , code_type
-      , code
+        denominator.patient_id
+      , cast(null as date) as recorded_date
     from denominator
     left join retinopathy_last_year
     on retinopathy_last_year.patient_id = denominator.patient_id
-    and retinopathy_last_year is null
+    and retinopathy_last_year.patient_id is null
 
 )
 
