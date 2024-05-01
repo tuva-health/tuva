@@ -1,14 +1,14 @@
-with resp_an as (
+with cardiac as (
     select distinct
         encounter_id
       , data_source
-      , 'cystic fibrosis' as exclusion_reason
-    from {{ ref('core__condition') }} as c
+      , 'cardiac procedure' as exclusion_reason
+    from {{ ref('core__procedure') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
-      and c.normalized_code_type = 'icd-10-cm'
-      and pqi.value_set_name = 'cystic_fibrosis_and_anomalies_of_the_respiratory_system_diagnosis_codes'
-      and pqi.pqi_number = '15'
+      and c.normalized_code_type = 'icd-10-pcs'
+      and pqi.value_set_name = 'cardiac_procedure_codes'
+      and pqi.pqi_number = 'appendix_b'
     where c.encounter_id is not null
 ),
 
@@ -17,7 +17,7 @@ union_cte as (
         encounter_id
       , data_source
       , exclusion_reason
-    from {{ ref('quality_measures__int_pqi_shared_exclusion_union') }}
+    from {{ ref('ahrq_measures__int_pqi_shared_exclusion_union') }}
 
     union
 
@@ -25,7 +25,7 @@ union_cte as (
         encounter_id
       , data_source
       , exclusion_reason
-    from resp_an
+    from cardiac
 )
 
 select

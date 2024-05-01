@@ -6,4 +6,4 @@ select
       partition by encounter_id, data_source 
       order by exclusion_reason
     ) as exclusion_number
-from {{ ref('quality_measures__int_pqi_shared_exclusion_union') }}
+from {{ ref('ahrq_measures__int_pqi_shared_exclusion_union') }}

@@ -1,43 +1,55 @@
-with sickle_cell as (
+with cardiac as (
     select distinct
         encounter_id
       , data_source
-      , 'sickle cell' as exclusion_reason
-    from {{ ref('core__condition') }} as c
-    inner join {{ ref('pqi__value_sets') }} as pqi 
-      on c.normalized_code = pqi.code
-      and c.normalized_code_type = 'icd-10-cm'
-      and pqi.value_set_name = 'sickle_cell_anemia_or_hb-s_disease_diagnosis_codes'
-      and pqi.pqi_number = '11'
-    where c.encounter_id is not null
-),
-
-immune_dx as (
-    select distinct
-        encounter_id
-      , data_source
-      , 'immunocompromised diagnosis' as exclusion_reason
-    from {{ ref('core__condition') }} as c
-    inner join {{ ref('pqi__value_sets') }} as pqi 
-      on c.normalized_code = pqi.code
-      and c.normalized_code_type = 'icd-10-cm'
-      and pqi.value_set_name = 'immunocompromised_state_diagnosis_codes'
-      and pqi.pqi_number = 'appendix_c'
-    where c.encounter_id is not null
-),
-
-immune_px as (
-    select distinct
-        encounter_id
-      , data_source
-      , 'immunocompromised procedure' as exclusion_reason
+      , 'cardiac procedure' as exclusion_reason
     from {{ ref('core__procedure') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-pcs'
-      and pqi.value_set_name = 'immunocompromised_state_procedure_codes'
-      and pqi.pqi_number = 'appendix_c'
+      and pqi.value_set_name = 'cardiac_procedure_codes'
+      and pqi_number = 'appendix_b'
     where c.encounter_id is not null
+),
+
+ckd as (
+    select distinct
+        encounter_id
+      , data_source
+    from {{ ref('core__condition') }} as c
+    inner join {{ ref('pqi__value_sets') }} as pqi 
+      on c.normalized_code = pqi.code
+      and c.normalized_code_type = 'icd-10-cm'
+      and pqi.value_set_name = 'exclusion_kidney_disease_diagnosis_codes'
+      and pqi_number = '07'
+    where c.encounter_id is not null
+),
+
+access as (
+    select distinct
+        encounter_id
+      , data_source
+    from {{ ref('core__procedure') }} as c
+    inner join {{ ref('pqi__value_sets') }} as pqi 
+      on c.normalized_code = pqi.code
+      and c.normalized_code_type = 'icd-10-pcs'
+      and pqi.value_set_name = 'exclusion_dialysis_access_procedure_codes'
+      and pqi.pqi_number = '07'
+    where c.encounter_id is not null
+),
+
+combine as (
+    select
+        c.encounter_id
+      , c.data_source
+      , 'ckd' as exclusion_reason
+    from {{ ref('core__condition') }} as c
+    inner join ckd 
+      on c.encounter_id = ckd.encounter_id
+      and c.data_source = ckd.data_source
+    inner join access as a 
+      on c.encounter_id = a.encounter_id
+      and c.data_source = a.data_source
 ),
 
 union_cte as (
@@ -45,31 +57,23 @@ union_cte as (
         encounter_id
       , data_source
       , exclusion_reason
-    from {{ ref('quality_measures__int_pqi_shared_exclusion_union') }}
-
+    from {{ ref('ahrq_measures__int_pqi_shared_exclusion_union') }}
+    
     union
-
+    
     select
         encounter_id
       , data_source
       , exclusion_reason
-    from sickle_cell
-
+    from cardiac
+    
     union
-
+    
     select
         encounter_id
       , data_source
       , exclusion_reason
-    from immune_dx
-
-    union
-
-    select
-        encounter_id
-      , data_source
-      , exclusion_reason
-    from immune_px
+    from combine
 )
 
 select

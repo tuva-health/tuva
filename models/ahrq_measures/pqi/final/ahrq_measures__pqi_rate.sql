@@ -4,7 +4,7 @@ select data_source
 ,year_number
 ,pqi_number
 ,count(encounter_id) as num_count
-from {{ ref('quality_measures__pqi_num_long') }}
+from {{ ref('ahrq_measures__pqi_num_long') }}
 group by data_source
 ,year_number
 ,pqi_number
@@ -15,7 +15,7 @@ select data_source
 ,year_number
 ,pqi_number
 ,count(patient_id) as denom_count
-from {{ ref('quality_measures__pqi_denom_long') }} d
+from {{ ref('ahrq_measures__pqi_denom_long') }} d
 group by data_source
 ,year_number
 ,pqi_number

@@ -17,7 +17,7 @@ union_cte as (
         encounter_id
       , data_source
       , exclusion_reason
-    from {{ ref('quality_measures__int_pqi_shared_exclusion_union') }}
+    from {{ ref('ahrq_measures__int_pqi_shared_exclusion_union') }}
 
     union all
 

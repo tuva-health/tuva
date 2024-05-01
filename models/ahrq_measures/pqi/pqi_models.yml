@@ -1,690 +1,690 @@
 version: 2
 
 models:
-  - name: quality_measures__pqi_rate
+  - name: ahrq_measures__pqi_rate
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: pqi_rate
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: table
     description: >
       Table that combines numerator and denominator and calculates a rate per 100k
 
-  - name: quality_measures__pqi_denom_long
+  - name: ahrq_measures__pqi_denom_long
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: pqi_denom_long
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: table
     description: >
       Long table that unions the denominator for all the PQI measures.
 
-  - name: quality_measures__pqi_num_long
+  - name: ahrq_measures__pqi_num_long
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: pqi_num_long
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: table
     description: >
       Long table that unions the numerator for all the PQI measures.
 
-  - name: quality_measures__pqi_exclusion_long
+  - name: ahrq_measures__pqi_exclusion_long
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: pqi_exclusion_long
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: table
     description: >
       Long table that unions the exclusions for all the PQI measures.
 
-  - name: quality_measures__pqi_summary
+  - name: ahrq_measures__pqi_summary
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: pqi_summary
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: table
     description: >
       Summary table for pqi numerators that bring in encounter details for analytics reporting.
 
-  - name: quality_measures__int_pqi_01_denom
+  - name: ahrq_measures__int_pqi_01_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_01_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 01 measure calculation.
 
-  - name: quality_measures__int_pqi_01_exclusions
+  - name: ahrq_measures__int_pqi_01_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_01_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 01 measure.
 
-  - name: quality_measures__int_pqi_01_num
+  - name: ahrq_measures__int_pqi_01_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_01_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 01 measure calculation.
 
-  - name: quality_measures__int_pqi_03_exclusions
+  - name: ahrq_measures__int_pqi_03_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_03_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 03 measure.
 
-  - name: quality_measures__int_pqi_03_num
+  - name: ahrq_measures__int_pqi_03_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_03_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 03 measure calculation.
 
-  - name: quality_measures__int_pqi_03_denom
+  - name: ahrq_measures__int_pqi_03_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_03_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 03 measure calculation.
     
-  - name: quality_measures__int_pqi_05_exclusions
+  - name: ahrq_measures__int_pqi_05_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_05_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 05 measure.
 
-  - name: quality_measures__int_pqi_05_num
+  - name: ahrq_measures__int_pqi_05_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_05_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 05 measure calculation.
 
-  - name: quality_measures__int_pqi_05_denom
+  - name: ahrq_measures__int_pqi_05_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_05_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 05 measure calculation.
     
-  - name: quality_measures__int_pqi_07_exclusions
+  - name: ahrq_measures__int_pqi_07_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_07_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 07 measure.
 
-  - name: quality_measures__int_pqi_07_num
+  - name: ahrq_measures__int_pqi_07_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_07_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 07 measure calculation.
 
-  - name: quality_measures__int_pqi_07_denom
+  - name: ahrq_measures__int_pqi_07_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_07_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 07 measure calculation.
     
-  - name: quality_measures__int_pqi_08_exclusions
+  - name: ahrq_measures__int_pqi_08_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_08_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 08 measure.
 
-  - name: quality_measures__int_pqi_08_num
+  - name: ahrq_measures__int_pqi_08_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_08_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 08 measure calculation.
 
-  - name: quality_measures__int_pqi_08_denom
+  - name: ahrq_measures__int_pqi_08_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_08_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 08 measure calculation.
     
-  - name: quality_measures__int_pqi_11_exclusions
+  - name: ahrq_measures__int_pqi_11_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_11_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 11 measure.
 
-  - name: quality_measures__int_pqi_11_num
+  - name: ahrq_measures__int_pqi_11_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_11_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 11 measure calculation.
 
-  - name: quality_measures__int_pqi_11_denom
+  - name: ahrq_measures__int_pqi_11_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_11_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 11 measure calculation.
     
-  - name: quality_measures__int_pqi_12_exclusions
+  - name: ahrq_measures__int_pqi_12_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_12_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 12 measure.
 
-  - name: quality_measures__int_pqi_12_num
+  - name: ahrq_measures__int_pqi_12_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_12_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 12 measure calculation.
 
-  - name: quality_measures__int_pqi_12_denom
+  - name: ahrq_measures__int_pqi_12_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_12_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 12 measure calculation.
     
-  - name: quality_measures__int_pqi_14_exclusions
+  - name: ahrq_measures__int_pqi_14_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_14_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 14 measure.
 
-  - name: quality_measures__int_pqi_14_num
+  - name: ahrq_measures__int_pqi_14_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_14_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 14 measure calculation.
 
-  - name: quality_measures__int_pqi_14_denom
+  - name: ahrq_measures__int_pqi_14_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_14_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 14 measure calculation.
     
-  - name: quality_measures__int_pqi_15_exclusions
+  - name: ahrq_measures__int_pqi_15_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_15_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 15 measure.
 
-  - name: quality_measures__int_pqi_15_num
+  - name: ahrq_measures__int_pqi_15_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_15_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 15 measure calculation.
 
-  - name: quality_measures__int_pqi_15_denom
+  - name: ahrq_measures__int_pqi_15_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_15_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 15 measure calculation.
     
-  - name: quality_measures__int_pqi_16_exclusions
+  - name: ahrq_measures__int_pqi_16_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_16_exclusions
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Exclusion logic specific to PQI 16 measure.
 
-  - name: quality_measures__int_pqi_16_num
+  - name: ahrq_measures__int_pqi_16_num
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_16_num
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Numerator for PQI 16 measure calculation.
 
-  - name: quality_measures__int_pqi_16_denom
+  - name: ahrq_measures__int_pqi_16_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_quality_measures
+          {var('tuva_schema_prefix')}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_16_denom
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Denominator for PQI 16 measure calculation.
     
-  - name: quality_measures__int_pqi_shared_exclusion_missing_age
+  - name: ahrq_measures__int_pqi_shared_exclusion_missing_age
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusions_missing_age
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
-      materialized: table
+      materialized: view
     description: >
       Exclusion logic for patients without an age
 
 
-  - name: quality_measures__int_pqi_shared_exclusion_missing_dates
+  - name: ahrq_measures__int_pqi_shared_exclusion_missing_dates
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusion_missing_dates
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Handles missing date fields across various PQI measures.
 
-  - name: quality_measures__int_pqi_shared_exclusion_missing_gender
+  - name: ahrq_measures__int_pqi_shared_exclusion_missing_gender
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusion_missing_gender
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Handles missing gender information for PQI measures.
 
-  - name: quality_measures__int_pqi_shared_exclusion_missing_primary_dx
+  - name: ahrq_measures__int_pqi_shared_exclusion_missing_primary_dx
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusion_missing_primary_dx
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Handles cases with missing primary diagnosis in PQI measure calculations.
 
-  - name: quality_measures__int_pqi_shared_exclusion_transfer
+  - name: ahrq_measures__int_pqi_shared_exclusion_transfer
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusion_transfer
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Excludes transferred patients from PQI calculations.
 
-  - name: quality_measures__int_pqi_shared_exclusion_ungroupable_drg
+  - name: ahrq_measures__int_pqi_shared_exclusion_ungroupable_drg
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusion_ungroupable_drg
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Excludes patients with ungroupable DRGs from PQI measures.
 
-  - name: quality_measures__int_pqi_shared_exclusion_union
+  - name: ahrq_measures__int_pqi_shared_exclusion_union
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _int_pqi_shared_exclusion_union
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: view
     description: >
       Union of all exclusion criteria used across PQI measures for consistent exclusion logic.
 
-  - name: quality_measures__stg_pqi_inpatient_encounter
+  - name: ahrq_measures__stg_pqi_inpatient_encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_quality_measures
+          {{var('tuva_schema_prefix')}}_ahrq_measures
         {% else %}
-          quality_measures
+          ahrq_measures
         {%- endif -%}
       alias: _stg_pqi_inpatient_encounter
       tags: 
-        - quality_measures
+        - ahrq_measures
         - pqi
       materialized: table
     description: >
