@@ -1,22 +1,8 @@
 version: 2
 
 models:
-  - name: ahrq_measures__pqi_rate
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_ahrq_measures
-        {% else %}
-          ahrq_measures
-        {%- endif -%}
-      alias: pqi_rate
-      tags: 
-        - ahrq_measures
-        - pqi
-      materialized: table
-    description: >
-      Table that combines numerator and denominator and calculates a rate per 100k
 
+## Final 
   - name: ahrq_measures__pqi_denom_long
     config:
       schema: |
@@ -32,22 +18,6 @@ models:
       materialized: table
     description: >
       Long table that unions the denominator for all the PQI measures.
-
-  - name: ahrq_measures__pqi_num_long
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_ahrq_measures
-        {% else %}
-          ahrq_measures
-        {%- endif -%}
-      alias: pqi_num_long
-      tags: 
-        - ahrq_measures
-        - pqi
-      materialized: table
-    description: >
-      Long table that unions the numerator for all the PQI measures.
 
   - name: ahrq_measures__pqi_exclusion_long
     config:
@@ -65,6 +35,38 @@ models:
     description: >
       Long table that unions the exclusions for all the PQI measures.
 
+  - name: ahrq_measures__pqi_num_long
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_ahrq_measures
+        {% else %}
+          ahrq_measures
+        {%- endif -%}
+      alias: pqi_num_long
+      tags: 
+        - ahrq_measures
+        - pqi
+      materialized: table
+    description: >
+      Long table that unions the numerator for all the PQI measures.
+
+  - name: ahrq_measures__pqi_rate
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_ahrq_measures
+        {% else %}
+          ahrq_measures
+        {%- endif -%}
+      alias: pqi_rate
+      tags: 
+        - ahrq_measures
+        - pqi
+      materialized: table
+    description: >
+      Table that combines numerator and denominator and calculates a rate per 100k
+
   - name: ahrq_measures__pqi_summary
     config:
       schema: |
@@ -80,6 +82,8 @@ models:
       materialized: table
     description: >
       Summary table for pqi numerators that bring in encounter details for analytics reporting.
+
+## Intermediate
 
   - name: ahrq_measures__int_pqi_01_denom
     config:
@@ -129,6 +133,22 @@ models:
     description: >
       Numerator for PQI 01 measure calculation.
 
+  - name: ahrq_measures__int_pqi_03_denom
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {var('tuva_schema_prefix')}_ahrq_measures
+        {% else %}
+          ahrq_measures
+        {%- endif -%}
+      alias: _int_pqi_03_denom
+      tags: 
+        - ahrq_measures
+        - pqi
+      materialized: view
+    description: >
+      Denominator for PQI 03 measure calculation.
+
   - name: ahrq_measures__int_pqi_03_exclusions
     config:
       schema: |
@@ -161,7 +181,7 @@ models:
     description: >
       Numerator for PQI 03 measure calculation.
 
-  - name: ahrq_measures__int_pqi_03_denom
+  - name: ahrq_measures__int_pqi_05_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -169,13 +189,13 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_03_denom
+      alias: _int_pqi_05_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 03 measure calculation.
+      Denominator for PQI 05 measure calculation.
     
   - name: ahrq_measures__int_pqi_05_exclusions
     config:
@@ -208,8 +228,8 @@ models:
       materialized: view
     description: >
       Numerator for PQI 05 measure calculation.
-
-  - name: ahrq_measures__int_pqi_05_denom
+    
+  - name: ahrq_measures__int_pqi_07_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -217,14 +237,14 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_05_denom
+      alias: _int_pqi_07_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 05 measure calculation.
-    
+      Denominator for PQI 07 measure calculation.
+
   - name: ahrq_measures__int_pqi_07_exclusions
     config:
       schema: |
@@ -241,6 +261,7 @@ models:
     description: >
       Exclusion logic specific to PQI 07 measure.
 
+
   - name: ahrq_measures__int_pqi_07_num
     config:
       schema: |
@@ -256,8 +277,8 @@ models:
       materialized: view
     description: >
       Numerator for PQI 07 measure calculation.
-
-  - name: ahrq_measures__int_pqi_07_denom
+    
+  - name: ahrq_measures__int_pqi_08_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -265,14 +286,14 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_07_denom
+      alias: _int_pqi_08_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 07 measure calculation.
-    
+      Denominator for PQI 08 measure calculation.
+
   - name: ahrq_measures__int_pqi_08_exclusions
     config:
       schema: |
@@ -305,7 +326,7 @@ models:
     description: >
       Numerator for PQI 08 measure calculation.
 
-  - name: ahrq_measures__int_pqi_08_denom
+  - name: ahrq_measures__int_pqi_11_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -313,13 +334,13 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_08_denom
+      alias: _int_pqi_11_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 08 measure calculation.
+      Denominator for PQI 11 measure calculation.
     
   - name: ahrq_measures__int_pqi_11_exclusions
     config:
@@ -353,7 +374,7 @@ models:
     description: >
       Numerator for PQI 11 measure calculation.
 
-  - name: ahrq_measures__int_pqi_11_denom
+  - name: ahrq_measures__int_pqi_12_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -361,14 +382,14 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_11_denom
+      alias: _int_pqi_12_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 11 measure calculation.
-    
+      Denominator for PQI 12 measure calculation.
+
   - name: ahrq_measures__int_pqi_12_exclusions
     config:
       schema: |
@@ -401,7 +422,7 @@ models:
     description: >
       Numerator for PQI 12 measure calculation.
 
-  - name: ahrq_measures__int_pqi_12_denom
+  - name: ahrq_measures__int_pqi_14_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -409,13 +430,13 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_12_denom
+      alias: _int_pqi_14_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 12 measure calculation.
+      Denominator for PQI 14 measure calculation.
     
   - name: ahrq_measures__int_pqi_14_exclusions
     config:
@@ -449,7 +470,7 @@ models:
     description: >
       Numerator for PQI 14 measure calculation.
 
-  - name: ahrq_measures__int_pqi_14_denom
+  - name: ahrq_measures__int_pqi_15_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -457,14 +478,14 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_14_denom
+      alias: _int_pqi_15_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 14 measure calculation.
-    
+      Denominator for PQI 15 measure calculation.
+
   - name: ahrq_measures__int_pqi_15_exclusions
     config:
       schema: |
@@ -497,7 +518,7 @@ models:
     description: >
       Numerator for PQI 15 measure calculation.
 
-  - name: ahrq_measures__int_pqi_15_denom
+  - name: ahrq_measures__int_pqi_16_denom
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
@@ -505,14 +526,14 @@ models:
         {% else %}
           ahrq_measures
         {%- endif -%}
-      alias: _int_pqi_15_denom
+      alias: _int_pqi_16_denom
       tags: 
         - ahrq_measures
         - pqi
       materialized: view
     description: >
-      Denominator for PQI 15 measure calculation.
-    
+      Denominator for PQI 16 measure calculation.
+
   - name: ahrq_measures__int_pqi_16_exclusions
     config:
       schema: |
@@ -545,21 +566,6 @@ models:
     description: >
       Numerator for PQI 16 measure calculation.
 
-  - name: ahrq_measures__int_pqi_16_denom
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {var('tuva_schema_prefix')}_ahrq_measures
-        {% else %}
-          ahrq_measures
-        {%- endif -%}
-      alias: _int_pqi_16_denom
-      tags: 
-        - ahrq_measures
-        - pqi
-      materialized: view
-    description: >
-      Denominator for PQI 16 measure calculation.
     
   - name: ahrq_measures__int_pqi_shared_exclusion_missing_age
     config:
@@ -674,6 +680,8 @@ models:
     description: >
       Union of all exclusion criteria used across PQI measures for consistent exclusion logic.
 
+## Staging
+
   - name: ahrq_measures__stg_pqi_inpatient_encounter
     config:
       schema: |
@@ -686,6 +694,6 @@ models:
       tags: 
         - ahrq_measures
         - pqi
-      materialized: table
+      materialized: ephemeral
     description: >
       Staging table for PQI inpatient encounters, serving as the basis for further PQI measure calculations.

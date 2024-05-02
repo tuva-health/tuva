@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('pqi_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+   )
+}}
+
 with kidney as (
     select distinct
         encounter_id
@@ -80,4 +85,5 @@ select
       partition by encounter_id, data_source 
       order by exclusion_reason
     ) as exclusion_number
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from union_cte

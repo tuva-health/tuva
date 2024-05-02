@@ -1,3 +1,7 @@
+{{ config(
+     enabled = var('pqi_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+   )
+}}
 
 with num as (
 select data_source
@@ -27,6 +31,7 @@ select d.data_source,
        d.denom_count,
        coalesce(num.num_count, 0) as num_count,
        coalesce(num.num_count, 0)/d.denom_count*100000 as "rate_per_100_thousand"
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 from denom d
 left join num 
     on d.pqi_number = num.pqi_number
