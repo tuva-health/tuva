@@ -70,6 +70,10 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_to_atc:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
+      terminology__snomed_ct:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','snomed_ct.csv',compression=true,null_marker=true) }}"
+      terminology__snomed_ct_transitive_closures:
+        +post-hook: "{{ load_seed('tuva-public-resources/terminology','snomed_ct_transitive_closures.csv',compression=true,null_marker=true) }}"
       terminology__snomed_icd_10_map:
         +post-hook: "{{ load_seed('tuva-public-resources/terminology','snomed_icd_10_map.csv',compression=true,null_marker=true) }}"
     value_sets:
