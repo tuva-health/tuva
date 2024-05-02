@@ -124,7 +124,7 @@ with denominator as (
     from denominator
     left join retinopathy_last_year
     on retinopathy_last_year.patient_id = denominator.patient_id
-    and retinopathy_last_year.patient_id is null
+    where retinopathy_last_year.patient_id is null
 
 )
 
