@@ -3,247 +3,265 @@
    )
 }}
 
-/*
-    Eligible population from the denominator model before exclusions
-*/
-with denominator as (
+{%- set performance_period_begin -%}
+(
+  select 
+    performance_period_begin
+  from {{ ref('quality_measures__int_nqf2372__performance_period') }}
 
-    select
-          patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
-    from {{ ref('quality_measures__int_nqf2372_denominator') }}
+)
+{%- endset -%}
+
+{%- set performance_period_end -%}
+(
+  select 
+    performance_period_end
+  from {{ ref('quality_measures__int_nqf2372__performance_period') }}
+
+)
+{%- endset -%}
+
+with frailty as (
+
+  select
+    *
+  from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
+  where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
-, advanced_illness as (
+, valid_mastectomy_patients as (
 
     select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from {{ ref('quality_measures__int_nqf2372_exclude_advanced_illness') }}
-
-)
-
-, dementia as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from {{ ref('quality_measures__int_nqf2372_exclude_dementia') }}
-
-)
-
-, hospice as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from {{ ref('quality_measures__int_nqf2372_exclude_hospice') }}
-
-)
-
-, institutional as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
-    from {{ ref('quality_measures__int_nqf2372_exclude_institutional') }}
-
-)
-
-, mastectomy as (
-
-    select
-          patient_id
-        , exclusion_date
-        , exclusion_reason
+        patient_id
+      , exclusion_date
+      , exclusion_reason
     from {{ ref('quality_measures__int_nqf2372_exclude_mastectomy') }}
+)
+
+, valid_hospice_palliative as (
+
+  select
+      patient_id
+    , exclusion_date
+    , exclusion_reason
+    , exclusion_type
+  from {{ref('quality_measures__int_shared_exclusions_hospice_palliative')}}
+  where lower(exclusion_reason) in 
+  (
+        'palliative care encounter'
+      , 'palliative care intervention'
+      , 'hospice care ambulatory'
+      , 'hospice encounter'
+  )
+  and
+  exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
-, palliative as (
+, valid_institutional_snp as (
+
+  select 
+      patient_id
+    , exclusion_date
+    , exclusion_reason
+    , exclusion_type
+  from {{ref('quality_measures__int_shared_exclusions_institutional_snp')}}
+  where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
+
+)
+
+, valid_dementia_exclusions as (
+
+  select
+      source.patient_id
+    , source.exclusion_date
+    , source.exclusion_reason
+    , source.exclusion_type
+  from {{ref('quality_measures__int_shared_exclusions_dementia')}} source
+  inner join frailty
+    on source.patient_id = frailty.patient_id
+  where (
+    source.dispensing_date
+      between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp= performance_period_begin ) }}
+          and {{ performance_period_end }}
+    or source.paid_date
+      between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp= performance_period_begin ) }}
+          and {{ performance_period_end }}
+    )
+
+)
+
+-- advanced illness start
+, advanced_illness_exclusion as (
+
+  select
+    source.*
+  from {{ ref('quality_measures__int_shared_exclusions_advanced_illness') }} as source
+  inner join frailty
+    on source.patient_id = frailty.patient_id
+  where source.exclusion_date
+    between
+      {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp=performance_period_begin) }}
+      and {{ performance_period_end }}
+
+)
+
+, acute_inpatient_advanced_illness as (
+
+  select
+    *
+  from advanced_illness_exclusion
+  where patient_type = 'acute_inpatient'
+
+)
+
+, nonacute_outpatient_advanced_illness as (
+
+  select
+    *
+  from advanced_illness_exclusion
+  where patient_type = 'nonacute_outpatient'
+
+)
+
+, acute_inpatient_counts as (
 
     select
           patient_id
-        , exclusion_date
-        , exclusion_reason
-    from {{ ref('quality_measures__int_nqf2372_exclude_palliative') }}
+        , exclusion_type
+        , count(distinct exclusion_date) as encounter_count
+    from acute_inpatient_advanced_illness
+    group by patient_id, exclusion_type
 
 )
 
-, denominator_with_advanced_illness as (
+, nonacute_outpatient_counts as (
 
     select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , case
-            when advanced_illness.patient_id is not null then 1
-            else 0
-          end as exclusion_flag
-        , advanced_illness.exclusion_date
-        , advanced_illness.exclusion_reason
-    from denominator
-         left join advanced_illness
-            on denominator.patient_id = advanced_illness.patient_id
+          patient_id
+        , exclusion_type
+        , count(distinct exclusion_date) as encounter_count
+    from nonacute_outpatient_advanced_illness
+    group by patient_id, exclusion_type
 
 )
 
-, denominator_with_dementia as (
+, valid_advanced_illness_exclusions as (
 
     select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , case
-            when dementia.patient_id is not null then 1
-            else 0
-          end as exclusion_flag
-        , dementia.exclusion_date
-        , dementia.exclusion_reason
-    from denominator
-         left join dementia
-            on denominator.patient_id = dementia.patient_id
+          acute_inpatient_advanced_illness.patient_id
+        , acute_inpatient_advanced_illness.exclusion_date
+        , acute_inpatient_advanced_illness.exclusion_reason
+        , acute_inpatient_advanced_illness.exclusion_type
+    from acute_inpatient_advanced_illness
+    left join acute_inpatient_counts
+      on acute_inpatient_advanced_illness.patient_id = acute_inpatient_counts.patient_id
+    where acute_inpatient_counts.encounter_count >= 1
 
-)
-
-, denominator_with_hospice as (
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , case
-            when hospice.patient_id is not null then 1
-            else 0
-          end as exclusion_flag
-        , hospice.exclusion_date
-        , hospice.exclusion_reason
-    from denominator
-         left join hospice
-            on denominator.patient_id = hospice.patient_id
-
-)
-
-, denominator_with_institutional as (
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , case
-            when institutional.patient_id is not null then 1
-            else 0
-          end as exclusion_flag
-        , institutional.exclusion_date
-        , institutional.exclusion_reason
-    from denominator
-         left join institutional
-            on denominator.patient_id = institutional.patient_id
-
-)
-
-, denominator_with_mastectomy as (
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , case
-            when mastectomy.patient_id is not null then 1
-            else 0
-          end as exclusion_flag
-        , mastectomy.exclusion_date
-        , mastectomy.exclusion_reason
-    from denominator
-         left join mastectomy
-            on denominator.patient_id = mastectomy.patient_id
-
-)
-
-, denominator_with_palliative as (
-
-    select
-          denominator.patient_id
-        , denominator.performance_period_begin
-        , denominator.performance_period_end
-        , denominator.measure_id
-        , denominator.measure_name
-        , denominator.measure_version
-        , case
-            when palliative.patient_id is not null then 1
-            else 0
-          end as exclusion_flag
-        , palliative.exclusion_date
-        , palliative.exclusion_reason
-    from denominator
-         left join palliative
-            on denominator.patient_id = palliative.patient_id
-
-)
-
-, exclusions_unioned as (
-
-    select * from denominator_with_advanced_illness
     union all
-    select * from denominator_with_dementia
+
+    select
+        nonacute_outpatient_advanced_illness.patient_id
+      , nonacute_outpatient_advanced_illness.exclusion_date
+      , nonacute_outpatient_advanced_illness.exclusion_reason
+      , nonacute_outpatient_advanced_illness.exclusion_type
+    from nonacute_outpatient_advanced_illness
+    left join nonacute_outpatient_counts
+      on nonacute_outpatient_advanced_illness.patient_id = nonacute_outpatient_counts.patient_id
+    where nonacute_outpatient_counts.encounter_count >= 2
+
+)
+-- advanced illness end
+
+, valid_mastectomy_patients_with_exclusion_type as (
+
+    select
+        patient_id
+      , exclusion_date
+      , exclusion_reason
+      , 'mastectomy_performed' as exclusion_type
+    from valid_mastectomy_patients
+)
+
+, exclusions as (
+
+    select * from valid_advanced_illness_exclusions
+
     union all
-    select * from denominator_with_hospice
+
+    select * from valid_dementia_exclusions
+
     union all
-    select * from denominator_with_institutional
+
+    select * from valid_institutional_snp
+
     union all
-    select * from denominator_with_mastectomy
+
+    select * from valid_hospice_palliative
+
+)
+
+, combined_exclusions as (
+
+    select 
+      exclusions.*
+    , denominator.age
+    from exclusions
+    inner join {{ ref('quality_measures__int_nqf2372_denominator') }} denominator
+      on exclusions.patient_id = denominator.patient_id
+
+)
+
+, valid_exclusions as (
+
+  select
+        patient_id
+      , exclusion_date
+      , exclusion_reason
+      , exclusion_type
+  from combined_exclusions
+  where exclusion_type != 'hospice_palliative' 
+    and age >= 66
+
+  union all
+
+  select
+        patient_id
+      , exclusion_date
+      , exclusion_reason
+      , exclusion_type
+  from combined_exclusions
+  where exclusion_type = 'hospice_palliative'
+
+)
+
+, valid_exclusions_with_mastectomy as (
+
+    select *
+    from valid_exclusions
+
     union all
-    select * from denominator_with_palliative
+
+    select *
+    from valid_mastectomy_patients_with_exclusion_type
 
 )
 
 , add_data_types as (
 
     select
+        distinct
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(performance_period_begin as date) as performance_period_begin
-        , cast(performance_period_end as date) as performance_period_end
-        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
-        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
-        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
-        , cast(exclusion_flag as integer) as exclusion_flag
-    from exclusions_unioned
+        , 1 as exclusion_flag
+    from valid_exclusions_with_mastectomy
 
 )
 
 select
       patient_id
-    , performance_period_begin
-    , performance_period_end
-    , measure_id
-    , measure_name
-    , measure_version
     , exclusion_date
     , exclusion_reason
     , exclusion_flag

@@ -44,11 +44,6 @@ with patient as (
 
     select
           patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
         , exclusion_date
         , exclusion_reason
         , exclusion_flag

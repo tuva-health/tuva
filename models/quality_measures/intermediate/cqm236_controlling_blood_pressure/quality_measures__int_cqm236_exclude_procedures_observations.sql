@@ -131,6 +131,7 @@ with denominator as (
           end as is_pregnant
         , denominator.performance_period_begin
         , denominator.performance_period_end
+        , denominator.age
     from exclusions_unioned
     inner join denominator
         on exclusions_unioned.patient_id = denominator.patient_id
@@ -161,6 +162,8 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
+    , age
+    , 'measure specific exclusion for observation procedure' as exclusion_type
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     exclusions_filtered
