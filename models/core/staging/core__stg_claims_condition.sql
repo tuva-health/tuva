@@ -18,7 +18,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_1 as source_code
@@ -37,7 +37,7 @@ select
            , claim_start_date
 	       , discharge_date
 	       , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_2 as source_code
@@ -56,7 +56,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_3 as source_code
@@ -75,7 +75,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_4 as source_code
@@ -94,7 +94,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_5 as source_code
@@ -113,7 +113,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_6 as source_code
@@ -132,7 +132,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_7 as source_code
@@ -151,7 +151,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_8 as source_code
@@ -170,7 +170,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_9 as source_code
@@ -189,7 +189,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_10 as source_code
@@ -208,7 +208,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_11 as source_code
@@ -227,7 +227,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_12 as source_code
@@ -246,7 +246,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_13 as source_code
@@ -265,7 +265,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_14 as source_code
@@ -284,7 +284,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_15 as source_code
@@ -303,7 +303,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_16 as source_code
@@ -322,7 +322,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_17 as source_code
@@ -341,7 +341,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_18 as source_code
@@ -360,7 +360,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_19 as source_code
@@ -379,7 +379,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_20 as source_code
@@ -398,7 +398,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_21 as source_code
@@ -417,7 +417,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_22 as source_code
@@ -436,7 +436,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_23 as source_code
@@ -455,7 +455,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_24 as source_code
@@ -474,7 +474,7 @@ select
            , claim_start_date
            , discharge_date
            , claim_end_date
-    ) as condition_date
+    ) as recorded_date
   , 'discharge_diagnosis' as condition_type
   , diagnosis_code_type as source_code_type
   , diagnosis_code_25 as source_code
@@ -491,7 +491,7 @@ select distinct
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
-    , {{ try_to_cast_date('unpivot_cte.condition_date', 'YYYY-MM-DD') }} as recorded_date
+    , {{ try_to_cast_date('unpivot_cte.recorded_date', 'YYYY-MM-DD') }} as recorded_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as onset_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as resolved_date
     , cast('active' as {{ dbt.type_string() }} ) as status

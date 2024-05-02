@@ -115,7 +115,7 @@ with egfr_labs as (
           patient_id
         , data_source
         , code_type
-        , code
+        , code as lab_code
         , result_date
         , result
         , case
@@ -124,6 +124,13 @@ with egfr_labs as (
             when result between 30 and 44 then '328'
             when result between 45 and 59 then '329'
           end as hcc_code
+        , 'eGFR ('
+            || code
+            || ') result '
+            || cast(result as {{ dbt.type_string() }})
+            || ' on '
+            || result_date
+          as contributing_factor
     from eligible_labs
     where row_num = 1
 
@@ -143,8 +150,9 @@ with egfr_labs as (
         , unioned.data_source
         , unioned.result_date
         , unioned.result
-        , unioned.code as lab_code
+        , unioned.lab_code
         , unioned.hcc_code
+        , unioned.contributing_factor
         , seed_hcc_descriptions.hcc_description
         , billed_hccs.current_year_billed
     from unioned
@@ -154,6 +162,24 @@ with egfr_labs as (
             on unioned.patient_id = billed_hccs.patient_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
+
+)
+
+, add_standard_fields as (
+
+    select
+          patient_id
+        , data_source
+        , result_date
+        , result
+        , lab_code
+        , hcc_code
+        , hcc_description
+        , contributing_factor
+        , current_year_billed
+        , cast('Lab result suspect' as {{ dbt.type_string() }}) as reason
+        , result_date as suspect_date
+    from add_billed_flag
 
 )
 
@@ -168,7 +194,10 @@ with egfr_labs as (
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(current_year_billed as boolean) as current_year_billed
-    from add_billed_flag
+        , cast(reason as {{ dbt.type_string() }}) as reason
+        , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
+        , cast(suspect_date as date) as suspect_date
+    from add_standard_fields
 
 )
 
@@ -181,5 +210,8 @@ select
     , hcc_code
     , hcc_description
     , current_year_billed
+    , reason
+    , contributing_factor
+    , suspect_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

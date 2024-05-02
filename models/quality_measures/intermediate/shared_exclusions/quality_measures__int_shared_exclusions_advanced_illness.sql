@@ -153,7 +153,7 @@ with patients_with_frailty as (
             on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
-    where med_claim_exclusions.concept_name = 'acute inpatient'
+    where lower(med_claim_exclusions.concept_name) = 'acute inpatient'
 
     union all
 

@@ -15,13 +15,14 @@
 with patient_stage as(
     select
         patient_id
+        ,first_name
+        ,last_name
         ,gender
         ,race
         ,birth_date
         ,death_date
         ,death_flag
-        ,first_name
-        ,last_name
+        ,social_security_number
         ,address
         ,city
         ,state
@@ -46,6 +47,7 @@ select
     , cast(birth_date as date) as birth_date
     , cast(death_date as date) as death_date
     , cast(death_flag as int) as death_flag
+    , cast(social_security_number as {{ dbt.type_string() }}) as social_security_number
     , cast(address as {{ dbt.type_string() }}) as address
     , cast(city as {{ dbt.type_string() }}) as city
     , cast(state as {{ dbt.type_string() }}) as state

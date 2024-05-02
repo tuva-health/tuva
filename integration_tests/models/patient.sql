@@ -7,6 +7,7 @@ cast(null as {{ dbt.type_string() }} ) as patient_id
 , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as birth_date
 , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as death_date
 , cast(null as {{ dbt.type_int() }} ) as death_flag
+, cast(null as {{ dbt.type_string() }} ) as social_security_number
 , cast(null as {{ dbt.type_string() }} ) as address
 , cast(null as {{ dbt.type_string() }} ) as city
 , cast(null as {{ dbt.type_string() }} ) as state

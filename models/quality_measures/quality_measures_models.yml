@@ -215,16 +215,6 @@ models:
     description: >
       Performance Period definition for Breast Cancer screening.
 
-  - name: quality_measures__int_nqf2372__frailty
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372__frailty
-      tags: quality_measures
-      materialized: view
-    description: >
-      Exclusion logic for patients with frailty used by other exclusion models.
-
   - name: quality_measures__int_nqf2372_denominator
     config:
       schema: |
@@ -250,96 +240,14 @@ models:
         description: Name of the measure.
       - name: measure_version
         description: Version of the measure.
+      - name: performance_period_lookback
+        description: Lookback period of NQF2372.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
           may be counted as eligible to meet a measure’s inclusion requirements.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_nqf2372_exclude_advanced_illness
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_advanced_illness
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_dementia
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_dementia
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and taking dementia medications
-      for the reporting version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_hospice
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_hospice
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using hospice services for the reporting 
-      version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_institutional
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_institutional
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients staying in an institution for the reporting 
-      version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
 
   - name: quality_measures__int_nqf2372_exclude_mastectomy
     config:
@@ -361,27 +269,8 @@ models:
         description: >
           Reason (usually the value set concept name) that excludes patient 
           from the measure.
-
-  - name: quality_measures__int_nqf2372_exclude_palliative
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf2372_exclude_palliative
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using palliative services for the reporting 
-      version of NQF 2372, Breast Cancer Screening.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf2372_exclusions
     config:
@@ -396,16 +285,6 @@ models:
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -508,7 +387,7 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  ### Colorectal Cancer Screening
+### Colorectal Cancer Screening
   - name: quality_measures__int_nqf0034_denominator
     config:
       schema: |
@@ -518,19 +397,17 @@ models:
       materialized: table
     description: >
       Denominator logic for the reporting version of NQF 0034, Colorectal Cancer 
-      Screening.    
-
-  - name: quality_measures__int_nqf0034_exclude_advanced_illness
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_advanced_illness
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 0034, Colorectal Cancer Screening.     
-
+      Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: min_age
+        description: Patient's minumum age during encounter as of the performance_period.
+      - name: max_age
+        description: Patient's maximum age during encounter as of the performance_period.
+      - name: qualifying_types
+        description: Indicative letter of patient's type of encounter.
+      
   - name: quality_measures__int_nqf0034_exclude_colectomy_cancer
     config:
       schema: |
@@ -540,41 +417,19 @@ models:
       materialized: table
     description: >
       Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of NQF 0034, Colorectal Cancer Screening.     
-
-  - name: quality_measures__int_nqf0034_exclude_dementia
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_dementia
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and taking dementia medications
-      for the reporting version of NQF 0034, Colorectal Cancer Screening.
-
-  - name: quality_measures__int_nqf0034_exclude_hospice_palliative
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_hospice_palliative
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using hospice or palliative services for the reporting 
-      version of NQF 0034, Colorectal Cancer Screening.     
-
-  - name: quality_measures__int_nqf0034_exclude_institutional_snp
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034_exclude_institutional_snp
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients staying in an institution for the reporting 
-      version of NQF 0034, Colorectal Cancer Screening.      
-      
+      the reporting version of NQF 0034, Colorectal Cancer Screening.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_type
+        description: Measure specific exclusion for historical record of colectomy cancer.
+      - name: tuva_last_run 
+        desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0034_exclusions
     config:
@@ -585,6 +440,23 @@ models:
       materialized: table
     description: >
       Combined exclusion logic for the reporting version of NQF 0034, Colorectal Cancer Screening.      
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0034_long
     config:
@@ -595,8 +467,50 @@ models:
       materialized: table
     description: >
       Final preparation of the reporting version of NQF 0034, Colorectal Cancer Screening
-      before combining with other measures.      
-
+      before combining with other measures.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+      
   - name: quality_measures__int_nqf0034_numerator
     config:
       schema: |
@@ -607,16 +521,15 @@ models:
     description: >
       Numerator logic for the reporting version of NQF 0034,
       Colorectal Cancer Screening
-
-  - name: quality_measures__int_nqf0034__frailty
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0034__frailty
-      tags: quality_measures
-      materialized: view
-    description: >
-      Frailty definition for nqf 0034 colorectal cancer screening used in multiple exclusions
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence
+        description: Reason (usually the value set concept name) that includes patient 
+          from the measure.
 
   - name: quality_measures__int_nqf0034__performance_period
     config:
@@ -627,6 +540,7 @@ models:
       materialized: view
     description: >
       Performance Period definition for NQF 0034 Colorectal Cancer screening.
+    
 ### Diabetes Hemoglobin a1c
   - name: quality_measures__int_nqf0059__performance_period
     config:
@@ -826,96 +740,6 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  - name: quality_measures__int_cqm236_exclude_hospice_palliative
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm236_exclude_hospice_palliative
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients using hospice and palliative services for the reporting 
-      version of CQM 236, Controlling Blood Pressure.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_cqm236_exclude_institutional_snp
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm236_exclude_institutional_snp
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients staying in an institution for the reporting 
-      version of CQM 236, Controlling Blood Pressure.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-
-  - name: quality_measures__int_cqm236__frailty
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm236__frailty
-      tags: quality_measures
-      materialized: view
-    description: >
-      Exclusion logic for patients with frailty used by other exclusion models.
-
-  - name: quality_measures__int_cqm236_exclude_dementia
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm236_exclude_dementia
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and taking dementia medications
-      for the reporting version of CQM 236, Controlling Blood Pressure.
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: exclusion_date
-        description: >
-          Date of event or service that excludes patient from the measure.
-      - name: exclusion_reason
-        description: >
-          Reason (usually the value set concept name) that excludes patient 
-          from the measure.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-  
-  - name: quality_measures__int_cqm236_exclude_advanced_illness
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm236_exclude_advanced_illness
-      tags: quality_measures
-      materialized: table
-    description: >
-      Exclusion logic for patients with frailty and advanced illness for 
-      the reporting version of CQM 236, Controlling Blood Pressure.
-
   - name: quality_measures__int_cqm236_exclude_procedures_observations
     config:
       schema: |
@@ -939,16 +763,6 @@ models:
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -1072,6 +886,8 @@ models:
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
+      - name: recorded_date
+        description: Date of incident/fracture recorded.
       - name: age
         description: Patient's age as of the performance_period_begin date.
       - name: performance_period_begin
@@ -1116,6 +932,9 @@ models:
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
       - name: numerator_flag
         description: >
           The numerator reflects the subset of patients in the denominator 
@@ -1164,29 +983,15 @@ models:
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
-      - name: evidence_date
-        description: >
-          Date of event or service that places patient in the numerator.
-      - name: evidence_value
-        description: >
-          Observed evidence value for the patients in the numerator.
-      - name: numerator_flag
-        description: >
-          The numerator reflects the subset of patients in the denominator 
-          for whom a particular service has been provided or for whom a 
-          particular outcome has been achieved.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
+      - name: exclusion_date
+        description: Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_type
+        description: measure specific exclusion for procedure medication.
+      - name: tuva_last_run 
+        desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0053_long
     config:
