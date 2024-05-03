@@ -91,40 +91,59 @@ with denominator as (
 
 )
 
-, retinopathy_last_year as (
+, retinopathy_conditions as (
 
-    select 
-          conditions.patient_id
-        , conditions.recorded_date
-        , conditions.code_type
-        , conditions.code
+    select
+        conditions.patient_id
+      , conditions.recorded_date
+      , conditions.code
+      , conditions.code_type
     from conditions
     inner join retina_test_code
     on conditions.code = retina_test_code.code
-        and conditions.code_type = retina_test_code.code_system
-            and lower(retina_test_code.concept_name) = 'diabetic retinopathy'
-    inner join {{ ref('quality_measures__int_cbe0055__performance_period') }} pp
-        on recorded_date between
+    and conditions.code_type = retina_test_code.code_system
+    and lower(retina_test_code.concept_name) = 'diabetic retinopathy'
+)
+
+, retinopathy_last_year as (
+
+    select 
+          denominator.patient_id
+        , retinopathy_conditions.recorded_date
+        , retinopathy_conditions.code_type
+        , retinopathy_conditions.code
+        , case
+          when
+              retinopathy_conditions.recorded_date between
                 {{ dbt.dateadd (
                 datepart = "year"
                 , interval = -1
-                , from_date_or_timestamp = "pp.performance_period_begin"
+                , from_date_or_timestamp = "denominator.performance_period_begin"
                 )
                 }}
-                and 
-                pp.performance_period_begin
+                and
+                denominator.performance_period_begin
+          then
+              1
+          else
+              0
+          end as retinopathy_last_year_flag
+    from denominator
+    left join retinopathy_conditions
+    on denominator.patient_id = retinopathy_conditions.patient_id
+    left join retina_test_code
+    on retinopathy_conditions.code = retina_test_code.code
+        and retinopathy_conditions.code_type = retina_test_code.code_system
 
 )
 
 , no_retinopathy_last_year as (
 
     select 
-        denominator.patient_id
+        retinopathy_last_year.patient_id
       , cast(null as date) as recorded_date
-    from denominator
-    left join retinopathy_last_year
-    on retinopathy_last_year.patient_id = denominator.patient_id
-    where retinopathy_last_year.patient_id is null
+    from retinopathy_last_year
+    where retinopathy_last_year_flag = 0
 
 )
 
