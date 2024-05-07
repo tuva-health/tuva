@@ -228,8 +228,8 @@ with frailty as (
     , denominator.age
   from frailty
   inner join denominator
-    where frailty.patient_id = denominator.patient_id
-      and denominator.age >= 81
+  on frailty.patient_id = denominator.patient_id
+    where denominator.age >= 81
 
 )
 
