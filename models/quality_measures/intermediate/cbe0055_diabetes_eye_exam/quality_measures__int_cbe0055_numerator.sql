@@ -53,21 +53,50 @@ with denominator as (
 
 )
 
-, qualifying_patients_for_procedure as (
+, qualifying_procedure as (
 
     select 
           procedures.patient_id
-        , procedure_date
+        , procedures.procedure_date
         , procedures.code_type
         , procedures.code
+        , retina_test_code.concept_name
     from procedures
     inner join {{ ref('quality_measures__int_cbe0055__performance_period') }} pp
     on procedure_date between
         performance_period_begin and performance_period_end
-
     inner join retina_test_code
         on procedures.code = retina_test_code.code
             and procedures.code_type = retina_test_code.code_system
+
+)
+
+, qualifying_patients_for_procedure as (
+    select 
+          patient_id
+        , procedure_date
+        , code_type
+        , code
+        , concept_name
+    from qualifying_procedure
+    where lower(concept_name) in ( 
+                        'diabetic retinal eye exam met' 
+                      , 'retinal or dilated eye exam'
+                      )
+
+)
+
+, qualifying_patients_with_ophthalm_consult as (
+
+    select 
+        qualifying_procedure.patient_id,
+        qualifying_procedure.procedure_date,
+        qualifying_procedure.code_type,
+        qualifying_procedure.code
+    from qualifying_procedure
+    inner join qualifying_patients_for_procedure
+        on qualifying_procedure.patient_id = qualifying_patients_for_procedure.patient_id
+        and lower(qualifying_procedure.concept_name) = 'ophthalmological services'
 
 )
 
@@ -101,8 +130,8 @@ with denominator as (
     from conditions
     inner join retina_test_code
     on conditions.code = retina_test_code.code
-    and conditions.code_type = retina_test_code.code_system
-    and lower(retina_test_code.concept_name) = 'diabetic retinopathy'
+      and conditions.code_type = retina_test_code.code_system
+        and lower(retina_test_code.concept_name) = 'diabetic retinopathy'
 )
 
 , retinopathy_last_year as (
@@ -150,9 +179,9 @@ with denominator as (
 , qualifying_patients as (
 
     select 
-          qualifying_patients_for_procedure.patient_id
-        , qualifying_patients_for_procedure.procedure_date as evidence_date
-    from qualifying_patients_for_procedure
+          qualifying_patients_with_ophthalm_consult.patient_id
+        , qualifying_patients_with_ophthalm_consult.procedure_date as evidence_date
+    from qualifying_patients_with_ophthalm_consult
 
     union all
 
