@@ -7,8 +7,15 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+**Describe the bug - Required**
 A clear and concise description of what the bug is.
+
+**Environment - Required**
+* Tuva project package version (e.g. 0.6.0):
+* dbt version (e.g. 1.7):
+* dbt type (e.g. dbt cloud or dbt CLI):
+* Data warehouse (e.g. Snowflake):
+
 
 **To Reproduce**
 Steps to reproduce the behavior:
@@ -22,10 +29,6 @@ A clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
-
-**Environment**
-* Package version (e.g. 0.6.0):
-* Data warehouse (e.g. Snowflake):
 
 **Additional context**
 Add any other context about the problem here.
