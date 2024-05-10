@@ -164,6 +164,9 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
         cms_hcc__payment_hcc_count_factors:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_payment_hcc_count_factors.csv',compression=true,null_marker=true) }}"
+      data_quality:
+        data_quality__test_catalog:
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','data_quality_test_catalog.csv',compression=true,null_marker=true) }}"
       ed_classification:
         ed_classification__categories:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','ed_classification_categories.csv',compression=true,null_marker=true) }}"
@@ -210,3 +213,6 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','specialty_cohort.csv',compression=true,null_marker=true) }}"
         readmissions__surgery_gyncology_cohort:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','surgery_gyncology_cohort.csv',compression=true,null_marker=true) }}"
+      service_categories:
+        service_category__service_categories:
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','service_category_service_categories.csv',compression=true,null_marker=true) }}"
