@@ -134,6 +134,7 @@ seeds:
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
       alias: _value_set_specialty_cohort
       tags: readmissions
+      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         ccs : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -143,7 +144,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         procedure_or_diagnosis : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-      enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+
 
   - name: readmissions__surgery_gynecology_cohort
     config:
