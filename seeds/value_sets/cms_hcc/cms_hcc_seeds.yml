@@ -12,7 +12,14 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
-        coefficient: float
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        payment_year: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        normalization_factor: |
+         {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ma_coding_pattern_adjustment: |
+         {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: cms_hcc__cpt_hcpcs
     description: >
@@ -43,7 +50,29 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
-        coefficient: float
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        factor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        enrollment_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        plan_segment: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        gender: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        age_group: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        medicaid_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        dual_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        orec: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        institutional_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: |
+          float
+          
 
   - name: cms_hcc__disabled_interaction_factors
     description: > 
@@ -56,9 +85,23 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        factor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        enrollment_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        institutional_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        short_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hcc_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        coefficient: float
+        coefficient: |
+          float
+          
 
   - name: cms_hcc__disease_factors
     description: >
@@ -71,9 +114,26 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        factor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        enrollment_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        medicaid_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        dual_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        orec: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        institutional_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hcc_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        coefficient: float
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: |
+          float
 
   - name: cms_hcc__disease_hierarchy
     description: >
@@ -91,6 +151,7 @@ seeds:
         hccs_to_exclude: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
+
   - name: cms_hcc__disease_interaction_factors
     description: >
       Disease interaction factors by model version and risk segment. Extracted 
@@ -102,11 +163,30 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        factor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        enrollment_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        medicaid_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        dual_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        orec: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        institutional_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        short_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hcc_code_1: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hcc_code_2: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        coefficient: float
+        coefficient: |
+          float
 
   - name: cms_hcc__enrollment_interaction_factors
     description: >
@@ -119,7 +199,25 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
-        coefficient: float
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        factor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        gender: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        enrollment_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        medicaid_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        dual_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        institutional_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: |
+          float
+          
 
   - name: cms_hcc__icd_10_cm_mappings
     description: >
@@ -156,4 +254,23 @@ seeds:
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
-        coefficient: float
+        model_version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        factor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        enrollment_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        medicaid_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        dual_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        orec: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        institutional_status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        payment_hcc_count: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        coefficient: |
+          float

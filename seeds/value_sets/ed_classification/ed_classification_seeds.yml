@@ -10,13 +10,15 @@ seeds:
       alias: _value_set_categories
       tags: ed_classification
       enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
-    columns:
-      - name: classification
-        description: code for classification
-      - name: classification_name
-        description: human readable name for classification
-      - name: classification_order
-        description: Sortable column that organizes the ED classes
+      column_types:
+        classification : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        classification_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        classification_order : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        classification_column : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: ed_classification__icd_10_cm_to_ccs
     config:
@@ -24,6 +26,7 @@ seeds:
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
       alias: _value_set_icd_10_cm_to_ccs
       tags: ed_classification
+      enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
         icd_10_cm : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -33,7 +36,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccs_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-      enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+
 
   - name: ed_classification__johnston_icd9
     description: A probabilistic mapping of icd9 codes to ed classification categories

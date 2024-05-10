@@ -1,14 +1,6 @@
 version: 2
 
 seeds:
-  - name: quality_measures__measures
-    description: Overview of reporting measures.
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _value_set_measures
-      tags: quality_measures
-      enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
 
   - name: quality_measures__concepts
     description: Measures to concepts crosswalk. List of concepts used in each reporting measure.
@@ -18,6 +10,36 @@ seeds:
       alias: _value_set_concepts
       tags: quality_measures
       enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        concept_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        concept_oid: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        measure_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        measure_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          
+
+  - name: quality_measures__measures
+    description: Overview of reporting measures.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _value_set_measures
+      tags: quality_measures
+      enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        version: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        steward: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: quality_measures__value_sets
     description: Concepts to value sets crosswalk. List of codes in each concept.
@@ -28,5 +50,11 @@ seeds:
       tags: quality_measures
       enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
+        concept_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        concept_oid: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        code_system: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}

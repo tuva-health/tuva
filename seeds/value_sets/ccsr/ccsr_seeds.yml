@@ -1,6 +1,26 @@
 version: 2
 
 seeds:
+  - name: ccsr__dxccsr_v2023_1_body_systems
+    description: |
+      A table containing descriptions of the top level categories used in the CCSR condition mapper.
+      This was manually exctracted from the User Guide PDF included with the DXCCSR SAS program.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+      alias: _value_set_dxccsr_v2023_1_body_systems
+      tags:
+        - ccsr
+      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        body_system: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ccsr_parent_category: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        parent_category_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    
+
   - name: ccsr__dxccsr_v2023_1_cleaned_map
     description: A table containing the CSV mapping file included with the DXCCSR SAS program.
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
@@ -73,18 +93,3 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         clinical_domain: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-                    
-
-
-
-  - name: ccsr__dxccsr_v2023_1_body_systems
-    description: |
-      A table containing descriptions of the top level categories used in the CCSR condition mapper.
-      This was manually exctracted from the User Guide PDF included with the DXCCSR SAS program.
-    config:
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
-      alias: _value_set_dxccsr_v2023_1_body_systems
-      tags:
-        - ccsr
-      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
