@@ -109,7 +109,7 @@ seeds:
       terminology__present_on_admission:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','present_on_admission.csv',compression=true,null_marker=true) }}"
       terminology__provider:
-        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','provider.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_provider_data/0_8_1','provider.csv',compression=true,null_marker=true) }}"
       terminology__race:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','race.csv',compression=true,null_marker=true) }}"
       terminology__revenue_center:
