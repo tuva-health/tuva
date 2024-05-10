@@ -17,7 +17,7 @@ seeds:
         payment_year: |
           integer
         normalization_factor: |
-         {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          numeric
         ma_coding_pattern_adjustment: |
          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
