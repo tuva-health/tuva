@@ -22,7 +22,7 @@ with denominator as (
           code
         , code_system
         , concept_name
-    From {{ref('quality_measures__value_sets')}}
+    from {{ref('quality_measures__value_sets')}}
     where lower(concept_name) in  (
           'diabetic retinal eye exam met'
         , 'retinal or dilated eye exam'
