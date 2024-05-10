@@ -13,12 +13,11 @@ with visit_codes as (
           'office visit'
         , 'home healthcare services'
         , 'preventive care services established office visit, 18 and up'
-        , 'preventive care services initial office visit, 18 and up'
-        , 'annual wellness visit'
-        , 'telephone visits'
-        , 'emergency department evaluation and management visit'
         , 'outpatient'
         , 'observation'
+        , 'diabetes visit'
+        , 'ophthalmological services'
+        , 'diabetic retinopathy'
     )
 
 )
@@ -107,9 +106,8 @@ with visit_codes as (
         , code_system
     from {{ ref('quality_measures__value_sets') }}
     where lower(concept_name) in (
-          'diabetes visit'
-        , 'diabetes'
-    )
+          'diabetes'
+        )
 
 )
 

@@ -24,9 +24,7 @@ with denominator as (
         , concept_name
     From {{ref('quality_measures__value_sets')}}
     where lower(concept_name) in  (
-          'diabetic retinopathy'
-        , 'ophthalmological services'
-        , 'diabetic retinal eye exam met'
+          'diabetic retinal eye exam met'
         , 'retinal or dilated eye exam'
     )
 
@@ -53,14 +51,11 @@ with denominator as (
 
 )
 
-, qualifying_procedure as (
+, qualifying_patients as (
 
     select 
           procedures.patient_id
-        , procedures.procedure_date
-        , procedures.code_type
-        , procedures.code
-        , retina_test_code.concept_name
+        , procedures.procedure_date as evidence_date
     from procedures
     inner join {{ ref('quality_measures__int_cbe0055__performance_period') }} pp
     on procedure_date between
@@ -68,127 +63,6 @@ with denominator as (
     inner join retina_test_code
         on procedures.code = retina_test_code.code
             and procedures.code_type = retina_test_code.code_system
-
-)
-
-, qualifying_patients_for_procedure as (
-    select 
-          patient_id
-        , procedure_date
-        , code_type
-        , code
-        , concept_name
-    from qualifying_procedure
-    where lower(concept_name) in ( 
-                        'diabetic retinal eye exam met' 
-                      , 'retinal or dilated eye exam'
-                      )
-
-)
-
-, qualifying_patients_with_ophthalm_consult as (
-
-    select 
-        qualifying_procedure.patient_id,
-        qualifying_procedure.procedure_date,
-        qualifying_procedure.code_type,
-        qualifying_procedure.code
-    from qualifying_procedure
-    inner join qualifying_patients_for_procedure
-        on qualifying_procedure.patient_id = qualifying_patients_for_procedure.patient_id
-        and lower(qualifying_procedure.concept_name) = 'ophthalmological services'
-
-)
-
-, conditions as (
-
-    select
-          patient_id
-        , recorded_date
-        , coalesce (
-              normalized_code_type
-            , case
-                when lower(source_code_type) = 'snomed' then 'snomed-ct'
-                else lower(source_code_type)
-              end
-          ) as code_type
-        , coalesce (
-              normalized_code
-            , source_code
-          ) as code
-    from {{ ref('quality_measures__stg_core__condition') }}
-
-)
-
-, retinopathy_conditions as (
-
-    select
-        conditions.patient_id
-      , conditions.recorded_date
-      , conditions.code
-      , conditions.code_type
-    from conditions
-    inner join retina_test_code
-    on conditions.code = retina_test_code.code
-      and conditions.code_type = retina_test_code.code_system
-        and lower(retina_test_code.concept_name) = 'diabetic retinopathy'
-)
-
-, retinopathy_last_year as (
-
-    select 
-          denominator.patient_id
-        , retinopathy_conditions.recorded_date
-        , retinopathy_conditions.code_type
-        , retinopathy_conditions.code
-        , case
-          when
-              retinopathy_conditions.recorded_date between
-                {{ dbt.dateadd (
-                datepart = "year"
-                , interval = -1
-                , from_date_or_timestamp = "denominator.performance_period_begin"
-                )
-                }}
-                and
-                denominator.performance_period_begin
-          then
-              1
-          else
-              0
-          end as retinopathy_last_year_flag
-    from denominator
-    left join retinopathy_conditions
-    on denominator.patient_id = retinopathy_conditions.patient_id
-    left join retina_test_code
-    on retinopathy_conditions.code = retina_test_code.code
-        and retinopathy_conditions.code_type = retina_test_code.code_system
-
-)
-
-, no_retinopathy_last_year as (
-
-    select 
-        retinopathy_last_year.patient_id
-      , cast(null as date) as recorded_date
-    from retinopathy_last_year
-    where retinopathy_last_year_flag = 0
-
-)
-
-, qualifying_patients as (
-
-    select 
-          qualifying_patients_with_ophthalm_consult.patient_id
-        , qualifying_patients_with_ophthalm_consult.procedure_date as evidence_date
-    from qualifying_patients_with_ophthalm_consult
-
-    union all
-
-    select 
-          no_retinopathy_last_year.patient_id
-        , no_retinopathy_last_year.recorded_date as evidence_date  
-    from no_retinopathy_last_year
 
 )
 
