@@ -10,7 +10,13 @@ seeds:
       tags: hcc_suspecting
       enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
+        concept_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        concept_oid: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        code_system: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
   - name: hcc_suspecting__hcc_descriptions
