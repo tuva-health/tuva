@@ -3,10 +3,19 @@
    )
 }}
 
+with date_int as (
+    select distinct
+        replace(year_month,'-','') yyyymm
+      , first_day_of_month
+    from {{ ref('terminology__calendar') }} as c
+)
+
 select 
     data_source
   , patient_id
-  , year_month
-from 
-    {{ ref('financial_pmpm__member_months') }}
+  , first_day_of_month
+  , d.yyyymm as year_month
 
+from 
+    {{ ref('financial_pmpm__member_months') }} mm
+inner join date_int d on mm.year_month = d.yyyymm 

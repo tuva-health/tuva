@@ -16,7 +16,7 @@ select
   , patient_id
   , facility_npi
   , paid_amount
-  , to_char(encounter_start_date, 'yyyy') as year_number
+  , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
 from 
     {{ ref('core__encounter') }}
 where 

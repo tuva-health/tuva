@@ -8,10 +8,11 @@ select distinct
     left(e.year_month, 4) as year_number
   , e.patient_id
   , e.data_source
-  , datediff('year', p.birth_date, to_date(e.year_month, 'YYYYMM')) as age
+  , {{ datediff('p.birth_date', 'e.first_day_of_month', 'year') }} as age
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_member_months') }} as e
 inner join {{ ref('ahrq_measures__stg_pqi_patient') }} as p 
   on e.patient_id = p.patient_id
   and p.data_source = e.data_source
-where datediff('year', p.birth_date, to_date(e.year_month, 'YYYYMM')) >= 18
+where 
+  {{ datediff('p.birth_date', 'e.first_day_of_month', 'year') }} >= 18

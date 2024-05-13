@@ -724,30 +724,6 @@ seeds:
         map_category_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
-  - name: terminology__imaging
-    config:
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: imaging
-      tags:
-        - terminology
-        - data_profiling
-      column_types:
-        hcpcs : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        nitos : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
-        invasive_non_invasive : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        modality : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        body_region : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        focus_area : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-       
 
   - name: terminology__snomed_ct
     config:
