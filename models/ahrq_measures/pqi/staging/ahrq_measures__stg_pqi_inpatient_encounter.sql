@@ -4,7 +4,18 @@
 }}
 
 select 
-    *
+    encounter_id
+  , data_source
+  , ms_drg_code
+  , ms_drg_description
+  , admit_source_code
+  , encounter_start_date
+  , encounter_end_date
+  , length_of_stay
+  , primary_diagnosis_code
+  , patient_id
+  , facility_npi
+  , paid_amount
   , to_char(encounter_start_date, 'yyyy') as year_number
 from 
     {{ ref('core__encounter') }}

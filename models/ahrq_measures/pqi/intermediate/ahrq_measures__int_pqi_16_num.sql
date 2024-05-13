@@ -8,7 +8,7 @@ with diagnosis as (
     select distinct 
         c.encounter_id,
         c.data_source
-    from {{ ref('core__condition') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-cm'
@@ -21,7 +21,7 @@ procedure as (
     select 
         p.encounter_id,
         p.data_source
-    from {{ ref('core__procedure') }} as p
+    from {{ ref('ahrq_measures__stg_pqi_procedure') }} as p
     inner join diagnosis as d 
       on p.encounter_id = d.encounter_id
       and d.data_source = p.data_source

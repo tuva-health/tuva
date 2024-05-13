@@ -8,7 +8,7 @@ with cardiac as (
         encounter_id
       , data_source
       , 'cardiac procedure' as exclusion_reason
-    from {{ ref('core__procedure') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_procedure') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-pcs'
@@ -21,7 +21,7 @@ ckd as (
     select distinct
         encounter_id
       , data_source
-    from {{ ref('core__condition') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-cm'
@@ -34,7 +34,7 @@ access as (
     select distinct
         encounter_id
       , data_source
-    from {{ ref('core__procedure') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_procedure') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-pcs'
@@ -48,7 +48,7 @@ combine as (
         c.encounter_id
       , c.data_source
       , 'ckd' as exclusion_reason
-    from {{ ref('core__condition') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join ckd 
       on c.encounter_id = ckd.encounter_id
       and c.data_source = ckd.data_source

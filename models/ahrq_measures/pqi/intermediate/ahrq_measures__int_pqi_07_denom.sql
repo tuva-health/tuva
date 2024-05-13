@@ -9,8 +9,8 @@ select distinct
   , e.data_source
   , datediff('year', p.birth_date, to_date(e.year_month, 'YYYYMM')) as age
   , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('financial_pmpm__member_months') }} as e
-inner join {{ ref('core__patient') }} as p 
+from {{ ref('ahrq_measures__stg_pqi_member_months') }} as e
+inner join {{ ref('ahrq_measures__stg_pqi_patient') }} as p 
   on e.patient_id = p.patient_id
   and p.data_source = e.data_source
 where datediff('year', p.birth_date, to_date(e.year_month, 'YYYYMM')) >= 18

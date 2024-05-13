@@ -8,7 +8,7 @@ with cardiac as (
         encounter_id
       , data_source
       , 'cardiac procedure' as exclusion_reason
-    from {{ ref('core__procedure') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_procedure') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-pcs'

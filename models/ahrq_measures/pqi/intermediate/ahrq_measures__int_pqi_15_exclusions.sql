@@ -9,7 +9,7 @@ with resp_an as (
         encounter_id
       , data_source
       , 'cystic fibrosis' as exclusion_reason
-    from {{ ref('core__condition') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-cm'

@@ -8,7 +8,7 @@ with kidney as (
         encounter_id
       , data_source
       , 'kidney' as exclusion_reason
-    from {{ ref('core__condition') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-cm'
@@ -22,7 +22,7 @@ immune_dx as (
         encounter_id
       , data_source
       , 'immunocompromised diagnosis' as exclusion_reason
-    from {{ ref('core__condition') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-cm'
@@ -36,7 +36,7 @@ immune_px as (
         encounter_id
       , data_source
       , 'immunocompromised procedure' as exclusion_reason
-    from {{ ref('core__procedure') }} as c
+    from {{ ref('ahrq_measures__stg_pqi_procedure') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi 
       on c.normalized_code = pqi.code
       and c.normalized_code_type = 'icd-10-pcs'

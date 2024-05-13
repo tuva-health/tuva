@@ -8,6 +8,6 @@ select
     data_source
   , patient_id
   , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('core__patient') }}
+from {{ ref('ahrq_measures__stg_pqi_patient') }}
 where 
   sex not in ('male', 'female')
