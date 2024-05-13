@@ -11,14 +11,14 @@ seeds:
         - tuva_chronic_conditions
         - chronic_conditions
       enabled: "{{ var('tuva_chronic_conditions_enabled',var('tuva_marts_enabled',True)) }}"
-    columns:
-      - name: condition_family
-        description: A higher level rollup grouping of conditions from the condition column
-      - name: condition
-        description: The name of the condition that each diagnosis code rolls up into
-      - name: icd_10_cm_code
-        description: The icd10 code
-      - name: icd_10_cm_description
-        description: The description for the icd10 code
-      - name: condition_column_name
-        description: The name of the column as it will appear in chronic_conditions_wide
+      column_types:
+        condition_family : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        condition : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        icd_10_cm_code : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        icd_10_cm_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        condition_column_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}

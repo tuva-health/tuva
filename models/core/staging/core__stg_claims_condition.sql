@@ -505,7 +505,7 @@ select distinct
         end as {{ dbt.type_string() }}
       ) as normalized_code_type
     , cast(icd.icd_10_cm as {{ dbt.type_string() }} ) as normalized_code
-    , cast(icd.description as {{ dbt.type_string() }} ) as normalized_description
+    , cast(icd.long_description as {{ dbt.type_string() }} ) as normalized_description
     , cast(unpivot_cte.diagnosis_rank as {{ dbt.type_int() }} ) as condition_rank
     , cast(unpivot_cte.present_on_admit_code as {{ dbt.type_string() }} ) as present_on_admit_code
     , cast(poa.present_on_admit_description as {{ dbt.type_string() }} ) as present_on_admit_description
