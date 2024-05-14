@@ -76,7 +76,7 @@ with denominator as (
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
-        , '1' as numerator_flag
+        , cast('1' as integer) as numerator_flag
     from qualifying_patients
     inner join denominator
     on qualifying_patients.patient_id = denominator.patient_id
