@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -11,7 +12,7 @@ with normalize as(
         , bill.bill_type_code
     from {{ ref('normalized_input__stg_medical_claim') }} med
     inner join {{ ref('terminology__bill_type') }} bill
-        on med.bill_type_code = bill.bill_type_code
+        on ltrim(med.bill_type_code,'0') = bill.bill_type_code
     where claim_type = 'institutional'
 )
 , distinct_counts as(
