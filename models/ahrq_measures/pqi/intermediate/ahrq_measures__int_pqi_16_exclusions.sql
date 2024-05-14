@@ -39,7 +39,7 @@ union_cte as (
       , exclusion_reason
     from {{ ref('ahrq_measures__int_pqi_shared_exclusion_union') }}
 
-    union
+    union all
 
     select
         encounter_id
@@ -47,7 +47,7 @@ union_cte as (
       , exclusion_reason
     from amputation
 
-    union
+    union all
 
     select
         encounter_id

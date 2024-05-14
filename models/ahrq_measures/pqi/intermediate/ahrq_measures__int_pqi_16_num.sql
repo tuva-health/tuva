@@ -1,13 +1,11 @@
 {{ config(
-     enabled = var('pqi_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
-
+     enabled = var('pqi_enabled', var('claims_enabled', var('tuva_marts_enabled', false))) | as_bool
+)}}
 
 with diagnosis as (
-    select distinct 
-        c.encounter_id,
-        c.data_source
+    select distinct
+        c.encounter_id
+      , c.data_source
     from {{ ref('ahrq_measures__stg_pqi_condition') }} as c
     inner join {{ ref('pqi__value_sets') }} as pqi
       on c.normalized_code = pqi.code
@@ -18,9 +16,9 @@ with diagnosis as (
 ),
 
 procedure as (
-    select 
-        p.encounter_id,
-        p.data_source
+    select distinct
+        p.encounter_id
+      , p.data_source
     from {{ ref('ahrq_measures__stg_pqi_procedure') }} as p
     inner join diagnosis as d 
       on p.encounter_id = d.encounter_id
@@ -32,12 +30,12 @@ procedure as (
       and pqi_number = '16'
 )
 
-select 
-    e.data_source,
-    e.patient_id,
-    e.year_number,
-    e.encounter_id
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+select
+    e.data_source
+  , e.patient_id
+  , e.year_number
+  , e.encounter_id
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }} as e
 inner join {{ ref('ahrq_measures__int_pqi_16_denom') }} as denom 
   on e.patient_id = denom.patient_id
