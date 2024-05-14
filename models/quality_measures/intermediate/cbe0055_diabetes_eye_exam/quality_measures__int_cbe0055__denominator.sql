@@ -12,7 +12,10 @@ with visit_codes as (
     where lower(concept_name) in (
           'office visit'
         , 'home healthcare services'
-        , 'preventive care services established office visit, 18 and up'
+        , 'preventive care services established office visit, 18 and up'        
+        , 'preventive care services initial office visit, 18 and up'
+        , 'annual wellness visit'
+        , 'telephone visits'
         , 'outpatient'
         , 'observation'
         , 'diabetes visit'
