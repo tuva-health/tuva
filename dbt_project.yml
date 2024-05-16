@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.8.1'
+version: '0.8.2'
 config-version: 2
 require-dbt-version: ">=1.3.0"
 
@@ -17,6 +17,7 @@ vars:
     prccsr_version: "'2023.1'"
 
 
+
     ## CMS HCC data mart vars
     # The payment_year variable has a default of the current year, this can be
     # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
@@ -26,6 +27,13 @@ vars:
     ## Quality Measures period var
     # to run quality measueres for a period other than current year, add the below variable uncommented to your project
     # quality_measures_period_end: "2020-12-31"
+
+
+    ## Enable Normalize engine var
+    # set to false or leave undefined to affect no change
+    # set to unmapped to enable models in normalize schema that list any codes not mapped to normalized codes
+    # set to true produce the unmapped code models, and to integrate a seed called custom_mapped to map codes to normalized
+    # enable_normalize_engine: false
 
 
     ## Tuva Last Run
@@ -115,7 +123,7 @@ seeds:
       terminology__revenue_center:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','revenue_center.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_to_atc:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','snomed_ct.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct_transitive_closures:
