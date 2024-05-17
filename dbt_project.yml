@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.8.1'
+version: '0.8.2'
 config-version: 2
 require-dbt-version: ">=1.3.0"
 
@@ -17,6 +17,7 @@ vars:
     prccsr_version: "'2023.1'"
 
 
+
     ## CMS HCC data mart vars
     # The payment_year variable has a default of the current year, this can be
     # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
@@ -26,6 +27,13 @@ vars:
     ## Quality Measures period var
     # to run quality measueres for a period other than current year, add the below variable uncommented to your project
     # quality_measures_period_end: "2020-12-31"
+
+
+    ## Enable Normalize engine var
+    # set to false or leave undefined to affect no change
+    # set to unmapped to enable models in normalize schema that list any codes not mapped to normalized codes
+    # set to true produce the unmapped code models, and to integrate a seed called custom_mapped to map codes to normalized
+    # enable_normalize_engine: false
 
 
     ## Tuva Last Run
@@ -49,140 +57,140 @@ seeds:
   the_tuva_project:
     terminology:
       terminology__admit_source:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','admit_source.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','admit_source.csv',compression=true,null_marker=true) }}"
       terminology__admit_type:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','admit_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','admit_type.csv',compression=true,null_marker=true) }}"
       terminology__ansi_fips_state:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','ansi_fips_state.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','ansi_fips_state.csv',compression=true,null_marker=true) }}"
       terminology__apr_drg:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','apr_drg.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','apr_drg.csv',compression=true,null_marker=true) }}"
       terminology__bill_type:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','bill_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','bill_type.csv',compression=true,null_marker=true) }}"
       terminology__calendar:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','calendar.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','calendar.csv',compression=true,null_marker=true) }}"
       terminology__claim_type:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','claim_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','claim_type.csv',compression=true,null_marker=true) }}"
       terminology__code_type:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','code_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','code_type.csv',compression=true,null_marker=true) }}"
       terminology__discharge_disposition:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','discharge_disposition.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','discharge_disposition.csv',compression=true,null_marker=true) }}"
       terminology__encounter_type:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','encounter_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','encounter_type.csv',compression=true,null_marker=true) }}"
       terminology__ethnicity:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','ethnicity.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','ethnicity.csv',compression=true,null_marker=true) }}"
       terminology__fips_county:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','fips_county.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','fips_county.csv',compression=true,null_marker=true) }}"
       terminology__gender:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','gender.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','gender.csv',compression=true,null_marker=true) }}"
       terminology__hcpcs_level_2:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','hcpcs_level_2.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','hcpcs_level_2.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_cm:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','icd_10_cm.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','icd_10_pcs.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','icd_10_pcs.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_cm:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','icd_9_cm.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','icd_9_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_pcs:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','icd_9_pcs.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','icd_9_pcs.csv',compression=true,null_marker=true) }}"
       terminology__loinc:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','loinc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','loinc.csv',compression=true,null_marker=true) }}"
       terminology__loinc_deprecated_mapping:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','loinc_deprecated_mapping.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','loinc_deprecated_mapping.csv',compression=true,null_marker=true) }}"
       terminology__mdc:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','mdc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','mdc.csv',compression=true,null_marker=true) }}"
       terminology__medicare_dual_eligibility:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','medicare_dual_eligibility.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','medicare_dual_eligibility.csv',compression=true,null_marker=true) }}"
       terminology__medicare_orec:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','medicare_orec.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','medicare_orec.csv',compression=true,null_marker=true) }}"
       terminology__medicare_status:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','medicare_status.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','medicare_status.csv',compression=true,null_marker=true) }}"
       terminology__ms_drg:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','ms_drg.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','ms_drg.csv',compression=true,null_marker=true) }}"
       terminology__ndc:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','ndc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','ndc.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
         +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
       terminology__payer_type:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','payer_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','payer_type.csv',compression=true,null_marker=true) }}"
       terminology__place_of_service:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','place_of_service.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','place_of_service.csv',compression=true,null_marker=true) }}"
       terminology__present_on_admission:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','present_on_admission.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','present_on_admission.csv',compression=true,null_marker=true) }}"
       terminology__provider:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_provider_data/0_8_1','provider.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_provider_data/0.8.2','provider.csv',compression=true,null_marker=true) }}"
       terminology__race:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','race.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','race.csv',compression=true,null_marker=true) }}"
       terminology__revenue_center:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','revenue_center.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','revenue_center.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_to_atc:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','snomed_ct.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','snomed_ct.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct_transitive_closures:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','snomed_ct_transitive_closures.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','snomed_ct_transitive_closures.csv',compression=true,null_marker=true) }}"
       terminology__snomed_icd_10_map:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','snomed_icd_10_map.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','snomed_icd_10_map.csv',compression=true,null_marker=true) }}"
       terminology__ssa_fips_state:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0_8_1','ssa_fips_state.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.2','ssa_fips_state.csv',compression=true,null_marker=true) }}"
 
     value_sets:
       ccsr:
         ccsr__dxccsr_v2023_1_body_systems:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','dxccsr_v2023_1_body_systems.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','dxccsr_v2023_1_body_systems.csv',compression=true,null_marker=true) }}"
         ccsr__dxccsr_v2023_1_cleaned_map:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','dxccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','dxccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
         ccsr__prccsr_v2023_1_cleaned_map:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','prccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','prccsr_v2023_1_cleaned_map.csv',compression=true,null_marker=true) }}"
       chronic_conditions:
         chronic_conditions__cms_chronic_conditions_hierarchy:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_chronic_conditions_hierarchy.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_chronic_conditions_hierarchy.csv',compression=true,null_marker=true) }}"
         chronic_conditions__tuva_chronic_conditions_hierarchy:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','tuva_chronic_conditions_hierarchy.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','tuva_chronic_conditions_hierarchy.csv',compression=true,null_marker=true) }}"
       clinical_concept_library:
         clinical_concepts:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','tuva_clinical_concepts.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','tuva_clinical_concepts.csv',compression=true,null_marker=true) }}"
         coding_systems:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','tuva_coding_systems.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','tuva_coding_systems.csv',compression=true,null_marker=true) }}"
         value_set_members:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','tuva_value_set_members.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','tuva_value_set_members.csv',compression=true,null_marker=true) }}"
       cms_hcc:
         cms_hcc__adjustment_rates:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_adjustment_rates.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_adjustment_rates.csv',compression=true,null_marker=true) }}"
         cms_hcc__cpt_hcpcs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cpt_hcpcs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cpt_hcpcs.csv',compression=true,null_marker=true) }}"
         cms_hcc__demographic_factors:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_demographic_factors.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_demographic_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__disabled_interaction_factors:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_disabled_interaction_factors.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_disabled_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__disease_factors:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_disease_factors.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_disease_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__disease_interaction_factors:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_disease_interaction_factors.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_disease_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__enrollment_interaction_factors:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_enrollment_interaction_factors.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_enrollment_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__icd_10_cm_mappings:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
         cms_hcc__payment_hcc_count_factors:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','cms_hcc_payment_hcc_count_factors.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','cms_hcc_payment_hcc_count_factors.csv',compression=true,null_marker=true) }}"
       data_quality:
         data_quality__test_catalog:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','data_quality_test_catalog.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','data_quality_test_catalog.csv',compression=true,null_marker=true) }}"
       ed_classification:
         ed_classification__categories:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','ed_classification_categories.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','ed_classification_categories.csv',compression=true,null_marker=true) }}"
         ed_classification__icd_10_cm_to_ccs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
         ed_classification__johnston_icd10:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','johnston_icd10',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','johnston_icd10',compression=true,null_marker=true) }}"
         ed_classification__johnston_icd9:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','johnston_icd9',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','johnston_icd9',compression=true,null_marker=true) }}"
       hcc_suspecting:
         hcc_suspecting__clinical_concepts:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','hcc_suspecting_clinical_concepts.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','hcc_suspecting_clinical_concepts.csv',compression=true,null_marker=true) }}"
         hcc_suspecting__hcc_descriptions:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','hcc_suspecting_descriptions.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','hcc_suspecting_descriptions.csv',compression=true,null_marker=true) }}"
         hcc_suspecting__icd_10_cm_mappings:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','hcc_suspecting_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','hcc_suspecting_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
       quality_measures:
         quality_measures__concepts:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','quality_measures_concepts.csv',compression=true,null_marker=true) }}"
@@ -192,27 +200,27 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','quality_measures_value_set_codes.csv',compression=true,null_marker=true) }}"
       readmissions:
         readmissions__acute_diagnosis_ccs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','acute_diagnosis_ccs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','acute_diagnosis_ccs.csv',compression=true,null_marker=true) }}"
         readmissions__acute_diagnosis_icd_10_cm:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','acute_diagnosis_icd_10_cm.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','acute_diagnosis_icd_10_cm.csv',compression=true,null_marker=true) }}"
         readmissions__always_planned_ccs_diagnosis_cateogry:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','always_planned_ccs_diagnosis_cateogry.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','always_planned_ccs_diagnosis_cateogry.csv',compression=true,null_marker=true) }}"
         readmissions__always_planned_ccs_procedure_cateogry:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','always_planned_ccs_procedure_cateogry.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','always_planned_ccs_procedure_cateogry.csv',compression=true,null_marker=true) }}"
         readmissions__exclusion_ccs_diagnosis_category:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','exclusion_ccs_diagnosis_category.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','exclusion_ccs_diagnosis_category.csv',compression=true,null_marker=true) }}"
         readmissions__icd_10_cm_to_ccs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
         readmissions__icd_10_pcs_to_ccs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','icd_10_pcs_to_ccs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','icd_10_pcs_to_ccs.csv',compression=true,null_marker=true) }}"
         readmissions__potentially_planned_ccs_procedure_category:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','potentially_planned_ccs_procedure_category.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','potentially_planned_ccs_procedure_category.csv',compression=true,null_marker=true) }}"
         readmissions__potentially_planned_icd_10_pcs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','potentially_planned_icd_10_pcs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','potentially_planned_icd_10_pcs.csv',compression=true,null_marker=true) }}"
         readmissions__specialty_cohort:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','specialty_cohort.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','specialty_cohort.csv',compression=true,null_marker=true) }}"
         readmissions__surgery_gyncology_cohort:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','surgery_gyncology_cohort.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','surgery_gyncology_cohort.csv',compression=true,null_marker=true) }}"
       service_categories:
         service_category__service_categories:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0_8_1','service_category_service_categories.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.2','service_category_service_categories.csv',compression=true,null_marker=true) }}"

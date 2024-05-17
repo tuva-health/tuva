@@ -1,0 +1,120 @@
+version: 2
+
+models:
+
+  - name: normalize__all_unmapped
+    description: >
+      unmapped condition codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: all_unmapped
+      tags: normalized
+      materialized: table
+
+  - name: normalize__all_codes
+    description: >
+      unmapped condition codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: all_codes
+      tags: normalized
+      materialized: view
+
+
+  - name: normalize__unmapped_condition
+    description: >
+      unmapped condition codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_condition
+      tags: normalize
+      materialized: table
+
+  - name: normalize__unmapped_procedure
+    description: >
+      unmapped procedure codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_procedure
+      tags: normalize
+      materialized: table
+
+  - name: normalize__unmapped_lab_result
+    description: >
+      unmapped procedure codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_lab_result
+      tags: normalized
+      materialized: table
+
+  - name: normalize__unmapped_medication
+    description: >
+      unmapped procedure codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_medication
+      tags: normalized
+      materialized: table
+
+  - name: normalize__unmapped_observation
+    description: >
+      unmapped procedure codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_observation
+      tags: normalized
+      materialized: table
+      
+
+
+
+
+  - name: normalize__stg_unmapped_condition
+    description: >
+      unmapped condition codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_procedure
+    description: >
+      unmapped procedure codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_lab_result
+    description: >
+      unmapped procedure codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_medication
+    description: >
+      unmapped procedure codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_observation
+    description: >
+      unmapped procedure codes
+    config:
+      tags: normalized
+      materialized: ephemeral
