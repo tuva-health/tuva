@@ -1,8 +1,8 @@
-name: 'integration_tests'
+name: 'ci_testing'
 version: '1.0.0'
 config-version: 2
 
-profile: default
+profile: default 
 
 vars:
 
@@ -22,8 +22,8 @@ vars:
   # Use the vars below to enabled or disable sections of The Tuva Project.
 
   ## The vars directly below enable all models related to the type of healthcare data being used
-  clinical_enabled: true
-
+#  clinical_enabled: true
+#  claims_enabled: true
 
   ## The vars directly below enable a single data mart.  See the Quickstart
   # guide for instructions.
@@ -59,7 +59,7 @@ dispatch:
 
 
 seeds:
-  integration_tests:
+  ci_testing:
     eligibility_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
     lab_result_seed:

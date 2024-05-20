@@ -26,19 +26,19 @@ jobs:
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: Get the result
         if: ${{ always() }}
@@ -55,19 +55,19 @@ jobs:
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt run --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":false,"claims_enabled":true}'
-          dbt_project_folder: "integration_tests"
+          dbt_command: 'dbt run --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
 
       - name: Get the result
         if: ${{ always() }}
@@ -85,19 +85,19 @@ jobs:
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: dbt-debug
         uses: mwhitaker/dbt-action@v1.6.3
         with:
           dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
-          dbt_project_folder: "integration_tests"
+          dbt_project_folder: "ci_testing"
 
       - name: dbt-build
         uses: mwhitaker/dbt-action@v1.6.3
         with:
-          dbt_command: 'dbt run --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":false}'
-          dbt_project_folder: "integration_tests"
+          dbt_command: 'dbt run --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt_project_folder: "ci_testing"
 
       - name: Get the result
         if: ${{ always() }}

@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: source_input
+    database: "{{ var('input_database') }}"
+    schema: "{{ var('input_schema') }}"
+    config:
+      enabled: |
+        {% if var('test_data_override') == true -%} {{ false|as_bool }} {%- else -%} {{ true|as_bool }} {%- endif -%}
+    tables:
+      - name: condition
+      - name: eligibility
+      - name: encounter
+      - name: lab_result
+      - name: medical_claim
+      - name: medication
+      - name: observation
+      - name: patient
+      - name: pharmacy_claim
+      - name: practitioner
+      - name: procedure
