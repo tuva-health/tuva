@@ -59,7 +59,7 @@ dispatch:
 
 
 seeds:
-  integration_tests:
+  ci_testing:
     eligibility_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
     lab_result_seed:
