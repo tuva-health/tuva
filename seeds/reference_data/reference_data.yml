@@ -2,6 +2,7 @@ version: 2
 
 seeds:
   - name: terminology__ansi_fips_state
+    description: 'Seed containing ANSI FIPS state codes and names.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -16,9 +17,16 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ansi_fips_state_name : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-          
+    columns:
+      - name: ansi_fips_state_code
+        description: 'The unique ANSI FIPS state code.'
+      - name: ansi_fips_state_abbreviation
+        description: 'The abbreviation of the ANSI FIPS state.'
+      - name: ansi_fips_state_name
+        description: 'The full name of the ANSI FIPS state.'
 
   - name: terminology__calendar
+    description: 'Seed containing calendar dates and related attributes.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -42,9 +50,34 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         first_day_of_month: date
         last_day_of_month: date
-
+    columns:
+      - name: full_date
+        description: 'The complete date.'
+      - name: year
+        description: 'The year part of the date.'
+      - name: month
+        description: 'The month part of the date.'
+      - name: day
+        description: 'The day part of the date.'
+      - name: month_name
+        description: 'The name of the month.'
+      - name: day_of_week_number
+        description: 'The number of the day in the week.'
+      - name: day_of_week_name
+        description: 'The name of the day in the week.'
+      - name: week_of_year
+        description: 'The week number in the year.'
+      - name: day_of_year
+        description: 'The day number in the year.'
+      - name: year_month
+        description: 'The year and month in YYYY-MM format.'
+      - name: first_day_of_month
+        description: 'The first day of the month.'
+      - name: last_day_of_month
+        description: 'The last day of the month.'
 
   - name: terminology__code_type
+    description: 'Seed containing code types.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -55,9 +88,12 @@ seeds:
       column_types:
         code_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-          
+    columns:
+      - name: code_type
+        description: 'The type of the code.'
 
   - name: terminology__fips_county
+    description: 'Seed containing FIPS county codes and names.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -70,9 +106,16 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         state : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: fips_code
+        description: 'The FIPS code for the county.'
+      - name: county
+        description: 'The name of the county.'
+      - name: state
+        description: 'The state where the county is located.'
 
   - name: terminology__ssa_fips_state
+    description: 'Seed containing SSA FIPS state codes and names.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -83,4 +126,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ssa_fips_state_name : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: ssa_fips_state_code
+        description: 'The SSA FIPS state code.'
+      - name: ssa_fips_state_name
+        description: 'The name of the SSA FIPS state.'

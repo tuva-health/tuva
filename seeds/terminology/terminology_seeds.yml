@@ -2,6 +2,7 @@ version: 2
 
 seeds:
   - name: terminology__admit_source
+    description: 'NUBC Admit Sources'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -17,9 +18,16 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         newborn_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: admit_source_code
+        description: 'The code representing the source of admission.'
+      - name: admit_source_description
+        description: 'A description of the admission source.'
+      - name: newborn_description
+        description: 'Description related to newborn admission. For use when admit type code = 4 (Newborn)'
 
   - name: terminology__admit_type
+    description: 'Seed containing NUBC admission types and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -33,43 +41,42 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         admit_type_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: admit_type_code
+        description: 'The code representing the type of admission.'
+      - name: admit_type_description
+        description: 'A description of the admission type.'
 
-
-
-
-
-  - name: terminology__rxnorm_to_atc
-    description: This file maps atc classes to rxcui.  The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.
+  - name: terminology__apr_drg
+    description: 'Seed containing All Patient Refined Diagnosis Related Groups (APR-DRG) codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: rxnorm_to_atc
+      alias: apr_drg
       tags:
         - terminology
+        - data_profiling
       column_types:
-        rxcui : |
+        apr_drg_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        rxnorm_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-        atc_1_code : |
+        medical_surgical : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_1_name : |
+        mdc_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_2_code : |
+        apr_drg_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_2_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_3_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_3_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_4_code : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        atc_4_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: apr_drg_code
+        description: 'The All Patient Refined Diagnosis Related Group (APR-DRG) code.'
+      - name: medical_surgical
+        description: 'Indicates whether the DRG is medical or surgical.'
+      - name: mdc_code
+        description: 'The Major Diagnostic Category (MDC) code associated with the APR-DRG.'
+      - name: apr_drg_description
+        description: 'The description of the All Patient Refined Diagnosis Related Group (APR-DRG).'
 
   - name: terminology__bill_type
+    description: 'Seed containing NUBC billing types and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -84,8 +91,18 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         deprecated : integer
         deprecated_date : date
+    columns:
+      - name: bill_type_code
+        description: 'The code representing the type of bill.'
+      - name: bill_type_description
+        description: 'A description of the billing type.'
+      - name: deprecated
+        description: 'Indicates if the billing type is deprecated.'
+      - name: deprecated_date
+        description: 'The date when the billing type code was deprecated.'
 
   - name: terminology__claim_type
+    description: 'Seed containing claim types.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -96,8 +113,12 @@ seeds:
       column_types:
         claim_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: claim_type
+        description: 'The type of the claim.'
 
   - name: terminology__discharge_disposition
+    description: 'Seed containing NUBC discharge disposition codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -107,8 +128,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         discharge_disposition_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: discharge_disposition_code
+        description: 'The code representing the discharge disposition.'
+      - name: discharge_disposition_description
+        description: 'A description of the discharge disposition.'
 
   - name: terminology__encounter_type
+    description: 'Seed containing Tuva maintained encounter types.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -119,8 +146,12 @@ seeds:
       column_types:
         encounter_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: encounter_type
+        description: 'The type of the encounter.'
 
   - name: terminology__ethnicity
+    description: 'Seed containing ethnicity codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -131,8 +162,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code representing the ethnicity.'
+      - name: description
+        description: 'A description of the ethnicity.'
 
   - name: terminology__gender
+    description: 'Seed containing gender codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -143,9 +180,12 @@ seeds:
       column_types:
         gender : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-          
+    columns:
+      - name: gender
+        description: 'The gender code.'
 
   - name: terminology__hcpcs_level_2
+    description: 'Seed containing HCPCS Level II codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -162,8 +202,73 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
         short_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: hcpcs
+        description: 'The HCPCS Level II code.'
+      - name: seqnum
+        description: 'The sequence number.'
+      - name: recid
+        description: 'The record identifier.'
+      - name: long_description
+        description: 'The long description of the HCPCS code.'
+      - name: short_description
+        description: 'The short description of the HCPCS code.'
+
+  - name: terminology__icd_9_cm
+    description: 'Seed containing ICD-9-CM codes and descriptions.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: icd_9_cm
+      tags:
+        - terminology
+        - claims_preprocessing
+        - readmissions
+        - data_profiling
+      column_types:
+        icd_9_cm : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        long_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        short_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd_9_cm
+        description: 'The ICD-9-CM code.'
+      - name: long_description
+        description: 'The long description of the ICD-9-CM code.'
+      - name: short_description
+        description: 'The short description of the ICD-9-CM code.'
+
+  - name: terminology__icd_9_pcs
+    description: 'Seed containing ICD-9-PCS codes and descriptions.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: icd_9_pcs
+      tags:
+        - terminology
+        - claims_preprocessing
+        - readmissions
+        - data_profiling
+      column_types:
+        icd_9_pcs : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        long_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        short_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd_9_pcs
+        description: 'The ICD-9-PCS code.'
+      - name: long_description
+        description: 'The long description of the ICD-9-PCS code.'
+      - name: short_description
+        description: 'The short description of the ICD-9-PCS code.'
+
 
   - name: terminology__icd_10_cm
+    description: 'Seed containing ICD-10-CM codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -182,8 +287,18 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         long_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd_10_cm
+        description: 'The ICD-10-CM code.'
+      - name: header_flag
+        description: 'Flag indicating if the code is a header.'
+      - name: short_description
+        description: 'The short description of the ICD-10-CM code.'
+      - name: long_description
+        description: 'The long description of the ICD-10-CM code.'
 
   - name: terminology__icd_10_pcs
+    description: 'Seed containing ICD-10-PCS codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -197,48 +312,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
-
-  - name: terminology__icd_9_cm
-    config:
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: icd_9_cm
-      tags:
-        - terminology
-        - claims_preprocessing
-        - readmissions
-        - data_profiling
-      column_types:
-        icd_9_cm : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        long_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        short_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
-
-
-  - name: terminology__icd_9_pcs
-    config:
-      schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: icd_9_pcs
-      tags:
-        - terminology
-        - claims_preprocessing
-        - readmissions
-        - data_profiling
-      column_types:
-        icd_9_pcs : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        long_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        short_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: icd_10_pcs
+        description: 'The ICD-10-PCS code.'
+      - name: description
+        description: 'The description of the ICD-10-PCS code.'
 
   - name: terminology__loinc
+    description: 'Seed containing LOINC codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -247,39 +328,39 @@ seeds:
         - terminology
       columns:
         - name: loinc
-          description: The LOINC code
-        - name:  short_name
-          description: If exists, the short human readable version of the LOINC description
+          description: 'The LOINC code.'
+        - name: short_name
+          description: 'If exists, the short human-readable version of the LOINC description.'
         - name: long_common_name
-          description: Clinician-friendly full loinc description
+          description: 'Clinician-friendly full LOINC description.'
         - name: component
-          description: The substance or entity being measured or observed.  Also called the Analyte. The first of six loinc parts.
+          description: 'The substance or entity being measured or observed. Also called the Analyte. The first of six LOINC parts.'
         - name: property
-          description: The characteristic or attribute of the analyte. The second of six loinc parts.
+          description: 'The characteristic or attribute of the analyte. The second of six LOINC parts.'
         - name: time_aspect
-          description: The interval of time over which an observation was made. The third of six loinc parts.
+          description: 'The interval of time over which an observation was made. The third of six LOINC parts.'
         - name: system
-          description: The thing upon which the observation was made. Also called specimen for laboratory tests. The fourth of six loinc parts.
+          description: 'The thing upon which the observation was made. Also called specimen for laboratory tests. The fourth of six LOINC parts.'
         - name: scale_type
-          description: How the observation value is quantified or expressed (e.g. quantitative, ordinal, nominal, etc).  The fifth of six loinc parts.
+          description: 'How the observation value is quantified or expressed (e.g. quantitative, ordinal, nominal, etc.). The fifth of six LOINC parts.'
         - name: method_type
-          description: A high-level classification of how the observation was made. Optional; only needed when the technique affects the clinical interpretation of the results.  The sixth of six loinc parts.
+          description: 'A high-level classification of how the observation was made. Optional; only needed when the technique affects the clinical interpretation of the results. The sixth of six LOINC parts.'
         - name: class_code
-          description: A code representing the general category of the loinc term
+          description: 'A code representing the general category of the LOINC term.'
         - name: class_description
-          description: The general category of the LOINC term
+          description: 'The general category of the LOINC term.'
         - name: class_type_code
-          description: A code representing the top level category for the test
+          description: 'A code representing the top-level category for the test.'
         - name: class_type_description
-          description: The top level category for the test; Laboratory, Clincal, Claims attachments, or Surveys
+          description: 'The top-level category for the test; Laboratory, Clinical, Claims attachments, or Surveys.'
         - name: external_copyright_notice
-          description: External copyright holders copyright notice for this LOINC code
+          description: External copyright holder's copyright notice for this LOINC code.
         - name: status
-          description: The status of the LOINC code concept. Active, Trial (experimental), Discouraged (not recommended), or Deprecated (should not be used)
+          description: 'The status of the LOINC code concept. Active, Trial (experimental), Discouraged (not recommended), or Deprecated (should not be used).'
         - name: version_first_released
-          description: The first release version of LOINC that included this code
+          description: 'The first release version of LOINC that included this code.'
         - name: version_last_changed
-          description: The last LOINC version in which this record was changed
+          description: 'The last LOINC version in which this record was changed.'
       column_types:
         loinc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -316,8 +397,8 @@ seeds:
         version_last_changed : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
-
   - name: terminology__loinc_deprecated_mapping
+    description: 'Seed containing deprecated LOINC codes and their replacements.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -326,17 +407,17 @@ seeds:
         - terminology
       columns:
         - name: loinc
-          description: The deprecated term to which the replacement term(s) apply.
+          description: 'The deprecated term to which the replacement term(s) apply.'
         - name: map_to
-          description: A replacement term that is to be used in place of the deprecated or discouraged term.
+          description: 'A replacement term that is to be used in place of the deprecated or discouraged term.'
         - name: comment
-          description: Narrative text that explains the rational for using the recommended replacement term.
+          description: 'Narrative text that explains the rationale for using the recommended replacement term.'
         - name: final_map_to
-          description: If there are multiple steps of deprecated codes, this is the final (active) code
+          description: 'If there are multiple steps of deprecated codes, this is the final (active) code.'
         - name: all_comments
-          description: An aggregation of comments for any mapping steps between the deprecated code and the active code
+          description: 'An aggregation of comments for any mapping steps between the deprecated code and the active code.'
         - name: depth
-          description: How many steps this mapping is to the active code
+          description: 'How many steps this mapping is to the active code.'
       column_types:
         loinc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -351,9 +432,8 @@ seeds:
         depth : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
 
-
-
   - name: terminology__mdc
+    description: 'Seed containing Major Diagnostic Categories (MDC) codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -364,9 +444,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         mdc_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: mdc_code
+        description: 'The Major Diagnostic Category (MDC) code.'
+      - name: mdc_description
+        description: 'The description of the Major Diagnostic Category (MDC).'
 
   - name: terminology__medicare_dual_eligibility
+    description: 'Seed containing Medicare dual eligibility status codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -380,9 +465,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         dual_status_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: dual_status_code
+        description: 'The code representing dual eligibility status.'
+      - name: dual_status_description
+        description: 'A description of the dual eligibility status.'
 
   - name: terminology__medicare_orec
+    description: 'Seed containing Medicare original reason for entitlement (OREC) codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -396,8 +486,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         original_reason_entitlement_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: original_reason_entitlement_code
+        description: 'The code representing the original reason for Medicare entitlement.'
+      - name: original_reason_entitlement_description
+        description: 'A description of the original reason for Medicare entitlement.'
 
   - name: terminology__medicare_status
+    description: 'Seed containing Medicare status codes and descriptions.'
     config:
       schema: |
         {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}
@@ -413,9 +509,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         medicare_status_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: medicare_status_code
+        description: 'The code representing the Medicare status.'
+      - name: medicare_status_description
+        description: 'A description of the Medicare status.'
 
   - name: terminology__ms_drg
+    description: 'Seed containing Medicare Severity Diagnosis Related Groups (MS-DRG) codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -436,9 +537,22 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         deprecated: integer
         deprecated_date: date
+    columns:
+      - name: ms_drg_code
+        description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
+      - name: mdc_code
+        description: 'The Major Diagnostic Category (MDC) code associated with the MS-DRG.'
+      - name: medical_surgical
+        description: 'Indicates whether the DRG is medical or surgical.'
+      - name: ms_drg_description
+        description: 'The description of the Medicare Severity Diagnosis Related Group (MS-DRG).'
+      - name: deprecated
+        description: 'Indicates if the MS-DRG code is deprecated (1) or not (0).'
+      - name: deprecated_date
+        description: 'The date when the MS-DRG code was deprecated.'
 
   - name: terminology__ndc
-    description: This file collects all ndcs collected by the fda and rxnorm, and compiles them into one list.  The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.
+    description: 'This file collects all NDCs collected by the FDA and RxNorm, and compiles them into one list. The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -454,9 +568,18 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         fda_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-
+    columns:
+      - name: ndc
+        description: 'The National Drug Code (NDC).'
+      - name: rxcui
+        description: 'The RxCUI identifier associated with the NDC.'
+      - name: rxnorm_description
+        description: 'The description of the RxNorm concept.'
+      - name: fda_description
+        description: 'The FDA description of the drug.'
 
   - name: terminology__other_provider_taxonomy
+    description: 'Seed containing other provider taxonomy codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -474,20 +597,36 @@ seeds:
         description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(101) {%- endif -%}
         primary_flag:  integer
+    columns:
+      - name: npi
+        description: 'The National Provider Identifier (NPI).'
+      - name: taxonomy_code
+        description: 'The provider taxonomy code.'
+      - name: medicare_specialty_code
+        description: 'The Medicare specialty code.'
+      - name: description
+        description: 'Description of the provider taxonomy.'
+      - name: primary_flag
+        description: 'Indicates if this is the primary taxonomy (1) or not (0).'
 
-        
   - name: terminology__payer_type
+    description: 'Seed containing payer types.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: payer_type
-      tags: 
+      tags:
         - terminology
         - data_profiling
       column_types:
         payer_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: payer_type
+        description: 'The type of payer.'
+
   - name: terminology__place_of_service
+    description: 'Seed containing place of service codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -501,7 +640,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         place_of_service_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: place_of_service_code
+        description: 'The code representing the place of service.'
+      - name: place_of_service_description
+        description: 'A description of the place of service.'
+
   - name: terminology__present_on_admission
+    description: 'Seed containing present on admission (POA) indicator codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -515,8 +661,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         present_on_admit_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: present_on_admit_code
+        description: 'The code representing if the condition was present on admission.'
+      - name: present_on_admit_description
+        description: 'A description of the present on admission (POA) indicator.'
 
   - name: terminology__provider
+    description: 'Seed containing provider information.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -557,13 +709,49 @@ seeds:
         deactivation_date: date
         deactivation_flag: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+    columns:
+      - name: npi
+        description: 'The National Provider Identifier (NPI).'
+      - name: entity_type_code
+        description: 'The entity type code of the provider.'
+      - name: entity_type_description
+        description: 'The entity type description of the provider.'
+      - name: primary_taxonomy_code
+        description: 'The primary taxonomy code of the provider.'
+      - name: primary_specialty_description
+        description: 'The primary specialty description of the provider.'
+      - name: provider_first_name
+        description: 'The first name of the provider.'
+      - name: provider_last_name
+        description: 'The last name of the provider.'
+      - name: provider_organization_name
+        description: 'The organization name of the provider.'
+      - name: parent_organization_name
+        description: 'The parent organization name of the provider.'
+      - name: practice_address_line_1
+        description: 'The first line of the practice address.'
+      - name: practice_address_line_2
+        description: 'The second line of the practice address.'
+      - name: practice_city
+        description: 'The city of the practice address.'
+      - name: practice_state
+        description: 'The state of the practice address.'
+      - name: practice_zip_code
+        description: 'The ZIP code of the practice address.'
+      - name: last_updated
+        description: 'The date when the provider information was last updated.'
+      - name: deactivation_date
+        description: 'The date when the provider was deactivated.'
+      - name: deactivation_flag
+        description: 'Flag indicating if the provider is deactivated.'
 
   - name: terminology__race
+    description: 'Seed containing race codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: race
-      tags: 
+      tags:
         - terminology
         - data_profiling
       column_types:
@@ -571,9 +759,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-          
+    columns:
+      - name: code
+        description: 'The code representing the race.'
+      - name: description
+        description: 'A description of the race.'
 
   - name: terminology__revenue_center
+    description: 'Seed containing revenue center codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -587,25 +780,66 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         revenue_center_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-  - name: terminology__apr_drg
+    columns:
+      - name: revenue_center_code
+        description: 'The code representing the revenue center.'
+      - name: revenue_center_description
+        description: 'A description of the revenue center.'
+
+  - name: terminology__rxnorm_to_atc
+    description: 'This file maps ATC classes to RxCUI. The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: apr_drg
+      alias: rxnorm_to_atc
       tags:
         - terminology
-        - data_profiling
       column_types:
-        apr_drg_code : |
+        rxcui : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        medical_surgical : |
+        rxnorm_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        atc_1_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        mdc_code : |
+        atc_1_name : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        apr_drg_description : |
+        atc_2_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        atc_2_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        atc_3_code : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        atc_3_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        atc_4_code : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        atc_4_name : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: rxcui
+        description: 'The RxNorm code.'
+      - name: rxnorm_description
+        description: 'Description of the RxNorm concept.'
+      - name: atc_1_code
+        description: 'The ATC level 1 code.'
+      - name: atc_1_name
+        description: 'The name of the ATC level 1 code.'
+      - name: atc_2_code
+        description: 'The ATC level 2 code.'
+      - name: atc_2_name
+        description: 'The name of the ATC level 2 code.'
+      - name: atc_3_code
+        description: 'The ATC level 3 code.'
+      - name: atc_3_name
+        description: 'The name of the ATC level 3 code.'
+      - name: atc_4_code
+        description: 'The ATC level 4 code.'
+      - name: atc_4_name
+        description: 'The name of the ATC level 4 code.'
+
 
   - name: terminology__snomed_icd_10_map
+    description: 'Seed containing mappings between SNOMED CT and ICD-10 codes.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -646,9 +880,42 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         map_category_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: id
+        description: 'The unique identifier for the mapping.'
+      - name: effective_time
+        description: 'The effective time of the mapping.'
+      - name: active
+        description: 'Indicates if the mapping is active.'
+      - name: module_id
+        description: 'The module ID associated with the mapping.'
+      - name: ref_set_id
+        description: 'The reference set ID associated with the mapping.'
+      - name: referenced_component_id
+        description: 'The referenced component ID.'
+      - name: referenced_component_name
+        description: 'The name of the referenced component.'
+      - name: map_group
+        description: 'The map group.'
+      - name: map_priority
+        description: 'The map priority.'
+      - name: map_rule
+        description: 'The map rule.'
+      - name: map_advice
+        description: 'Advice related to the map.'
+      - name: map_target
+        description: 'The map target.'
+      - name: map_target_name
+        description: 'The name of the map target.'
+      - name: correlation_id
+        description: 'The correlation ID associated with the mapping.'
+      - name: map_category_id
+        description: 'The map category ID.'
+      - name: map_category_name
+        description: 'The name of the map category.'
 
   - name: terminology__snomed_ct
+    description: 'Seed containing SNOMED CT codes and descriptions.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -664,11 +931,20 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         created: date
         last_updated: date
-
-
-
+    columns:
+      - name: snomed_ct
+        description: 'The SNOMED CT code.'
+      - name: description
+        description: 'The description of the SNOMED CT code.'
+      - name: is_active
+        description: 'Indicates if the SNOMED CT code is active.'
+      - name: created
+        description: 'The date when the SNOMED CT code was created.'
+      - name: last_updated
+        description: 'The date when the SNOMED CT code was last updated.'
 
   - name: terminology__snomed_ct_transitive_closures
+    description: 'Seed containing SNOMED CT transitive closures.'
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -684,4 +960,12 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         child_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-          
+    columns:
+      - name: parent_snomed_code
+        description: 'The SNOMED code of the parent concept.'
+      - name: parent_description
+        description: 'The description of the parent SNOMED concept.'
+      - name: child_snomed_code
+        description: 'The SNOMED code of the child concept.'
+      - name: child_description
+        description: 'The description of the child SNOMED concept.'

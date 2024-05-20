@@ -37,6 +37,40 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coding_system_version: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    - columns:
+      - description: Primary key for the table
+        name: value_set_member_id
+      - description: Foreign key to concept table
+        name: concept_id
+      - description: "Status of this individual value_set_members record. Options = \u201C\
+          active\u201D and \u201Cinactive\u201D, others to be added as needed."
+        name: status
+      - description: Date of last update of this row, formatted as YYYY-MM-DD.
+        name: last_update_date
+      - description: Relevant details regarding the nature and reasons for the most recent
+          update.
+        name: last_update_note
+      - description: Standardized code that is a member of the value set for the concept
+          referenced in concept_id
+        name: code
+      - description: Description for the code in the "code" column.
+        name: code_description
+      - description: Coding system ID for code in the "code" column. Foreign key to coding_systems
+        name: coding_system_id
+      - description: Version of the coding system used. For now, editorial conventions
+          and/or business logic will be required to establish a consistent format for
+          coding version for each coding system.
+        name: coding_system_version
+      - description: "Indicates whether the value set should include descendants of the\
+          \ specified code. If \u201Ctrue\u201D, include the specified code and all of\
+          \ its descendants. If \u201Cfalse\u201D, include only the specified code. Applies\
+          \ only to coding systems for which Tuva has implemented this feature."
+        name: include_descendants
+      - description: "In some cases it may be helpful to provide some explanatory context\
+          \ for inclusion of a particular code, e.g., insights into the intended meaning\
+          \ of the code that aren\u2019t implicit in the code description but are implied\
+          \ by other aspects of the coding system e.g., ICD-10-CM coding guidance."
+        name: comment
 
 
   - name: value_set_members
