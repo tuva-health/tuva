@@ -57,6 +57,8 @@ models:
           named after the payer and state "BCBS Tennessee").
       - name: encounter_id
         description: Unique identifier for each encounter.
+      - name: exclusion_reason
+        description: description of the reason the encounter was excluded
       - name: exclusion_number
         description: for a given encounter and pqi measure, the number of exclusion it qualifies for. 
       - name: pqi_number
@@ -129,7 +131,7 @@ models:
         description: the number of the pqi measure
       - name: denom_count
         description: the count of patients that qualified for the denominator of the corresponding year and pqi number.
-      - name: numerator_count
+      - name: num_count
         description: the count of patients that qualified for the numerator of the corresponding year and pqi number.
       - name: rate_per_100_thousand
         description: the calculated rate per 100 thousand (numerator divided by denominator, multiplied by 100000)
