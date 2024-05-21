@@ -22,3 +22,16 @@ seeds:
         claim_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         pipeline_test: integer
+    columns:
+      - name: source_table
+        description: Table the test is performed on
+      - name: test_category
+        description: Category of test
+      - name: test_name
+        description: Name of the test
+      - name: test_field
+        description: Field the test is performed on
+      - name: claim_type
+        description: Type of claim, if applicable, the test is relevant for
+      - name: pipeline_test
+        description: Flag indicating if the test is a pipeline test

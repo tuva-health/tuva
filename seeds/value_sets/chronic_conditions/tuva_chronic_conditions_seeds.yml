@@ -5,20 +5,33 @@ seeds:
     description: A list of the diagnoses codes and their long and short names along with grouping logic classifying each code into a condition group and a condition family group.
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
       alias: _value_set_tuva_chronic_conditions_hierarchy
       tags:
         - tuva_chronic_conditions
         - chronic_conditions
       enabled: "{{ var('tuva_chronic_conditions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
-        condition_family : |
+        condition_family: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        condition : |
+        condition: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        icd_10_cm_code : |
+        icd_10_cm_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        icd_10_cm_description : |
+        icd_10_cm_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        condition_column_name : |
+        condition_column_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: condition_family
+        description: Family group of the chronic condition
+      - name: condition
+        description: Name of the chronic condition
+      - name: icd_10_cm_code
+        description: ICD-10-CM code for the chronic condition
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      - name: icd_10_cm_description
+        description: Description of the ICD-10-CM code
+      - name: condition_column_name
+        description: Column name for the chronic condition

@@ -12,7 +12,7 @@
         , data_source
         , '{{ column_item }}' as column_checked
     from {{ relation }} as rel
-         left join {{ ref('terminology__calendar') }} as cal
+         left join {{ ref('reference_data__calendar') }} as cal
            on rel.{{ column_item }} = cal.full_date
     where cal.full_date is null
     and rel.{{ column_item }} is not null

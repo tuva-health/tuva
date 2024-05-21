@@ -24,12 +24,12 @@ models:
     columns:
         - name: patient_id
           description: The unique identifier for a patient
-        - name: condition_family
-          description: >
-            A higher level rollup grouping of conditions from the condition 
-            column
-          meta:
-            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__tuva_chronic_conditions_hierarchy.csv
+#        - name: condition_family
+#          description: >
+#            A higher level rollup grouping of conditions from the condition
+#            column
+#          meta:
+#            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__tuva_chronic_conditions_hierarchy.csv
         - name: condition
           description: >
             The name of the condition that each diagnosis code rolls up to
@@ -70,126 +70,96 @@ models:
     columns:
       - name: patient_id
         description: ID of the patient
-      - name: acute_myocardial_infarction
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: alcohol
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: alzheimers_disease
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: amyotrophic_lateral_sclerosis
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: anxiety
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: asthma
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: atherosclerosis
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: atrial_fibrillation
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: attention_deficit_hyperactivity_disorder
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: bipolar
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: breast_cancer
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: chronic_kidney_disease
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: chronic_obstructive_pulmonary_disease
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: cocaine
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: colorectal_cancer
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: crohns_disease
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: cystic_fibrosis
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: dementia
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: depression
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: heart_failure
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: hyperlipidemia
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: hypertension
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: lung_cancer
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: lupus
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: metabolic_syndrome
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: multiple_sclerosis
-        description: flag indicating if the condition is present
-        data_type: boolean
-      - name: muscular_dystrophy
-        description: flag indicating if the condition is present
-        data_type: boolean
       - name: obesity
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: obsessive_compulsive_disorder
+      - name: osteoarthritis
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: opioid
+      - name: copd
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: parkinsons_disease
+      - name: anxiety_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: personality_disorder
+      - name: ckd
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: post_traumatic_stress_disorder
+      - name: t2d
         description: flag indicating if the condition is present
-        data_type: boolean
+      - name: cll
+        description: flag indicating if the condition is present
+      - name: dysplipidemias
+        description: flag indicating if the condition is present
+      - name: hypertension
+        description: flag indicating if the condition is present
+      - name: atherosclerosis
+        description: flag indicating if the condition is present
+      - name: dementia
+        description: flag indicating if the condition is present
       - name: rheumatoid_arthritis
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: schizophrenia
+      - name: celiac
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: stroke
+      - name: hip_fracture
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: tobacco
+      - name: immunodeficiencies_and_white_blood_cell_disorders
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: type_1_diabetes
+      - name: asthma
         description: flag indicating if the condition is present
-        data_type: boolean
-      - name: type_2_diabetes
+      - name: t1d
         description: flag indicating if the condition is present
-        data_type: boolean
       - name: ulcerative_colitis
         description: flag indicating if the condition is present
-        data_type: boolean
+      - name: chrohns
+        description: flag indicating if the condition is present
+      - name: holicobacter
+        description: flag indicating if the condition is present
+      - name: bipolar
+        description: flag indicating if the condition is present
+      - name: heart_failure
+        description: flag indicating if the condition is present
+      - name: tabacco
+        description: flag indicating if the condition is present
+      - name: lyme
+        description: flag indicating if the condition is present
+      - name: breast_cancer
+        description: flag indicating if the condition is present
+      - name: osteoporosis
+        description: flag indicating if the condition is present
+      - name: pulmonary_embolism
+        description: flag indicating if the condition is present
+      - name: schizophrenia
+        description: flag indicating if the condition is present
+      - name: atrial_fibrillation
+        description: flag indicating if the condition is present
+      - name: colorectal_cancer
+        description: flag indicating if the condition is present
+      - name: depression
+        description: flag indicating if the condition is present
+      - name: deep_vein_thrombosis
+        description: flag indicating if the condition is present
+      - name: alzheimer
+        description: flag indicating if the condition is present
+      - name: stroke
+        description: flag indicating if the condition is present
+      - name: myocardial_infraction
+        description: flag indicating if the condition is present
+      - name: opiod_use_disorder
+        description: flag indicating if the condition is present
+      - name: lung_cancer
+        description: flag indicating if the condition is present
+      - name: herpes
+        description: flag indicating if the condition is present
+      - name: rickettsiosis
+        description: flag indicating if the condition is present
+      - name: ms
+        description: flag indicating if the condition is present
+      - name: alchohol
+        description: flag indicating if the condition is present
+      - name: adhd
+        description: flag indicating if the condition is present
+      - name: hiv
+        description: flag indicating if the condition is present
+      - name: ptsd
+        description: flag indicating if the condition is present
+      - name: lupus
+        description: flag indicating if the condition is present
       - name: tuva_last_run
         description: The time at with the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment.  Timezone is configurable via the `tuva_last_run` var.
 
