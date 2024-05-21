@@ -19,7 +19,16 @@ seeds:
         normalization_factor: |
           numeric
         ma_coding_pattern_adjustment: |
-         numeric
+          numeric
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: payment_year
+        description: The year for which the adjustment rates are applicable
+      - name: normalization_factor
+        description: The normalization factor applied
+      - name: ma_coding_pattern_adjustment
+        description: The Medicare Advantage coding pattern adjustment factor
 
   - name: cms_hcc__cpt_hcpcs
     description: >
@@ -38,6 +47,13 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         included_flag: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: payment_year
+        description: The year for which the CPT/HCPCS codes are applicable
+      - name: hcpcs_cpt_code
+        description: The CPT or HCPCS code
+      - name: included_flag
+        description: Flag indicating whether the code is included in the filtering
 
   - name: cms_hcc__demographic_factors
     description: > 
@@ -72,7 +88,29 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
           float
-          
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: factor_type
+        description: Type of demographic factor
+      - name: enrollment_status
+        description: Enrollment status of the individual
+      - name: plan_segment
+        description: Plan segment of the individual
+      - name: gender
+        description: Gender of the individual
+      - name: age_group
+        description: Age group of the individual
+      - name: medicaid_status
+        description: Medicaid status of the individual
+      - name: dual_status
+        description: Dual eligibility status of the individual
+      - name: orec
+        description: Original reason for entitlement code
+      - name: institutional_status
+        description: Institutional status of the individual
+      - name: coefficient
+        description: Coefficient for the demographic factor
 
   - name: cms_hcc__disabled_interaction_factors
     description: > 
@@ -101,7 +139,23 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
           float
-          
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: factor_type
+        description: Type of interaction factor
+      - name: enrollment_status
+        description: Enrollment status of the individual
+      - name: institutional_status
+        description: Institutional status of the individual
+      - name: short_name
+        description: Short name of the interaction factor
+      - name: description
+        description: Description of the interaction factor
+      - name: hcc_code
+        description: Hierarchical Condition Category code
+      - name: coefficient
+        description: Coefficient for the interaction factor
 
   - name: cms_hcc__disease_factors
     description: >
@@ -134,6 +188,27 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
           float
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: factor_type
+        description: Type of disease factor
+      - name: enrollment_status
+        description: Enrollment status of the individual
+      - name: medicaid_status
+        description: Medicaid status of the individual
+      - name: dual_status
+        description: Dual eligibility status of the individual
+      - name: orec
+        description: Original reason for entitlement code
+      - name: institutional_status
+        description: Institutional status of the individual
+      - name: hcc_code
+        description: Hierarchical Condition Category code
+      - name: description
+        description: Description of the disease factor
+      - name: coefficient
+        description: Coefficient for the disease factor
 
   - name: cms_hcc__disease_hierarchy
     description: >
@@ -154,7 +229,15 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         hccs_to_exclude: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: hcc_code
+        description: Hierarchical Condition Category code
+      - name: description
+        description: Description of the disease hierarchy
+      - name: hccs_to_exclude
+        description: HCC codes to exclude from the hierarchy
 
   - name: cms_hcc__disease_interaction_factors
     description: >
@@ -191,6 +274,31 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
           float
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: factor_type
+        description: Type of interaction factor
+      - name: enrollment_status
+        description: Enrollment status of the individual
+      - name: medicaid_status
+        description: Medicaid status of the individual
+      - name: dual_status
+        description: Dual eligibility status of the individual
+      - name: orec
+        description: Original reason for entitlement code
+      - name: institutional_status
+        description: Institutional status of the individual
+      - name: short_name
+        description: Short name of the interaction factor
+      - name: description
+        description: Description of the interaction factor
+      - name: hcc_code_1
+        description: First Hierarchical Condition Category code
+      - name: hcc_code_2
+        description: Second Hierarchical Condition Category code
+      - name: coefficient
+        description: Coefficient for the interaction factor
 
   - name: cms_hcc__enrollment_interaction_factors
     description: >
@@ -221,7 +329,25 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
           float
-          
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: factor_type
+        description: Type of enrollment interaction factor
+      - name: gender
+        description: Gender of the individual
+      - name: enrollment_status
+        description: Enrollment status of the individual
+      - name: medicaid_status
+        description: Medicaid status of the individual
+      - name: dual_status
+        description: Dual eligibility status of the individual
+      - name: institutional_status
+        description: Institutional status of the individual
+      - name: description
+        description: Description of the enrollment interaction factor
+      - name: coefficient
+        description: Coefficient for the enrollment interaction factor
 
   - name: cms_hcc__icd_10_cm_mappings
     description: >
@@ -246,6 +372,19 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         cms_hcc_v28_flag: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: payment_year
+        description: The year for which the ICD-10 to HCC mapping is applicable
+      - name: diagnosis_code
+        description: ICD-10 diagnosis code
+      - name: cms_hcc_v24
+        description: CMS-HCC version 24 code
+      - name: cms_hcc_v24_flag
+        description: Flag indicating inclusion in CMS-HCC version 24
+      - name: cms_hcc_v28
+        description: CMS-HCC version 28 code
+      - name: cms_hcc_v28_flag
+        description: Flag indicating inclusion in CMS-HCC version 28
 
   - name: cms_hcc__payment_hcc_count_factors
     description: >
@@ -278,4 +417,24 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
           float
-        
+    columns:
+      - name: model_version
+        description: Version of the CMS-HCC model
+      - name: factor_type
+        description: Type of HCC count factor
+      - name: enrollment_status
+        description: Enrollment status of the individual
+      - name: medicaid_status
+        description: Medicaid status of the individual
+      - name: dual_status
+        description: Dual eligibility status of the individual
+      - name: orec
+        description: Original reason for entitlement code
+      - name: institutional_status
+        description: Institutional status of the individual
+      - name: payment_hcc_count
+        description: Count of HCCs for payment adjustment
+      - name: description
+        description: Description of the HCC count factor
+      - name: coefficient
+        description: Coefficient for the HCC count factor

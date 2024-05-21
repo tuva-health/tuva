@@ -14,12 +14,12 @@ select
 
   cc.coding_system_name
   
-from {{ ref('clinical_concepts') }} aa
+from {{ ref('clinical_concept_library__clinical_concepts') }} aa
 
-left join {{ ref('value_set_members') }} bb
+left join {{ ref('clinical_concept_library__value_set_members') }} bb
 on aa.concept_id = bb.concept_id
 
-left join {{ ref('coding_systems') }} cc
+left join {{ ref('clinical_concept_library__coding_systems') }} cc
 on bb.coding_system_id = cc.coding_system_id
 )
 

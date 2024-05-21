@@ -291,7 +291,7 @@ with medical_claim as (
         , count(medical_claim.procedure_code_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
-         left join {{ ref('terminology__code_type') }} codetype
+         left join {{ ref('reference_data__code_type') }} codetype
            on medical_claim.procedure_code_type = codetype.code_type
          left join test_catalog
            on test_catalog.test_name = 'procedure_code_type invalid'
@@ -355,7 +355,7 @@ with medical_claim as (
         , count(medical_claim.diagnosis_code_type) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
-         left join {{ ref('terminology__code_type') }} codetype
+         left join {{ ref('reference_data__code_type') }} codetype
            on medical_claim.diagnosis_code_type = codetype.code_type
          left join test_catalog
            on test_catalog.test_name = 'diagnosis_code_type invalid'

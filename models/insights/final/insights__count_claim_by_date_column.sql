@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -87,7 +88,7 @@ with date_stage as(
 , all_date_range as (
     select distinct 
         replace(cal.year_month,'-','') as year_month
-    from {{ ref('terminology__calendar') }} cal
+    from {{ ref('reference_data__calendar') }} cal
     where (cal.year_month >= (select min(year_month) from date_stage)
     and cal.year_month <= (select max(year_month) from date_stage))
     
