@@ -377,6 +377,8 @@ seeds:
         description: The year for which the ICD-10 to HCC mapping is applicable
       - name: diagnosis_code
         description: ICD-10 diagnosis code
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
       - name: cms_hcc_v24
         description: CMS-HCC version 24 code
       - name: cms_hcc_v24_flag
@@ -424,12 +426,18 @@ seeds:
         description: Type of HCC count factor
       - name: enrollment_status
         description: Enrollment status of the individual
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
       - name: medicaid_status
         description: Medicaid status of the individual
       - name: dual_status
         description: Dual eligibility status of the individual
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_dual_eligibility.csv
       - name: orec
         description: Original reason for entitlement code
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_orec.csv
       - name: institutional_status
         description: Institutional status of the individual
       - name: payment_hcc_count

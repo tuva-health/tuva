@@ -11,19 +11,21 @@ seeds:
         - pqi
       enabled: "{{ var('quality_measures_pqi',var('tuva_marts_enabled',True)) }}"
       column_types:
-        code_value: |
+        code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         value_set_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         pqi_number: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
     columns:
-      - name: code_value
-        description: Code value associated with the PQI measure
+      - name: code
+        description: Code associated with the PQI measure
       - name: value_set_name
         description: Name of the value set
       - name: pqi_number
         description: Number of the PQI measure
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/pqi__measures.csv
 
   - name: pqi__measures
     description: Names and descriptions of each of the PQI measures
