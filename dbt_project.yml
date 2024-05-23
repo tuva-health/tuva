@@ -160,13 +160,15 @@ seeds:
         cms_hcc__adjustment_rates:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','cms_hcc_adjustment_rates.csv',compression=true,null_marker=true) }}"
         cms_hcc__cpt_hcpcs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','cpt_hcpcs.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.4','cms_hcc_cpt_hcpcs.csv',compression=true,null_marker=true) }}"
         cms_hcc__demographic_factors:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','cms_hcc_demographic_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__disabled_interaction_factors:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','cms_hcc_disabled_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__disease_factors:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','cms_hcc_disease_factors.csv',compression=true,null_marker=true) }}"
+        cms_hcc__disease_hierarchy:
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.4','cms_hcc_disease_hierarchy.csv',compression=true,null_marker=true) }}"
         cms_hcc__disease_interaction_factors:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','cms_hcc_disease_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__enrollment_interaction_factors:
@@ -184,9 +186,9 @@ seeds:
         ed_classification__icd_10_cm_to_ccs:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','icd_10_cm_to_ccs.csv',compression=true,null_marker=true) }}"
         ed_classification__johnston_icd10:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','johnston_icd10',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','johnston_icd10.csv',compression=true,null_marker=true) }}"
         ed_classification__johnston_icd9:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','johnston_icd9',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','johnston_icd9.csv',compression=true,null_marker=true) }}"
       hcc_suspecting:
         hcc_suspecting__clinical_concepts:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','hcc_suspecting_clinical_concepts.csv',compression=true,null_marker=true) }}"
@@ -206,10 +208,10 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','acute_diagnosis_ccs.csv',compression=true,null_marker=true) }}"
         readmissions__acute_diagnosis_icd_10_cm:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','acute_diagnosis_icd_10_cm.csv',compression=true,null_marker=true) }}"
-        readmissions__always_planned_ccs_diagnosis_cateogry:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','always_planned_ccs_diagnosis_cateogry.csv',compression=true,null_marker=true) }}"
-        readmissions__always_planned_ccs_procedure_cateogry:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','always_planned_ccs_procedure_cateogry.csv',compression=true,null_marker=true) }}"
+        readmissions__always_planned_ccs_diagnosis_category:
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','always_planned_ccs_diagnosis_category.csv',compression=true,null_marker=true) }}"
+        readmissions__always_planned_ccs_procedure_category:
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','always_planned_ccs_procedure_category.csv',compression=true,null_marker=true) }}"
         readmissions__exclusion_ccs_diagnosis_category:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','exclusion_ccs_diagnosis_category.csv',compression=true,null_marker=true) }}"
         readmissions__icd_10_cm_to_ccs:
@@ -222,8 +224,8 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','potentially_planned_icd_10_pcs.csv',compression=true,null_marker=true) }}"
         readmissions__specialty_cohort:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','specialty_cohort.csv',compression=true,null_marker=true) }}"
-        readmissions__surgery_gyncology_cohort:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','surgery_gyncology_cohort.csv',compression=true,null_marker=true) }}"
+        readmissions__surgery_gynecology_cohort:
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','surgery_gynecology_cohort.csv',compression=true,null_marker=true) }}"
       service_categories:
         service_category__service_categories:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.3','service_category_service_categories.csv',compression=true,null_marker=true) }}"
