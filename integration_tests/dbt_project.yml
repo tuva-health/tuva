@@ -8,11 +8,11 @@ vars:
 
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
-  test_data_override: true
+  test_data_override: false
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva
+  input_database: dev_aligned_marketplace
   input_schema: input_layer
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
@@ -22,7 +22,8 @@ vars:
   # Use the vars below to enabled or disable sections of The Tuva Project.
 
   ## The vars directly below enable all models related to the type of healthcare data being used
-  clinical_enabled: true
+  clinical_enabled: false
+  claims_enabled: true
 
 
   ## The vars directly below enable a single data mart.  See the Quickstart
