@@ -129,7 +129,7 @@ models:
         description: "The MS-DRG associted with the inpatient visit"
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
-      - name: total_paid_amount
+      - name: paid_amount
         description: "The amount paid for the visit"
       - name: length_of_stay
         description: "Integer representing the length of stay of the inpatient visit in days"
@@ -165,8 +165,6 @@ models:
         data_type: boolean
       - name: readmission_encounter_id
         description: "The unique identifier for the readmission encounter"
-      - name: readmission_patient_id
-        description: "The unique identifier for the patient"
       - name: readmission_admit_date
         description: "The date of admission for the readmission inpatient visit"
       - name: readmission_discharge_date
@@ -436,11 +434,6 @@ models:
         description: "The MS-DRG associted with the inpatient visit"
 
 ## Staging
-
-  - name: readmissions__stg_core__condition
-    config:
-      tags: readmissions
-      materialized: ephemeral
 
   - name: readmissions__stg_core__encounter
     config:

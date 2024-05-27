@@ -31,6 +31,6 @@ select
   max(last_diagnosis_date) as last_diagnosis_date,
   '{{ var('tuva_last_run')}}' as tuva_last_run
 from conditions_with_first_and_last_diagnosis_date aa
-inner join {{ ref('value_set_member_relevant_fields') }} bb
+inner join {{ ref('clinical_concept_library__value_set_member_relevant_fields') }} bb
 on aa.icd_10_cm = bb.code
 group by aa.patient_id, bb.concept_name

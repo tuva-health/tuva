@@ -1,0 +1,72 @@
+name: 'ci_testing'
+version: '1.0.0'
+config-version: 2
+
+profile: default 
+
+vars:
+
+  ## Use this variable to run the project with synthetic data loaded as seeds
+  # otherwise set to false and set the input vars below
+  test_data_override: false
+
+  ## Update these vars to use your own data as input, do not comment out
+  # enabled logic has been added to the sources config
+  input_database: tuva
+  input_schema: input_layer
+
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+
+  ## The Tuva Project can support claims and clinical data.
+  # By default, all models are disabled.
+  # Use the vars below to enabled or disable sections of The Tuva Project.
+
+  ## The vars directly below enable all models related to the type of healthcare data being used
+#  clinical_enabled: true
+#  claims_enabled: true
+
+  ## The vars directly below enable a single data mart.  See the Quickstart
+  # guide for instructions.
+
+  # ccsr_enabled: false
+  # cms_chronic_conditions_enabled: false
+  # tuva_chronic_conditions_enabled: false
+  # claims_preprocessing_enabled: false
+  # cms_hcc_enabled: false
+  # ed_classification_enabled: false
+  # financial_pmpm_enabled: false
+  # insights_enabled: false
+  # quality_measures_enabled: false
+  # readmissions_enabled: true
+
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+
+dispatch:
+  - macro_namespace: 'the_tuva_project'
+    search_order: ['integration_tests','the_tuva_project']
+
+
+seeds:
+  ci_testing:
+    eligibility_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','eligibility.csv',headers=true) }}"
+    lab_result_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','lab_result.csv',headers=true) }}"
+    medical_claim_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','medical_claim.csv',headers=true) }}"
+    observation_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','observation.csv',headers=true) }}"
+    pharmacy_claim_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"

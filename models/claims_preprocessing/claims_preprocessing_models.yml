@@ -264,11 +264,21 @@ models:
       - name: gender
         description: The gender of the patient.
         meta:
-          terminology: /terminology/demographics/gender
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__gender.csv
       - name: race
         description: The race of the patient.
         meta:
-          terminology: /terminology/demographics/race
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type.
+        description: Code system used for the primary diagnosis
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/reference_data/reference_data__code_type.csv
+      - name: primary_diagnosis_code
+        description: Primary diagnosis on claim.
+        meta:
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      - name: primary_diagnosis_description
+        description: Description of primary diagnosis code.
       - name: facility_npi
         description: The NPI for the facility where the encounter occurred.
       - name: provider_first_name
@@ -278,47 +288,37 @@ models:
       - name: ms_drg_code
         description: The MS-DRG code associted with the inpatient visit
         meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: ms_drg_description
         description: The MS-DRG description associted with the inpatient visit
-        meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
       - name: medical_surgical
         description: Indicates whether the MS-DRG is medical or surgical in nature.
-        meta:
-          terminology: /terminology/conditions-and-procedures/ms-drg
       - name: apr_drg_code
         description: The APR-DRG code associted with the inpatient visit
         meta:
-          terminology: /terminology/conditions-and-procedures/apr-drg
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: apr_drg_description
         description: The APR-DRG description associted with the inpatient visit
         meta:
-          terminology: /terminology/conditions-and-procedures/apr-drg
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: admit_source_code
         description: Admission source code for the encounter.
         meta:
-          terminology: /terminology/administrative-codes/admit-source
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__admit_source.csv
       - name: admit_source_description
         description: Admission source description for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/admit-source
       - name: admit_type_code
         description: Admission type code for the encounter.
         meta:
-          terminology: /terminology/administrative-codes/admit-type
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__admit_type.csv
       - name: admit_type_description
         description: Admission type description for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/admit-type
       - name: discharge_disposition_code
         description: Discharge disposition code for the encounter.
         meta:
-          terminology: /terminology/administrative-codes/discharge-disposition
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__discharge_disposition.csv
       - name: discharge_disposition_description
         description: Discharge disposition description for the encounter.
-        meta:
-          terminology: /terminology/administrative-codes/discharge-disposition
       - name: total_paid_amount
         description: The total paid amount across all claims for the encounter.
       - name: total_allowed_amount
@@ -927,10 +927,20 @@ models:
           can have more than one insurance product/plan.
       - name: subscriber_id
         description: Identifier that links a patient to a particular insurance product or health plan.
+      - name: gender
+        description: Biological sex of the patient.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: Race of the patient.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
       - name: birth_date
         description: Date the patient was born.
       - name: death_date
         description: Date the patient died.
+      - name: death_flag
+        description: Flag indicating if the patient is deceased
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
       - name: enrollment_end_date
@@ -957,6 +967,24 @@ models:
         description: Indicates how the patient became eligible for Medicare.
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
+      - name: first_name
+        description: Patient's first name.
+      - name: last_name
+        description: Patient's last name.
+      - name: social_security_number
+        description: Patient's social security number.
+      - name: subscriber_relation
+        description: Relationship to the policy holder (self, spouse, dependent, etc)
+      - name: address
+        description: Patient's street address.
+      - name: city
+        description: Patient's city of address.
+      - name: state
+        description: State the patient lives in (most recent known address)
+      - name: zip_code
+        description: Zip code the patient lives in (most recent known address).
+      - name: phone
+        description: Patient's phone number.
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically 
@@ -1124,19 +1152,452 @@ models:
         description: The total amount charged on the claim by the provider.
       - name: total_cost_amount
         description: The total amount paid on the claim by different parties.
-      - name: encounter_type
-        description: The type of encounter this claim belongs to.
-      - name: encounter_id
+      - name: diagnosis_code_type
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+        description: Indicates the type of diagnosis code (e.g. ICD-10-CM).
+      - name: diagnosis_code_1
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 1st ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_2
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_3
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_4
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 4th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_5
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 5th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_6
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 6th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_7
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 7th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_8
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 8th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_9
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 9th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_10
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 10th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_11
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 11th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_12
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 12th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_13
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 13th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_14
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 14th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_15
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 15th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_16
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 16th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_17
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 17th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_18
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 18th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_19
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 19th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_20
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 20th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_21
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 21st ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_22
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_23
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_24
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 24th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_25
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+        description: 25th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_poa_1
         description: >
-          The encounter_id for the encounter that this claims belongs to.
-      - name: service_category_1
-        description: The broader service category this claim belongs to.
+          Present on admission code for the 1st diagnosis on the claim.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
-      - name: service_category_2
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_2
+        description: >
+          Present on admission code for the 2nd diagnosis on the claim.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
-        description: The more specific service category this claim belongs to.
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_3
+        description: >
+          Present on admission code for the 3rd diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_4
+        description: >
+          Present on admission code for the 4th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_5
+        description: >
+          Present on admission code for the 5th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_6
+        description: >
+          Present on admission code for the 6th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_7
+        description: >
+          Present on admission code for the 7th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_8
+        description: >
+          Present on admission code for the 8th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_9
+        description: >
+          Present on admission code for the 9th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_10
+        description: >
+          Present on admission code for the 10th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_11
+        description: >
+          Present on admission code for the 11th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_12
+        description: >
+          Present on admission code for the 12th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_13
+        description: >
+          Present on admission code for the 13th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_14
+        description: >
+          Present on admission code for the 14th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_15
+        description: >
+          Present on admission code for the 15th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_16
+        description: >
+          Present on admission code for the 16th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_17
+        description: >
+          Present on admission code for the 17th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_18
+        description: >
+          Present on admission code for the 18th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_19
+        description: >
+          Present on admission code for the 19th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_20
+        description: >
+          Present on admission code for the 20th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_21
+        description: >
+          Present on admission code for the 21st diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_22
+        description: >
+          Present on admission code for the 22nd diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_23
+        description: >
+          Present on admission code for the 23rd diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_24
+        description: >
+          Present on admission code for the 24th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: diagnosis_poa_25
+        description: >
+          Present on admission code for the 25th diagnosis on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+      - name: procedure_code_type
+        description: Indicates the type of procedure code (e.g. ICD-10-PCS).
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+      - name: procedure_code_1
+        description: 1st ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_2
+        description: 2nd ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_3
+        description: 3rd ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_4
+        description: 4th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_5
+        description: 5th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_6
+        description: 6th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_7
+        description: 7th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_8
+        description: 8th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_9
+        description: 9th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_10
+        description: 10th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_11
+        description: 11th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_12
+        description: 12th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_13
+        description: 13th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_14
+        description: 14th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_15
+        description: 15th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_16
+        description: 16th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_17
+        description: 17th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_18
+        description: 18th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_19
+        description: 19th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_20
+        description: 20th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_21
+        description: 21st ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_22
+        description: 22nd ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_23
+        description: 23rd ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_24
+        description: 24th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_code_25
+        description: 25th ICD (9 or 10) procedure code on the claim.
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: procedure_date_1
+        description: Date of the 1st procedure on the claim.
+      - name: procedure_date_2
+        description: Date of the 2nd procedure on the claim.
+      - name: procedure_date_3
+        description: Date of the 3rd procedure on the claim.
+      - name: procedure_date_4
+        description: Date of the 4th procedure on the claim.
+      - name: procedure_date_5
+        description: Date of the 5th procedure on the claim.
+      - name: procedure_date_6
+        description: Date of the 6th procedure on the claim.
+      - name: procedure_date_7
+        description: Date of the 7th procedure on the claim.
+      - name: procedure_date_8
+        description: Date of the 8th procedure on the claim.
+      - name: procedure_date_9
+        description: Date of the 9th procedure on the claim.
+      - name: procedure_date_10
+        description: Date of the 10th procedure on the claim.
+      - name: procedure_date_11
+        description: Date of the 11th procedure on the claim.
+      - name: procedure_date_12
+        description: Date of the 12th procedure on the claim.
+      - name: procedure_date_13
+        description: Date of the 13th procedure on the claim.
+      - name: procedure_date_14
+        description: Date of the 14th procedure on the claim.
+      - name: procedure_date_15
+        description: Date of the 15th procedure on the claim.
+      - name: procedure_date_16
+        description: Date of the 16th procedure on the claim.
+      - name: procedure_date_17
+        description: Date of the 17th procedure on the claim.
+      - name: procedure_date_18
+        description: Date of the 18th procedure on the claim.
+      - name: procedure_date_19
+        description: Date of the 19th procedure on the claim.
+      - name: procedure_date_20
+        description: Date of the 20th procedure on the claim.
+      - name: procedure_date_21
+        description: Date of the 21st procedure on the claim.
+      - name: procedure_date_22
+        description: Date of the 22nd procedure on the claim.
+      - name: procedure_date_23
+        description: Date of the 23rd procedure on the claim.
+      - name: procedure_date_24
+        description: Date of the 24th procedure on the claim.
+      - name: procedure_date_25
+        description: Date of the 25th procedure on the claim.
+#      - name: encounter_type
+#        description: The type of encounter this claim belongs to.
+#      - name: encounter_id
+#        description: >
+#          The encounter_id for the encounter that this claims belongs to.
+#      - name: service_category_1
+#        description: The broader service category this claim belongs to.
+#        meta:
+#          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+#      - name: service_category_2
+#        meta:
+#          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+#        description: The more specific service category this claim belongs to.
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically 
