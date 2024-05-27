@@ -161,13 +161,14 @@ with visit_codes as (
                 then 1
             else 0
             end as is_older_than_65_flag
+        , visits_encounters.encounter_end_date as discharge_date
         , 1 as denominator_flag
     from patients_with_age
     cross join {{ref('quality_measures__int_nqf0097__performance_period')}} pp
     inner join visits_encounters
         on patients_with_age.patient_id = visits_encounters.patient_id
     where max_age >= 18
-        and visits_encounters.length_of_stay between 1 and 30 --ensures inpatient
+        and visits_encounters.length_of_stay > 0 --ensures inpatient
 )
 
 , add_data_types as (
@@ -180,6 +181,7 @@ with visit_codes as (
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
         , cast(measure_name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+        , cast(discharge_date as date) as discharge_date
         , cast(is_older_than_65_flag as integer) as is_older_than_65_flag
         , cast(denominator_flag as integer) as denominator_flag
     from qualifying_patients
