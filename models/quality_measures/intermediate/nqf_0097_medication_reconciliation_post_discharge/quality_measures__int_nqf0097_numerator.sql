@@ -23,7 +23,9 @@ with denominator as (
         , code
         , code_system
     from {{ ref('quality_measures__value_sets') }}
-    where lower(concept_name) = 'medication reconciliation post discharge'
+    where lower(concept_name) in (
+        'medication reconciliation post discharge'
+    )
 
 )
 
