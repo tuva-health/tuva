@@ -32,8 +32,6 @@ with valid_hospice_exclusions as (
   where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
     and lower(exclusion_reason) in (
             'hospice encounter'
-          , 'hospice care ambulatory'
-          , 'hospice diagnosis'
     )
 
 )
