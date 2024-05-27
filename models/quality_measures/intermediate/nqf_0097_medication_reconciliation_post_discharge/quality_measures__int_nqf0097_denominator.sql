@@ -181,6 +181,7 @@ with visit_codes as (
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
         , cast(measure_name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+        , cast(discharge_date as date) as discharge_date
         , cast(is_older_than_65_flag as integer) as is_older_than_65_flag
         , cast(denominator_flag as integer) as denominator_flag
     from qualifying_patients
