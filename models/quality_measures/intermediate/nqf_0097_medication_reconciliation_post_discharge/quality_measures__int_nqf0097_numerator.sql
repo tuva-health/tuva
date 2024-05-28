@@ -51,7 +51,6 @@ with denominator as (
         on procedures.source_code = reconsilation_codes.code
             and procedures.source_code_type = reconsilation_codes.code_system
 
-
 )
 
 , qualifying_patients_with_denominator as (
@@ -68,10 +67,9 @@ with denominator as (
     from denominator
     inner join reconsilation_procedures
         on denominator.patient_id = reconsilation_procedures.patient_id
-    where {{ datediff('reconsilation_procedures.procedure_date', 'denominator.discharge_date', 'day') }} <= 30
+    where {{ datediff('denominator.discharge_date', 'reconsilation_procedures.procedure_date', 'day') }} between 0 and 30
 
 )
-
 
 , add_data_types as (
 
