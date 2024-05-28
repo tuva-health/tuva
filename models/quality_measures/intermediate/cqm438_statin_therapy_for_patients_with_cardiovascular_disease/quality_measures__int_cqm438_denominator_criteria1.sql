@@ -191,8 +191,13 @@ with visit_codes as (
 , patients_with_ascvd as (
 
     select
-          patient_id
-        , evidence_date
+          historical_ascvd.patient_id
+        , historical_ascvd.evidence_date
+        , pp.performance_period_begin
+        , pp.performance_period_end
+        , pp.measure_id
+        , pp.measure_name
+        , pp.measure_version
     from historical_ascvd
     cross join {{ref('quality_measures__int_cqm438__performance_period')}} pp
     where evidence_date <= pp.performance_period_end
@@ -221,16 +226,15 @@ with visit_codes as (
         distinct
           patients_with_ascvd.patient_id
         , patients_with_age.max_age as age
-        , pp.performance_period_begin
-        , pp.performance_period_end
-        , pp.measure_id
-        , pp.measure_name
-        , pp.measure_version
+        , patients_with_ascvd.performance_period_begin
+        , patients_with_ascvd.performance_period_end
+        , patients_with_ascvd.measure_id
+        , patients_with_ascvd.measure_name
+        , patients_with_ascvd.measure_version
         , 1 as denominator_flag
     from patients_with_ascvd
     left join patients_with_age
         on patients_with_ascvd.patient_id = patients_with_age.patient_id
-    cross join {{ref('quality_measures__int_cqm438__performance_period')}} pp
     where patients_with_age.max_age is not null
 
 )

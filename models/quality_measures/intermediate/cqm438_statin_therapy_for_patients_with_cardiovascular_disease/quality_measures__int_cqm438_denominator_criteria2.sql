@@ -248,20 +248,16 @@ with visit_codes as (
 
 )
 
-, qualifying_patients_with_age as (
+, patients_with_age as (
 
     select
           p.patient_id
         , floor({{ datediff('birth_date', 'performance_period_begin', 'hour') }} / 8760.0)  as age
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version 
     from {{ref('quality_measures__stg_core__patient')}} p
-    inner join patients_with_cholesterol e
+    inner join encounters_by_patient e
         on p.patient_id = e.patient_id
             and p.death_date is null
+    cross join {{ref('quality_measures__int_cqm438__performance_period')}}
 
 )
 
@@ -269,15 +265,16 @@ with visit_codes as (
 
     select
         distinct
-          qualifying_patients_with_age.patient_id
-        , qualifying_patients_with_age.age as age
+          patients_with_cholesterol.patient_id
+        , patients_with_age.age as age
         , performance_period_begin
         , performance_period_end
         , measure_id
         , measure_name
         , measure_version
         , 1 as denominator_flag
-    from qualifying_patients_with_age
+    from patients_with_cholesterol
+    left join patients_with_age
     where age between 20 and 75
 
 )
