@@ -19,10 +19,14 @@ models:
       Table that identifies opportunities for generic substitution in pharmacy claims.
     tests:
       - unique:
-          column_name: "(data_source||'-'||ndc_code)"
+          column_name: "(data_source||'-'||claim_id||'-'||claim_line_number)"
     columns:
       - name: data_source
         description: Source of the data.
+      - name: claim_id
+        description: Unique identifier for the claim.
+      - name: claim_line_number
+        description: Line number of the claim.
       - name: ndc_code
         description: National Drug Code.
       - name: ndc_description
@@ -35,16 +39,17 @@ models:
         description: Indicates if a generic version is available.
       - name: paid_amount
         description: Amount paid for the drug.
-      - name: claim_count
-        description: Number of claims for the drug.
-      - name: cost_per_claim
-        description: Cost per claim for the drug.
-      - name: average_cost_generic
-        description: Average cost of the generic drug.
-      - name: brand_less_generic_cost
-        description: Difference between the cost per claim of the brand and the average cost of the generic drug.
+      - name: total_units
+        description: Total units of the drug dispensed.
+      - name: brand_cost_per_unit
+        description: Cost per unit for the branded drug.
+      - name: generic_average_cost_per_unit
+        description: Average cost per unit of the generic drug.
+      - name: brand_less_generic_cost_per_unit
+        description: Difference between the cost per unit of the brand and the average cost per unit of the generic drug.
       - name: generic_available_total_opportunity
-        description: Total potential savings from substituting with generics, where applicable.
+        description: Total potential savings from substituting with generics, where applicable, based on units multiplied by cost difference per unit.
+
 
   - name: pharmacy__generic_available_list
     config:
@@ -79,17 +84,19 @@ models:
       - name: brand_units
         description: Units of the brand drug dispensed.
       - name: brand_paid_per_unit
-        description: Paid amount per unit for the brand drug.
+        description: Paid amount per unit for the brand drug, calculated as total paid divided by units, if units are not zero.
       - name: generic_ndc
         description: National Drug Code for the generic drug.
       - name: generic_ndc_description
         description: FDA description of the generic drug.
       - name: generic_prescribed_history
-        description: Indicates if a generic version has previously been prescribed.
+        description: Indicates if a generic version has previously been prescribed, 1 for yes and 0 for no.
       - name: generic_cost_per_unit
         description: Cost per unit for the generic drug.
       - name: generic_cost_at_units
-        description: Cost for the generic drug at the dispensed units.
+        description: Cost for the generic drug at the dispensed units of the brand drug.
+
+
 
   - name: pharmacy__pharmacy_claim_expanded
     config:
@@ -139,6 +146,8 @@ models:
         description: Date when the drug was paid for.
       - name: paid_amount
         description: Amount paid for the drug.
+      - name: allowed_amount
+        description: Total allowed amount covered by insurance.
       - name: rxcui
         description: RxNorm Concept Unique Identifier.
       - name: product_name
@@ -161,16 +170,16 @@ models:
         description: Form of the drug dose.
       - name: generic_available
         description: Indicates if a generic version is available.
-      - name: average_cost_generic
-        description: Average cost of the generic drug.
-      - name: brand_less_generic_cost
-        description: Cost difference between the brand and generic drug.
+      - name: brand_cost_per_unit
+        description: Cost per unit for the brand drug.
+      - name: generic_average_cost_per_unit
+        description: Average cost per unit of the generic drug.
+      - name: brand_less_generic_cost_per_unit
+        description: Difference in cost per unit between the brand and generic drug.
       - name: generic_available_total_opportunity
-        description: Total potential savings from substituting with generics, where applicable.
+        description: Total potential savings from substituting with generics, where applicable, calculated per unit.
       - name: generic_available_sk
         description: Surrogate key for generic availability data.
-
-
 
 
 

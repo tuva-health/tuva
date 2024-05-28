@@ -17,8 +17,9 @@ select
   , sum(quantity) as total_units
   , case 
       when sum(quantity) > 0 
-        then sum(paid_amount) / sum(quantity) 
-      else 0 
+      and  sum(paid_amount) > 0 
+      then sum(paid_amount) / sum(quantity) 
+      else null 
     end as cost_per_unit
 from {{ ref('pharmacy__stg_pharmacy_claim') }} as p
 left join {{ ref('terminology__rxnorm_brand_generic') }} as r 

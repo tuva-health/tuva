@@ -15,6 +15,7 @@ with all_drugs as (
     , p.refills
     , p.paid_date
     , p.paid_amount
+    , p.allowed_amount
     , p.rxcui
     , r.product_name
     , r.product_tty
@@ -30,6 +31,7 @@ with all_drugs as (
           then 'brand_with_generic_available' 
         else r.brand_vs_generic 
       end as generic_available
+    , opp.brand_cost_per_unit
     , opp.generic_average_cost_per_unit
     , opp.brand_less_generic_cost_per_unit
     , opp.generic_available_total_opportunity
@@ -39,7 +41,8 @@ with all_drugs as (
   left join {{ ref('pharmacy__int_brand_with_generic_available') }} as ga 
     on p.rxcui = ga.brand_with_generic_available
   left join {{ ref('pharmacy__brand_generic_opportunity') }} as opp 
-    on p.ndc_code = opp.ndc_code
+    on p.claim_id = opp.claim_id
+    and p.claim_line_number = opp.claim_line_number
     and p.data_source = opp.data_source
 )
 
@@ -67,6 +70,7 @@ select
   , a.refills
   , a.paid_date
   , a.paid_amount
+  , a.allowed_amount
   , a.rxcui
   , a.product_name
   , a.product_tty
@@ -78,6 +82,7 @@ select
   , a.ingredient_name
   , a.dose_form_name
   , a.generic_available
+  , a.brand_cost_per_unit
   , a.generic_average_cost_per_unit
   , a.brand_less_generic_cost_per_unit
   , a.generic_available_total_opportunity
