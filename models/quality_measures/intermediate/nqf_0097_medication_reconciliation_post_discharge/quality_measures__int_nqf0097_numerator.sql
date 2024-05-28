@@ -12,6 +12,7 @@ with denominator as (
         , measure_id
         , measure_name
         , measure_version
+        , discharge_date
     from {{ ref('quality_measures__int_nqf0097_denominator') }}
 
 )
@@ -67,9 +68,7 @@ with denominator as (
     from denominator
     inner join reconsilation_procedures
         on denominator.patient_id = reconsilation_procedures.patient_id
-            and reconsilation_procedures.procedure_date 
-                between denominator.performance_period_begin
-                    and denominator.performance_period_end
+    where {{ datediff('reconsilation_procedures.procedure_date', 'denominator.discharge_date', 'day') }} <= 30
 
 )
 
