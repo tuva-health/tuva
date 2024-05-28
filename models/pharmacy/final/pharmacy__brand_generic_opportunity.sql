@@ -9,7 +9,7 @@ select claim_id
 ,claim_line_number
 ,data_source
 ,case when quantity > 0 then paid_amount/quantity else null end as brand_cost_per_unit
-from aligned_marketplace.core.pharmacy_claim
+from {{ ref('pharmacy__stg_pharmacy_claim') }}
 )
 
 
