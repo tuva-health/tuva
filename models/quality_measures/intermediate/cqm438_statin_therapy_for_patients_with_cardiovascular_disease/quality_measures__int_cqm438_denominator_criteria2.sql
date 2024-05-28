@@ -186,7 +186,9 @@ with visit_codes as (
     , labs.result as evidence_value
     , coalesce(collection_date,result_date) as evidence_date
     , cholesterol_codes.concept_name
-    , row_number() over(partition by labs.patient_id order by labs.result desc) as rn
+    , row_number() over(partition by labs.patient_id order by 
+                          labs.result desc
+                        , result_date desc) as rn
     from labs
     inner join cholesterol_codes
       on ( labs.normalized_code = cholesterol_codes.code
@@ -280,21 +282,6 @@ with visit_codes as (
 
 )
 
-, add_data_types as (
-
-    select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(age as integer) as age
-        , cast(performance_period_begin as date) as performance_period_begin
-        , cast(performance_period_end as date) as performance_period_end
-        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
-        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
-        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
-        , cast(denominator_flag as integer) as denominator_flag
-    from qualifying_patients
-
-)
-
 select 
       patient_id
     , age
@@ -304,5 +291,4 @@ select
     , measure_name
     , measure_version
     , denominator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from add_data_types
+from qualifying_patients

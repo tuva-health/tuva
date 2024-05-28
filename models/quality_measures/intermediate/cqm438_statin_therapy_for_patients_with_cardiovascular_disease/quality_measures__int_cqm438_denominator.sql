@@ -14,8 +14,7 @@ with denominator_criteria_1 as (
         , measure_name
         , measure_version
         , denominator_flag
-        , tuva_last_run
-        , '1' as criteria
+        , 1 as criteria
     from {{ ref('quality_measures__int_cqm438_denominator_criteria1') }}
 
 )
@@ -31,8 +30,7 @@ with denominator_criteria_1 as (
         , measure_name
         , measure_version
         , denominator_flag
-        , tuva_last_run
-        , '2' as criteria
+        , 2 as criteria
     from {{ ref('quality_measures__int_cqm438_denominator_criteria2') }}
 
 )
@@ -48,8 +46,7 @@ with denominator_criteria_1 as (
         , measure_name
         , measure_version
         , denominator_flag
-        , tuva_last_run
-        , '3' as criteria
+        , 3 as criteria
     from {{ ref('quality_measures__int_cqm438_denominator_criteria3') }}
 
 )
@@ -74,6 +71,29 @@ with denominator_criteria_1 as (
 
 )
 
+, add_data_types as (
+
+    select
+          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+        , cast(age as integer) as age
+        , cast(performance_period_begin as date) as performance_period_begin
+        , cast(performance_period_end as date) as performance_period_end
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+        , cast(denominator_flag as integer) as denominator_flag
+    from final_denominator
+
+)
+
 select 
-    *
-from final_denominator
+      patient_id
+    , age
+    , performance_period_begin
+    , performance_period_end
+    , measure_id
+    , measure_name
+    , measure_version
+    , denominator_flag
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from add_data_types
