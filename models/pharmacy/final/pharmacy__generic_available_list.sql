@@ -34,6 +34,7 @@ select
     end as generic_prescribed_history
   , gc.cost_per_unit as generic_cost_per_unit
   , gc.cost_per_unit * p.quantity as generic_cost_at_units
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy__stg_pharmacy_claim') }} as p
 inner join generic_sk as sk 
   on p.claim_id = sk.claim_id

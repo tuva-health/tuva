@@ -39,6 +39,7 @@ with all_drugs as (
     , opp.generic_average_cost_per_unit
     , opp.brand_less_generic_cost_per_unit
     , opp.generic_available_total_opportunity
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
   from {{ ref('pharmacy__stg_pharmacy_claim') }} as p
   left join {{ ref('terminology__rxnorm_brand_generic') }} as r 
     on p.rxcui = r.product_rxcui

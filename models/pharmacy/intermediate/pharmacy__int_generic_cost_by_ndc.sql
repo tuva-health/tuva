@@ -13,7 +13,7 @@ select
   , cl.total_units
   , cl.cost_per_unit
   , case when claim_count > 0 then 1 else 0 end as prescribed_atleast_one_generic_history
-
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy__rxnorm_generic_available') }} as g
 left join {{ ref('pharmacy__int_claims_current_cost') }} as cl 
   on cl.ndc_code = g.ndc

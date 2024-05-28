@@ -32,6 +32,7 @@ select
         then (cpu.brand_cost_per_unit - gc.generic_average_cost_per_unit) * pc.quantity 
       else 0 
     end as generic_available_total_opportunity
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy__stg_pharmacy_claim') }} as pc
 inner join cpu on pc.claim_id = cpu.claim_id
   and

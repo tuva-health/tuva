@@ -24,6 +24,7 @@ select
       then sum(paid_amount) / sum(quantity) 
       else null 
     end as cost_per_unit
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy__stg_pharmacy_claim') }} as p
 left join {{ ref('terminology__rxnorm_brand_generic') }} as r 
   on p.rxcui = r.product_rxcui
