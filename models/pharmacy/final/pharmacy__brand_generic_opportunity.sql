@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('brand_generic_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+) }}
+
 /* claimid/line/source grain. calculates opportunity at line level*/
 
 with cpu as (

@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('pqi_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+) }}
+
 select 
     p.ndc_code
   , n.fda_description as ndc_description
