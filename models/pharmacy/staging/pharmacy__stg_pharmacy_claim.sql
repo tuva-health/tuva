@@ -8,6 +8,7 @@ select
   , p.data_source
   , n.rxcui
   , p.paid_amount
+  , p.allowed_amount
   , p.claim_id
   , p.claim_line_number
   , p.patient_id
