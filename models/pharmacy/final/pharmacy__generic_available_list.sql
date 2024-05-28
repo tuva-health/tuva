@@ -43,6 +43,7 @@ inner join {{ ref('pharmacy__int_brand_with_generic_available') }} as b
   on p.rxcui = b.brand_with_generic_available
 inner join {{ ref('pharmacy__rxnorm_generic_available') }} as ga 
   on p.rxcui = ga.product_rxcui
+  and ga.ndc_product_tty in ('SCD','GPCK')
 left join {{ ref('terminology__ndc') }} as n 
   on ga.ndc = n.ndc
 left join {{ ref('pharmacy__int_claims_current_cost') }} as gc 

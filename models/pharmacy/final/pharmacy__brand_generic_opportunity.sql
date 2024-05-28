@@ -34,10 +34,10 @@ select
     end as generic_available_total_opportunity
 from {{ ref('pharmacy__stg_pharmacy_claim') }} as pc
 inner join cpu on pc.claim_id = cpu.claim_id
-and
-pc.claim_line_number = cpu.claim_line_number
-and
-pc.data_source = cpu.data_source
+  and
+  pc.claim_line_number = cpu.claim_line_number
+  and
+  pc.data_source = cpu.data_source
 inner join {{ ref('pharmacy__int_claims_current_cost') }} cc
   on cc.ndc_code = pc.ndc_code
   and
