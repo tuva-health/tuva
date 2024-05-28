@@ -45,6 +45,7 @@ with visit_codes as (
     from {{ref('quality_measures__stg_core__encounter')}} encounter
     inner join {{ref('quality_measures__int_nqf0097__performance_period')}} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
+            and coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     -- all encounter types considered; inpatient encounters are filtered by length of stay being more than 0 days
 
 )
