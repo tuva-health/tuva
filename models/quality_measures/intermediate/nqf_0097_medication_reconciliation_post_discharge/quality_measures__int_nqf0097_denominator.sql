@@ -39,6 +39,7 @@ with visit_codes as (
 
     select patient_id
          , length_of_stay
+         , encounter.encounter_end_date
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ref('quality_measures__stg_core__encounter')}} encounter
@@ -196,6 +197,7 @@ select
     , measure_id
     , measure_name
     , measure_version
+    , discharge_date
     , is_older_than_65_flag
     , denominator_flag
     , '{{ var('tuva_last_run')}}' as tuva_last_run
