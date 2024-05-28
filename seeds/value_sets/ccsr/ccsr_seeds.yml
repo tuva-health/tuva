@@ -4,10 +4,10 @@ seeds:
   - name: ccsr__dxccsr_v2023_1_body_systems
     description: |
       A table containing descriptions of the top level categories used in the CCSR condition mapper.
-      This was manually exctracted from the User Guide PDF included with the DXCCSR SAS program.
+      This was manually extracted from the User Guide PDF included with the DXCCSR SAS program.
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
       alias: _value_set_dxccsr_v2023_1_body_systems
       tags:
         - ccsr
@@ -19,15 +19,22 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         parent_category_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-    
+    columns:
+      - name: body_system
+        description: The body system associated with the CCSR parent category.
+      - name: ccsr_parent_category
+        description: The parent category in the CCSR condition mapper.
+      - name: parent_category_description
+        description: Description of the parent category in the CCSR condition mapper.
 
   - name: ccsr__dxccsr_v2023_1_cleaned_map
-    description: A table containing the CSV mapping file included with the DXCCSR SAS program.
+    description: |
+      A table containing the CSV mapping file included with the DXCCSR SAS program.
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
       For each ICD-10-CM code, the table contains up to six CCSR category codes and a default CCSR category code.
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
       alias: _value_set_dxccsr_v2023_1_cleaned_map
       tags:
         - ccsr
@@ -66,18 +73,56 @@ seeds:
         ccsr_category_5_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_6: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}  
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         ccsr_category_6_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}    
-
-
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd_10_cm_code
+        description: ICD-10-CM code
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      - name: icd_10_cm_code_description
+        description: Description of the ICD-10-CM code
+      - name: default_ccsr_category_ip
+        description: Default CCSR category for inpatient settings
+      - name: default_ccsr_category_description_ip
+        description: Description of the default CCSR category for inpatient settings
+      - name: default_ccsr_category_op
+        description: Default CCSR category for outpatient settings
+      - name: default_ccsr_category_description_op
+        description: Description of the default CCSR category for outpatient settings
+      - name: ccsr_category_1
+        description: First CCSR category code
+      - name: ccsr_category_1_description
+        description: Description of the first CCSR category code
+      - name: ccsr_category_2
+        description: Second CCSR category code
+      - name: ccsr_category_2_description
+        description: Description of the second CCSR category code
+      - name: ccsr_category_3
+        description: Third CCSR category code
+      - name: ccsr_category_3_description
+        description: Description of the third CCSR category code
+      - name: ccsr_category_4
+        description: Fourth CCSR category code
+      - name: ccsr_category_4_description
+        description: Description of the fourth CCSR category code
+      - name: ccsr_category_5
+        description: Fifth CCSR category code
+      - name: ccsr_category_5_description
+        description: Description of the fifth CCSR category code
+      - name: ccsr_category_6
+        description: Sixth CCSR category code
+      - name: ccsr_category_6_description
+        description: Description of the sixth CCSR category code
 
   - name: ccsr__prccsr_v2023_1_cleaned_map
-    description: A table containing the CSV mapping file included with the PRCCSR SAS program.
+    description: |
+      A table containing the CSV mapping file included with the PRCCSR SAS program.
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
       alias: _value_set_prccsr_v2023_1_cleaned_map
       tags:
         - ccsr
@@ -93,3 +138,16 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         clinical_domain: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+    columns:
+      - name: icd_10_pcs
+        description: ICD-10-PCS code
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+      - name: icd_10_pcs_description
+        description: Description of the ICD-10-PCS code
+      - name: prccsr
+        description: PRCCSR category code
+      - name: prccsr_description
+        description: Description of the PRCCSR category code
+      - name: clinical_domain
+        description: Clinical domain associated with the PRCCSR category

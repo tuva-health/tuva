@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -281,7 +282,7 @@ select
     , count(*) as procedure_date_occurrence_count
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from pivot_procedure piv
-left join {{ ref('terminology__calendar') }} cal
+left join {{ ref('reference_data__calendar') }} cal
     on piv.procedure_date = cal.full_date
 where claim_type = 'institutional'
 group by 
