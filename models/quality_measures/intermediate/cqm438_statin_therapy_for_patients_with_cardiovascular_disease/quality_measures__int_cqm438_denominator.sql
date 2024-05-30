@@ -185,6 +185,7 @@ with patients_with_ascvd as (
         , 1 as denominator_flag
     from patients_with_cholesterol
     left join patients_with_age
+    on patients_with_cholesterol.patient_id = patients_with_age.patient_id
     where age between 20 and 75
 
 )
