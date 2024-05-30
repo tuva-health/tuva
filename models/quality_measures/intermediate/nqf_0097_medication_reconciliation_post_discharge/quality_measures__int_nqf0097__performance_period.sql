@@ -18,8 +18,7 @@ where id = 'NQF0097')
 
 {%- set measure_version -%}
 (select version
-from quality_measures_seeds.quality_measures._value_set_measures
---  {{ ref('quality_measures__measures') }}
+from {{ ref('quality_measures__measures') }}
 where id = 'NQF0097')
 {%- endset -%}
 
