@@ -210,17 +210,41 @@ with patients_with_ascvd as (
 
 , final_denominator as (
     
-    select *
+    select
+          patient_id
+        , age
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
+        , denominator_flag
     from qualifying_patients_from_criteria1
 
     union all
 
-    select *
+    select
+          patient_id
+        , age
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
+        , denominator_flag
     from qualifying_patients_from_criteria2
     
     union all
 
-    select *
+    select
+          patient_id
+        , age
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
+        , denominator_flag
     from qualifying_patients_from_criteria3
 
 )

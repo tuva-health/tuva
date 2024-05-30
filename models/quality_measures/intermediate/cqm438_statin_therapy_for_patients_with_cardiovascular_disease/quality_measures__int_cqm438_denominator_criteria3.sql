@@ -59,6 +59,19 @@ with diabetes_codes as (
 
 )
 
+, add_data_types as (
+
+    select
+          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+        , cast(performance_period_begin as date) as performance_period_begin
+        , cast(performance_period_end as date) as performance_period_end
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_version as {{ dbt.type_string() }}) as measure_version
+    from patients_with_diabetes
+
+)
+
 select 
       patient_id
     , performance_period_begin
@@ -66,4 +79,5 @@ select
     , measure_id
     , measure_name
     , measure_version
-from patients_with_diabetes
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from add_data_types
