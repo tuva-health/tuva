@@ -82,7 +82,7 @@ with denominator as (
 
     select
           patient_id
-        , coalesce(prescribing_date, dispensing_date) as evidence_date
+        , coalesce(dispensing_date, prescribing_date) as evidence_date
         , source_code
         , source_code_type
     from {{ref('quality_measures__stg_core__medication')}} as medications

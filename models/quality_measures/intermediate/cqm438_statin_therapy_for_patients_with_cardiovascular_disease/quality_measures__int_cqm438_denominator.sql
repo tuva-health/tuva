@@ -73,6 +73,10 @@ with patients_with_ascvd as (
         , 'outpatient'
         , 'outpatient rehabilitation'
         , 'telehealth'
+        , 'nonacute inpatient'
+        , 'encounter inpatient'
+        , 'acute inpatient'
+        , 'emergency department'
      )
 
 )
@@ -209,12 +213,12 @@ with patients_with_ascvd as (
     select *
     from qualifying_patients_from_criteria1
 
-    union
+    union all
 
     select *
     from qualifying_patients_from_criteria2
     
-    union
+    union all
 
     select *
     from qualifying_patients_from_criteria3
