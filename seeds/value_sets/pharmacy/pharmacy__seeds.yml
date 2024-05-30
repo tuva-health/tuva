@@ -1,0 +1,34 @@
+version: 2
+
+seeds:
+  - name: pharmacy__rxnorm_generic_available
+    description: brand rxcuis from rxnorm with some additional columns added in
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy{% else %}pharmacy{%- endif -%}
+      alias: rxnorm_generic_available
+      tags:
+        - pharmacy
+
+      enabled: "{{ var('pharmacy',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        product_tty: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}        
+        product_rxcui: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        product_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        ndc_product_tty: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ndc_product_rxcui: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ndc_product_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        ndc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        product_startmarketingdate: |
+          date
+        package_startmarketingdate: |
+          date
+
+
