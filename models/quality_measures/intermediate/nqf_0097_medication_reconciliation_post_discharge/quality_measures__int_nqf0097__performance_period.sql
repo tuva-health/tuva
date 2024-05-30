@@ -6,8 +6,7 @@
 
 {%- set measure_id -%}
 (select id
-from quality_measures_seeds.quality_measures._value_set_measures
---  {{ ref('quality_measures__measures') }}
+from {{ ref('quality_measures__measures') }}
 where id = 'NQF0097')
 {%- endset -%}
 
