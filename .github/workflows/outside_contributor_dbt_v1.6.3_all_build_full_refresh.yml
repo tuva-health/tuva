@@ -31,6 +31,8 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -60,6 +62,8 @@ jobs:
     needs: snowflake_clinical_and_claims_enabled
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -90,6 +94,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -119,6 +125,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -149,6 +157,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -179,6 +189,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -208,6 +220,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -237,6 +251,8 @@ jobs:
     needs: bigquery_clinical_and_claims_enabled
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -267,6 +283,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: dbt-deps
         uses: mwhitaker/dbt-action@v1.6.3
@@ -309,7 +327,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
+
       - name: Post comment on PR
         run: |
           PR_COMMENT="Workflow has finished with the following statuses:<ul><li>Snowflake: ${{ needs.snowflake_clinical_and_claims_enabled.result }}</li></ul><ul><li>Snowflake: ${{ needs.snowflake_claims_enabled.result }}</li></ul><ul><li>Snowflake: ${{ needs.snowflake_clinical_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_clinical_and_claims_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_claims_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_clinical_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_clinical_and_claims_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_claims_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_clinical_enabled.result }}</li></ul>"

@@ -943,6 +943,7 @@ seeds:
       - name: last_updated
         description: 'The date when the SNOMED CT code was last updated.'
 
+
   - name: terminology__snomed_ct_transitive_closures
     description: 'Seed containing SNOMED CT transitive closures.'
     config:
@@ -969,3 +970,35 @@ seeds:
         description: 'The SNOMED code of the child concept.'
       - name: child_description
         description: 'The description of the child SNOMED concept.'
+
+
+  - name: terminology__rxnorm_brand_generic
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
+      alias: rxnorm_brand_generic
+      tags:
+        - terminology
+      column_types:
+        product_rxcui: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        product_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        product_tty: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        brand_vs_generic: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        brand_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+        clinical_product_rxcui: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        clinical_product_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        clinical_product_tty: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        ingredient_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        dose_form_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
+
