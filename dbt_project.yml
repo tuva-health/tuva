@@ -41,6 +41,8 @@ vars:
     # Default timezone is UTC
     tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
+on-run-end:
+  - "{{ log_warning_for_seeds() }}"
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
@@ -57,7 +59,7 @@ seeds:
   the_tuva_project:
     clinical_concept_library:
       clinical_concept_library__clinical_concepts:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.4','tuva_clinical_concepts.csv',compression=true,null_marker=true) }}"
+#        +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.4','tuva_clinical_concepts.csv',compression=true,null_marker=true) }}"
       clinical_concept_library__coding_systems:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.8.4','tuva_coding_systems.csv',compression=true,null_marker=true) }}"
       clinical_concept_library__value_set_members:
