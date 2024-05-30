@@ -66,7 +66,7 @@ seeds:
 
     reference_data:
       reference_data__code_type:
-#        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','code_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','code_type.csv',compression=true,null_marker=true) }}"
       reference_data__ansi_fips_state:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','ansi_fips_state.csv',compression=true,null_marker=true) }}"
       reference_data__calendar:
@@ -122,7 +122,7 @@ seeds:
       terminology__ndc:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','ndc.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
-        +post-hook: "{{ load_seed('tuva-public-resources/provider_data','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_provider_data/0.8.5','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
       terminology__payer_type:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','payer_type.csv',compression=true,null_marker=true) }}"
       terminology__place_of_service:
@@ -142,7 +142,7 @@ seeds:
       terminology__snomed_ct:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','snomed_ct.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct_transitive_closures:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','snomed_ct_transitive_closures.csv',compression=true,null_marker=true) }}"
+#        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','snomed_ct_transitive_closures.csv',compression=true,null_marker=true) }}"
       terminology__snomed_icd_10_map:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.8.5','snomed_icd_10_map.csv',compression=true,null_marker=true) }}"
 
