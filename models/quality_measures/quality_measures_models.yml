@@ -1221,6 +1221,81 @@ models:
       materialized: view
     description: >
       Performance Period definition for Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+  
+  - name: quality_measures__int_cqm438_denominator_criteria1
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm438_denominator_criteria1
+      tags: quality_measures
+      materialized: table
+    description: >
+      Subset of denominator logic for submission of criteria 1 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm438_denominator_criteria2
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm438_denominator_criteria2
+      tags: quality_measures
+      materialized: table
+    description: >
+      Subset of denominator logic for submission of criteria 2 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm438_denominator_criteria3
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm438_denominator_criteria3
+      tags: quality_measures
+      materialized: table
+    description: >
+      Subset of denominator logic for submission of criteria 3 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_cqm438_denominator
     config:
@@ -1250,111 +1325,6 @@ models:
         description: >
           The denominator is associated with a given patient population that 
           may be counted as eligible to meet a measure’s inclusion requirements.
-      - name: tuva_last_run
-        description: The date and timestamp of the dbt run.
-  
-  - name: quality_measures__int_cqm438_denominator_criteria1
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator_criteria1
-      tags: quality_measures
-      materialized: table
-    description: >
-      Subset of denominator logic for submission of criteria 1 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
-
-  - name: quality_measures__int_cqm438_denominator_criteria2
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator_criteria2
-      tags: quality_measures
-      materialized: table
-    description: >
-      Subset of denominator logic for submission of criteria 2 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
-
-  - name: quality_measures__int_cqm438_denominator_criteria3
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator_criteria3
-      tags: quality_measures
-      materialized: table
-    description: >
-      Subset of denominator logic for submission of criteria 3 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
-
-  - name: quality_measures__int_cqm438_numerator
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_numerator
-      tags: quality_measures
-      materialized: table
-    description: >
-      Numerator logic for the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
-    columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
-      - name: performance_period_begin
-        description: Beginning date of the performance or measurement period.
-      - name: performance_period_end
-        description: Ending date of the performance or measurement period.
-      - name: measure_id
-        description: Unique measure identification number.
-      - name: measure_name
-        description: Name of the measure.
-      - name: measure_version
-        description: Version of the measure.
-      - name: evidence_date
-        description: >
-          Date of event or service that places patient in the numerator.
-      - name: evidence_value
-        description: >
-          Observed evidence value for the patients in the numerator.
-      - name: numerator_flag
-        description: >
-          The numerator reflects the subset of patients in the denominator 
-          for whom a particular service has been provided or for whom a 
-          particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -1434,6 +1404,42 @@ models:
         description: Name of the measure.
       - name: measure_version
         description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm438_numerator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm438_numerator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Numerator logic for the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
