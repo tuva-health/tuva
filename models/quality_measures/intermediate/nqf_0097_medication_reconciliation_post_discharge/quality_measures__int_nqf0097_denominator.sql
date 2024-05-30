@@ -153,11 +153,6 @@ with visit_codes as (
         , pp.measure_id
         , pp.measure_name
         , pp.measure_version
-        , case
-            when patients_with_age.max_age < 65
-                then 1
-            else 0
-            end as is_older_than_65_flag
         , visits_encounters.encounter_end_date as discharge_date
         , 1 as denominator_flag
     from patients_with_age
@@ -179,7 +174,6 @@ with visit_codes as (
         , cast(measure_name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_version as {{ dbt.type_string() }}) as measure_version
         , cast(discharge_date as date) as discharge_date
-        , cast(is_older_than_65_flag as integer) as is_older_than_65_flag
         , cast(denominator_flag as integer) as denominator_flag
     from qualifying_patients
 
@@ -194,7 +188,6 @@ select
     , measure_name
     , measure_version
     , discharge_date
-    , is_older_than_65_flag
     , denominator_flag
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
