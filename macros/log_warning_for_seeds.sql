@@ -11,7 +11,7 @@
             {% if var('error_empty_seeds',False) == true %}
                 {% do exceptions.raise_compiler_error ("The seed " ~ seed ~ " contains no data.  Check tuva:dbt_project.yml configurations to ensure data was correctly loaded with post hook") %}
             {% else %}
-                {% do log("The seed " ~ seed ~ " contains no data.  Check tuva:dbt_project.yml configurations to ensure data was correctly loaded with post hook", info=True) %}
+                {% do exceptions.warn("The seed " ~ seed ~ " contains no data.  Check tuva:dbt_project.yml configurations to ensure data was correctly loaded with post hook") %}
             {% endif %}
         {% endif %}
     {% endfor %}
