@@ -28,7 +28,7 @@ with cholesterol_codes as (
         , source_code_type
         , normalized_code
         , normalized_code_type
-    from {{ ref('quality_measures__stg_core__condition')}}
+    from {{ ref('quality_measures__stg_core__condition') }}
 
 )
 
@@ -78,8 +78,9 @@ with cholesterol_codes as (
 )
 
 , labs as (
+
     select
-        patient_id
+          patient_id
         , result
         , result_date
         , collection_date
@@ -87,15 +88,16 @@ with cholesterol_codes as (
         , source_code
         , normalized_code_type
         , normalized_code
-    from {{ ref('quality_measures__stg_core__lab_result')}}
+    from {{ ref('quality_measures__stg_core__lab_result') }}
 
 )
 
 , cholesterol_tests_with_result as (
+
     select
       labs.patient_id
     , labs.result as evidence_value
-    , coalesce(collection_date,result_date) as evidence_date
+    , coalesce(collection_date, result_date) as evidence_date
     , cholesterol_codes.concept_name
     , row_number() over(partition by labs.patient_id order by 
                           labs.result desc

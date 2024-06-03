@@ -27,7 +27,7 @@ with diabetes_codes as (
         , source_code_type
         , normalized_code
         , normalized_code_type
-    from {{ ref('quality_measures__stg_core__condition')}}
+    from {{ ref('quality_measures__stg_core__condition') }}
 
 )
 
@@ -54,7 +54,7 @@ with diabetes_codes as (
         , measure_name
         , measure_version 
     from diabetes_conditions
-    inner join {{ref('quality_measures__int_cqm438__performance_period')}} pp
+    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} pp
     on evidence_date <= pp.performance_period_end
 
 )

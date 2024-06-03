@@ -150,5 +150,5 @@ select
     , measure_id
     , measure_name
     , measure_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

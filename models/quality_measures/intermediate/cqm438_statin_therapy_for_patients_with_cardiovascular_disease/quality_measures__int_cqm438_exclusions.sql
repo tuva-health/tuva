@@ -33,7 +33,7 @@ with exclusion_codes as (
             when 'ICD10PCS' then 'icd-10-pcs'
           else lower(code_system) end as code_system
         , concept_name
-    from {{ref('quality_measures__value_sets')}}
+    from {{ ref('quality_measures__value_sets') }}
     where lower(concept_name) in  (
             'rhabdomyolysis'
           , 'breastfeeding'
@@ -55,7 +55,7 @@ with exclusion_codes as (
     , exclusion_date
     , exclusion_reason
     , exclusion_type
-  from {{ref('quality_measures__int_shared_exclusions_hospice_palliative')}}
+  from {{ ref('quality_measures__int_shared_exclusions_hospice_palliative') }}
   where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
@@ -147,7 +147,7 @@ with exclusion_codes as (
       , coalesce(prescribing_date, dispensing_date) as exclusion_date
       , source_code
       , source_code_type
-    from {{ref('quality_measures__stg_core__medication')}}
+    from {{ ref('quality_measures__stg_core__medication') }}
 
 )
 
@@ -157,7 +157,7 @@ with exclusion_codes as (
         patient_id
       , dispensing_date
       , ndc_code
-    from {{ref('quality_measures__stg_pharmacy_claim')}} 
+    from {{ ref('quality_measures__stg_pharmacy_claim') }} 
 
 )
 
@@ -308,7 +308,7 @@ with exclusion_codes as (
       , patients_with_exclusions.exclusion_date
       , patients_with_exclusions.exclusion_reason  
   from patients_with_exclusions
-  inner join {{ref('quality_measures__int_cqm438_denominator')}} as denominator
+  inner join {{ ref('quality_measures__int_cqm438_denominator') }} as denominator
       on patients_with_exclusions.patient_id = denominator.patient_id
 
 )
@@ -330,5 +330,5 @@ select
     , exclusion_date
     , exclusion_reason
     , exclusion_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

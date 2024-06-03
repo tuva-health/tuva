@@ -110,7 +110,7 @@ with ascvd_codes as (
         , pp.measure_name
         , pp.measure_version
     from historical_ascvd
-    inner join {{ref('quality_measures__int_cqm438__performance_period')}} pp
+    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} pp
     on evidence_date <= pp.performance_period_end
 
 )
@@ -135,5 +135,5 @@ select
     , measure_id
     , measure_name
     , measure_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

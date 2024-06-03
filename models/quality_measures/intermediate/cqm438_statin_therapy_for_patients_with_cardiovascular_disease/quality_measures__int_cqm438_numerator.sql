@@ -22,7 +22,7 @@ with denominator as (
           code
         , code_system
         , concept_name
-    from {{ref('quality_measures__value_sets')}}
+    from {{ ref('quality_measures__value_sets') }}
     where lower(concept_name) in  (
           'high intensity statin therapy'
         , 'low intensity statin therapy'
@@ -71,7 +71,7 @@ with denominator as (
         patient_id
       , dispensing_date as evidence_date
       , ndc_code
-    from {{ref('quality_measures__stg_pharmacy_claim')}} as pharmacy_claims
+    from {{ ref('quality_measures__stg_pharmacy_claim') }} as pharmacy_claims
     inner join statin_codes
     on pharmacy_claims.ndc_code = statin_codes.code
         and lower(statin_codes.code_system) = 'ndc'
@@ -85,7 +85,7 @@ with denominator as (
         , coalesce(dispensing_date, prescribing_date) as evidence_date
         , source_code
         , source_code_type
-    from {{ref('quality_measures__stg_core__medication')}} as medications
+    from {{ ref('quality_measures__stg_core__medication') }} as medications
     inner join statin_codes
         on medications.source_code = statin_codes.code
         and medications.source_code_type = statin_codes.code_system
@@ -99,7 +99,7 @@ with denominator as (
         , conditions.recorded_date as evidence_date
         , conditions.source_code
         , conditions.source_code_type
-    from {{ ref('quality_measures__stg_core__condition')}} conditions
+    from {{ ref('quality_measures__stg_core__condition') }} conditions
     inner join statin_codes
         on conditions.source_code_type = statin_codes.code_system
             and conditions.source_code = statin_codes.code
