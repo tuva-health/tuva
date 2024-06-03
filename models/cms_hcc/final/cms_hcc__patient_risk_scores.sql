@@ -28,12 +28,12 @@ with seed_adjustment_rates as (
 
     select
         patient_id
-        , cast(substr(year_month, 1, 4) as integer) as eligible_year
+        , cast({{ substring('year_month', 1, 4) }} as integer) as eligible_year
         , COUNT(1) as member_months
-    from  {{ ref('financial_pmpm__member_months') }}
+    from  {{ ref('cms_hcc__stg_financial_pmpm__member_months') }}
     group by
         patient_id
-        , cast(substr(year_month, 1, 4) as integer)
+        , cast({{ substring('year_month', 1, 4) }} as integer)
 )
 
 , raw_score as (
