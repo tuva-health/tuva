@@ -48,12 +48,17 @@ with patients_with_ascvd as (
 , visit_codes as (
 
     select
-          value_sets.code
-        , value_sets.code_system
-    from {{ ref('quality_measures__value_sets') }} value_sets
-    inner join {{ ref('quality_measures__concepts') }} concepts
-        on value_sets.concept_name = concepts.concept_name
-            and concepts.measure_id = 'CQM438'
+          code
+        , code_system
+    from {{ ref('quality_measures__value_sets') }} 
+    where lower(concept_name) in (
+          'annual wellness visit'
+        , 'office visit'
+        , 'outpatient consultation'
+        , 'preventive care services established office visit, 18 and up'
+        , 'preventive care services individual counseling'
+        , 'preventive care services initial office visit, 18 and up'
+    )
 
 )
 
@@ -76,7 +81,7 @@ with patients_with_ascvd as (
         , 'encounter inpatient'
         , 'acute inpatient'
         , 'emergency department'
-     )
+    )
 
 )
 
@@ -120,7 +125,7 @@ with patients_with_ascvd as (
 
     union all
     
-    select *, cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc, cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
 
 )
