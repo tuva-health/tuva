@@ -17,7 +17,7 @@ with denominator as (
 
 )
 
-, reconsilation_codes as (
+, reconciliation_codes as (
 
     select
           concept_name
