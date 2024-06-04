@@ -41,7 +41,7 @@ with denominator as (
 
 )
 
-, reconsilation_procedures as (
+, reconcilation_procedures as (
 
     select
           procedures.patient_id
