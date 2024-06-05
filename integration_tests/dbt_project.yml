@@ -2,18 +2,18 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: default
+profile: herself_health
 
 vars:
   error_empty_seeds: true
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
-  test_data_override: false
+  use_synthetic_data: true
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
   input_database: tuva
-  input_schema: input_layer
+  input_schema: core_stage
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
@@ -72,3 +72,7 @@ seeds:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','observation.csv',headers=true) }}"
     pharmacy_claim_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"
+
+models:
+  integration_tests:
+    +materialized: ephemeral
