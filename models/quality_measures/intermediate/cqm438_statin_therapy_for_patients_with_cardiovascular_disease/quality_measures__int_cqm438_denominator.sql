@@ -58,6 +58,7 @@ with patients_with_ascvd as (
         , 'preventive care services established office visit, 18 and up'
         , 'preventive care services individual counseling'
         , 'preventive care services initial office visit, 18 and up'
+        , 'outpatient encounters for preventive care'
     )
 
 )
@@ -77,10 +78,6 @@ with patients_with_ascvd as (
         , 'outpatient'
         , 'outpatient rehabilitation'
         , 'telehealth'
-        , 'nonacute inpatient'
-        , 'encounter inpatient'
-        , 'acute inpatient'
-        , 'emergency department'
     )
 
 )

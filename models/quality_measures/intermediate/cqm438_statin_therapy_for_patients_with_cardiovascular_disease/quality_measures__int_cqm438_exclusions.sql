@@ -44,6 +44,7 @@ with exclusion_codes as (
           , 'statin allergen'
           , 'end stage renal disease'
           , 'statin associated muscle symptoms'
+          , 'medical reason'
     )
 
 )

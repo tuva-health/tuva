@@ -92,20 +92,6 @@ with denominator as (
         
 )
 
-, condition_statin_related as (
-
-    select 
-          conditions.patient_id
-        , conditions.recorded_date as evidence_date
-        , conditions.source_code
-        , conditions.source_code_type
-    from {{ ref('quality_measures__stg_core__condition') }} conditions
-    inner join statin_codes
-        on conditions.source_code_type = statin_codes.code_system
-            and conditions.source_code = statin_codes.code
-
-)
-
 , qualifying_patients as (
 
     select
@@ -126,13 +112,6 @@ with denominator as (
           medication_statin_related.patient_id
         , medication_statin_related.evidence_date
     from medication_statin_related
-
-    union all
-
-    select
-          condition_statin_related.patient_id
-        , condition_statin_related.evidence_date  
-    from condition_statin_related
 
 )
 

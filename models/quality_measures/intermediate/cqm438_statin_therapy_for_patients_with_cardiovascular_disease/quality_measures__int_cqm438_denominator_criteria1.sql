@@ -14,11 +14,11 @@ with ascvd_codes as (
             , 'myocardial infarction'
             , 'pci'
             , 'stable and unstable angina'
-            , 'atherosclerosis and peripheral arterial disease'
             , 'cabg or pci procedure'
             , 'cabg surgeries'
             , 'cerebrovascular disease stroke or tia'
             , 'ischemic heart disease or related diagnoses'
+            , 'carotid intervention'
         )
 
 )
