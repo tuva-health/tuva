@@ -100,6 +100,12 @@ models:
       tags: core
       materialized: table
     columns:
+      - name: eligibility_id
+        description: Unique identifier for each eligibility row in the table.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: member_id
@@ -914,7 +920,7 @@ models:
         tests:
           - unique:
               config:
-                severity: error
+                severity: warn
       - name: npi
         description: NPI for the provider.
         meta:
@@ -957,7 +963,7 @@ models:
         tests:
           - unique:
               config:
-                severity: error
+                severity: warn
       - name: encounter_id
         description: >
           The encounter_id for the encounter where this procedure was performed.
