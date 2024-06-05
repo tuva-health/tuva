@@ -30,33 +30,7 @@
 
 {%- macro postgres__try_to_cast_date(column_name, date_format) -%}
 
-    {%- if date_format == 'YYYY-MM-DD' -%}
-    case
-      when {{ column_name }} similar to '[0-9]{4}-[0-9]{2}-[0-9]{2}'
-      then to_date( {{ column_name }}, 'YYYY-MM-DD')
-      else date(NULL)
-    end
-    {%- elif date_format == 'YYYYMMDD' -%}
-    case
-      when {{ column_name }} similar to '[0-9]{4}[0-9]{2}[0-9]{2}'
-      then to_date( {{ column_name }}, 'YYYYMMDD')
-      else date(NULL)
-    end
-    {%- elif date_format == 'MM/DD/YYYY' -%}
-    case
-      when {{ column_name }} similar to '[0-9]{2}/[0-9]{2}/[0-9]{4}'
-      then to_date( {{ column_name }}, 'MM/DD/YYYY')
-      else date(NULL)
-    end
-    {%- elif date_format == 'YYYY-MM-DD HH:MI:SS' -%}
-    case
-      when {{ column_name }} similar to '[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}'
-      then to_date( {{ column_name }}, 'YYYY-MM-DD HH:MI:SS')
-      else date(NULL)
-    end
-    {%- else -%}
-    date(NULL)
-    {%- endif -%}
+    {{ dbt.safe_cast(column_name, api.Column.translate_type("date")).strip() }}
 
 {%- endmacro -%}
 
