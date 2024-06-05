@@ -41,15 +41,15 @@ with denominator as (
 
 )
 
-, reconcilation_procedures as (
+, reconciliation_procedures as (
 
     select
           procedures.patient_id
         , procedures.procedure_date
     from procedures
-    inner join reconsilation_codes
-        on procedures.source_code = reconsilation_codes.code
-            and procedures.source_code_type = reconsilation_codes.code_system
+    inner join reconciliation_codes
+        on procedures.source_code = reconciliation_codes.code
+            and procedures.source_code_type = reconciliation_codes.code_system
 
 )
 
@@ -62,12 +62,12 @@ with denominator as (
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
-        , reconsilation_procedures.procedure_date as evidence_date
+        , reconciliation_procedures.procedure_date as evidence_date
         , 1 as numerator_flag
     from denominator
-    inner join reconsilation_procedures
-        on denominator.patient_id = reconsilation_procedures.patient_id
-    where {{ datediff('denominator.discharge_date', 'reconsilation_procedures.procedure_date', 'day') }} between 0 and 30
+    inner join reconciliation_procedures
+        on denominator.patient_id = reconciliation_procedures.patient_id
+    where {{ datediff('denominator.discharge_date', 'reconciliation_procedures.procedure_date', 'day') }} between 0 and 30
 
 )
 

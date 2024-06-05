@@ -18,7 +18,15 @@ with visit_codes as (
     select
         concept_name
     from {{ ref('quality_measures__concepts') }}
-    where measure_id = 'NQF0097'
+    where concept_name in (
+          'annual wellness visit'
+        , 'care services in long term residential facility'
+        , 'encounter to document medications'
+        , 'home healthcare services'
+        , 'office visit'
+        , 'outpatient'
+        , 'psychoanalysis'
+    )
 
 )
 
