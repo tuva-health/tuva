@@ -119,7 +119,7 @@ with cholesterol_codes as (
         , evidence_date
     from cholesterol_tests_with_result
     where rn= 1 
-        and evidence_value >= 190
+        and cast(evidence_value as {{ dbt.type_numeric() }}) >= 190
 
 )
 
