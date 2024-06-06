@@ -19,6 +19,8 @@ with measures_unioned as (
     select * from {{ ref('quality_measures__int_cbe0055_long') }}
     union all
     select * from {{ ref('quality_measures__int_nqf0097_long') }}
+    union all
+    select * from {{ ref('quality_measures__int_cqm438_long') }}
     
 )
 
