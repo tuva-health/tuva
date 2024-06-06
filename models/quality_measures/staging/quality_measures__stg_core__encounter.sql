@@ -9,6 +9,7 @@ select
       patient_id
     , encounter_id
     , encounter_type
+    , length_of_stay
     , encounter_start_date
     , encounter_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -20,6 +21,7 @@ select
       patient_id
     , encounter_id
     , encounter_type
+    , length_of_stay
     , encounter_start_date
     , encounter_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -31,6 +33,7 @@ select
       cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
+    , cast(null as {{dbt.type_numeric()}} ) as length_of_stay
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_start_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_end_date
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
