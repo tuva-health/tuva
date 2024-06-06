@@ -108,7 +108,7 @@ with cholesterol_codes as (
        and labs.normalized_code_type = cholesterol_codes.code_system )
       or ( labs.source_code = cholesterol_codes.code
        and labs.source_code_type = cholesterol_codes.code_system )
-        and {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
+    where {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
 
 )
 
