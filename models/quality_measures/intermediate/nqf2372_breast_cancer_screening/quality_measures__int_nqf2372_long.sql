@@ -3,15 +3,7 @@
    )
 }}
 
-/* selecting the full patient population as the grain of this table */
-with patient as (
-
-    select distinct patient_id
-    from {{ ref('quality_measures__stg_core__patient') }}
-
-)
-
-, denominator as (
+with denominator as (
 
     select
           patient_id
@@ -29,11 +21,6 @@ with patient as (
 
     select
           patient_id
-        , performance_period_begin
-        , performance_period_end
-        , measure_id
-        , measure_name
-        , measure_version
         , evidence_date
         , numerator_flag
     from {{ ref('quality_measures__int_nqf2372_numerator') }}
@@ -54,7 +41,7 @@ with patient as (
 , measure_flags as (
 
     select
-          patient.patient_id
+          denominator.patient_id
         , case
             when denominator.patient_id is not null
             then denominator.denominator_flag
@@ -78,13 +65,11 @@ with patient as (
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
-    from patient
-        left join denominator
-            on patient.patient_id = denominator.patient_id
+    from denominator
         left join numerator
-            on patient.patient_id = numerator.patient_id
+            on denominator.patient_id = numerator.patient_id
         left join exclusions
-            on patient.patient_id = exclusions.patient_id
+            on denominator.patient_id = exclusions.patient_id
 
 )
 
