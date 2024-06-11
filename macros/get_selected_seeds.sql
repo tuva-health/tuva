@@ -6,7 +6,7 @@
     {% set ns = namespace(selected_seeds=[]) %}
 
     {% for node in nodes %}
-        {% if node.resource_type == 'seed' and node.unique_id in selected_nodes and node.package_name in['the_tuva_project','tuva'] %}
+        {% if node.resource_type == 'seed' and node.unique_id in selected_nodes and node.package_name in['the_tuva_project','tuva','ci_testing',''] %}
             {% set fully_qualified_name = node.database ~ '.' ~ node.schema ~ '.' ~ node.alias %}
             {% do ns.selected_seeds.append(fully_qualified_name) %}
         {% endif %}
