@@ -49,7 +49,7 @@ with period_end as (
         , case
           when extract(month from performance_period_end) between 1 and 3
             then extract(year from performance_period_end) || '-01-01'
-          else extract(year from performance_period_end) || '10-01'
+          else extract(year from performance_period_end) || '-10-01'
           end
           as performance_period_begin
     from period_end
@@ -64,7 +64,9 @@ with period_end as (
     , case
         when extract(month from performance_period_end) between 1 and 3
             then (extract(year from performance_period_end) - 1) || '-08-01'
-        else extract(year from performance_period_end) || '-08-01'
+        when extract(month from performance_period_end) between 10 and 12
+            then extract(year from performance_period_end) || '-08-01'
+        else NULL
     end as lookback_period_august
   from period_begin
 
