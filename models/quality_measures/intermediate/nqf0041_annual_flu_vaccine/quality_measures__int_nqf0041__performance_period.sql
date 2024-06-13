@@ -39,7 +39,7 @@ with period_end as (
 )
 
 /*
-    set performance period begin to January or December
+    set performance period begin to January or October
     for visits in influenza season
 */
 , period_begin as (
