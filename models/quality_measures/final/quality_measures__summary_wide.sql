@@ -103,31 +103,32 @@ with measures_long as (
 
     select
           measures_long.patient_id
-        , nqf_2372.performance_flag as nqf_2372
-        , nqf_0034.performance_flag as nqf_0034
-        , nqf_0059.performance_flag as nqf_0059
-        , cqm_236.performance_flag as cqm_236
-        , nqf_0053.performance_flag as nqf_0053
-        , cbe_0055.performance_flag as cbe_0055
-        , nqf_0097.performance_flag as nqf_0097
-        , cqm_438.performance_flag as cqm_438
+        , max(nqf_2372.performance_flag) as nqf_2372
+        , max(nqf_0034.performance_flag) as nqf_0034
+        , max(nqf_0059.performance_flag) as nqf_0059
+        , max(cqm_236.performance_flag) as cqm_236
+        , max(nqf_0053.performance_flag) as nqf_0053
+        , max(cbe_0055.performance_flag) as cbe_0055
+        , max(nqf_0097.performance_flag) as nqf_0097
+        , max(cqm_438.performance_flag) as cqm_438
     from measures_long
-    left join nqf_2372
-         on measures_long.patient_id = nqf_2372.patient_id
-    left join nqf_0034
-         on measures_long.patient_id = nqf_0034.patient_id
-    left join nqf_0059
-         on measures_long.patient_id = nqf_0059.patient_id
-    left join cqm_236
-         on measures_long.patient_id = cqm_236.patient_id
-    left join nqf_0053
-         on measures_long.patient_id = nqf_0053.patient_id
-    left join cbe_0055
-         on measures_long.patient_id = cbe_0055.patient_id
-    left join nqf_0097
-         on measures_long.patient_id = nqf_0097.patient_id
-    left join cqm_438
-         on measures_long.patient_id = cqm_438.patient_id
+        left join nqf_2372
+            on measures_long.patient_id = nqf_2372.patient_id
+        left join nqf_0034
+            on measures_long.patient_id = nqf_0034.patient_id
+        left join nqf_0059
+            on measures_long.patient_id = nqf_0059.patient_id
+        left join cqm_236
+            on measures_long.patient_id = cqm_236.patient_id
+        left join nqf_0053
+            on measures_long.patient_id = nqf_0053.patient_id
+        left join cbe_0055
+            on measures_long.patient_id = cbe_0055.patient_id
+        left join nqf_0097
+            on measures_long.patient_id = nqf_0097.patient_id
+        left join cqm_438
+            on measures_long.patient_id = cqm_438.patient_id
+    group by measures_long.patient_id
 
 )
 
