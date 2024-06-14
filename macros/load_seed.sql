@@ -188,7 +188,9 @@ FORMAT_OPTIONS (
   {% if null_marker == true %} 'nullValue' = '\\N', {% else %} {% endif %}
   'enforceSchema' = 'true',
   'inferSchema' = 'false',
-  'sep' = ','
+  'sep' = ',',
+  'escape' = "\"",
+  'multiline' = 'true'
 )
 COPY_OPTIONS (
   'mergeSchema' = 'false',
