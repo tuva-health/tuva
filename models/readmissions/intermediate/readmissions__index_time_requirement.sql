@@ -15,11 +15,12 @@ with cte as (
   from {{ ref('readmissions__encounter') }}
 )
 
-select encounter_id, '{{ var('tuva_last_run')}}' as tuva_last_run
+select encounter_id
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('readmissions__encounter') }}
 cross join cte
 where discharge_date <= {{ dbt.dateadd (
 datepart = "day"
 , interval = -30
-, from_date_or_timestamp = cte.max_discharge
+, from_date_or_timestamp = "cte.max_discharge"
 )}}
