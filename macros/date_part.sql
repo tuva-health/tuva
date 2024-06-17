@@ -11,3 +11,7 @@
 {% macro bigquery__date_part(datepart, date) -%}
     extract({{ datepart }} from {{ date }})
 {%- endmacro %}
+
+{% macro athena__date_part(datepart, date) -%}
+    extract({{ datepart }} from {{ date }})
+{%- endmacro %}

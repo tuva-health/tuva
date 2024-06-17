@@ -84,6 +84,11 @@ copy  {{ this }}
 
 {% endmacro %}
 
+{% macro athena__load_seed(uri, pattern, compression, headers, null_marker) %}
+  {% if execute %}
+    {% do adapter.load_tuva_seed(this, uri, pattern, compression, headers, null_marker) %}
+  {% endif %}
+{% endmacro %}
 
 
 {% macro snowflake__load_seed(uri,pattern,compression,headers,null_marker) %}
