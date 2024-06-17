@@ -96,8 +96,8 @@ with all_conditions as (
         , cast('Prior coding history' as {{ dbt.type_string() }}) as reason
         , icd_10_cm_code
             || case
-                when last_billed is not null then ' last billed on ' || last_billed
-                when last_billed is null and last_recorded is not null then ' last recorded on ' || last_recorded
+                when last_billed is not null then ' last billed on ' || cast(last_billed as {{ dbt.type_string() }})
+                when last_billed is null and last_recorded is not null then ' last recorded on ' || cast(last_recorded as {{ dbt.type_string() }})
                 else ' (missing recorded and billing dates) '
           end as contributing_factor
         , coalesce(last_billed, last_recorded) as condition_date

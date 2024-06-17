@@ -1,10 +1,11 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
 
-with normalize as(
+with normalize_cte as(
     select 
         med.claim_id
         , med.data_source
@@ -20,7 +21,7 @@ with normalize as(
         , data_source
         , discharge_disposition_code
         , count(*) as discharge_disposition_occurrence_count
-    from normalize
+    from normalize_cte
     where discharge_disposition_code is not null
     group by 
         claim_id

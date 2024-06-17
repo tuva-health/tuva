@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -8,7 +9,7 @@ select
     'medical_claim' as claim_category
     , claim_id
     , patient_id
-    , cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),2) as year_month
+    , cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) || substring('0'||cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}),-2) as year_month
 from {{ ref('core__medical_claim') }}
 )
 
@@ -17,7 +18,7 @@ select
     'pharmacy_claim' as claim_category
     , claim_id
     , patient_id
-    , cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) || right('0'||cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}),2) as year_month
+    , cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) || substring('0'||cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}),-2) as year_month
 from {{ ref('core__pharmacy_claim') }}
 )
 , union_orphans as(

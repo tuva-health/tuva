@@ -1011,7 +1011,7 @@ models:
         - claims_preprocessing
     tests:
       - unique:
-          column_name: "(claim_id||'-'||claim_line_number)"
+          column_name: "claim_id || '-' || CAST(claim_line_number AS {{ dbt.type_string() }})"
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

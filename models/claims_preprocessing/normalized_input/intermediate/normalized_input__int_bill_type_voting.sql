@@ -5,7 +5,7 @@
 }}
 
 
-with normalize as(
+with normalize_cte as(
     select 
         med.claim_id
         , med.data_source
@@ -21,7 +21,7 @@ with normalize as(
         , data_source
         , bill_type_code
         , count(*) as bill_type_occurrence_count
-    from normalize
+    from normalize_cte
     where bill_type_code is not null
     group by 
         claim_id
