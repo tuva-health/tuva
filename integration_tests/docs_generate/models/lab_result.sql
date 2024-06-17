@@ -26,4 +26,6 @@ select
     , cast(null as {{ dbt.type_string() }} ) as specimen
     , cast(null as {{ dbt.type_string() }} ) as ordering_practitioner_id
     , cast(null as {{ dbt.type_string() }} ) as data_source
+    , cast(null as {{ dbt.type_string() }} ) as file_name
+    , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
 limit 0
