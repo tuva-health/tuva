@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('insights_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -24,7 +25,7 @@ from {{ ref('core__pharmacy_claim') }}
   select 
     med.* 
   from medical_claim_orphan med
-  left join {{ ref('financial_pmpm__member_months') }} months
+  left join {{ ref('core__member_months') }} months
       on med.patient_id = months.patient_id
       and med.year_month = months.year_month
   where months.patient_id is null
@@ -34,7 +35,7 @@ from {{ ref('core__pharmacy_claim') }}
   select 
     med.* 
   from pharmacy_claim_orphan med
-  left join {{ ref('financial_pmpm__member_months') }} months
+  left join {{ ref('core__member_months') }} months
       on med.patient_id = months.patient_id
       and med.year_month = months.year_month
   where months.patient_id is null

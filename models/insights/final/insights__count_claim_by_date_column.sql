@@ -79,7 +79,7 @@ with date_stage as(
         'member_months' as date_field
         , year_month
         , count(*) as distinct_count
-    from {{ ref('financial_pmpm__member_months') }}
+    from {{ ref('core__member_months') }}
     group by
         year_month
 )
