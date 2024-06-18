@@ -16,7 +16,7 @@
 
 
 select
-    cast(med.claim_id as {{ dbt.type_string() }} )|| '-' ||cast(med.claim_line_number as {{ dbt.type_int() }} ) as medical_claim_id
+    cast(med.claim_id as {{ dbt.type_string() }} )|| '-' ||cast(med.claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
     , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
     , cast(coalesce(ap.encounter_id,ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id 
