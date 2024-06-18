@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -25,4 +26,6 @@ select
     , copayment_amount
     , deductible_amount
     , data_source
+    , file_name
+    , ingest_datetime
 from {{ ref('pharmacy_claim') }}
