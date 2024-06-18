@@ -30,7 +30,7 @@ with seed_adjustment_rates as (
         patient_id
         , cast({{ substring('year_month', 1, 4) }} as integer) as eligible_year
         , COUNT(1) as member_months
-    from  {{ ref('cms_hcc__stg_financial_pmpm__member_months') }}
+    from  {{ ref('cms_hcc__stg_core__member_months') }}
     group by
         patient_id
         , cast({{ substring('year_month', 1, 4) }} as integer)
