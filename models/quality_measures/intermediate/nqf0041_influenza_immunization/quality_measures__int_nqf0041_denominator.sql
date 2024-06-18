@@ -33,8 +33,8 @@ with visit_codes as (
     select patient_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
-    from {{ref('quality_measures__stg_core__encounter')}} encounter
-    inner join {{ref('quality_measures__int_nqf0041__performance_period')}} as pp
+    from {{ ref('quality_measures__stg_core__encounter') }} encounter
+    inner join {{ ref('quality_measures__int_nqf0041__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
@@ -53,11 +53,11 @@ with visit_codes as (
           patient_id
         , procedure_date as min_date
         , procedure_date as max_date
-    from {{ref('quality_measures__stg_core__procedure')}} proc
-    inner join {{ref('quality_measures__int_nqf0041__performance_period')}}  as pp
+    from {{ ref('quality_measures__stg_core__procedure') }} procedures
+    inner join {{ ref('quality_measures__int_nqf0041__performance_period') }}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join visit_codes
-        on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
+        on coalesce(procedures.normalized_code,procedures.source_code) = visit_codes.code
 
 )
 
@@ -67,8 +67,8 @@ with visit_codes as (
           patient_id
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
-    from {{ref('quality_measures__stg_medical_claim')}} medical_claim
-    inner join {{ref('quality_measures__int_nqf0041__performance_period')}}  as pp on
+    from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
+    inner join {{ ref('quality_measures__int_nqf0041__performance_period') }}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join visit_codes
@@ -114,7 +114,7 @@ with visit_codes as (
         , round({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0, 1)  as age_in_one_decimal_point
         , max_date
         , qualifying_types
-    from {{ref('quality_measures__stg_core__patient')}} p
+    from {{ ref('quality_measures__stg_core__patient') }} p
     inner join encounters_by_patient e
         on p.patient_id = e.patient_id
     where p.death_date is null
@@ -126,7 +126,7 @@ with visit_codes as (
     select
         distinct
           patients_with_age.patient_id
-        , patients_with_age.age_in_one_decimal_point as age
+        , floor(patients_with_age.age_in_one_decimal_point) as age
         , pp.performance_period_begin
         , pp.performance_period_end
         , pp.measure_id
@@ -134,7 +134,7 @@ with visit_codes as (
         , pp.measure_version
         , 1 as denominator_flag
     from patients_with_age
-    cross join {{ref('quality_measures__int_nqf0041__performance_period')}} pp
+    cross join {{ ref('quality_measures__int_nqf0041__performance_period') }} pp
     where age_in_one_decimal_point >= 0.5
 
 )
