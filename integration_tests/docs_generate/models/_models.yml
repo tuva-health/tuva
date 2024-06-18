@@ -86,6 +86,12 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
 
   - name: medical_claim
     config:
@@ -675,6 +681,16 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
+          
+          
+          
+
   - name: pharmacy_claim
     config:
       database: tuva
@@ -822,6 +838,13 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: encounter
     config:
@@ -922,6 +945,12 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
 
   - name: lab_result
     config:
@@ -1010,6 +1039,13 @@ models:
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: location
     config:
@@ -1049,6 +1085,13 @@ models:
         description: The longitude of the location.
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: medication
     config:
@@ -1110,6 +1153,14 @@ models:
           Unique identifier for the practitioner who ordered the medication.
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
+          
 
   - name: observation
     config:
@@ -1162,6 +1213,13 @@ models:
         description: The normalized high end of the reference range.
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: patient
     config:
@@ -1211,6 +1269,13 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: practitioner
     config:
@@ -1242,6 +1307,14 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
+          
 
   - name: procedure
     config:
@@ -1316,3 +1389,9 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage

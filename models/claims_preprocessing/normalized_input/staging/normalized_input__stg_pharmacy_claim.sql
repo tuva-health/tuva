@@ -27,4 +27,6 @@ select
     , deductible_amount
     , in_network_flag
     , data_source
+    , file_name
+    , ingest_datetime
 from {{ ref('pharmacy_claim') }}
