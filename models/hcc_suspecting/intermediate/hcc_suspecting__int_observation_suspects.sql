@@ -351,9 +351,9 @@ with conditions as (
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
         , 'PHQ-9 result '
-            || cast(depression_assessments_ordered.result as {{ dbt.type_string() }})
+            || CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
             || ' on '
-            || depression_assessments_ordered.observation_date
+            || CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
           as contributing_factor
     from depression_assessments_ordered
         inner join seed_hcc_descriptions
