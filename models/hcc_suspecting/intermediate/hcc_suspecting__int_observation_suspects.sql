@@ -275,18 +275,18 @@ with conditions as (
         , hcc_code
         , hcc_description
         , 'BMI result '
-            || cast(observation_result as {{ dbt.type_string() }})
-            || case
-                when condition_code is null then ''
-                else ' with '
-                    || condition_concept_name
+            || CAST(observation_result AS {{ dbt.type_string() }})
+            || CASE
+                WHEN condition_code IS NULL THEN ''
+                ELSE ' with '
+                    || CAST(condition_concept_name AS {{ dbt.type_string() }})
                     || ' ('
-                    || condition_code
+                    || CAST(condition_code AS {{ dbt.type_string() }})
                     || ' on '
-                    || condition_date
+                    || CAST(condition_date AS {{ dbt.type_string() }})
                     || ')'
-                end
-          as contributing_factor
+                END
+          AS contributing_factor
     from hcc_48_unioned
 
 )
