@@ -487,7 +487,12 @@ where diagnosis_code_25 is not null
 )
 
 select distinct
-      cast(unpivot_cte.data_source||'_'||unpivot_cte.claim_id||'_'||unpivot_cte.diagnosis_rank||'_'||unpivot_cte.source_code as {{ dbt.type_string() }} ) as condition_id
+      cast(
+    cast(unpivot_cte.data_source as {{ dbt.type_string() }}) || '_' ||
+    cast(unpivot_cte.claim_id as {{ dbt.type_string() }}) || '_' ||
+    cast(unpivot_cte.diagnosis_rank as {{ dbt.type_string() }}) || '_' ||
+    cast(unpivot_cte.source_code as {{ dbt.type_string() }})
+  as {{ dbt.type_string() }}) as condition_id
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
