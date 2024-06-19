@@ -3,7 +3,7 @@
 ) }}
 
 select distinct
-    cast(left(e.year_month, 4) as int) as year_number
+    cast(substring(e.year_month, 1, 4) as int) AS year_number
   , e.patient_id
   , e.data_source
   , {{ datediff('p.birth_date', 'e.first_day_of_month', 'year') }} as age

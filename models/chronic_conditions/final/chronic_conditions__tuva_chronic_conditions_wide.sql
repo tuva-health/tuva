@@ -120,7 +120,7 @@ where condition = 'Ulcerative colitis'
 chrohns as (
 select distinct patient_id
 from {{ ref('chronic_conditions__tuva_chronic_conditions_long')  }}
-where condition = 'Chrohn\'s Disease'
+where condition = 'Crohn''s Disease'
 ),
 
 holicobacter as (
