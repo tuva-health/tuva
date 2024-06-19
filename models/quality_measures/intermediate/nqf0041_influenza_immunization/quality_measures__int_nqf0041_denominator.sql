@@ -72,7 +72,7 @@ with visit_codes as (
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join visit_codes
-        on medical_claim.hcpcs_code= visit_codes.code
+        on medical_claim.hcpcs_code = visit_codes.code
 
 )
 
@@ -111,7 +111,7 @@ with visit_codes as (
     select
           p.patient_id
         , min_date
-        , round({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0, 1)  as age_in_one_decimal_point
+        , ({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0) as age_in_decimal_point
         , max_date
         , qualifying_types
     from {{ ref('quality_measures__stg_core__patient') }} p
@@ -126,7 +126,7 @@ with visit_codes as (
     select
         distinct
           patients_with_age.patient_id
-        , floor(patients_with_age.age_in_one_decimal_point) as age
+        , patients_with_age.age_in_decimal_point as age
         , pp.performance_period_begin
         , pp.performance_period_end
         , pp.measure_id
@@ -135,7 +135,7 @@ with visit_codes as (
         , 1 as denominator_flag
     from patients_with_age
     cross join {{ ref('quality_measures__int_nqf0041__performance_period') }} pp
-    where age_in_one_decimal_point >= 0.5
+    where age_in_decimal_point >= 0.5 --filters patients aged 6 months or older
 
 )
 
@@ -143,7 +143,7 @@ with visit_codes as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(age as integer) as age
+        , round(cast(age as {{ dbt.type_numeric() }}), 1) as age -- ensures age is seen in one decimal point
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id

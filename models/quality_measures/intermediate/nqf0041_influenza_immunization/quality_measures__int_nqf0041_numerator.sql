@@ -43,7 +43,7 @@ with denominator as (
     from {{ ref('quality_measures__stg_core__procedure') }} as procedures
     inner join influenza_vaccination_code
         on procedures.source_code = influenza_vaccination_code.code
-        and procedures.source_code_type = influenza_vaccination_code.code_system
+            and procedures.source_code_type = influenza_vaccination_code.code_system
 
 )
 

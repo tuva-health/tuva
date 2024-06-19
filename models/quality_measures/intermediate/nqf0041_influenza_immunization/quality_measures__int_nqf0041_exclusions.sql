@@ -5,6 +5,7 @@
 
 {%- set performance_period_begin -%}
 (
+
   select 
     performance_period_begin
   from {{ ref('quality_measures__int_nqf0041__performance_period') }}
@@ -14,6 +15,7 @@
 
 {%- set performance_period_end -%}
 (
+
   select 
     performance_period_end
   from {{ ref('quality_measures__int_nqf0041__performance_period') }}
@@ -23,6 +25,7 @@
 
 {%- set lookback_period_august -%}
 (
+
   select 
     lookback_period_august
   from {{ ref('quality_measures__int_nqf0041__performance_period') }}
@@ -103,8 +106,7 @@ with denominator as (
 
     select
           medical_claim.patient_id
-        , medical_claim.claim_start_date
-        , medical_claim.claim_end_date
+        , coalesce(medical_claim.claim_end_date, medical_claim.claim_start_date) as exclusion_date
         , medical_claim.hcpcs_code
         , exclusion_codes.concept_name as concept_name
     from medical_claim
@@ -153,7 +155,7 @@ with denominator as (
 
     select
         patient_id
-      , coalesce(claim_end_date, claim_start_date) as exclusion_date
+      , exclusion_date
       , concept_name as exclusion_reason
     from med_claim_exclusions
 
@@ -175,8 +177,8 @@ with denominator as (
       , valid_exclusions.exclusion_reason
     from valid_exclusions
     inner join denominator
-    on valid_exclusions.patient_id = denominator.patient_id
-    
+      on valid_exclusions.patient_id = denominator.patient_id
+
 )
 
 , add_data_types as (

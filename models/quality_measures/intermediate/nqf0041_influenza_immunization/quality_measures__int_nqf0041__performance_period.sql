@@ -60,7 +60,7 @@ with period_end as (
 
 )
 
--- lookback_period for august
+-- lookback_period for august of either current or previous year
 , lookback_period as (
 
   select
