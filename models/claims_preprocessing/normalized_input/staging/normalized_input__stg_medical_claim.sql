@@ -146,7 +146,6 @@ select
     , procedure_date_23
     , procedure_date_24
     , procedure_date_25
+    , in_network_flag
     , data_source
-    , file_name
-    , ingest_datetime
 from {{ ref('medical_claim') }}

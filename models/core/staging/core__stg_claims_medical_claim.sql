@@ -58,6 +58,7 @@ select
     , cast(med.copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
     , cast(med.deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
     , cast(med.total_cost_amount as {{ dbt.type_numeric() }} ) as total_cost_amount
+    , cast(med.in_network_flag as int ) as in_network_flag
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} med
