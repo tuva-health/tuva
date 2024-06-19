@@ -19,4 +19,6 @@ select
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_low
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_high
     , cast(null as {{ dbt.type_string() }} ) as data_source
+    , cast(null as {{ dbt.type_string() }} ) as file_name
+    , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
 limit 0

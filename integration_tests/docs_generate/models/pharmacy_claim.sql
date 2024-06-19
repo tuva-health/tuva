@@ -19,4 +19,6 @@ select
     , copayment_amount
     , deductible_amount
     , data_source
+    , file_name
+    , ingest_datetime
 from {{ ref('pharmacy_claim_seed') }}
