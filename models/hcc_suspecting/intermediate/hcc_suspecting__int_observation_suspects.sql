@@ -34,7 +34,7 @@ with conditions as (
     select
           patient_id
         , observation_date
-        , cast(result as numeric) as result
+        , CAST(result AS {{ dbt.type_numeric() }}) AS result
         , code_type
         , code
         , data_source
