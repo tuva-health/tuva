@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -147,6 +148,7 @@ select
 	, cast(coalesce(px_date.procedure_date_24, undetermined.procedure_date_24) as date ) as procedure_date_24
 	, cast(coalesce(px_date.procedure_date_25, undetermined.procedure_date_25) as date ) as procedure_date_25
 	, cast(med.data_source as {{ dbt.type_string() }} ) as data_source
+    , cast(med.in_network_flag as int ) as in_network_flag
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_string() }} ) as tuva_last_run
 from {{ ref('normalized_input__stg_medical_claim') }} med
 left join {{ref('normalized_input__int_admit_source_final') }} ad_source
