@@ -37,6 +37,6 @@ select
 from condition
 left join ccsr__dx_vertical_pivot
     on condition.normalized_code = ccsr__dx_vertical_pivot.code
-left join dxccsr_body_systems using(ccsr_parent_category)
+left join dxccsr_body_systems on ccsr__dx_vertical_pivot.ccsr_parent_category = dxccsr_body_systems.ccsr_parent_category
 
     

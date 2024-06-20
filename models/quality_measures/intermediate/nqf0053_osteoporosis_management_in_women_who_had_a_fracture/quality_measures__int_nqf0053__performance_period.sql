@@ -62,19 +62,19 @@ with period_end as (
 -- lookback_period for last june 30 and december 31
 , lookback_period as (
 
-  select
-      *
-    , case
-        when performance_period_end >= cast(extract(year from performance_period_end) || '-06-30' as date)
-            then extract(year from performance_period_end) || '-06-30'
-        else extract(year from performance_period_begin) || '-06-30'
-      end as lookback_period_june
-    , case
-        when performance_period_end >= cast(extract(year from performance_period_end) || '-12-31' as date)
-            then extract(year from performance_period_end) || '-12-31'
-        else extract(year from performance_period_begin) || '-12-31'
-      end as lookback_period_december
-  from period_begin
+SELECT
+  *,
+  CASE
+    WHEN performance_period_end >= CAST(CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-06-30' AS DATE)
+      THEN CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-06-30'
+    ELSE CAST(extract(year FROM performance_period_begin) AS {{ dbt.type_string() }}) || '-06-30'
+  END AS lookback_period_june,
+  CASE
+    WHEN performance_period_end >= CAST(CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-12-31' AS DATE)
+      THEN CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-12-31'
+    ELSE CAST(extract(year FROM performance_period_begin) AS {{ dbt.type_string() }}) || '-12-31'
+  END AS lookback_period_december
+FROM period_begin
 
 )
 

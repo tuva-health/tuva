@@ -13,7 +13,7 @@ left join {{ ref('service_category__emergency_department_institutional') }} b
 left join {{ ref('service_category__urgent_care_institutional') }} c
   on a.claim_id = c.claim_id
 where a.claim_type = 'institutional'
-  and left(a.bill_type_code,2) in ('13','71','73')
+  and substring(a.bill_type_code, 1, 2) in ('13','71','73')
   and b.claim_id is null
   and c.claim_id is null
   
