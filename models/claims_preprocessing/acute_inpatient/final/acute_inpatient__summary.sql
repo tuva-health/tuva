@@ -75,17 +75,16 @@ group by 1
     from {{ ref('acute_inpatient__stg_eligibility') }}
     )
 
-, provider as (
+, facility as (
     select
         a.encounter_id
         , max(a.facility_npi) as facility_npi
-        , b.provider_first_name
-        , b.provider_last_name
+        , b.provider_organization_name
         , count(distinct facility_npi) as npi_count
     from {{ ref('acute_inpatient__institutional_encounter_id') }} a
     left join {{ ref('terminology__provider') }} b
     on a.facility_npi = b.npi
-    group by 1,3,4
+    group by 1,3
 )
 
 select
@@ -99,9 +98,8 @@ select
 , c.diagnosis_code_type as primary_diagnosis_code_type
 , c.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-, f.facility_npi
-, f.provider_first_name
-, f.provider_last_name
+, f.facility_npi as facility_id
+, f.provider_organization_name as facility_name
 , c.ms_drg_code
 , j.ms_drg_description
 , j.medical_surgical
@@ -130,7 +128,7 @@ left join professional_claim_details d
   on a.encounter_id = d.encounter_id
 left join patient e
   on a.patient_id = e.patient_id
-left join provider f
+left join facility f
   on a.encounter_id = f.encounter_id
 left join {{ ref('terminology__discharge_disposition') }} g
   on c.discharge_disposition_code = g.discharge_disposition_code

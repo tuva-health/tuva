@@ -21,9 +21,12 @@ select
        , cast(payer as {{ dbt.type_string() }} ) as payer
        , cast(plan as {{ dbt.type_string() }} ) as plan
        , cast(prescribing_provider_npi as {{ dbt.type_string() }} ) as prescribing_provider_npi
+       , cast(prescribing_provider_name as {{ dbt.type_string() }} ) as prescribing_provider_name
        , cast(dispensing_provider_npi as {{ dbt.type_string() }} ) as dispensing_provider_npi
+       , cast(dispensing_provider_name as {{ dbt.type_string() }} ) as dispensing_provider_name
        , cast(dispensing_date as date ) as dispensing_date
        , cast(ndc_code as {{ dbt.type_string() }} ) as ndc_code
+       , cast(ndc_description as {{ dbt.type_string() }} ) as ndc_description
        , cast(quantity as integer ) as quantity
        , cast(days_supply as integer ) as days_supply
        , cast(refills as integer ) as refills
@@ -35,4 +38,4 @@ select
        , cast(deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
        , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('normalized_input__pharmacy_claim') }} 
+from {{ ref('normalized_input__pharmacy_claim') }}  pharm

@@ -5,14 +5,14 @@
 }}
 
 with distinct_encounters as (
-select distinct
-  a.encounter_id
-, a.patient_id
-, b.encounter_start_date
-, b.encounter_end_date
-from {{ ref('emergency_department__int_encounter_id') }} a
-inner join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} b
-  on a.encounter_id = b.encounter_id
+    select distinct
+      a.encounter_id
+    , a.patient_id
+    , b.encounter_start_date
+    , b.encounter_end_date
+    from {{ ref('emergency_department__int_encounter_id') }} a
+    inner join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} b
+      on a.encounter_id = b.encounter_id
 )
 
 , institutional_claim_details as (
@@ -54,39 +54,38 @@ inner join {{ ref('emergency_department__int_encounter_start_and_end_dates') }} 
 )
 
 , professional_claim_details as (
-select
-  b.encounter_id
-, sum(paid_amount) as prof_paid_amount
-, sum(allowed_amount) as prof_allowed_amount
-, sum(charge_amount) as prof_charge_amount
-from {{ ref('medical_claim') }} a
-inner join {{ ref('emergency_department__int_encounter_id') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_line_number = b.claim_line_number
-  and a.claim_type = 'professional'
-group by 1
+    select
+      b.encounter_id
+    , sum(paid_amount) as prof_paid_amount
+    , sum(allowed_amount) as prof_allowed_amount
+    , sum(charge_amount) as prof_charge_amount
+    from {{ ref('medical_claim') }} a
+    inner join {{ ref('emergency_department__int_encounter_id') }} b
+      on a.claim_id = b.claim_id
+      and a.claim_line_number = b.claim_line_number
+      and a.claim_type = 'professional'
+    group by 1
 )
 
 , patient as (
-select distinct
-  patient_id
-, birth_date
-, gender
-, race
-from {{ ref('eligibility') }}
+    select distinct
+          patient_id
+        , birth_date
+        , gender
+        , race
+    from {{ ref('eligibility') }}
 )
 
-, provider as (
-select
-  a.encounter_id
-, max(a.facility_npi) as facility_npi
-, b.provider_first_name
-, b.provider_last_name
-, count(distinct facility_npi) as npi_count
-from {{ ref('emergency_department__int_institutional_encounter_id') }} a
-left join {{ ref('terminology__provider') }} b
-  on a.facility_npi = b.npi
-group by 1,3,4
+, facility as (
+    select
+          a.encounter_id
+        , max(a.facility_npi) as facility_npi
+        , b.provider_organization_name
+        , count(distinct facility_npi) as npi_count
+    from {{ ref('emergency_department__int_institutional_encounter_id') }} a
+    left join {{ ref('terminology__provider') }} b
+      on a.facility_npi = b.npi
+    group by 1,3
 )
 
 select
@@ -100,9 +99,8 @@ select
     , c.diagnosis_code_type as primary_diagnosis_code_type
     , c.diagnosis_code_1 as primary_diagnosis_code
     , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-    , f.facility_npi
-    , f.provider_first_name
-    , f.provider_last_name
+    , f.facility_npi as facility_id
+    , f.provider_organization_name as facility_name
     , c.ms_drg_code
     , j.ms_drg_description
     , j.medical_surgical
@@ -131,7 +129,7 @@ left join professional_claim_details d
   on a.encounter_id = d.encounter_id
 left join patient e
   on a.patient_id = e.patient_id
-left join provider f
+left join facility f
   on a.encounter_id = f.encounter_id
 left join {{ ref('terminology__discharge_disposition') }} g
   on c.discharge_disposition_code = g.discharge_disposition_code
