@@ -16,7 +16,8 @@
 
 
 select
-    cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
+    cast(med.claim_id as {{ dbt.type_string() }} )|| '-' ||cast(med.claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
+    , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
     , cast(coalesce(ap.encounter_id,ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id 
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
@@ -58,6 +59,7 @@ select
     , cast(med.copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
     , cast(med.deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
     , cast(med.total_cost_amount as {{ dbt.type_numeric() }} ) as total_cost_amount
+    , cast(med.in_network_flag as int ) as in_network_flag
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} med

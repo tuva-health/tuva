@@ -14,7 +14,8 @@
 
 
 select
-         cast(claim_id as {{ dbt.type_string() }} ) as claim_id
+        cast(claim_id as {{ dbt.type_string() }} ) || '-' || cast(claim_line_number as {{ dbt.type_string() }} ) as pharmacy_claim_id
+       , cast(claim_id as {{ dbt.type_string() }} ) as claim_id
        , cast(claim_line_number as integer ) as claim_line_number
        , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
@@ -33,6 +34,7 @@ select
        , cast(coinsurance_amount as {{ dbt.type_numeric() }} ) as coinsurance_amount
        , cast(copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
        , cast(deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
+       , cast(in_network_flag as int ) as in_network_flag
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__pharmacy_claim') }} 
