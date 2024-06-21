@@ -1010,8 +1010,10 @@ models:
         - normalized_input
         - claims_preprocessing
     tests:
-      - unique:
-          column_name: "(claim_id||'-'||claim_line_number)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

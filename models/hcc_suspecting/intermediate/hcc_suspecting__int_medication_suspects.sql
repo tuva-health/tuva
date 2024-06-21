@@ -113,11 +113,11 @@ with all_medications as (
         , cast('Medication suspect' as {{ dbt.type_string() }}) as reason
         , concept_name
             || ' ('
-            || drug_code
+            || CAST(drug_code AS {{ dbt.type_string() }})
             || ')'
             || ' dispensed on '
-            || dispensing_date
-          as contributing_factor
+            || CAST(dispensing_date AS {{ dbt.type_string() }})
+          AS contributing_factor
         , dispensing_date as suspect_date
     from add_billed_flag
 

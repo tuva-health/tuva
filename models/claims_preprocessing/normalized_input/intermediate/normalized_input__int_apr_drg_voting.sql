@@ -4,7 +4,9 @@
    )
 }}
 
-with normalize as(
+
+with normalize_cte as(
+
     select 
         med.claim_id
         , med.data_source
@@ -22,7 +24,7 @@ with normalize as(
         , apr_drg_code
         , apr_drg_description
         , count(*) as apr_drg_occurrence_count
-    from normalize
+    from normalize_cte
     where apr_drg_code is not null
     group by 
         claim_id

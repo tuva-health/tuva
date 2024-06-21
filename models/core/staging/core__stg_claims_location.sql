@@ -12,6 +12,7 @@ from {{ ref('core__stg_claims_medical_claim') }}
 
 union all
 
+
 select distinct rendering_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
 

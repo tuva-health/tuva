@@ -199,19 +199,20 @@ with conditions as (
         , condition_2_recorded_date
         , current_year_billed
         , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
-        , condition_1_concept_name
+        , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
             || ' ('
-            || condition_1_code
+            || CAST(condition_1_code AS {{ dbt.type_string() }})
             || ' on '
-            || condition_1_recorded_date
+            || CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
             || ')'
             || ' and '
-            || condition_2_concept_name
+            || CAST(condition_2_concept_name AS {{ dbt.type_string() }})
             || ' ('
-            || condition_2_code
+            || CAST(condition_2_code AS {{ dbt.type_string() }})
             || ' on '
-            || condition_2_recorded_date
+            || CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
             || ')'
+
           as contributing_factor
         , condition_1_recorded_date as suspect_date
     from add_billed_flag

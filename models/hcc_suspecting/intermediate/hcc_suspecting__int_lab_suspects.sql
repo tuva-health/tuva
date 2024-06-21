@@ -125,12 +125,13 @@ with egfr_labs as (
             when result between 45 and 59 then '329'
           end as hcc_code
         , 'eGFR ('
-            || code
+            || CAST(code AS {{ dbt.type_string() }})
             || ') result '
-            || cast(result as {{ dbt.type_string() }})
+            || CAST(result AS {{ dbt.type_string() }})
             || ' on '
-            || result_date
-          as contributing_factor
+            || CAST(result_date AS {{ dbt.type_string() }})
+          AS contributing_factor
+
     from eligible_labs
     where row_num = 1
 
