@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -18,14 +19,22 @@ select
     , claim_line_end_date
     , admission_date
     , discharge_date
-    , admit_source_code
-    , admit_type_code
-    , discharge_disposition_code
-    , place_of_service_code
-    , bill_type_code
-    , ms_drg_code
-    , apr_drg_code
-    , revenue_center_code
+    , ad_src.admit_source_code
+    , ad_src.admit_source_description
+    , ad_type.admit_type_code
+    , ad_type.admit_type_description
+    , dis.discharge_disposition_code
+    , dis.discharge_disposition_description
+    , pos.place_of_service_code
+    , pos.place_of_service_description
+    , tob.bill_type_code
+    , tob.bill_type_description
+    , msdrg.ms_drg_code
+    , msdrg.ms_drg_description
+    , aprdrg.apr_drg_code
+    , aprdrg.apr_drg_description
+    , rev.revenue_center_code
+    , rev.revenue_center_description
     , service_unit_quantity
     , hcpcs_code
     , hcpcs_modifier_1
@@ -34,8 +43,11 @@ select
     , hcpcs_modifier_4
     , hcpcs_modifier_5
     , rendering_npi
+    , rendnpi.npi as rendering_name
     , billing_npi
+    , billnpi.npi as billing_name
     , facility_npi
+    , facnpi.npi as facility_name
     , paid_date
     , paid_amount
     , allowed_amount
@@ -148,5 +160,27 @@ select
     , procedure_date_25
     , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('normalized_input__stg_medical_claim') }}
+from {{ ref('normalized_input__stg_medical_claim') }} med
+left join {{ ref('terminology__admit_source')}} ad_src
+    on med.admit_source_code = ad_src.admit_source_code
+left join {{ ref('terminology__admit_type')}} ad_type
+    on med.admit_type_code = ad_type.admit_type_code
+left join {{ ref('terminology__discharge_disposition')}} dis
+    on med.discharge_disposition_code = dis.discharge_disposition_code
+left join {{ ref('terminology__place_of_service')}} pos
+    on med.place_of_service_code = pos.place_of_service_code
+left join {{ ref('terminology__bill_type')}} tob
+    on med.bill_type_code = tob.bill_type_code
+left join {{ ref('terminology__ms_drg')}} msdrg
+    on med.ms_drg_code = msdrg.ms_drg_code
+left join {{ ref('terminology__apr_drg')}} aprdrg
+    on med.apr_drg_code = aprdrg.apr_drg_code
+left join {{ ref('terminology__revenue_center')}} rev
+    on med.revenue_center_code = rev.revenue_center_code
+left join {{ ref('terminology__provider')}} rendnpi
+    on med.rendering_npi = rendnpi.npi
+left join {{ ref('terminology__provider')}} billnpi
+    on med.billing_npi = billnpi.npi
+left join {{ ref('terminology__provider')}} facnpi
+    on med.facility_npi = facnpi.npi
 where claim_type in ('undetermined')

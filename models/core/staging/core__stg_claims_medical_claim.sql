@@ -34,13 +34,21 @@ select
     , cast(srv_group.service_category_1 as {{ dbt.type_string() }} ) as service_category_1
     , cast(srv_group.service_category_2 as {{ dbt.type_string() }} ) as service_category_2
     , cast(med.admit_source_code as {{ dbt.type_string() }} ) as admit_source_code
+    , cast(med.admit_source_description as {{ dbt.type_string() }} ) as admit_source_description
     , cast(med.admit_type_code as {{ dbt.type_string() }} ) as admit_type_code
+    , cast(med.admit_type_description as {{ dbt.type_string() }} ) as admit_type_description
     , cast(med.discharge_disposition_code as {{ dbt.type_string() }} ) as discharge_disposition_code
+    , cast(med.discharge_disposition_description as {{ dbt.type_string() }} ) as discharge_disposition_description
     , cast(med.place_of_service_code as {{ dbt.type_string() }} ) as place_of_service_code
+    , cast(med.place_of_service_description as {{ dbt.type_string() }} ) as place_of_service_description
     , cast(med.bill_type_code as {{ dbt.type_string() }} ) as bill_type_code
+    , cast(med.bill_type_description as {{ dbt.type_string() }} ) as bill_type_description
     , cast(med.ms_drg_code as {{ dbt.type_string() }} ) as ms_drg_code
+    , cast(med.ms_drg_description as {{ dbt.type_string() }} ) as ms_drg_description
     , cast(med.apr_drg_code as {{ dbt.type_string() }} ) as apr_drg_code
+    , cast(med.apr_drg_description as {{ dbt.type_string() }} ) as apr_drg_description
     , cast(med.revenue_center_code as {{ dbt.type_string() }} ) as revenue_center_code
+    , cast(med.revenue_center_description as {{ dbt.type_string() }} ) as revenue_center_description
     , cast(med.service_unit_quantity as {{ dbt.type_numeric() }} ) as service_unit_quantity
     , cast(med.hcpcs_code as {{ dbt.type_string() }} ) as hcpcs_code
     , cast(med.hcpcs_modifier_1 as {{ dbt.type_string() }} ) as hcpcs_modifier_1
@@ -48,9 +56,12 @@ select
     , cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }} ) as hcpcs_modifier_3
     , cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }} ) as hcpcs_modifier_4
     , cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }} ) as hcpcs_modifier_5
-    , cast(med.rendering_npi as {{ dbt.type_string() }} ) as rendering_npi
-    , cast(med.billing_npi as {{ dbt.type_string() }} ) as billing_npi
-    , cast(med.facility_npi as {{ dbt.type_string() }} ) as facility_npi
+    , cast(med.rendering_id as {{ dbt.type_string() }} ) as rendering_id
+    , cast(med.rendering_name as {{ dbt.type_string() }} ) as rendering_name
+    , cast(med.billing_id as {{ dbt.type_string() }} ) as billing_id
+    , cast(med.billing_name as {{ dbt.type_string() }} ) as billing_name
+    , cast(med.facility_id as {{ dbt.type_string() }} ) as facility_id
+    , cast(med.facility_name as {{ dbt.type_string() }} ) as facility_name
     , {{ try_to_cast_date('med.paid_date', 'YYYY-MM-DD') }} as paid_date
     , cast(med.paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
     , cast(med.allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
@@ -72,4 +83,3 @@ left join {{ ref('acute_inpatient__encounter_id') }} ap
 left join {{ ref('emergency_department__int_encounter_id') }} ed
     on med.claim_id = ed.claim_id
     and med.claim_line_number = ed.claim_line_number
-

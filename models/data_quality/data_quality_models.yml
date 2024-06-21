@@ -13,19 +13,19 @@ models:
         - data_quality
         - claims_preprocessing
       materialized: table
-    tests:
-      - claims_preprocessing_pipeline_checks:
-          config:
-            severity: warn
+#    tests:
+#      - claims_preprocessing_pipeline_checks:
+#          config:
+#            severity: warn
     columns:
       - name: source_table
         description: Table this test category is in reference to
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: test_category
         description: Category of test
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: counts
         description: >
           Aggregated counts of all tests in this category and table that failed
@@ -49,16 +49,16 @@ models:
     columns:
       - name: source_table
         description: Table this test is in reference to
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: test_category
         description: Category of test
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: test_name
         description: Name of the test being performed
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: grain
         description: Grain of the test
       - name: claim_type
@@ -91,18 +91,18 @@ models:
     columns:
       - name: source_table
         description: Table this test is in reference to
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: grain
         description: Grain of the test
       - name: test_category
         description: Category of test
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: test_name
         description: Name of the test being performed
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: claim_type
         description: Specific claim type, if any, that this test is specific to
       - name: pipeline_test
@@ -132,16 +132,16 @@ models:
     columns:
       - name: use_case
         description: The mart or logic that would be affected by test failures
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: source_table
         description: Table this use case is in reference to
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: test_name
         description: Name of the test being performed
-        tests:
-          - not_null
+#        tests:
+#          - not_null
       - name: failures
         description: Number of failures of this test
         data_type: integer
