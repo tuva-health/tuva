@@ -25,6 +25,8 @@ where id = 'NQF0041')
 /*
     set performance period end to the end of the current calendar year
     or use the quality_measures_period_end variable if provided
+      - set quality_measures_period_end to december end for last quarter measurement period
+      - set quality_measures_period_end to march end for first quarter measurement period     
 */
 
 with period_end as (
@@ -60,7 +62,10 @@ with period_end as (
 
 )
 
--- lookback_period for august of either current or previous year
+/*
+    lookback_period for august of either current or previous year
+    for immunization qualifying date
+*/
 , lookback_period as (
 
   select
