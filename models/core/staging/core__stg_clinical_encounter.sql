@@ -18,8 +18,8 @@ select
     , cast(discharge_disposition_description as {{ dbt.type_string() }} ) as discharge_disposition_description
     , cast(attending_provider_id as {{ dbt.type_string() }} ) as attending_provider_id
     , cast(attending_provider_name as {{ dbt.type_string() }} ) as attending_provider_name
-    , cast(facility_npi as {{ dbt.type_string() }} ) as facility_id
-    , cast(facility_npi as {{ dbt.type_string() }} ) as facility_name
+    , cast(facility_id as {{ dbt.type_string() }} ) as facility_id
+    , cast(facility_name as {{ dbt.type_string() }} ) as facility_name
     , cast(primary_diagnosis_code_type as {{ dbt.type_string() }} ) as primary_diagnosis_code_type
     , cast(primary_diagnosis_code as {{ dbt.type_string() }} ) as primary_diagnosis_code
     , cast(primary_diagnosis_description as {{ dbt.type_string() }} ) as primary_diagnosis_description

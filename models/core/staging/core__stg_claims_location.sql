@@ -10,12 +10,12 @@ with all_providers_in_claims_dataset as (
 select distinct facility_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
 
-union all
+union distinct
 
 select distinct rendering_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
 
-union all
+union distinct
 
 select distinct billing_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
