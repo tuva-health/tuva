@@ -19,7 +19,7 @@ inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
         b.encounter_id
         , first.diagnosis_code_1
         , first.diagnosis_code_type
-        , first.facility_npi as facility_npi
+        , first.facility_id as facility_id
         , first.ms_drg_code as ms_drg_code
         , first.apr_drg_code as apr_drg_code
         , first.admit_source_code as admit_source_code
@@ -44,7 +44,7 @@ inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
         b.encounter_id
         , first.diagnosis_code_1
         , first.diagnosis_code_type
-        , first.facility_npi
+        , first.facility_id
         , first.ms_drg_code
         , first.apr_drg_code
         , first.admit_source_code
@@ -78,12 +78,12 @@ group by 1
 , facility as (
     select
         a.encounter_id
-        , max(a.facility_npi) as facility_npi
+        , max(a.facility_id) as facility_id
         , b.provider_organization_name
-        , count(distinct facility_npi) as npi_count
+        , count(distinct facility_id) as npi_count
     from {{ ref('acute_inpatient__institutional_encounter_id') }} a
     left join {{ ref('terminology__provider') }} b
-    on a.facility_npi = b.npi
+    on a.facility_id = b.npi
     group by 1,3
 )
 
@@ -98,7 +98,7 @@ select
 , c.diagnosis_code_type as primary_diagnosis_code_type
 , c.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-, f.facility_npi as facility_id
+, f.facility_id as facility_id
 , f.provider_organization_name as facility_name
 , c.ms_drg_code
 , j.ms_drg_description

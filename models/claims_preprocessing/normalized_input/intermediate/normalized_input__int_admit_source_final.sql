@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -9,6 +10,7 @@ select
     , data_source
     , column_name
     , normalized_code
+    , normalized_description
     , occurrence_count
     , next_occurrence_count
     , occurrence_row_count

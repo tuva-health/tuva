@@ -12,7 +12,7 @@ select
     , claim_end_date
     , admission_date
     , discharge_date
-    , facility_npi
+    , facility_id
     , ms_drg_code
     , apr_drg_code
     , admit_source_code

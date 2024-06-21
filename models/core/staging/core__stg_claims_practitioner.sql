@@ -13,17 +13,17 @@
 
 
 with all_providers_in_claims_dataset as (
-select distinct facility_npi as npi, data_source
+select distinct facility_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
 
 union all
 
-select distinct rendering_npi as npi, data_source
+select distinct rendering_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
 
 union all
 
-select distinct billing_npi as npi, data_source
+select distinct billing_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
 ),
 

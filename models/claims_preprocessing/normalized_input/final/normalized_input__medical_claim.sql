@@ -20,13 +20,21 @@ select
 	, cast(coalesce(dates.minimum_admission_date, undetermined.admission_date) as date ) as admission_date
 	, cast(coalesce(dates.maximum_discharge_date, undetermined.discharge_date) as date ) as discharge_date
 	, cast(coalesce(ad_source.normalized_code, undetermined.admit_source_code) as {{ dbt.type_string() }} ) as admit_source_code
+    , cast(coalesce(ad_source.normalized_description, undetermined.admit_source_description) as {{ dbt.type_string() }} ) as admit_source_description
 	, cast(coalesce(ad_type.normalized_code, undetermined.admit_type_code) as {{ dbt.type_string() }} ) as admit_type_code
+    , cast(coalesce(ad_type.normalized_description, undetermined.admit_type_description) as {{ dbt.type_string() }} ) as admit_type_description
 	, cast(coalesce(disch_disp.normalized_code, undetermined.discharge_disposition_code) as {{ dbt.type_string() }} ) as discharge_disposition_code
+    , cast(coalesce(disch_disp.normalized_description, undetermined.discharge_disposition_description) as {{ dbt.type_string() }} ) as discharge_disposition_description
 	, cast(coalesce(pos.normalized_code, undetermined.place_of_service_code) as {{ dbt.type_string() }} ) as place_of_service_code
+    , cast(coalesce(pos.normalized_description, undetermined.place_of_service_description) as {{ dbt.type_string() }} ) as place_of_service_description
 	, cast(coalesce(bill.normalized_code, undetermined.bill_type_code) as {{ dbt.type_string() }} ) as bill_type_code
+    , cast(coalesce(bill.normalized_description, undetermined.bill_type_description) as {{ dbt.type_string() }} ) as bill_type_description
 	, cast(coalesce(ms.normalized_code, undetermined.ms_drg_code) as {{ dbt.type_string() }} ) as ms_drg_code
+    , cast(coalesce(ms.normalized_description, undetermined.ms_drg_description) as {{ dbt.type_string() }} ) as ms_drg_description
 	, cast(coalesce(apr.normalized_code, undetermined.apr_drg_code) as {{ dbt.type_string() }} ) as apr_drg_code
+    , cast(coalesce(apr.normalized_description, undetermined.apr_drg_description) as {{ dbt.type_string() }} ) as apr_drg_description
 	, cast(coalesce(rev.normalized_code, undetermined.revenue_center_code) as {{ dbt.type_string() }} ) as revenue_center_code
+    , cast(coalesce(rev.normalized_description, undetermined.revenue_center_description) as {{ dbt.type_string() }} ) as revenue_center_description
 	, cast(med.service_unit_quantity as {{ dbt.type_string() }} ) as service_unit_quantity
 	, cast(med.hcpcs_code as {{ dbt.type_string() }} ) as hcpcs_code
 	, cast(med.hcpcs_modifier_1 as {{ dbt.type_string() }} ) as hcpcs_modifier_1
@@ -34,10 +42,13 @@ select
 	, cast(med.hcpcs_modifier_3 as {{ dbt.type_string() }} ) as hcpcs_modifier_3
 	, cast(med.hcpcs_modifier_4 as {{ dbt.type_string() }} ) as hcpcs_modifier_4
 	, cast(med.hcpcs_modifier_5 as {{ dbt.type_string() }} ) as hcpcs_modifier_5
-	, cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as {{ dbt.type_string() }} ) as rendering_npi
-	, cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }} ) as billing_npi
-	, cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }} ) as facility_npi
-	, cast(med.paid_date as date ) as paid_date
+	, cast(coalesce(med_npi.normalized_rendering_npi, undetermined.rendering_npi) as {{ dbt.type_string() }} ) as rendering_id
+    , cast(coalesce(med_npi.normalized_rendering_name, undetermined.rendering_name) as {{ dbt.type_string() }} ) as rendering_name
+	, cast(coalesce(med_npi.normalized_billing_npi, undetermined.billing_npi) as {{ dbt.type_string() }} ) as billing_id
+    , cast(coalesce(med_npi.normalized_billing_name, undetermined.billing_name) as {{ dbt.type_string() }} ) as billing_name
+	, cast(coalesce(med_npi.normalized_facility_npi, undetermined.facility_npi) as {{ dbt.type_string() }} ) as facility_id
+	, cast(coalesce(med_npi.normalized_facility_name, undetermined.facility_name) as {{ dbt.type_string() }} ) as facility_name
+    , cast(med.paid_date as date ) as paid_date
 	, cast(med.paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
 	, cast(med.allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
 	, cast(med.charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
