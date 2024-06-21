@@ -53,7 +53,7 @@ select
         when bb.encounter_id is not null then 1
 	else 0
     end as had_readmission_flag,
-    bb.admit_date - aa.discharge_date as days_to_readmit,
+    {{ dbt.datediff("bb.admit_date", "aa.discharge_date", "day") }} as days_to_readmit,
     case
         when ({{ dbt.datediff("bb.admit_date", "aa.discharge_date", "day") }}) <= 30  then 1
 	else 0

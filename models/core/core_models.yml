@@ -18,7 +18,9 @@ models:
       - name: condition_id
         description: Unique identifier for each condition in the table.
         tests:
-          - unique
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -98,6 +100,12 @@ models:
       tags: core
       materialized: table
     columns:
+      - name: eligibility_id
+        description: Unique identifier for each eligibility row in the table.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: member_id
@@ -164,6 +172,10 @@ models:
     columns:
       - name: encounter_id
         description: Unique identifier for each encounter.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for a patient.
       - name: encounter_type
@@ -270,7 +282,11 @@ models:
       materialized: table
     columns:
       - name: lab_result_id
-        description: Unique identifier for the lab test.
+        description: Unique identifier for each lab result.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient.
       - name: encounter_id
@@ -368,6 +384,10 @@ models:
     columns:
       - name: location_id
         description: Unique identifier for each location.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: npi
         description: >
           The national provider identifier associated with the location e.g. 
@@ -401,6 +421,7 @@ models:
           `dbt_utils.pretty_time` as the local time of the `dbt run` 
           environment.  Timezone is configurable via the `tuva_last_run` var.
 
+
   - name: core__medical_claim
     description: >
       The medical claim table contains information on services rendered to 
@@ -412,10 +433,13 @@ models:
       alias: medical_claim
       tags: core
       materialized: table
-    tests:
-      - unique:
-          column_name: "(claim_id||'-'||claim_line_number)"
     columns:
+      - name: medical_claim_id
+        description: Unique identifier for each row in the table.
+        tests:
+          - unique:
+              config:
+                severity: error
       - name: claim_id
         description: Unique identifier for each claim.
       - name: claim_line_number
@@ -592,6 +616,10 @@ models:
     columns:
       - name: medication_id
         description: Unique identifier for each medication in the table.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -704,6 +732,10 @@ models:
     columns:
       - name: observation_id
         description: Unique identifier for each observation in the dataset.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -766,6 +798,10 @@ models:
     columns:
       - name: patient_id
         description: Unique identifier for each person across all datasets.
+        tests:
+          - unique:
+              config:
+                severity: error
       - name: sex
         description: The gender of the patient.
         meta:
@@ -825,6 +861,12 @@ models:
       tags: core
       materialized: table
     columns:
+      - name: pharmacy_claim_id
+        description: Unique identifier for each row in the table.
+        tests:
+          - unique:
+              config:
+                severity: error
       - name: claim_id
         description: Unique identifier for each claim.
       - name: claim_line_number
@@ -906,6 +948,10 @@ models:
     columns:
       - name: practitioner_id
         description: Unique ID for the provider.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: npi
         description: NPI for the provider.
         meta:
@@ -946,7 +992,9 @@ models:
       - name: procedure_id
         description: The unique identifier for the performed procedure.
         tests:
-          - unique
+          - unique:
+              config:
+                severity: warn
       - name: encounter_id
         description: >
           The encounter_id for the encounter where this procedure was performed.

@@ -9,5 +9,5 @@ select distinct
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
-  and left(bill_type_code,2) in ('52')
+  and substring(bill_type_code, 1, 2) in ('52')
   

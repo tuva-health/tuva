@@ -264,8 +264,13 @@ models:
       This model unions condition flags from the 3 upstream stage models that
       calculate them.
     tests:
-      - unique:
-          column_name: "(patient_id || claim_id || start_date || condition)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - claim_id
+            - start_date
+            - condition
+
     columns:
         - name: patient_id
           description: Unique ID for the patient.

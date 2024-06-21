@@ -5,11 +5,13 @@
 }}
 
 
-with normalize as(
+
+with normalize_cte as(
     select 
         med.claim_id
         , med.data_source
         , admit.admit_source_code
+
         , admit.admit_source_description
     from {{ ref('normalized_input__stg_medical_claim') }} med
     inner join {{ ref('terminology__admit_source') }} admit
@@ -23,7 +25,7 @@ with normalize as(
         , admit_source_code
         , admit_source_description
         , count(*) as admit_source_occurrence_count
-    from normalize
+    from normalize_cte
     where admit_source_code is not null
     group by 
         claim_id

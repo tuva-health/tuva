@@ -17,9 +17,9 @@ seeds:
         payment_year: |
           integer
         normalization_factor: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
         ma_coding_pattern_adjustment: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -87,7 +87,7 @@ seeds:
         institutional_status: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -138,7 +138,7 @@ seeds:
         hcc_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -187,7 +187,7 @@ seeds:
         description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -273,7 +273,7 @@ seeds:
         hcc_code_2: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -328,7 +328,7 @@ seeds:
         description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model
@@ -418,7 +418,7 @@ seeds:
         description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         coefficient: |
-          float
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
     columns:
       - name: model_version
         description: Version of the CMS-HCC model

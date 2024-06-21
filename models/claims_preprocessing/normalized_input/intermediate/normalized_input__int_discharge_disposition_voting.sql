@@ -5,7 +5,7 @@
 }}
 
 
-with normalize as(
+with normalize_cte as(
     select 
         med.claim_id
         , med.data_source
@@ -23,7 +23,7 @@ with normalize as(
         , discharge_disposition_code
         , discharge_disposition_description
         , count(*) as discharge_disposition_occurrence_count
-    from normalize
+    from normalize_cte
     where discharge_disposition_code is not null
     group by 
         claim_id

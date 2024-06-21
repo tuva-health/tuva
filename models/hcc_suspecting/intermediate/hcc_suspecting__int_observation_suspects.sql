@@ -34,7 +34,7 @@ with conditions as (
     select
           patient_id
         , observation_date
-        , cast(result as numeric) as result
+        , CAST(result AS {{ dbt.type_numeric() }}) AS result
         , code_type
         , code
         , data_source
@@ -275,18 +275,18 @@ with conditions as (
         , hcc_code
         , hcc_description
         , 'BMI result '
-            || cast(observation_result as {{ dbt.type_string() }})
-            || case
-                when condition_code is null then ''
-                else ' with '
-                    || condition_concept_name
+            || CAST(observation_result AS {{ dbt.type_string() }})
+            || CASE
+                WHEN condition_code IS NULL THEN ''
+                ELSE ' with '
+                    || CAST(condition_concept_name AS {{ dbt.type_string() }})
                     || ' ('
-                    || condition_code
+                    || CAST(condition_code AS {{ dbt.type_string() }})
                     || ' on '
-                    || condition_date
+                    || CAST(condition_date AS {{ dbt.type_string() }})
                     || ')'
-                end
-          as contributing_factor
+                END
+          AS contributing_factor
     from hcc_48_unioned
 
 )
@@ -351,9 +351,9 @@ with conditions as (
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
         , 'PHQ-9 result '
-            || cast(depression_assessments_ordered.result as {{ dbt.type_string() }})
+            || CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
             || ' on '
-            || depression_assessments_ordered.observation_date
+            || CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
           as contributing_factor
     from depression_assessments_ordered
         inner join seed_hcc_descriptions

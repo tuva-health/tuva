@@ -94,7 +94,7 @@ with medical_claims as (
     from medical_claims
     where claim_type = 'institutional'
         and extract(year from claim_end_date) = {{ collection_year }}
-        and left(bill_type_code,2) in ('11','41')
+        and substring(bill_type_code, 1, 2) in ('11','41')
 
 )
 
@@ -115,7 +115,7 @@ with medical_claims as (
     where claim_type = 'institutional'
         and extract(year from claim_end_date) = {{ collection_year }}
         and cpt_hcpcs_list.payment_year = {{ payment_year }}
-        and left(bill_type_code,2) in ('12','13','43','71','73','76','77','85')
+        and substring(bill_type_code, 1, 2) in ('12','13','43','71','73','76','77','85')
 
 )
 
