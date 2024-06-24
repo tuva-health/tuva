@@ -38,8 +38,8 @@ with claim_dates as(
         , inferred_claim_end_date
         , inferred_claim_start_column_used
         , inferred_claim_end_column_used
-        , cast(date_part('year', inferred_claim_start_date) as {{ dbt.type_string() }} ) || lpad(cast(date_part('month', inferred_claim_start_date) as {{ dbt.type_string() }} ),2,'0') AS inferred_claim_start_year_month
-        , cast(date_part('year', inferred_claim_end_date) as {{ dbt.type_string() }} ) || lpad(cast(date_part('month', inferred_claim_end_date) as {{ dbt.type_string() }} ),2,'0') AS inferred_claim_end_year_month
+        , cast({{ date_part("year", "inferred_claim_start_date")}} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "inferred_claim_start_date")}} as {{ dbt.type_string() }} ),2,'0') AS inferred_claim_start_year_month
+        , cast({{ date_part("year", "inferred_claim_end_date")}} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "inferred_claim_end_date")}} as {{ dbt.type_string() }} ),2,'0') AS inferred_claim_end_year_month
     from claim_dates
 
 )
