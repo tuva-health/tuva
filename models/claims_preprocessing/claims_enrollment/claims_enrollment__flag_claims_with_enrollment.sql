@@ -60,6 +60,6 @@ inner join claim_year_month claim
     and mm.payer = claim.payer
     and mm.plan = claim.plan
     and mm.year_month >= claim.inferred_claim_start_year_month
-    and mm.year_month <= inferred_claim_end_year_month
+    and mm.year_month <= claim.inferred_claim_end_year_month
 
 

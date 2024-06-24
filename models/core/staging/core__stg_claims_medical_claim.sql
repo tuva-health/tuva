@@ -88,7 +88,7 @@ select
     cast(med.medical_claim_id as {{ dbt.type_string() }} ) as medical_claim_id
     , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
-    , cast(encounter_id as {{ dbt.type_string() }} ) as encounter_id
+    , cast(med.encounter_id as {{ dbt.type_string() }} ) as encounter_id
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
     , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
@@ -100,8 +100,8 @@ select
     , {{ try_to_cast_date('med.claim_line_end_date', 'YYYY-MM-DD') }} as claim_line_end_date
     , {{ try_to_cast_date('med.admission_date', 'YYYY-MM-DD') }} as admission_date
     , {{ try_to_cast_date('med.discharge_date', 'YYYY-MM-DD') }} as discharge_date
-    , cast(service_category_1 as {{ dbt.type_string() }} ) as service_category_1
-    , cast(service_category_2 as {{ dbt.type_string() }} ) as service_category_2
+    , cast(med.service_category_1 as {{ dbt.type_string() }} ) as service_category_1
+    , cast(med.service_category_2 as {{ dbt.type_string() }} ) as service_category_2
     , cast(med.admit_source_code as {{ dbt.type_string() }} ) as admit_source_code
     , cast(med.admit_source_description as {{ dbt.type_string() }} ) as admit_source_description
     , cast(med.admit_type_code as {{ dbt.type_string() }} ) as admit_type_code
@@ -146,7 +146,7 @@ select
                 else 0
         end as int) as enrollment_flag
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
-    , cast(tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    , cast(med.tuva_last_run as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from medical_claim_stage med
 left join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} enroll
     on med.medical_claim_id = enroll.medical_claim_id
