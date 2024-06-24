@@ -1,3 +1,9 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
+   )
+}}
+
 
 with claim_dates as(
     select
@@ -47,6 +53,7 @@ select
     , claim.inferred_claim_end_year_month
     , claim.inferred_claim_start_column_used
     , claim.inferred_claim_end_column_used
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('core__member_months')}} mm
 inner join claim_year_month claim
     on mm.patient_id = claim.patient_id
