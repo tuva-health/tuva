@@ -206,18 +206,18 @@ from {{ ref('acute_inpatient__institutional_claims') }}
 ),
 
 
-facility_npi_not_unique as (
+facility_id_not_unique as (
 select
-  '22 facility_npi_not_unique' as field,
-  sum(facility_npi_not_unique) as total_count
+  '22 facility_id_not_unique' as field,
+  sum(facility_id_not_unique) as total_count
 from {{ ref('acute_inpatient__institutional_claims') }}
 ),
 
 
-facility_npi_missing as (
+facility_id_missing as (
 select
-  '23 facility_npi_missing' as field,
-  sum(facility_npi_missing) as total_count
+  '23 facility_id_missing' as field,
+  sum(facility_id_missing) as total_count
 from {{ ref('acute_inpatient__institutional_claims') }}
 ),
 
@@ -378,12 +378,12 @@ from discharge_disposition_code_missing
 union all
 
 select *
-from facility_npi_not_unique
+from facility_id_not_unique
 
 union all
 
 select *
-from facility_npi_missing
+from facility_id_missing
 
 union all
 

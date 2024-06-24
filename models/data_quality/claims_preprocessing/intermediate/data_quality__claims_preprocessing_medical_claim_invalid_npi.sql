@@ -32,16 +32,16 @@ with medical_claim as (
         , 'claim_id' as grain
         , medical_claim.claim_id
         , medical_claim.data_source
-        , count(medical_claim.billing_npi) as filled_row_count
+        , count(medical_claim.billing_id) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
          left join {{ ref('terminology__provider')}} pro
-           on medical_claim.billing_npi = pro.npi
+           on medical_claim.billing_id = pro.npi
          left join test_catalog
            on test_catalog.test_name = 'billing_npi invalid'
            and test_catalog.source_table = 'normalized_input__medical_claim'
     where pro.npi is null
-    and medical_claim.billing_npi is not null
+    and medical_claim.billing_id is not null
     group by
           medical_claim.claim_id
         , medical_claim.data_source
@@ -63,16 +63,16 @@ with medical_claim as (
         , 'claim_id' as grain
         , medical_claim.claim_id
         , medical_claim.data_source
-        , count(medical_claim.facility_npi) as filled_row_count
+        , count(medical_claim.facility_id) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
          left join {{ ref('terminology__provider')}} pro
-           on medical_claim.facility_npi = pro.npi
+           on medical_claim.facility_id = pro.npi
          left join test_catalog
-           on test_catalog.test_name = 'facility_npi invalid'
+           on test_catalog.test_name = 'facility_id invalid'
            and test_catalog.source_table = 'normalized_input__medical_claim'
     where pro.npi is null
-    and medical_claim.facility_npi is not null
+    and medical_claim.facility_id is not null
     group by
           medical_claim.claim_id
         , medical_claim.data_source
@@ -94,16 +94,16 @@ with medical_claim as (
         , 'claim_id' as grain
         , medical_claim.claim_id
         , medical_claim.data_source
-        , count(medical_claim.rendering_npi) as filled_row_count
+        , count(medical_claim.rendering_id) as filled_row_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
     from medical_claim
          left join {{ ref('terminology__provider')}} pro
-           on medical_claim.rendering_npi = pro.npi
+           on medical_claim.rendering_id = pro.npi
          left join test_catalog
-           on test_catalog.test_name = 'rendering_npi invalid'
+           on test_catalog.test_name = 'rendering_id invalid'
            and test_catalog.source_table = 'normalized_input__medical_claim'
     where pro.npi is null
-    and medical_claim.rendering_npi is not null
+    and medical_claim.rendering_id is not null
     group by
           medical_claim.claim_id
         , medical_claim.data_source

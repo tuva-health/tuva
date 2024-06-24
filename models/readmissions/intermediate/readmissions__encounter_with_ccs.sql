@@ -15,7 +15,7 @@ select
     aa.admit_date,
     aa.discharge_date,
     aa.discharge_disposition_code,
-    aa.facility_npi,
+    aa.facility_id,
     aa.ms_drg_code,
     aa.paid_amount,
     aa.primary_diagnosis_code,

@@ -23,7 +23,7 @@ select
   start_date,
   end_date,
   discharge_disposition_code,
-  facility_npi,
+  facility_id,
   row_number() over (partition by patient_id order by end_date, start_date, claim_id) as row_num
 from {{ ref('acute_inpatient__institutional_claims') }}
 ),
@@ -36,21 +36,21 @@ select
   aa.row_num as row_num_a,
   bb.row_num as row_num_b,
   case
-    -- Claims with same end_date and same facility_npi should be merged:
+    -- Claims with same end_date and same facility_id should be merged:
     when (aa.end_date = bb.end_date
-          and aa.facility_npi = bb.facility_npi) then 1
+          and aa.facility_id = bb.facility_id) then 1
 
     -- Claims with different end_date and start_date that are
     -- adjacent (i.e. separated by 1 day) should be merged:
     when  ( {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }}  = bb.start_date
-          and aa.facility_npi = bb.facility_npi
+          and aa.facility_id = bb.facility_id
 	  and aa.discharge_disposition_code = '30') then 1
 
     -- Claims with different end_date 
     -- should be merged if they overlap:
     when ( (aa.end_date <> bb.end_date) and 
            (aa.end_date >= bb.start_date) and --overlap requirement
-           (aa.facility_npi = bb.facility_npi)
+           (aa.facility_id = bb.facility_id)
 	 )then 1
     else 0
   end as merge_flag
@@ -97,7 +97,7 @@ select
   aa.start_date,
   aa.end_date,
   aa.discharge_disposition_code,
-  aa.facility_npi,
+  aa.facility_id,
   aa.row_num,
   case when (bb.claim_id is null and cc.claim_id is null) then 1
        else 0
@@ -143,7 +143,7 @@ select
   aa.start_date as start_date,
   aa.end_date as end_date,
   aa.discharge_disposition_code as discharge_disposition_code,
-  aa.facility_npi as facility_npi,
+  aa.facility_id as facility_id,
   aa.row_num as row_num,
   aa.close_flag as close_flag,
   bb.min_closing_row as min_closing_row
@@ -161,7 +161,7 @@ select
   aa.start_date as start_date,
   aa.end_date as end_date,
   aa.discharge_disposition_code as discharge_disposition_code,
-  aa.facility_npi as facility_npi,
+  aa.facility_id as facility_id,
   aa.row_num as row_num,
   aa.close_flag as close_flag,
   aa.min_closing_row as min_closing_row,

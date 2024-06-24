@@ -13,7 +13,7 @@
     , 'claim_start_date'
     , 'claim_end_date'
     , 'place_of_service_code'
-    , 'billing_npi'
+    , 'billing_id'
     , 'paid_date'
     , 'diagnosis_code_type'
     , 'diagnosis_code_1'
