@@ -259,12 +259,12 @@ models:
         description: Name of the plan.
       - name: inferred_claim_start_year_month
         description: |
-          The claim start date year and month.  If claims start date is missing then the following column will be used, 
-          in the following order if also NULL:  admission date, claim end date, discharge date
+          The claim start date year and month.  If claim line start date is missing then the following column will be used, 
+          in the following order if also NULL:  claim start date, admission date
       - name: inferred_claim_end_year_month
         description: |
-          The claim end date year and month.  If claims end date is missing then the following column will be used, 
-          in the following order if also NULL:  discharge date, claim start date, admission date
+          The claim end date year and month.  If claim line end date is missing then the following column will be used, 
+          in the following order if also NULL:  claim end date, discharge date
       - name: inferred_claim_start_column_used
         description: The name of the column used to populated inferred_claim_start_year_month.
       - name: inferred_claim_end_column_used
