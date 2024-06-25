@@ -23,17 +23,6 @@
 )
 {%- endset -%}
 
-{%- set lookback_period_august -%}
-(
-
-  select 
-    lookback_period_august
-  from {{ ref('quality_measures__int_nqf0041__performance_period') }}
-
-)
-{%- endset -%}
-
-
 with denominator as (
     
     select
