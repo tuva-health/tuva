@@ -24,6 +24,9 @@ with visit_codes as (
         , 'preventive care services initial office visit, 18 and up'
         , 'preventive care services, initial office visit, 0 to 17'
         , 'preventive care, established office visit, 0 to 17'
+        , 'online assessments'
+        , 'patient provider interaction'
+        , 'telephone visits'
     )
 
 )
