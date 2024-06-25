@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -16,7 +17,7 @@ select
   mc.admit_source_code,
   mc.admit_type_code,
   mc.discharge_disposition_code,
-  mc.facility_npi,
+  mc.facility_id,
   mc.claim_type,
   mc.data_source
 from {{ ref('emergency_department__stg_medical_claim') }} mc
@@ -119,16 +120,16 @@ select
     when max(discharge_disposition_code) is null then 1
     else 0
   end as discharge_disposition_code_missing,
--- facility_npi_not_unique:
+-- facility_id_not_unique:
   case
-    when count(distinct facility_npi) > 1 then 1
+    when count(distinct facility_id) > 1 then 1
     else 0
-  end as facility_npi_not_unique,
--- facility_npi_missing:  
+  end as facility_id_not_unique,
+-- facility_id_missing:  
   case
-    when max(facility_npi) is null then 1
+    when max(facility_id) is null then 1
     else 0
-  end as facility_npi_missing,
+  end as facility_id_missing,
 -- claim_type_not_unique:
   case
     when count(distinct claim_type) > 1 then 1
@@ -161,7 +162,7 @@ select
   max(admit_source_code) as admit_source_code,
   max(admit_type_code) as admit_type_code,
   max(discharge_disposition_code) as discharge_disposition_code,
-  max(facility_npi) as facility_npi,
+  max(facility_id) as facility_id,
   max(claim_type) as claim_type,
   coalesce(min(admission_date),
            min(claim_start_date)) as start_date,
@@ -192,7 +193,7 @@ select
   h.admit_source_code as admit_source_code,
   h.admit_type_code as admit_type_code,
   h.discharge_disposition_code as discharge_disposition_code,
-  h.facility_npi as facility_npi,
+  h.facility_id as facility_id,
   h.claim_type as claim_type,
   h.start_date as start_date,
   h.end_date as end_date,
@@ -205,8 +206,8 @@ select
         (dq.patient_id_missing = 1) or
         (dq.discharge_disposition_code_not_unique = 1) or
         (dq.discharge_disposition_code_missing = 1) or
-        (dq.facility_npi_not_unique = 1) or
-        (dq.facility_npi_missing = 1) or
+        (dq.facility_id_not_unique = 1) or
+        (dq.facility_id_missing = 1) or
         (h.date_used_as_start_date is null) or
 	(h.date_used_as_end_date is null) or
 	(h.start_date > h.end_date) ) then 1
@@ -276,8 +277,8 @@ select
        as discharge_disposition_code_not_unique,
   dq.discharge_disposition_code_missing
        as discharge_disposition_code_missing,
-  dq.facility_npi_not_unique as facility_npi_not_unique,
-  dq.facility_npi_missing as facility_npi_missing,
+  dq.facility_id_not_unique as facility_id_not_unique,
+  dq.facility_id_missing as facility_id_missing,
   dq.claim_type_not_unique as claim_type_not_unique,
   dq.claim_type_missing as claim_type_missing,
   dq.claim_type_not_institutional as claim_type_not_institutional,

@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -11,7 +12,7 @@ with first_claim_values as(
         , diagnosis_code_type
         , admit_source_code
         , admit_type_code
-        , facility_npi
+        , facility_id
         , ms_drg_code
         , apr_drg_code
     from {{ ref('acute_inpatient__encounter_id')}} e
@@ -27,7 +28,7 @@ select
     , diagnosis_code_type
     , admit_source_code
     , admit_type_code
-    , facility_npi
+    , facility_id
     , ms_drg_code
     , apr_drg_code
     , row_number() over (partition by encounter_id order by claim_start) as claim_row

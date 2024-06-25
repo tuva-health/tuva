@@ -9,7 +9,7 @@ select
     encounter_start_date,
     encounter_end_date,
     discharge_disposition_code,
-    facility_npi,
+    facility_id,
     ms_drg_code,
     paid_amount,
     primary_diagnosis_code,
