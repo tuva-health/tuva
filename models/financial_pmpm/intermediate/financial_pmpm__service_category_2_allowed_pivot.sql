@@ -4,16 +4,22 @@
 }}
 
 with service_cat_2 as (
-select
-  patient_id
-, year_month
-, payer
-, plan
-, service_category_2
-, data_source
-, sum(total_allowed) as total_allowed
-from {{ ref('financial_pmpm__patient_spend_with_service_categories') }}
-group by 1,2,3,4,5,6
+  select
+    patient_id
+  , year_month
+  , payer
+  , plan
+  , service_category_2
+  , data_source
+  , sum(total_allowed) as total_allowed
+  from {{ ref('financial_pmpm__patient_spend_with_service_categories') }}
+  group by
+    patient_id
+  , year_month
+  , payer
+  , plan
+  , service_category_2
+  , data_source
 )
 
 select
@@ -50,4 +56,9 @@ select
 ) }}
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from service_cat_2
-group by 1,2,3,4,5
+group by
+  patient_id
+, year_month
+, payer
+, plan
+, data_source
