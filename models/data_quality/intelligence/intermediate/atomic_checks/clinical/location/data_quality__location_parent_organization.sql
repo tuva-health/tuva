@@ -14,5 +14,5 @@
                 ,case when M.PARENT_ORGANIZATION is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(PARENT_ORGANIZATION AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','location')}} M
+            FROM {{ ref('location') }} M
             

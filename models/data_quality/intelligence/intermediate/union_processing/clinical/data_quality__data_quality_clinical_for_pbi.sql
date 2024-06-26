@@ -44,7 +44,7 @@ pk_examples as (
               COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY,
               ROW_NUMBER() OVER (PARTITION BY detail.SUMMARY_SK ORDER BY detail.SUMMARY_SK) AS RN
        FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
-              left join {{ ref('crosswalk__field_info')}} as field_info on detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
+              left join {{ ref('data_quality__crosswalk_field_info')}} as field_info on detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
                      and detail.field_name = field_info.field_name
        WHERE detail.BUCKET_NAME = 'valid'
               AND field_info.UNIQUE_VALUES_EXPECTED_FLAG = 1
@@ -98,7 +98,7 @@ SELECT
        detail.FIELD_VALUE as FIELD_VALUE,
        COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY
 FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
-LEFT JOIN {{ ref('crosswalk__field_info') }} as field_info ON detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
+LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} as field_info ON detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
        and detail.field_name = field_info.field_name
 WHERE 
        detail.BUCKET_NAME = 'valid'

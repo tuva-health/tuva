@@ -14,5 +14,5 @@
                 ,case when M.QUANTITY is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(QUANTITY AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','medication')}} M
+            FROM {{ ref('medication') }} M
             

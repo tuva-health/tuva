@@ -14,5 +14,5 @@
                 ,case when M.ACCESSION_NUMBER is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(ACCESSION_NUMBER AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{ source('tuva_clinical_input','lab_result') }} M
+            FROM {{ ref('lab_result') }} M
             

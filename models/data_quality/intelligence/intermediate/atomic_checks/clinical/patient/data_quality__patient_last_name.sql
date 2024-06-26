@@ -14,5 +14,5 @@
                 ,case when M.LAST_NAME is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(LAST_NAME AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','patient')}} M
+            FROM {{ ref('patient') }} M
             

@@ -14,5 +14,5 @@
                 ,case when M.PANEL_ID is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(PANEL_ID AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','observation')}} M
+            FROM {{ ref('observation') }} M
             

@@ -12,7 +12,7 @@ UNIQUE_FIELD as (
         ,BASE.Discharge_Disposition_Code || '|' || COALESCE(TERM.DISCHARGE_DISPOSITION_DESCRIPTION, '') as Field
         ,DATA_SOURCE
     FROM BASE
-    LEFT JOIN {{ source('tuva_terminology','discharge_disposition') }} AS TERM ON BASE.Discharge_Disposition_Code = TERM.Discharge_Disposition_Code
+    LEFT JOIN {{ ref('terminology__discharge_disposition') }} AS TERM ON BASE.Discharge_Disposition_Code = TERM.Discharge_Disposition_Code
 ),
 CLAIM_GRAIN as (
     SELECT CLAIM_ID
@@ -55,5 +55,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
     ,CAST(LEFT(AGG.FIELD_AGGREGATED,255) AS VARCHAR(255)) AS FIELD_VALUE
 FROM BASE M
 LEFT JOIN CLAIM_GRAIN CG ON M.CLAIM_ID = CG.CLAIM_ID AND M.Data_Source = CG.Data_Source
-LEFT JOIN {{ source('tuva_terminology','discharge_disposition') }} AS TERM ON M.Discharge_Disposition_Code = TERM.Discharge_Disposition_Code
+LEFT JOIN {{ ref('terminology__discharge_disposition') }} AS TERM ON M.Discharge_Disposition_Code = TERM.Discharge_Disposition_Code
 LEFT JOIN CLAIM_AGG AGG ON M.CLAIM_ID = AGG.CLAIM_ID AND M.Data_Source = AGG.Data_Source

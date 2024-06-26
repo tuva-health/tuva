@@ -14,5 +14,5 @@
                 ,case when M.FACILITY_TYPE is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(FACILITY_TYPE AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','location')}} M
+            FROM {{ ref('location') }} M
             

@@ -14,4 +14,4 @@
                 ,case when M.NDC_DESCRIPTION is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(LEFT(NDC_DESCRIPTION, 255) AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','medication')}} M
+            FROM {{ ref('medication') }} M

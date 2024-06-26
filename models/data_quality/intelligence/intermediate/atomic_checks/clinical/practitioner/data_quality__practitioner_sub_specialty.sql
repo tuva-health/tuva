@@ -14,5 +14,5 @@
                 ,case when M.SUB_SPECIALTY is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(SUB_SPECIALTY AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','practitioner')}} M
+            FROM {{ ref('practitioner') }} M
             

@@ -12,7 +12,7 @@ UNIQUE_FIELD as (
         ,Diagnosis_Code_1 || '|' || coalesce(TERM.LONG_DESCRIPTION,'') as Field
         ,DATA_SOURCE
     FROM BASE
-    LEFT JOIN {{ source('tuva_terminology','icd_10_cm') }} AS TERM ON BASE.Diagnosis_Code_1 = TERM.ICD_10_CM
+    LEFT JOIN {{ ref('terminology__icd_10_cm') }} AS TERM ON BASE.Diagnosis_Code_1 = TERM.ICD_10_CM
 ),
 CLAIM_GRAIN as (
     SELECT CLAIM_ID
@@ -56,5 +56,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
     ,CAST(LEFT(AGG.FIELD_AGGREGATED,255) AS VARCHAR(255)) AS FIELD_VALUE
 FROM BASE M
 LEFT JOIN CLAIM_GRAIN CG ON M.CLAIM_ID = CG.CLAIM_ID AND M.Data_Source = CG.Data_Source
-LEFT JOIN {{ source('tuva_terminology','icd_10_cm') }} AS TERM ON M.Diagnosis_Code_1 = TERM.ICD_10_CM
+LEFT JOIN {{ ref('terminology__icd_10_cm') }} AS TERM ON M.Diagnosis_Code_1 = TERM.ICD_10_CM
 LEFT JOIN CLAIM_AGG AGG ON M.CLAIM_ID = AGG.CLAIM_ID AND M.Data_Source = AGG.Data_Source

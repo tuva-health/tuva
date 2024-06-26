@@ -14,5 +14,5 @@
                 ,case when M.DAYS_SUPPLY is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(DAYS_SUPPLY AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','medication')}} M
+            FROM {{ ref('medication') }} M
             

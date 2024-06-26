@@ -14,5 +14,5 @@
                 ,case when M.MODIFIER_3 is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(MODIFIER_3 AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','procedure')}} M
+            FROM {{ ref('procedure') }} M
             

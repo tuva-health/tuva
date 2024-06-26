@@ -13,4 +13,4 @@ SELECT
     ,case when M.ALLOWED_AMOUNT is not null then 'valid' else 'null' end as BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(ALLOWED_AMOUNT AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_clinical_input','encounter') }} M
+FROM {{ ref('encounter') }} M

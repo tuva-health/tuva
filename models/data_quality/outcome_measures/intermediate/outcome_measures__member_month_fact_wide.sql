@@ -10,8 +10,8 @@ with pkpy as (
         ,SUM(e.length_of_stay) as total_los
         ,SUM(rs.unplanned_readmit_30_flag) as readmit_num
         ,SUM(rs.index_admission_flag) as readmit_denom
-    from {{ source('tuva_core','encounter') }}  e
-        left join {{ source('tuva_readmissions','readmission_summary')}} rs on e.patient_id = rs.patient_id // Need to confirm this is the correct way to join, no data_source in RS
+    from {{ ref('encounter') }}  e
+        left join {{ ref('readmissions__readmission_summary')}} rs on e.patient_id = rs.patient_id // Need to confirm this is the correct way to join, no data_source in RS
             and e.encounter_id = rs.encounter_id
             and rs.index_admission_flag = 1
     group by
@@ -23,7 +23,7 @@ payers as (
     select distinct
         data_source
         ,payer_type
-    from {{ source('tuva_core','eligibility') }}
+    from {{ ref('eligibility') }}
 )
 select
     pmp.data_source
@@ -44,7 +44,7 @@ select
     ,CAST(COALESCE(pkpy.total_los, 0) AS REAL) AS total_los // Should I do this or should it be null?
     ,CAST(COALESCE(pkpy.readmit_num, 0) AS REAL) AS readmit_num 
     ,CAST(COALESCE(pkpy.readmit_denom, 0) AS REAL) AS readmit_denom
-from {{ source('tuva_financial','pmpm_prep')}} pmp
+from {{ source('financial_pmpm__pmpm_prep')}} pmp
     left join pkpy on pmp.data_source = pkpy.data_source
         and pmp.year_month = pkpy.year_month
         and pmp.patient_id = pkpy.patient_id

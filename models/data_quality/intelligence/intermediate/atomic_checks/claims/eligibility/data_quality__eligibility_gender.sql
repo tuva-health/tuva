@@ -19,4 +19,4 @@ SELECT DISTINCT
     end as INVALID_REASON
     ,CAST(M.GENDER AS VARCHAR(255)) AS FIELD_VALUE
 FROM {{ ref('intelligence__stg_eligibility') }} M
-LEFT JOIN {{ source('tuva_terminology','gender') }} TERM ON M.GENDER = TERM.GENDER
+LEFT JOIN {{ ref('terminology__gender') }} TERM ON M.GENDER = TERM.GENDER

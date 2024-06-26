@@ -27,4 +27,4 @@ SELECT
     end as INVALID_REASON
     ,CAST(M.RENDERING_NPI AS VARCHAR(255)) AS FIELD_VALUE
 FROM BASE M
-LEFT JOIN {{ source('tuva_terminology','provider') }} AS TERM ON M.RENDERING_NPI = TERM.NPI
+LEFT JOIN {{ ref('terminology__provider') }} AS TERM ON M.RENDERING_NPI = TERM.NPI

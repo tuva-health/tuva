@@ -19,4 +19,4 @@ SELECT DISTINCT
     end as INVALID_REASON
     ,CAST(M.PAYER_TYPE AS VARCHAR(255)) AS FIELD_VALUE
 FROM {{ ref('intelligence__stg_eligibility') }} M
-LEFT JOIN {{ source('tuva_terminology','payer_type') }} TERM ON M.PAYER_TYPE = TERM.PAYER_TYPE
+LEFT JOIN {{ ref('terminology__payer_type') }} TERM ON M.PAYER_TYPE = TERM.PAYER_TYPE

@@ -22,4 +22,4 @@ SELECT DISTINCT -- to bring to claim_ID grain
     end as INVALID_REASON                                                        
     ,CAST(M.DISPENSING_PROVIDER_NPI AS VARCHAR(255)) AS FIELD_VALUE
 FROM {{ ref('intelligence__stg_pharmacy_claim') }} M
-LEFT JOIN {{ source('tuva_terminology','provider') }} AS TERM ON M.DISPENSING_PROVIDER_NPI = TERM.NPI
+LEFT JOIN {{ ref('terminology__provider') }} AS TERM ON M.DISPENSING_PROVIDER_NPI = TERM.NPI

@@ -14,5 +14,5 @@
                 ,case when M.SOURCE_CODE_TYPE is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(SOURCE_CODE_TYPE AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','medication')}} M
+            FROM {{ ref('medication') }} M
             

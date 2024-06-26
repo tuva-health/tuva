@@ -13,7 +13,7 @@ UNIQUE_FIELD as (
         ,BASE.MS_DRG_CODE || '|' || COALESCE(TERM.MS_DRG_DESCRIPTION,'') as Field
         ,DATA_SOURCE
     FROM BASE
-    LEFT JOIN {{ source('tuva_terminology','ms_drg') }} AS TERM ON BASE.MS_DRG_CODE = TERM.MS_DRG_CODE
+    LEFT JOIN {{ ref('terminology__ms_drg') }} AS TERM ON BASE.MS_DRG_CODE = TERM.MS_DRG_CODE
 ),
 CLAIM_GRAIN as (
     SELECT CLAIM_ID
@@ -56,5 +56,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
     ,CAST(LEFT(AGG.FIELD_AGGREGATED,255) AS VARCHAR(255)) AS FIELD_VALUE
 FROM BASE M
 LEFT JOIN CLAIM_GRAIN CG ON M.CLAIM_ID = CG.CLAIM_ID AND M.Data_Source = CG.Data_Source
-LEFT JOIN {{ source('tuva_terminology','ms_drg') }} AS TERM ON M.MS_DRG_CODE = TERM.MS_DRG_CODE
+LEFT JOIN {{ ref('terminology__ms_drg') }} AS TERM ON M.MS_DRG_CODE = TERM.MS_DRG_CODE
 LEFT JOIN CLAIM_AGG AGG ON M.CLAIM_ID = AGG.CLAIM_ID AND M.Data_Source = AGG.Data_Source

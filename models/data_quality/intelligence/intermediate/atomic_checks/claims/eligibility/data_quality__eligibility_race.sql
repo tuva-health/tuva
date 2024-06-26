@@ -19,4 +19,4 @@ SELECT DISTINCT -- to bring to claim_ID grain
     end as INVALID_REASON
     ,CAST(RACE AS VARCHAR(255)) AS FIELD_VALUE
 FROM {{ ref('intelligence__stg_eligibility') }} M
-LEFT JOIN {{ source('tuva_terminology','race') }} R on M.RACE=R.description
+LEFT JOIN {{ ref('terminology__race') }} R on M.RACE=R.description

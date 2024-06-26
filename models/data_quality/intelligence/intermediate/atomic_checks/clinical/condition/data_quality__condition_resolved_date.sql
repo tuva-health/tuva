@@ -13,4 +13,4 @@ SELECT
     ,case when M.RESOLVED_DATE is not null then 'valid' else 'null' end as BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(RESOLVED_DATE AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_clinical_input','condition') }} M
+FROM {{ ref('condition') }} M

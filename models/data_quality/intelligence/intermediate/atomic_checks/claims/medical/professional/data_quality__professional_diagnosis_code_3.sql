@@ -27,4 +27,4 @@ SELECT
     end as INVALID_REASON
     ,CAST(M.DIAGNOSIS_CODE_3 || '|' || COALESCE(TERM.LONG_DESCRIPTION, '') AS VARCHAR(255)) AS FIELD_VALUE
 FROM BASE M
-LEFT JOIN {{ source('tuva_terminology','icd_10_cm') }} AS TERM ON M.Diagnosis_Code_3 = TERM.ICD_10_CM
+LEFT JOIN {{ ref('terminology__icd_10_cm') }} AS TERM ON M.Diagnosis_Code_3 = TERM.ICD_10_CM

@@ -19,4 +19,4 @@ SELECT DISTINCT
     end as INVALID_REASON
     ,CAST(STATE AS VARCHAR(255)) AS FIELD_VALUE
 FROM {{ ref('intelligence__stg_eligibility') }} M
-LEFT JOIN {{ source('tuva_terminology','ssa_fips_state') }} AS TERM ON M.STATE = TERM.SSA_FIPS_STATE_NAME
+LEFT JOIN {{ ref('reference_data__ssa_fips_state') }} AS TERM ON M.STATE = TERM.SSA_FIPS_STATE_NAME

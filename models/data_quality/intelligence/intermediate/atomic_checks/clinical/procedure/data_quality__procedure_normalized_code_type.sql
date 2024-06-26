@@ -14,5 +14,5 @@
                 ,case when M.NORMALIZED_CODE_TYPE is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,null as INVALID_REASON
                 ,CAST(NORMALIZED_CODE_TYPE AS VARCHAR(255)) AS FIELD_VALUE
-            FROM {{source('tuva_clinical_input','procedure')}} M
+            FROM {{ ref('procedure') }} M
             

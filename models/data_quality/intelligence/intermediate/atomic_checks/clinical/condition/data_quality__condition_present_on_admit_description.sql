@@ -13,4 +13,4 @@ SELECT
     ,case when M.PRESENT_ON_ADMIT_DESCRIPTION is not null then 'valid' else 'null' end as BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(LEFT(PRESENT_ON_ADMIT_DESCRIPTION, 255) AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_clinical_input','condition') }} M
+FROM {{ ref('condition') }} M
