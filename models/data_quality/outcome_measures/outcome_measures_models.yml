@@ -1,0 +1,18 @@
+version: 2
+models:
+- name: outcome_measures__member_month_fact_wide # copy 3 - 6 per model
+  config: # could add database here as well if needed
+    schema: data_quality # update
+    alias: member_month_fact_wide # table name
+    tags:
+      - outcome_measures
+    materialized: view # can switch to view if we want
+
+
+- name: outcome_measures__measure_month_fact_long
+  config: 
+    schema: data_quality
+    alias: measure_month_fact_long
+    tags:
+      - outcome_measures
+    materialized: table

@@ -1,0 +1,651 @@
+version: 2
+models:
+
+
+### Claim Header
+
+
+- name: data_quality__claim_allowed_amount
+  config:
+    schema: data_quality
+    alias: claim_allowed_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_charge_amount
+  config:
+    schema: data_quality
+    alias: claim_charge_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_claim_id
+  config:
+    schema: data_quality
+    alias: claim_claim_id
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_claim_line_end_date
+  config:
+    schema: data_quality
+    alias: claim_claim_line_end_date
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_claim_line_number
+  config:
+    schema: data_quality
+    alias: claim_claim_line_number
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_claim_line_start_date
+  config:
+    schema: data_quality
+    alias: claim_claim_line_start_date
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_claim_type
+  config:
+    schema: data_quality
+    alias: claim_claim_type
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_coinsurance_amount
+  config:
+    schema: data_quality
+    alias: claim_coninsurance_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_copayment_amount
+  config:
+    schema: data_quality
+    alias: claim_copayment_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_data_source
+  config:
+    schema: data_quality
+    alias: claim_data_source
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_deductible_amount
+  config:
+    schema: data_quality
+    alias: claim_deductible_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_diagnosis_code_type
+  config:
+    schema: data_quality
+    alias: claim_diagnosis_code_type
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_hcpcs_code
+  config:
+    schema: data_quality
+    alias: claim_hcpcs_code
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_member_id
+  config:
+    schema: data_quality
+    alias: claim_member_id
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_paid_amount
+  config:
+    schema: data_quality
+    alias: claim_paid_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_paid_date
+  config:
+    schema: data_quality
+    alias: claim_paid_date
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_patient_id
+  config:
+    schema: data_quality
+    alias: claim_patient_id
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_payer
+  config:
+    schema: data_quality
+    alias: claim_payer
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_plan
+  config:
+    schema: data_quality
+    alias: claim_plan
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__claim_total_cost_amount
+  config:
+    schema: data_quality
+    alias: claim_total_cost_amount
+    tags:
+      - claims
+      - medical
+      - intermediate
+    materialized: view
+
+
+### Institutional Claims
+
+
+- name: data_quality__institutional_ms_drg_code
+  config:
+    schema: data_quality
+    alias: institutional_ms_drg_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_admission_date
+  config:
+    schema: data_quality
+    alias: institutional_admission_date
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_admit_source_code
+  config:
+    schema: data_quality
+    alias: institutional_admit_source_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_admit_type_code
+  config:
+    schema: data_quality
+    alias: institutional_admit_type_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_apr_drg_code
+  config:
+    schema: data_quality
+    alias: institutional_apr_drg_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_bill_type_code
+  config:
+    schema: data_quality
+    alias: institutional_bill_type_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_billing_npi
+  config:
+    schema: data_quality
+    alias: institutional_billing_npi
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_claim_end_date
+  config:
+    schema: data_quality
+    alias: institutional_claim_end_date
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_claim_start_date
+  config:
+    schema: data_quality
+    alias: institutional_claim_start_date
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_diagnosis_code_1
+  config:
+    schema: data_quality
+    alias: institutional_diagnosis_code_1
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_diagnosis_code_2
+  config:
+    schema: data_quality
+    alias: institutional_diagnosis_code_2
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_diagnosis_code_3
+  config:
+    schema: data_quality
+    alias: institutional_diagnosis_code_3
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_discharge_date
+  config:
+    schema: data_quality
+    alias: institutional_discharge_date
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_discharge_disposition_code
+  config:
+    schema: data_quality
+    alias: institutional_discharge_disposition_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_facility_npi
+  config:
+    schema: data_quality
+    alias: institutional_facility_npi
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_present_on_admission_1
+  config:
+    schema: data_quality
+    alias: institutional_present_on_admission_1
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_present_on_admission_2
+  config:
+    schema: data_quality
+    alias: institutional_present_on_admission_2
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_present_on_admission_3
+  config:
+    schema: data_quality
+    alias: institutional_present_on_admission_3
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_procedure_code_1
+  config:
+    schema: data_quality
+    alias: institutional_procedure_code_1
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_procedure_code_2
+  config:
+    schema: data_quality
+    alias: institutional_procedure_code_2
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_procedure_code_3
+  config:
+    schema: data_quality
+    alias: institutional_procedure_code_3
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_procedure_date_1
+  config:
+    schema: data_quality
+    alias: institutional_procedure_date_1
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_procedure_date_2
+  config:
+    schema: data_quality
+    alias: institutional_procedure_date_2
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_procedure_date_3
+  config:
+    schema: data_quality
+    alias: institutional_procedure_date_3
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_rendering_npi
+  config:
+    schema: data_quality
+    alias: institutional_rendering_npi
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_revenue_center_code
+  config:
+    schema: data_quality
+    alias: institutional_revenue_center_code
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__institutional_service_unit_quantity
+  config:
+    schema: data_quality
+    alias: institutional_service_unit_quantity
+    tags:
+      - claims
+      - medical
+      - institutional
+      - intermediate
+    materialized: view
+
+
+### Professional Claims
+
+
+- name: data_quality__professional_billing_npi
+  config:
+    schema: data_quality
+    alias: professional_billing_npi
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_facility_npi
+  config:
+    schema: data_quality
+    alias: professional_facility_npi
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_place_of_service_code
+  config:
+    schema: data_quality
+    alias: professional_place_of_service_code
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_claim_end_date
+  config:
+    schema: data_quality
+    alias: professional_claim_end_date
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_claim_start_date
+  config:
+    schema: data_quality
+    alias: professional_claim_start_date
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_diagnosis_code_1
+  config:
+    schema: data_quality
+    alias: professional_diagnosis_code_1
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_diagnosis_code_2
+  config:
+    schema: data_quality
+    alias: professional_diagnosis_code_2
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__professional_diagnosis_code_3
+  config:
+    schema: data_quality
+    alias: professional_diagnosis_code_3
+    tags:
+      - claims
+      - medical
+      - professional
+      - intermediate
+    materialized: view

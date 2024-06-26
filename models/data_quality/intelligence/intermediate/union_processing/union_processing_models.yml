@@ -1,0 +1,61 @@
+dbt buildversion: 2
+models:
+
+### Claims Specific
+
+- name: data_quality__claim_type_summary
+  config: 
+    schema: data_quality
+    alias: claim_type_summary
+    tags:
+      - claims
+      - union_processing
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__data_quality_claims_detail
+  config: 
+    schema: data_quality
+    alias: data_quality_claims_detail
+    tags:
+      - claims
+      - union_processing
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__data_quality_claims_for_pbi
+  config: 
+    schema: data_quality
+    alias: data_quality_claims_for_pbi
+    tags:
+      - claims
+      - union_processing
+      - intermediate
+    materialized: view
+
+
+### Clinical Specific
+
+
+- name: data_quality__data_quality_clinical_detail
+  config: 
+    schema: data_quality
+    alias: data_quality_clinical_detail
+    tags:
+      - clinical
+      - union_processing
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__data_quality_clinical_for_pbi
+  config: 
+    schema: data_quality
+    alias: data_quality_clinical_for_pbi
+    tags:
+      - clinical
+      - union_processing
+      - intermediate
+    materialized: view
