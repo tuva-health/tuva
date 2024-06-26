@@ -38,7 +38,7 @@ with claims_with_service_categories as (
     , plan
     , 'Pharmacy' as service_category_1
     , cast(null as {{ dbt.type_string() }}) as service_category_2
-    , {{try_to_cast_date('dispensing_date','YYYMMDD') }}  as claim_date
+    , dispensing_date as claim_date
     , paid_amount
     , allowed_amount
     , data_source
@@ -81,4 +81,11 @@ select
   , data_source
   , '{{ var('tuva_last_run')}}' as tuva_last_run
   from combine_medical_and_rx
-group by 1,2,3,4,5,6,9
+group by
+    patient_id
+  , year_month
+  , payer
+  , plan
+  , service_category_1
+  , service_category_2
+  , data_source
