@@ -1,4 +1,3 @@
--- depends_on: {{ ref('data_quality__claims_preprocessing_summary') }}
 
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
@@ -21,9 +20,9 @@ select
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(payer as {{ dbt.type_string() }} ) as payer
        , cast(plan as {{ dbt.type_string() }} ) as plan
-       , cast(prescribing_provider_npi as {{ dbt.type_string() }} ) as prescribing_provider_npi
+       , cast(prescribing_provider_id as {{ dbt.type_string() }} ) as prescribing_provider_id
        , cast(prescribing_provider_name as {{ dbt.type_string() }} ) as prescribing_provider_name
-       , cast(dispensing_provider_npi as {{ dbt.type_string() }} ) as dispensing_provider_npi
+       , cast(dispensing_provider_id as {{ dbt.type_string() }} ) as dispensing_provider_id
        , cast(dispensing_provider_name as {{ dbt.type_string() }} ) as dispensing_provider_name
        , cast(dispensing_date as date ) as dispensing_date
        , cast(ndc_code as {{ dbt.type_string() }} ) as ndc_code

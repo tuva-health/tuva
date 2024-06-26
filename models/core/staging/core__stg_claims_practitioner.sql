@@ -1,4 +1,3 @@
--- depends_on: {{ ref('data_quality__claims_preprocessing_summary') }}
 
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
@@ -25,6 +24,16 @@ union distinct
 
 select distinct billing_id as npi, data_source
 from {{ ref('core__stg_claims_medical_claim') }}
+
+union distinct
+
+select distinct prescribing_provider_id as npi, data_source
+from {{ ref('core__stg_claims_pharmacy_claim') }}
+
+union distinct
+
+select distinct dispensing_provider_id as npi, data_source
+from {{ ref('core__stg_claims_pharmacy_claim') }}
 ),
 
 
