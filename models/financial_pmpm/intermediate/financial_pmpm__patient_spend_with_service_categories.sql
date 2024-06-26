@@ -5,16 +5,16 @@
 
 with claims_with_service_categories as (
   select
-      a.patient_id
-    , a.payer
-    , a.plan
-    , a.service_category_1
-    , a.service_category_2
-    , coalesce(a.claim_start_date,a.claim_end_date) as claim_date
-    , a.paid_amount
-    , a.allowed_amount
+      patient_id
+    , payer
+    , plan
+    , service_category_1
+    , service_category_2
+    , coalesce(claim_start_date,claim_end_date) as claim_date
+    , paid_amount
+    , allowed_amount
     , data_source
-  from {{ ref('financial_pmpm__stg_medical_claim') }} a
+  from {{ ref('financial_pmpm__stg_medical_claim') }}
 )
 
 , medical_claims_year_month as (
