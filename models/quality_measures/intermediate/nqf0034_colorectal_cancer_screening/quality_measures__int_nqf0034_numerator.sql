@@ -172,20 +172,44 @@ with denominator as (
 
 )
 
-,qualifying_labs as (
-    select
+, normalized_code_labs as (
+  select
       patient_id
-    , coalesce(collection_date,result_date) as lab_date
+    , coalesce(collection_date, result_date) as lab_date
     , screening_codes.concept_name
-    from labs
-    inner join screening_periods
-        on coalesce(labs.collection_date, labs.result_date) between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
-    inner join  screening_codes
-      on ( labs.normalized_code = screening_codes.code
-       and labs.normalized_code_type = screening_codes.code_system )
-      or ( labs.source_code = screening_codes.code
-       and labs.source_code_type = screening_codes.code_system )
-    )
+  from labs
+  inner join screening_periods
+    on coalesce(labs.collection_date, labs.result_date) >= screening_periods.effective_performance_period_begin
+    and coalesce(labs.collection_date, labs.result_date) <= screening_periods.performance_period_end
+  inner join screening_codes
+    on labs.normalized_code = screening_codes.code
+    and labs.normalized_code_type = screening_codes.code_system
+)
+
+, source_code_labs as (
+  select
+      patient_id
+    , coalesce(collection_date, result_date) as lab_date
+    , screening_codes.concept_name
+  from labs
+  inner join screening_periods
+    on coalesce(labs.collection_date, labs.result_date) >= screening_periods.effective_performance_period_begin
+    and coalesce(labs.collection_date, labs.result_date) <= screening_periods.performance_period_end
+  inner join screening_codes
+    on labs.source_code = screening_codes.code
+    and labs.source_code_type = screening_codes.code_system
+)
+
+, qualifying_labs_union as (
+  select * from normalized_code_labs
+  union all
+  select * from source_code_labs
+)
+
+, qualifying_labs as (
+  select distinct *
+  from qualifying_labs_union
+)
 
 ,qualifying_events as (
     select
