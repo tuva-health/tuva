@@ -4,7 +4,7 @@
 
 WITH BASE as (
     SELECT * 
-    FROM {{ source('tuva_claim_input','eligibility') }}
+    FROM {{ ref('intelligence__stg_eligibility') }}
 
 ),
 UNIQUE_FIELD as (

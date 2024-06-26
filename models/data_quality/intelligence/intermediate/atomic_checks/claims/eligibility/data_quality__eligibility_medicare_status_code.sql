@@ -18,5 +18,5 @@ SELECT DISTINCT
         else null
     end as INVALID_REASON
     ,CAST(M.MEDICARE_STATUS_CODE || '|' || COALESCE(TERM.MEDICARE_STATUS_DESCRIPTION,'') AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','eligibility') }} M
+FROM {{ ref('intelligence__stg_eligibility') }} M
 LEFT JOIN {{ source('tuva_terminology','medicare_status') }} TERM ON M.MEDICARE_STATUS_CODE = TERM.MEDICARE_STATUS_CODE

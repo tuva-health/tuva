@@ -18,5 +18,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
         else null
     end as INVALID_REASON
     ,CAST(M.CLAIM_TYPE AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','medical_claim') }} M
+FROM {{ ref('intelligence__stg_medical_claim') }} M
 LEFT JOIN {{ source('tuva_terminology','claim_type') }} TERM ON M.CLAIM_TYPE = TERM.CLAIM_TYPE

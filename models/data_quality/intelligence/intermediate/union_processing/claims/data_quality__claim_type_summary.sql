@@ -5,7 +5,7 @@ select
     ,claim_type
     ,count(distinct claim_id) as claim_count
     ,sum(paid_amount) as paid_amount
-from {{ source('tuva_claim_input','medical_claim') }}
+from {{ ref('intelligence__stg_medical_claim') }}
 group by
     data_source
     ,claim_type

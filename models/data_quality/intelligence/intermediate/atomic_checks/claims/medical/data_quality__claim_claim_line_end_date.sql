@@ -24,4 +24,4 @@ SELECT
         else null
     END AS INVALID_REASON
     ,CAST(CLAIM_LINE_END_DATE AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','medical_claim') }} M
+FROM {{ ref('intelligence__stg_medical_claim') }} M

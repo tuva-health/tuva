@@ -18,5 +18,5 @@ SELECT DISTINCT
         else null
     end as INVALID_REASON
     ,CAST(M.original_reason_entitlement_code || '|' || COALESCE(TERM.ORIGINAL_REASON_ENTITLEMENT_DESCRIPTION, '') AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','eligibility') }} M
+FROM {{ ref('intelligence__stg_eligibility') }} M
 LEFT JOIN {{ source('tuva_terminology','medicare_orec') }} TERM ON M.original_reason_entitlement_code = TERM.original_reason_entitlement_code

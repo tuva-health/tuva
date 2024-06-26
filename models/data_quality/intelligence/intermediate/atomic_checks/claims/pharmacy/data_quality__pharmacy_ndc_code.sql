@@ -20,5 +20,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
         else null
     end as INVALID_REASON
     ,CAST(LEFT(M.NDC_CODE || '|' || COALESCE(TERM.RXNORM_DESCRIPTION, TERM.FDA_DESCRIPTION, ''), 255) AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','pharmacy_claim') }} M
+FROM {{ ref('intelligence__stg_pharmacy_claim') }} M
 LEFT JOIN {{ source('tuva_terminology','ndc') }} AS TERM ON M.NDC_CODE = TERM.NDC

@@ -14,4 +14,4 @@ SELECT
         WHEN M.MEMBER_ID is null then 'null' else 'valid' END AS BUCKET_NAME
     ,NULL as INVALID_REASON
     ,CAST(MEMBER_ID AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','pharmacy_claim') }} M
+FROM {{ ref('intelligence__stg_pharmacy_claim') }} M

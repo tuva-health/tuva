@@ -18,4 +18,4 @@ SELECT DISTINCT
         END AS BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(Death_Flag AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','eligibility') }} M
+FROM {{ ref('intelligence__stg_eligibility') }} M

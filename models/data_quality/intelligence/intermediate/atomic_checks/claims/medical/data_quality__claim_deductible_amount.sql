@@ -14,4 +14,4 @@ SELECT
                                     else 'valid' end as BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(DEDUCTIBLE_AMOUNT AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','medical_claim') }} M
+FROM {{ ref('intelligence__stg_medical_claim') }} M

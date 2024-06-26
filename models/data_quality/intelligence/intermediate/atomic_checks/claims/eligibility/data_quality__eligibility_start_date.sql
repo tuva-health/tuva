@@ -22,4 +22,4 @@ SELECT DISTINCT
     else null
     END AS INVALID_REASON
     ,CAST(ENROLLMENT_START_DATE AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','eligibility') }} M
+FROM {{ ref('intelligence__stg_eligibility') }} M

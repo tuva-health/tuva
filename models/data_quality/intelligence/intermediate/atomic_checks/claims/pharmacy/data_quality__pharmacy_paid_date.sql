@@ -22,4 +22,4 @@ SELECT
         else null
         END AS INVALID_REASON
     ,CAST(PAID_DATE AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','pharmacy_claim') }} M
+FROM {{ ref('intelligence__stg_pharmacy_claim') }} M

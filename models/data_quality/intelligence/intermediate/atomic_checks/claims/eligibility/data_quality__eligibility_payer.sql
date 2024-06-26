@@ -13,4 +13,4 @@ SELECT DISTINCT
     ,case when M.PAYER is not null then 'valid' else 'null' end as BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(PAYER AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','eligibility') }} M
+FROM {{ ref('intelligence__stg_eligibility') }} M

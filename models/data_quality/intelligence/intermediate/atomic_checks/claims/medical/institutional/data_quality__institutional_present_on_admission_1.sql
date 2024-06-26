@@ -4,7 +4,7 @@
 
 WITH BASE as (
     SELECT * 
-    FROM {{ source('tuva_claim_input','medical_claim') }}
+    FROM {{ ref('intelligence__stg_medical_claim') }}
     WHERE CLAIM_TYPE = 'institutional'
     
 ),

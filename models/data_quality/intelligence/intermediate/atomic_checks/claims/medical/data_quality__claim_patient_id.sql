@@ -13,4 +13,4 @@ SELECT DISTINCT -- to bring to claim_ID grain
     ,case when M.PATIENT_ID is not null then 'valid' else 'null' end as BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(PATIENT_ID AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','medical_claim') }} M
+FROM {{ ref('intelligence__stg_medical_claim') }} M

@@ -14,4 +14,4 @@ SELECT
         WHEN M.DAYS_SUPPLY is null then 'null' else 'valid' END AS BUCKET_NAME
     ,null as INVALID_REASON
     ,CAST(DAYS_SUPPLY AS VARCHAR(255)) AS FIELD_VALUE
-FROM {{ source('tuva_claim_input','pharmacy_claim') }} M
+FROM {{ ref('intelligence__stg_pharmacy_claim') }} M
