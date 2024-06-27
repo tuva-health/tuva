@@ -45,8 +45,8 @@ with ascvd_codes as (
         , conditions.recorded_date as evidence_date
     from conditions
     inner join ascvd_codes
-        on conditions.source_code_type = ascvd_codes.code_system
-            and conditions.source_code = ascvd_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = ascvd_codes.code_system
+            and coalesce(conditions.normalized_code, conditions.source_code) = ascvd_codes.code
 
 )
 
