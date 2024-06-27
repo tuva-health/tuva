@@ -140,8 +140,8 @@ with visit_codes as (
         , conditions.source_code_type
     from conditions
     inner join diabetics_codes
-        on conditions.source_code_type = diabetics_codes.code_system
-            and conditions.source_code = diabetics_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = diabetics_codes.code_system
+            and coalesce( conditions.normalized_code, conditions.source_code) = diabetics_codes.code
 
 )
 
