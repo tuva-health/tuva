@@ -31,6 +31,17 @@ with denominator as (
 
 )
 
+, labs as (
+
+    select * from {{ref('quality_measures__stg_core__lab_result')}}
+    where normalized_code in 
+    ('8480-6' --systolic
+    ,'8462-4') --diastolic
+    and
+    normalized_code_type = 'loinc'
+
+)
+
 , observations_within_range as (
 
     select
@@ -44,6 +55,23 @@ with denominator as (
     inner join denominator
         on observations.patient_id = denominator.patient_id
         and observations.observation_date between 
+            denominator.performance_period_begin and denominator.performance_period_end
+
+)
+
+, labs_within_range as (
+
+    select
+        labs.*
+        , denominator.measure_id
+        , denominator.measure_name
+        , denominator.measure_version
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
+    from labs
+    inner join denominator
+        on labs.patient_id = denominator.patient_id
+        and coalesce(labs.result_date,labs.collection_date) between 
             denominator.performance_period_begin and denominator.performance_period_end
 
 )
@@ -67,7 +95,7 @@ with denominator as (
             encounters.encounter_start_date and encounters.encounter_end_date
 )
 
-, valid_observations as (
+, obs_and_labs as (
 
     select
           patient_id
@@ -79,30 +107,49 @@ with denominator as (
         , measure_version
         , performance_period_begin
         , performance_period_end
+        , normalized_code
     from observations_with_encounters
     where is_valid_encounter_observation = 1
 
+    union all
+
+    select
+          patient_id
+        , coalesce(labs.result_date,collection_date) as observation_date
+        , cast(result as {{ dbt.type_float() }}) as bp_reading
+        , cast(null as {{ dbt.type_string() }}) as normalized_description
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
+        , normalized_code
+    from labs_within_range labs
 )
 
-, systolic_bp_observations as (
+, systolic_bp as (
 
     select
           *
         , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
-    from valid_observations
+    from obs_and_labs
     where lower(normalized_description) = 'systolic blood pressure'
+    or
+    normalized_code = '8480-6'
 
 )
 
-, diastolic_bp_observations as (
+, diastolic_bp as (
 
     select
           patient_id
         , observation_date
         , bp_reading
         , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
-    from valid_observations
+    from obs_and_labs
     where lower(normalized_description) = 'diastolic blood pressure'
+    or
+    normalized_code = '8462-4'
 
 )
 
@@ -117,7 +164,7 @@ with denominator as (
         , measure_version
         , performance_period_begin
         , performance_period_end
-    from systolic_bp_observations
+    from systolic_bp
     where rn = 1
 
 )
@@ -128,7 +175,7 @@ with denominator as (
           patient_id
         , observation_date
         , bp_reading as diastolic_bp
-    from diastolic_bp_observations
+    from diastolic_bp
     where rn = 1
 
 )
