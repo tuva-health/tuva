@@ -6,19 +6,36 @@
 
 with denominator as (
 
-    select * from {{ref('quality_measures__int_cqm236_denominator')}}
+    select
+          patient_id
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
+    from {{ ref('quality_measures__int_cqm236_denominator') }}
 
 )
 
 , encounters as (
 
-    select * from {{ref('quality_measures__stg_core__encounter')}}
+    select
+          patient_id
+        , encounter_type
+        , encounter_start_date
+        , encounter_end_date
+    from {{ ref('quality_measures__stg_core__encounter') }}
 
 )
 
 , observations as (
 
-    select * from {{ref('quality_measures__stg_core__observation')}}
+    select
+          patient_id
+        , observation_date
+        , normalized_description
+        , result
+    from {{ ref('quality_measures__stg_core__observation') }}
     where lower(normalized_description) in 
         (
               'systolic blood pressure'
@@ -34,7 +51,10 @@ with denominator as (
 , observations_within_range as (
 
     select
-        observations.*
+          observations.patient_id
+        , observations.observation_date
+        , observations.normalized_description
+        , observations.result
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
@@ -51,20 +71,29 @@ with denominator as (
 , observations_with_encounters as (
 
     select
-        observations_within_range.*
+          observations_within_range.patient_id
+        , observations_within_range.observation_date
+        , observations_within_range.normalized_description
+        , observations_within_range.result
         , case
             when lower(encounters.encounter_type) in (
-                 'emergency department'
-                ,'acute inpatient'
+                  'emergency department'
+                , 'acute inpatient'
             )
             then 0
             else 1
           end as is_valid_encounter_observation
+        , observations_within_range.measure_id
+        , observations_within_range.measure_name
+        , observations_within_range.measure_version
+        , observations_within_range.performance_period_begin
+        , observations_within_range.performance_period_end
     from observations_within_range
     left join encounters
         on observations_within_range.patient_id = encounters.patient_id
         and observations_within_range.observation_date between 
             encounters.encounter_start_date and encounters.encounter_end_date
+
 )
 
 , valid_observations as (
@@ -87,7 +116,14 @@ with denominator as (
 , systolic_bp_observations as (
 
     select
-          *
+          patient_id
+        , observation_date
+        , bp_reading
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
         , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
     from valid_observations
     where lower(normalized_description) = 'systolic blood pressure'
@@ -136,8 +172,15 @@ with denominator as (
 , patients_with_bp_readings as (
 
     select
-          least_recent_systolic_bp.*
+          least_recent_systolic_bp.patient_id
+        , least_recent_systolic_bp.systolic_bp
         , least_recent_diastolic_bp.diastolic_bp
+        , least_recent_systolic_bp.observation_date
+        , least_recent_systolic_bp.measure_id
+        , least_recent_systolic_bp.measure_name
+        , least_recent_systolic_bp.measure_version
+        , least_recent_systolic_bp.performance_period_begin
+        , least_recent_systolic_bp.performance_period_end
     from least_recent_systolic_bp
     inner join least_recent_diastolic_bp
         on least_recent_systolic_bp.patient_id = least_recent_diastolic_bp.patient_id
@@ -148,7 +191,13 @@ with denominator as (
 , numerator as (
 
     select
-          *
+          patient_id
+        , observation_date
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
         , case
             when systolic_bp < 140.0 and diastolic_bp < 90.0
             then 1

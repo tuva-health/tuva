@@ -32,7 +32,6 @@ with visit_codes as (
 
 , valid_visit_codes as (
 
-
     select
           visit_codes.concept_name
         , visit_codes.code

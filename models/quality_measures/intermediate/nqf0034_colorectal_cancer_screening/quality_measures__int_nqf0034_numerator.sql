@@ -21,46 +21,54 @@ with denominator as (
 
     select
           patient_id
-
     from {{ ref('quality_measures__int_nqf0034_denominator') }}
 
 )
-, screening_codes as
-(
+
+, screening_codes as (
+
     select
-          code
-        , case code_system
-            when 'SNOMEDCT' then 'snomed-ct'
-            when 'ICD9CM' then 'icd-9-cm'
-            when 'ICD10CM' then 'icd-10-cm'
-            when 'CPT' then 'hcpcs'
-            when 'ICD10PCS' then 'icd-10-pcs'
-          else lower(code_system) end as code_system
-        , concept_name
-    From {{ref('quality_measures__value_sets')}}
+        code
+      , case code_system
+          when 'SNOMEDCT' then 'snomed-ct'
+          when 'ICD9CM' then 'icd-9-cm'
+          when 'ICD10CM' then 'icd-10-cm'
+          when 'CPT' then 'hcpcs'
+          when 'ICD10PCS' then 'icd-10-pcs'
+        else lower(code_system) end 
+        as code_system
+      , concept_name
+    from {{ref('quality_measures__value_sets')}}
     where concept_name in  (
-        'Fecal Occult Blood Test (FOBT)' -- mp
-        ,'Flexible Sigmoidoscopy' --mp+4
-        ,'Colonoscopy' -- mp+9
-        ,'CT Colonography' -- mp+4
-        ,'sDNA FIT Test' -- mp+2
+          'Fecal Occult Blood Test (FOBT)' -- mp
+        , 'Flexible Sigmoidoscopy' --mp+4
+        , 'Colonoscopy' -- mp+9
+        , 'CT Colonography' -- mp+4
+        , 'sDNA FIT Test' -- mp+2
     )
+
 )
+
 , screening_periods  as (
-    select *,
-        case concept_name
+
+    select 
+          code
+        , code_system
+        , concept_name
+        , case concept_name
             when 'Fecal Occult Blood Test (FOBT)' then pp.performance_period_begin --mp
             when 'Flexible Sigmoidoscopy' then pp.performance_period_begin_4yp --mp+4
             when 'Colonoscopy' then pp.performance_period_begin_9yp -- mp+9
             when 'CT Colonography' then pp.performance_period_begin_4yp -- mp+4
             when 'sDNA FIT Test' then pp.performance_period_begin_2yp -- mp+2
-        else pp.performance_period_begin end as effective_performance_period_begin
-
+          else pp.performance_period_begin 
+          end as effective_performance_period_begin
+        , performance_period_end
     from screening_codes
     inner join {{ref('quality_measures__int_nqf0034__performance_period')}} pp
         on 1 = 1
-    )
-
+    
+)
 
 , medical_claim as (
 
@@ -116,6 +124,7 @@ with denominator as (
 )
 
 , labs as (
+
     select  patient_id
     , result_date
     , collection_date
@@ -124,8 +133,8 @@ with denominator as (
     , normalized_code_type
     , normalized_code
     from {{ ref('quality_measures__stg_core__lab_result')}}
-    )
 
+)
 
 , qualifying_claims as (
 
@@ -187,6 +196,7 @@ with denominator as (
 )
 
 , source_code_labs as (
+
   select
       patient_id
     , coalesce(collection_date, result_date) as lab_date
@@ -198,20 +208,39 @@ with denominator as (
   inner join screening_codes
     on labs.source_code = screening_codes.code
     and labs.source_code_type = screening_codes.code_system
+
 )
 
 , qualifying_labs_union as (
-  select * from normalized_code_labs
+
+  select 
+        patient_id
+      , lab_date
+      , concept_name
+  from normalized_code_labs
+
   union all
-  select * from source_code_labs
+
+  select 
+        patient_id
+      , lab_date
+      , concept_name
+  from source_code_labs
+
 )
 
 , qualifying_labs as (
-  select distinct *
+
+  select distinct
+        patient_id
+      , lab_date
+      , concept_name
   from qualifying_labs_union
+
 )
 
-,qualifying_events as (
+, qualifying_events as (
+
     select
           patient_id
         , claim_date as evidence_date
@@ -242,14 +271,12 @@ with denominator as (
         , concept_name as evidence
     from qualifying_labs
 
-    )
+)
 
 select
-    cast (qualifying_events.patient_id as {{ dbt.type_string() }}) patient_id
-    ,cast( evidence_date as date) as evidence_date
-    ,cast( evidence as {{ dbt.type_string() }}) as evidence
-
+      cast( qualifying_events.patient_id as {{ dbt.type_string() }}) patient_id
+    , cast( evidence_date as date) as evidence_date
+    , cast( evidence as {{ dbt.type_string() }}) as evidence
 from qualifying_events
 inner join denominator
     on qualifying_events.patient_id = denominator.patient_id
-

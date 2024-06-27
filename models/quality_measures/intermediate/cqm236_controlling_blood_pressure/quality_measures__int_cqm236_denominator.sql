@@ -39,7 +39,7 @@ with visit_codes as (
         , 'encounter inpatient'
         , 'acute_inpatient'
         , 'emergency_department'
-     )
+    )
 
 )
 
@@ -70,10 +70,10 @@ with visit_codes as (
     inner join visit_codes
         on medical_claim.hcpcs_code= visit_codes.code
 
-
 )
 
 , all_encounters as (
+
     select *, 'v' as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from visits_encounters
     union all
@@ -82,9 +82,11 @@ with visit_codes as (
     union all
     select *, cast(null as {{ dbt.type_string() }}) as visit_enc,cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
+
 )
 
 , encounters_by_patient as (
+
     select
           patient_id
         , min(min_date) min_date
@@ -143,6 +145,7 @@ with visit_codes as (
 )
 
 , patients_with_age as (
+    
     select
           p.patient_id
         , min_date
@@ -189,6 +192,7 @@ with visit_codes as (
             , interval = +6
             , from_date_or_timestamp = "performance_period_begin"
             )}}
+
 )
 
 , add_data_types as (
