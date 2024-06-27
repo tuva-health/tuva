@@ -73,7 +73,7 @@ with distinct_encounters as (
         , birth_date
         , gender
         , race
-    from {{ ref('eligibility') }}
+    from {{ ref('emergency_department__stg_eligibility') }}
 )
 
 , facility as (
