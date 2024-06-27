@@ -4,7 +4,7 @@
    )
 }}
 
-with  visit_codes as (
+with visit_codes as (
 
     select
           code
@@ -20,7 +20,9 @@ with  visit_codes as (
         , 'emergency department evaluation and management visit'
     )
 
-), visits_encounters as (
+)
+
+, visits_encounters as (
 
     select 
            patient_id
@@ -50,7 +52,7 @@ with  visit_codes as (
     from {{ref('quality_measures__stg_core__procedure')}} proc
     inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
-    inner join  visit_codes
+    inner join visit_codes
         on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
 
 )
@@ -65,7 +67,7 @@ with  visit_codes as (
     inner join {{ref('quality_measures__int_cqm236__performance_period')}}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
-    inner join  visit_codes
+    inner join visit_codes
         on medical_claim.hcpcs_code= visit_codes.code
 
 
@@ -135,8 +137,8 @@ with  visit_codes as (
         , conditions.source_code_type
     from conditions
     inner join hypertension_codes
-        on conditions.source_code_type = hypertension_codes.code_system
-            and conditions.source_code = hypertension_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = hypertension_codes.code_system
+            and coalesce(conditions.normalized_code, conditions.source_code) = hypertension_codes.code
 
 )
 
