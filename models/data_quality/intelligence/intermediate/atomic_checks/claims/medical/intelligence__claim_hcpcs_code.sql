@@ -23,4 +23,3 @@ SELECT
     ,CAST(M.HCPCS_CODE || '|' || COALESCE(TERM.SHORT_DESCRIPTION, '') AS VARCHAR(255)) AS FIELD_VALUE
     FROM {{ ref('intelligence__stg_medical_claim') }} M
 LEFT JOIN {{ ref('terminology__hcpcs_level_2') }} AS TERM ON M.HCPCS_CODE = TERM.HCPCS
-LEFT JOIN {{ ref('terminology__cpt') }} AS CPT on M.HCPCS_CODE = CPT.HCPCS
