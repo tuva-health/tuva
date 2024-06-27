@@ -22,6 +22,7 @@ select
     , paid_date
     , paid_amount
     , allowed_amount
+    , charge_amount
     , coinsurance_amount
     , copayment_amount
     , deductible_amount
