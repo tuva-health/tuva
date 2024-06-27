@@ -26,9 +26,11 @@ with denominator as (
     where lower(concept_name) in  (
         'hba1c laboratory test'
     )
+    
 )
 
 , labs as (
+
     select
         patient_id
         , result
@@ -43,6 +45,7 @@ with denominator as (
 )
 
 , qualifying_labs as (
+
     select
       labs.patient_id
     , labs.result as evidence_value
@@ -51,10 +54,8 @@ with denominator as (
     , row_number() over(partition by labs.patient_id order by coalesce(collection_date,result_date) desc) as rn
     from labs
     inner join hba1c_test_code
-      on ( labs.normalized_code = hba1c_test_code.code
-       and labs.normalized_code_type = hba1c_test_code.code_system )
-      or ( labs.source_code = hba1c_test_code.code
-       and labs.source_code_type = hba1c_test_code.code_system )
+        on coalesce(labs.normalized_code, labs.source_code) = hba1c_test_code.code
+            and coalesce(labs.normalized_code_type, labs.source_code_type) = hba1c_test_code.code_system
     left join denominator
         on labs.patient_id = denominator.patient_id
     where coalesce(collection_date,result_date) <= denominator.performance_period_end
@@ -63,6 +64,7 @@ with denominator as (
 )
 
 , recent_readings as (
+
     select
           patient_id
         , evidence_date
