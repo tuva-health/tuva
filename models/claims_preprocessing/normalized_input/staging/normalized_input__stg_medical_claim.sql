@@ -34,7 +34,9 @@ select
     , hcpcs_modifier_4
     , hcpcs_modifier_5
     , rendering_npi
+    , rendering_tin
     , billing_npi
+    , billing_tin
     , facility_npi
     , paid_date
     , paid_amount
