@@ -12,12 +12,11 @@ SELECT
     ,'HCPCS_CODE' AS FIELD_NAME
     ,case 
           when TERM.HCPCS is not null then 'valid'
-          when CPT.HCPCS is not null then 'valid'
           when M.HCPCS_CODE is not null then 'invalid'      
           else 'null' 
     end as BUCKET_NAME
     ,case
-        when M.HCPCS_CODE is not null AND TERM.HCPCS is null AND CPT.HCPCS is null then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
+        when M.HCPCS_CODE is not null AND TERM.HCPCS is null then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
         else null
      end as INVALID_REASON
     ,CAST(M.HCPCS_CODE || '|' || COALESCE(TERM.SHORT_DESCRIPTION, '') AS VARCHAR(255)) AS FIELD_VALUE
