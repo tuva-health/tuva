@@ -16,7 +16,7 @@ WITH Ranked_Examples as (
               FIELD_VALUE as FIELD_VALUE,
               COUNT(DRILL_DOWN_VALUE) as FREQUENCY,
               ROW_NUMBER() OVER (PARTITION BY SUMMARY_SK, BUCKET_NAME, FIELD_VALUE ORDER BY FIELD_VALUE) AS RN
-       FROM {{ ref('data_quality__data_quality_clinical_detail') }}
+       FROM {{ ref('intelligence__data_quality_clinical_detail') }}
        WHERE BUCKET_NAME not in ('valid', 'null')
        GROUP BY
               DATA_SOURCE,
@@ -43,8 +43,8 @@ pk_examples as (
               detail.FIELD_VALUE as FIELD_VALUE,
               COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY,
               ROW_NUMBER() OVER (PARTITION BY detail.SUMMARY_SK ORDER BY detail.SUMMARY_SK) AS RN
-       FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
-              left join {{ ref('data_quality__crosswalk_field_info')}} as field_info on detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
+       FROM {{ ref('intelligence__data_quality_clinical_detail') }} as detail
+              left join {{ ref('intelligence__crosswalk_field_info')}} as field_info on detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
                      and detail.field_name = field_info.field_name
        WHERE detail.BUCKET_NAME = 'valid'
               AND field_info.UNIQUE_VALUES_EXPECTED_FLAG = 1
@@ -72,7 +72,7 @@ SELECT
        MAX(DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE, //1 sample claim
        null as FIELD_VALUE,
        COUNT(DRILL_DOWN_VALUE) as FREQUENCY
-FROM {{ ref('data_quality__data_quality_clinical_detail') }}
+FROM {{ ref('intelligence__data_quality_clinical_detail') }}
 WHERE BUCKET_NAME = 'null'
 GROUP BY
        DATA_SOURCE,
@@ -97,8 +97,8 @@ SELECT
        MAX(detail.DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE, //1 sample claim
        detail.FIELD_VALUE as FIELD_VALUE,
        COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY
-FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
-LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} as field_info ON detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
+FROM {{ ref('intelligence__data_quality_clinical_detail') }} as detail
+LEFT JOIN {{ ref('intelligence__crosswalk_field_info') }} as field_info ON detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
        and detail.field_name = field_info.field_name
 WHERE 
        detail.BUCKET_NAME = 'valid'

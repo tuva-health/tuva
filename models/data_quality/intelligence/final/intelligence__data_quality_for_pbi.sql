@@ -16,7 +16,7 @@ SELECT
     DRILL_DOWN_VALUE,
     INVALID_REASON,
     SUMMARY_SK  
-FROM {{ ref('data_quality__data_quality_claims_for_pbi') }}
+FROM {{ ref('intelligence__data_quality_claims_for_pbi') }}
 
 UNION
 
@@ -31,7 +31,7 @@ SELECT
     DRILL_DOWN_VALUE,
     INVALID_REASON,
     SUMMARY_SK
-FROM {{ ref('data_quality__data_quality_clinical_for_pbi') }}
+FROM {{ ref('intelligence__data_quality_clinical_for_pbi') }}
 
 {% elif var('claims_enabled', False) == true -%}
 
@@ -46,7 +46,7 @@ SELECT
     DRILL_DOWN_VALUE,
     INVALID_REASON,
     SUMMARY_SK  
-FROM {{ ref('data_quality__data_quality_claims_for_pbi') }}
+FROM {{ ref('intelligence__data_quality_claims_for_pbi') }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
@@ -61,6 +61,6 @@ SELECT
     DRILL_DOWN_VALUE,
     INVALID_REASON,
     SUMMARY_SK
-FROM {{ ref('data_quality__data_quality_clinical_for_pbi') }}
+FROM {{ ref('intelligence__data_quality_clinical_for_pbi') }}
 
 {%- endif %}

@@ -8,7 +8,7 @@ WITH CTE AS (
     ,FM.INPUT_LAYER_TABLE_NAME
     ,FM.CLAIM_TYPE
     ,TABLE_CLAIM_TYPE_FIELD_SK
-    FROM {{ ref('data_quality__crosswalk_field_to_mart_sk') }} FM
+    FROM {{ ref('intelligence__crosswalk_field_to_mart_sk') }} FM
 )
 
 SELECT 
@@ -24,14 +24,14 @@ SELECT
     SUM(CASE WHEN BUCKET_NAME <> 'null' THEN 1 ELSE 0 END) as FILL_NUM,
     COUNT(DRILL_DOWN_VALUE) as DENOM
 FROM 
-    {{ ref('data_quality__data_quality_detail') }} X
+    {{ ref('intelligence__data_quality_detail') }} X
 LEFT JOIN CTE FM 
     ON X.FIELD_NAME = FM.FIELD_NAME
     AND
     FM.INPUT_LAYER_TABLE_NAME = X.TABLE_NAME
     AND
     FM.CLAIM_TYPE = X.CLAIM_TYPE
-LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} SCT
+LEFT JOIN {{ ref('intelligence__crosswalk_field_info') }} SCT
     ON X.FIELD_NAME = SCT.FIELD_NAME
     AND
     SCT.INPUT_LAYER_TABLE_NAME = X.TABLE_NAME

@@ -3,9 +3,11 @@ models:
 
 #### Intelligence
 ## Final
-- name: data_quality__data_quality_detail
+- name: intelligence__data_quality_detail
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: data_quality_detail
     tags:
       - claims
@@ -13,9 +15,11 @@ models:
       - final
     materialized: table
 
-- name: data_quality__summary
+- name: intelligence__summary
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: summary
     tags:
       - claims
@@ -23,9 +27,11 @@ models:
       - final
     materialized: table
 
-- name: data_quality__crosswalk_field_to_mart_sk
+- name: intelligence__crosswalk_field_to_mart_sk
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: field_to_mart_sk
     tags:
       - claims
@@ -34,9 +40,11 @@ models:
     materialized: table
 
 
-- name: data_quality__quality_trend
+- name: intelligence__quality_trend
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: quality_trend
     tags:
       - claims
@@ -45,9 +53,11 @@ models:
     materialized: table
 
 
-- name: data_quality__data_quality_for_pbi
+- name: intelligence__data_quality_for_pbi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: data_quality_for_pbi
     tags:
       - claims
@@ -58,9 +68,11 @@ models:
 #### Atomic Checks
 ## Claims Eligibility
 
-- name: data_quality__eligibility_address
+- name: intelligence__eligibility_address
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_address
     tags:
       - claims
@@ -69,9 +81,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_birth_date
+- name: intelligence__eligibility_birth_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_birth_date
     tags:
       - claims
@@ -80,9 +94,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_city
+- name: intelligence__eligibility_city
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_city
     tags:
       - claims
@@ -91,9 +107,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_data_source
+- name: intelligence__eligibility_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_data_source
     tags:
       - claims
@@ -102,9 +120,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_death_date
+- name: intelligence__eligibility_death_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_death_date
     tags:
       - claims
@@ -113,9 +133,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_death_flag
+- name: intelligence__eligibility_death_flag
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_death_flag
     tags:
       - claims
@@ -124,9 +146,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_dual_status_code
+- name: intelligence__eligibility_dual_status_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_dual_status_code
     tags:
       - claims
@@ -135,9 +159,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_end_date
+- name: intelligence__eligibility_end_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_end_date
     tags:
       - claims
@@ -146,9 +172,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_first_name
+- name: intelligence__eligibility_first_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_first_name
     tags:
       - claims
@@ -157,9 +185,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_gender
+- name: intelligence__eligibility_gender
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_gender
     tags:
       - claims
@@ -168,9 +198,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_last_name
+- name: intelligence__eligibility_last_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_last_name
     tags:
       - claims
@@ -179,9 +211,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_medicare_status_code
+- name: intelligence__eligibility_medicare_status_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_medicare_status_code
     tags:
       - claims
@@ -190,9 +224,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_member_id
+- name: intelligence__eligibility_member_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_member_id
     tags:
       - claims
@@ -201,9 +237,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_original_reason_entitlement_code
+- name: intelligence__eligibility_original_reason_entitlement_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_original_reason_entitlement_code
     tags:
       - claims
@@ -212,9 +250,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_patient_id
+- name: intelligence__eligibility_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_patient_id
     tags:
       - claims
@@ -223,9 +263,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_payer_type
+- name: intelligence__eligibility_payer_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_payer_type
     tags:
       - claims
@@ -234,9 +276,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_payer
+- name: intelligence__eligibility_payer
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_payer
     tags:
       - claims
@@ -245,9 +289,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_phone
+- name: intelligence__eligibility_phone
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_phone
     tags:
       - claims
@@ -256,9 +302,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_plan
+- name: intelligence__eligibility_plan
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_plan
     tags:
       - claims
@@ -267,9 +315,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_race
+- name: intelligence__eligibility_race
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_race
     tags:
       - claims
@@ -278,9 +328,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_start_date
+- name: intelligence__eligibility_start_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_start_date
     tags:
       - claims
@@ -289,9 +341,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_state
+- name: intelligence__eligibility_state
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_state
     tags:
       - claims
@@ -300,9 +354,11 @@ models:
     materialized: view
 
 
-- name: data_quality__eligibility_zip_code
+- name: intelligence__eligibility_zip_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: eligibility_zip_code
     tags:
       - claims
@@ -315,9 +371,11 @@ models:
 ### Claim Header
 
 
-- name: data_quality__claim_allowed_amount
+- name: intelligence__claim_allowed_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_allowed_amount
     tags:
       - claims
@@ -326,9 +384,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_charge_amount
+- name: intelligence__claim_charge_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_charge_amount
     tags:
       - claims
@@ -337,9 +397,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_claim_id
+- name: intelligence__claim_claim_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_claim_id
     tags:
       - claims
@@ -348,9 +410,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_claim_line_end_date
+- name: intelligence__claim_claim_line_end_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_claim_line_end_date
     tags:
       - claims
@@ -359,9 +423,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_claim_line_number
+- name: intelligence__claim_claim_line_number
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_claim_line_number
     tags:
       - claims
@@ -370,9 +436,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_claim_line_start_date
+- name: intelligence__claim_claim_line_start_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_claim_line_start_date
     tags:
       - claims
@@ -381,9 +449,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_claim_type
+- name: intelligence__claim_claim_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_claim_type
     tags:
       - claims
@@ -392,9 +462,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_coinsurance_amount
+- name: intelligence__claim_coinsurance_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_coninsurance_amount
     tags:
       - claims
@@ -403,9 +475,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_copayment_amount
+- name: intelligence__claim_copayment_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_copayment_amount
     tags:
       - claims
@@ -414,9 +488,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_data_source
+- name: intelligence__claim_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_data_source
     tags:
       - claims
@@ -425,9 +501,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_deductible_amount
+- name: intelligence__claim_deductible_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_deductible_amount
     tags:
       - claims
@@ -436,9 +514,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_diagnosis_code_type
+- name: intelligence__claim_diagnosis_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_diagnosis_code_type
     tags:
       - claims
@@ -447,9 +527,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_hcpcs_code
+- name: intelligence__claim_hcpcs_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_hcpcs_code
     tags:
       - claims
@@ -458,9 +540,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_member_id
+- name: intelligence__claim_member_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_member_id
     tags:
       - claims
@@ -469,9 +553,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_paid_amount
+- name: intelligence__claim_paid_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_paid_amount
     tags:
       - claims
@@ -480,9 +566,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_paid_date
+- name: intelligence__claim_paid_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_paid_date
     tags:
       - claims
@@ -491,9 +579,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_patient_id
+- name: intelligence__claim_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_patient_id
     tags:
       - claims
@@ -502,9 +592,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_payer
+- name: intelligence__claim_payer
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_payer
     tags:
       - claims
@@ -513,9 +605,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_plan
+- name: intelligence__claim_plan
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_plan
     tags:
       - claims
@@ -524,9 +618,11 @@ models:
     materialized: view
 
 
-- name: data_quality__claim_total_cost_amount
+- name: intelligence__claim_total_cost_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_total_cost_amount
     tags:
       - claims
@@ -538,9 +634,11 @@ models:
 ### Institutional Claims
 
 
-- name: data_quality__institutional_ms_drg_code
+- name: intelligence__institutional_ms_drg_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_ms_drg_code
     tags:
       - claims
@@ -550,9 +648,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_admission_date
+- name: intelligence__institutional_admission_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_admission_date
     tags:
       - claims
@@ -562,9 +662,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_admit_source_code
+- name: intelligence__institutional_admit_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_admit_source_code
     tags:
       - claims
@@ -574,9 +676,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_admit_type_code
+- name: intelligence__institutional_admit_type_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_admit_type_code
     tags:
       - claims
@@ -586,9 +690,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_apr_drg_code
+- name: intelligence__institutional_apr_drg_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_apr_drg_code
     tags:
       - claims
@@ -598,9 +704,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_bill_type_code
+- name: intelligence__institutional_bill_type_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_bill_type_code
     tags:
       - claims
@@ -610,9 +718,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_billing_npi
+- name: intelligence__institutional_billing_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_billing_npi
     tags:
       - claims
@@ -622,9 +732,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_claim_end_date
+- name: intelligence__institutional_claim_end_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_claim_end_date
     tags:
       - claims
@@ -634,9 +746,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_claim_start_date
+- name: intelligence__institutional_claim_start_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_claim_start_date
     tags:
       - claims
@@ -646,9 +760,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_diagnosis_code_1
+- name: intelligence__institutional_diagnosis_code_1
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_diagnosis_code_1
     tags:
       - claims
@@ -658,9 +774,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_diagnosis_code_2
+- name: intelligence__institutional_diagnosis_code_2
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_diagnosis_code_2
     tags:
       - claims
@@ -670,9 +788,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_diagnosis_code_3
+- name: intelligence__institutional_diagnosis_code_3
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_diagnosis_code_3
     tags:
       - claims
@@ -682,9 +802,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_discharge_date
+- name: intelligence__institutional_discharge_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_discharge_date
     tags:
       - claims
@@ -694,9 +816,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_discharge_disposition_code
+- name: intelligence__institutional_discharge_disposition_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_discharge_disposition_code
     tags:
       - claims
@@ -706,9 +830,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_facility_npi
+- name: intelligence__institutional_facility_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_facility_npi
     tags:
       - claims
@@ -718,9 +844,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_present_on_admission_1
+- name: intelligence__institutional_present_on_admission_1
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_present_on_admission_1
     tags:
       - claims
@@ -730,9 +858,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_present_on_admission_2
+- name: intelligence__institutional_present_on_admission_2
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_present_on_admission_2
     tags:
       - claims
@@ -742,9 +872,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_present_on_admission_3
+- name: intelligence__institutional_present_on_admission_3
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_present_on_admission_3
     tags:
       - claims
@@ -754,9 +886,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_procedure_code_1
+- name: intelligence__institutional_procedure_code_1
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_procedure_code_1
     tags:
       - claims
@@ -766,9 +900,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_procedure_code_2
+- name: intelligence__institutional_procedure_code_2
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_procedure_code_2
     tags:
       - claims
@@ -778,9 +914,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_procedure_code_3
+- name: intelligence__institutional_procedure_code_3
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_procedure_code_3
     tags:
       - claims
@@ -790,9 +928,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_procedure_date_1
+- name: intelligence__institutional_procedure_date_1
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_procedure_date_1
     tags:
       - claims
@@ -802,9 +942,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_procedure_date_2
+- name: intelligence__institutional_procedure_date_2
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_procedure_date_2
     tags:
       - claims
@@ -814,9 +956,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_procedure_date_3
+- name: intelligence__institutional_procedure_date_3
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_procedure_date_3
     tags:
       - claims
@@ -826,9 +970,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_rendering_npi
+- name: intelligence__institutional_rendering_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_rendering_npi
     tags:
       - claims
@@ -838,9 +984,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_revenue_center_code
+- name: intelligence__institutional_revenue_center_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_revenue_center_code
     tags:
       - claims
@@ -850,9 +998,11 @@ models:
     materialized: view
 
 
-- name: data_quality__institutional_service_unit_quantity
+- name: intelligence__institutional_service_unit_quantity
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: institutional_service_unit_quantity
     tags:
       - claims
@@ -865,9 +1015,11 @@ models:
 ### Professional Claims
 
 
-- name: data_quality__professional_billing_npi
+- name: intelligence__professional_billing_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_billing_npi
     tags:
       - claims
@@ -877,9 +1029,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_facility_npi
+- name: intelligence__professional_facility_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_facility_npi
     tags:
       - claims
@@ -889,9 +1043,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_place_of_service_code
+- name: intelligence__professional_place_of_service_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_place_of_service_code
     tags:
       - claims
@@ -901,9 +1057,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_claim_end_date
+- name: intelligence__professional_claim_end_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_claim_end_date
     tags:
       - claims
@@ -913,9 +1071,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_claim_start_date
+- name: intelligence__professional_claim_start_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_claim_start_date
     tags:
       - claims
@@ -925,9 +1085,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_diagnosis_code_1
+- name: intelligence__professional_diagnosis_code_1
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_diagnosis_code_1
     tags:
       - claims
@@ -937,9 +1099,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_diagnosis_code_2
+- name: intelligence__professional_diagnosis_code_2
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_diagnosis_code_2
     tags:
       - claims
@@ -949,9 +1113,11 @@ models:
     materialized: view
 
 
-- name: data_quality__professional_diagnosis_code_3
+- name: intelligence__professional_diagnosis_code_3
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: professional_diagnosis_code_3
     tags:
       - claims
@@ -963,9 +1129,11 @@ models:
 
 ## Claims pharmacy
 
-- name: data_quality__pharmacy_allowed_amount
+- name: intelligence__pharmacy_allowed_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_allowed_amount
     tags:
       - claims
@@ -974,9 +1142,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_claim_id
+- name: intelligence__pharmacy_claim_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_id
     tags:
       - claims
@@ -985,9 +1155,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_claim_line_number
+- name: intelligence__pharmacy_claim_line_number
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_line_number
     tags:
       - claims
@@ -996,9 +1168,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_coinsurance_amount
+- name: intelligence__pharmacy_coinsurance_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_coinsurance_amount
     tags:
       - claims
@@ -1007,9 +1181,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_copayment_amount
+- name: intelligence__pharmacy_copayment_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_copayment_amount
     tags:
       - claims
@@ -1018,9 +1194,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_data_source
+- name: intelligence__pharmacy_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_data_source
     tags:
       - claims
@@ -1029,9 +1207,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_days_supply
+- name: intelligence__pharmacy_days_supply
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_days_supply
     tags:
       - claims
@@ -1040,9 +1220,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_deductible_amount
+- name: intelligence__pharmacy_deductible_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_deductible_amount
     tags:
       - claims
@@ -1051,9 +1233,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_dispensing_date
+- name: intelligence__pharmacy_dispensing_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_dispensing_date
     tags:
       - claims
@@ -1062,9 +1246,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_dispensing_provider_npi
+- name: intelligence__pharmacy_dispensing_provider_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_dispensing_provider_npi
     tags:
       - claims
@@ -1073,9 +1259,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_member_id
+- name: intelligence__pharmacy_member_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_member_id
     tags:
       - claims
@@ -1084,9 +1272,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_ndc_code
+- name: intelligence__pharmacy_ndc_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_ndc_code
     tags:
       - claims
@@ -1095,9 +1285,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_paid_amount
+- name: intelligence__pharmacy_paid_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_paid_amount
     tags:
       - claims
@@ -1106,9 +1298,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_paid_date
+- name: intelligence__pharmacy_paid_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_paid_date
     tags:
       - claims
@@ -1117,9 +1311,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_patient_id
+- name: intelligence__pharmacy_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_patient_id
     tags:
       - claims
@@ -1128,9 +1324,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_payer
+- name: intelligence__pharmacy_payer
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_payer
     tags:
       - claims
@@ -1139,9 +1337,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_plan
+- name: intelligence__pharmacy_plan
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_plan
     tags:
       - claims
@@ -1150,9 +1350,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_prescribing_provider_npi
+- name: intelligence__pharmacy_prescribing_provider_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_prescribing_provider_npi
     tags:
       - claims
@@ -1161,9 +1363,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_quantity
+- name: intelligence__pharmacy_quantity
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_quantity
     tags:
       - claims
@@ -1172,9 +1376,11 @@ models:
     materialized: view
 
 
-- name: data_quality__pharmacy_refills
+- name: intelligence__pharmacy_refills
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: pharmacy_refills
     tags:
       - claims
@@ -1184,9 +1390,11 @@ models:
 
 #### Atomic Checks
 ## Clinical condition
-- name: data_quality__condition_claim_id
+- name: intelligence__condition_claim_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_claim_id
     tags:
       - clinical
@@ -1195,9 +1403,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_condition_id
+- name: intelligence__condition_condition_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_condition_id
     tags:
       - clinical
@@ -1206,9 +1416,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_condition_rank
+- name: intelligence__condition_condition_rank
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_condition_rank
     tags:
       - clinical
@@ -1217,9 +1429,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_condition_type
+- name: intelligence__condition_condition_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_condition_type
     tags:
       - clinical
@@ -1228,9 +1442,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_data_source
+- name: intelligence__condition_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_data_source
     tags:
       - clinical
@@ -1239,9 +1455,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_encounter_id
+- name: intelligence__condition_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_encounter_id
     tags:
       - clinical
@@ -1250,9 +1468,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_normalized_code_type
+- name: intelligence__condition_normalized_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_normalized_code_type
     tags:
       - clinical
@@ -1261,9 +1481,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_normalized_code
+- name: intelligence__condition_normalized_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_normalized_code
     tags:
       - clinical
@@ -1272,9 +1494,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_normalized_description
+- name: intelligence__condition_normalized_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_normalized_description
     tags:
       - clinical
@@ -1283,9 +1507,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_onset_date
+- name: intelligence__condition_onset_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_onset_date
     tags:
       - clinical
@@ -1294,9 +1520,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_patient_id
+- name: intelligence__condition_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_patient_id
     tags:
       - clinical
@@ -1305,9 +1533,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_present_on_admit_code
+- name: intelligence__condition_present_on_admit_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_present_on_admit_code
     tags:
       - clinical
@@ -1316,9 +1546,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_present_on_admit_description
+- name: intelligence__condition_present_on_admit_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_present_on_admit_description
     tags:
       - clinical
@@ -1327,9 +1559,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_recorded_date
+- name: intelligence__condition_recorded_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_recorded_date
     tags:
       - clinical
@@ -1338,9 +1572,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_resolved_date
+- name: intelligence__condition_resolved_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_resolved_date
     tags:
       - clinical
@@ -1349,9 +1585,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_source_code
+- name: intelligence__condition_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_source_code
     tags:
       - clinical
@@ -1360,9 +1598,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_source_code_type
+- name: intelligence__condition_source_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_source_code_type
     tags:
       - clinical
@@ -1371,9 +1611,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_source_description
+- name: intelligence__condition_source_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_source_description
     tags:
       - clinical
@@ -1382,9 +1624,11 @@ models:
     materialized: view
 
 
-- name: data_quality__condition_status
+- name: intelligence__condition_status
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: condition_status
     tags:
       - clinical
@@ -1393,9 +1637,11 @@ models:
     materialized: view
 
 ## Clinical encounter
-- name: data_quality__encounter_admit_source_code
+- name: intelligence__encounter_admit_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_admit_source_code
     tags:
       - clinical
@@ -1404,9 +1650,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_admit_source_description
+- name: intelligence__encounter_admit_source_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_admit_source_description
     tags:
       - clinical
@@ -1415,9 +1663,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_admit_type_code
+- name: intelligence__encounter_admit_type_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_admit_type_code
     tags:
       - clinical
@@ -1426,9 +1676,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_admit_type_description
+- name: intelligence__encounter_admit_type_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_admit_type_description
     tags:
       - clinical
@@ -1437,9 +1689,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_allowed_amount
+- name: intelligence__encounter_allowed_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_allowed_amount
     tags:
       - clinical
@@ -1448,9 +1702,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_apr_drg_code
+- name: intelligence__encounter_apr_drg_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_apr_drg_code
     tags:
       - clinical
@@ -1459,9 +1715,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_apr_drg_description
+- name: intelligence__encounter_apr_drg_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_apr_drg_description
     tags:
       - clinical
@@ -1470,9 +1728,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_attending_provider_id
+- name: intelligence__encounter_attending_provider_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_attending_provider_id
     tags:
       - clinical
@@ -1481,9 +1741,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_charge_amount
+- name: intelligence__encounter_charge_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_charge_amount
     tags:
       - clinical
@@ -1492,9 +1754,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_data_source
+- name: intelligence__encounter_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_data_source
     tags:
       - clinical
@@ -1503,9 +1767,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_discharge_disposition_code
+- name: intelligence__encounter_discharge_disposition_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_discharge_disposition_code
     tags:
       - clinical
@@ -1514,9 +1780,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_discharge_disposition_description
+- name: intelligence__encounter_discharge_disposition_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_discharge_disposition_description
     tags:
       - clinical
@@ -1525,9 +1793,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_encounter_end_date
+- name: intelligence__encounter_encounter_end_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_encounter_end_date
     tags:
       - clinical
@@ -1536,9 +1806,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_encounter_id
+- name: intelligence__encounter_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_encounter_id
     tags:
       - clinical
@@ -1547,9 +1819,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_encounter_start_date
+- name: intelligence__encounter_encounter_start_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_encounter_start_date
     tags:
       - clinical
@@ -1558,9 +1832,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_encounter_type
+- name: intelligence__encounter_encounter_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_encounter_type
     tags:
       - clinical
@@ -1569,9 +1845,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_facility_npi
+- name: intelligence__encounter_facility_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_facility_npi
     tags:
       - clinical
@@ -1580,9 +1858,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_length_of_stay
+- name: intelligence__encounter_length_of_stay
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_length_of_stay
     tags:
       - clinical
@@ -1591,9 +1871,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_ms_drg_code
+- name: intelligence__encounter_ms_drg_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_ms_drg_code
     tags:
       - clinical
@@ -1602,9 +1884,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_ms_drg_description
+- name: intelligence__encounter_ms_drg_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_ms_drg_description
     tags:
       - clinical
@@ -1613,9 +1897,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_paid_amount
+- name: intelligence__encounter_paid_amount
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_paid_amount
     tags:
       - clinical
@@ -1624,9 +1910,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_patient_id
+- name: intelligence__encounter_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_patient_id
     tags:
       - clinical
@@ -1635,9 +1923,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_primary_diagnosis_code
+- name: intelligence__encounter_primary_diagnosis_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_primary_diagnosis_code
     tags:
       - clinical
@@ -1646,9 +1936,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_primary_diagnosis_code_type
+- name: intelligence__encounter_primary_diagnosis_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_primary_diagnosis_code_type
     tags:
       - clinical
@@ -1657,9 +1949,11 @@ models:
     materialized: view
 
 
-- name: data_quality__encounter_primary_diagnosis_description
+- name: intelligence__encounter_primary_diagnosis_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: encounter_primary_diagnosis_description
     tags:
       - clinical
@@ -1669,9 +1963,11 @@ models:
 
 
 ## Clinical lab result
-- name: data_quality__lab_result_source_abnormal_flag
+- name: intelligence__lab_result_source_abnormal_flag
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_abnormal_flag
     tags:
       - clinical
@@ -1680,9 +1976,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_specimen
+- name: intelligence__lab_result_specimen
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_specimen
     tags:
       - clinical
@@ -1691,9 +1989,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_reference_range_low
+- name: intelligence__lab_result_source_reference_range_low
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_reference_range_low
     tags:
       - clinical
@@ -1702,9 +2002,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_units
+- name: intelligence__lab_result_source_units
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_units
     tags:
       - clinical
@@ -1713,9 +2015,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_lab_result_id
+- name: intelligence__lab_result_lab_result_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_lab_result_id
     tags:
       - clinical
@@ -1724,9 +2028,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_collection_date
+- name: intelligence__lab_result_collection_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_collection_date
     tags:
       - clinical
@@ -1735,9 +2041,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_component
+- name: intelligence__lab_result_normalized_component
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_component
     tags:
       - clinical
@@ -1746,9 +2054,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_ordering_practitioner_id
+- name: intelligence__lab_result_ordering_practitioner_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_ordering_practitioner_id
     tags:
       - clinical
@@ -1757,9 +2067,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_result
+- name: intelligence__lab_result_result
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_result
     tags:
       - clinical
@@ -1768,9 +2080,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_code_type
+- name: intelligence__lab_result_source_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_code_type
     tags:
       - clinical
@@ -1779,9 +2093,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_description
+- name: intelligence__lab_result_normalized_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_description
     tags:
       - clinical
@@ -1790,9 +2106,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_reference_range_low
+- name: intelligence__lab_result_normalized_reference_range_low
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_reference_range_low
     tags:
       - clinical
@@ -1801,9 +2119,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_reference_range_high
+- name: intelligence__lab_result_normalized_reference_range_high
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_reference_range_high
     tags:
       - clinical
@@ -1812,9 +2132,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_code
+- name: intelligence__lab_result_normalized_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_code
     tags:
       - clinical
@@ -1823,9 +2145,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_description
+- name: intelligence__lab_result_source_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_description
     tags:
       - clinical
@@ -1834,9 +2158,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_status
+- name: intelligence__lab_result_status
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_status
     tags:
       - clinical
@@ -1845,9 +2171,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_accession_number
+- name: intelligence__lab_result_accession_number
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_accession_number
     tags:
       - clinical
@@ -1856,9 +2184,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_result_date
+- name: intelligence__lab_result_result_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_result_date
     tags:
       - clinical
@@ -1867,9 +2197,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_abnormal_flag
+- name: intelligence__lab_result_normalized_abnormal_flag
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_abnormal_flag
     tags:
       - clinical
@@ -1878,9 +2210,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_data_source
+- name: intelligence__lab_result_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_data_source
     tags:
       - clinical
@@ -1889,9 +2223,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_units
+- name: intelligence__lab_result_normalized_units
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_units
     tags:
       - clinical
@@ -1900,9 +2236,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_normalized_code_type
+- name: intelligence__lab_result_normalized_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_normalized_code_type
     tags:
       - clinical
@@ -1911,9 +2249,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_reference_range_high
+- name: intelligence__lab_result_source_reference_range_high
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_reference_range_high
     tags:
       - clinical
@@ -1922,9 +2262,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_code
+- name: intelligence__lab_result_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_code
     tags:
       - clinical
@@ -1933,9 +2275,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_patient_id
+- name: intelligence__lab_result_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_patient_id
     tags:
       - clinical
@@ -1944,9 +2288,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_source_component
+- name: intelligence__lab_result_source_component
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_source_component
     tags:
       - clinical
@@ -1955,9 +2301,11 @@ models:
     materialized: view
 
 
-- name: data_quality__lab_result_encounter_id
+- name: intelligence__lab_result_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: lab_result_encounter_id
     tags:
       - clinical
@@ -1966,9 +2314,11 @@ models:
     materialized: view
 
 ## Clinical location
-- name: data_quality__location_parent_organization
+- name: intelligence__location_parent_organization
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_parent_organization
     tags:
       - clinical
@@ -1977,9 +2327,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_latitude
+- name: intelligence__location_latitude
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_latitude
     tags:
       - clinical
@@ -1988,9 +2340,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_facility_type
+- name: intelligence__location_facility_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_facility_type
     tags:
       - clinical
@@ -1999,9 +2353,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_zip_code
+- name: intelligence__location_zip_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_zip_code
     tags:
       - clinical
@@ -2010,9 +2366,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_data_source
+- name: intelligence__location_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_data_source
     tags:
       - clinical
@@ -2021,9 +2379,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_city
+- name: intelligence__location_city
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_city
     tags:
       - clinical
@@ -2032,9 +2392,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_npi
+- name: intelligence__location_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_npi
     tags:
       - clinical
@@ -2043,9 +2405,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_location_id
+- name: intelligence__location_location_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_location_id
     tags:
       - clinical
@@ -2054,9 +2418,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_longitude
+- name: intelligence__location_longitude
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_longitude
     tags:
       - clinical
@@ -2065,9 +2431,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_address
+- name: intelligence__location_address
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_address
     tags:
       - clinical
@@ -2076,9 +2444,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_state
+- name: intelligence__location_state
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_state
     tags:
       - clinical
@@ -2087,9 +2457,11 @@ models:
     materialized: view
 
 
-- name: data_quality__location_name
+- name: intelligence__location_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: location_name
     tags:
       - clinical
@@ -2099,9 +2471,11 @@ models:
 
 
 ## Clinical medication
-- name: data_quality__medication_rxnorm_code
+- name: intelligence__medication_rxnorm_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_rxnorm_code
     tags:
       - clinical
@@ -2110,9 +2484,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_source_code
+- name: intelligence__medication_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_source_code
     tags:
       - clinical
@@ -2121,9 +2497,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_atc_code
+- name: intelligence__medication_atc_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_atc_code
     tags:
       - clinical
@@ -2132,9 +2510,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_dispensing_date
+- name: intelligence__medication_dispensing_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_dispensing_date
     tags:
       - clinical
@@ -2143,9 +2523,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_prescribing_date
+- name: intelligence__medication_prescribing_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_prescribing_date
     tags:
       - clinical
@@ -2154,9 +2536,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_days_supply
+- name: intelligence__medication_days_supply
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_days_supply
     tags:
       - clinical
@@ -2165,9 +2549,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_strength
+- name: intelligence__medication_strength
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_strength
     tags:
       - clinical
@@ -2176,9 +2562,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_patient_id
+- name: intelligence__medication_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_patient_id
     tags:
       - clinical
@@ -2187,9 +2575,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_rxnorm_description
+- name: intelligence__medication_rxnorm_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_rxnorm_description
     tags:
       - clinical
@@ -2198,9 +2588,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_encounter_id
+- name: intelligence__medication_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_encounter_id
     tags:
       - clinical
@@ -2209,9 +2601,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_data_source
+- name: intelligence__medication_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_data_source
     tags:
       - clinical
@@ -2220,9 +2614,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_atc_description
+- name: intelligence__medication_atc_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_atc_description
     tags:
       - clinical
@@ -2231,9 +2627,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_quantity_unit
+- name: intelligence__medication_quantity_unit
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_quantity_unit
     tags:
       - clinical
@@ -2242,9 +2640,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_source_description
+- name: intelligence__medication_source_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_source_description
     tags:
       - clinical
@@ -2253,9 +2653,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_ndc_code
+- name: intelligence__medication_ndc_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_ndc_code
     tags:
       - clinical
@@ -2264,9 +2666,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_medication_id
+- name: intelligence__medication_medication_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_medication_id
     tags:
       - clinical
@@ -2275,9 +2679,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_source_code_type
+- name: intelligence__medication_source_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_source_code_type
     tags:
       - clinical
@@ -2286,9 +2692,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_ndc_description
+- name: intelligence__medication_ndc_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_ndc_description
     tags:
       - clinical
@@ -2297,9 +2705,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_quantity
+- name: intelligence__medication_quantity
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_quantity
     tags:
       - clinical
@@ -2308,9 +2718,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_practitioner_id
+- name: intelligence__medication_practitioner_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_practitioner_id
     tags:
       - clinical
@@ -2319,9 +2731,11 @@ models:
     materialized: view
 
 
-- name: data_quality__medication_route
+- name: intelligence__medication_route
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: medication_route
     tags:
       - clinical
@@ -2330,9 +2744,11 @@ models:
     materialized: view
 
 ## Clinical observation
-- name: data_quality__observation_source_code
+- name: intelligence__observation_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_source_code
     tags:
       - clinical
@@ -2341,9 +2757,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_normalized_reference_range_high
+- name: intelligence__observation_normalized_reference_range_high
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_normalized_reference_range_high
     tags:
       - clinical
@@ -2352,9 +2770,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_source_units
+- name: intelligence__observation_source_units
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_source_units
     tags:
       - clinical
@@ -2363,9 +2783,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_observation_type
+- name: intelligence__observation_observation_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_observation_type
     tags:
       - clinical
@@ -2374,9 +2796,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_normalized_code
+- name: intelligence__observation_normalized_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_normalized_code
     tags:
       - clinical
@@ -2385,9 +2809,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_normalized_description
+- name: intelligence__observation_normalized_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_normalized_description
     tags:
       - clinical
@@ -2396,9 +2822,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_data_source
+- name: intelligence__observation_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_data_source
     tags:
       - clinical
@@ -2407,9 +2835,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_panel_id
+- name: intelligence__observation_panel_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_panel_id
     tags:
       - clinical
@@ -2418,9 +2848,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_observation_id
+- name: intelligence__observation_observation_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_observation_id
     tags:
       - clinical
@@ -2429,9 +2861,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_source_reference_range_low
+- name: intelligence__observation_source_reference_range_low
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_source_reference_range_low
     tags:
       - clinical
@@ -2440,9 +2874,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_result
+- name: intelligence__observation_result
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_result
     tags:
       - clinical
@@ -2451,9 +2887,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_source_code_type
+- name: intelligence__observation_source_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_source_code_type
     tags:
       - clinical
@@ -2462,9 +2900,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_normalized_reference_range_low
+- name: intelligence__observation_normalized_reference_range_low
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_normalized_reference_range_low
     tags:
       - clinical
@@ -2473,9 +2913,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_observation_date
+- name: intelligence__observation_observation_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_observation_date
     tags:
       - clinical
@@ -2484,9 +2926,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_encounter_id
+- name: intelligence__observation_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_encounter_id
     tags:
       - clinical
@@ -2495,9 +2939,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_source_description
+- name: intelligence__observation_source_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_source_description
     tags:
       - clinical
@@ -2506,9 +2952,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_source_reference_range_high
+- name: intelligence__observation_source_reference_range_high
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_source_reference_range_high
     tags:
       - clinical
@@ -2517,9 +2965,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_normalized_units
+- name: intelligence__observation_normalized_units
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_normalized_units
     tags:
       - clinical
@@ -2528,9 +2978,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_normalized_code_type
+- name: intelligence__observation_normalized_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_normalized_code_type
     tags:
       - clinical
@@ -2539,9 +2991,11 @@ models:
     materialized: view
 
 
-- name: data_quality__observation_patient_id
+- name: intelligence__observation_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: observation_patient_id
     tags:
       - clinical
@@ -2550,9 +3004,11 @@ models:
     materialized: view
 
 ## Clinical patient
-- name: data_quality__patient_sex
+- name: intelligence__patient_sex
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_sex
     tags:
       - clinical
@@ -2561,9 +3017,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_state
+- name: intelligence__patient_state
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_state
     tags:
       - clinical
@@ -2572,9 +3030,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_city
+- name: intelligence__patient_city
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_city
     tags:
       - clinical
@@ -2583,9 +3043,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_longitude
+- name: intelligence__patient_longitude
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_longitude
     tags:
       - clinical
@@ -2594,9 +3056,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_county
+- name: intelligence__patient_county
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_county
     tags:
       - clinical
@@ -2605,9 +3069,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_race
+- name: intelligence__patient_race
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_race
     tags:
       - clinical
@@ -2616,9 +3082,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_death_flag
+- name: intelligence__patient_death_flag
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_death_flag
     tags:
       - clinical
@@ -2627,9 +3095,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_address
+- name: intelligence__patient_address
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_address
     tags:
       - clinical
@@ -2638,9 +3108,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_data_source
+- name: intelligence__patient_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_data_source
     tags:
       - clinical
@@ -2649,9 +3121,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_zip_code
+- name: intelligence__patient_zip_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_zip_code
     tags:
       - clinical
@@ -2660,9 +3134,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_first_name
+- name: intelligence__patient_first_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_first_name
     tags:
       - clinical
@@ -2671,9 +3147,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_last_name
+- name: intelligence__patient_last_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_last_name
     tags:
       - clinical
@@ -2682,9 +3160,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_latitude
+- name: intelligence__patient_latitude
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_latitude
     tags:
       - clinical
@@ -2693,9 +3173,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_birth_date
+- name: intelligence__patient_birth_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_birth_date
     tags:
       - clinical
@@ -2704,9 +3186,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_death_date
+- name: intelligence__patient_death_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_death_date
     tags:
       - clinical
@@ -2715,9 +3199,11 @@ models:
     materialized: view
 
 
-- name: data_quality__patient_patient_id
+- name: intelligence__patient_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: patient_patient_id
     tags:
       - clinical
@@ -2726,9 +3212,11 @@ models:
     materialized: view
 
 ## Clinical practitioner
-- name: data_quality__practitioner_practice_affiliation
+- name: intelligence__practitioner_practice_affiliation
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_practice_affiliation
     tags:
       - clinical
@@ -2737,9 +3225,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_sub_specialty
+- name: intelligence__practitioner_sub_specialty
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_sub_specialty
     tags:
       - clinical
@@ -2748,9 +3238,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_last_name
+- name: intelligence__practitioner_last_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_last_name
     tags:
       - clinical
@@ -2759,9 +3251,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_practitioner_id
+- name: intelligence__practitioner_practitioner_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_practitioner_id
     tags:
       - clinical
@@ -2770,9 +3264,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_data_source
+- name: intelligence__practitioner_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_data_source
     tags:
       - clinical
@@ -2781,9 +3277,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_npi
+- name: intelligence__practitioner_npi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_npi
     tags:
       - clinical
@@ -2792,9 +3290,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_first_name
+- name: intelligence__practitioner_first_name
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_first_name
     tags:
       - clinical
@@ -2803,9 +3303,11 @@ models:
     materialized: view
 
 
-- name: data_quality__practitioner_specialty
+- name: intelligence__practitioner_specialty
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: practitioner_specialty
     tags:
       - clinical
@@ -2814,9 +3316,11 @@ models:
     materialized: view
 
 ## Clinical procedure
-- name: data_quality__procedure_normalized_code_type
+- name: intelligence__procedure_normalized_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_normalized_code_type
     tags:
       - clinical
@@ -2825,9 +3329,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_normalized_description
+- name: intelligence__procedure_normalized_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_normalized_description
     tags:
       - clinical
@@ -2836,9 +3342,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_procedure_id
+- name: intelligence__procedure_procedure_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_procedure_id
     tags:
       - clinical
@@ -2847,9 +3355,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_claim_id
+- name: intelligence__procedure_claim_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_claim_id
     tags:
       - clinical
@@ -2858,9 +3368,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_source_code
+- name: intelligence__procedure_source_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_source_code
     tags:
       - clinical
@@ -2869,9 +3381,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_source_code_type
+- name: intelligence__procedure_source_code_type
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_source_code_type
     tags:
       - clinical
@@ -2880,9 +3394,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_source_description
+- name: intelligence__procedure_source_description
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_source_description
     tags:
       - clinical
@@ -2891,9 +3407,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_practitioner_id
+- name: intelligence__procedure_practitioner_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_practitioner_id
     tags:
       - clinical
@@ -2902,9 +3420,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_data_source
+- name: intelligence__procedure_data_source
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_data_source
     tags:
       - clinical
@@ -2913,9 +3433,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_patient_id
+- name: intelligence__procedure_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_patient_id
     tags:
       - clinical
@@ -2924,9 +3446,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_procedure_date
+- name: intelligence__procedure_procedure_date
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_procedure_date
     tags:
       - clinical
@@ -2935,9 +3459,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_encounter_id
+- name: intelligence__procedure_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_encounter_id
     tags:
       - clinical
@@ -2946,9 +3472,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_modifier_5
+- name: intelligence__procedure_modifier_5
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_modifier_5
     tags:
       - clinical
@@ -2957,9 +3485,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_modifier_4
+- name: intelligence__procedure_modifier_4
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_modifier_4
     tags:
       - clinical
@@ -2968,9 +3498,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_normalized_code
+- name: intelligence__procedure_normalized_code
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_normalized_code
     tags:
       - clinical
@@ -2979,9 +3511,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_modifier_1
+- name: intelligence__procedure_modifier_1
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_modifier_1
     tags:
       - clinical
@@ -2990,9 +3524,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_modifier_3
+- name: intelligence__procedure_modifier_3
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_modifier_3
     tags:
       - clinical
@@ -3001,9 +3537,11 @@ models:
     materialized: view
 
 
-- name: data_quality__procedure_modifier_2
+- name: intelligence__procedure_modifier_2
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: procedure_modifier_2
     tags:
       - clinical
@@ -3011,9 +3549,11 @@ models:
       - intermediate
     materialized: view
 #### Concepts
-- name: data_quality__unique_value_examples
+- name: intelligence__unique_value_examples
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: unique_value_examples
     tags:
       - clinical
@@ -3022,9 +3562,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_condition_condition_id
+- name: intelligence__primary_keys_condition_condition_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_condition_condition_id
     tags:
       - clinical
@@ -3033,9 +3575,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_encounter_encounter_id
+- name: intelligence__primary_keys_encounter_encounter_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_encounter_encounter_id
     tags:
       - clinical
@@ -3044,9 +3588,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_lab_result_lab_result_id
+- name: intelligence__primary_keys_lab_result_lab_result_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_lab_result_lab_result_id
     tags:
       - clinical
@@ -3055,9 +3601,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_location_location_id
+- name: intelligence__primary_keys_location_location_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_location_location_id
     tags:
       - clinical
@@ -3066,9 +3614,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_medication_medication_id
+- name: intelligence__primary_keys_medication_medication_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_medication_medication_id
     tags:
       - clinical
@@ -3077,9 +3627,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_observation_observation_id
+- name: intelligence__primary_keys_observation_observation_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_observation_observation_id
     tags:
       - clinical
@@ -3088,9 +3640,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_patient_patient_id
+- name: intelligence__primary_keys_patient_patient_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_patient_patient_id
     tags:
       - clinical
@@ -3099,9 +3653,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_practitioner_practitioner_id
+- name: intelligence__primary_keys_practitioner_practitioner_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_practitioner_practitioner_id
     tags:
       - clinical
@@ -3110,9 +3666,11 @@ models:
     materialized: view
 
 
-- name: data_quality__primary_keys_procedure_procedure_id
+- name: intelligence__primary_keys_procedure_procedure_id
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: primary_keys_procedure_procedure_id
     tags:
       - clinical
@@ -3124,9 +3682,11 @@ models:
 #### Union processing
 ### Claims Specific
 
-- name: data_quality__claim_type_summary
+- name: intelligence__claim_type_summary
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: claim_type_summary
     tags:
       - claims
@@ -3136,9 +3696,11 @@ models:
 
 
 
-- name: data_quality__data_quality_claims_detail
+- name: intelligence__data_quality_claims_detail
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: data_quality_claims_detail
     tags:
       - claims
@@ -3147,9 +3709,11 @@ models:
     materialized: view
 
 
-- name: data_quality__data_quality_claims_for_pbi
+- name: intelligence__data_quality_claims_for_pbi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: data_quality_claims_for_pbi
     tags:
       - claims
@@ -3161,9 +3725,11 @@ models:
 ### Clinical Specific
 
 
-- name: data_quality__data_quality_clinical_detail
+- name: intelligence__data_quality_clinical_detail
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: data_quality_clinical_detail
     tags:
       - clinical
@@ -3172,9 +3738,11 @@ models:
     materialized: view
 
 
-- name: data_quality__data_quality_clinical_for_pbi
+- name: intelligence__data_quality_clinical_for_pbi
   config:
-    schema: data_quality
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
     alias: data_quality_clinical_for_pbi
     tags:
       - clinical

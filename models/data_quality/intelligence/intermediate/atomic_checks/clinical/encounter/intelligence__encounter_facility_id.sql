@@ -9,8 +9,8 @@ SELECT
     ,'Encounter ID' as DRILL_DOWN_KEY
     ,IFNULL(ENCOUNTER_ID, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'FACILITY_NPI' AS FIELD_NAME
-    ,case when M.FACILITY_NPI is not null then 'valid' else 'null' end as BUCKET_NAME
+    ,'FACILITY_ID' AS FIELD_NAME
+    ,case when M.FACILITY_ID is not null then 'valid' else 'null' end as BUCKET_NAME
     ,null as INVALID_REASON
-    ,CAST(FACILITY_NPI AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(FACILITY_ID AS VARCHAR(255)) AS FIELD_VALUE
 FROM {{ ref('encounter') }} M

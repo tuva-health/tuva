@@ -107,7 +107,7 @@ from long_num ln
     left join long_denom ld on ln.data_source = ld.data_source
         and ln.year_month = ld.year_month
         and ln.measure_name = ld.measure_name
-    left join {{ ref('data_quality__crosswalk_measure_reasonable_ranges') }} mrr on ln.payer_type = mrr.payer_type
+    left join {{ ref('intelligence__crosswalk_measure_reasonable_ranges') }} mrr on ln.payer_type = mrr.payer_type
         and ln.measure_name = mrr.measure_name
 
 {% else -%}

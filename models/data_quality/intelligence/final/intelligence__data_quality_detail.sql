@@ -16,7 +16,7 @@ SELECT
 	INVALID_REASON,
 	FIELD_VALUE,
 	SUMMARY_SK
-FROM {{ ref('data_quality__data_quality_claims_detail') }}
+FROM {{ ref('intelligence__data_quality_claims_detail') }}
 
 UNION
 
@@ -32,7 +32,7 @@ SELECT
 	INVALID_REASON,
 	FIELD_VALUE,
 	SUMMARY_SK
-FROM {{ ref('data_quality__data_quality_clinical_detail') }}
+FROM {{ ref('intelligence__data_quality_clinical_detail') }}
 
 {% elif var('claims_enabled', False) == true -%}
 
@@ -48,7 +48,7 @@ SELECT
 	INVALID_REASON,
 	FIELD_VALUE,
 	SUMMARY_SK
-FROM {{ ref('data_quality__data_quality_claims_detail') }}
+FROM {{ ref('intelligence__data_quality_claims_detail') }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
@@ -64,6 +64,6 @@ SELECT
 	INVALID_REASON,
 	FIELD_VALUE,
 	SUMMARY_SK
-FROM {{ ref('data_quality__data_quality_clinical_detail') }}
+FROM {{ ref('intelligence__data_quality_clinical_detail') }}
 
 {%- endif %}

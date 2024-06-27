@@ -7,7 +7,7 @@ WITH valid_conditions AS (
     SELECT 
         *
     FROM 
-        {{ ref('data_quality__practitioner_practitioner_id') }}
+        {{ ref('intelligence__practitioner_practitioner_id') }}
     WHERE 
         BUCKET_NAME = 'valid'
 )
@@ -34,7 +34,7 @@ WITH valid_conditions AS (
         FIELD_VALUE,
         BUCKET_NAME
     FROM 
-        {{ ref('data_quality__practitioner_practitioner_id') }}
+        {{ ref('intelligence__practitioner_practitioner_id') }}
     WHERE 
         BUCKET_NAME = 'valid'
     QUALIFY ROW_NUMBER() OVER (ORDER BY RANDOM()) <= 5
@@ -52,7 +52,7 @@ WITH valid_conditions AS (
         a.BUCKET_NAME,
         b.duplicate_count
     FROM 
-        {{ ref('data_quality__practitioner_practitioner_id') }} a
+        {{ ref('intelligence__practitioner_practitioner_id') }} a
     JOIN 
         uniqueness_check b ON a.FIELD_VALUE = b.FIELD_VALUE
 ) 

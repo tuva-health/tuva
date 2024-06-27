@@ -17,7 +17,7 @@ WITH Ranked_Examples as (
        FIELD_VALUE as FIELD_VALUE,
        COUNT(DRILL_DOWN_VALUE) as FREQUENCY,
        ROW_NUMBER() OVER (PARTITION BY SUMMARY_SK, BUCKET_NAME, FIELD_VALUE ORDER BY FIELD_VALUE) AS RN
-FROM {{ ref('data_quality__data_quality_claims_detail') }}
+FROM {{ ref('intelligence__data_quality_claims_detail') }}
 WHERE BUCKET_NAME not in ('valid', 'null')
 GROUP BY
        DATA_SOURCE,
@@ -43,7 +43,7 @@ SELECT
        MAX(DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE, //1 sample claim
        null as FIELD_VALUE,
        COUNT(DRILL_DOWN_VALUE) as FREQUENCY
-FROM {{ ref('data_quality__data_quality_claims_detail') }}
+FROM {{ ref('intelligence__data_quality_claims_detail') }}
 WHERE BUCKET_NAME = 'null'
 GROUP BY
        DATA_SOURCE,
@@ -67,7 +67,7 @@ SELECT
        MAX(DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE, //1 sample claim
        FIELD_VALUE as FIELD_VALUE,
        COUNT(DRILL_DOWN_VALUE) as FREQUENCY
-FROM {{ ref('data_quality__data_quality_claims_detail') }}
+FROM {{ ref('intelligence__data_quality_claims_detail') }}
 WHERE BUCKET_NAME = 'valid'
 GROUP BY
        DATA_SOURCE,
