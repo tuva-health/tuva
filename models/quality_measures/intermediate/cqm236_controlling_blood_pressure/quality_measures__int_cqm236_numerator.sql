@@ -33,6 +33,7 @@ with denominator as (
     select
           patient_id
         , observation_date
+        , normalized_code
         , normalized_description
         , result
     from {{ ref('quality_measures__stg_core__observation') }}
@@ -50,7 +51,13 @@ with denominator as (
 
 , labs as (
 
-    select * from {{ref('quality_measures__stg_core__lab_result')}}
+    select 
+          patient_id
+        , result_date
+        , collection_date
+        , result
+        , normalized_code
+    from {{ref('quality_measures__stg_core__lab_result')}}
     where normalized_code in 
     ('8480-6' --systolic
     ,'8462-4') --diastolic
@@ -64,6 +71,7 @@ with denominator as (
     select
           observations.patient_id
         , observations.observation_date
+        , observations.normalized_code
         , observations.normalized_description
         , observations.result
         , denominator.measure_id
@@ -82,7 +90,11 @@ with denominator as (
 , labs_within_range as (
 
     select
-        labs.*
+          labs.patient_id
+        , labs.normalized_code
+        , labs.result_date
+        , labs.collection_date
+        , labs.result
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
@@ -103,6 +115,7 @@ with denominator as (
         , observations_within_range.observation_date
         , observations_within_range.normalized_description
         , observations_within_range.result
+        , observations_within_range.normalized_code
         , case
             when lower(encounters.encounter_type) in (
                   'emergency department'
