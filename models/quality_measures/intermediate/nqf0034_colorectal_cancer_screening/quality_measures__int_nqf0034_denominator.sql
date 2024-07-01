@@ -123,13 +123,14 @@ with visit_codes as (
     from {{ref('quality_measures__stg_core__patient')}} p
     inner join encounters_by_patient e
         on p.patient_id = e.patient_id
-    where p.birth_date is not null
+    where p.death_date is null -- ensures deceased patients are not included
 
 )
 
-select patient_id,
-       min_age,
-       max_age,
-       qualifying_types
+select 
+      patient_id
+    , min_age
+    , max_age
+    , qualifying_types
 from patients_with_age
 where max_age >= 45 and min_age <=  75

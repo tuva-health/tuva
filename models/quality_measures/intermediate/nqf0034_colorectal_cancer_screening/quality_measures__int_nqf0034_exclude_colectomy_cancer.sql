@@ -19,13 +19,13 @@ with exclusion_codes as (
             when 'ICD10CM' then 'icd-10-cm'
             when 'CPT' then 'hcpcs'
             when 'ICD10PCS' then 'icd-10-pcs'
-          else lower(code_system) end 
-          as code_system
+          else lower(code_system) 
+          end as code_system
         , concept_name
     From {{ref('quality_measures__value_sets')}}
-    where concept_name in  (
-          'Malignant Neoplasm of Colon'
-        , 'Total Colectomy'
+    where lower(concept_name) in  (
+          'malignant neoplasm of colon'
+        , 'total colectomy'
     )
 
 )

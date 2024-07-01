@@ -35,16 +35,16 @@ with denominator as (
           when 'ICD10CM' then 'icd-10-cm'
           when 'CPT' then 'hcpcs'
           when 'ICD10PCS' then 'icd-10-pcs'
-        else lower(code_system) end 
-        as code_system
+        else lower(code_system) 
+        end as code_system
       , concept_name
     from {{ref('quality_measures__value_sets')}}
-    where concept_name in  (
-          'Fecal Occult Blood Test (FOBT)' -- mp
-        , 'Flexible Sigmoidoscopy' --mp+4
-        , 'Colonoscopy' -- mp+9
-        , 'CT Colonography' -- mp+4
-        , 'sDNA FIT Test' -- mp+2
+    where lower(concept_name) in  (
+          'fecal occult blood test (fobt)' -- mp
+        , 'flexible sigmoidoscopy' --mp+4
+        , 'colonoscopy' -- mp+9
+        , 'ct colonography' -- mp+4
+        , 'sdna fit test' -- mp+2
     )
 
 )
@@ -125,7 +125,8 @@ with denominator as (
 
 , labs as (
 
-    select  patient_id
+    select  
+      patient_id
     , result_date
     , collection_date
     , source_code_type
@@ -157,7 +158,7 @@ with denominator as (
     select
           observations.patient_id
         , observations.observation_date
-    , screening_codes.concept_name
+        , screening_codes.concept_name
     from observations
     inner join screening_periods
         on observations.observation_date between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
@@ -171,7 +172,7 @@ with denominator as (
     select
           procedures.patient_id
         , procedures.procedure_date
-    , screening_codes.concept_name
+        , screening_codes.concept_name
     from procedures
     inner join screening_periods
         on procedures.procedure_date between screening_periods.effective_performance_period_begin and screening_periods.performance_period_end
@@ -274,7 +275,7 @@ with denominator as (
 )
 
 select
-      cast( qualifying_events.patient_id as {{ dbt.type_string() }}) patient_id
+      cast( qualifying_events.patient_id as {{ dbt.type_string() }}) as patient_id
     , cast( evidence_date as date) as evidence_date
     , cast( evidence as {{ dbt.type_string() }}) as evidence
 from qualifying_events
