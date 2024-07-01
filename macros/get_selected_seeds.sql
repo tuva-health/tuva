@@ -7,7 +7,7 @@
 
     {% for node in nodes %}
         {% if node.resource_type == 'seed' and node.unique_id in selected_nodes and node.package_name in['the_tuva_project','tuva'] %}
-            {% set fully_qualified_name = adapter.quote(node.database) ~ '.' ~ node.schema ~ '.' ~ node.alias %}
+            {% set fully_qualified_name = adapter.quote(node.database) ~ '.' ~ adapter.quote(node.schema) ~ '.' ~ adapter.quote(node.alias) %}
             {% do ns.selected_seeds.append(fully_qualified_name) %}
         {% endif %}
     {% endfor %}
