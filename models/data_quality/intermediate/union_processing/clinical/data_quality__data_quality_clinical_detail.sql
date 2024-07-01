@@ -144,7 +144,7 @@ SELECT * FROM {{ ref('data_quality__encounter_encounter_type') }}
 
 UNION
 
-SELECT * FROM {{ ref('data_quality__encounter_facility_npi') }}
+SELECT * FROM {{ ref('data_quality__encounter_facility_id') }}
 
 UNION
 
