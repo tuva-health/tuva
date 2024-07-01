@@ -55,14 +55,11 @@ with denominator as (
 
     select
         patient_id
-      , encounter_id
       , procedure_date
-      , source_code_type
-      , source_code
     from {{ref('quality_measures__stg_core__procedure')}} as procs
     inner join osteo_procedure_codes
-        on procs.source_code = osteo_procedure_codes.code
-        and procs.source_code_type = osteo_procedure_codes.code_system
+        on coalesce(procs.normalized_code, procs.source_code) = osteo_procedure_codes.code
+        and coalesce(procs.normalized_code_type, procs.source_code_type) = osteo_procedure_codes.code_system
 
 )
 

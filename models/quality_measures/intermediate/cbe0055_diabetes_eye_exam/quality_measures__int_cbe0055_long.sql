@@ -13,7 +13,7 @@ with denominator as (
         , measure_name
         , measure_version
         , denominator_flag
-    from {{ ref('quality_measures__int_cbe0055__denominator') }}
+    from {{ ref('quality_measures__int_cbe0055_denominator') }}
 
 )
 

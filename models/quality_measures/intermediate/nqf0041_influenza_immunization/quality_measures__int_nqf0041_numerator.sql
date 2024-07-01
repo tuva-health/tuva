@@ -38,12 +38,10 @@ with denominator as (
     select
         patient_id
       , procedure_date
-      , source_code_type
-      , source_code
     from {{ ref('quality_measures__stg_core__procedure') }} as procedures
     inner join influenza_vaccination_code
-        on procedures.source_code = influenza_vaccination_code.code
-            and procedures.source_code_type = influenza_vaccination_code.code_system
+        on coalesce(procedures.normalized_code, procedures.source_code) = influenza_vaccination_code.code
+            and coalesce(procedures.normalized_code_type, procedures.source_code_type) = influenza_vaccination_code.code_system
 
 )
 

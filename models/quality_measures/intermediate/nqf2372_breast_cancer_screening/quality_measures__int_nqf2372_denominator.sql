@@ -100,7 +100,7 @@ with performance_period as (
         , performance_period.performance_period_begin
         , performance_period.performance_period_end
         , performance_period.performance_period_lookback
-        , floor({{ datediff('patient.birth_date', 'performance_period.performance_period_end', 'hour') }} / 8766.0) as age
+        , floor({{ datediff('patient.birth_date', 'performance_period.performance_period_begin', 'hour') }} / 8760.0) as age  -- 365*24 hours in a year
     from patient
          cross join performance_period
 

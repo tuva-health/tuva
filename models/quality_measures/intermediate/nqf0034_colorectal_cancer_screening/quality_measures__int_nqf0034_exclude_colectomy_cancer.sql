@@ -10,6 +10,7 @@ Patients with a diagnosis or past history of total colectomy or colorectal cance
 
 
 with exclusion_codes as (
+
     select
           code
         , case code_system
@@ -18,12 +19,13 @@ with exclusion_codes as (
             when 'ICD10CM' then 'icd-10-cm'
             when 'CPT' then 'hcpcs'
             when 'ICD10PCS' then 'icd-10-pcs'
-          else lower(code_system) end as code_system
+          else lower(code_system) 
+          end as code_system
         , concept_name
     From {{ref('quality_measures__value_sets')}}
-    where concept_name in  (
-         'Malignant Neoplasm of Colon'
-        , 'Total Colectomy'
+    where lower(concept_name) in  (
+          'malignant neoplasm of colon'
+        , 'total colectomy'
     )
 
 )
@@ -188,8 +190,6 @@ with exclusion_codes as (
     from procedure_exclusions
 
 )
-
-
 
 select
       patient_id
