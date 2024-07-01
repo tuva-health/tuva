@@ -1,37 +1,36 @@
 version: 2
 
 seeds:
-  - name: data_quality__test_catalog
+  - name: crosswalk__field_info
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality{% else %}data_quality{%- endif -%}
-      alias: _value_set_test_catalog
-      tags:
-        - data_quality
-        - claims_preprocessing
-      enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
-      column_types:
-        source_table : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        test_category : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        test_name : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        test_field: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        claim_type : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        pipeline_test: integer
-    columns:
-      - name: source_table
-        description: Table the test is performed on
-      - name: test_category
-        description: Category of test
-      - name: test_name
-        description: Name of the test
-      - name: test_field
-        description: Field the test is performed on
-      - name: claim_type
-        description: Type of claim, if applicable, the test is relevant for
-      - name: pipeline_test
-        description: Flag indicating if the test is a pipeline test
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
+        {% else %}dqi_crosswalk{%- endif -%}
+    description: >
+      Target thresholds at the field level determining red, yellow, and green values in the Data Quality dashboard.
+
+
+  - name: crosswalk__field_to_mart
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
+        {% else %}dqi_crosswalk{%- endif -%}
+    description: >
+      Crosswalk table that defines which fields impact the ability for marts to run.
+
+
+  - name: crosswalk__mart_to_outcome_measure
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
+        {% else %}dqi_crosswalk{%- endif -%}
+    description: >
+      Crosswalk table that defines which marts impact which outcome measures.
+
+  - name: crosswalk__measure_reasonable_ranges
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
+        {% else %}dqi_crosswalk{%- endif -%}
+    description: >
+      Crosswalk table that sets reasonable ranges for outcome measures

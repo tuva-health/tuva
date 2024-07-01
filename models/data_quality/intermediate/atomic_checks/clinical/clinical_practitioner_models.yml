@@ -1,0 +1,106 @@
+version: 2
+models:
+
+
+- name: data_quality__practitioner_practice_affiliation
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_practice_affiliation
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_sub_specialty
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_sub_specialty
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_last_name
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_last_name
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_practitioner_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_practitioner_id
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_data_source
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_data_source
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_npi
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_npi
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_first_name
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_first_name
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__practitioner_specialty
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: practitioner_specialty
+    tags:
+      - clinical
+      - practitioner
+      - intermediate
+    materialized: view

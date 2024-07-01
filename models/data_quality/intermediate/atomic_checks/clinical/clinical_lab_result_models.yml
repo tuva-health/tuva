@@ -1,0 +1,353 @@
+version: 2
+models:
+
+
+- name: data_quality__lab_result_source_abnormal_flag
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_abnormal_flag
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_specimen
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_specimen
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_reference_range_low
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_reference_range_low
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_units
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_units
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_lab_result_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_lab_result_id
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_collection_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_collection_date
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_component
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_component
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_ordering_practitioner_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_ordering_practitioner_id
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_result
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_result
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_code_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_code_type
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_description
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_description
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_reference_range_low
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_reference_range_low
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_reference_range_high
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_reference_range_high
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_code
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_description
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_description
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_status
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_status
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_accession_number
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_accession_number
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_result_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_result_date
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_abnormal_flag
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_abnormal_flag
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_data_source
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_data_source
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_units
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_units
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_normalized_code_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_normalized_code_type
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_reference_range_high
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_reference_range_high
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_code
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_patient_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_patient_id
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_source_component
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_source_component
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__lab_result_encounter_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_encounter_id
+    tags:
+      - clinical
+      - lab_result
+      - intermediate
+    materialized: view

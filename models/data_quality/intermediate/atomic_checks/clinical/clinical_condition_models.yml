@@ -1,0 +1,249 @@
+version: 2
+models:
+
+
+- name: data_quality__condition_claim_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_claim_id
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_condition_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_condition_id
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_condition_rank
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_condition_rank
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_condition_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_condition_type
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_data_source
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_data_source
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_encounter_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_encounter_id
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_normalized_code_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_normalized_code_type
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_normalized_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_normalized_code
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_normalized_description
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_normalized_description
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_onset_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_onset_date
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_patient_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_patient_id
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_present_on_admit_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_present_on_admit_code
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_present_on_admit_description
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_present_on_admit_description
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_recorded_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_recorded_date
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_resolved_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_resolved_date
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_source_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_source_code
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_source_code_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_source_code_type
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_source_description
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_source_description
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
+
+
+- name: data_quality__condition_status
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_status
+    tags:
+      - clinical
+      - condition
+      - intermediate
+    materialized: view
