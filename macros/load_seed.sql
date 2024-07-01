@@ -222,51 +222,6 @@ COPY_OPTIONS (
 
 
 
-{% macro postgres__load_seed(uri,pattern,compression,headers,null_marker) %}
-{%- set columns = adapter.get_columns_in_relation(this) -%}
-{%- set collist = [] -%}
-
-{% for col in columns %}
-  {% do collist.append(col.name) %}
-{% endfor %}
-
-{%- set cols = collist|join(',') -%}
-
-{%- set null_string = '\'\'\\\\N\'\'' if null_marker == true else "''''" -%}
-
-{% set sql %}
-DO $$
-BEGIN
-    BEGIN
-        PERFORM aws_s3.table_import_from_s3(
-            '{{ this }}',
-            '{{ cols }}',
-            '(FORMAT csv, HEADER false, NULL  {{ null_string }} , ENCODING UTF8)',  -- Ensure the correct encoding is specified (UTF8)
-            aws_commons.create_s3_uri('tuva-public-resources', '{{ uri.replace('tuva-public-resources/', '') }}/{{ pattern }}_0_0_0.csv.gz', 'us-east-1'),
-            aws_commons.create_aws_credentials('AKIA2EPVNTV4FLAEBFGE', 'TARgblERrFP81Op+52KZW7HrP1Om6ObEDQAUVN2u', '')
-        );
-    EXCEPTION
-        WHEN OTHERS THEN
-            NULL;  -- Silently handle any exceptions
-    END;
-END $$;
-{% endset %}
-
-{% call statement('postgressql',fetch_result=true) %}
-{{ sql }}
-{% endcall %}
-
-{% if execute %}
-{# debugging { log(sql, True)} #}
-{% set results = load_result('postgressql') %}
-{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ,True) }}
-{# debugging { log(results, True) } #}
-{% endif %}
-
-{% endmacro %}
-
-
-
 {% macro default__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% if execute %}
 {% do log('No adapter found, seed not loaded',info = True) %}
