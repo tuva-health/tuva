@@ -30,5 +30,6 @@ SELECT
         else null
     END AS INVALID_REASON
     ,CAST(CLAIM_LINE_END_DATE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('medical_claim')}} M
 cross join tuva_last_run cte

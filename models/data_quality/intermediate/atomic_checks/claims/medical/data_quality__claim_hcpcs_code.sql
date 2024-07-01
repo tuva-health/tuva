@@ -20,5 +20,6 @@ SELECT
         else null
      end as INVALID_REASON
     ,CAST(M.HCPCS_CODE || '|' || COALESCE(TERM.SHORT_DESCRIPTION, '') AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
     FROM {{ ref('medical_claim')}} M
 LEFT JOIN {{ ref('terminology__hcpcs_level_2')}} AS TERM ON M.HCPCS_CODE = TERM.HCPCS

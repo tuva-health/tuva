@@ -18,4 +18,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
         else null
      end as INVALID_REASON
     ,CAST(ZIP_CODE AS VARCHAR(255)) AS FIELD_VALUE
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('eligibility')}} M

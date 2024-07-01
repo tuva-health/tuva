@@ -55,7 +55,8 @@ SELECT DISTINCT
         WHEN M.DEATH_DATE <= M.BIRTH_DATE THEN 'death date before birth date'
         else null
     END AS INVALID_REASON
-,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM BASE M
 LEFT JOIN CLAIM_GRAIN CG ON M.MEMBER_ID = CG.MEMBER_ID AND M.Data_Source = CG.Data_Source
 LEFT JOIN CLAIM_AGG AGG ON M.MEMBER_ID = AGG.MEMBER_ID AND M.Data_Source = AGG.Data_Source

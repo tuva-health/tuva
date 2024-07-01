@@ -18,5 +18,6 @@ SELECT DISTINCT
         else null
     end as INVALID_REASON
     ,CAST(M.GENDER AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('eligibility')}} M
 LEFT JOIN {{ ref('terminology__gender')}} TERM ON M.GENDER = TERM.GENDER

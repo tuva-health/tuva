@@ -18,5 +18,6 @@ SELECT DISTINCT
         else null
     end as INVALID_REASON
     ,CAST(M.PAYER_TYPE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('eligibility')}} M
 LEFT JOIN {{ ref('terminology__payer_type')}} TERM ON M.PAYER_TYPE = TERM.PAYER_TYPE

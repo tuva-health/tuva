@@ -52,6 +52,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
         else null
     end as INVALID_REASON
     ,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM BASE M
 LEFT JOIN CLAIM_GRAIN CG ON M.CLAIM_ID = CG.CLAIM_ID AND M.Data_Source = CG.Data_Source
 LEFT JOIN {{ ref('terminology__provider')}} AS TERM ON M.Billing_NPI = TERM.NPI

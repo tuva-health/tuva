@@ -23,4 +23,5 @@ SELECT DISTINCT
         else null
     END AS INVALID_REASON
     ,CAST(ENROLLMENT_END_DATE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('eligibility')}} M

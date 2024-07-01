@@ -18,5 +18,6 @@ SELECT DISTINCT
         else null
     end as INVALID_REASON
     ,CAST(STATE AS VARCHAR(255)) AS FIELD_VALUE
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('eligibility')}} M
 LEFT JOIN {{ ref('reference_data__ssa_fips_state')}} AS TERM ON M.STATE = TERM.SSA_FIPS_STATE_NAME

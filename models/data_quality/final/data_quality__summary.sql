@@ -22,8 +22,9 @@ SELECT
     SCT.GREEN,
     SUM(CASE WHEN BUCKET_NAME = 'valid' THEN 1 ELSE 0 END) as VALID_NUM,
     SUM(CASE WHEN BUCKET_NAME <> 'null' THEN 1 ELSE 0 END) as FILL_NUM,
-    COUNT(DRILL_DOWN_VALUE) as DENOM
-FROM 
+    COUNT(DRILL_DOWN_VALUE) as DENOM,
+    '{{ var('tuva_last_run')}}' as tuva_last_run
+FROM
     {{ ref('data_quality__data_quality_detail') }} X
 LEFT JOIN CTE FM 
     ON X.FIELD_NAME = FM.FIELD_NAME

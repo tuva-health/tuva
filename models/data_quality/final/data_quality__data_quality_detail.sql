@@ -15,7 +15,8 @@ SELECT
 	BUCKET_NAME,
 	INVALID_REASON,
 	FIELD_VALUE,
-	SUMMARY_SK
+	SUMMARY_SK,
+	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_detail') }}
 
 UNION
@@ -31,7 +32,8 @@ SELECT
 	BUCKET_NAME,
 	INVALID_REASON,
 	FIELD_VALUE,
-	SUMMARY_SK
+	SUMMARY_SK,
+	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_detail') }}
 
 {% elif var('claims_enabled', False) == true -%}
@@ -47,7 +49,8 @@ SELECT
 	BUCKET_NAME,
 	INVALID_REASON,
 	FIELD_VALUE,
-	SUMMARY_SK
+	SUMMARY_SK,
+	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_detail') }}
 
 {% elif var('clinical_enabled', False) == true -%}
@@ -63,7 +66,8 @@ SELECT
 	BUCKET_NAME,
 	INVALID_REASON,
 	FIELD_VALUE,
-	SUMMARY_SK
+	SUMMARY_SK,
+	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_detail') }}
 
 {%- endif %}
