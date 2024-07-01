@@ -18,8 +18,8 @@ Jinja is used to set payment year variable.
 {% set payment_year = var('cms_hcc_payment_year') | int() -%}
 {% set payment_year_age_date = payment_year ~ '-02-01' -%}
 {% set collection_year = payment_year - 1 -%}
-{% set collection_year_start = collection_year ~ '-01-01' -%}
-{% set collection_year_end = collection_year ~ '-12-31' -%}
+{% set collection_year_start = "'" ~ collection_year ~ "-01-01'" %}
+{% set collection_year_end = "'" ~ collection_year ~ "-12-31'" %}
 
 with stg_eligibility as (
 
@@ -67,13 +67,13 @@ with stg_eligibility as (
         , enrollment_start_date
         , enrollment_end_date
         , case
-            when enrollment_start_date < '{{ collection_year_start }}'
-            then '{{ collection_year_start }}'
+            when enrollment_start_date < {{ try_to_cast_date(collection_year_start, 'YYYY-MM-DD') }}
+            then {{ try_to_cast_date(collection_year_start, 'YYYY-MM-DD') }}
             else enrollment_start_date
           end as proxy_enrollment_start_date
         , case
-            when enrollment_end_date > '{{ collection_year_end }}'
-            then '{{ collection_year_end }}'
+            when enrollment_end_date > {{ try_to_cast_date(collection_year_end, 'YYYY-MM-DD') }}
+            then {{ try_to_cast_date(collection_year_end, 'YYYY-MM-DD') }}
             else enrollment_end_date
           end as proxy_enrollment_end_date
     from stg_eligibility

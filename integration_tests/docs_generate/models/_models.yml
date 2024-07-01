@@ -7,6 +7,7 @@ models:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: > 
       The eligibility table includes information about a patient's health 
       insurance coverage and demographics (note: we use the word patient as a 
@@ -86,12 +87,19 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
 
   - name: medical_claim
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: > 
       The medical_claim table contains information on healthcare services and 
       supplies provided to patients, billed by providers, and paid for by health 
@@ -675,11 +683,22 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
+          
+          
+          
+
   - name: pharmacy_claim
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The pharmacy_claim table includes information about retail and specialty 
       drug prescriptions that have been filled by a patient, billed by a 
@@ -756,6 +775,7 @@ models:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The condition table contains information related to medical conditions 
       patients have, including problems, admitting diagnosis codes, and billable 
@@ -822,12 +842,20 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: encounter
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The encounter table contains information about patients visits (i.e. 
       encounters).  This includes acute inpatient, emergency department, office 
@@ -875,10 +903,13 @@ models:
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: facility_npi
+      - name: facility_id
         description: >
-          Facility NPI for the encounter (typically represents the facility 
-          where services were performed).
+          Facility identifier for the encounter (typically represents the facility where services were performed).  Can
+          be an NPI or source code.
+      - name: facility_name
+        description: >
+          Facility name for the encounter (typically represents the facility where services were performed).
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
@@ -922,12 +953,19 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
 
   - name: lab_result
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The lab result table contains information about lab test results, 
       including the LOINC code and description, units, reference range, and 
@@ -1010,12 +1048,20 @@ models:
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: location
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The location table contains information on practice and facility locations 
       where patients receive medical care.
@@ -1049,6 +1095,13 @@ models:
         description: The longitude of the location.
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: medication
     config:
@@ -1110,12 +1163,21 @@ models:
           Unique identifier for the practitioner who ordered the medication.
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
+          
 
   - name: observation
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The observation table contains information on measurements other than lab 
       tests e.g. blood pressure, height, and weight.
@@ -1162,12 +1224,20 @@ models:
         description: The normalized high end of the reference range.
       - name: data_source
         description: Custom description of the source system e.g. Epic.
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: patient
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The patient table contains demographic and geographic information on 
       patients.
@@ -1211,12 +1281,20 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
 
   - name: practitioner
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The practitioner table contains information on the providers in the 
       dataset e.g. physicians, physicians assistants, etc.
@@ -1242,12 +1320,21 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage
+          
+          
 
   - name: procedure
     config:
       database: tuva
       schema: input_layer
       tags: input_layer
+      materialized: table
     description: >
       The procedure table contains information on procedures that were performed 
       on patients in the dataset.
@@ -1316,3 +1403,9 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file
+      - name: ingest_datetime
+        description: >
+          The date and time the source file/data was ingested into the data warehouse or
+          landed in cloud storage

@@ -9,8 +9,8 @@ with all_drugs as (
     , p.claim_line_number
     , p.patient_id
     , p.member_id
-    , p.prescribing_provider_npi
-    , p.dispensing_provider_npi
+    , p.prescribing_provider_id
+    , p.dispensing_provider_id
     , p.dispensing_date
     , p.ndc_code
     , p.ndc_description
@@ -65,8 +65,8 @@ select
   , a.claim_line_number
   , a.patient_id
   , a.member_id
-  , a.prescribing_provider_npi
-  , a.dispensing_provider_npi
+  , a.prescribing_provider_id
+  , a.dispensing_provider_id
   , a.dispensing_date
   , a.ndc_code
   , a.ndc_description

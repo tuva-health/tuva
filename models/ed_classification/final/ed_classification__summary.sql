@@ -10,15 +10,15 @@ select
     , cat.classification_order as ed_classification_order
     , class.patient_id
     , class.encounter_end_date
-    , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }}) 
-        || right('0'||cast({{ date_part("month", "class.encounter_end_date") }} as {{ dbt.type_string() }}),2) 
+    , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
+      || substring('0'||cast({{ date_part("month", "class.encounter_end_date") }} as {{ dbt.type_string() }}),-2)
     as year_month
     , class.primary_diagnosis_code
     , class.primary_diagnosis_description
     , class.paid_amount
     , class.allowed_amount
     , class.charge_amount
-    , class.facility_npi
+    , class.facility_id
     , fac_prov.provider_organization_name as facility_name
     , practice_state as facility_state
     , practice_city as facility_city
@@ -35,6 +35,6 @@ from {{ ref('ed_classification__int_filter_encounter_with_classification') }} cl
 inner join {{ ref('ed_classification__categories') }} cat
     using(classification)
 left join {{ ref('terminology__provider') }} fac_prov 
-    on class.facility_npi = fac_prov.npi
+    on class.facility_id = fac_prov.npi
 left join {{ ref('ed_classification__stg_patient') }} pat
     on class.patient_id = pat.patient_id

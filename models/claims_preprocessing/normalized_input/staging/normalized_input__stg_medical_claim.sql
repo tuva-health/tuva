@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -33,7 +34,9 @@ select
     , hcpcs_modifier_4
     , hcpcs_modifier_5
     , rendering_npi
+    , rendering_tin
     , billing_npi
+    , billing_tin
     , facility_npi
     , paid_date
     , paid_amount
@@ -145,5 +148,6 @@ select
     , procedure_date_23
     , procedure_date_24
     , procedure_date_25
+    , in_network_flag
     , data_source
 from {{ ref('medical_claim') }}

@@ -40,7 +40,7 @@ select distinct
   claim_id
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
-  and left(bill_type_code,2) in ('11','12') 
+  and substring(bill_type_code, 1, 2) in ('11','12')
 )
 
 select distinct 

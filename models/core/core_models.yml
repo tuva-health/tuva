@@ -18,7 +18,9 @@ models:
       - name: condition_id
         description: Unique identifier for each condition in the table.
         tests:
-          - unique
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -98,6 +100,12 @@ models:
       tags: core
       materialized: table
     columns:
+      - name: eligibility_id
+        description: Unique identifier for each eligibility row in the table.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: member_id
@@ -164,6 +172,10 @@ models:
     columns:
       - name: encounter_id
         description: Unique identifier for each encounter.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for a patient.
       - name: encounter_type
@@ -270,7 +282,11 @@ models:
       materialized: table
     columns:
       - name: lab_result_id
-        description: Unique identifier for the lab test.
+        description: Unique identifier for each lab result.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient.
       - name: encounter_id
@@ -368,6 +384,10 @@ models:
     columns:
       - name: location_id
         description: Unique identifier for each location.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: npi
         description: >
           The national provider identifier associated with the location e.g. 
@@ -401,6 +421,7 @@ models:
           `dbt_utils.pretty_time` as the local time of the `dbt run` 
           environment.  Timezone is configurable via the `tuva_last_run` var.
 
+
   - name: core__medical_claim
     description: >
       The medical claim table contains information on services rendered to 
@@ -412,10 +433,13 @@ models:
       alias: medical_claim
       tags: core
       materialized: table
-    tests:
-      - unique:
-          column_name: "(claim_id||'-'||claim_line_number)"
     columns:
+      - name: medical_claim_id
+        description: Unique identifier for each row in the table.
+        tests:
+          - unique:
+              config:
+                severity: error
       - name: claim_id
         description: Unique identifier for each claim.
       - name: claim_line_number
@@ -523,10 +547,16 @@ models:
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: rendering_tin
+        description: >
+          Rendering provider tax identification number (TIN).
       - name: billing_npi
         description: >
           Billing NPI for the claim (typically represents organization billing 
           the claim).
+      - name: billing_tin
+        description: >
+          Billing provider tax identification number (TIN).
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
@@ -592,6 +622,10 @@ models:
     columns:
       - name: medication_id
         description: Unique identifier for each medication in the table.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -658,6 +692,38 @@ models:
           `dbt_utils.pretty_time` as the local time of the `dbt run` 
           environment.  Timezone is configurable via the `tuva_last_run` var.
 
+
+  - name: core__member_months
+    description: Creates member months from eligibility data
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: member_months
+      tags:
+        - core
+      materialized: table
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: year_month
+        description: Unique year-month of in the dataset computed from eligibility.
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: plan
+        description: Name of the plan (i.e. sub contract) providing coverage.
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+      - name: tuva_last_run
+        description: >
+          The last time the data was refreshed.  Generated by 
+          `dbt_utils.pretty_time` as the local time of the `dbt run` 
+          environment.  Timezone is configurable via the `tuva_last_run` var.
+      
+
+
   - name: core__observation
     description: >
       The observation table contains information on measurements other than 
@@ -672,6 +738,10 @@ models:
     columns:
       - name: observation_id
         description: Unique identifier for each observation in the dataset.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_id
@@ -734,6 +804,10 @@ models:
     columns:
       - name: patient_id
         description: Unique identifier for each person across all datasets.
+        tests:
+          - unique:
+              config:
+                severity: error
       - name: sex
         description: The gender of the patient.
         meta:
@@ -793,6 +867,12 @@ models:
       tags: core
       materialized: table
     columns:
+      - name: pharmacy_claim_id
+        description: Unique identifier for each row in the table.
+        tests:
+          - unique:
+              config:
+                severity: error
       - name: claim_id
         description: Unique identifier for each claim.
       - name: claim_line_number
@@ -844,6 +924,9 @@ models:
       - name: allowed_amount
         description: >
           Contractual amount allowed to be paid by the payer + patient.
+      - name: charge_amount
+        description: >
+          The total amount charged on the claim by the provider.
       - name: coinsurance_amount
         description: The total coinsurance charged on the claim by the provider.
       - name: copayment_amount
@@ -874,6 +957,10 @@ models:
     columns:
       - name: practitioner_id
         description: Unique ID for the provider.
+        tests:
+          - unique:
+              config:
+                severity: warn
       - name: npi
         description: NPI for the provider.
         meta:
@@ -914,7 +1001,9 @@ models:
       - name: procedure_id
         description: The unique identifier for the performed procedure.
         tests:
-          - unique
+          - unique:
+              config:
+                severity: warn
       - name: encounter_id
         description: >
           The encounter_id for the encounter where this procedure was performed.

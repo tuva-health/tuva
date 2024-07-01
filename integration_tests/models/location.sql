@@ -1,3 +1,11 @@
+{{ config(
+     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
+ | as_bool
+   )
+}}
+
+{% if var('use_synthetic_data') == true -%}
+
 select
 cast(null as {{ dbt.type_string() }} ) as location_id
 , cast(null as {{ dbt.type_string() }} ) as npi
@@ -11,5 +19,13 @@ cast(null as {{ dbt.type_string() }} ) as location_id
 , cast(null as {{ dbt.type_float() }} ) as latitude
 , cast(null as {{ dbt.type_float() }} ) as longitude
 , cast(null as {{ dbt.type_string() }} ) as data_source
+, cast(null as {{ dbt.type_string() }} ) as file_name
+, cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
 , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 limit 0
+
+{%- else -%}
+
+select * from {{ source('source_input', 'location') }}
+
+{%- endif %}

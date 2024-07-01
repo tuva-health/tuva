@@ -1,4 +1,3 @@
--- depends_on: {{ ref('data_quality__claims_preprocessing_summary') }}
 
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
@@ -13,6 +12,7 @@ with unpivot_cte as (
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -32,6 +32,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -51,6 +52,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -70,6 +72,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -89,6 +92,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -108,6 +112,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -127,6 +132,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -146,6 +152,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -165,6 +172,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -184,6 +192,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -203,6 +212,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -222,6 +232,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -241,6 +252,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -260,6 +272,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -279,6 +292,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -298,6 +312,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -317,6 +332,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -336,6 +352,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -355,6 +372,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -374,6 +392,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -393,6 +412,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -412,6 +432,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -431,6 +452,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -450,6 +472,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -469,6 +492,7 @@ union all
 
 select
     claim_id
+  , claim_line_number
   , patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -487,7 +511,12 @@ where diagnosis_code_25 is not null
 )
 
 select distinct
-      cast(unpivot_cte.data_source||'_'||unpivot_cte.claim_id||'_'||unpivot_cte.diagnosis_rank||'_'||unpivot_cte.source_code as {{ dbt.type_string() }} ) as condition_id
+      cast(
+    cast(unpivot_cte.data_source as {{ dbt.type_string() }}) || '_' ||
+    cast(unpivot_cte.claim_id as {{ dbt.type_string() }}) || '_' ||
+    cast(unpivot_cte.diagnosis_rank as {{ dbt.type_string() }}) || '_' ||
+    cast(unpivot_cte.source_code as {{ dbt.type_string() }})
+        as {{ dbt.type_string() }}) as condition_id
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id

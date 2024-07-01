@@ -25,4 +25,6 @@ select
     , zip_code
     , phone
     , data_source
+    , file_name
+    , ingest_datetime
 from {{ ref('eligibility_seed') }}

@@ -1,4 +1,3 @@
--- depends_on: {{ ref('data_quality__claims_preprocessing_summary') }}
 
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
@@ -21,7 +20,7 @@ select
     ) as procedure_date
   , 'hcpcs' as source_code_type
   , hcpcs_code as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , hcpcs_modifier_1 as modifier_1
   , hcpcs_modifier_2 as modifier_2
   , hcpcs_modifier_3 as modifier_3
@@ -39,7 +38,7 @@ select
   , procedure_date_1 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_1 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -57,7 +56,7 @@ select
   , procedure_date_2 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_2 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -75,7 +74,7 @@ select
   , procedure_date_3 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_3 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -93,7 +92,7 @@ select
   , procedure_date_4 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_4 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -111,7 +110,7 @@ select
   , procedure_date_5 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_5 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -129,7 +128,7 @@ select
   , procedure_date_6 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_6 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -147,7 +146,7 @@ select
   , procedure_date_7 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_7 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -165,7 +164,7 @@ select
   , procedure_date_8 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_8 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -183,7 +182,7 @@ select
   , procedure_date_9 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_9 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -201,7 +200,7 @@ select
   , procedure_date_10 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_10 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -219,7 +218,7 @@ select
   , procedure_date_11 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_11 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -236,7 +235,7 @@ select
   , procedure_date_12 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_12 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -254,7 +253,7 @@ select
   , procedure_date_13 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_13 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -272,7 +271,7 @@ select
   , procedure_date_14 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_14 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -290,7 +289,7 @@ select
   , procedure_date_15 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_15 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -308,7 +307,7 @@ select
   , procedure_date_16 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_16 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -326,7 +325,7 @@ select
   , procedure_date_17 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_17 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -344,7 +343,7 @@ select
   , procedure_date_18 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_18 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -362,7 +361,7 @@ select
   , procedure_date_19 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_19 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -380,7 +379,7 @@ select
   , procedure_date_20 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_20 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -398,7 +397,7 @@ select
   , procedure_date_21 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_21 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -416,7 +415,7 @@ select
   , procedure_date_22 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_22 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -434,7 +433,7 @@ select
   , procedure_date_23 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_23 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -452,7 +451,7 @@ select
   , procedure_date_24 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_24 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3
@@ -470,7 +469,7 @@ select
   , procedure_date_25 as procedure_date
   , procedure_code_type as source_code_type
   , procedure_code_25 as source_code
-  , rendering_npi as practitioner_npi
+  , rendering_id as practitioner_npi
   , null as modifier_1
   , null as modifier_2
   , null as modifier_3

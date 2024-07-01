@@ -9,7 +9,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
         {% else %}_tuva_claims{%- endif -%}
       tags: claims
-      materialized: table
+      materialized: ephemeral
 
   - name: medical_claim
     description: Created from seed or source data depending on test_data_override variable.
@@ -18,7 +18,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
         {% else %}_tuva_claims{%- endif -%}
       tags: claims
-      materialized: table
+      materialized: ephemeral
 
   - name: pharmacy_claim
     description: Created from seed or source data depending on test_data_override variable.
@@ -27,7 +27,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
         {% else %}_tuva_claims{%- endif -%}
       tags: claims
-      materialized: table
+      materialized: ephemeral
 
 # clinical input models
   - name: condition
@@ -36,7 +36,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: encounter
     description: Created using empty table logic.
@@ -44,7 +44,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: lab_result
     description: Created from seed or source data depending on test_data_override variable.
@@ -52,7 +52,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: location
     description: Created using empty table logic.
@@ -60,7 +60,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: medication
     description: Created using empty table logic.
@@ -68,7 +68,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: observation
     description: Created using empty table logic.
@@ -76,7 +76,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: patient
     description: Created using empty table logic.
@@ -84,7 +84,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: practitioner
     description: Created using empty table logic.
@@ -92,7 +92,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral
 
   - name: procedure
     description: Created using empty table logic.
@@ -100,4 +100,4 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
         {% else %}_tuva_clinical{%- endif -%}
-      materialized: view
+      materialized: ephemeral

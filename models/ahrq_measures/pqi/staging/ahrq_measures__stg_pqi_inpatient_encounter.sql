@@ -13,7 +13,7 @@ select
   , length_of_stay
   , primary_diagnosis_code
   , patient_id
-  , facility_npi
+  , facility_id
   , paid_amount
   , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
 from 

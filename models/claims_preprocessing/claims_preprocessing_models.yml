@@ -236,6 +236,41 @@ models:
         - claims_preprocessing
       materialized: ephemeral
 
+#### Claims Enrollment
+## Final
+  - name: claims_enrollment__flag_claims_with_enrollment
+    description: This table contains claims with matching enrollment
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: flag_claims_with_enrollment
+      tags:
+        - claims_preprocessing
+      materialized: table
+    columns:
+      - name: medical_claim_id
+        description: Unique identifier for the medical claim.
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: payer
+        description: Name of the payer.
+      - name: plan
+        description: Name of the plan.
+      - name: inferred_claim_start_year_month
+        description: |
+          The claim start date year and month.  If claim line start date is missing then the following column will be used, 
+          in the following order if also NULL:  claim start date, admission date
+      - name: inferred_claim_end_year_month
+        description: |
+          The claim end date year and month.  If claim line end date is missing then the following column will be used, 
+          in the following order if also NULL:  claim end date, discharge date
+      - name: inferred_claim_start_column_used
+        description: The name of the column used to populated inferred_claim_start_year_month.
+      - name: inferred_claim_end_column_used
+        description: The name of the column used to populated inferred_claim_start_column_used.
+
+
 #### Emergency Department
 ## Final
 
@@ -1010,8 +1045,10 @@ models:
         - normalized_input
         - claims_preprocessing
     tests:
-      - unique:
-          column_name: "(claim_id||'-'||claim_line_number)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

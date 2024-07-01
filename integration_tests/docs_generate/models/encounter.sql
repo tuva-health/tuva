@@ -12,7 +12,9 @@ select
     , cast(null as {{ dbt.type_string() }} ) as discharge_disposition_code
     , cast(null as {{ dbt.type_string() }} ) as discharge_disposition_description
     , cast(null as {{ dbt.type_string() }} ) as attending_provider_id
-    , cast(null as {{ dbt.type_string() }} ) as facility_npi
+    , cast(null as {{ dbt.type_string() }} ) as attending_provider_name
+    , cast(null as {{ dbt.type_string() }} ) as facility_id
+    , cast(null as {{ dbt.type_string() }} ) as facility_name
     , cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_code_type
     , cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_code
     , cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_description
@@ -24,4 +26,6 @@ select
     , cast(null as {{ dbt.type_numeric() }} ) as allowed_amount
     , cast(null as {{ dbt.type_numeric() }} ) as charge_amount
     , cast(null as {{ dbt.type_string() }} ) as data_source
+    , cast(null as {{ dbt.type_string() }} ) as file_name
+    , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
 limit 0
