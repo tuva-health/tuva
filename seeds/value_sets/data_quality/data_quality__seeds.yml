@@ -1,7 +1,7 @@
 version: 2
 
 seeds:
-  - name: crosswalk__field_info
+  - name: data_quality__crosswalk_field_info
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
@@ -10,7 +10,7 @@ seeds:
       Target thresholds at the field level determining red, yellow, and green values in the Data Quality dashboard.
 
 
-  - name: crosswalk__field_to_mart
+  - name: data_quality__crosswalk_field_to_mart
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
@@ -19,7 +19,7 @@ seeds:
       Crosswalk table that defines which fields impact the ability for marts to run.
 
 
-  - name: crosswalk__mart_to_outcome_measure
+  - name: data_quality__crosswalk_mart_to_outcome_measure
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
@@ -27,7 +27,7 @@ seeds:
     description: >
       Crosswalk table that defines which marts impact which outcome measures.
 
-  - name: crosswalk__measure_reasonable_ranges
+  - name: data_quality__crosswalk_measure_reasonable_ranges
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_dqi_crosswalk
