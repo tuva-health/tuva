@@ -17,8 +17,21 @@ with visit_codes as (
 , procedures as (
 
     select
-        *
-    from {{ ref('quality_measures__stg_core__procedure')}}
+          patient_id
+        , procedure_date
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce(
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures__stg_core__procedure') }}
 
 )
 
@@ -143,8 +156,8 @@ with visit_codes as (
         , conditions.source_code_type
     from conditions
     inner join bone_fracture_codes
-        on conditions.source_code_type = bone_fracture_codes.code_system
-            and conditions.source_code = bone_fracture_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = bone_fracture_codes.code_system
+            and coalesce(conditions.normalized_code, conditions.source_code) = bone_fracture_codes.code
 
 )
 
@@ -202,8 +215,8 @@ with visit_codes as (
         procedures.*
     from procedures
     inner join visit_codes
-        on procedures.source_code = visit_codes.code
-            and procedures.source_code_type = visit_codes.code_system
+        on procedures.code = visit_codes.code
+            and procedures.code_type = visit_codes.code_system
     inner join {{ ref('quality_measures__int_nqf0053__performance_period') }} as pp
         on procedures.procedure_date 
             between pp.performance_period_begin and pp.performance_period_end

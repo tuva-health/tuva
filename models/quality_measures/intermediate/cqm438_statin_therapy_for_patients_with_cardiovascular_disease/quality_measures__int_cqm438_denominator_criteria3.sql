@@ -38,8 +38,8 @@ with diabetes_codes as (
         , conditions.recorded_date as evidence_date
     from conditions
     inner join diabetes_codes
-        on conditions.source_code_type = diabetes_codes.code_system
-            and conditions.source_code = diabetes_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = diabetes_codes.code_system
+            and coalesce(conditions.normalized_code, conditions.source_code) = diabetes_codes.code
 
 )
 

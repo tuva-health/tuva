@@ -80,12 +80,9 @@ with distinct_encounters as (
     select
           a.encounter_id
         , max(a.facility_id) as facility_id
-        , b.provider_organization_name
         , count(distinct facility_id) as npi_count
     from {{ ref('emergency_department__int_institutional_encounter_id') }} a
-    left join {{ ref('terminology__provider') }} b
-      on a.facility_id = b.npi
-    group by 1,3
+    group by a.encounter_id
 )
 
 select
@@ -100,7 +97,7 @@ select
     , c.diagnosis_code_1 as primary_diagnosis_code
     , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
     , f.facility_id
-    , f.provider_organization_name as facility_name
+    , b.provider_organization_name as facility_name
     , c.ms_drg_code
     , j.ms_drg_description
     , j.medical_surgical
@@ -131,6 +128,8 @@ left join patient e
   on a.patient_id = e.patient_id
 left join facility f
   on a.encounter_id = f.encounter_id
+left join {{ ref('terminology__provider') }} b
+  on f.facility_id = b.npi
 left join {{ ref('terminology__discharge_disposition') }} g
   on c.discharge_disposition_code = g.discharge_disposition_code
 left join {{ ref('terminology__admit_source') }} h

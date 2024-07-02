@@ -124,7 +124,9 @@ with denominator as (
 , excluded_patients as (
 
     select
-          exclusions_unioned.*
+          exclusions_unioned.patient_id
+        , exclusions_unioned.exclusion_date
+        , exclusions_unioned.exclusion_reason
         , case
             when exclusion_reason = 'pregnancy' then 1
             else 0
@@ -141,7 +143,10 @@ with denominator as (
 , exclusions_filtered as (
 
     select
-        *
+          patient_id
+        , age
+        , exclusion_date
+        , exclusion_reason
     from excluded_patients
     where is_pregnant = 1
         and exclusion_date between performance_period_begin and performance_period_end
@@ -149,7 +154,10 @@ with denominator as (
     union all
 
     select
-        *
+          patient_id
+        , age
+        , exclusion_date
+        , exclusion_reason
     from excluded_patients
     where is_pregnant = 0
         and exclusion_date between performance_period_begin and performance_period_end
