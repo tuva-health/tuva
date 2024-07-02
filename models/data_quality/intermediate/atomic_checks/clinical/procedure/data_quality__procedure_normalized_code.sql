@@ -86,16 +86,16 @@ WHERE
     m.NORMALIZED_CODE_TYPE NOT IN ('icd-9-pcs', 'icd-10-pcs','hcpcs_level_2')
 )
 
-SELECT * FROM icd9
+SELECT *, '{{ var('tuva_last_run')}}' as tuva_last_run FROM icd9
 
 UNION
 
-SELECT * FROM icd10
+SELECT * , '{{ var('tuva_last_run')}}' as tuva_last_run FROM icd10
 
 UNION
 
-SELECT * FROM hcpcs_level_2
+SELECT * , '{{ var('tuva_last_run')}}' as tuva_last_run FROM hcpcs_level_2
 
 UNION
 
-SELECT * FROM others
+SELECT * , '{{ var('tuva_last_run')}}' as tuva_last_run FROM others

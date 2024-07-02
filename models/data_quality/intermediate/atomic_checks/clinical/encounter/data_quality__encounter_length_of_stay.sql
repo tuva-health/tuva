@@ -13,4 +13,5 @@ SELECT
     ,case when M.LENGTH_OF_STAY is not null then 'valid' else 'null' end as BUCKET_NAME
     ,cast(null as varchar(255)) as INVALID_REASON
     ,CAST(LENGTH_OF_STAY AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M

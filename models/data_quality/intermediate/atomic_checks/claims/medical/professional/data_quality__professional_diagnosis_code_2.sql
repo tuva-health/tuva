@@ -26,5 +26,6 @@ SELECT
         else null
     end as INVALID_REASON
     ,CAST(M.DIAGNOSIS_CODE_2 || '|' || COALESCE(term.short_description, '') AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM BASE M
 LEFT JOIN {{ ref('terminology__icd_10_cm')}} AS TERM ON M.Diagnosis_Code_2 = TERM.ICD_10_CM

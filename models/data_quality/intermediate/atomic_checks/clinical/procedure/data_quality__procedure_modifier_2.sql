@@ -19,5 +19,6 @@ SELECT
           then 'Modifier 2 does not join to Terminology hcpcs_level_2 table'
     else null end as INVALID_REASON
     ,CAST(MODIFIER_2 AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('procedure')}} M
 LEFT JOIN {{ ref('terminology__hcpcs_level_2')}} TERM on m.MODIFIER_2 = term.HCPCS

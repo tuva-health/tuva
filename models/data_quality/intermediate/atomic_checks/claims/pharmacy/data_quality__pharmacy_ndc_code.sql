@@ -19,7 +19,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
             then 'NDC Code does not join to Terminology NDC table'
         else null
     end as INVALID_REASON
-,CAST(SUBSTRING(M.NDC_CODE || '|' || COALESCE(TERM.RXNORM_DESCRIPTION, TERM.FDA_DESCRIPTION, ''), 1, 255) AS VARCHAR(255)) AS FIELD_VALUE
-
+    ,CAST(SUBSTRING(M.NDC_CODE || '|' || COALESCE(TERM.RXNORM_DESCRIPTION, TERM.FDA_DESCRIPTION, ''), 1, 255) AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('pharmacy_claim')}} M
 LEFT JOIN {{ ref('terminology__ndc')}} AS TERM ON M.NDC_CODE = TERM.NDC

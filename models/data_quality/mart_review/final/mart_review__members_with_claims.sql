@@ -34,6 +34,7 @@ SELECT
              WHEN mc.patient_id is not null THEN 1 ELSE 0 END) / cast(COUNT(*) AS DECIMAL(18,2)) as decimal (18,2)) AS percent_members_with_claims,
     CAST(SUM(CASE WHEN mc.patient_id IS NOT NULL THEN 1 ELSE 0 END) / cast(COUNT(*) AS DECIMAL(18,2)) as decimal (18,2)) AS percent_members_with_medical_claims,
     CAST(SUM(CASE WHEN pc.patient_id IS NOT NULL THEN 1 ELSE 0 END) / cast(COUNT(*) AS DECIMAL(18,2)) as decimal (18,2)) AS percent_members_with_pharmacy_claims
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('core__member_months')}} mm
 LEFT JOIN medical_claim mc 
     ON mm.patient_id = mc.patient_id

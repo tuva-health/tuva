@@ -16,6 +16,7 @@ WITH Ranked_Examples as (
               FIELD_VALUE as FIELD_VALUE,
               COUNT(DRILL_DOWN_VALUE) as FREQUENCY,
               ROW_NUMBER() OVER (PARTITION BY SUMMARY_SK, BUCKET_NAME, FIELD_VALUE ORDER BY FIELD_VALUE) AS RN
+              , '{{ var('tuva_last_run')}}' as tuva_last_run
        FROM {{ ref('data_quality__data_quality_clinical_detail') }}
        WHERE BUCKET_NAME not in ('valid', 'null')
        GROUP BY
@@ -28,6 +29,7 @@ WITH Ranked_Examples as (
               DRILL_DOWN_VALUE,
               INVALID_REASON,
               SUMMARY_SK
+              , '{{ var('tuva_last_run')}}'
 ),
 
 pk_examples as (
@@ -43,6 +45,7 @@ pk_examples as (
               detail.FIELD_VALUE as FIELD_VALUE,
               COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY,
               ROW_NUMBER() OVER (PARTITION BY detail.SUMMARY_SK ORDER BY detail.SUMMARY_SK) AS RN
+              , '{{ var('tuva_last_run')}}' as tuva_last_run
        FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
               left join {{ ref('data_quality__crosswalk_field_info')}} as field_info on detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
                      and detail.field_name = field_info.field_name
@@ -58,6 +61,7 @@ pk_examples as (
               detail.DRILL_DOWN_VALUE,
               detail.INVALID_REASON,
               detail.SUMMARY_SK
+              , '{{ var('tuva_last_run')}}'
 )
 --- Null Values
 
@@ -72,6 +76,7 @@ SELECT
        MAX(DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE, //1 sample claim
        null as FIELD_VALUE,
        COUNT(DRILL_DOWN_VALUE) as FREQUENCY
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_detail') }}
 WHERE BUCKET_NAME = 'null'
 GROUP BY
@@ -82,6 +87,7 @@ GROUP BY
        INVALID_REASON,
        DRILL_DOWN_KEY,
        SUMMARY_SK
+       , '{{ var('tuva_last_run')}}'
 UNION
 
 --- Valid Values except PKs
@@ -97,6 +103,7 @@ SELECT
        MAX(detail.DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE, //1 sample claim
        detail.FIELD_VALUE as FIELD_VALUE,
        COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
 LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} as field_info ON detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
        and detail.field_name = field_info.field_name
@@ -112,6 +119,7 @@ GROUP BY
        detail.INVALID_REASON,
        detail.DRILL_DOWN_KEY,
        detail.SUMMARY_SK
+       , '{{ var('tuva_last_run')}}'
 UNION
 
 -- 5 Examples of each invalid example
@@ -127,6 +135,7 @@ SELECT
        DRILL_DOWN_VALUE as DRILL_DOWN_VALUE,
        FIELD_VALUE as FIELD_VALUE,
        FREQUENCY
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM Ranked_Examples
 WHERE rn <= 5
 
@@ -145,6 +154,7 @@ SELECT
        'All Others' as DRILL_DOWN_VALUE,
        FIELD_VALUE as FIELD_VALUE,
        SUM(FREQUENCY) AS FREQUENCY
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM Ranked_Examples
 WHERE rn > 5 --- Aggregating all other rows
 GROUP BY
@@ -156,7 +166,7 @@ GROUP BY
     INVALID_REASON,
     DRILL_DOWN_KEY,
     FIELD_VALUE
-
+    , '{{ var('tuva_last_run')}}'
 UNION
 
 --- 5 Examples of valid primary key values
@@ -172,6 +182,7 @@ SELECT
        DRILL_DOWN_VALUE as DRILL_DOWN_VALUE,
        FIELD_VALUE as FIELD_VALUE,
        FREQUENCY
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM pk_examples
 WHERE rn <= 5
 
@@ -190,6 +201,7 @@ SELECT
        'All Others' as DRILL_DOWN_VALUE,
        'All Others' as FIELD_VALUE,
        SUM(FREQUENCY) AS FREQUENCY
+       , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM pk_examples
 WHERE rn > 5 --- Aggregating all other rows
 GROUP BY
@@ -201,3 +213,4 @@ GROUP BY
     INVALID_REASON,
     DRILL_DOWN_KEY,
     FIELD_VALUE
+    , '{{ var('tuva_last_run')}}'

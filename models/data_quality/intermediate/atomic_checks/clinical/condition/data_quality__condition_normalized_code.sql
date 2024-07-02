@@ -18,5 +18,6 @@ SELECT
           then 'Normalized code does not join to Terminology icd_10_cm table'
     else null end as INVALID_REASON
     ,CAST(NORMALIZED_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('condition')}} M
 LEFT JOIN {{ ref('terminology__icd_10_cm')}} TERM on m.NORMALIZED_CODE = term.icd_10_cm

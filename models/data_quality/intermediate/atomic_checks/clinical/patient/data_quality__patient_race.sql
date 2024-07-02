@@ -19,5 +19,6 @@ SELECT
           then 'Race description does not join to Terminology race table'
     else null end as INVALID_REASON
     ,CAST(RACE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('patient')}} M
 LEFT JOIN {{ ref('terminology__race')}} TERM on m.race = term.description

@@ -20,5 +20,6 @@ SELECT DISTINCT -- to bring to claim_ID grain
         else null
     end as INVALID_REASON                                             
     ,CAST(M.PRESCRIBING_PROVIDER_NPI AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('pharmacy_claim')}} M
 LEFT JOIN {{ ref('terminology__provider')}} AS TERM ON M.PRESCRIBING_PROVIDER_NPI = TERM.NPI

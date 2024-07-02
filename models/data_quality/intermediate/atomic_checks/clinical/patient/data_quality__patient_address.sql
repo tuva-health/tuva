@@ -14,5 +14,6 @@
                 ,case when M.ADDRESS is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,cast(null as varchar(255)) as INVALID_REASON
                 ,CAST(ADDRESS AS VARCHAR(255)) AS FIELD_VALUE
+                , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('patient')}} M
             

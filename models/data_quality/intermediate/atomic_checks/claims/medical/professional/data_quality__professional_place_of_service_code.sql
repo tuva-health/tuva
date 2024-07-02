@@ -26,5 +26,6 @@ SELECT
         else null
     end as INVALID_REASON
     ,CAST(M.PLACE_OF_SERVICE_CODE || '|' || COALESCE(TERM.PLACE_OF_SERVICE_DESCRIPTION, '') AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM base M
 LEFT JOIN {{ ref('terminology__place_of_service')}} AS TERM ON M.PLACE_OF_SERVICE_CODE = TERM.PLACE_OF_SERVICE_CODE

@@ -14,4 +14,5 @@ SELECT DISTINCT -- to bring to claim_ID grain
                                               else 'valid' end as BUCKET_NAME
     ,cast(null as varchar(255)) as INVALID_REASON
     ,CAST(COPAYMENT_AMOUNT AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('pharmacy_claim')}} M

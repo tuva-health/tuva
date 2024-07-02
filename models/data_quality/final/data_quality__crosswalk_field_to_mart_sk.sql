@@ -22,27 +22,29 @@ with results as (
         input_layer_table_name
       , claim_type
       , field_name
-    from {{ ref('crosswalk__field_to_mart') }}
+    from {{ ref('data_quality__crosswalk_field_to_mart') }}
 
 )
 
 , final as (
 
     select
-        table_name as input_layer_table_name
+        input_layer_table_name
       , claim_type
       , field_name
       , row_number() over (
             order by
-                table_name
+                input_layer_table_name
               , claim_type
               , field_name
         ) as table_claim_type_field_sk
+	, '{{ var('tuva_last_run')}}' as tuva_last_run
     from results
     group by
-        table_name
+        input_layer_table_name
       , claim_type
       , field_name
+      , '{{ var('tuva_last_run')}}'
 
 )
 

@@ -59,6 +59,7 @@ WITH valid_conditions AS (
 
 SELECT 
     *
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM 
     duplicates_summary
 QUALIFY ROW_NUMBER() OVER (ORDER BY RANDOM()) <= 5 // invalid -> duplicate
@@ -68,6 +69,7 @@ UNION
 SELECT 
     *,
     0 as duplicate_count
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM 
     random_sample
 WHERE 

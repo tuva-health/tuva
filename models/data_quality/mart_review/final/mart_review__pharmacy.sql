@@ -39,6 +39,7 @@ SELECT
     a.atc_2_name,
     a.atc_3_name,
     a.atc_4_name
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('core__pharmacy_claim')}} p
 LEFT JOIN {{ ref('terminology__ndc')}} n ON p.ndc_code = n.ndc
 LEFT JOIN {{ ref('terminology__rxnorm_brand_generic') }} r ON n.rxcui = r.product_rxcui

@@ -25,4 +25,5 @@ SELECT
         else null
     END AS INVALID_REASON
     ,CAST(DEATH_DATE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('patient')}} M

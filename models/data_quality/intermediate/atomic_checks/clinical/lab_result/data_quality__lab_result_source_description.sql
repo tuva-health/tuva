@@ -14,4 +14,5 @@
                 ,case when M.SOURCE_DESCRIPTION is not null then 'valid' else 'null' end as BUCKET_NAME
                 ,cast(null as varchar(255)) as INVALID_REASON
                 ,CAST(LEFT(SOURCE_DESCRIPTION, 255) AS VARCHAR(255)) AS FIELD_VALUE
+                , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('lab_result')}} M

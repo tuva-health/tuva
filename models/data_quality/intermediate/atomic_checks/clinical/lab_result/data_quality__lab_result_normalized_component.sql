@@ -19,5 +19,6 @@ SELECT
           then 'Normalized component does not join to Terminology loinc table'
     else null end as INVALID_REASON
     ,CAST(NORMALIZED_COMPONENT AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('lab_result')}} M
 LEFT JOIN {{ ref('terminology__loinc')}} TERM on m.NORMALIZED_COMPONENT = term.loinc

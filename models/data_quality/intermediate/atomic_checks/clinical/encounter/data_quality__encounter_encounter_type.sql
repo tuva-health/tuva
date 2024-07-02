@@ -18,5 +18,6 @@ SELECT
           then 'Encounter type does not join to Terminology encounter_type table'
           else null end as INVALID_REASON
     ,CAST(m.ENCOUNTER_TYPE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__encounter_type')}} TERM on m.encounter_type = term.encounter_type

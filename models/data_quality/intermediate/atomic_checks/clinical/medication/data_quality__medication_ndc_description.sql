@@ -19,5 +19,6 @@ SELECT
           then 'NDC code type does not join to Terminology ndc table'
     else null end as INVALID_REASON
     ,CAST(LEFT(NDC_DESCRIPTION, 255) AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('medication')}} M
 LEFT JOIN {{ ref('terminology__ndc')}} TERM on M.NDC_CODE = TERM.NDC

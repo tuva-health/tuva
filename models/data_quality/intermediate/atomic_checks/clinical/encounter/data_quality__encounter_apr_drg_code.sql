@@ -18,5 +18,6 @@ SELECT
           then 'APR DRG Code does not join to Terminology apr_drg table'
           else null end as INVALID_REASON
     ,CAST(m.APR_DRG_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__apr_drg')}} TERM on m.APR_DRG_CODE = TERM.APR_DRG_CODE

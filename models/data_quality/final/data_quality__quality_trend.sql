@@ -28,4 +28,4 @@ left join {{ ref('data_quality__dqi_calendar') }} c on cte.source_date_type = c.
 group by
       c.first_day_of_month
     , summary_sk
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run')}}'

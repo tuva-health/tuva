@@ -26,5 +26,6 @@ SELECT
         else null
     end as INVALID_REASON
     ,CAST(M.FACILITY_NPI AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM BASE M
 LEFT JOIN {{ ref('terminology__provider')}} AS TERM ON M.FACILITY_NPI = TERM.NPI

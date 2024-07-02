@@ -30,6 +30,7 @@ SELECT
     CONCAT(e.patient_id, '|', e.data_source) AS patient_source_key,
     e.facility_name,
     e.encounter_start_date
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('core__encounter')}} e
 LEFT JOIN {{ ref('ed_classification__summary') }} S ON e.encounter_id = s.encounter_id
 LEFT JOIN cte ON e.facility_id = cte.location_id

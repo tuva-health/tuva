@@ -14,5 +14,6 @@ SELECT P.Patient_ID,
        P.data_source,
        CONCAT(P.Patient_ID, '|', P.data_source) AS Patient_Source_key,
        COALESCE(CTE.NumofConditions, 0) AS NumofConditions
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('core__patient')}} P
 LEFT JOIN cte ON P.PATIENT_ID = CTE.PATIENT_ID AND P.data_source = CTE.data_source

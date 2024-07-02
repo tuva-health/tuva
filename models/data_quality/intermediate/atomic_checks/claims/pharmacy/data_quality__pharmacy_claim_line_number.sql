@@ -14,4 +14,5 @@ SELECT
         WHEN M.CLAIM_LINE_NUMBER is null then 'null' else 'valid' END AS BUCKET_NAME
     ,cast(null as varchar(255)) as INVALID_REASON
     ,CAST(MEMBER_ID AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('pharmacy_claim')}} M

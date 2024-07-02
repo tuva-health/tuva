@@ -18,5 +18,6 @@ SELECT
           then 'Admit Type Code does not join to Terminology admit_type table'
           else null end as INVALID_REASON
     ,CAST(m.ADMIT_TYPE_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__admit_type')}} TERM on M.ADMIT_TYPE_CODE = TERM.ADMIT_TYPE_CODE

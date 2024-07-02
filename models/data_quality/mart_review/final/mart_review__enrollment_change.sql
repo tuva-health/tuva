@@ -55,6 +55,6 @@ Result AS (
 )
 
 
-SELECT * 
+SELECT * , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM Result
 

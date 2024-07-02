@@ -19,5 +19,6 @@ SELECT
           then 'NPI does not join to Terminology provider table'
     else null end as INVALID_REASON
     ,CAST(m.NPI AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('practitioner')}} M
 LEFT JOIN {{ ref('terminology__provider')}} TERM ON m.npi = term.npi

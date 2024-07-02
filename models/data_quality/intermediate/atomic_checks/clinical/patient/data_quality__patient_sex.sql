@@ -19,5 +19,6 @@ SELECT
           then 'Sex does not join to Terminology gender table'
     else null end as INVALID_REASON
     ,CAST(SEX AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('patient')}} M
 LEFT JOIN {{ ref('terminology__gender')}} TERM on m.sex = term.gender

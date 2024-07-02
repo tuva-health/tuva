@@ -32,4 +32,5 @@ SELECT
         model_version,
         patient_risk_sk,
         risk_score
+        , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM cte

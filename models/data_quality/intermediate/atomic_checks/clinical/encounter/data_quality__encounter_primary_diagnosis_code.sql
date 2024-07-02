@@ -18,5 +18,6 @@ SELECT
           then 'Primary diagnosis code does not join to Terminology icd_10_cm table'
     else null end as INVALID_REASON
     ,CAST(PRIMARY_DIAGNOSIS_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__icd_10_cm')}} TERM on m.PRIMARY_DIAGNOSIS_CODE = term.icd_10_cm

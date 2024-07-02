@@ -21,5 +21,6 @@ SELECT
         else null
     end as INVALID_REASON                        
     ,CAST(M.REVENUE_CENTER_CODE || '|' || TERM.REVENUE_CENTER_DESCRIPTION AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
     FROM {{ ref('medical_claim')}} M
 LEFT JOIN {{ ref('terminology__revenue_center')}} AS TERM ON M.REVENUE_CENTER_CODE = TERM.REVENUE_CENTER_CODE

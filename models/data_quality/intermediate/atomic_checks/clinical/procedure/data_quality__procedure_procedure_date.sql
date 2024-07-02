@@ -23,4 +23,5 @@ SELECT
         else null
     END AS INVALID_REASON
     ,CAST(PROCEDURE_DATE AS VARCHAR(255)) AS FIELD_VALUE
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('procedure')}} M
