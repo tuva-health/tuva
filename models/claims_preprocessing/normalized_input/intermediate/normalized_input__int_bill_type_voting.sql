@@ -13,7 +13,7 @@ with normalize_cte as(
         , bill.bill_type_description
     from {{ ref('normalized_input__stg_medical_claim') }} med
     inner join {{ ref('terminology__bill_type') }} bill
-        on ltrim(med.bill_type_code,'0') = bill.bill_type_code
+        on {{ ltrim('med.bill_type_code', '0') }} = bill.bill_type_code
     where claim_type = 'institutional'
 )
 , distinct_counts as(
