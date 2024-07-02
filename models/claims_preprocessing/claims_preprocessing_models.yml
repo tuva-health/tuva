@@ -1125,7 +1125,7 @@ models:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__revenue_center.csv
       - name: service_unit_quantity
         description: The number of units for the particular revenue center code.
-        data_type: float
+        data_type: {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
       - name: hcpcs_code
         description: HCPCS level 1 or level 2 code for the claim line.
         meta:
