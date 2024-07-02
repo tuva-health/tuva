@@ -14,6 +14,7 @@ with results as (
         table_name as input_layer_table_name
       , claim_type
       , field_name
+      , NULL AS mart_name
     from {{ ref('data_quality__data_quality_detail') }}
 
     union all
@@ -22,6 +23,7 @@ with results as (
         input_layer_table_name
       , claim_type
       , field_name
+      , mart_name
     from {{ ref('data_quality__crosswalk_field_to_mart') }}
 
 )
@@ -32,6 +34,7 @@ with results as (
         input_layer_table_name
       , claim_type
       , field_name
+      , mart_name
       , row_number() over (
             order by
                 input_layer_table_name
@@ -44,6 +47,7 @@ with results as (
         input_layer_table_name
       , claim_type
       , field_name
+      , mart_name
       , '{{ var('tuva_last_run')}}'
 
 )
