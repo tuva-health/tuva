@@ -1,3 +1,9 @@
+{{ config(
+     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+ | as_bool
+   )
+}}
+
 SELECT m.*,
     COALESCE(p.total_paid, 0) AS total_paid,
     COALESCE(p.medical_paid, 0) AS medical_paid,

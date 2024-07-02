@@ -1,3 +1,9 @@
+{{ config(
+     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
+   )
+}}
+
 WITH xwalk AS (
     SELECT DISTINCT patient_id, data_source
     FROM {{ ref('core__patient')}}

@@ -1,3 +1,10 @@
+{{ config(
+     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+ | as_bool
+   )
+}}
+
+
 SELECT *,
        total_paid * member_months AS total_paid_absolute,
        medical_paid * member_months AS medical_paid_absolute,

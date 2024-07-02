@@ -1,4 +1,10 @@
-with cte as 
+{{ config(
+     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+ | as_bool
+   )
+}}
+
+with cte as
 (
 select distinct year_month_int
 ,full_date

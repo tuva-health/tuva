@@ -1,4 +1,10 @@
-WITH cte AS 
+{{ config(
+     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
+ | as_bool
+   )
+}}
+
+WITH cte AS
 (
     SELECT DISTINCT location_id, npi, name
     FROM {{ ref('core__location')}}
