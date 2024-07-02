@@ -80,7 +80,7 @@ group by 1
           a.encounter_id
         , max(a.facility_id) as facility_id
         , count(distinct facility_id) as npi_count
-    from {{ ref('emergency_department__int_institutional_encounter_id') }} a
+    from {{ ref('acute_inpatient__institutional_encounter_id') }} a
     group by a.encounter_id
 )
 
