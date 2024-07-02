@@ -73,9 +73,9 @@ seeds:
         payer_type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         lower_bound: |
-          integer
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
         upper_bound: |
-          integer
+          {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
 
 
   - name: data_quality__dqi_calendar

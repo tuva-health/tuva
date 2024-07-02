@@ -8,7 +8,7 @@ with icd9 as (
         ,coalesce(M.PROCEDURE_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
         ,'PROCEDURE' AS TABLE_NAME
         ,'Procedure ID' as DRILL_DOWN_KEY
-        ,IFNULL(PROCEDURE_ID, 'NULL') AS DRILL_DOWN_VALUE
+        , coalesce(procedure_id, 'NULL') AS DRILL_DOWN_VALUE
         -- ,M.CLAIM_TYPE AS CLAIM_TYPE
         ,'NORMALIZED_CODE' AS FIELD_NAME
         ,case when TERM.icd_9_pcs is not null then 'valid'
@@ -30,7 +30,7 @@ icd10 as (
     ,coalesce(M.PROCEDURE_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
     ,'PROCEDURE' AS TABLE_NAME
     ,'Procedure ID' as DRILL_DOWN_KEY
-    ,IFNULL(PROCEDURE_ID, 'NULL') AS DRILL_DOWN_VALUE
+    , coalesce(procedure_id, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'NORMALIZED_CODE' AS FIELD_NAME
     ,case when TERM.icd_10_pcs is not null then 'valid'
@@ -52,7 +52,7 @@ hcpcs_level_2 as (
     ,coalesce(M.PROCEDURE_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
     ,'PROCEDURE' AS TABLE_NAME
     ,'Procedure ID' as DRILL_DOWN_KEY
-    ,IFNULL(PROCEDURE_ID, 'NULL') AS DRILL_DOWN_VALUE
+    , coalesce(procedure_id, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'NORMALIZED_CODE' AS FIELD_NAME
     ,case when TERM.hcpcs is not null then 'valid'
@@ -75,7 +75,7 @@ others as (
     ,coalesce(M.PROCEDURE_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
     ,'PROCEDURE' AS TABLE_NAME
     ,'Procedure ID' as DRILL_DOWN_KEY
-    ,IFNULL(PROCEDURE_ID, 'NULL') AS DRILL_DOWN_VALUE
+    , coalesce(procedure_id, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'NORMALIZED_CODE' AS FIELD_NAME
     ,'null' as BUCKET_NAME
