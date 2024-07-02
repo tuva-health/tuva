@@ -24,7 +24,7 @@ select
     , sum(DENOM)  as DENOM
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from cte
-left join {{ ref('data_quality__dqi_calendar') }} c on cte.source_date_type = c.full_date
+left join {{ ref('reference_data__calendar') }} c on cte.source_date_type = c.full_date
 group by
       c.first_day_of_month
     , summary_sk
