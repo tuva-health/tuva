@@ -8,7 +8,7 @@ with cte as
 (
 select distinct year_month_int
 ,full_date
-from {{ ref('data_quality__dqi_calendar') }} c
+from {{ ref('reference_data__calendar') }} c
 where day = 1
 
 )

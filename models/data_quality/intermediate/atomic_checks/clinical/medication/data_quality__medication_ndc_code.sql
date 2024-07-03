@@ -8,7 +8,7 @@
                 ,coalesce(M.DISPENSING_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
                 ,'MEDICATION' AS TABLE_NAME
                 ,'Medication ID' as DRILL_DOWN_KEY
-                ,IFNULL(MEDICATION_ID, 'NULL') AS DRILL_DOWN_VALUE
+                , coalesce(medication_id, 'NULL') AS DRILL_DOWN_VALUE
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'NDC_CODE' AS FIELD_NAME
                 ,case when M.NDC_CODE is not null then 'valid' else 'null' end as BUCKET_NAME

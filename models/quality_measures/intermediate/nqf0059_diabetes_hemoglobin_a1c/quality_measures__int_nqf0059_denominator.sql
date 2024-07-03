@@ -3,7 +3,7 @@
    )
 }}
 
-with  visit_codes as (
+with visit_codes as (
 
     select
           code
@@ -19,7 +19,10 @@ with  visit_codes as (
         , 'nutrition services'
     )
 
-), visits_encounters as (
+)
+
+, visits_encounters as (
+
     select patient_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
@@ -33,10 +36,12 @@ with  visit_codes as (
         , 'outpatient'
         , 'outpatient rehabilitation'
         , 'telehealth'
-     )
+    )
+
 )
 
 , procedure_encounters as (
+
     select 
           patient_id
         , procedure_date as min_date
@@ -47,19 +52,20 @@ with  visit_codes as (
     inner join  visit_codes
         on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
 
-
 )
+
 , claims_encounters as (
-    select patient_id
-    , coalesce(claim_start_date,claim_end_date) as min_date
-    , coalesce(claim_end_date,claim_start_date) as max_date
+
+    select 
+          patient_id
+        , coalesce(claim_start_date,claim_end_date) as min_date
+        , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
     inner join {{ref('quality_measures__int_nqf0059__performance_period')}}  as pp on
         coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
          and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join  visit_codes
         on medical_claim.hcpcs_code= visit_codes.code
-
 
 )
 
@@ -101,14 +107,12 @@ with  visit_codes as (
 
     select
           patient_id
-        , claim_id
-        , encounter_id
         , recorded_date
         , source_code
         , source_code_type
         , normalized_code
         , normalized_code_type
-    from {{ ref('quality_measures__stg_core__condition')}}
+    from {{ ref('quality_measures__stg_core__condition') }}
 
 )
 
@@ -116,15 +120,11 @@ with  visit_codes as (
 
     select
           conditions.patient_id
-        , conditions.claim_id
-        , conditions.encounter_id
         , conditions.recorded_date
-        , conditions.source_code
-        , conditions.source_code_type
     from conditions
     inner join diabetics_codes
-        on conditions.source_code_type = diabetics_codes.code_system
-            and conditions.source_code = diabetics_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = diabetics_codes.code_system
+            and coalesce(conditions.normalized_code, conditions.source_code) = diabetics_codes.code
 
 )
 
@@ -140,7 +140,6 @@ with  visit_codes as (
     inner join encounters_by_patient e
         on p.patient_id = e.patient_id
     where p.death_date is null
-
 
 )
 

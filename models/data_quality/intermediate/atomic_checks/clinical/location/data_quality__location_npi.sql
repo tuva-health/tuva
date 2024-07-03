@@ -8,7 +8,7 @@ SELECT
     ,coalesce(GETDATE(),cast('1900-01-01' as date)) AS SOURCE_DATE
     ,'LOCATION' AS TABLE_NAME
     ,'Location ID' as DRILL_DOWN_KEY
-    ,IFNULL(LOCATION_ID, 'NULL') AS DRILL_DOWN_VALUE
+    , coalesce(location_id, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'NPI' AS FIELD_NAME
     ,case when TERM.NPI is not null then 'valid'

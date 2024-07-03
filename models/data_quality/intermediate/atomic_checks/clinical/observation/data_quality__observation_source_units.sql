@@ -8,7 +8,7 @@
                 ,coalesce(M.OBSERVATION_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
                 ,'OBSERVATION' AS TABLE_NAME
                 ,'Observation ID' as DRILL_DOWN_KEY
-                ,IFNULL(OBSERVATION_ID, 'NULL') AS DRILL_DOWN_VALUE
+                , coalesce(observation_id, 'NULL') AS DRILL_DOWN_VALUE
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'SOURCE_UNITS' AS FIELD_NAME
                 ,case when M.SOURCE_UNITS is not null then 'valid' else 'null' end as BUCKET_NAME

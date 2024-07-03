@@ -8,7 +8,7 @@ SELECT
     ,coalesce(M.DISPENSING_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
     ,'MEDICATION' AS TABLE_NAME
     ,'Medication ID' as DRILL_DOWN_KEY
-    ,IFNULL(MEDICATION_ID, 'NULL') AS DRILL_DOWN_VALUE
+    , coalesce(medication_id, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'ATC_CODE' AS FIELD_NAME
     ,case when COALESCE(TERM_1.atc_1_name,TERM_2.atc_2_name,TERM_3.atc_3_name,TERM_4.atc_4_name) is not null then 'valid'

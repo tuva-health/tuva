@@ -27,11 +27,20 @@ with denominator as (
 
     select
           patient_id
-        , encounter_id
         , procedure_date
-        , source_code
-        , source_code_type
-    from {{ ref('quality_measures__stg_core__procedure')}}
+        , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce(
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures__stg_core__procedure') }}
 
 )
 
@@ -98,8 +107,8 @@ with denominator as (
         , bone_density_test_codes.concept_name
     from procedures
     inner join bone_density_test_codes
-        on procedures.source_code = bone_density_test_codes.code
-            and procedures.source_code_type = bone_density_test_codes.code_system
+        on procedures.code = bone_density_test_codes.code
+            and procedures.code_type = bone_density_test_codes.code_system
 
 )
 

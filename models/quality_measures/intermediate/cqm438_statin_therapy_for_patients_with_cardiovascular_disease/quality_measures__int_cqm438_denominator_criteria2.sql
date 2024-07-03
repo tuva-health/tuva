@@ -39,8 +39,8 @@ with cholesterol_codes as (
         , conditions.recorded_date as evidence_date
     from conditions
     inner join cholesterol_codes
-        on conditions.source_code_type = cholesterol_codes.code_system
-            and conditions.source_code = cholesterol_codes.code
+        on coalesce(conditions.normalized_code_type, conditions.source_code_type) = cholesterol_codes.code_system
+            and coalesce(conditions.normalized_code, conditions.source_code) = cholesterol_codes.code
 
 )
 
@@ -104,10 +104,8 @@ with cholesterol_codes as (
                         , result_date desc) as rn
     from labs
     inner join cholesterol_codes
-      on ( labs.normalized_code = cholesterol_codes.code
-       and labs.normalized_code_type = cholesterol_codes.code_system )
-      or ( labs.source_code = cholesterol_codes.code
-       and labs.source_code_type = cholesterol_codes.code_system )
+      on coalesce(labs.normalized_code, labs.source_code) = cholesterol_codes.code
+        and coalesce(labs.normalized_code_type, labs.source_code_type) = cholesterol_codes.code_system
     where {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
 
 )

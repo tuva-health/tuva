@@ -8,7 +8,7 @@ SELECT
     ,coalesce(M.RESULT_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
     ,'LAB_RESULT' AS TABLE_NAME
     ,'Lab Result ID' as DRILL_DOWN_KEY
-    ,IFNULL(LAB_RESULT_ID, 'NULL') AS DRILL_DOWN_VALUE
+    , coalesce(lab_result_id, 'NULL') AS DRILL_DOWN_VALUE
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'COLLECTION_DATE' AS FIELD_NAME
     ,CASE 
