@@ -35,12 +35,7 @@ with results as (
       , claim_type
       , field_name
       , mart_name
-      , row_number() over (
-            order by
-                input_layer_table_name
-              , claim_type
-              , field_name
-        ) as table_claim_type_field_sk
+      , DENSE_RANK () OVER (ORDER BY INPUT_LAYER_TABLE_NAME, CLAIM_TYPE, FIELD_NAME) as TABLE_CLAIM_TYPE_FIELD_SK
 	, '{{ var('tuva_last_run')}}' as tuva_last_run
     from results
     group by
