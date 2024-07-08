@@ -52,6 +52,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         first_day_of_month: date
         last_day_of_month: date
+        year_month_int: integer
+
     columns:
       - name: full_date
         description: 'The complete date.'

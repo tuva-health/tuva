@@ -331,7 +331,7 @@ select
   end as immunodeficiencies_and_white_blood_cell_disorders,
   case when patient_id in (select * from asthma) then 1
        else 0
-  end as asthma,
+  end asthma,
   case when patient_id in (select * from t1d) then 1
        else 0
   end as t1d,

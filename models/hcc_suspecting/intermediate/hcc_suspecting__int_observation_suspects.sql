@@ -312,7 +312,7 @@ with conditions as (
                   depression_assessment.patient_id
                 , depression_assessment.data_source
             order by depression_assessment.observation_date desc nulls last
-        ) as assessment_order
+        ) assessment_order
     from depression_assessment
 
 )
