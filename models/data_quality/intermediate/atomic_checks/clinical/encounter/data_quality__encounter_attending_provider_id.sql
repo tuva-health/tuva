@@ -17,7 +17,7 @@ SELECT
     ,case when M.ATTENDING_PROVIDER_ID is not null and TERM.NPI is null
           then 'Attending provider ID does not join to Terminology provider table'
           else null end as INVALID_REASON
-    ,CAST(ATTENDING_PROVIDER_ID AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(ATTENDING_PROVIDER_ID as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__provider')}} TERM on m.ATTENDING_PROVIDER_ID = TERM.NPI

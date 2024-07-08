@@ -17,7 +17,7 @@ left join {{ ref('pqi__value_sets') }} as copd
   on e.primary_diagnosis_code = copd.code
   and copd.value_set_name = 'chronic_obstructive_pulmonary_disorder'
   and copd.pqi_number = '05'
-left join {{ ref('pqi__value_sets') }} as asthma
+left join {{ ref('pqi__value_sets') }} asthma
   on e.primary_diagnosis_code = asthma.code
   and asthma.value_set_name = 'asthma'
   and asthma.pqi_number = '05'

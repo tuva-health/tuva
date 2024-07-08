@@ -18,7 +18,7 @@ SELECT
     ,case when M.NORMALIZED_CODE is not null and TERM.loinc is null
           then 'Normalized code does not join to Terminology loinc table'
     else null end as INVALID_REASON
-    ,CAST(NORMALIZED_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(NORMALIZED_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('lab_result')}} M
 LEFT JOIN {{ ref('terminology__loinc')}} term on m.NORMALIZED_CODE = term.loinc

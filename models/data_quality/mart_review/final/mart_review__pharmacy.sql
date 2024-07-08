@@ -24,7 +24,7 @@ SELECT
     p.claim_line_number,
     p.patient_id,
     p.data_source,
-    CONCAT(p.patient_id, '|', p.data_source) AS patient_source_key,
+    p.patient_id || '|' || p.data_source AS patient_source_key,
     p.ndc_code,
     COALESCE(n.fda_description, n.rxnorm_description) AS ndc_description,
     p.paid_amount,

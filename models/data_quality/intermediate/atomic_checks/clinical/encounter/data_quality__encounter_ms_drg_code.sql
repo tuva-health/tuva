@@ -17,7 +17,7 @@ SELECT
     ,case when M.MS_DRG_CODE is not null and TERM.MS_DRG_CODE is null
           then 'MS DRG Code does not join to Terminology ms_drg table'
           else null end as INVALID_REASON
-    ,CAST(m.MS_DRG_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(m.MS_DRG_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__ms_drg')}} TERM on m.MS_DRG_CODE = TERM.MS_DRG_CODE

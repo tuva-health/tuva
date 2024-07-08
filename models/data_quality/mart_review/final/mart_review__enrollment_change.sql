@@ -25,7 +25,7 @@ Changes AS (
         THEN 'added'
     END AS Change_Type
 FROM RankedMonths
-UNION ALL
+union all
 SELECT
     Patient_ID,
     data_source,
@@ -40,7 +40,7 @@ FROM RankedMonths
 ),
 Final AS (
     SELECT
-        CONCAT(Patient_ID, '|', cast(Change_MONTH as varchar(10))) AS MemberMonthKey,
+        Patient_ID || '|' || cast(Change_MONTH as {{ dbt.type_string() }}) AS MemberMonthKey,
         data_source,
         Patient_ID,
         Change_MONTH,

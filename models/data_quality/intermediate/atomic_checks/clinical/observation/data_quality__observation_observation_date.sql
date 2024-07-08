@@ -12,16 +12,16 @@ SELECT
     -- ,M.CLAIM_TYPE AS CLAIM_TYPE
     ,'OBSERVATION_DATE' AS FIELD_NAME
     ,CASE 
-        WHEN M.OBSERVATION_DATE > '{{ var('tuva_last_run') }}' THEN 'invalid'
+        WHEN M.OBSERVATION_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
         WHEN M.OBSERVATION_DATE <= cast('1901-01-01' as date) THEN 'invalid'
         WHEN M.OBSERVATION_DATE IS NULL THEN 'null'
         ELSE 'valid' 
     END AS BUCKET_NAME
     ,CASE 
-        WHEN M.OBSERVATION_DATE > '{{ var('tuva_last_run') }}' THEN 'future'
+        WHEN M.OBSERVATION_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
         WHEN M.OBSERVATION_DATE <= cast('1901-01-01' as date) THEN 'too old'
         else null
     END AS INVALID_REASON
-    ,CAST(OBSERVATION_DATE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(OBSERVATION_DATE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('observation')}} M

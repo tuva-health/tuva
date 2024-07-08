@@ -20,12 +20,12 @@ vars:
     ## CMS HCC data mart vars
     # The payment_year variable has a default of the current year, this can be
     # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
-    cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
+    cms_hcc_payment_year: 2019
 
 
     ## Quality Measures period var
     # to run quality measueres for a period other than current year, add the below variable uncommented to your project
-    # quality_measures_period_end: "2020-12-31"
+    quality_measures_period_end: "2019-12-31"
 
 
     ## Enable Normalize engine var
@@ -70,7 +70,7 @@ seeds:
       reference_data__ansi_fips_state:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.9.0','ansi_fips_state.csv',compression=true,null_marker=true) }}"
       reference_data__calendar:
-        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.9.0','calendar.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.0','calendar.csv',compression=true,null_marker=true) }}"
       reference_data__fips_county:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.9.0','fips_county.csv',compression=true,null_marker=true) }}"
       reference_data__ssa_fips_state:
@@ -189,8 +189,6 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.0','data_quality_crosswalk_mart_to_outcome_measure.csv',compression=true,null_marker=true) }}"
         data_quality__crosswalk_measure_reasonable_ranges:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.0','data_quality_crosswalk_measure_reasonable_ranges.csv',compression=true,null_marker=true) }}"
-        data_quality__dqi_calendar:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.0','data_quality_dqi_calendar.csv',compression=true,null_marker=true) }}"
       ed_classification:
         ed_classification__categories:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.9.0','ed_classification_categories.csv',compression=true,null_marker=true) }}"

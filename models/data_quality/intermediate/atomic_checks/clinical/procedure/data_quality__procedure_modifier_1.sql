@@ -18,7 +18,7 @@ SELECT
     ,case when M.MODIFIER_1 is not null and TERM.HCPCS is null
           then 'Modifier 1 does not join to Terminology hcpcs_level_2 table'
     else null end as INVALID_REASON
-    ,CAST(MODIFIER_1 AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(MODIFIER_1 as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('procedure')}} M
 LEFT JOIN {{ ref('terminology__hcpcs_level_2')}} TERM on m.MODIFIER_1 = term.HCPCS

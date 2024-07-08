@@ -12,7 +12,7 @@
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'RESULT' AS FIELD_NAME
                 ,case when M.RESULT is not null then 'valid' else 'null' end as BUCKET_NAME
-                ,cast(null as varchar(255)) as INVALID_REASON
-                ,CAST(LEFT(RESULT, 255) AS VARCHAR(255)) AS FIELD_VALUE
+                ,cast(null as {{ dbt.type_string() }}) as INVALID_REASON
+                ,CAST(LEFT(RESULT, 255) as {{ dbt.type_string() }}) AS FIELD_VALUE
                 , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('observation')}} M

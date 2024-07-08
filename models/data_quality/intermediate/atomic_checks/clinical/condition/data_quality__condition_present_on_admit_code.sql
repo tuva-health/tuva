@@ -18,7 +18,7 @@ SELECT
           then 'Present On Admit Code does not join to Terminology present_on_admission table'
           else null 
     end as INVALID_REASON
-    ,CAST(m.PRESENT_ON_ADMIT_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(m.PRESENT_ON_ADMIT_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('condition')}} M
 LEFT JOIN {{ ref('terminology__present_on_admission')}} TERM ON m.PRESENT_ON_ADMIT_CODE = TERM.PRESENT_ON_ADMIT_CODE

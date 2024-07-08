@@ -19,7 +19,7 @@ SELECT
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_detail') }}
 
-UNION
+union all
 
 SELECT
     DATA_SOURCE,

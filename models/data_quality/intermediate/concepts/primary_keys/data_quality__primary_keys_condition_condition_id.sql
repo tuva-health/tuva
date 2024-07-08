@@ -32,12 +32,13 @@ WITH valid_conditions AS (
         DRILL_DOWN_VALUE,
         FIELD_NAME,
         FIELD_VALUE,
-        BUCKET_NAME
+        BUCKET_NAME,
+        ROW_NUMBER() OVER (ORDER BY DRILL_DOWN_KEY) as row_number_value
     FROM 
         {{ ref('data_quality__condition_condition_id') }}
     WHERE 
         BUCKET_NAME = 'valid'
-    QUALIFY ROW_NUMBER() OVER (ORDER BY RANDOM()) <= 5
+
 )
 
 , duplicates_summary AS (
@@ -50,10 +51,11 @@ WITH valid_conditions AS (
         a.FIELD_NAME,
         a.FIELD_VALUE,
         a.BUCKET_NAME,
-        b.duplicate_count
+        b.duplicate_count,
+        ROW_NUMBER() OVER (ORDER BY DRILL_DOWN_KEY) as row_number_value
     FROM 
         {{ ref('data_quality__condition_condition_id') }} a
-    JOIN 
+    inner JOIN
         uniqueness_check b ON a.FIELD_VALUE = b.FIELD_VALUE
 ) 
 
@@ -62,9 +64,9 @@ SELECT
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM 
     duplicates_summary
-QUALIFY ROW_NUMBER() OVER (ORDER BY RANDOM()) <= 5
+where row_number_value <= 5
 
-UNION
+union all
 
 SELECT 
     *,
@@ -72,5 +74,6 @@ SELECT
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM 
     random_sample
-WHERE 
-    NOT EXISTS (SELECT 1 FROM duplicates_summary)
+WHERE
+    row_number_value <= 5
+    and NOT EXISTS (SELECT 1 FROM duplicates_summary)

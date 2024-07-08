@@ -31,7 +31,6 @@ GROUP BY
        DRILL_DOWN_VALUE,
        INVALID_REASON,
        SUMMARY_SK
-       , '{{ var('tuva_last_run')}}'
 )
 SELECT
        SUMMARY_SK,
@@ -57,8 +56,8 @@ GROUP BY
        INVALID_REASON,
        DRILL_DOWN_KEY,
        SUMMARY_SK
-       , '{{ var('tuva_last_run')}}'
-UNION
+
+union all
 SELECT
        SUMMARY_SK,
        DATA_SOURCE,
@@ -84,8 +83,8 @@ GROUP BY
        INVALID_REASON,
        DRILL_DOWN_KEY,
        SUMMARY_SK
-       , '{{ var('tuva_last_run')}}'
-UNION
+
+union all
 SELECT
        SUMMARY_SK,
        DATA_SOURCE,
@@ -101,7 +100,7 @@ SELECT
        , '{{ var('tuva_last_run')}}'
 FROM Ranked_Examples
 WHERE rn <= 5 -- 5 Example claims per unique SK / field value
-UNION
+union all
 SELECT
        SUMMARY_SK,
        DATA_SOURCE,
@@ -127,4 +126,4 @@ GROUP BY
     INVALID_REASON,
     DRILL_DOWN_KEY,
     FIELD_VALUE
-    , '{{ var('tuva_last_run')}}'
+

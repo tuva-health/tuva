@@ -12,8 +12,8 @@
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'QUANTITY_UNIT' AS FIELD_NAME
                 ,case when M.QUANTITY_UNIT is not null then 'valid' else 'null' end as BUCKET_NAME
-                ,cast(null as varchar(255)) as INVALID_REASON
-                ,CAST(QUANTITY_UNIT AS VARCHAR(255)) AS FIELD_VALUE
+                ,cast(null as {{ dbt.type_string() }}) as INVALID_REASON
+                ,CAST(QUANTITY_UNIT as {{ dbt.type_string() }}) AS FIELD_VALUE
                 , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('medication')}} M
             

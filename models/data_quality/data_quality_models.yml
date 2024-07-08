@@ -83,7 +83,7 @@ models:
       - claims
       - clinical
       - final
-    materialized: table
+    materialized: view
   columns:
     - name: summary_sk
       description: Surrogate key for summary table
@@ -3802,7 +3802,7 @@ models:
     materialized: view
 
 
-#### Union processing
+#### union all processing
 ### Claims Specific
 
 - name: data_quality__claim_type_summary
@@ -3813,7 +3813,7 @@ models:
     alias: claim_type_summary
     tags:
       - claims
-      - union_processing
+      - union all_processing
       - intermediate
     materialized: view
 
@@ -3827,9 +3827,9 @@ models:
     alias: data_quality_claims_detail
     tags:
       - claims
-      - union_processing
+      - union all_processing
       - intermediate
-    materialized: view
+    materialized: table
 
 
 - name: data_quality__data_quality_claims_for_pbi
@@ -3840,7 +3840,7 @@ models:
     alias: data_quality_claims_for_pbi
     tags:
       - claims
-      - union_processing
+      - union all_processing
       - intermediate
     materialized: view
 
@@ -3856,7 +3856,7 @@ models:
     alias: data_quality_clinical_detail
     tags:
       - clinical
-      - union_processing
+      - union all_processing
       - intermediate
     materialized: table
 
@@ -3869,7 +3869,7 @@ models:
     alias: data_quality_clinical_for_pbi
     tags:
       - clinical
-      - union_processing
+      - union all_processing
       - intermediate
     materialized: view
 

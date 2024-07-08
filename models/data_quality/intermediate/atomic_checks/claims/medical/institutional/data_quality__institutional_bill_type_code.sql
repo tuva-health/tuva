@@ -9,7 +9,7 @@ WITH BASE as (
 ),
 UNIQUE_FIELD as (
     SELECT DISTINCT CLAIM_ID
-        ,BASE.BILL_TYPE_CODE || '|' || COALESCE(TERM.BILL_TYPE_DESCRIPTION,'') as Field
+        ,cast(BASE.BILL_TYPE_CODE || '|' || COALESCE(TERM.BILL_TYPE_DESCRIPTION,'') as {{ dbt.type_string() }}) as Field
         ,DATA_SOURCE
     FROM BASE
     LEFT JOIN {{ ref('terminology__bill_type')}} AS TERM ON BASE.BILL_TYPE_CODE = TERM.BILL_TYPE_CODE
@@ -26,7 +26,7 @@ CLAIM_AGG as (
 SELECT
     CLAIM_ID,
     DATA_SOURCE,
-    {{ dbt.listagg(measure="coalesce(cast(Field as varchar), 'null')", delimiter_text="', '", order_by_clause="order by Field desc") }} AS FIELD_AGGREGATED
+    {{ dbt.listagg(measure="coalesce(Field, 'null')", delimiter_text="', '", order_by_clause="order by Field desc") }} AS FIELD_AGGREGATED
 FROM
     UNIQUE_FIELD
 GROUP BY
@@ -35,7 +35,7 @@ GROUP BY
 	)
 SELECT DISTINCT -- to bring to claim_ID grain 
     M.Data_SOURCE
-    ,coalesce(cast(M.CLAIM_START_DATE as varchar(50)),cast('1900-01-01' as varchar(10))) AS SOURCE_DATE
+    ,coalesce(cast(M.CLAIM_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
     ,'MEDICAL_CLAIM' AS TABLE_NAME
     ,'Claim ID' AS DRILL_DOWN_KEY
     ,coalesce(M.CLAIM_ID, 'NULL') AS DRILL_DOWN_VALUE
@@ -52,7 +52,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
             then 'Bill Type Code does not join to Terminology Bill_Type table'
         else null
     end as INVALID_REASON
-    ,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM BASE M
 LEFT JOIN CLAIM_GRAIN CG ON M.CLAIM_ID = CG.CLAIM_ID AND M.Data_Source = CG.Data_Source

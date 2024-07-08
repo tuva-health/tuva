@@ -12,8 +12,8 @@
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'SOURCE_REFERENCE_RANGE_HIGH' AS FIELD_NAME
                 ,case when M.SOURCE_REFERENCE_RANGE_HIGH is not null then 'valid' else 'null' end as BUCKET_NAME
-                ,cast(null as varchar(255)) as INVALID_REASON
-                ,CAST(SOURCE_REFERENCE_RANGE_HIGH AS VARCHAR(255)) AS FIELD_VALUE
+                ,cast(null as {{ dbt.type_string() }}) as INVALID_REASON
+                ,CAST(SOURCE_REFERENCE_RANGE_HIGH as {{ dbt.type_string() }}) AS FIELD_VALUE
                 , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('observation')}} M
             

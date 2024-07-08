@@ -17,7 +17,7 @@ SELECT
     ,case when M.ADMIT_SOURCE_CODE is not null and TERM.ADMIT_SOURCE_CODE is null
           then 'Admit source code does not join to Terminology admit source table'
           else null end as INVALID_REASON
-    ,CAST(m.ADMIT_SOURCE_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(m.ADMIT_SOURCE_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__admit_source')}} TERM ON M.ADMIT_SOURCE_CODE = TERM.ADMIT_SOURCE_CODE

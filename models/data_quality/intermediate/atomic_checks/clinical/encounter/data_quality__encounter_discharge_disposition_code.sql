@@ -17,7 +17,7 @@ SELECT
     ,case when M.DISCHARGE_DISPOSITION_CODE is not null and TERM.DISCHARGE_DISPOSITION_CODE is null
           then 'Discharge Disposition Code does not join to Terminology discharge_disposition table'
           else null end as INVALID_REASON
-    ,CAST(m.DISCHARGE_DISPOSITION_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(m.DISCHARGE_DISPOSITION_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('encounter')}} M
 LEFT JOIN {{ ref('terminology__discharge_disposition')}} TERM ON M.DISCHARGE_DISPOSITION_CODE = TERM.DISCHARGE_DISPOSITION_CODE

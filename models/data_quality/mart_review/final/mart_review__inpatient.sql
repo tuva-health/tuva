@@ -10,17 +10,17 @@ WITH cte AS (
 )
 
 SELECT e.*,
-    CONCAT(e.patient_id, '|', e.data_source) AS patient_source_key,
-    CONCAT(e.encounter_id, '|', e.data_source) AS encounter_source_key,
-    CONCAT(e.ms_drg_code, ' | ', e.ms_drg_description) AS DRGwithDescription,
-    CONCAT(e.primary_diagnosis_code, ' | ', e.primary_diagnosis_description) AS Primary_Diagnosis_and_Description,
-    CONCAT(e.admit_source_code, ' | ', e.admit_source_description) AS Admit_Source_code_and_Description,
-    CONCAT(e.admit_type_code, ' | ', e.admit_type_description) AS admit_type_code_and_description,
-    CONCAT(e.discharge_disposition_code, ' | ', e.discharge_disposition_description) AS discharge_code_and_description,
+    e.patient_id || '|' || e.data_source AS patient_source_key,
+    e.encounter_id || '|' || e.data_source AS encounter_source_key,
+    e.ms_drg_code || ' | ' || e.ms_drg_description AS DRGwithDescription,
+    e.primary_diagnosis_code || ' | ' || e.primary_diagnosis_description AS Primary_Diagnosis_and_Description,
+    e.admit_source_code || ' | ' || e.admit_source_description AS Admit_Source_code_and_Description,
+    e.admit_type_code || ' | ' || e.admit_type_description AS admit_type_code_and_description,
+    e.discharge_disposition_code || ' | ' || e.discharge_disposition_description AS discharge_code_and_description,
     P.CCSR_PARENT_CATEGORY,
     P.CCSR_Category,
     P.CCSR_CATEGORY_DESCRIPTION,
-    CONCAT(P.CCSR_Category, ' | ', P.CCSR_CATEGORY_DESCRIPTION) AS CCSR_CATEGORY_AND_DESCRIPTION,
+    P.CCSR_Category || ' | ' || P.CCSR_CATEGORY_DESCRIPTION AS CCSR_CATEGORY_AND_DESCRIPTION,
     B.BODY_SYSTEM
 FROM {{ ref('core__encounter')}} e
 LEFT JOIN cte l ON e.facility_id = l.location_id

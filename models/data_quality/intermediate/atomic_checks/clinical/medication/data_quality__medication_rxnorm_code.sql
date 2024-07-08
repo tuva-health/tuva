@@ -18,7 +18,7 @@ SELECT
     ,case when M.RXNORM_CODE is not null and TERM.RXCUI is null
           then 'RX norm code does not join to Terminology rxnorm_to_atc table'
     else null end as INVALID_REASON
-    ,CAST(RXNORM_CODE AS VARCHAR(255)) AS FIELD_VALUE
+    ,CAST(RXNORM_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('medication')}} M
 LEFT JOIN {{ ref('terminology__rxnorm_to_atc')}} TERM on m.RXNORM_CODE = TERM.RXCUI

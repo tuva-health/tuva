@@ -12,8 +12,8 @@
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'DAYS_SUPPLY' AS FIELD_NAME
                 ,case when M.DAYS_SUPPLY is not null then 'valid' else 'null' end as BUCKET_NAME
-                ,cast(null as varchar(255)) as INVALID_REASON
-                ,CAST(DAYS_SUPPLY AS VARCHAR(255)) AS FIELD_VALUE
+                ,cast(null as {{ dbt.type_string() }}) as INVALID_REASON
+                ,CAST(DAYS_SUPPLY as {{ dbt.type_string() }}) AS FIELD_VALUE
                 , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('medication')}} M
             

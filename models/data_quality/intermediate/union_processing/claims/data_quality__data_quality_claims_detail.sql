@@ -4,501 +4,1530 @@
 }}
 
 WITH CTE as (
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_allowed_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_charge_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_claim_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_claim_line_end_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_claim_line_number') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_claim_line_start_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_claim_type') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_coinsurance_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_copayment_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_data_source') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_deductible_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_diagnosis_code_type') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_hcpcs_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_member_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_paid_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_paid_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_patient_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_payer') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_plan') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__claim_total_cost_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_address') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_birth_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_city') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_data_source') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_death_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_death_flag') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_dual_status_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT
+    cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_end_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_first_name') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_gender') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_last_name') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_medicare_status_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_member_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_original_reason_entitlement_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_patient_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_payer_type') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_payer') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_phone') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_plan') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_race') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_start_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_state') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__eligibility_zip_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_ms_drg_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_admission_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_admit_source_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_admit_type_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_apr_drg_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_bill_type_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_billing_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_claim_end_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_claim_start_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_diagnosis_code_1') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_diagnosis_code_2') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_diagnosis_code_3') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_discharge_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_discharge_disposition_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_facility_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_present_on_admission_1') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_present_on_admission_2') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_present_on_admission_3') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_procedure_code_1') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_procedure_code_2') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_procedure_code_3') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_procedure_date_1') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_procedure_date_2') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_procedure_date_3') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_rendering_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_revenue_center_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__institutional_service_unit_quantity') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_allowed_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_claim_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_claim_line_number') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_coinsurance_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_copayment_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_data_source') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_days_supply') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_deductible_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_dispensing_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_dispensing_provider_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_member_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_ndc_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_paid_amount') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_paid_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_patient_id') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_payer') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_plan') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_prescribing_provider_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_quantity') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__pharmacy_refills') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_billing_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_facility_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_place_of_service_code') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_rendering_npi') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_claim_end_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_claim_start_date') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_diagnosis_code_1') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_diagnosis_code_2') }}
 
-UNION
+union all
 
-SELECT *
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_diagnosis_code_3') }}
 
 )
 
-SELECT *
+-- noinspection SqlNoDataSourceInspection
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as date) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 ,DENSE_RANK() OVER (ORDER BY DATA_SOURCE, TABLE_NAME, CLAIM_TYPE, FIELD_NAME) as SUMMARY_SK
 FROM CTE

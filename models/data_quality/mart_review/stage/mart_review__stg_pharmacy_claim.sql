@@ -5,6 +5,6 @@
 }}
 
 select mc.*,
-cast(c.year_month_int as varchar(6)) as year_month
+cast(c.year_month_int as {{ dbt.type_string() }}) as year_month
 FROM {{ ref('core__pharmacy_claim')}}  mc
 left join {{ ref('reference_data__calendar') }} c on coalesce(mc.paid_date,mc.dispensing_date) = c.full_date

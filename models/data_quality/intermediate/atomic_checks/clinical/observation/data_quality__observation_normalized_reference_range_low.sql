@@ -12,8 +12,8 @@
                 -- ,M.CLAIM_TYPE AS CLAIM_TYPE
                 ,'NORMALIZED_REFERENCE_RANGE_LOW' AS FIELD_NAME
                 ,case when M.NORMALIZED_REFERENCE_RANGE_LOW is not null then 'valid' else 'null' end as BUCKET_NAME
-                ,cast(null as varchar(255)) as INVALID_REASON
-                ,CAST(NORMALIZED_REFERENCE_RANGE_LOW AS VARCHAR(255)) AS FIELD_VALUE
+                ,cast(null as {{ dbt.type_string() }}) as INVALID_REASON
+                ,CAST(NORMALIZED_REFERENCE_RANGE_LOW as {{ dbt.type_string() }}) AS FIELD_VALUE
                 , '{{ var('tuva_last_run')}}' as tuva_last_run
             FROM {{ ref('observation')}} M
             

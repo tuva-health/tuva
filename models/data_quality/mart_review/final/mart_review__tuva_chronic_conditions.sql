@@ -39,6 +39,6 @@ with cte as (
 )
 
 select *
-  , concat(patient_id, '|', data_source) as patient_source_key
+  , patient_id || '|' || data_source as patient_source_key
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from result
