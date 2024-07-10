@@ -28,7 +28,7 @@ WITH base_patient_data AS (
 
 SELECT 
     *,
-    cast(FLOOR({{ datediff('birth_date', 'tuva_last_run', 'day') }} / 365) as {{ dbt.type_int() }}) AS patient_age,
+    cast(FLOOR({{ datediff('birth_date', 'tuva_last_run', 'day') }} / 365) as {{ dbt.type_int() }}) AS age,
     cast(
         CASE
             WHEN FLOOR({{ datediff('birth_date', 'tuva_last_run', 'day') }} / 365) < 10 THEN '0-9'

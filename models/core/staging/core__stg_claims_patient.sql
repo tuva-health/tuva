@@ -51,8 +51,7 @@ select
     , cast(null as {{ dbt.type_float() }}) as latitude 
     , cast(null as {{ dbt.type_float() }}) as longitude
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-    , cast(FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) as {{ dbt.type_int() }}) AS patient_age
+    , cast(FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) as {{ dbt.type_int() }}) AS age
     , cast(
         CASE
             WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 10 THEN '0-9'
@@ -67,5 +66,6 @@ select
             ELSE '90+'
         END as {{ dbt.type_string() }}
     ) AS age_group
+    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from patient_stage
 where row_sequence = 1
