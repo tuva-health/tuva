@@ -1,4 +1,3 @@
-
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
    )
@@ -7,9 +6,6 @@
 -- *************************************************
 -- This dbt model creates the patient table in core.
 -- *************************************************
-
-
-
 
 with patient_stage as(
     select
@@ -56,5 +52,20 @@ select
     , cast(null as {{ dbt.type_float() }}) as longitude
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) as {{ dbt.type_int() }}) AS patient_age
+    , cast(
+        CASE
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 10 THEN '0-9'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 20 THEN '10-19'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 30 THEN '20-29'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 40 THEN '30-39'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 50 THEN '40-49'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 60 THEN '50-59'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 70 THEN '60-69'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 80 THEN '70-79'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 90 THEN '80-89'
+            ELSE '90+'
+        END as {{ dbt.type_string() }}
+    ) AS age_group
 from patient_stage
 where row_sequence = 1
