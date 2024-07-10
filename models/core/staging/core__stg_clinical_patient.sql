@@ -27,7 +27,7 @@ WITH base_patient_data AS (
 )
 
 SELECT 
-    *,
+    *
     , cast(FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) as {{ dbt.type_int() }}) AS age
     , cast(
         CASE
