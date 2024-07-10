@@ -2,66 +2,73 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-select 
-    'INPUT_LAYER' AS SOURCE
-    ,'ELIGIBILITY' as TABLE_NAME
-    ,count(*) as ROW_COUNT
-    ,count(distinct patient_id) as UNIQUE_CHECK
-    ,'Unique Patient Count' as UNIQUE_CHECK_DESC
-    ,2 AS TABLE_ORDER
-from {{ ref('eligibility')}}
+with cte as (
+    select 
+        'input_layer' as source
+      , 'eligibility' as table_name
+      , count(*) as row_count
+      , count(distinct patient_id) as unique_check
+      , 'Unique Patient Count' as unique_check_desc
+      , 2 as table_order
+    from {{ ref('eligibility') }}
 
-union
+    union all
 
-select 
-    'RAW_DATA' AS SOURCE
-    ,'ELIGIBILITY' as TABLE_NAME
-    ,NULL as ROW_COUNT
-    ,NULL as UNIQUE_CHECK
-    ,'Unique Patient Count' as UNIQUE_CHECK_DESC
-    ,1 AS TABLE_ORDER
-from {{ ref('eligibility')}}
+    select 
+        'raw_data' as source
+      , 'eligibility' as table_name
+      , null as row_count
+      , null as unique_check
+      , 'Unique Patient Count' as unique_check_desc
+      , 1 as table_order
+    from {{ ref('eligibility') }}
 
-union
+    union all
 
-select 
-    'INPUT_LAYER' AS SOURCE
-    ,'MEDICAL_CLAIM' as TABLE_NAME
-    ,count(*) as ROW_COUNT
-    ,count(distinct claim_id) as UNIQUE_CHECK
-    ,'Unique Claim Count' as UNIQUE_CHECK_DESC
-    ,4 AS TABLE_ORDER
-from {{ ref('medical_claim')}}
+    select 
+        'input_layer' as source
+      , 'medical_claim' as table_name
+      , count(*) as row_count
+      , count(distinct claim_id) as unique_check
+      , 'Unique Claim Count' as unique_check_desc
+      , 4 as table_order
+    from {{ ref('medical_claim') }}
 
-union
+    union all
 
-select 
-    'RAW_DATA' AS SOURCE
-    ,'MEDICAL_CLAIM' as TABLE_NAME
-    ,NULL as ROW_COUNT
-    ,NULL as UNIQUE_CHECK
-    ,'Unique Claim Count' as UNIQUE_CHECK_DESC
-    ,3 AS TABLE_ORDER
-from {{ ref('medical_claim')}}
+    select 
+        'raw_data' as source
+      , 'medical_claim' as table_name
+      , null as row_count
+      , null as unique_check
+      , 'Unique Claim Count' as unique_check_desc
+      , 3 as table_order
+    from {{ ref('medical_claim') }}
 
-union
+    union all
 
-select 
-    'INPUT_LAYER' AS SOURCE
-    ,'PHARMACY_CLAIM' as TABLE_NAME
-    ,count(*) as ROW_COUNT
-    ,count(distinct claim_id) as UNIQUE_CHECK
-    ,'Unique Claim Count' as UNIQUE_CHECK_DESC
-    ,6 AS TABLE_ORDER
-from {{ ref('pharmacy_claim')}}
+    select 
+        'input_layer' as source
+      , 'pharmacy_claim' as table_name
+      , count(*) as row_count
+      , count(distinct claim_id) as unique_check
+      , 'Unique Claim Count' as unique_check_desc
+      , 6 as table_order
+    from {{ ref('pharmacy_claim') }}
 
-union
+    union all
 
-select 
-    'RAW_DATA' AS SOURCE
-    ,'PHARMACY_CLAIM' as TABLE_NAME
-    ,NULL as ROW_COUNT
-    ,NULL as UNIQUE_CHECK
-    ,'Unique Claim Count' as UNIQUE_CHECK_DESC
-    ,5 AS TABLE_ORDER
-from {{ ref('pharmacy_claim')}}
+    select 
+        'raw_data' as source
+      , 'pharmacy_claim' as table_name
+      , null as row_count
+      , null as unique_check
+      , 'Unique Claim Count' as unique_check_desc
+      , 5 as table_order
+    from {{ ref('pharmacy_claim') }}
+)
+
+select
+    cte.*
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
+from cte
