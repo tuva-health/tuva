@@ -21,18 +21,18 @@ SELECT
     , cast(latitude as {{ dbt.type_float() }} ) as latitude
     , cast(longitude as {{ dbt.type_float() }} ) as longitude
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
-    , cast(FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) as {{ dbt.type_int() }}) AS age
+    , cast(FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) as {{ dbt.type_int() }}) AS age
     , cast(
         CASE
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 10 THEN '0-9'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 20 THEN '10-19'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 30 THEN '20-29'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 40 THEN '30-39'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 50 THEN '40-49'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 60 THEN '50-59'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 70 THEN '60-69'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 80 THEN '70-79'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "cast('" ~ var('tuva_last_run') ~ "' as date)", 'day') }} / 365) < 90 THEN '80-89'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 10 THEN '0-9'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 20 THEN '10-19'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 30 THEN '20-29'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 40 THEN '30-39'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 50 THEN '40-49'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 60 THEN '50-59'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 70 THEN '60-69'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 80 THEN '70-79'
+            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 90 THEN '80-89'
             ELSE '90+'
         END as {{ dbt.type_string() }}
     ) AS age_group
