@@ -30,6 +30,8 @@ with patient_stage as(
                 then cast ('2050-01-01' as date)
                 else enrollment_end_date end DESC)
             as row_sequence
+        , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }}) as tuva_last_run_datetime
+        , cast(substring('{{ var('tuva_last_run')}}',1,10) as date) as tuva_last_run_date
     from {{ ref('normalized_input__eligibility')}}
 )
 
@@ -51,21 +53,21 @@ select
     , cast(null as {{ dbt.type_float() }}) as latitude 
     , cast(null as {{ dbt.type_float() }}) as longitude
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-    , cast(FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) as {{ dbt.type_int() }}) AS age
+    , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) as age
     , cast(
         CASE
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 10 THEN '0-9'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 20 THEN '10-19'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 30 THEN '20-29'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 40 THEN '30-39'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 50 THEN '40-49'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 60 THEN '50-59'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 70 THEN '60-69'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 80 THEN '70-79'
-            WHEN FLOOR({{ datediff("cast(birth_date as date)", "DATE(PARSE_TIMESTAMP('%Y-%m-%d %H:%M:%E6S%Ez', '" ~ var('tuva_last_run') ~ "'))", 'day') }} / 365) < 90 THEN '80-89'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 10 THEN '0-9'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 20 THEN '10-19'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 30 THEN '20-29'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 40 THEN '30-39'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 50 THEN '40-49'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 60 THEN '50-59'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 70 THEN '60-69'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 80 THEN '70-79'
+            WHEN cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) < 90 THEN '80-89'
             ELSE '90+'
         END as {{ dbt.type_string() }}
     ) AS age_group
-    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , tuva_last_run_datetime as tuva_last_run
 from patient_stage
 where row_sequence = 1
