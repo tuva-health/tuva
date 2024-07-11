@@ -24,9 +24,7 @@ where id = 'CBE0101')
 
 /*
     set performance period end to the end of the current calendar year
-    or use the quality_measures_period_end variable if provided
-      - set quality_measures_period_end to december end for last quarter measurement period
-      - set quality_measures_period_end to march end for first quarter measurement period     
+    or use the quality_measures_period_end variable if provided   
 */
 
 with period_end as (
