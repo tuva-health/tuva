@@ -14,10 +14,9 @@ SELECT
     e.encounter_ID,
     CASE WHEN S.Encounter_ID IS NULL THEN 'Not Classified' ELSE S.ED_CLASSIFICATION_DESCRIPTION END AS ED_CLASSIFICATION_DESCRIPTION,
     CASE 
-        WHEN S.Encounter_ID IS NULL THEN 'Not Classified'
-        WHEN CAST(S.ed_classification_order AS INT) <= 3 THEN 'Avoidable'
-        ELSE 'Non-Avoidable'
-    END AS Avoidable_Flag,
+        WHEN S.Encounter_ID IS NULL THEN 'Non-Avoidable'
+        WHEN CAST(S.ed_classification_order AS INT) <= 3 THEN s.ED_CLASSIFICATION_DESCRIPTION
+        ELSE 'Non-Avoidable' END AS avoidable_category,
     e.PAID_AMOUNT,
     e.primary_diagnosis_code,
     e.primary_diagnosis_description,
