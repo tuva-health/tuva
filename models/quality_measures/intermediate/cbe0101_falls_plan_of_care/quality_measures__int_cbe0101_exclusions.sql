@@ -60,7 +60,7 @@ with denominator as (
         , exclusion_date
         , exclusion_reason
     from hospice_palliative
-    where exclusion_type in (
+    where lower(exclusion_reason) in (
             'hospice encounter'
           , 'hospice care ambulatory'
           , 'hospice diagnosis'
@@ -145,6 +145,18 @@ with denominator as (
       , exclusion_date
       , exclusion_reason
     from exclusion_claims
+
+)
+
+, combined_exclusions as (
+
+    select
+        exclusion_patients.patient_id
+      , exclusion_patients.exclusion_date
+      , exclusion_patients.exclusion_reason
+    from exclusion_patients
+    inner join denominator
+      on exclusion_patients.patient_id = denominator.patient_id
 
 )
 
