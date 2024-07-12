@@ -43,6 +43,16 @@ models:
       - mart_review
     materialized: table
 
+- name: mart_review__generics
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__generics
+    tags:
+      - mart_review
+    materialized: table
+
 - name: mart_review__inpatient
   config:
     schema: |
