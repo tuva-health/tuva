@@ -11,7 +11,7 @@ select d.source_date as source_date_type
     ,COUNT(DRILL_DOWN_VALUE) as DENOM
 from {{ ref('data_quality__data_quality_detail') }} d
 group by
-    source_date_type
+    d.source_date
     ,summary_sk
 
 )
