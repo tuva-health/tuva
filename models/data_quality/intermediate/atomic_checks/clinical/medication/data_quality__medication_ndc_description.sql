@@ -13,12 +13,12 @@ SELECT
     ,'NDC_DESCRIPTION' AS FIELD_NAME
     ,case when TERM.NDC is not null then 'valid'
           when M.NDC_CODE is not null then 'invalid'
-          else 'null' 
+          else 'null'
     end as BUCKET_NAME
     ,case when M.NDC_CODE is not null and TERM.NDC is null
           then 'NDC code type does not join to Terminology ndc table'
     else null end as INVALID_REASON
-    ,CAST(LEFT(NDC_DESCRIPTION, 255) as {{ dbt.type_string() }}) AS FIELD_VALUE
+    ,cast(substring(NDC_DESCRIPTION, 1, 255) as {{ dbt.type_string() }}) AS FIELD_VALUE
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('medication')}} M
 LEFT JOIN {{ ref('terminology__ndc')}} TERM on M.NDC_CODE = TERM.NDC
