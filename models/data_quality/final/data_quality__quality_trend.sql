@@ -24,7 +24,7 @@ select
     , sum(FILL_NUM) as FILL_NUM
     , sum(DENOM)  as DENOM
 from cte
-left join {{ ref('terminology__dqi_calendar') }} c on cte.source_date_type = c.full_date
+left join {{ ref('reference_data__calendar') }} c on cte.source_date_type = c.full_date
 group by
       c.first_day_of_month
     , summary_sk
