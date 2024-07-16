@@ -26,7 +26,7 @@ where id = 'NQF0041')
     set performance period end to the end of the current calendar year
     or use the quality_measures_period_end variable if provided
       - set quality_measures_period_end to december end for last quarter measurement period
-      - set quality_measures_period_end to march end for first quarter measurement period     
+      - set quality_measures_period_end to march end for first quarter measurement period
 */
 
 with period_end as (
@@ -38,7 +38,7 @@ with period_end as (
         cast('{{ var('quality_measures_period_end') }}' as date)
         {%- endif %}
          as performance_period_end
-         
+
 )
 
 /*
@@ -73,8 +73,8 @@ with period_end as (
       *
     , case
         when extract(month from performance_period_end) between 1 and 8
-            then (extract(year from performance_period_end) - 1) || '-08-01'
-        else extract(year from performance_period_end) || '-08-01'
+            then cast((extract(year from performance_period_end) - 1) as {{ dbt.type_string() }}) || '-08-01'
+        else cast(extract(year from performance_period_end) as {{ dbt.type_string() }}) || '-08-01'
       end as lookback_period_august
   from period_begin
 
