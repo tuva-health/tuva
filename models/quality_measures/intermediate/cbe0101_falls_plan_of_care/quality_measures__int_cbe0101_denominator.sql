@@ -23,25 +23,6 @@ with visit_codes as (
 
 )
 
-, visits_encounters as (
-
-    select patient_id
-         , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
-         , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
-    from {{ ref('quality_measures__stg_core__encounter') }} encounter
-    inner join {{ ref('quality_measures__int_cbe0101__performance_period') }} as pp
-        on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
-            and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
-    where lower(encounter_type) in (
-          'home health'
-        , 'office visit'
-        , 'outpatient'
-        , 'outpatient rehabilitation'
-        , 'telehealth'
-    )
-
-)
-
 , procedures as (
 
     select
@@ -71,6 +52,25 @@ with visit_codes as (
         , claim_end_date
         , hcpcs_code
     from {{ ref('quality_measures__stg_medical_claim') }}
+
+)
+
+, visits_encounters as (
+
+    select patient_id
+         , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
+         , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
+    from {{ ref('quality_measures__stg_core__encounter') }} encounter
+    inner join {{ ref('quality_measures__int_cbe0101__performance_period') }} as pp
+        on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
+            and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
+    where lower(encounter_type) in (
+          'home health'
+        , 'office visit'
+        , 'outpatient'
+        , 'outpatient rehabilitation'
+        , 'telehealth'
+    )
 
 )
 
@@ -212,9 +212,10 @@ with visit_codes as (
         , pp.measure_name
         , pp.measure_version
     from qualifying_cares
-    cross join {{ ref('quality_measures__int_cbe0101__performance_period') }} pp
-    where evidence_date between pp.performance_period_begin and pp.performance_period_end 
-    /*  code 1100F is reported if there are two or more falls in the last year itself,
+    inner join {{ ref('quality_measures__int_cbe0101__performance_period') }} pp
+        on evidence_date between pp.performance_period_begin and pp.performance_period_end 
+    /*  
+        code 1100F is reported if there are two or more falls in the last year itself,
         so if it's reported in performance year, it indicates the falls in the last year
     */
 
@@ -242,7 +243,7 @@ with visit_codes as (
 
 , add_data_types as (
 
-    select
+    select distinct
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(age as integer) as age
         , cast(encounter_date as date) as encounter_date

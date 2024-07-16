@@ -47,7 +47,6 @@ with denominator as (
           patient_id
         , exclusion_date
         , exclusion_reason
-        , exclusion_type
     from {{ ref('quality_measures__int_shared_exclusions_hospice_palliative') }}
     where exclusion_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
@@ -99,7 +98,7 @@ with denominator as (
     select
           patient_id
         , procedure_date as exclusion_date
-        , 'Limited mobility' as exclusion_reason
+        , 'Limited Mobility' as exclusion_reason
     from procedures
     inner join exclusion_code
         on procedures.code = exclusion_code.code
@@ -168,7 +167,7 @@ with denominator as (
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , cast(1 as integer) as exclusion_flag
-    from exclusion_patients
+    from combined_exclusions
 
 )
 

@@ -50,26 +50,6 @@ with denominator as (
 
 )
 
-, conditions as (
-
-    select
-          patient_id
-        , recorded_date
-        , coalesce (
-              normalized_code_type
-            , case
-                when lower(source_code_type) = 'snomed' then 'snomed-ct'
-                else lower(source_code_type)
-              end
-          ) as code_type
-        , coalesce(
-              normalized_code
-            , source_code
-          ) as code
-    from {{ ref('quality_measures__stg_core__condition') }}
-
-)
-
 , qualifying_procedures as (
 
     select
@@ -80,18 +60,6 @@ with denominator as (
         on procedures.code = fallcare_codes.code
             and procedures.code_type = fallcare_codes.code_system
             
-)
-
-, qualifying_conditions as (
-
-    select
-          patient_id
-        , recorded_date as evidence_date
-    from conditions
-    inner join fallcare_codes
-        on conditions.code = fallcare_codes.code
-            and conditions.code_type = fallcare_codes.code_system
-
 )
 
 , qualifying_claims as (
@@ -112,13 +80,6 @@ with denominator as (
           patient_id
         , evidence_date
     from qualifying_procedures
-
-    union all
-
-    select
-          patient_id
-        , evidence_date
-    from qualifying_conditions
 
     union all
 
