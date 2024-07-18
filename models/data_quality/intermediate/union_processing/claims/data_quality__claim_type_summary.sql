@@ -19,6 +19,6 @@ select
     null as claim_count,
     null as paid_amount
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from VALUES(1)
+limit 0
 
 {%- endif %}
