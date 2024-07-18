@@ -4,7 +4,8 @@
 }}
 
 select 
-    encounter_id
+      encounter_id
+    , claim_id
     , patient_id
     , normalized_code
     , '{{ var('tuva_last_run')}}' as tuva_last_run
