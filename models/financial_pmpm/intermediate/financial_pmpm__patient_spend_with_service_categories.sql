@@ -38,7 +38,7 @@ with claims_with_service_categories as (
     , plan
     , 'Pharmacy' as service_category_1
     , cast(null as {{ dbt.type_string() }}) as service_category_2
-    , dispensing_date as claim_date
+    , coalesce(dispensing_date, paid_date) as claim_date
     , paid_amount
     , allowed_amount
     , data_source
