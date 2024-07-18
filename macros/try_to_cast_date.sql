@@ -71,3 +71,10 @@
     try_cast( {{ column_name }} as date )
 
 {%- endmacro -%}
+
+{%- macro athena__try_to_cast_date(column_name, date_format) -%}
+    (case
+        when typeof({{ column_name }}) = 'date' then date({{ column_name }})
+        else try_cast(substring(try_cast({{ column_name }} as varchar), 1, 10) as date)
+    end)
+{%- endmacro -%}
