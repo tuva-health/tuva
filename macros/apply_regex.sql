@@ -33,3 +33,9 @@
      {{ column_name }} similar to '{{ regex }}'
 
 {%- endmacro -%}
+
+{%- macro duckdb__apply_regex(column_name, regex) -%}
+
+    regexp_matches({{ column_name }}, '{{ regex }}')
+
+{%- endmacro -%}
