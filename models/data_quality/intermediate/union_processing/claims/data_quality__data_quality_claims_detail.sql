@@ -6,7 +6,7 @@
 WITH CTE as (
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -22,7 +22,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -38,7 +38,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -54,7 +54,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -70,7 +70,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -86,7 +86,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -102,7 +102,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -118,7 +118,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -134,7 +134,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -150,7 +150,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -166,7 +166,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -182,7 +182,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -198,7 +198,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -214,7 +214,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -230,7 +230,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -246,7 +246,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -262,7 +262,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -278,7 +278,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -294,7 +294,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -310,7 +310,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -326,7 +326,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -342,7 +342,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -358,7 +358,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -374,7 +374,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -390,7 +390,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -406,7 +406,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -422,7 +422,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -438,7 +438,7 @@ union all
 
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -453,7 +453,7 @@ SELECT
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -468,7 +468,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -483,7 +483,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -498,7 +498,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -513,7 +513,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -528,7 +528,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -543,7 +543,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -558,7 +558,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -573,7 +573,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -588,7 +588,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -603,7 +603,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -618,7 +618,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -633,7 +633,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -648,7 +648,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -663,7 +663,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -678,7 +678,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -693,7 +693,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -708,7 +708,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -723,7 +723,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -738,7 +738,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -753,7 +753,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -768,7 +768,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -783,7 +783,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -798,7 +798,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -813,7 +813,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -828,7 +828,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -843,7 +843,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -858,7 +858,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -873,7 +873,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -888,7 +888,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -903,7 +903,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -918,7 +918,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -933,7 +933,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -948,7 +948,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -963,7 +963,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -978,7 +978,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -993,7 +993,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1008,7 +1008,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1023,7 +1023,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1038,7 +1038,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1053,7 +1053,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1068,7 +1068,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1083,7 +1083,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1098,7 +1098,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1113,7 +1113,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1128,7 +1128,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1143,7 +1143,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1158,7 +1158,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1173,7 +1173,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1188,7 +1188,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1203,7 +1203,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1218,7 +1218,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1233,7 +1233,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1248,7 +1248,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1263,7 +1263,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1278,7 +1278,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1293,7 +1293,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1308,7 +1308,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1323,7 +1323,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1338,7 +1338,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1353,7 +1353,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1368,7 +1368,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1383,7 +1383,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1398,7 +1398,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1413,7 +1413,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1428,7 +1428,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1443,7 +1443,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1458,7 +1458,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1473,7 +1473,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1488,7 +1488,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1503,7 +1503,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 union all
 
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
@@ -1519,7 +1519,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 
 -- noinspection SqlNoDataSourceInspection
 SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
-	, cast(source_date as date) as source_date
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
 	, cast(table_name as {{ dbt.type_string() }}) as table_name
 	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
 	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
