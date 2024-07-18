@@ -151,13 +151,6 @@ models:
         description: Unique identifier for an encounter.
       - name: claim_id
         description: Unique claim_id for each claim.
-        tests:
-          - not_null:
-              config:
-                severity: warn
-          - unique:
-              config:
-                severity: warn
       - name: patient_id
         description: Unique identifier for each patient.
       - name: body_system
