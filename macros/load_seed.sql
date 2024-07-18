@@ -179,8 +179,8 @@ FROM (
   {% if env_var('AWS_SESSION_TOKEN', False) %}
   WITH (
     CREDENTIAL (
-      AWS_ACCESS_KEY = "{{ env_var('AWS_ACCESS_KEY') }}",
-      AWS_SECRET_KEY = "{{ env_var('AWS_SECRET_KEY') }}",
+      AWS_ACCESS_KEY = "{{ env_var('AWS_ACCESS_KEY_ID') }}",
+      AWS_SECRET_KEY = "{{ env_var('AWS_SECRET_ACCESS_KEY') }}",
       AWS_SESSION_TOKEN = "{{ env_var('AWS_SESSION_TOKEN') }}"
     )
   )
