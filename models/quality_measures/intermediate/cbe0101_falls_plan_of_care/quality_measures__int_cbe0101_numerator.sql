@@ -95,7 +95,7 @@ with denominator as (
     select
           qualifying_cares.patient_id
         , qualifying_cares.evidence_date
-        , null as evidence_value
+        , cast(null as {{ dbt.type_string() }}) as evidence_value
         , denominator.performance_period_begin
         , denominator.performance_period_end
         , denominator.measure_id
