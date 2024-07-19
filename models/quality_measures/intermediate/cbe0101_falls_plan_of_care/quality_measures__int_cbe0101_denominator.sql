@@ -17,8 +17,15 @@ with visit_codes as (
         , 'occupational therapy evaluation'
         , 'office visit'
         , 'physical therapy evaluation'
-        , 'online assessments'  -- for clinical data sources
-        , 'telephone visits'    -- for clinical data sources
+        , 'online assessments'
+        , 'telephone visits'  
+        , 'care services in long term residential facility'
+        , 'discharge services nursing facility'
+        , 'encounter inpatient'
+        , 'ophthalmological services'
+        , 'preventive care services established office visit, 18 and up'
+        , 'preventive care services individual counseling'
+        , 'preventive care services initial office visit, 18 and up'
     )
 
 )
