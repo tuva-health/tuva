@@ -6,6 +6,7 @@
 select distinct 
   claim_id
 , 'Outpatient Psychiatric' as service_category_2
+, 'Outpatient Psychiatric' as service_category_3
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'

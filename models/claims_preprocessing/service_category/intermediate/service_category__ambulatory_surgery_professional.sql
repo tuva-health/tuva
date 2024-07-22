@@ -6,7 +6,8 @@
 select distinct 
   a.claim_id
 , a.claim_line_number
-, 'Ambulatory Surgery' as service_category_2
+, 'Ambulatory Sugery Center' as service_category_2
+, 'Ambulatory Sugery Center' as service_category_3
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__dme_professional') }} b

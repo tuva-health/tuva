@@ -3,14 +3,7 @@
    )
 }}
 
-with duplicate_bill_types as (
-select distinct
-  claim_id
-, 'Other' as service_category_2
-from {{ ref('service_category__duplicate_bill_types') }}
-)
-
-, combine as (
+with combine as (
 select *
 from {{ ref('service_category__acute_inpatient_institutional') }}
 
@@ -60,18 +53,10 @@ select *
 from {{ ref('service_category__urgent_care_institutional') }}
 )
 
-select
-  claim_id
-, service_category_2
-from duplicate_bill_types
 
-union all
 
 select
   a.claim_id
 , a.service_category_2
+, a.service_category_3
 from combine a
-left join duplicate_bill_types b
-  on a.claim_id = b.claim_id
-where b.claim_id is null
-

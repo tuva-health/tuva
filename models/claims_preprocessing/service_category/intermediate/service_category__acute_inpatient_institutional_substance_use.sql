@@ -1,0 +1,24 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+   )
+}}
+
+
+
+select distinct 
+  a.claim_id
+, 'Substance Use' as service_category_2
+, 'Substance Use' as service_category_3
+, '{{ var('tuva_last_run')}}' as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }} s
+inner join {{ ref('service_category__acute_inpatient_institutional') }} a on s.claim_id = a.claim_id
+where a.facility_primary_taxonomy_code in ('324500000X'
+                                          '261QR0405X'
+                                          '101YA0400X')
+or
+default_ccsr_category_description_ip in ('MBD026'
+                                        ,'SYM008'
+                                        ,'MBD025'
+                                        ,'SYM009'
+                                        ,'MBD034'
+                                        )

@@ -879,7 +879,7 @@ models:
   - name: service_category__stg_medical_claim
     description: Staging med claims for sc grouper
     config:
-      materialized: ephemeral
+      materialized: table # change back
       tags: 
         - service_category_grouper
         - claims_preprocessing
@@ -2076,6 +2076,28 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
       alias: _int_normalized_input_undetermined_claim_type
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: service_category__acute_inpatient_institutional_med_surg
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_acute_inpatient_institutional_med_surg
+      materialized: table
+      tags: 
+        - normalized_input
+        - claims_preprocessing
+
+  - name: service_category__acute_inpatient_institutional_maternity
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_acute_inpatient_institutional_maternity
       materialized: table
       tags: 
         - normalized_input

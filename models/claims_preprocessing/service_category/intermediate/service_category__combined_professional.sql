@@ -82,6 +82,7 @@ select
   claim_id
 , claim_line_number
 , service_category_2
+, service_category_3
 , tuva_last_run
 from {{ ref('service_category__dme_professional') }}
 
@@ -91,6 +92,7 @@ select
   a.claim_id
 , a.claim_line_number
 , a.service_category_2
+, a.service_category_3
 , a.tuva_last_run
 from {{ ref('service_category__ambulance_professional') }} a
 left join {{ ref('service_category__dme_professional') }} b
@@ -104,6 +106,7 @@ select
   a.claim_id
 , a.claim_line_number
 , a.service_category_2
+, a.service_category_3
 , a.tuva_last_run
 from combined a
 left join {{ ref('service_category__dme_professional') }} b
