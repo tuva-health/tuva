@@ -10,5 +10,10 @@ select
     , source_code
     , normalized_code_type
     , normalized_code
+    , modifier_1
+    , modifier_2
+    , modifier_3
+    , modifier_4
+    , modifier_5
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__procedure') }}
