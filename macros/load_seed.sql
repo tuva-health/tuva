@@ -229,11 +229,12 @@ COPY_OPTIONS (
 
 
 
--- postgres - note this requires some pre-work on your part you need to clone
+-- postgres - note this requires some pre-work on your part -  you need to clone
 -- the data from the tuva public resource bucket to re-assemble it into a single
--- file per seed - also ensure you've set the Content-Type system header on each
--- to be gzip (https://stackoverflow.com/a/74439053) otherwise the extension
--- won't know to decompress it.
+-- file per seed with quoted null's unquoted - also ensure you've set the
+-- Content-Type system header on each to be gzip
+-- (https://stackoverflow.com/a/74439053) otherwise the extension won't know to
+-- decompress it.
 --
 -- TODO: revisit removing column list, I think it'll work fine with '' for cols
 {% macro postgres__load_seed(uri,pattern,compression,headers,null_marker) %}
