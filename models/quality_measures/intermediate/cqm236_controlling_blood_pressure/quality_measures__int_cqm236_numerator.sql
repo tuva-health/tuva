@@ -4,7 +4,21 @@
    )
 }}
 
-with denominator as (
+with controlled_bp_codes as (
+
+    select
+          code
+        , code_system
+        , concept_name
+    from {{ ref('quality_measures__value_sets') }}
+    where lower(concept_name) in (
+          'most recent systolic blood pressure < 140 mmhg'  --G8752 hcpcs
+        , 'most recent diastolic blood pressure < 90 mmhg'  --G8754 hcpcs
+    )
+    
+)
+
+, denominator as (
 
     select
           patient_id
@@ -66,6 +80,186 @@ with denominator as (
 
 )
 
+, all_procedures as (
+
+    select
+        patient_id
+      , procedure_date
+      , coalesce (
+              normalized_code_type
+            , case
+                when lower(source_code_type) = 'cpt' then 'hcpcs'
+                when lower(source_code_type) = 'snomed' then 'snomed-ct'
+                else lower(source_code_type)
+              end
+          ) as code_type
+        , coalesce (
+              normalized_code
+            , source_code
+          ) as code
+    from {{ ref('quality_measures__stg_core__procedure') }}
+
+)
+
+, all_medical_claims as (
+    
+    select
+          patient_id
+        , claim_start_date
+        , claim_end_date
+        , hcpcs_code
+    from {{ ref('quality_measures__stg_medical_claim') }}
+
+)
+
+, controlled_bp_procedures as (
+
+    select
+          all_procedures.patient_id
+        , all_procedures.procedure_date as evidence_date
+        , controlled_bp_codes.code
+    from all_procedures
+    inner join controlled_bp_codes
+        on all_procedures.code_type = controlled_bp_codes.code_system
+            and all_procedures.code = controlled_bp_codes.code
+
+)
+
+, controlled_bp_medical_claims as (
+
+    select
+          all_medical_claims.patient_id
+        , coalesce(all_medical_claims.claim_end_date, all_medical_claims.claim_start_date) as evidence_date
+        , controlled_bp_codes.code
+    from all_medical_claims
+    inner join controlled_bp_codes
+        on all_medical_claims.hcpcs_code = controlled_bp_codes.code
+            and controlled_bp_codes.code_system = 'hcpcs'
+
+)
+
+, controlled_bp_patients as (
+
+    select
+          patient_id
+        , evidence_date
+        , code
+    from controlled_bp_procedures
+
+    union all
+    
+    select
+          patient_id
+        , evidence_date
+        , code
+    from controlled_bp_medical_claims
+
+)
+
+, controlled_bp_within_range as (
+
+    select
+          controlled_bp_patients.patient_id
+        , controlled_bp_patients.evidence_date
+        , controlled_bp_patients.code
+        , denominator.measure_id
+        , denominator.measure_name
+        , denominator.measure_version
+        , denominator.performance_period_begin
+        , denominator.performance_period_end
+    from controlled_bp_patients
+    inner join denominator
+        on controlled_bp_patients.patient_id = denominator.patient_id
+            and controlled_bp_patients.evidence_date between
+                denominator.performance_period_begin and denominator.performance_period_end
+
+)
+
+, procedure_claims_w_encounters as (
+
+    select
+          controlled_bp_within_range.patient_id
+        , controlled_bp_within_range.evidence_date
+        , controlled_bp_within_range.code
+        , case
+            when lower(encounters.encounter_type) in (
+                  'emergency department'
+                , 'acute inpatient'
+            )
+            then 0
+            else 1
+          end as is_valid_procedure_claims
+        , controlled_bp_within_range.measure_id
+        , controlled_bp_within_range.measure_name
+        , controlled_bp_within_range.measure_version
+        , controlled_bp_within_range.performance_period_begin
+        , controlled_bp_within_range.performance_period_end
+    from controlled_bp_within_range
+    left join encounters
+        on controlled_bp_within_range.patient_id = encounters.patient_id
+        and controlled_bp_within_range.evidence_date between 
+            encounters.encounter_start_date and encounters.encounter_end_date 
+    
+)
+
+, valid_procedures_and_claims as (
+
+    select
+          patient_id
+        , evidence_date
+        , code
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
+    from procedure_claims_w_encounters
+    where is_valid_procedure_claims = 1
+
+)
+
+, systolic_bp_from_procedure_claims as (
+
+    select
+          patient_id
+        , evidence_date
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
+    from valid_procedures_and_claims
+    where code = 'G8752' --systolic
+
+)
+
+, diastolic_bp_from_procedure_claims as (
+
+    select
+          patient_id
+        , evidence_date
+    from valid_procedures_and_claims
+    where code = 'G8754' --diastolic
+
+)
+
+, qualifying_patients_controlled_bp as (
+
+    select
+          systolic_bp_from_procedure_claims.patient_id
+        , systolic_bp_from_procedure_claims.evidence_date
+        , measure_id
+        , measure_name
+        , measure_version
+        , performance_period_begin
+        , performance_period_end
+    from systolic_bp_from_procedure_claims
+    inner join diastolic_bp_from_procedure_claims
+        on systolic_bp_from_procedure_claims.patient_id = diastolic_bp_from_procedure_claims.patient_id
+            and systolic_bp_from_procedure_claims.evidence_date = diastolic_bp_from_procedure_claims.evidence_date
+
+)
+
 , observations_within_range as (
 
     select
@@ -92,8 +286,7 @@ with denominator as (
     select
           labs.patient_id
         , labs.normalized_code
-        , labs.result_date
-        , labs.collection_date
+        , coalesce(labs.result_date, labs.collection_date) as observation_date
         , labs.result
         , denominator.measure_id
         , denominator.measure_name
@@ -137,6 +330,34 @@ with denominator as (
 
 )
 
+, labs_with_encounters as (
+
+    select
+          labs_within_range.patient_id
+        , labs_within_range.normalized_code
+        , labs_within_range.observation_date
+        , labs_within_range.result
+        , case
+            when lower(encounters.encounter_type) in (
+                  'emergency department'
+                , 'acute inpatient'
+            )
+            then 0
+            else 1
+          end as is_valid_encounter_labs
+        , labs_within_range.measure_id
+        , labs_within_range.measure_name
+        , labs_within_range.measure_version
+        , labs_within_range.performance_period_begin
+        , labs_within_range.performance_period_end
+    from labs_within_range
+    left join encounters
+        on labs_within_range.patient_id = encounters.patient_id
+        and labs_within_range.observation_date between
+            encounters.encounter_start_date and encounters.encounter_end_date
+            
+)
+
 , obs_and_labs as (
 
     select
@@ -157,7 +378,7 @@ with denominator as (
 
     select
           patient_id
-        , coalesce(labs.result_date,collection_date) as observation_date
+        , observation_date
         , cast(result as {{ dbt.type_float() }}) as bp_reading
         , cast(null as {{ dbt.type_string() }}) as normalized_description
         , measure_id
@@ -264,6 +485,19 @@ with denominator as (
             else 0
           end as numerator_flag
     from patients_with_bp_readings
+
+    union all
+
+    select
+          patient_id
+        , evidence_date as observation_date
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
+        , 1 as numerator_flag
+    from qualifying_patients_controlled_bp
 
 )
 
