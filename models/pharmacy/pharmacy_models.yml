@@ -18,8 +18,11 @@ models:
     description: >
       Table that identifies opportunities for generic substitution in pharmacy claims.
     tests:
-      - unique:
-          column_name: "(data_source||'-'||claim_id||'-'||claim_line_number)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - data_source
+            - claim_id
+            - claim_line_number
     columns:
       - name: data_source
         description: Source of the data.
@@ -70,8 +73,10 @@ models:
     description: >
       Provides a list of pharmacy claims where a generic alternative is available, detailing both brand and potential generic drug costs and descriptions.
     tests:
-      - unique:
-          column_name: "(generic_available_sk||'-'||generic_ndc)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - generic_available_sk
+            - generic_ndc
     columns:
       - name: generic_available_sk
         description: Surrogate key for generic availability.
@@ -121,8 +126,11 @@ models:
     description: >
       Expanded view of pharmacy claims with additional details.
     tests:
-      - unique:
-          column_name: "(data_source||'-'||claim_id||'-'||claim_line_number)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - data_source
+            - claim_id
+            - claim_line_number
     columns:
       - name: data_source
         description: Source of the data.
