@@ -11,7 +11,7 @@ SELECT DISTINCT
     ,'ELIGIBILITY' AS CLAIM_TYPE
     ,'DEATH_FLAG' AS FIELD_NAME
     ,CASE
-        WHEN M.DEATH_FLAG in (1,0) THEN 'valid'
+        WHEN M.DEATH_FLAG in ('1','0') THEN 'valid'
         WHEN M.DEATH_FLAG is null then 'null'
         ELSE 'invalid'
         END AS BUCKET_NAME
