@@ -5,12 +5,14 @@
 
 select distinct 
     med.claim_id
-    , 'Observation' as service_category_2
-    , 'Observation' as service_category_3
+    , med.claim_line_number
+    , med.claim_line_id
+    , 'Office-Based Pharmacy' as service_category_2
+    , 'Office-Based Pharmacy' as service_category_3
     ,'{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
-where claim_type = 'institutional'
-and (revenue_center_code in ('0760','0761','0762','0769')
-or hcpcs_code in ('G0378','G0379')
-)
+where claim_type = 'professional'
+and ccs_category = '240' --medications
+and place_of_service_code = '11'
+

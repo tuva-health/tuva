@@ -20,13 +20,17 @@ select distinct
   claim_id
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
-  and substring(bill_type_code, 1, 2) in ('11','12')
+  and substring(bill_type_code, 1, 2) in ('11' -- hospital inpatient 
+  ,'12' --hospital inpatient 
+  ,'21' --SNF inpatient
+  ,'82' --Inpatient Hospice
+  ,'81' --Inpatient Hospice
+  )
 )
 
 select distinct 
   a.claim_id
-, 'Acute Inpatient - Other' as service_category_2
-, 'Acute Inpatient - Other' as service_category_3
+, 'Inpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 inner join bill_type_requirement d
@@ -36,8 +40,7 @@ union distinct
 
 select distinct 
   a.claim_id
-, 'Acute Inpatient - Other' as service_category_2
-, 'Acute Inpatient - Other' as service_category_3
+, 'Inpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 inner join drg_requirement c

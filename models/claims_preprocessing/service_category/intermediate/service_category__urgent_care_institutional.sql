@@ -7,6 +7,7 @@ select distinct
   a.claim_id
 , 'Urgent Care' as service_category_2
 , 'Urgent Care' as service_category_3
+,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__emergency_department_institutional') }} b

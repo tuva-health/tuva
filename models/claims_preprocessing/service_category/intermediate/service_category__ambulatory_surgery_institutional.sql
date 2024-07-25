@@ -7,10 +7,10 @@ select distinct
     med.claim_id
     , 'Ambulatory Sugery Center' as service_category_2
     , 'Ambulatory Sugery Center' as service_category_3
+    , '{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
-left join {{ ref('service_category__acute_inpatient_institutional') }} inpatient
-    on med.claim_id = inpatient.claim_id
-where claim_type = 'institutional'
-and revenue_center_code in ('0490','0499')
-and inpatient.claim_id is null
+inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatient
+    on med.claim_id = outpatient.claim_id
+where revenue_center_code in ('0490','0499')
+

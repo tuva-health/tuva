@@ -5,11 +5,11 @@
 
 select distinct 
   claim_id
-, claim_line_number
 , 'Hospice' as service_category_2
 , 'Hospice' as service_category_3
+,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
-where claim_type = 'professional'
-  and place_of_service_code in ('34')
+where claim_type = 'institutional'
+  and substring(bill_type_code, 1, 2) in ('81','82')
   
