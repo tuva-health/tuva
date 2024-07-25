@@ -1,891 +1,1443 @@
-create schema if not exists terminology;
--- with owner <user>;
-
-
-
-DROP TABLE IF EXISTS terminology.admit_source CASCADE;
-CREATE TABLE terminology.admit_source
-(
-	admit_source_code VARCHAR(256)   ENCODE lzo
-	,admit_source_description VARCHAR(256)   ENCODE lzo
-	,newborn_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.admit_source owner to <User>;
-copy terminology.admit_source
-  from 's3://tuva-public-resources/terminology/admit_source.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.admit_type CASCADE;
-CREATE TABLE terminology.admit_type
-(
-	admit_type_code VARCHAR(256)   ENCODE lzo
-	,admit_type_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.admit_type owner to <User>;
-copy terminology.admit_type
-  from 's3://tuva-public-resources/terminology/admit_type.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.ansi_fips_state CASCADE;
-CREATE TABLE terminology.ansi_fips_state
-(
-	ansi_fips_state_code VARCHAR(256)   ENCODE lzo
-	,ansi_fips_state_abbreviation VARCHAR(256)   ENCODE lzo
-	,ansi_fips_state_name VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.ansi_fips_state owner to <User>;
-copy terminology.ansi_fips_state
-  from 's3://tuva-public-resources/terminology/ansi_fips_state.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.apr_drg CASCADE;
-CREATE TABLE terminology.apr_drg
-(
-	apr_drg_code VARCHAR(256)   ENCODE lzo
-	,severity VARCHAR(256)   ENCODE lzo
-	,apr_drg_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.apr_drg owner to <User>;
-copy terminology.apr_drg
-  from 's3://tuva-public-resources/terminology/apr_drg.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.bill_type CASCADE;
-CREATE TABLE terminology.bill_type
-(
-	bill_type_code VARCHAR(256)   ENCODE lzo
-	,bill_type_description VARCHAR(256)   ENCODE lzo
-	,deprecated INTEGER   ENCODE az64
-	,deprecated_date DATE   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.bill_type owner to <User>;
-copy terminology.bill_type
-  from 's3://tuva-public-resources/terminology/bill_type.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.calendar CASCADE;
-CREATE TABLE terminology.calendar
-(
-	full_date DATE   ENCODE az64
-	,"year" INTEGER   ENCODE az64
-	,"month" INTEGER   ENCODE az64
-	,"day" INTEGER   ENCODE az64
-	,month_name VARCHAR(3)   ENCODE lzo
-	,day_of_week_number INTEGER   ENCODE az64
-	,day_of_week_name VARCHAR(9)   ENCODE lzo
-	,week_of_year INTEGER   ENCODE az64
-	,day_of_year INTEGER   ENCODE az64
-	,year_month VARCHAR(7)   ENCODE lzo
-	,first_day_of_month DATE   ENCODE az64
-	,last_day_of_month DATE   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.calendar owner to <User>;
-copy terminology.calendar
-  from 's3://tuva-public-resources/terminology/calendar.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.claim_type CASCADE;
-CREATE TABLE terminology.claim_type
-(
-	claim_type VARCHAR(13)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.claim_type owner to <User>;
-copy terminology.claim_type
-  from 's3://tuva-public-resources/terminology/claim_type.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.code_type CASCADE;
-CREATE TABLE terminology.code_type
-(
-	code_type VARCHAR(13)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.code_type owner to <User>;
-copy terminology.code_type
-  from 's3://tuva-public-resources/terminology/code_type.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.discharge_disposition CASCADE;
-CREATE TABLE terminology.discharge_disposition
-(
-	discharge_disposition_code VARCHAR(256)   ENCODE lzo
-	,discharge_disposition_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.discharge_disposition owner to <User>;
-copy terminology.discharge_disposition
-  from 's3://tuva-public-resources/terminology/discharge_disposition.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.encounter_type CASCADE;
-CREATE TABLE terminology.encounter_type
-(
-	encounter_type VARCHAR(34)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.encounter_type owner to <User>;
-copy terminology.encounter_type
-  from 's3://tuva-public-resources/terminology/encounter_type.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.ethnicity CASCADE;
-CREATE TABLE terminology.ethnicity
-(
-	code VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.ethnicity owner to <User>;
-copy terminology.ethnicity
-  from 's3://tuva-public-resources/terminology/ethnicity.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.fips_county CASCADE;
-CREATE TABLE terminology.fips_county
-(
-	fips_code VARCHAR(256)   ENCODE lzo
-	,county VARCHAR(256)   ENCODE lzo
-	,state VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.fips_county owner to <User>;
-copy terminology.fips_county
-  from 's3://tuva-public-resources/terminology/fips_county.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.gender CASCADE;
-CREATE TABLE terminology.gender
-(
-	gender VARCHAR(7)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.gender owner to <User>;
-copy terminology.gender
-  from 's3://tuva-public-resources/terminology/gender.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.hcpcs_level_2 CASCADE;
-CREATE TABLE terminology.hcpcs_level_2
-(
-	hcpcs VARCHAR(256)   ENCODE lzo
-	,seqnum VARCHAR(256)   ENCODE lzo
-	,recid VARCHAR(256)   ENCODE lzo
-	,long_description VARCHAR(2000)   ENCODE lzo
-	,short_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.hcpcs_level_2 owner to <User>;
-copy terminology.hcpcs_level_2
-  from 's3://tuva-public-resources/terminology/hcpcs_level_2.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.icd_10_cm CASCADE;
-CREATE TABLE terminology.icd_10_cm
-(
-	icd_10_cm VARCHAR(256)   ENCODE lzo
-	,valid_flag VARCHAR(256)   ENCODE lzo
-	,short_description VARCHAR(256)   ENCODE lzo
-	,long_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.icd_10_cm owner to <User>;
-copy terminology.icd_10_cm
-  from 's3://tuva-public-resources/terminology/icd_10_cm.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.icd_10_pcs CASCADE;
-CREATE TABLE terminology.icd_10_pcs
-(
-	icd_10_pcs VARCHAR(256)   ENCODE lzo
-	,valid_flag VARCHAR(256)   ENCODE lzo
-	,short_description VARCHAR(256)   ENCODE lzo
-	,long_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.icd_10_pcs owner to <User>;
-copy terminology.icd_10_pcs
-  from 's3://tuva-public-resources/terminology/icd_10_pcs.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.icd_9_cm CASCADE;
-CREATE TABLE terminology.icd_9_cm
-(
-	icd_9_cm VARCHAR(256)   ENCODE lzo
-	,long_description VARCHAR(256)   ENCODE lzo
-	,short_description VARCHAR(256)   ENCODE lzo
-
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.icd_9_cm owner to <User>;
-copy terminology.icd_9_cm
-  from 's3://tuva-public-resources/terminology/icd_9_cm.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.mdc CASCADE;
-CREATE TABLE terminology.mdc
-(
-	mdc_code VARCHAR(256)   ENCODE lzo
-	,mdc_description VARCHAR(88)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.mdc owner to <User>;
-copy terminology.mdc
-  from 's3://tuva-public-resources/terminology/mdc.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.medicare_dual_eligibility CASCADE;
-CREATE TABLE terminology.medicare_dual_eligibility
-(
-	dual_status_code VARCHAR(256)   ENCODE lzo
-	,dual_status_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.medicare_dual_eligibility owner to <User>;
-copy terminology.medicare_dual_eligibility
-  from 's3://tuva-public-resources/terminology/medicare_dual_eligibility.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.medicare_status CASCADE;
-CREATE TABLE terminology.medicare_status
-(
-	medicare_status_code VARCHAR(256)   ENCODE lzo
-	,medicare_status_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.medicare_status owner to <User>;
-copy terminology.medicare_status
-  from 's3://tuva-public-resources/terminology/medicare_status.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.ms_drg CASCADE;
-CREATE TABLE terminology.ms_drg
-(
-	ms_drg_code VARCHAR(256)   ENCODE lzo
-	,mdc_code VARCHAR(256)   ENCODE lzo
-	,medical_surgical VARCHAR(256)   ENCODE lzo
-	,ms_drg_description VARCHAR(256)   ENCODE lzo
-	,deprecated INTEGER   ENCODE az64
-	,deprecated_date DATE   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.ms_drg owner to <User>;
-copy terminology.ms_drg
-  from 's3://tuva-public-resources/terminology/ms_drg.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.other_provider_taxonomy CASCADE;
-CREATE TABLE terminology.other_provider_taxonomy
-(
-	npi VARCHAR(35)   ENCODE lzo
-	,taxonomy_code VARCHAR(35)   ENCODE lzo
-	,medicare_specialty_code VARCHAR(173)   ENCODE lzo
-	,description VARCHAR(101)   ENCODE lzo
-	,primary_flag INTEGER   ENCODE az64
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.other_provider_taxonomy owner to <User>;
-copy terminology.other_provider_taxonomy
-  from 's3://tuva-public-resources/terminology/other_provider_taxonomy.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.payer_type CASCADE;
-CREATE TABLE terminology.payer_type
-(
-	payer_type VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.payer_type owner to <User>;
-copy terminology.payer_type
-  from 's3://tuva-public-resources/terminology/payer_type.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.place_of_service CASCADE;
-CREATE TABLE terminology.place_of_service
-(
-	place_of_service_code VARCHAR(256)   ENCODE lzo
-	,place_of_service_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.place_of_service owner to <User>;
-copy terminology.place_of_service
-  from 's3://tuva-public-resources/terminology/place_of_service.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.present_on_admission CASCADE;
-CREATE TABLE terminology.present_on_admission
-(
-	present_on_admit_code VARCHAR(256)   ENCODE lzo
-	,present_on_admit_description VARCHAR(230)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.present_on_admission owner to <User>;
-copy terminology.present_on_admission
-  from 's3://tuva-public-resources/terminology/present_on_admission.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology."provider" CASCADE;
-CREATE TABLE terminology."provider"
-(
-	npi VARCHAR(35)   ENCODE lzo
-	,entity_type_code VARCHAR(26)   ENCODE lzo
-	,entity_type_description VARCHAR(37)   ENCODE lzo
-	,primary_taxonomy_code VARCHAR(35)   ENCODE lzo
-	,primary_specialty_description VARCHAR(173)   ENCODE lzo
-	,provider_name VARCHAR(95)   ENCODE lzo
-	,parent_organization_name VARCHAR(95)   ENCODE lzo
-	,practice_address_line_1 VARCHAR(80)   ENCODE lzo
-	,practice_address_line_2 VARCHAR(80)   ENCODE lzo
-	,practice_city VARCHAR(65)   ENCODE lzo
-	,practice_state VARCHAR(65)   ENCODE lzo
-	,practice_zip_code VARCHAR(42)   ENCODE lzo
-	,last_updated DATE   ENCODE az64
-	,deactivation_date DATE   ENCODE az64
-	,deactivation_flag VARCHAR(80)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology."provider" owner to <User>;
-copy terminology.provider
-  from 's3://tuva-public-resources/terminology/provider.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.race CASCADE;
-CREATE TABLE terminology.race
-(
-	code VARCHAR(6)   ENCODE lzo
-	,description VARCHAR(41)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.race owner to <User>;
-copy terminology.race
-  from 's3://tuva-public-resources/terminology/race.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.revenue_center CASCADE;
-CREATE TABLE terminology.revenue_center
-(
-	revenue_center_code VARCHAR(256)   ENCODE lzo
-	,revenue_center_description VARCHAR(66)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.revenue_center owner to <User>;
-copy terminology.revenue_center
-  from 's3://tuva-public-resources/terminology/revenue_center.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS terminology.ssa_fips_state CASCADE;
-CREATE TABLE terminology.ssa_fips_state
-(
-	ssa_fips_state_code VARCHAR(256)   ENCODE lzo
-	,ssa_fips_state_name VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE terminology.ssa_fips_state owner to <User>;
-copy terminology.ssa_fips_state
-  from 's3://tuva-public-resources/terminology/ssa_fips_state.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-
-create schema if not exists value_sets;
--- with owner <user>;
-
-
-
-DROP TABLE IF EXISTS value_sets.acute_diagnosis_ccs CASCADE;
-CREATE TABLE value_sets.acute_diagnosis_ccs
-(
-	ccs_diagnosis_category VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.acute_diagnosis_ccs owner to <User>;
-copy value_sets.acute_diagnosis_ccs
-  from 's3://tuva-public-resources/value-sets/acute_diagnosis_ccs.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.acute_diagnosis_icd_10_cm CASCADE;
-CREATE TABLE value_sets.acute_diagnosis_icd_10_cm
-(
-	icd_10_cm VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.acute_diagnosis_icd_10_cm owner to <User>;
-copy value_sets.acute_diagnosis_icd_10_cm
-  from 's3://tuva-public-resources/value-sets/acute_diagnosis_icd_10_cm.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.always_planned_ccs_diagnosis_category CASCADE;
-CREATE TABLE value_sets.always_planned_ccs_diagnosis_category
-(
-	ccs_diagnosis_category VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.always_planned_ccs_diagnosis_category owner to <User>;
-copy value_sets.always_planned_ccs_diagnosis_category
-  from 's3://tuva-public-resources/value-sets/always_planned_ccs_diagnosis_category.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.always_planned_ccs_procedure_category CASCADE;
-CREATE TABLE value_sets.always_planned_ccs_procedure_category
-(
-	ccs_procedure_category VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.always_planned_ccs_procedure_category owner to <User>;
-copy value_sets.always_planned_ccs_procedure_category
-  from 's3://tuva-public-resources/value-sets/always_planned_ccs_procedure_category.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.cms_chronic_conditions_hierarchy CASCADE;
-CREATE TABLE value_sets.cms_chronic_conditions_hierarchy
-(
-	condition_id INTEGER   ENCODE az64
-	,condition VARCHAR(81)   ENCODE lzo
-	,condition_column_name VARCHAR(79)   ENCODE lzo
-	,chronic_condition_type VARCHAR(49)   ENCODE lzo
-	,condition_category VARCHAR(25)   ENCODE lzo
-	,additional_logic VARCHAR(248)   ENCODE lzo
-	,claims_qualification VARCHAR(295)   ENCODE lzo
-	,inclusion_type VARCHAR(7)   ENCODE lzo
-	,code_system VARCHAR(10)   ENCODE lzo
-	,code VARCHAR(11)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.cms_chronic_conditions_hierarchy owner to <User>;
-copy value_sets.cms_chronic_conditions_hierarchy
-  from 's3://tuva-public-resources/value-sets/cms_chronic_conditions_hierarchy.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.exclusion_ccs_diagnosis_category CASCADE;
-CREATE TABLE value_sets.exclusion_ccs_diagnosis_category
-(
-	ccs_diagnosis_category VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-	,exclusion_category VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.exclusion_ccs_diagnosis_category owner to <User>;
-copy value_sets.exclusion_ccs_diagnosis_category
-  from 's3://tuva-public-resources/value-sets/exclusion_ccs_diagnosis_category.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.icd_10_cm_to_ccs CASCADE;
-CREATE TABLE value_sets.icd_10_cm_to_ccs
-(
-	icd_10_cm VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-	,ccs_diagnosis_category VARCHAR(256)   ENCODE lzo
-	,ccs_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.icd_10_cm_to_ccs owner to <User>;
-copy value_sets.icd_10_cm_to_ccs
-  from 's3://tuva-public-resources/value-sets/icd_10_cm_to_ccs.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.icd_10_pcs_to_ccs CASCADE;
-CREATE TABLE value_sets.icd_10_pcs_to_ccs
-(
-	icd_10_pcs VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-	,ccs_procedure_category VARCHAR(256)   ENCODE lzo
-	,ccs_description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.icd_10_pcs_to_ccs owner to <User>;
-copy value_sets.icd_10_pcs_to_ccs
-  from 's3://tuva-public-resources/value-sets/icd_10_pcs_to_ccs.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.potentially_planned_ccs_procedure_category CASCADE;
-CREATE TABLE value_sets.potentially_planned_ccs_procedure_category
-(
-	ccs_procedure_category VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.potentially_planned_ccs_procedure_category owner to <User>;
-copy value_sets.potentially_planned_ccs_procedure_category
-  from 's3://tuva-public-resources/value-sets/potentially_planned_ccs_procedure_category.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.potentially_planned_icd_10_pcs CASCADE;
-CREATE TABLE value_sets.potentially_planned_icd_10_pcs
-(
-	icd_10_pcs VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.potentially_planned_icd_10_pcs owner to <User>;
-copy value_sets.potentially_planned_icd_10_pcs
-  from 's3://tuva-public-resources/value-sets/potentially_planned_icd_10_pcs.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.service_category CASCADE;
-CREATE TABLE value_sets.service_category
-(
-	service_category_1 VARCHAR(256)   ENCODE lzo
-	,service_category_2 VARCHAR(256)   ENCODE lzo
-	,claim_type VARCHAR(256)   ENCODE lzo
-	,hcpcs_code VARCHAR(256)   ENCODE lzo
-	,bill_type_code_first_2_digits VARCHAR(256)   ENCODE lzo
-	,revenue_center_code VARCHAR(256)   ENCODE lzo
-	,valid_drg_flag VARCHAR(256)   ENCODE lzo
-	,place_of_service_code VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.service_category owner to <User>;
-copy value_sets.service_category
-  from 's3://tuva-public-resources/value-sets/service_category.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.specialty_cohort CASCADE;
-CREATE TABLE value_sets.specialty_cohort
-(
-	ccs VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-	,specialty_cohort VARCHAR(256)   ENCODE lzo
-	,procedure_or_diagnosis VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.specialty_cohort owner to <User>;
-copy value_sets.specialty_cohort
-  from 's3://tuva-public-resources/value-sets/specialty_cohort.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.surgery_gynecology_cohort CASCADE;
-CREATE TABLE value_sets.surgery_gynecology_cohort
-(
-	icd_10_pcs VARCHAR(256)   ENCODE lzo
-	,description VARCHAR(256)   ENCODE lzo
-	,ccs_code_and_description VARCHAR(256)   ENCODE lzo
-	,specialty_cohort VARCHAR(256)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.surgery_gynecology_cohort owner to <User>;
-copy value_sets.surgery_gynecology_cohort
-  from 's3://tuva-public-resources/value-sets/surgery_gynecology_cohort.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
-
-
-
-DROP TABLE IF EXISTS value_sets.tuva_chronic_conditions_hierarchy CASCADE;
-CREATE TABLE value_sets.tuva_chronic_conditions_hierarchy
-(
-	condition_family VARCHAR(26)   ENCODE lzo
-	,condition VARCHAR(47)   ENCODE lzo
-	,icd_10_cm_code VARCHAR(7)   ENCODE lzo
-	,icd_10_cm_description VARCHAR(225)   ENCODE lzo
-	,condition_column_name VARCHAR(40)   ENCODE lzo
-)
-DISTSTYLE AUTO
-;
--- ALTER TABLE value_sets.tuva_chronic_conditions_hierarchy owner to <User>;
-copy value_sets.tuva_chronic_conditions_hierarchy
-  from 's3://tuva-public-resources/value-sets/tuva_chronic_conditions_hierarchy.csv'
-  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
-  secret_access_key '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'
-  csv
-  gzip
-  region 'us-east-1';
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ADMIT_SOURCE CASCADE;
+CREATE TABLE terminology.ADMIT_SOURCE (
+	ADMIT_SOURCE_CODE varchar,
+	ADMIT_SOURCE_DESCRIPTION varchar,
+	NEWBORN_DESCRIPTION varchar
+);
+COPY terminology.ADMIT_SOURCE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/admit_source.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ADMIT_TYPE CASCADE;
+CREATE TABLE terminology.ADMIT_TYPE (
+	ADMIT_TYPE_CODE varchar,
+	ADMIT_TYPE_DESCRIPTION varchar
+);
+COPY terminology.ADMIT_TYPE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/admit_type.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.APR_DRG CASCADE;
+CREATE TABLE terminology.APR_DRG (
+	APR_DRG_CODE varchar,
+	MEDICAL_SURGICAL varchar,
+	MDC_CODE varchar,
+	APR_DRG_DESCRIPTION varchar
+);
+COPY terminology.APR_DRG
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/apr_drg.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.BILL_TYPE CASCADE;
+CREATE TABLE terminology.BILL_TYPE (
+	BILL_TYPE_CODE varchar,
+	BILL_TYPE_DESCRIPTION varchar,
+	DEPRECATED integer,
+	DEPRECATED_DATE date
+);
+COPY terminology.BILL_TYPE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/bill_type.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.CLAIM_TYPE CASCADE;
+CREATE TABLE terminology.CLAIM_TYPE (
+	CLAIM_TYPE varchar
+);
+COPY terminology.CLAIM_TYPE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/claim_type.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.DISCHARGE_DISPOSITION CASCADE;
+CREATE TABLE terminology.DISCHARGE_DISPOSITION (
+	DISCHARGE_DISPOSITION_CODE varchar,
+	DISCHARGE_DISPOSITION_DESCRIPTION varchar
+);
+COPY terminology.DISCHARGE_DISPOSITION
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/discharge_disposition.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ENCOUNTER_TYPE CASCADE;
+CREATE TABLE terminology.ENCOUNTER_TYPE (
+	ENCOUNTER_TYPE varchar
+);
+COPY terminology.ENCOUNTER_TYPE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/encounter_type.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ETHNICITY CASCADE;
+CREATE TABLE terminology.ETHNICITY (
+	CODE varchar,
+	DESCRIPTION varchar
+);
+COPY terminology.ETHNICITY
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/ethnicity.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.GENDER CASCADE;
+CREATE TABLE terminology.GENDER (
+	GENDER varchar
+);
+COPY terminology.GENDER
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/gender.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.HCPCS_LEVEL_2 CASCADE;
+CREATE TABLE terminology.HCPCS_LEVEL_2 (
+	HCPCS varchar,
+	SEQNUM varchar,
+	RECID varchar,
+	LONG_DESCRIPTION varchar(2000),
+	SHORT_DESCRIPTION varchar
+);
+COPY terminology.HCPCS_LEVEL_2
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/hcpcs_level_2.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ICD_9_CM CASCADE;
+CREATE TABLE terminology.ICD_9_CM (
+	ICD_9_CM varchar,
+	LONG_DESCRIPTION varchar,
+	SHORT_DESCRIPTION varchar
+);
+COPY terminology.ICD_9_CM
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/icd_9_cm.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ICD_9_PCS CASCADE;
+CREATE TABLE terminology.ICD_9_PCS (
+	ICD_9_PCS varchar,
+	LONG_DESCRIPTION varchar,
+	SHORT_DESCRIPTION varchar
+);
+COPY terminology.ICD_9_PCS
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/icd_9_pcs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ICD_10_CM CASCADE;
+CREATE TABLE terminology.ICD_10_CM (
+	ICD_10_CM varchar,
+	HEADER_FLAG varchar,
+	SHORT_DESCRIPTION varchar,
+	LONG_DESCRIPTION varchar
+);
+COPY terminology.ICD_10_CM
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/icd_10_cm.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.ICD_10_PCS CASCADE;
+CREATE TABLE terminology.ICD_10_PCS (
+	ICD_10_PCS varchar,
+	DESCRIPTION varchar
+);
+COPY terminology.ICD_10_PCS
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/icd_10_pcs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.LOINC CASCADE;
+CREATE TABLE terminology.LOINC (
+	LOINC varchar,
+	SHORT_NAME varchar,
+	LONG_COMMON_NAME varchar,
+	COMPONENT varchar,
+	PROPERTY varchar,
+	TIME_ASPECT varchar,
+	"system" varchar,
+	SCALE_TYPE varchar,
+	METHOD_TYPE varchar,
+	CLASS_CODE varchar,
+	CLASS_DESCRIPTION varchar,
+	CLASS_TYPE_CODE varchar,
+	CLASS_TYPE_DESCRIPTION varchar,
+	EXTERNAL_COPYRIGHT_NOTICE varchar(3000),
+	STATUS varchar,
+	VERSION_FIRST_RELEASED varchar,
+	VERSION_LAST_CHANGED varchar
+);
+COPY terminology.LOINC
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/loinc.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.LOINC_DEPRECATED_MAPPING CASCADE;
+CREATE TABLE terminology.LOINC_DEPRECATED_MAPPING (
+	LOINC varchar,
+	MAP_TO varchar,
+	COMMENT varchar,
+	FINAL_MAP_TO varchar,
+	ALL_COMMENTS varchar,
+	DEPTH varchar
+);
+COPY terminology.LOINC_DEPRECATED_MAPPING
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/loinc_deprecated_mapping.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.MDC CASCADE;
+CREATE TABLE terminology.MDC (
+	MDC_CODE varchar,
+	MDC_DESCRIPTION varchar
+);
+COPY terminology.MDC
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/mdc.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.MEDICARE_DUAL_ELIGIBILITY CASCADE;
+CREATE TABLE terminology.MEDICARE_DUAL_ELIGIBILITY (
+	DUAL_STATUS_CODE varchar,
+	DUAL_STATUS_DESCRIPTION varchar
+);
+COPY terminology.MEDICARE_DUAL_ELIGIBILITY
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/medicare_dual_eligibility.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.MEDICARE_OREC CASCADE;
+CREATE TABLE terminology.MEDICARE_OREC (
+	ORIGINAL_REASON_ENTITLEMENT_CODE varchar,
+	ORIGINAL_REASON_ENTITLEMENT_DESCRIPTION varchar
+);
+COPY terminology.MEDICARE_OREC
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/medicare_orec.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.MEDICARE_STATUS CASCADE;
+CREATE TABLE terminology.MEDICARE_STATUS (
+	MEDICARE_STATUS_CODE varchar,
+	MEDICARE_STATUS_DESCRIPTION varchar
+);
+COPY terminology.MEDICARE_STATUS
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/medicare_status.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.MS_DRG CASCADE;
+CREATE TABLE terminology.MS_DRG (
+	MS_DRG_CODE varchar,
+	MDC_CODE varchar,
+	MEDICAL_SURGICAL varchar,
+	MS_DRG_DESCRIPTION varchar,
+	DEPRECATED integer,
+	DEPRECATED_DATE date
+);
+COPY terminology.MS_DRG
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/ms_drg.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.NDC CASCADE;
+CREATE TABLE terminology.NDC (
+	NDC varchar,
+	RXCUI varchar,
+	RXNORM_DESCRIPTION varchar(3000),
+	FDA_DESCRIPTION varchar(3000)
+);
+COPY terminology.NDC
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/ndc.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.OTHER_PROVIDER_TAXONOMY CASCADE;
+CREATE TABLE terminology.OTHER_PROVIDER_TAXONOMY (
+	NPI varchar(35),
+	TAXONOMY_CODE varchar(35),
+	MEDICARE_SPECIALTY_CODE varchar(173),
+	DESCRIPTION varchar(101),
+	PRIMARY_FLAG integer
+);
+COPY terminology.OTHER_PROVIDER_TAXONOMY
+FROM 's3://tuva-public-resources/versioned_provider_data/0.10.1/other_provider_taxonomy.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.PAYER_TYPE CASCADE;
+CREATE TABLE terminology.PAYER_TYPE (
+	PAYER_TYPE varchar
+);
+COPY terminology.PAYER_TYPE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/payer_type.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.PLACE_OF_SERVICE CASCADE;
+CREATE TABLE terminology.PLACE_OF_SERVICE (
+	PLACE_OF_SERVICE_CODE varchar,
+	PLACE_OF_SERVICE_DESCRIPTION varchar
+);
+COPY terminology.PLACE_OF_SERVICE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/place_of_service.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.PRESENT_ON_ADMISSION CASCADE;
+CREATE TABLE terminology.PRESENT_ON_ADMISSION (
+	PRESENT_ON_ADMIT_CODE varchar,
+	PRESENT_ON_ADMIT_DESCRIPTION varchar
+);
+COPY terminology.PRESENT_ON_ADMISSION
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/present_on_admission.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.PROVIDER CASCADE;
+CREATE TABLE terminology.PROVIDER (
+	NPI varchar(35),
+	ENTITY_TYPE_CODE varchar(26),
+	ENTITY_TYPE_DESCRIPTION varchar(37),
+	PRIMARY_TAXONOMY_CODE varchar(35),
+	PRIMARY_SPECIALTY_DESCRIPTION varchar(173),
+	PROVIDER_FIRST_NAME varchar(95),
+	PROVIDER_LAST_NAME varchar(95),
+	PROVIDER_ORGANIZATION_NAME varchar(95),
+	PARENT_ORGANIZATION_NAME varchar(95),
+	PRACTICE_ADDRESS_LINE_1 varchar(80),
+	PRACTICE_ADDRESS_LINE_2 varchar(80),
+	PRACTICE_CITY varchar(65),
+	PRACTICE_STATE varchar(65),
+	PRACTICE_ZIP_CODE varchar(42),
+	LAST_UPDATED date,
+	DEACTIVATION_DATE date,
+	DEACTIVATION_FLAG varchar(80)
+);
+COPY terminology.PROVIDER
+FROM 's3://tuva-public-resources/versioned_provider_data/0.10.1/provider.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.RACE CASCADE;
+CREATE TABLE terminology.RACE (
+	CODE varchar,
+	DESCRIPTION varchar
+);
+COPY terminology.RACE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/race.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.REVENUE_CENTER CASCADE;
+CREATE TABLE terminology.REVENUE_CENTER (
+	REVENUE_CENTER_CODE varchar,
+	REVENUE_CENTER_DESCRIPTION varchar
+);
+COPY terminology.REVENUE_CENTER
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/revenue_center.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.RXNORM_TO_ATC CASCADE;
+CREATE TABLE terminology.RXNORM_TO_ATC (
+	RXCUI varchar,
+	RXNORM_DESCRIPTION varchar(3000),
+	ATC_1_CODE varchar,
+	ATC_1_NAME varchar,
+	ATC_2_CODE varchar,
+	ATC_2_NAME varchar,
+	ATC_3_CODE varchar,
+	ATC_3_NAME varchar,
+	ATC_4_CODE varchar,
+	ATC_4_NAME varchar
+);
+COPY terminology.RXNORM_TO_ATC
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/rxnorm_to_atc.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.SNOMED_ICD_10_MAP CASCADE;
+CREATE TABLE terminology.SNOMED_ICD_10_MAP (
+	ID varchar,
+	EFFECTIVE_TIME varchar,
+	ACTIVE varchar,
+	MODULE_ID varchar,
+	REF_SET_ID varchar,
+	REFERENCED_COMPONENT_ID varchar,
+	REFERENCED_COMPONENT_NAME varchar,
+	MAP_GROUP varchar,
+	MAP_PRIORITY varchar,
+	MAP_RULE varchar(500),
+	MAP_ADVICE varchar(500),
+	MAP_TARGET varchar,
+	MAP_TARGET_NAME varchar,
+	CORRELATION_ID varchar,
+	MAP_CATEGORY_ID varchar,
+	MAP_CATEGORY_NAME varchar
+);
+COPY terminology.SNOMED_ICD_10_MAP
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/snomed_icd_10_map.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.SNOMED_CT CASCADE;
+CREATE TABLE terminology.SNOMED_CT (
+	SNOMED_CT varchar,
+	DESCRIPTION varchar,
+	IS_ACTIVE varchar,
+	CREATED date,
+	LAST_UPDATED date
+);
+COPY terminology.SNOMED_CT
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/snomed_ct.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.SNOMED_CT_TRANSITIVE_CLOSURES CASCADE;
+CREATE TABLE terminology.SNOMED_CT_TRANSITIVE_CLOSURES (
+	PARENT_SNOMED_CODE varchar,
+	PARENT_DESCRIPTION varchar,
+	CHILD_SNOMED_CODE varchar,
+	CHILD_DESCRIPTION varchar
+);
+COPY terminology.SNOMED_CT_TRANSITIVE_CLOSURES
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/snomed_ct_transitive_closures.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS terminology;
+DROP TABLE IF EXISTS terminology.RXNORM_BRAND_GENERIC CASCADE;
+CREATE TABLE terminology.RXNORM_BRAND_GENERIC (
+	PRODUCT_RXCUI varchar,
+	PRODUCT_NAME varchar(3000),
+	PRODUCT_TTY varchar,
+	BRAND_VS_GENERIC varchar,
+	BRAND_NAME varchar(1000),
+	CLINICAL_PRODUCT_RXCUI varchar,
+	CLINICAL_PRODUCT_NAME varchar(3000),
+	CLINICAL_PRODUCT_TTY varchar,
+	INGREDIENT_NAME varchar(3000),
+	DOSE_FORM_NAME varchar
+);
+COPY terminology.RXNORM_BRAND_GENERIC
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/rxnorm_brand_generic.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS clinical_concept_library;
+DROP TABLE IF EXISTS clinical_concept_library.CLINICAL_CONCEPTS CASCADE;
+CREATE TABLE clinical_concept_library.CLINICAL_CONCEPTS (
+	CONCEPT_ID varchar,
+	CONCEPT_NAME varchar,
+	STATUS varchar,
+	CONCEPT_OID varchar,
+	LAST_UPDATE_DATE date,
+	LAST_UPDATE_NOTE varchar,
+	CONCEPT_TYPE varchar,
+	CONTENT_SOURCE varchar(3000),
+	EXTERNAL_SOURCE_DETAIL varchar(3000),
+	CONCEPT_SCOPE varchar(3000),
+	VALUE_SET_SEARCH_NOTES varchar(3000),
+	CODE varchar,
+	CODE_DESCRIPTION varchar,
+	CODING_SYSTEM_ID varchar,
+	CODING_SYSTEM_VERSION varchar
+);
+COPY clinical_concept_library.CLINICAL_CONCEPTS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/tuva_clinical_concepts.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS clinical_concept_library;
+DROP TABLE IF EXISTS clinical_concept_library.VALUE_SET_MEMBERS CASCADE;
+CREATE TABLE clinical_concept_library.VALUE_SET_MEMBERS (
+	VALUE_SET_MEMBER_ID varchar,
+	CONCEPT_ID varchar,
+	STATUS varchar,
+	LAST_UPDATE_DATE date,
+	LAST_UPDATE_NOTE varchar,
+	CODE varchar,
+	CODE_DESCRIPTION varchar(2000),
+	CODING_SYSTEM_ID varchar,
+	CODING_SYSTEM_VERSION varchar,
+	INCLUDE_DESCENDANTS varchar,
+	COMMENT varchar(2000)
+);
+COPY clinical_concept_library.VALUE_SET_MEMBERS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/tuva_value_set_members.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS clinical_concept_library;
+DROP TABLE IF EXISTS clinical_concept_library.CODING_SYSTEMS CASCADE;
+CREATE TABLE clinical_concept_library.CODING_SYSTEMS (
+	CODING_SYSTEM_ID varchar,
+	CODING_SYSTEM_NAME varchar,
+	CODING_SYSTEM_URI varchar,
+	CODING_SYSTEM_OID varchar
+);
+COPY clinical_concept_library.CODING_SYSTEMS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/tuva_coding_systems.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS pharmacy;
+DROP TABLE IF EXISTS pharmacy.RXNORM_GENERIC_AVAILABLE CASCADE;
+CREATE TABLE pharmacy.RXNORM_GENERIC_AVAILABLE (
+	PRODUCT_TTY varchar,
+	PRODUCT_RXCUI varchar,
+	PRODUCT_NAME varchar(3000),
+	NDC_PRODUCT_TTY varchar,
+	NDC_PRODUCT_RXCUI varchar,
+	NDC_PRODUCT_NAME varchar(3000),
+	NDC varchar,
+	PRODUCT_STARTMARKETINGDATE date,
+	PACKAGE_STARTMARKETINGDATE date
+);
+COPY pharmacy.RXNORM_GENERIC_AVAILABLE
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/rxnorm_generic_available.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS data_quality;
+DROP TABLE IF EXISTS data_quality._VALUE_SET_CROSSWALK_FIELD_INFO CASCADE;
+CREATE TABLE data_quality._VALUE_SET_CROSSWALK_FIELD_INFO (
+	INPUT_LAYER_TABLE_NAME varchar,
+	CLAIM_TYPE varchar,
+	FIELD_NAME varchar,
+	RED integer,
+	GREEN integer,
+	UNIQUE_VALUES_EXPECTED_FLAG integer
+);
+COPY data_quality._VALUE_SET_CROSSWALK_FIELD_INFO
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/data_quality_crosswalk_field_info.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS data_quality;
+DROP TABLE IF EXISTS data_quality._VALUE_SET_CROSSWALK_FIELD_TO_MART CASCADE;
+CREATE TABLE data_quality._VALUE_SET_CROSSWALK_FIELD_TO_MART (
+	INPUT_LAYER_TABLE_NAME varchar,
+	CLAIM_TYPE varchar,
+	FIELD_NAME varchar,
+	MART_NAME varchar
+);
+COPY data_quality._VALUE_SET_CROSSWALK_FIELD_TO_MART
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/data_quality_crosswalk_field_to_mart.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS data_quality;
+DROP TABLE IF EXISTS data_quality._VALUE_SET_CROSSWALK_MART_TO_OUTCOME_MEASURE CASCADE;
+CREATE TABLE data_quality._VALUE_SET_CROSSWALK_MART_TO_OUTCOME_MEASURE (
+	MART_NAME varchar,
+	MEASURE_NAME varchar
+);
+COPY data_quality._VALUE_SET_CROSSWALK_MART_TO_OUTCOME_MEASURE
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/data_quality_crosswalk_mart_to_outcome_measure.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS data_quality;
+DROP TABLE IF EXISTS data_quality._VALUE_SET_CROSSWALK_MEASURE_REASONABLE_RANGES CASCADE;
+CREATE TABLE data_quality._VALUE_SET_CROSSWALK_MEASURE_REASONABLE_RANGES (
+	MEASURE_NAME varchar,
+	PAYER_TYPE varchar,
+	LOWER_BOUND float,
+	UPPER_BOUND float
+);
+COPY data_quality._VALUE_SET_CROSSWALK_MEASURE_REASONABLE_RANGES
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/data_quality_crosswalk_measure_reasonable_ranges.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS claims_preprocessing;
+DROP TABLE IF EXISTS claims_preprocessing._VALUE_SET_SERVICE_CATEGORIES CASCADE;
+CREATE TABLE claims_preprocessing._VALUE_SET_SERVICE_CATEGORIES (
+	SERVICE_CATEGORY_1 varchar,
+	SERVICE_CATEGORY_2 varchar
+);
+COPY claims_preprocessing._VALUE_SET_SERVICE_CATEGORIES
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/service_category_service_categories.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ed_classification;
+DROP TABLE IF EXISTS ed_classification._VALUE_SET_CATEGORIES CASCADE;
+CREATE TABLE ed_classification._VALUE_SET_CATEGORIES (
+	CLASSIFICATION varchar,
+	CLASSIFICATION_NAME varchar,
+	CLASSIFICATION_ORDER varchar,
+	CLASSIFICATION_COLUMN varchar
+);
+COPY ed_classification._VALUE_SET_CATEGORIES
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/ed_classification_categories.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ed_classification;
+DROP TABLE IF EXISTS ed_classification._VALUE_SET_ICD_10_CM_TO_CCS CASCADE;
+CREATE TABLE ed_classification._VALUE_SET_ICD_10_CM_TO_CCS (
+	ICD_10_CM varchar,
+	DESCRIPTION varchar,
+	CCS_DIAGNOSIS_CATEGORY varchar,
+	CCS_DESCRIPTION varchar
+);
+COPY ed_classification._VALUE_SET_ICD_10_CM_TO_CCS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/icd_10_cm_to_ccs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ed_classification;
+DROP TABLE IF EXISTS ed_classification._VALUE_SET_JOHNSTON_ICD9 CASCADE;
+CREATE TABLE ed_classification._VALUE_SET_JOHNSTON_ICD9 (
+	ICD9 varchar,
+	EDCNNPA varchar,
+	EDCNPA varchar,
+	EPCT varchar,
+	NONER varchar,
+	INJURY varchar,
+	PSYCH varchar,
+	ALCOHOL varchar,
+	DRUG varchar
+);
+COPY ed_classification._VALUE_SET_JOHNSTON_ICD9
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/johnston_icd9.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ed_classification;
+DROP TABLE IF EXISTS ed_classification._VALUE_SET_JOHNSTON_ICD10 CASCADE;
+CREATE TABLE ed_classification._VALUE_SET_JOHNSTON_ICD10 (
+	ICD10 varchar,
+	EDCNNPA varchar,
+	EDCNPA varchar,
+	NONER varchar,
+	EPCT varchar,
+	INJURY varchar,
+	PSYCH varchar,
+	ALCOHOL varchar,
+	DRUG varchar
+);
+COPY ed_classification._VALUE_SET_JOHNSTON_ICD10
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/johnston_icd10.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_ACUTE_DIAGNOSIS_CCS CASCADE;
+CREATE TABLE readmissions._VALUE_SET_ACUTE_DIAGNOSIS_CCS (
+	CCS_DIAGNOSIS_CATEGORY varchar,
+	DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_ACUTE_DIAGNOSIS_CCS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/acute_diagnosis_ccs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_ACUTE_DIAGNOSIS_ICD_10_CM CASCADE;
+CREATE TABLE readmissions._VALUE_SET_ACUTE_DIAGNOSIS_ICD_10_CM (
+	ICD_10_CM varchar,
+	DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_ACUTE_DIAGNOSIS_ICD_10_CM
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/acute_diagnosis_icd_10_cm.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_ALWAYS_PLANNED_CCS_DIAGNOSIS_CATEGORY CASCADE;
+CREATE TABLE readmissions._VALUE_SET_ALWAYS_PLANNED_CCS_DIAGNOSIS_CATEGORY (
+	CCS_DIAGNOSIS_CATEGORY varchar,
+	DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_ALWAYS_PLANNED_CCS_DIAGNOSIS_CATEGORY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/always_planned_ccs_diagnosis_category.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_ALWAYS_PLANNED_CCS_PROCEDURE_CATEGORY CASCADE;
+CREATE TABLE readmissions._VALUE_SET_ALWAYS_PLANNED_CCS_PROCEDURE_CATEGORY (
+	CCS_PROCEDURE_CATEGORY varchar,
+	DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_ALWAYS_PLANNED_CCS_PROCEDURE_CATEGORY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/always_planned_ccs_procedure_category.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_EXCLUSION_CCS_DIAGNOSIS_CATEGORY CASCADE;
+CREATE TABLE readmissions._VALUE_SET_EXCLUSION_CCS_DIAGNOSIS_CATEGORY (
+	CCS_DIAGNOSIS_CATEGORY varchar,
+	DESCRIPTION varchar,
+	EXCLUSION_CATEGORY varchar
+);
+COPY readmissions._VALUE_SET_EXCLUSION_CCS_DIAGNOSIS_CATEGORY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/exclusion_ccs_diagnosis_category.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_ICD_10_CM_TO_CCS CASCADE;
+CREATE TABLE readmissions._VALUE_SET_ICD_10_CM_TO_CCS (
+	ICD_10_CM varchar,
+	DESCRIPTION varchar,
+	CCS_DIAGNOSIS_CATEGORY varchar,
+	CCS_DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_ICD_10_CM_TO_CCS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/icd_10_cm_to_ccs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_ICD_10_PCS_TO_CCS CASCADE;
+CREATE TABLE readmissions._VALUE_SET_ICD_10_PCS_TO_CCS (
+	ICD_10_PCS varchar,
+	DESCRIPTION varchar,
+	CCS_PROCEDURE_CATEGORY varchar,
+	CCS_DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_ICD_10_PCS_TO_CCS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/icd_10_pcs_to_ccs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_POTENTIALLY_PLANNED_CCS_PROCEDURE_CATEGORY CASCADE;
+CREATE TABLE readmissions._VALUE_SET_POTENTIALLY_PLANNED_CCS_PROCEDURE_CATEGORY (
+	CCS_PROCEDURE_CATEGORY varchar,
+	DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_POTENTIALLY_PLANNED_CCS_PROCEDURE_CATEGORY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/potentially_planned_ccs_procedure_category.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_POTENTIALLY_PLANNED_ICD_10_PCS CASCADE;
+CREATE TABLE readmissions._VALUE_SET_POTENTIALLY_PLANNED_ICD_10_PCS (
+	ICD_10_PCS varchar,
+	DESCRIPTION varchar
+);
+COPY readmissions._VALUE_SET_POTENTIALLY_PLANNED_ICD_10_PCS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/potentially_planned_icd_10_pcs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_SPECIALTY_COHORT CASCADE;
+CREATE TABLE readmissions._VALUE_SET_SPECIALTY_COHORT (
+	CCS varchar,
+	DESCRIPTION varchar,
+	SPECIALTY_COHORT varchar,
+	PROCEDURE_OR_DIAGNOSIS varchar
+);
+COPY readmissions._VALUE_SET_SPECIALTY_COHORT
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/specialty_cohort.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS readmissions;
+DROP TABLE IF EXISTS readmissions._VALUE_SET_SURGERY_GYNECOLOGY_COHORT CASCADE;
+CREATE TABLE readmissions._VALUE_SET_SURGERY_GYNECOLOGY_COHORT (
+	ICD_10_PCS varchar,
+	DESCRIPTION varchar,
+	CCS_CODE_AND_DESCRIPTION varchar,
+	SPECIALTY_COHORT varchar
+);
+COPY readmissions._VALUE_SET_SURGERY_GYNECOLOGY_COHORT
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/surgery_gynecology_cohort.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_ADJUSTMENT_RATES CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_ADJUSTMENT_RATES (
+	MODEL_VERSION varchar,
+	PAYMENT_YEAR integer,
+	NORMALIZATION_FACTOR float,
+	MA_CODING_PATTERN_ADJUSTMENT float
+);
+COPY cms_hcc._VALUE_SET_ADJUSTMENT_RATES
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_adjustment_rates.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_CPT_HCPCS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_CPT_HCPCS (
+	PAYMENT_YEAR integer,
+	HCPCS_CPT_CODE varchar,
+	INCLUDED_FLAG varchar
+);
+COPY cms_hcc._VALUE_SET_CPT_HCPCS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_cpt_hcpcs.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_DEMOGRAPHIC_FACTORS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_DEMOGRAPHIC_FACTORS (
+	MODEL_VERSION varchar,
+	FACTOR_TYPE varchar,
+	ENROLLMENT_STATUS varchar,
+	PLAN_SEGMENT varchar,
+	GENDER varchar,
+	AGE_GROUP varchar,
+	MEDICAID_STATUS varchar,
+	DUAL_STATUS varchar,
+	OREC varchar,
+	INSTITUTIONAL_STATUS varchar,
+	COEFFICIENT float
+);
+COPY cms_hcc._VALUE_SET_DEMOGRAPHIC_FACTORS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_demographic_factors.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_DISABLED_INTERACTION_FACTORS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_DISABLED_INTERACTION_FACTORS (
+	MODEL_VERSION varchar,
+	FACTOR_TYPE varchar,
+	ENROLLMENT_STATUS varchar,
+	INSTITUTIONAL_STATUS varchar,
+	SHORT_NAME varchar,
+	DESCRIPTION varchar,
+	HCC_CODE varchar,
+	COEFFICIENT float
+);
+COPY cms_hcc._VALUE_SET_DISABLED_INTERACTION_FACTORS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_disabled_interaction_factors.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_DISEASE_FACTORS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_DISEASE_FACTORS (
+	MODEL_VERSION varchar,
+	FACTOR_TYPE varchar,
+	ENROLLMENT_STATUS varchar,
+	MEDICAID_STATUS varchar,
+	DUAL_STATUS varchar,
+	OREC varchar,
+	INSTITUTIONAL_STATUS varchar,
+	HCC_CODE varchar,
+	DESCRIPTION varchar,
+	COEFFICIENT float
+);
+COPY cms_hcc._VALUE_SET_DISEASE_FACTORS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_disease_factors.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_DISEASE_HIERARCHY CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_DISEASE_HIERARCHY (
+	MODEL_VERSION varchar,
+	HCC_CODE varchar,
+	DESCRIPTION varchar,
+	HCCS_TO_EXCLUDE varchar
+);
+COPY cms_hcc._VALUE_SET_DISEASE_HIERARCHY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_disease_hierarchy.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_DISEASE_INTERACTION_FACTORS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_DISEASE_INTERACTION_FACTORS (
+	MODEL_VERSION varchar,
+	FACTOR_TYPE varchar,
+	ENROLLMENT_STATUS varchar,
+	MEDICAID_STATUS varchar,
+	DUAL_STATUS varchar,
+	OREC varchar,
+	INSTITUTIONAL_STATUS varchar,
+	SHORT_NAME varchar,
+	DESCRIPTION varchar,
+	HCC_CODE_1 varchar,
+	HCC_CODE_2 varchar,
+	COEFFICIENT float
+);
+COPY cms_hcc._VALUE_SET_DISEASE_INTERACTION_FACTORS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_disease_interaction_factors.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_ENROLLMENT_INTERACTION_FACTORS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_ENROLLMENT_INTERACTION_FACTORS (
+	MODEL_VERSION varchar,
+	FACTOR_TYPE varchar,
+	GENDER varchar,
+	ENROLLMENT_STATUS varchar,
+	MEDICAID_STATUS varchar,
+	DUAL_STATUS varchar,
+	INSTITUTIONAL_STATUS varchar,
+	DESCRIPTION varchar,
+	COEFFICIENT float
+);
+COPY cms_hcc._VALUE_SET_ENROLLMENT_INTERACTION_FACTORS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_enrollment_interaction_factors.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_ICD_10_CM_MAPPINGS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_ICD_10_CM_MAPPINGS (
+	PAYMENT_YEAR integer,
+	DIAGNOSIS_CODE varchar,
+	CMS_HCC_V24 varchar,
+	CMS_HCC_V24_FLAG varchar,
+	CMS_HCC_V28 varchar,
+	CMS_HCC_V28_FLAG varchar
+);
+COPY cms_hcc._VALUE_SET_ICD_10_CM_MAPPINGS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_icd_10_cm_mappings.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS cms_hcc;
+DROP TABLE IF EXISTS cms_hcc._VALUE_SET_PAYMENT_HCC_COUNT_FACTORS CASCADE;
+CREATE TABLE cms_hcc._VALUE_SET_PAYMENT_HCC_COUNT_FACTORS (
+	MODEL_VERSION varchar,
+	FACTOR_TYPE varchar,
+	ENROLLMENT_STATUS varchar,
+	MEDICAID_STATUS varchar,
+	DUAL_STATUS varchar,
+	OREC varchar,
+	INSTITUTIONAL_STATUS varchar,
+	PAYMENT_HCC_COUNT varchar,
+	DESCRIPTION varchar,
+	COEFFICIENT float
+);
+COPY cms_hcc._VALUE_SET_PAYMENT_HCC_COUNT_FACTORS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_hcc_payment_hcc_count_factors.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS quality_measures;
+DROP TABLE IF EXISTS quality_measures._VALUE_SET_CONCEPTS CASCADE;
+CREATE TABLE quality_measures._VALUE_SET_CONCEPTS (
+	CONCEPT_NAME varchar,
+	CONCEPT_OID varchar,
+	MEASURE_ID varchar,
+	MEASURE_NAME varchar
+);
+COPY quality_measures._VALUE_SET_CONCEPTS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/quality_measures_concepts.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS quality_measures;
+DROP TABLE IF EXISTS quality_measures._VALUE_SET_MEASURES CASCADE;
+CREATE TABLE quality_measures._VALUE_SET_MEASURES (
+	ID varchar,
+	NAME varchar,
+	DESCRIPTION varchar(3000),
+	VERSION varchar,
+	STEWARD varchar
+);
+COPY quality_measures._VALUE_SET_MEASURES
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/quality_measures_measures.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS quality_measures;
+DROP TABLE IF EXISTS quality_measures._VALUE_SET_CODES CASCADE;
+CREATE TABLE quality_measures._VALUE_SET_CODES (
+	CONCEPT_NAME varchar,
+	CONCEPT_OID varchar,
+	CODE varchar,
+	CODE_SYSTEM varchar
+);
+COPY quality_measures._VALUE_SET_CODES
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/quality_measures_value_set_codes.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ccsr;
+DROP TABLE IF EXISTS ccsr._VALUE_SET_DXCCSR_V2023_1_BODY_SYSTEMS CASCADE;
+CREATE TABLE ccsr._VALUE_SET_DXCCSR_V2023_1_BODY_SYSTEMS (
+	BODY_SYSTEM varchar,
+	CCSR_PARENT_CATEGORY varchar,
+	PARENT_CATEGORY_DESCRIPTION varchar(3000)
+);
+COPY ccsr._VALUE_SET_DXCCSR_V2023_1_BODY_SYSTEMS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/dxccsr_v2023_1_body_systems.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ccsr;
+DROP TABLE IF EXISTS ccsr._VALUE_SET_DXCCSR_V2023_1_CLEANED_MAP CASCADE;
+CREATE TABLE ccsr._VALUE_SET_DXCCSR_V2023_1_CLEANED_MAP (
+	ICD_10_CM_CODE varchar,
+	ICD_10_CM_CODE_DESCRIPTION varchar,
+	DEFAULT_CCSR_CATEGORY_IP varchar,
+	DEFAULT_CCSR_CATEGORY_DESCRIPTION_IP varchar,
+	DEFAULT_CCSR_CATEGORY_OP varchar,
+	DEFAULT_CCSR_CATEGORY_DESCRIPTION_OP varchar,
+	CCSR_CATEGORY_1 varchar,
+	CCSR_CATEGORY_1_DESCRIPTION varchar,
+	CCSR_CATEGORY_2 varchar,
+	CCSR_CATEGORY_2_DESCRIPTION varchar,
+	CCSR_CATEGORY_3 varchar,
+	CCSR_CATEGORY_3_DESCRIPTION varchar,
+	CCSR_CATEGORY_4 varchar,
+	CCSR_CATEGORY_4_DESCRIPTION varchar,
+	CCSR_CATEGORY_5 varchar,
+	CCSR_CATEGORY_5_DESCRIPTION varchar,
+	CCSR_CATEGORY_6 varchar,
+	CCSR_CATEGORY_6_DESCRIPTION varchar
+);
+COPY ccsr._VALUE_SET_DXCCSR_V2023_1_CLEANED_MAP
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/dxccsr_v2023_1_cleaned_map.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS ccsr;
+DROP TABLE IF EXISTS ccsr._VALUE_SET_PRCCSR_V2023_1_CLEANED_MAP CASCADE;
+CREATE TABLE ccsr._VALUE_SET_PRCCSR_V2023_1_CLEANED_MAP (
+	ICD_10_PCS varchar,
+	ICD_10_PCS_DESCRIPTION varchar,
+	PRCCSR varchar,
+	PRCCSR_DESCRIPTION varchar,
+	CLINICAL_DOMAIN varchar
+);
+COPY ccsr._VALUE_SET_PRCCSR_V2023_1_CLEANED_MAP
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/prccsr_v2023_1_cleaned_map.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS hcc_suspecting;
+DROP TABLE IF EXISTS hcc_suspecting._VALUE_SET_CLINICAL_CONCEPTS CASCADE;
+CREATE TABLE hcc_suspecting._VALUE_SET_CLINICAL_CONCEPTS (
+	CONCEPT_NAME varchar,
+	CONCEPT_OID varchar,
+	CODE varchar,
+	CODE_SYSTEM varchar
+);
+COPY hcc_suspecting._VALUE_SET_CLINICAL_CONCEPTS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/hcc_suspecting_clinical_concepts.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS hcc_suspecting;
+DROP TABLE IF EXISTS hcc_suspecting._VALUE_SET_HCC_DESCRIPTIONS CASCADE;
+CREATE TABLE hcc_suspecting._VALUE_SET_HCC_DESCRIPTIONS (
+	HCC_CODE varchar,
+	HCC_DESCRIPTION varchar
+);
+COPY hcc_suspecting._VALUE_SET_HCC_DESCRIPTIONS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/hcc_suspecting_descriptions.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS hcc_suspecting;
+DROP TABLE IF EXISTS hcc_suspecting._VALUE_SET_ICD_10_CM_MAPPINGS CASCADE;
+CREATE TABLE hcc_suspecting._VALUE_SET_ICD_10_CM_MAPPINGS (
+	DIAGNOSIS_CODE varchar,
+	CMS_HCC_ESRD_V21 varchar,
+	CMS_HCC_ESRD_V24 varchar,
+	CMS_HCC_V22 varchar,
+	CMS_HCC_V24 varchar,
+	CMS_HCC_V28 varchar,
+	RX_HCC_V05 varchar,
+	RX_HCC_V08 varchar
+);
+COPY hcc_suspecting._VALUE_SET_ICD_10_CM_MAPPINGS
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/hcc_suspecting_icd_10_cm_mappings.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS chronic_conditions;
+DROP TABLE IF EXISTS chronic_conditions._VALUE_SET_TUVA_CHRONIC_CONDITIONS_HIERARCHY CASCADE;
+CREATE TABLE chronic_conditions._VALUE_SET_TUVA_CHRONIC_CONDITIONS_HIERARCHY (
+	CONDITION_FAMILY varchar,
+	CONDITION varchar,
+	ICD_10_CM_CODE varchar,
+	ICD_10_CM_DESCRIPTION varchar,
+	CONDITION_COLUMN_NAME varchar
+);
+COPY chronic_conditions._VALUE_SET_TUVA_CHRONIC_CONDITIONS_HIERARCHY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/tuva_chronic_conditions_hierarchy.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS chronic_conditions;
+DROP TABLE IF EXISTS chronic_conditions._VALUE_SET_CMS_CHRONIC_CONDITIONS_HIERARCHY CASCADE;
+CREATE TABLE chronic_conditions._VALUE_SET_CMS_CHRONIC_CONDITIONS_HIERARCHY (
+	CONDITION_ID varchar,
+	CONDITION varchar,
+	CONDITION_COLUMN_NAME varchar,
+	CHRONIC_CONDITION_TYPE varchar,
+	CONDITION_CATEGORY varchar,
+	ADDITIONAL_LOGIC varchar,
+	CLAIMS_QUALIFICATION varchar(1024),
+	INCLUSION_TYPE varchar,
+	CODE_SYSTEM varchar,
+	CODE varchar
+);
+COPY chronic_conditions._VALUE_SET_CMS_CHRONIC_CONDITIONS_HIERARCHY
+FROM 's3://tuva-public-resources/versioned_value_sets/0.10.1/cms_chronic_conditions_hierarchy.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS reference_data;
+DROP TABLE IF EXISTS reference_data.ANSI_FIPS_STATE CASCADE;
+CREATE TABLE reference_data.ANSI_FIPS_STATE (
+	ANSI_FIPS_STATE_CODE varchar,
+	ANSI_FIPS_STATE_ABBREVIATION varchar,
+	ANSI_FIPS_STATE_NAME varchar
+);
+COPY reference_data.ANSI_FIPS_STATE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/ansi_fips_state.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS reference_data;
+DROP TABLE IF EXISTS reference_data.CALENDAR CASCADE;
+CREATE TABLE reference_data.CALENDAR (
+	FULL_DATE date,
+	YEAR integer,
+	MONTH integer,
+	DAY integer,
+	MONTH_NAME varchar,
+	DAY_OF_WEEK_NUMBER integer,
+	DAY_OF_WEEK_NAME varchar,
+	WEEK_OF_YEAR integer,
+	DAY_OF_YEAR integer,
+	YEAR_MONTH varchar,
+	FIRST_DAY_OF_MONTH date,
+	LAST_DAY_OF_MONTH date,
+	YEAR_MONTH_INT integer
+);
+COPY reference_data.CALENDAR
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/calendar.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS reference_data;
+DROP TABLE IF EXISTS reference_data.CODE_TYPE CASCADE;
+CREATE TABLE reference_data.CODE_TYPE (
+	CODE_TYPE varchar
+);
+COPY reference_data.CODE_TYPE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/code_type.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS reference_data;
+DROP TABLE IF EXISTS reference_data.FIPS_COUNTY CASCADE;
+CREATE TABLE reference_data.FIPS_COUNTY (
+	FIPS_CODE varchar,
+	COUNTY varchar,
+	STATE varchar
+);
+COPY reference_data.FIPS_COUNTY
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/fips_county.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
+CREATE SCHEMA IF NOT EXISTS reference_data;
+DROP TABLE IF EXISTS reference_data.SSA_FIPS_STATE CASCADE;
+CREATE TABLE reference_data.SSA_FIPS_STATE (
+	SSA_FIPS_STATE_CODE varchar,
+	SSA_FIPS_STATE_NAME varchar
+);
+COPY reference_data.SSA_FIPS_STATE
+FROM 's3://tuva-public-resources/versioned_terminology/0.10.1/ssa_fips_state.csv'
+ACCESS_KEY_ID 'AKIA2EPVNTV4FLAEBFGE'
+SECRET_ACCESS_KEY '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'
+CSV GZIP EMPTYASNULL 
+ REGION 'us-east-1';
+
+
