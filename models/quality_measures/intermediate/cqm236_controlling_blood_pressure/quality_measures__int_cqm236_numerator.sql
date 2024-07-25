@@ -387,7 +387,9 @@ with controlled_bp_codes as (
         , performance_period_begin
         , performance_period_end
         , normalized_code
-    from labs_within_range labs
+    from labs_with_encounters labs
+    where is_valid_encounter_labs = 1
+
 )
 
 , systolic_bp as (
