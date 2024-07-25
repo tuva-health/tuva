@@ -138,7 +138,7 @@ with controlled_bp_codes as (
 
 )
 
-, controlled_bp_patients as (
+, controlled_bp_patients_proc_claims as (
 
     select
           patient_id
@@ -156,21 +156,21 @@ with controlled_bp_codes as (
 
 )
 
-, controlled_bp_within_range as (
+, controlled_bp_within_range_proc_claims as (
 
     select
-          controlled_bp_patients.patient_id
-        , controlled_bp_patients.evidence_date
-        , controlled_bp_patients.code
+          controlled_bp_patients_proc_claims.patient_id
+        , controlled_bp_patients_proc_claims.evidence_date
+        , controlled_bp_patients_proc_claims.code
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
         , denominator.performance_period_begin
         , denominator.performance_period_end
-    from controlled_bp_patients
+    from controlled_bp_patients_proc_claims
     inner join denominator
-        on controlled_bp_patients.patient_id = denominator.patient_id
-            and controlled_bp_patients.evidence_date between
+        on controlled_bp_patients_proc_claims.patient_id = denominator.patient_id
+            and controlled_bp_patients_proc_claims.evidence_date between
                 denominator.performance_period_begin and denominator.performance_period_end
 
 )
@@ -178,9 +178,9 @@ with controlled_bp_codes as (
 , procedure_claims_w_encounters as (
 
     select
-          controlled_bp_within_range.patient_id
-        , controlled_bp_within_range.evidence_date
-        , controlled_bp_within_range.code
+          controlled_bp_within_range_proc_claims.patient_id
+        , controlled_bp_within_range_proc_claims.evidence_date
+        , controlled_bp_within_range_proc_claims.code
         , case
             when lower(encounters.encounter_type) in (
                   'emergency department'
@@ -189,15 +189,15 @@ with controlled_bp_codes as (
             then 0
             else 1
           end as is_valid_procedure_claims
-        , controlled_bp_within_range.measure_id
-        , controlled_bp_within_range.measure_name
-        , controlled_bp_within_range.measure_version
-        , controlled_bp_within_range.performance_period_begin
-        , controlled_bp_within_range.performance_period_end
-    from controlled_bp_within_range
+        , controlled_bp_within_range_proc_claims.measure_id
+        , controlled_bp_within_range_proc_claims.measure_name
+        , controlled_bp_within_range_proc_claims.measure_version
+        , controlled_bp_within_range_proc_claims.performance_period_begin
+        , controlled_bp_within_range_proc_claims.performance_period_end
+    from controlled_bp_within_range_proc_claims
     left join encounters
-        on controlled_bp_within_range.patient_id = encounters.patient_id
-        and controlled_bp_within_range.evidence_date between 
+        on controlled_bp_within_range_proc_claims.patient_id = encounters.patient_id
+        and controlled_bp_within_range_proc_claims.evidence_date between 
             encounters.encounter_start_date and encounters.encounter_end_date 
     
 )
@@ -243,7 +243,7 @@ with controlled_bp_codes as (
 
 )
 
-, qualifying_patients_controlled_bp as (
+, qualifying_controlled_bp_proc_claims as (
 
     select
           systolic_bp_from_procedure_claims.patient_id
@@ -497,7 +497,7 @@ with controlled_bp_codes as (
         , measure_name
         , measure_version
         , 1 as numerator_flag
-    from qualifying_patients_controlled_bp
+    from qualifying_controlled_bp_proc_claims
 
 )
 
