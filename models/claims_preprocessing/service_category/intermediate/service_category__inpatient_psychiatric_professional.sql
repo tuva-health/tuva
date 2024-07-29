@@ -14,4 +14,3 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'professional'
   and place_of_service_code in ('51','55','56')
-  

@@ -11,8 +11,7 @@ select distinct
     , 'Office-Based Pharmacy' as service_category_3
     ,'{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} med
-where claim_type = 'professional'
+from {{ ref('service_category__stg_professional') }} med
 and ccs_category = '240' --medications
 and place_of_service_code = '11'
 

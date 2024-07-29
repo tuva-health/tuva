@@ -3,14 +3,14 @@
    )
 }}
 
-select distinct
+select distinct 
     claim_id
     , claim_line_number
     , claim_line_id
-, 'Hospice' as service_category_2
-, 'Hospice' as service_category_3
+, 'Inpatient Psychiatric' as service_category_2
+, 'Inpatient Psychiatric' as service_category_3
 ,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_professional') }} med
-and place_of_service_code in ('34')
-  
+from {{ ref('service_category__stg_inpatient_institutional') }}
+where s.primary_taxonomy_code in ('283Q00000X'
+                                  ,'273R00000X')
