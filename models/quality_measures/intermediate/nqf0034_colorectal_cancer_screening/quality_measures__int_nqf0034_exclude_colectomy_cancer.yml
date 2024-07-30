@@ -1,0 +1,25 @@
+version: 2
+models:
+- name: quality_measures__int_nqf0034_exclude_colectomy_cancer
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_nqf0034_exclude_colectomy_cancer
+    tags: quality_measures
+    materialized: table
+  description: >
+    Exclusion logic for patients with frailty and advanced illness for  the reporting
+    version of NQF 0034, Colorectal Cancer Screening.
+  columns:
+  - name: patient_id
+    description: Unique patient_id for each person.
+  - name: exclusion_date
+    description: Date of event or service that excludes patient from the measure.
+  - name: exclusion_reason
+    description: Reason (usually the value set concept name) that excludes patient
+      from the measure.
+  - name: exclusion_type
+    description: Measure specific exclusion for historical record of colectomy cancer.
+  - name: tuva_last_run
+    desciption: The date and timestamp of the dbt run.
+

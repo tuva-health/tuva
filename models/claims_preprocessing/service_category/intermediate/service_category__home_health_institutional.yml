@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: service_category__home_health_institutional
+  description: N/A
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_home_health_institutional
+    materialized: table
+    tags:
+    - service_category_grouper
+    - claims_preprocessing
+

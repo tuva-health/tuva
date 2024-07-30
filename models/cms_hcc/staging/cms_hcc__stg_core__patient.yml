@@ -1,0 +1,19 @@
+version: 2
+models:
+- name: cms_hcc__stg_core__patient
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _stg_patient
+    tags: cms_hcc
+    materialized: ephemeral
+  description: Staging patient from core.
+  columns:
+  - name: patient_id
+    description: Unique identifier for each patient in the dataset.
+  - name: sex
+    description: Biological sex of the patient.
+  - name: birth_date
+    description: Date the patient was born.
+  - name: death_date
+    description: The death date of the patient if there is one.

@@ -1,0 +1,29 @@
+version: 2
+models:
+- name: hcc_suspecting__summary
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+    alias: summary
+    tags: hcc_suspecting
+    materialized: table
+  description: >
+    This final model displays a rollup of suspecting conditions per patient.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: patient_sex
+    description: The gender of the patient.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+  - name: patient_birth_date
+    description: The birth date of the patient.
+  - name: patient_age
+    description: The patient's current age.
+  - name: suspecting_gaps
+    description: Count of suspecting conditions.
+  - name: tuva_last_run
+    description: The date the model was run.
+
+  ## Intermediate

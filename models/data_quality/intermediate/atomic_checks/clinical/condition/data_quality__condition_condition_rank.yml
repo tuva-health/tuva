@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: data_quality__condition_condition_rank
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_condition_rank
+    tags:
+    - clinical
+    - condition
+    - intermediate
+    materialized: table
+
+

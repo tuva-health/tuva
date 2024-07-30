@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: data_quality__unique_value_examples
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: unique_value_examples
+    tags:
+    - clinical
+    - concepts
+    - intermediate
+    materialized: table
+
+

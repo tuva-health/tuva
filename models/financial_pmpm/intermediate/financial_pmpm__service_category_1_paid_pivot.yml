@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: financial_pmpm__service_category_1_paid_pivot
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+      {% else %}financial_pmpm{%- endif -%}
+    alias: _int_service_category_1_paid_pivot
+    tags:
+    - financial_pmpm
+    materialized: table
+  description: >
+    Pivots out paid amounts into columns by service category level 1.
+

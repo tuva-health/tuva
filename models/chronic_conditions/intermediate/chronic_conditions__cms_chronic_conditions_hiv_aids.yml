@@ -1,0 +1,46 @@
+version: 2
+models:
+- name: chronic_conditions__cms_chronic_conditions_hiv_aids
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+      {% else %}chronic_conditions{%- endif -%}
+    alias: _int_cms_chronic_condition_hiv_aids
+    tags:
+    - cms_chronic_conditions
+    - chronic_conditions
+    materialized: table
+  description: >
+    This model contains logic for the chronic condition Human
+    Immunodeficiency Virus and/or Acquired Immunodeficiency Syndrome
+    (HIV/AIDS). This model maps ICD-10-CM diagnosis codes and MS DRG
+    codes to the chronic condition.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+    tests:
+    - not_null
+  - name: claim_id
+    description: Unique identifier for each claim.
+    tests:
+    - not_null
+  - name: start_date
+    description: >
+      Start date of the chronic condition derived from diagnosis,  procedure, or medication.
+  - name: chronic_condition_type
+    description: >
+      The type of chronic condition as defined by CMS.  ('Common' or 'Other chronic
+      or potentially disabling conditions')
+  - name: condition_category
+    description: The category of the condition (e.g. Other).
+  - name: condition
+    description: The name of the chronic condition.
+    tests:
+    - not_null
+    - accepted_values:
+        values: ['Human Immunodeficiency Virus and/or Acquired Immunodeficiency Syndrome
+            (HIV/AIDS)']
+  - name: data_source
+    description: >
+      Indicates the name of the source dataset (e.g. Medicare Claims).
+

@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: data_quality__lab_result_ordering_practitioner_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_ordering_practitioner_id
+    tags:
+    - clinical
+    - lab_result
+    - intermediate
+    materialized: table
+
+

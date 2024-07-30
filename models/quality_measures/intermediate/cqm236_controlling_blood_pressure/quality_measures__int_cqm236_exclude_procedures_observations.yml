@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: quality_measures__int_cqm236_exclude_procedures_observations
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_cqm236_exclude_procedures_observations
+    tags: quality_measures
+    materialized: table
+  description: >
+    Exclusion logic for patients with certain observations and procedures for  the
+    reporting version of CQM 236, Controlling Blood Pressure.
+

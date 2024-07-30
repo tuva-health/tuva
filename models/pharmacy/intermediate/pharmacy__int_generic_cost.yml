@@ -1,0 +1,17 @@
+version: 2
+models:
+- name: pharmacy__int_generic_cost
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix', None) != None -%}
+        {{var('tuva_schema_prefix')}}_pharmacy
+      {% else %}
+        pharmacy
+      {%- endif -%}
+    alias: _int_generic_cost
+    tags:
+    - pharmacy
+    materialized: view
+  description: >
+    Intermediate view calculating the cost of generic drugs.
+

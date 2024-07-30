@@ -1,0 +1,42 @@
+version: 2
+seeds:
+- name: pharmacy_claim
+  config:
+    schema: input_layer
+    tags: tuva_demo
+    column_types:
+      claim_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      claim_line_number: integer
+      patient_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      member_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      plan: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      prescribing_provider_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      dispensing_provider_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      dispensing_date: date
+      ndc_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      quantity: integer
+      days_supply: integer
+      refills: integer
+      paid_date: date
+      paid_amount: float
+      allowed_amount: float
+      charge_amount: float
+      coinsurance_amount: float
+      copayment_amount: float
+      deductible_amount: float
+      in_network_flag: integer
+      data_source: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      ingest_datetime: |
+        {%- if target.type in ("postgres") -%} timestamp {%- else -%} datetime {%- endif -%}

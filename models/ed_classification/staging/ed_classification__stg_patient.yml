@@ -1,0 +1,10 @@
+version: 2
+models:
+- name: ed_classification__stg_patient
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+      {% else %}ed_classification{%- endif -%}
+    tags: ed_classification
+    materialized: ephemeral
+

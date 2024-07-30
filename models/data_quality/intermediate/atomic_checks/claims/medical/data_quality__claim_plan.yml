@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: data_quality__claim_plan
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: claim_plan
+    tags:
+    - claims
+    - medical
+    - intermediate
+    materialized: table
+
+

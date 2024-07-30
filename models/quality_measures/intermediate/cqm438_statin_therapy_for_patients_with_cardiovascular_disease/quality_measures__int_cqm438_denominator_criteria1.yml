@@ -1,0 +1,28 @@
+version: 2
+models:
+- name: quality_measures__int_cqm438_denominator_criteria1
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_cqm438_denominator_criteria1
+    tags: quality_measures
+    materialized: table
+  description: >
+    Subset of denominator logic for submission of criteria 1 of the reporting version
+    of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
+  columns:
+  - name: patient_id
+    description: Unique patient_id for each person.
+  - name: performance_period_begin
+    description: Beginning date of the performance or measurement period.
+  - name: performance_period_end
+    description: Ending date of the performance or measurement period.
+  - name: measure_id
+    description: Unique measure identification number.
+  - name: measure_name
+    description: Name of the measure.
+  - name: measure_version
+    description: Version of the measure.
+  - name: tuva_last_run
+    description: The date and timestamp of the dbt run.
+

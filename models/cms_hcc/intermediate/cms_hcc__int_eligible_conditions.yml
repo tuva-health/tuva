@@ -1,0 +1,27 @@
+version: 2
+models:
+- name: cms_hcc__int_eligible_conditions
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _int_eligible_conditions
+    tags: cms_hcc
+    materialized: table
+  description: >
+    Conditions from eligible risk-adjustable claims per claim type for the  collection
+    year.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: condition_code
+    description: The condition code.
+    tests:
+    - not_null
+  - name: model_version
+    description: CMS HCC model version.
+  - name: payment_year
+    description: >
+      The payment year the HCC and risk scores are being calculated for.
+  - name: tuva_last_run
+    description: The date the model was run.
+

@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: ahrq_measures__stg_pqi_member_months
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+    alias: _stg_pqi_member_months
+    tags:
+    - ahrq_measures
+    - pqi
+    materialized: ephemeral
+  description: >
+    Staging table for PQI member months, from financial_pmpm__member_months.
+

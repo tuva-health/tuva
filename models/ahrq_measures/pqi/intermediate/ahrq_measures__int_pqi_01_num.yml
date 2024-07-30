@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: ahrq_measures__int_pqi_01_num
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+    alias: _int_pqi_01_num
+    tags:
+    - ahrq_measures
+    - pqi
+    materialized: view
+  description: >
+    Numerator for PQI 01 measure calculation.
+

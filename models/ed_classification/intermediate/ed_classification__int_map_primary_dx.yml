@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: ed_classification__int_map_primary_dx
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+      {% else %}ed_classification{%- endif -%}
+    alias: _int_by_provider_parent_organization
+    tags: ed_classification
+    materialized: table
+  description: Map ED encounter primary dx to classification
+
+
+##  Staging
+

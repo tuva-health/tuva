@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: acute_inpatient__encounter_data_for_medical_claims
+  description: All encounter-related fields that will be added to medical_claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_encounter_data_for_medical_claims
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: view
+

@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: data_quality__professional_claim_end_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: professional_claim_end_date
+    tags:
+    - claims
+    - medical
+    - professional
+    - intermediate
+    materialized: table
+
+

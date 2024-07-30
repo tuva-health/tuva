@@ -1,0 +1,18 @@
+version: 2
+models:
+- name: data_quality__professional_diagnosis_code_3
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: professional_diagnosis_code_3
+    tags:
+    - claims
+    - medical
+    - professional
+    - intermediate
+    materialized: table
+
+
+## Claims pharmacy
+

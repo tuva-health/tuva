@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: readmissions__encounter_with_ccs
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_encounter_with_ccs
+    tags: readmissions
+    materialized: view
+
+

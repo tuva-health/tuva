@@ -1,0 +1,27 @@
+version: 2
+models:
+- name: cms_hcc__int_hcc_mapping
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _int_hcc_mapping
+    tags: cms_hcc
+    materialized: table
+  description: >
+    Eligible conditions mapped to HCC codes for the corresponding HCC model  version
+    and payment year
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: condition_code
+    description: Condition code.
+  - name: hcc_code
+    description: HCC code.
+  - name: model_version
+    description: CMS HCC model version.
+  - name: payment_year
+    description: >
+      The payment year the HCC and risk scores are being calculated for.
+  - name: tuva_last_run
+    description: The date the model was run.
+

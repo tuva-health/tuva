@@ -1,0 +1,18 @@
+version: 2
+models:
+- name: data_quality__claim_total_cost_amount
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: claim_total_cost_amount
+    tags:
+    - claims
+    - medical
+    - intermediate
+    materialized: table
+
+
+### Institutional Claims
+
+

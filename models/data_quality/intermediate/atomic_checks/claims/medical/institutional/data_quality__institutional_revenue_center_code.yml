@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: data_quality__institutional_revenue_center_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: institutional_revenue_center_code
+    tags:
+    - claims
+    - medical
+    - institutional
+    - intermediate
+    materialized: table
+
+

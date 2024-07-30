@@ -1,0 +1,22 @@
+version: 2
+models:
+- name: readmissions__encounter_specialty_cohort
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_encounter_specialty_cohort
+    tags: readmissions
+    materialized: view
+  description: "This model lists the specialty cohort associated with each inpatient
+    encounter. All encounters in the stg_encounter model are present here, and each
+    gets a specialty cohort assigned from the following list of 5 options: Surgery/Gynecology,
+    Medicine, Cardiorespiratory, Cardiovascular, Neurology. Encounters that don't
+    have a specialty cohort get 'Medicine' assigned by default."
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+  - name: specialty_cohort
+    description: "The specialty cohort associated with the encounter"
+
+

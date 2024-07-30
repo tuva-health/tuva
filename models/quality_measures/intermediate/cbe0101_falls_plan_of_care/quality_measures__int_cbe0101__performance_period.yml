@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: quality_measures__int_cbe0101__performance_period
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_cbe0101__performance_period
+    tags: quality_measures
+    materialized: view
+  description: >
+    Performance Period definition for Falls: Plan of Care.
+

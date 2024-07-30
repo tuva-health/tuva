@@ -1,0 +1,24 @@
+version: 2
+models:
+- name: readmissions__procedure_ccs
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_procedure_ccs
+    tags: readmissions
+    materialized: view
+  description: "This model includes all procedures from the stg_procedure model and
+    adds a valid_icd_10_pcs_flag to indicate if the ICD-10-PCS code for this procedure
+    is valid. We also add the CCS procedure category associated with the procedure"
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+  - name: procedure_code
+    description: "An ICD-10-PCS code associated with this encounter_id"
+  - name: valid_icd_10_pcs_flag
+    description: "A flag indicating if the ICD-10-PCS procedure code given is valid"
+  - name: ccs_procedure_category
+    description: "The CCS code associated with the given ICD-10-PCS procedure"
+
+

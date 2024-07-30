@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: pharmacy__stg_pharmacy_claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix', None) != None -%}
+        {{var('tuva_schema_prefix')}}_pharmacy
+      {% else %}
+        pharmacy
+      {%- endif -%}
+    alias: stg_pharmacy_claim
+    tags:
+    - pharmacy
+    materialized: ephemeral
+  description: >
+    Staging table for pharmacy claims, serving as the basis for further calculations.

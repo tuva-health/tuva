@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: service_category__stg_medical_claim
+  description: Staging med claims for sc grouper
+  config:
+    materialized: ephemeral
+    tags:
+    - service_category_grouper
+    - claims_preprocessing
+
+##  Data Quality
+

@@ -1,0 +1,123 @@
+version: 2
+models:
+- name: core__encounter
+  description: >
+    The encounter table contains information about patients visits (i.e.  encounters).  This
+    includes acute inpatient, emergency department, office  visits, SNF stays, etc.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: encounter
+    tags: core
+    materialized: table
+  columns:
+  - name: encounter_id
+    description: Unique identifier for each encounter.
+    tests:
+    - unique:
+        config:
+          severity: warn
+  - name: patient_id
+    description: Unique identifier for a patient.
+  - name: encounter_type
+    description: >
+      Indicates the type of encounter e.g. acute inpatient, emergency  department,
+      etc.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__encounter_type.csv
+  - name: encounter_start_date
+    description: Date when the encounter started.
+  - name: encounter_end_date
+    description: Date when the encounter ended.
+  - name: length_of_stay
+    description: >
+      Length of the encounter calculated as encounter_end_date -  encounter_start_date.
+  - name: admit_source_code
+    description: Admission source code for the encounter.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+  - name: admit_source_description
+    description: Description of the admit_source_code for the encounter.
+  - name: admit_type_code
+    description: Admission type code for the encounter.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+  - name: admit_type_description
+    description: Description of the admit_type_code for the encounter.
+  - name: discharge_disposition_code
+    description: Discharge disposition code for the encounter.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+  - name: discharge_disposition_description
+    description: >
+      Description of the discharge_disposition_code for the encounter.
+  - name: attending_provider_id
+    description: attending provider for the encounter.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: "**Note: this terminology set is too large to be loaded as
+        a seed and is instead loaded from public cloud storage for supported adapters."
+  - name: facility_npi
+    description: >
+      Facility NPI for the encounter (typically represents the facility  where services
+      were performed).
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: "**Note: this terminology set is too large to be loaded as
+        a seed and is instead loaded from public cloud storage for supported adapters."
+  - name: primary_diagnosis_code_type
+    description: >
+      The type of condition code reported in the source system e.g.  ICD-10-CM.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+  - name: primary_diagnosis_code
+    description: >
+      Primary diagnosis code for the encounter.  If from claims the primary  diagnosis
+      code comes from the institutional claim.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      terminology_note: "**Note: this terminology set is too large to be loaded as
+        a seed and is instead loaded from public cloud storage for supported adapters."
+  - name: primary_diagnosis_description
+    description: Description of the primary diagnosis code.
+  - name: ms_drg_code
+    description: MS-DRG code for the encounter.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+  - name: ms_drg_description
+    description: Description of the ms_drg_code.
+  - name: apr_drg_code
+    description: APR-DRG code for the encounter.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+  - name: apr_drg_description
+    description: Description of the APR-DRG code.
+  - name: paid_amount
+    description: The total amount paid for the encounter by the insurer.
+  - name: allowed_amount
+    description: >
+      The total amount allowed (includes amount paid by the insurer and  patient)
+      on the encounter.
+  - name: charge_amount
+    description: The total amount charged on the encounter by the provider.
+  - name: data_source
+    description: >
+      User-configured field that indicates the data source (e.g. typically  named
+      after the payer and state "BCBS Tennessee").
+  - name: tuva_last_run
+    description: >
+      The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time`
+      as the local time of the `dbt run`  environment.  Timezone is configurable via
+      the `tuva_last_run` var.
+

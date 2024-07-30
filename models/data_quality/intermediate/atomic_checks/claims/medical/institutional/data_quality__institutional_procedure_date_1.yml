@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: data_quality__institutional_procedure_date_1
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: institutional_procedure_date_1
+    tags:
+    - claims
+    - medical
+    - institutional
+    - intermediate
+    materialized: table
+
+

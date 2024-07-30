@@ -1,0 +1,34 @@
+version: 2
+models:
+- name: cms_hcc__int_disease_factors
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _int_disease_factors
+    tags: cms_hcc
+    materialized: table
+  description: >
+    Disease factor values for every enrollee's final payment-eligible HCC
+    after the hierarchy has been applied and necessary HCCs dropped for the  corresponding
+    HCC model version and payment year.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: hcc_code
+    description: HCC code.
+  - name: hcc_description
+    description: HCC description.
+  - name: coefficient
+    description: >
+      Relative factor value that correspond to the CMS HCC model's  risk indicators.
+  - name: factor_type
+    description: >
+      Type of risk factor, e.g. Demographic, Disease, etc.
+  - name: model_version
+    description: CMS HCC model version.
+  - name: payment_year
+    description: >
+      The payment year the HCC and risk scores are being calculated for.
+  - name: tuva_last_run
+    description: The date the model was run.
+

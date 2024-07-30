@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: emergency_department__int_encounter_id
+  description: Fix encounter_id so each professional claim can only belong to one
+    encounter
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_emergency_department_encounter_id
+    tags:
+    - emergency_department
+    - claims_preprocessing
+    materialized: view
+

@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: emergency_department__int_first_claim_values
+  description: Orders claims to pull out encounter details (admit type, drg, etc)
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_emergency_department_first_claim_values
+    tags:
+    - emergency_department
+    - claims_preprocessing
+    materialized: table
+

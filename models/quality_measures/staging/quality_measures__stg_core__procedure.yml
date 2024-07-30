@@ -1,0 +1,27 @@
+version: 2
+models:
+- name: quality_measures__stg_core__procedure
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _stg_procedure
+    tags: quality_measures
+    materialized: ephemeral
+  description: Staging procedures from core.
+  columns:
+  - name: patient_id
+    tests:
+    - not_null:
+        severity: warn
+  - name: procedure_date
+  - name: source_code_type
+  - name: source_code
+  - name: normalized_code_type
+  - name: normalized_code
+  - name: modifier_1
+  - name: modifier_2
+  - name: modifier_3
+  - name: modifier_4
+  - name: modifier_5
+  - name: tuva_last_run
+

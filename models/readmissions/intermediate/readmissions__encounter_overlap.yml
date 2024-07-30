@@ -1,0 +1,18 @@
+version: 2
+models:
+- name: readmissions__encounter_overlap
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_encounter_overlap
+    tags: readmissions
+    materialized: view
+  description: "This model lists all pairs of encounters that have some date overlap."
+  columns:
+  - name: patient_id
+    description: "The unique identifier for the patient"
+  - name: encounter_id_A
+    description: "Unique identifier for one of the overlapping encounters"
+  - name: encounter_id_B
+    description: "Unique identifier for the other overlapping encounter"

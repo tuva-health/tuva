@@ -1,0 +1,31 @@
+version: 2
+models:
+- name: readmissions__readmission_crude
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_readmission_crude
+    tags: readmissions
+    materialized: view
+  description: "This model lists all encounters and whether they had a 'crude' readmission,
+    meaning that the encounter had a hospitalization after discharge, without regard
+    to all CMS readmission logic."
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+  - name: patient_id
+    description: "The unique identifier for the patient"
+  - name: admit_date
+    description: "The date of admission for the inpatient visit"
+  - name: discharge_date
+  - name: had_readmission_flag
+    description: "A flag to indicate whether the encounter had a readmission any number
+      of days after discharge"
+  - name: days_to_readmit
+    description: "An integer to indicate the number of days to readmission"
+  - name: readmit_30_flag
+    description: "A flag to indicate whether the encounter had a 30-day readmission"
+
+
+

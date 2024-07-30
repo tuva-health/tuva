@@ -17,6 +17,14 @@ vars:
 
 
 
+    claims_enabled: true
+    ed_classification_enabled: true
+    clinical_enabled: true
+    quality_measures_enabled: true
+    chronic_conditions_enabled: true
+    claims_preprocessing_enabled: true
+    readmissions_enabled: true
+    tuva_marts_enabled: true
     ## CMS HCC data mart vars
     # The payment_year variable has a default of the current year, this can be
     # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
@@ -61,6 +69,16 @@ clean-targets:
 
 seeds:
   the_tuva_project:
+    eligibility:
+      +post-hook: "{{ load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','eligibility.csv',headers=true) }}"
+    lab_result:
+      +post-hook: "{{ load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','lab_result.csv',headers=true) }}"
+    medical_claim:
+      +post-hook: "{{ load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','medical_claim.csv',headers=true) }}"
+    observation:
+      +post-hook: "{{ load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','observation.csv',headers=true) }}"
+    pharmacy_claim:
+      +post-hook: "{{ load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','pharmacy_claim.csv',headers=true) }}"
     clinical_concept_library:
       clinical_concept_library__clinical_concepts:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.2','tuva_clinical_concepts.csv',compression=true,null_marker=true) }}"

@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: acute_inpatient__data_quality_summary
+  description: Summary of data quality issues with acute inpatient claims
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_acute_inpatient_data_quality_summary
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: table
+

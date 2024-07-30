@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: core__stg_clinical_encounter
+  description: Staging core clinical encounters
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: _stg_clinical_encounter
+    tags: core_stage_clinical
+    materialized: view
+

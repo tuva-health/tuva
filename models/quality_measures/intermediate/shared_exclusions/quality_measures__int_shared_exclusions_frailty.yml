@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: quality_measures__int_shared_exclusions_frailty
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_shared_exclusions_frailty
+    tags: quality_measures
+    materialized: table
+  description: >
+    Exclusion logic for patients with frailty used by other exclusion models.
+

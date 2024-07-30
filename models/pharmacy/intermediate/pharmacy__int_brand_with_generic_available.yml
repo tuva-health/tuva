@@ -1,0 +1,17 @@
+version: 2
+models:
+- name: pharmacy__int_brand_with_generic_available
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix', None) != None -%}
+        {{var('tuva_schema_prefix')}}_pharmacy
+      {% else %}
+        pharmacy
+      {%- endif -%}
+    alias: _int_brand_with_generic_available
+    tags:
+    - pharmacy
+    materialized: view
+  description: >
+    Intermediate view identifying brand drugs that have generic equivalents available.
+

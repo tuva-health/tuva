@@ -1,0 +1,18 @@
+version: 2
+models:
+- name: readmissions__index_admission
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_index_admission
+    tags: readmissions
+    materialized: view
+  description: "This model lists all index admissions for the hospital wide readmissions
+    measure. These represent encounter_ids that meet the requirements to be an index
+    admission for the HWR measure."
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+
+

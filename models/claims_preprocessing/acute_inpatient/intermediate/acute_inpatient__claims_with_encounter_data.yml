@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: acute_inpatient__claims_with_encounter_data
+  description: Add all relevant encounter data to each acute inpatient claim_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_acute_inpatient_claims_with_encounter_data
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: table
+

@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: quality_measures__int_shared_exclusions_institutional_snp
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_shared_exclusions_institutional_snp
+    tags: quality_measures
+    materialized: table
+  description: >
+    Exclusion logic for patients staying in an institution for the reporting for entire
+    patient population. 
+
+## Intermediate
+### Breast Cancer Screening

@@ -1,0 +1,20 @@
+version: 2
+models:
+- name: pharmacy__int_generic_cost_by_ndc
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix', None) != None -%}
+        {{var('tuva_schema_prefix')}}_pharmacy
+      {% else %}
+        pharmacy
+      {%- endif -%}
+    alias: _int_generic_cost_by_ndc
+    tags:
+    - pharmacy
+    materialized: view
+  description: >
+    Intermediate view calculating the cost of generic drugs at the ndc level for informational
+    purposes.
+
+## Staging
+

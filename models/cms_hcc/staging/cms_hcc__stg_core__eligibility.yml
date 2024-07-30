@@ -1,0 +1,23 @@
+version: 2
+models:
+- name: cms_hcc__stg_core__eligibility
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _stg_eligibility
+    tags: cms_hcc
+    materialized: ephemeral
+  description: Staging eligibility from core.
+  columns:
+  - name: patient_id
+    description: Unique identifier for each patient in the dataset.
+  - name: enrollment_start_date
+    description: Date the patient's insurance eligibility began.
+  - name: enrollment_end_date
+    description: Date the patient's insurance eligibility ended.
+  - name: dual_status_code
+    description: >
+      Indicates whether the patient is dually eligible for Medicare  and Medicaid.
+  - name: medicare_status_code
+    description: Indicates how the patient became eligible for Medicare.
+

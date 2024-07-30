@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: acute_inpatient__encounter_start_and_end_dates
+  description: Defines encounter start and end dates for acute inpatient encounters
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_acute_inpatient_encounter_start_and_end_dates
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: table
+

@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: data_quality__condition_present_on_admit_description
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: condition_present_on_admit_description
+    tags:
+    - clinical
+    - condition
+    - intermediate
+    materialized: table
+
+

@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: core__stg_claims_medical_claim
+  description: Staging core medical claims
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: _stg_claims_medical_claim
+    tags: core_stage_claims
+    materialized: table
+

@@ -1,0 +1,16 @@
+version: 2
+models:
+- name: normalized_input__int_undetermined_claim_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_normalized_input_undetermined_claim_type
+    materialized: table
+    tags:
+    - normalized_input
+    - claims_preprocessing
+
+
+
+##    Staging

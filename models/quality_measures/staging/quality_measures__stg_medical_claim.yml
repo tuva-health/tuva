@@ -1,0 +1,25 @@
+version: 2
+models:
+- name: quality_measures__stg_medical_claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _stg_medical_claim
+    tags: quality_measures
+    materialized: ephemeral
+  description: >
+    Staging medical claims from the input layer. Creates an empty table if  using
+    clinical only.
+  columns:
+  - name: patient_id
+  - name: claim_start_date
+  - name: claim_end_date
+  - name: place_of_service
+  - name: hcpcs_code
+  - name: hcpcs_modifier_1
+  - name: hcpcs_modifier_2
+  - name: hcpcs_modifier_3
+  - name: hcpcs_modifier_4
+  - name: hcpcs_modifier_5
+  - name: tuva_last_run
+

@@ -1,0 +1,12 @@
+version: 2
+models:
+- name: mart_review__stg_medical_claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__stg_medical_claim
+    tags:
+    - mart_review
+    materialized: table
+

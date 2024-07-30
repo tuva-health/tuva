@@ -1,0 +1,17 @@
+version: 2
+models:
+- name: readmissions__index_time_requirement
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_index_time_requirement
+    tags: readmissions
+    materialized: view
+  description: "This model lists all encounters that meet the time requirement to
+    be an index admission."
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+
+

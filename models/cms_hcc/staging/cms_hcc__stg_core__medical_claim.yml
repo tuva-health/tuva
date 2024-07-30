@@ -1,0 +1,31 @@
+version: 2
+models:
+- name: cms_hcc__stg_core__medical_claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _stg_medical_claim
+    tags: cms_hcc
+    materialized: ephemeral
+  description: Staging medical claims from core.
+  columns:
+  - name: claim_id
+    description: Unique identifier for each claim.
+  - name: claim_line_number
+    description: >
+      Indicates the line number for the particular line of the claim.
+  - name: claim_type
+    description: >
+      Indicates whether the claim is professional (CMS-1500),  institutional (UB-04),
+      dental, or vision.
+  - name: patient_id
+    description: Unique identifier for each patient in the dataset.
+  - name: claim_start_date
+    description: Start date for the claim.
+  - name: claim_end_date
+    description: End date for the claim.
+  - name: bill_type_code
+    description: Bill type code for the claim (institutional claims only).
+  - name: hcpcs_code
+    description: HCPCS level 1 or level 2 code for the claim line.
+

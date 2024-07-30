@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: emergency_department__int_institutional_encounter_id
+  description: Assigns encounter_id to every emergency_department institutional claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_emergency_department_institutional_encounter_id
+    tags:
+    - emergency_department
+    - claims_preprocessing
+
+

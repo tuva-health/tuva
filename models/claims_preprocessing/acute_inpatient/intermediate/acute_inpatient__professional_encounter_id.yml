@@ -1,0 +1,14 @@
+version: 2
+models:
+- name: acute_inpatient__professional_encounter_id
+  description: Assigns encounter_id to every acute inpatient professional claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_acute_inpatient_professional_encounter_id
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: table
+

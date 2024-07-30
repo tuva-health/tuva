@@ -1,0 +1,13 @@
+version: 2
+models:
+- name: quality_measures__int_shared_exclusions_hospice_palliative
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_shared_exclusions_hospice_palliative
+    tags: quality_measures
+    materialized: table
+  description: >
+    Exclusion logic for patients using hospice or palliative services for the reporting
+    for entire patient population.
+

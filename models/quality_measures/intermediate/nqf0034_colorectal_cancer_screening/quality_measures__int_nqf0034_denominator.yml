@@ -1,0 +1,21 @@
+version: 2
+models:
+- name: quality_measures__int_nqf0034_denominator
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_nqf0034_denominator
+    tags: quality_measures
+    materialized: table
+  description: >
+    Denominator logic for the reporting version of NQF 0034, Colorectal Cancer  Screening.
+  columns:
+  - name: patient_id
+    description: Unique patient_id for each person.
+  - name: min_age
+    description: Patient's minumum age during encounter as of the performance_period.
+  - name: max_age
+    description: Patient's maximum age during encounter as of the performance_period.
+  - name: qualifying_types
+    description: Indicative letter of patient's type of encounter.
+

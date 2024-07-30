@@ -1,0 +1,60 @@
+version: 2
+models:
+- name: cms_hcc__int_members
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _int_members
+    tags: cms_hcc
+    materialized: table
+  description: >
+    Transformed eligibility data into the demographic risk segments required  for
+    the CMS HCC and risk calculations.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+    tests:
+    - not_null
+    - unique
+  - name: enrollment_status
+    description: >
+      Indicates whether the patient is a "Continuing" or "New" enrollee.
+  - name: gender
+    description: Indicates whether the patient is "Female" or "Male".
+  - name: age_group
+    description: >
+      Indicates what age group the patient is in. (e.g. "60-64").
+      CMS guidance: Age is calculated as of Feb 1 of the payment year.
+  - name: medicaid_status
+    description: Indicates whether the patient is enrolled in Medicaid.
+  - name: dual_status
+    description: >
+      Indicates whether the patient has "Full", "Partial", or "Non"  dual status.
+  - name: orec
+    description: >
+      Indicates the Original Reason for Entitlement Code (OREC)  "Aged", "Disabled",
+      or "ESRD". If available, current Medicare Status  is used when OREC is missing.
+  - name: institutional_status
+    description: >
+      Indicates whether the patient resided in an institution for at  least 90 days.
+  - name: enrollment_status_default
+    description: >
+      Indicates the input data was missing and a default status was used.
+  - name: medicaid_dual_status_default
+    description: >
+      Indicates the input data was missing and a default status was used.
+  - name: orec_default
+    description: >
+      Indicates the input data was missing and a default status was used.
+  - name: institutional_status_default
+    description: >
+      Indicates the input data was missing and a default status was used.
+  - name: model_version
+    description: CMS HCC model version.
+  - name: payment_year
+    description: >
+      The payment year the HCC and risk scores are being calculated for.
+  - name: tuva_last_run
+    description: The date the model was run.
+
+## Staging

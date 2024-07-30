@@ -1,0 +1,17 @@
+version: 2
+models:
+- name: readmissions__planned_encounter
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_planned_encounter
+    tags: readmissions
+    materialized: view
+  description: "This model gives a list of all encounter_ids that were planned encounters."
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+
+
+

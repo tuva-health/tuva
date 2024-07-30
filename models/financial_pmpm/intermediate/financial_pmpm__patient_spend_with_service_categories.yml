@@ -1,0 +1,15 @@
+version: 2
+models:
+- name: financial_pmpm__patient_spend_with_service_categories
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+      {% else %}financial_pmpm{%- endif -%}
+    alias: _int_patient_spend_with_service_categories
+    tags:
+    - financial_pmpm
+    materialized: table
+  description: >
+    Adds service categories to claims and sums paid and allowed amounts to the year-month
+    level.
+
