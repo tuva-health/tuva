@@ -12,7 +12,7 @@ select distinct
 ,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
-inner join  {{ ref('service_category__stg_professional') }} prof on med.claimd_id = prof.claim_id
+inner join  {{ ref('service_category__stg_professional') }} prof on med.claim_id = prof.claim_id
 and med.claim_line_number = prof.claim_line_number
   and place_of_service_code in ('11','02')
   and ccs_category = '227' --consultation eval and preventative care
