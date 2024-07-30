@@ -1,0 +1,31 @@
+version: 2
+
+models:
+## Final
+
+#Intermediate
+
+##    Staging
+  - name: encounters__stg_inpatient_institutional
+    config:
+      materialized: table
+      tags: 
+        - encounters
+
+  - name: encounters__stg_medical_claim
+    config:
+      materialized: table
+      tags: 
+        - encounters
+
+  - name: encounters__stg_outpatient_institutional
+    config:
+      materialized: table
+      tags: 
+        - encounters
+
+  - name: encounters__stg_professional
+    config:
+      materialized: table
+      tags: 
+        - encounters
