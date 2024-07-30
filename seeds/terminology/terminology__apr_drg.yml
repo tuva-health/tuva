@@ -1,0 +1,32 @@
+version: 2
+seeds:
+- name: terminology__apr_drg
+  description: 'Seed containing All Patient Refined Diagnosis Related Groups (APR-DRG)
+    codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: apr_drg
+    tags:
+    - terminology
+    - data_profiling
+    column_types:
+      apr_drg_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      medical_surgical: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      mdc_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      apr_drg_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: apr_drg_code
+    description: 'The All Patient Refined Diagnosis Related Group (APR-DRG) code.'
+  - name: medical_surgical
+    description: 'Indicates whether the DRG is medical or surgical.'
+  - name: mdc_code
+    description: 'The Major Diagnostic Category (MDC) code associated with the APR-DRG.'
+  - name: apr_drg_description
+    description: 'The description of the All Patient Refined Diagnosis Related Group
+      (APR-DRG).'
+

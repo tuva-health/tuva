@@ -1,0 +1,56 @@
+version: 2
+seeds:
+- name: reference_data__calendar
+  description: 'Seed containing calendar dates and related attributes.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
+    alias: calendar
+    tags:
+    - terminology
+    - pmpm
+    - reference_data
+    column_types:
+      full_date: date
+      year: integer
+      month: integer
+      day: integer
+      month_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      day_of_week_number: integer
+      day_of_week_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      week_of_year: integer
+      day_of_year: integer
+      year_month: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      first_day_of_month: date
+      last_day_of_month: date
+      year_month_int: integer
+
+  columns:
+  - name: full_date
+    description: 'The complete date.'
+  - name: year
+    description: 'The year part of the date.'
+  - name: month
+    description: 'The month part of the date.'
+  - name: day
+    description: 'The day part of the date.'
+  - name: month_name
+    description: 'The name of the month.'
+  - name: day_of_week_number
+    description: 'The number of the day in the week.'
+  - name: day_of_week_name
+    description: 'The name of the day in the week.'
+  - name: week_of_year
+    description: 'The week number in the year.'
+  - name: day_of_year
+    description: 'The day number in the year.'
+  - name: year_month
+    description: 'The year and month in YYYY-MM format.'
+  - name: first_day_of_month
+    description: 'The first day of the month.'
+  - name: last_day_of_month
+    description: 'The last day of the month.'
+

@@ -1,0 +1,29 @@
+version: 2
+seeds:
+- name: hcc_suspecting__clinical_concepts
+  description: Value sets for clinical concepts.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+    alias: _value_set_clinical_concepts
+    tags: hcc_suspecting
+    enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      concept_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      concept_oid: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      code_system: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: concept_name
+    description: Name of the clinical concept
+  - name: concept_oid
+    description: OID of the clinical concept
+  - name: code
+    description: Code representing the clinical concept
+  - name: code_system
+    description: Code system used for the code
+

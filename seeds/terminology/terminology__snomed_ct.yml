@@ -1,0 +1,32 @@
+version: 2
+seeds:
+- name: terminology__snomed_ct
+  description: 'Seed containing SNOMED CT codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: snomed_ct
+    tags:
+    - terminology
+    column_types:
+      snomed_ct: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      is_active: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      created: date
+      last_updated: date
+  columns:
+  - name: snomed_ct
+    description: 'The SNOMED CT code.'
+  - name: description
+    description: 'The description of the SNOMED CT code.'
+  - name: is_active
+    description: 'Indicates if the SNOMED CT code is active.'
+  - name: created
+    description: 'The date when the SNOMED CT code was created.'
+  - name: last_updated
+    description: 'The date when the SNOMED CT code was last updated.'
+
+

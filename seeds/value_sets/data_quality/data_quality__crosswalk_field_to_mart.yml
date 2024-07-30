@@ -1,0 +1,22 @@
+version: 2
+seeds:
+- name: data_quality__crosswalk_field_to_mart
+  description: >
+    Crosswalk table that defines which fields impact the ability for marts to run.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: _value_set_crosswalk_field_to_mart
+    column_types:
+      input_layer_table_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      claim_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      field_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      mart_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+
+
+

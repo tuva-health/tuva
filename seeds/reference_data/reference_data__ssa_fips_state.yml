@@ -1,0 +1,21 @@
+version: 2
+seeds:
+- name: reference_data__ssa_fips_state
+  description: 'Seed containing SSA FIPS state codes and names.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
+    alias: ssa_fips_state
+    tags:
+    - terminology
+    - reference_data
+    column_types:
+      ssa_fips_state_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      ssa_fips_state_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: ssa_fips_state_code
+    description: 'The SSA FIPS state code.'
+  - name: ssa_fips_state_name
+    description: 'The name of the SSA FIPS state.'

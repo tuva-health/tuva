@@ -1,0 +1,28 @@
+version: 2
+seeds:
+- name: clinical_concept_library__coding_systems
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
+    alias: coding_systems
+    tags: clinical_concept_library
+    column_types:
+      coding_system_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coding_system_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coding_system_uri: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coding_system_oid: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: coding_system_id
+    description: Primary key for the table
+  - name: coding_system_name
+    description: Name of the coding system, e.g. “SNOMED CT US Edition”
+  - name: coding_system_uri
+    description: URI as used in FHIR to represent coding system. This provides an
+      unambiguous identifier for the coding system.
+  - name: coding_system_oid
+    description: OID for the coding system. This provides another unambiguous identifier
+      for the coding system (along with uri).

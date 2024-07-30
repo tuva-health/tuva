@@ -1,0 +1,65 @@
+version: 2
+seeds:
+- name: clinical_concept_library__value_set_members
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
+    alias: value_set_members
+    tags: clinical_concept_library
+    column_types:
+      value_set_member_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      concept_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      last_update_date: date
+      last_update_note: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      code_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
+      coding_system_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coding_system_version: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      include_descendants: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      comment: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
+  columns:
+  - name: value_set_member_id
+    description: Primary key for the table
+  - name: concept_id
+    description: Foreign key to concept table
+  - name: status
+    description: Status of this individual value_set_members record. Options = “active”
+      and “inactive”, others to be added as needed.
+  - name: last_update_date
+    description: Date of last update of this row, formatted as YYYY-MM-DD.
+  - name: last_update_note
+    description: Relevant details regarding the nature and reasons for the most recent
+      update.
+  - name: code
+    description: Standardized code that is a member of the value set for the concept
+      referenced in concept_id
+  - name: code_description
+    description: Description for the code in the "code" column.
+  - name: coding_system_id
+    description: Coding system ID for code in the "code" column. Foreign key to coding_systems
+  - name: coding_system_version
+    description: Version of the coding system used. For now, editorial conventions
+      and/or business logic will be required to establish a consistent format for
+      coding version for each coding system.
+  - name: include_descendants
+    description: Indicates whether the value set should include descendants of the
+      specified code. If “true”, include the specified code and all of its descendants.
+      If “false”, include only the specified code. Applies only to coding systems
+      for which Tuva has implemented this feature.
+  - name: comment
+    description: In some cases it may be helpful to provide some explanatory context
+      for inclusion of a particular code, e.g., insights into the intended meaning
+      of the code that aren’t implicit in the code description but are implied by
+      other aspects of the coding system e.g., ICD-10-CM coding guidance.
+

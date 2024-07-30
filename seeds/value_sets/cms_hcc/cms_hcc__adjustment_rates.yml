@@ -1,0 +1,31 @@
+version: 2
+seeds:
+- name: cms_hcc__adjustment_rates
+  description: >
+    Adjustment rates by payment year. Extracted from rate announcement
+    documents on cms.gov.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _value_set_adjustment_rates
+    tags: cms_hcc
+    enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      model_version: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      payment_year: |
+        integer
+      normalization_factor: |
+        {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
+      ma_coding_pattern_adjustment: |
+        {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
+  columns:
+  - name: model_version
+    description: Version of the CMS-HCC model
+  - name: payment_year
+    description: The year for which the adjustment rates are applicable
+  - name: normalization_factor
+    description: The normalization factor applied
+  - name: ma_coding_pattern_adjustment
+    description: The Medicare Advantage coding pattern adjustment factor
+

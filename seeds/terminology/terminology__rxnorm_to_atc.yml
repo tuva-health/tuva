@@ -1,0 +1,55 @@
+version: 2
+seeds:
+- name: terminology__rxnorm_to_atc
+  description: 'This file maps ATC classes to RxCUI. The file is maintained by [CodeRX](https://coderx.io/)
+    in partnership with Tuva Health.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: rxnorm_to_atc
+    tags:
+    - terminology
+    column_types:
+      rxcui: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      rxnorm_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+      atc_1_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_1_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_2_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_2_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_3_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_3_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_4_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      atc_4_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: rxcui
+    description: 'The RxNorm code.'
+  - name: rxnorm_description
+    description: 'Description of the RxNorm concept.'
+  - name: atc_1_code
+    description: 'The ATC level 1 code.'
+  - name: atc_1_name
+    description: 'The name of the ATC level 1 code.'
+  - name: atc_2_code
+    description: 'The ATC level 2 code.'
+  - name: atc_2_name
+    description: 'The name of the ATC level 2 code.'
+  - name: atc_3_code
+    description: 'The ATC level 3 code.'
+  - name: atc_3_name
+    description: 'The name of the ATC level 3 code.'
+  - name: atc_4_code
+    description: 'The ATC level 4 code.'
+  - name: atc_4_name
+    description: 'The name of the ATC level 4 code.'
+
+

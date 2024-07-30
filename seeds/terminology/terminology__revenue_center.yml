@@ -1,0 +1,23 @@
+version: 2
+seeds:
+- name: terminology__revenue_center
+  description: 'Seed containing revenue center codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: revenue_center
+    tags:
+    - terminology
+    - claims_preprocessing
+    - data_profiling
+    column_types:
+      revenue_center_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      revenue_center_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: revenue_center_code
+    description: 'The code representing the revenue center.'
+  - name: revenue_center_description
+    description: 'A description of the revenue center.'
+

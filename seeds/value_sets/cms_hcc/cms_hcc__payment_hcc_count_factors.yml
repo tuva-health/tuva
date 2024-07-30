@@ -1,0 +1,63 @@
+version: 2
+seeds:
+- name: cms_hcc__payment_hcc_count_factors
+  description: >
+    Payment HCC count factors by model version and risk segment. Extracted  from rate
+    announcement documents on cms.gov.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _value_set_payment_hcc_count_factors
+    tags: cms_hcc
+    enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      model_version: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      factor_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      enrollment_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      medicaid_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      dual_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      orec: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      institutional_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      payment_hcc_count: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coefficient: |
+        {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
+  columns:
+  - name: model_version
+    description: Version of the CMS-HCC model
+  - name: factor_type
+    description: Type of HCC count factor
+  - name: enrollment_status
+    description: Enrollment status of the individual
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
+  - name: medicaid_status
+    description: Medicaid status of the individual
+  - name: dual_status
+    description: Dual eligibility status of the individual
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_dual_eligibility.csv
+  - name: orec
+    description: Original reason for entitlement code
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_orec.csv
+  - name: institutional_status
+    description: Institutional status of the individual
+  - name: payment_hcc_count
+    description: Count of HCCs for payment adjustment
+  - name: description
+    description: Description of the HCC count factor
+  - name: coefficient
+    description: Coefficient for the HCC count factor

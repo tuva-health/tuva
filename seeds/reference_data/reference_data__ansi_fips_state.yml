@@ -1,0 +1,27 @@
+version: 2
+seeds:
+- name: reference_data__ansi_fips_state
+  description: 'Seed containing ANSI FIPS state codes and names.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
+    alias: ansi_fips_state
+    tags:
+    - terminology
+    - medicare_cclf_connector
+    - reference_data
+    column_types:
+      ansi_fips_state_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      ansi_fips_state_abbreviation: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      ansi_fips_state_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: ansi_fips_state_code
+    description: 'The unique ANSI FIPS state code.'
+  - name: ansi_fips_state_abbreviation
+    description: 'The abbreviation of the ANSI FIPS state.'
+  - name: ansi_fips_state_name
+    description: 'The full name of the ANSI FIPS state.'
+

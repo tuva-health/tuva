@@ -1,0 +1,78 @@
+version: 2
+seeds:
+- name: terminology__snomed_icd_10_map
+  description: 'Seed containing mappings between SNOMED CT and ICD-10 codes.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: snomed_icd_10_map
+    tags:
+    - terminology
+    - hcc_suspecting
+    column_types:
+      id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      effective_time: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      active: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      module_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      ref_set_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      referenced_component_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      referenced_component_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_group: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_priority: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_rule: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(500) {%- endif -%}
+      map_advice: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(500) {%- endif -%}
+      map_target: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_target_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      correlation_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_category_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_category_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: id
+    description: 'The unique identifier for the mapping.'
+  - name: effective_time
+    description: 'The effective time of the mapping.'
+  - name: active
+    description: 'Indicates if the mapping is active.'
+  - name: module_id
+    description: 'The module ID associated with the mapping.'
+  - name: ref_set_id
+    description: 'The reference set ID associated with the mapping.'
+  - name: referenced_component_id
+    description: 'The referenced component ID.'
+  - name: referenced_component_name
+    description: 'The name of the referenced component.'
+  - name: map_group
+    description: 'The map group.'
+  - name: map_priority
+    description: 'The map priority.'
+  - name: map_rule
+    description: 'The map rule.'
+  - name: map_advice
+    description: 'Advice related to the map.'
+  - name: map_target
+    description: 'The map target.'
+  - name: map_target_name
+    description: 'The name of the map target.'
+  - name: correlation_id
+    description: 'The correlation ID associated with the mapping.'
+  - name: map_category_id
+    description: 'The map category ID.'
+  - name: map_category_name
+    description: 'The name of the map category.'
+

@@ -1,0 +1,63 @@
+version: 2
+seeds:
+- name: cms_hcc__disease_interaction_factors
+  description: >
+    Disease interaction factors by model version and risk segment. Extracted  from
+    rate announcement documents on cms.gov.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _value_set_disease_interaction_factors
+    tags: cms_hcc
+    enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      model_version: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      factor_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      enrollment_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      medicaid_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      dual_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      orec: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      institutional_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      short_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      hcc_code_1: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      hcc_code_2: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coefficient: |
+        {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
+  columns:
+  - name: model_version
+    description: Version of the CMS-HCC model
+  - name: factor_type
+    description: Type of interaction factor
+  - name: enrollment_status
+    description: Enrollment status of the individual
+  - name: medicaid_status
+    description: Medicaid status of the individual
+  - name: dual_status
+    description: Dual eligibility status of the individual
+  - name: orec
+    description: Original reason for entitlement code
+  - name: institutional_status
+    description: Institutional status of the individual
+  - name: short_name
+    description: Short name of the interaction factor
+  - name: description
+    description: Description of the interaction factor
+  - name: hcc_code_1
+    description: First Hierarchical Condition Category code
+  - name: hcc_code_2
+    description: Second Hierarchical Condition Category code
+  - name: coefficient
+    description: Coefficient for the interaction factor
+

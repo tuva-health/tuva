@@ -1,0 +1,23 @@
+version: 2
+seeds:
+- name: terminology__admit_type
+  description: 'Seed containing NUBC admission types and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: admit_type
+    tags:
+    - terminology
+    - claims_preprocessing
+    - data_profiling
+    column_types:
+      admit_type_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      admit_type_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: admit_type_code
+    description: 'The code representing the type of admission.'
+  - name: admit_type_description
+    description: 'A description of the admission type.'
+

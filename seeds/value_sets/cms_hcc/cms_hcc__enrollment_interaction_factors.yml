@@ -1,0 +1,51 @@
+version: 2
+seeds:
+- name: cms_hcc__enrollment_interaction_factors
+  description: >
+    Enrollment interaction factors by model version and risk segment.  Extracted from
+    rate announcement documents on cms.gov.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _value_set_enrollment_interaction_factors
+    tags: cms_hcc
+    enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      model_version: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      factor_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      gender: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      enrollment_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      medicaid_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      dual_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      institutional_status: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      coefficient: |
+        {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
+  columns:
+  - name: model_version
+    description: Version of the CMS-HCC model
+  - name: factor_type
+    description: Type of enrollment interaction factor
+  - name: gender
+    description: Gender of the individual
+  - name: enrollment_status
+    description: Enrollment status of the individual
+  - name: medicaid_status
+    description: Medicaid status of the individual
+  - name: dual_status
+    description: Dual eligibility status of the individual
+  - name: institutional_status
+    description: Institutional status of the individual
+  - name: description
+    description: Description of the enrollment interaction factor
+  - name: coefficient
+    description: Coefficient for the enrollment interaction factor
+

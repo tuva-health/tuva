@@ -1,0 +1,23 @@
+version: 2
+seeds:
+- name: terminology__present_on_admission
+  description: 'Seed containing present on admission (POA) indicator codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: present_on_admission
+    tags:
+    - terminology
+    - data_profiling
+    - claims_preprocessing
+    column_types:
+      present_on_admit_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      present_on_admit_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: present_on_admit_code
+    description: 'The code representing if the condition was present on admission.'
+  - name: present_on_admit_description
+    description: 'A description of the present on admission (POA) indicator.'
+

@@ -1,0 +1,31 @@
+version: 2
+seeds:
+- name: terminology__ndc
+  description: 'This file collects all NDCs collected by the FDA and RxNorm, and compiles
+    them into one list. The file is maintained by [CodeRX](https://coderx.io/) in
+    partnership with Tuva Health.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: ndc
+    tags:
+    - terminology
+    column_types:
+      ndc: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      rxcui: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      rxnorm_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+      fda_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+  columns:
+  - name: ndc
+    description: 'The National Drug Code (NDC).'
+  - name: rxcui
+    description: 'The RxCUI identifier associated with the NDC.'
+  - name: rxnorm_description
+    description: 'The description of the RxNorm concept.'
+  - name: fda_description
+    description: 'The FDA description of the drug.'
+

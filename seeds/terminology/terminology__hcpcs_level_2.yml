@@ -1,0 +1,32 @@
+version: 2
+seeds:
+- name: terminology__hcpcs_level_2
+  description: 'Seed containing HCPCS Level II codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: hcpcs_level_2
+    tags: terminology
+    column_types:
+      hcpcs: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      seqnum: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      recid: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      long_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2000) {%- endif -%}
+      short_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: hcpcs
+    description: 'The HCPCS Level II code.'
+  - name: seqnum
+    description: 'The sequence number.'
+  - name: recid
+    description: 'The record identifier.'
+  - name: long_description
+    description: 'The long description of the HCPCS code.'
+  - name: short_description
+    description: 'The short description of the HCPCS code.'
+

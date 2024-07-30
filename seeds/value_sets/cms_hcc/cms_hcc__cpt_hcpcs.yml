@@ -1,0 +1,27 @@
+version: 2
+seeds:
+- name: cms_hcc__cpt_hcpcs
+  description: >
+    CPT/HCPCS encounter filtering included list by payment year. Combined  and cleaned
+    version of code files on cms.gov.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+    alias: _value_set_cpt_hcpcs
+    tags: cms_hcc
+    enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      payment_year: |
+        integer
+      hcpcs_cpt_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      included_flag: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: payment_year
+    description: The year for which the CPT/HCPCS codes are applicable
+  - name: hcpcs_cpt_code
+    description: The CPT or HCPCS code
+  - name: included_flag
+    description: Flag indicating whether the code is included in the filtering
+

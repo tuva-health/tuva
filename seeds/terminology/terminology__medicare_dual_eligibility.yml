@@ -1,0 +1,23 @@
+version: 2
+seeds:
+- name: terminology__medicare_dual_eligibility
+  description: 'Seed containing Medicare dual eligibility status codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: medicare_dual_eligibility
+    tags:
+    - terminology
+    - claims_preprocessing
+    - data_profiling
+    column_types:
+      dual_status_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      dual_status_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: dual_status_code
+    description: 'The code representing dual eligibility status.'
+  - name: dual_status_description
+    description: 'A description of the dual eligibility status.'
+
