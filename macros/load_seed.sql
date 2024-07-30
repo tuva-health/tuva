@@ -191,7 +191,7 @@ PATTERN = '{{ pattern }}*'
 FORMAT_OPTIONS (
   {% if headers == true %} 'skipRows' = '1', {% else %} 'skipRows' = '0', {% endif %}
   {% if null_marker == true %} 'nullValue' = '\\N', {% else %} {% endif %}
-  'enforceSchema' = 'true',
+  'enforceSchema' = 'false',
   'inferSchema' = 'false',
   'sep' = ',',
   'escape' = "\"",
