@@ -13,8 +13,22 @@ select distinct
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} a on s.claim_id = a.claim_id
-left join {{ ref('service_category__acute_inpatient_institutional_maternity') }} mat on mat.claim_id = a.claim_id
+{# left join {{ ref('service_category__acute_inpatient_institutional_maternity') }} mat on mat.claim_id = a.claim_id
 left join {{ ref('service_category__acute_inpatient_institutional_med_surg') }} med on med.claim_id = a.claim_id
 left join {{ ref('service_category__acute_inpatient_institutional_substance_use') }} sub on sub.claim_id = a.claim_id
 left join {{ ref('service_category__inpatient_skilled_nursing_institutional') }} snf on snf.claim_id = a.claim_id
 left join {{ ref('service_category__inpatient_hospice_institutional') }} hosp on hosp.claim_id = a.claim_id
+where s.claim_id is null
+and
+mat.claim_id is null
+and
+med.claim_id is null
+and
+sub.claim_id is null
+and
+snf.claim_id is null
+and
+hosp.claim_id is null 
+
+simplified by setting lowest priority instead of explicitly doing all the joins
+#}

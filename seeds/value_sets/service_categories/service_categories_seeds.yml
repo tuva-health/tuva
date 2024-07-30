@@ -16,8 +16,16 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         service_category_2: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        service_category_3: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        priority: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}          
     columns:
       - name: service_category_1
         description: high level service category
       - name: service_category_2
         description: sub-category of service category
+      - name: service_category_3
+        description: sub-category of service category        
+      - name: priority
+        description: sub-category of service category        

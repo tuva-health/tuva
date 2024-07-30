@@ -6,6 +6,7 @@
 
 select
     claim_type
+    ,claim_line_id
     , service_category_1
     , service_category_2
     , service_category_3
@@ -59,4 +60,5 @@ group by
     , bill_type_description
     , duplicate_row_number
     , source_model_name
-
+    , claim_line_id
+ 

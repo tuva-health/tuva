@@ -121,6 +121,7 @@ select
     d.claim_id
     , d.claim_line_number
     , d.claim_type
+    , d.claim_id || '|' || d.claim_line_number as claim_line_id
     , service_category_1
     , service_category_2
     , service_category_3
