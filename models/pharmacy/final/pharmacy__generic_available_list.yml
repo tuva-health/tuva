@@ -17,14 +17,11 @@ models:
     both brand and potential generic drug costs and descriptions.
   tests:
   - dbt_utils.unique_combination_of_columns:
-  - name: test
-    description: test      combination_of_columns:
-  - name: test
-    description: test      - generic_available_sk
+      combination_of_columns:
+      - generic_available_sk
       - generic_ndc
   columns:
-  - name: test
-    description: test  - name: generic_available_sk
+  - name: generic_available_sk
     description: Surrogate key for generic availability.
   - name: data_source
     description: Source of the data.

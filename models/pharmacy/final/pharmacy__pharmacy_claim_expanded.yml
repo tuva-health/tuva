@@ -16,15 +16,12 @@ models:
     Expanded view of pharmacy claims with additional details.
   tests:
   - dbt_utils.unique_combination_of_columns:
-  - name: test
-    description: test      combination_of_columns:
-  - name: test
-    description: test      - data_source
+      combination_of_columns:
+      - data_source
       - claim_id
       - claim_line_number
   columns:
-  - name: test
-    description: test  - name: data_source
+  - name: data_source
     description: Source of the data.
   - name: claim_id
     description: Unique identifier for each pharmacy claim.
