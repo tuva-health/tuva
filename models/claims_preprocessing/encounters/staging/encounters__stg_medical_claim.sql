@@ -8,8 +8,8 @@ select
   , claim_line_number
   , claim_id || cast(claim_line_number as {{dbt.type_string() }} ) as claim_line_id
   , claim_type
-  , coalesce(m.admission_date,claim_start_date,claim_line_start_date) as start_dts
-  , coalesce(admission_date,claim_start_date,claim_line_start_date) as start_dts
+  , coalesce(m.admission_date,claim_start_date,claim_line_start_date) as start_date
+  , coalesce(admission_date,claim_start_date,claim_line_start_date) as end_date
   , m.bill_type_code
   , bt.bill_type_description
   , m.hcpcs_code
@@ -29,6 +29,7 @@ select
   , p.primary_taxonomy_code
   , p.primary_specialty_description
   , n.modality
+  , m.billing_id
   , '{{ var('tuva_last_run') }}' as tuva_last_run
   , row_number() over (order by random()) as rn
 from {{ ref('normalized_input__medical_claim') }} m

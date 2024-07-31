@@ -6,7 +6,7 @@
 with drg_requirement as (
 select distinct 
   mc.claim_id
-from {{ ref('service_category__stg_medical_claim') }} mc
+from {{ ref('encounters__stg_medical_claim') }} mc
 left join {{ ref('terminology__ms_drg')}} msdrg
   on mc.ms_drg_code = msdrg.ms_drg_code
 left join {{ ref('terminology__apr_drg')}} aprdrg
@@ -18,7 +18,7 @@ where claim_type = 'institutional'
 , bill_type_requirement as (
 select distinct 
   claim_id
-from {{ ref('service_category__stg_medical_claim') }}
+from {{ ref('encounters__stg_medical_claim') }}
 where claim_type = 'institutional'
   and substring(bill_type_code, 1, 2) in ('11' -- hospital inpatient 
   ,'12' --hospital inpatient 
@@ -32,7 +32,7 @@ select distinct
   a.claim_id
 , 'Inpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} a
+from {{ ref('encounters__stg_medical_claim') }} a
 inner join bill_type_requirement d
   on a.claim_id = d.claim_id
 
@@ -42,6 +42,6 @@ select distinct
   a.claim_id
 , 'Inpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} a
+from {{ ref('encounters__stg_medical_claim') }} a
 inner join drg_requirement c
   on a.claim_id = c.claim_id
