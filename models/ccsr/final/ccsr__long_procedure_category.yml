@@ -36,15 +36,15 @@ models:
     description: >
       The parent category code for each CCSR category. In practice, this is  the three
       letter prefix to the category code.
+  - name: ccsr_category
+    description: The CCSR category mapped to the ICD-10-PCS code.
+  - name: ccsr_category_description
+    description: A description of the clinical domain.
   - name: clinical_domain
     description: >
       The ICD-10-PCS Clinical Domain that the CCSR parent category belongs  to. Note
       that the condition models don't have this column, but the  `body_system` is
       a conceptually related column in the condition tables.
-  - name: ccsr_category_description
-    description: A description of the clinical domain.
-  - name: ccsr_category
-    description: The CCSR category mapped to the ICD-10-PCS code.
   - name: prccsr_version
     description: >
       The version number of the CCSR program from which the dbt model was  derived.

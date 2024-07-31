@@ -26,20 +26,20 @@ models:
   - name: code_description
     description: >
       The description of the ICD-10-CM code included in the seed file.
+  - name: ccsr_parent_category
+    description: >
+      The CCSR parent category - the three letter prefix for each  alphanumeric category.
   - name: ccsr_category
     description: >
       A CCSR category for the ICD-10-CM code. One ICD-10-CM code may have up
       6 CCSR categories associated, ordinally ranked by the  ccsr_category_rank. Will
       be null if a record has a `code` that isn't  referenced in the CCSR seed file.
+  - name: ccsr_category_description
+    description: The human readable description of the `ccsr_category`.
   - name: ccsr_category_rank
     description: >
       The ordinal rank of a given CCSR category mapped to an ICD-10-CM code.  The
       CCSR seed CSV has the order of categories assigned to each  ICD-10-CM code.
-  - name: ccsr_category_description
-    description: The human readable description of the `ccsr_category`.
-  - name: ccsr_parent_category
-    description: >
-      The CCSR parent category - the three letter prefix for each  alphanumeric category.
   - name: is_ip_default_category
     description: >
       For each ICD-10-CM code, this field will return true for the CCSR  category

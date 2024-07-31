@@ -30,22 +30,14 @@ models:
     description: Name of the payer
   - name: plan
     description: Name of the plan
-  - name: prescribing_provider_npi
-    description: >
-      NPI for the provider that wrote the prescription (e.g. priamry care  physician).
-    meta:
-      terminology: 
-        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-      terminology_note: "**Note: this terminology set is too large to be loaded as
-        a seed and is instead loaded from public cloud storage for supported adapters."
-  - name: dispensing_provider_npi
-    description: >
-      NPI for the provider that dispensed the prescription (e.g. pharmacy).
-    meta:
-      terminology: 
-        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-      terminology_note: "**Note: this terminology set is too large to be loaded as
-        a seed and is instead loaded from public cloud storage for supported adapters."
+  - name: prescribing_provider_id
+    description: ''
+  - name: prescribing_provider_name
+    description: ''
+  - name: dispensing_provider_id
+    description: ''
+  - name: dispensing_provider_name
+    description: ''
   - name: dispensing_date
     description: Date the prescription was filled.
   - name: ndc_code
@@ -53,6 +45,8 @@ models:
     meta:
       terminology: 
         https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+  - name: ndc_description
+    description: ''
   - name: quantity
     description: Number of doses.
     data_type: integer
@@ -69,12 +63,16 @@ models:
   - name: allowed_amount
     description: >
       Contractual amount allowed to be paid by the payer + patient.
+  - name: charge_amount
+    description: ''
   - name: coinsurance_amount
     description: The total coinsurance charged on the claim by the provider.
   - name: copayment_amount
     description: The total copayment charged on the claim by the provider.
   - name: deductible_amount
     description: The total amount charged on the claim by the provider.
+  - name: in_network_flag
+    description: ''
   - name: data_source
     description: >
       User-configured field that indicates the data source (e.g. typically  named

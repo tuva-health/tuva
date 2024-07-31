@@ -24,6 +24,9 @@ models:
     description: >
       Indicates the line number for the particular line of the claim.
     data_type: integer
+  - name: encounter_id
+    description: >
+      The encounter_id for the encounter that this claims belongs to.
   - name: claim_type
     description: >
       Indicates whether the claim is professional (CMS-1500), institutional  (UB-04),
@@ -54,6 +57,16 @@ models:
     description: Admission date for the claim (inpatient claims only).
   - name: discharge_date
     description: Discharge date for the claim (inpatient claims only).
+  - name: service_category_1
+    description: The broader service category this claim belongs to.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+  - name: service_category_2
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+    description: The more specific service category this claim belongs to.
   - name: admit_source_code
     description: >
       Indicates where the patient was before the healthcare encounter  (inpatient
@@ -61,11 +74,15 @@ models:
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+  - name: admit_source_description
+    description: ''
   - name: admit_type_code
     description: Indicates the type of admission (inpatient claims only).
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+  - name: admit_type_description
+    description: ''
   - name: discharge_disposition_code
     description: >
       Indicates the type of setting the patient was discharged to  (institutional
@@ -73,26 +90,36 @@ models:
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+  - name: discharge_disposition_description
+    description: ''
   - name: place_of_service_code
     description: Place of service for the claim (professional claims only).
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__place_of_service.csv
+  - name: place_of_service_description
+    description: ''
   - name: bill_type_code
     description: Bill type code for the claim (institutional claims only).
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__bill_type.csv
+  - name: bill_type_description
+    description: ''
   - name: ms_drg_code
     description: MS-DRG for the claim (inpatient claims only).
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+  - name: ms_drg_description
+    description: ''
   - name: apr_drg_code
     description: APR-DRG for the claim (inpatient claims only).
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+  - name: apr_drg_description
+    description: ''
   - name: revenue_center_code
     description: >
       Revenue center code for the claim line (institutional only and  typically multiple
@@ -100,6 +127,8 @@ models:
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__revenue_center.csv
+  - name: revenue_center_description
+    description: ''
   - name: service_unit_quantity
     description: The number of units for the particular revenue center code.
     data_type: integer
@@ -133,21 +162,15 @@ models:
     meta:
       terminology: 
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
-  - name: rendering_npi
-    description: >
-      Rendering NPI for the claim (typically represents the physician or  entity providing
-      services).
-    meta:
-      terminology: 
-        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-      terminology_note: "**Note: this terminology set is too large to be loaded as
-        a seed and is instead loaded from public cloud storage for supported adapters."
+  - name: rendering_id
+    description: ''
   - name: rendering_tin
     description: >
       Rendering provider tax identification number (TIN).
-  - name: billing_npi
-    description: >
-      Billing NPI for the claim (typically represents organization billing  the claim).
+  - name: rendering_name
+    description: ''
+  - name: billing_id
+    description: ''
   - name: billing_tin
     description: >
       Billing provider tax identification number (TIN).
@@ -156,15 +179,12 @@ models:
         https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
       terminology_note: "**Note: this terminology set is too large to be loaded as
         a seed and is instead loaded from public cloud storage for supported adapters."
-  - name: facility_npi
-    description: >
-      Facility NPI for the claim (typically represents the facility where  services
-      were performed).
-    meta:
-      terminology: 
-        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-      terminology_note: "**Note: this terminology set is too large to be loaded as
-        a seed and is instead loaded from public cloud storage for supported adapters."
+  - name: billing_name
+    description: ''
+  - name: facility_id
+    description: ''
+  - name: facility_name
+    description: ''
   - name: paid_date
     description: The date the claim was paid.
   - name: paid_amount
@@ -183,21 +203,10 @@ models:
     description: The total amount charged on the claim by the provider.
   - name: total_cost_amount
     description: The total amount paid on the claim by different parties.
-  - name: encounter_type
-    description: The type of encounter this claim belongs to.
-  - name: encounter_id
-    description: >
-      The encounter_id for the encounter that this claims belongs to.
-  - name: service_category_1
-    description: The broader service category this claim belongs to.
-    meta:
-      terminology: 
-        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
-  - name: service_category_2
-    meta:
-      terminology: 
-        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
-    description: The more specific service category this claim belongs to.
+  - name: in_network_flag
+    description: ''
+  - name: enrollment_flag
+    description: ''
   - name: data_source
     description: >
       User-configured field that indicates the data source (e.g. typically  named

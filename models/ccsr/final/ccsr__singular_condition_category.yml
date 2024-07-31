@@ -19,18 +19,6 @@ models:
     description: Unique claim_id for each claim.
   - name: patient_id
     description: Unique identifier for each patient.
-  - name: body_system
-    description: >
-      The body system to which each parent category belongs. The 22 body  systems
-      generally follow the structure of the ICD-10-CM diagnosis  chapters. Note that
-      the procedure tables don't have this column, but  a conceptually related field
-      in procedure models is `clinical_domain`.
-  - name: ccsr_parent_category
-    description: >
-      The parent category code for each CCSR category. In practice, this is  the three
-      letter prefix to the category code.
-  - name: parent_category_description
-    description: A description of the parent category.
   - name: ccsr_category
     description: >
       A CCSR category for the ICD-10-CM code. One ICD-10-CM code may have up
@@ -38,6 +26,18 @@ models:
       be null if a record has a `code` that isn't  referenced in the CCSR seed file.
   - name: ccsr_category_description
     description: The human readable description of the `ccsr_category`.
+  - name: ccsr_parent_category
+    description: >
+      The parent category code for each CCSR category. In practice, this is  the three
+      letter prefix to the category code.
+  - name: parent_category_description
+    description: A description of the parent category.
+  - name: body_system
+    description: >
+      The body system to which each parent category belongs. The 22 body  systems
+      generally follow the structure of the ICD-10-CM diagnosis  chapters. Note that
+      the procedure tables don't have this column, but  a conceptually related field
+      in procedure models is `clinical_domain`.
   - name: dxccsr_version
     description: >
       The version number of the CCSR program from which the dbt model was  derived.

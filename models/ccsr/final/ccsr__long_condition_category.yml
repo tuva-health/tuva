@@ -35,16 +35,16 @@ models:
   - name: condition_rank
     description: The numerical ranking of a diagnosis code in a claim.
     data_type: integer
+  - name: ccsr_parent_category
+    description: >
+      The parent category code for each CCSR category. In practice, this is  the three
+      letter prefix to the category code.
   - name: body_system
     description: >
       The body system to which each parent category belongs. The 22 body  systems
       generally follow the structure of the ICD-10-CM diagnosis  chapters. Note that
       the procedure tables don't have this column, but  a conceptually related field
       in procedure models is `clinical_domain`.
-  - name: ccsr_parent_category
-    description: >
-      The parent category code for each CCSR category. In practice, this is  the three
-      letter prefix to the category code.
   - name: parent_category_description
     description: A description of the parent category.
   - name: ccsr_category
