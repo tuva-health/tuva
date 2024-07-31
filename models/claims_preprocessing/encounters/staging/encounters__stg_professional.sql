@@ -3,7 +3,7 @@
    )
 }}
 
-select  distinct 
+select distinct 
   a.claim_id
   ,a.claim_line_number
 , 'Professional' as service_type
