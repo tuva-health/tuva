@@ -16,12 +16,15 @@ models:
     Table that identifies opportunities for generic substitution in pharmacy claims.
   tests:
   - dbt_utils.unique_combination_of_columns:
-      combination_of_columns:
-      - data_source
+  - name: test
+    description: test      combination_of_columns:
+  - name: test
+    description: test      - data_source
       - claim_id
       - claim_line_number
   columns:
-  - name: data_source
+  - name: test
+    description: test  - name: data_source
     description: Source of the data.
   - name: claim_id
     description: Unique identifier for the claim.
