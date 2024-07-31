@@ -40,6 +40,11 @@ vars:
     # Default timezone is UTC
     tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
+
+    ## Tuva seed S3 bucket override (for PG only) - also optional prefix in case the bucket has other content
+    #tuva_seeds_s3_bucket: "tuva-public-resources"
+    #tuva_seeds_s3_key_prefix: "tuva/seeds/example/prefix"
+
 on-run-end:
   - "{{ log_warning_for_seeds() }}"
 
