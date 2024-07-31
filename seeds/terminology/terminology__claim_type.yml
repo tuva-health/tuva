@@ -1,0 +1,18 @@
+version: 2
+seeds:
+- name: terminology__claim_type
+  description: 'Seed containing claim types.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: claim_type
+    tags:
+    - terminology
+    - data_profiling
+    column_types:
+      claim_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: claim_type
+    description: 'The type of the claim.'
+

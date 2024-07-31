@@ -1,0 +1,30 @@
+version: 2
+seeds:
+- name: terminology__snomed_ct_transitive_closures
+  description: 'Seed containing SNOMED CT transitive closures.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: snomed_ct_transitive_closures
+    tags:
+    - terminology
+    column_types:
+      parent_snomed_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      parent_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      child_snomed_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      child_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: parent_snomed_code
+    description: 'The SNOMED code of the parent concept.'
+  - name: parent_description
+    description: 'The description of the parent SNOMED concept.'
+  - name: child_snomed_code
+    description: 'The SNOMED code of the child concept.'
+  - name: child_description
+    description: 'The description of the child SNOMED concept.'
+
+

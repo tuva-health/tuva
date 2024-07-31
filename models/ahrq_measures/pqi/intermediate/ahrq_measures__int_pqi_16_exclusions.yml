@@ -1,0 +1,24 @@
+version: 2
+models:
+- name: ahrq_measures__int_pqi_16_exclusions
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+    alias: _int_pqi_16_exclusions
+    tags:
+    - ahrq_measures
+    - pqi
+    materialized: view
+  description: >
+    Exclusion logic specific to PQI 16 measure.
+  columns:
+  - name: encounter_id
+    description: ''
+  - name: data_source
+    description: ''
+  - name: exclusion_reason
+    description: ''
+  - name: exclusion_number
+    description: ''
+  - name: tuva_last_run
+    description: ''

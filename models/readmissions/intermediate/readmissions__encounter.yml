@@ -1,0 +1,33 @@
+version: 2
+models:
+- name: readmissions__encounter
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+      {% else %}readmissions{%- endif -%}
+    alias: _int_encounter
+    tags: readmissions
+    materialized: view
+  description: "This is a staging table for the input layer. Each row represents a
+    unique acute inpatient encounter."
+  columns:
+  - name: encounter_id
+    description: "The unique identifier for the encounter"
+  - name: patient_id
+    description: "The unique identifier for the patient"
+  - name: admit_date
+    description: "The date of admission for the inpatient visit"
+  - name: discharge_date
+    description: "The date of discharge for the inpatient visit"
+  - name: discharge_disposition_code
+    description: ''
+  - name: facility_id
+    description: ''
+  - name: ms_drg_code
+    description: ''
+  - name: paid_amount
+    description: ''
+  - name: primary_diagnosis_code
+    description: ''
+  - name: tuva_last_run
+    description: ''

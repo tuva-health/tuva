@@ -1,0 +1,38 @@
+version: 2
+models:
+- name: data_quality__data_quality_claims_detail
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_claims_detail
+    tags:
+    - claims
+    - union all_processing
+    - intermediate
+    materialized: table
+  columns:
+  - name: data_source
+    description: ''
+  - name: source_date
+    description: ''
+  - name: table_name
+    description: ''
+  - name: drill_down_key
+    description: ''
+  - name: drill_down_value
+    description: ''
+  - name: claim_type
+    description: ''
+  - name: field_name
+    description: ''
+  - name: bucket_name
+    description: ''
+  - name: invalid_reason
+    description: ''
+  - name: field_value
+    description: ''
+  - name: tuva_last_run
+    description: ''
+  - name: SUMMARY_SK
+    description: ''

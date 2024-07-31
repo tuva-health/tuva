@@ -1,0 +1,75 @@
+version: 2
+models:
+- name: core__lab_result
+  description: >
+    The lab result table contains information about lab test results,  including the
+    LOINC code and description, units, reference range, and  result.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: lab_result
+    tags: core
+    materialized: table
+  columns:
+  - name: LAB_RESULT_ID
+    description: ''
+  - name: PATIENT_ID
+    description: ''
+  - name: ENCOUNTER_ID
+    description: ''
+  - name: ACCESSION_NUMBER
+    description: ''
+  - name: SOURCE_CODE_TYPE
+    description: ''
+  - name: SOURCE_CODE
+    description: ''
+  - name: SOURCE_DESCRIPTION
+    description: ''
+  - name: SOURCE_COMPONENT
+    description: ''
+  - name: NORMALIZED_CODE_TYPE
+    description: ''
+  - name: NORMALIZED_CODE
+    description: ''
+  - name: NORMALIZED_DESCRIPTION
+    description: ''
+  - name: mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: NORMALIZED_COMPONENT
+    description: ''
+  - name: STATUS
+    description: ''
+  - name: RESULT
+    description: ''
+  - name: RESULT_DATE
+    description: ''
+  - name: COLLECTION_DATE
+    description: ''
+  - name: SOURCE_UNITS
+    description: ''
+  - name: NORMALIZED_UNITS
+    description: ''
+  - name: SOURCE_REFERENCE_RANGE_LOW
+    description: ''
+  - name: SOURCE_REFERENCE_RANGE_HIGH
+    description: ''
+  - name: NORMALIZED_REFERENCE_RANGE_LOW
+    description: ''
+  - name: NORMALIZED_REFERENCE_RANGE_HIGH
+    description: ''
+  - name: SOURCE_ABNORMAL_FLAG
+    description: ''
+  - name: NORMALIZED_ABNORMAL_FLAG
+    description: ''
+  - name: SPECIMEN
+    description: ''
+  - name: ORDERING_PRACTITIONER_ID
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: TUVA_LAST_RUN
+    description: ''

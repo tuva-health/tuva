@@ -1,0 +1,31 @@
+version: 2
+models:
+- name: normalized_input__int_discharge_disposition_voting
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_normalized_input_discharge_disposition_voting
+    materialized: table
+    tags:
+    - normalized_input
+    - claims_preprocessing
+  columns:
+  - name: claim_id
+    description: ''
+  - name: data_source
+    description: ''
+  - name: column_name
+    description: ''
+  - name: normalized_code
+    description: ''
+  - name: normalized_description
+    description: ''
+  - name: occurrence_count
+    description: ''
+  - name: next_occurrence_count
+    description: ''
+  - name: occurrence_row_count
+    description: ''
+  - name: tuva_last_run
+    description: ''

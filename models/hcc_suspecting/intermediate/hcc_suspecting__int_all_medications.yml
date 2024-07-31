@@ -1,0 +1,26 @@
+version: 2
+models:
+- name: hcc_suspecting__int_all_medications
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+    alias: _int_all_medications
+    tags: hcc_suspecting
+    materialized: table
+  description: Union of medications and pharmacy claims.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: dispensing_date
+    description: Date the medication was dispensed or paid date.
+  - name: drug_code
+    description: NDC or rxnorm code.
+  - name: code_system
+    description: The type of drug code.
+  - name: data_source
+    description: >
+      User-configured field that indicates the data source (e.g. typically  named
+      after the payer and state "BCBS Tennessee").
+  - name: tuva_last_run
+    description: The date the model was run.
+

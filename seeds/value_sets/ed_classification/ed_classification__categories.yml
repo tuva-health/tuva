@@ -1,0 +1,29 @@
+version: 2
+seeds:
+- name: ed_classification__categories
+  description: A mapping of ED Classifications to human-readable names
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
+    alias: _value_set_categories
+    tags: ed_classification
+    enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      classification: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      classification_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      classification_order: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      classification_column: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: classification
+    description: ED classification code
+  - name: classification_name
+    description: Human-readable name for the ED classification
+  - name: classification_order
+    description: Order of the ED classification
+  - name: classification_column
+    description: Column name for the ED classification
+

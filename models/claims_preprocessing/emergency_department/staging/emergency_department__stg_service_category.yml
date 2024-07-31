@@ -1,0 +1,20 @@
+version: 2
+models:
+- name: emergency_department__stg_service_category
+  config:
+    alias: emergency_department__stg_service_category
+    tags:
+    - emergency_department
+    - claims_preprocessing
+    materialized: ephemeral
+  columns:
+  - name: claim_id
+    description: ''
+  - name: claim_type
+    description: ''
+  - name: claim_line_number
+    description: ''
+  - name: service_category_2
+    description: ''
+  - name: tuva_last_run
+    description: ''

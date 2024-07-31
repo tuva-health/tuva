@@ -1,0 +1,34 @@
+version: 2
+models:
+- name: data_quality__lab_result_ordering_practitioner_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: lab_result_ordering_practitioner_id
+    tags:
+    - clinical
+    - lab_result
+    - intermediate
+    materialized: table
+  columns:
+  - name: Data_SOURCE
+    description: ''
+  - name: SOURCE_DATE
+    description: ''
+  - name: TABLE_NAME
+    description: ''
+  - name: DRILL_DOWN_KEY
+    description: ''
+  - name: DRILL_DOWN_VALUE
+    description: ''
+  - name: FIELD_NAME
+    description: ''
+  - name: BUCKET_NAME
+    description: ''
+  - name: INVALID_REASON
+    description: ''
+  - name: FIELD_VALUE
+    description: ''
+  - name: tuva_last_run
+    description: ''

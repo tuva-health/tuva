@@ -1,0 +1,51 @@
+version: 2
+models:
+- name: hcc_suspecting__int_observation_suspects
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+    alias: _int_observation_suspects
+    tags: hcc_suspecting
+    materialized: table
+  description: Suspecting observation conditions.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: data_source
+    description: >
+      User-configured field that indicates the data source (e.g. typically  named
+      after the payer and state "BCBS Tennessee").
+  - name: observation_date
+    description: Date the observation was recorded.
+  - name: observation_result
+    description: The result of the observation.
+  - name: condition_code
+    description: The code for the comorbid condition.
+  - name: condition_date
+    description: Recorded date for the condition.
+  - name: condition_concept_name
+    description: Clinical concept name for the comorbid condition.
+  - name: hcc_code
+    description: >
+      HCC code from the latest CMS HCC model available in the mart.
+    meta:
+      terminology: 
+        https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+  - name: hcc_description
+    description: >
+      HCC description from the latest CMS HCC model available in the mart.
+  - name: current_year_billed
+    description: >
+      Flag indicating that the ICD-10-CM code mapped to the HCC has been
+      billed during the payment year.
+  - name: reason
+    description: Standardized reason for the suspecting condition.
+  - name: contributing_factor
+    description: >
+      Description of the contributing factor(s) for the suspecting condition.
+  - name: suspect_date
+    description: >
+      Date when the suspecting observation was recorded.
+  - name: tuva_last_run
+    description: The date the model was run.
+

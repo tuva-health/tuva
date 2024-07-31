@@ -1,0 +1,23 @@
+version: 2
+seeds:
+- name: terminology__place_of_service
+  description: 'Seed containing place of service codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: place_of_service
+    tags:
+    - terminology
+    - claims_preprocessing
+    - data_profiling
+    column_types:
+      place_of_service_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      place_of_service_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: place_of_service_code
+    description: 'The code representing the place of service.'
+  - name: place_of_service_description
+    description: 'A description of the place of service.'
+

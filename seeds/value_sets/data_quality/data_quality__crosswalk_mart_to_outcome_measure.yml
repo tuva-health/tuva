@@ -1,0 +1,16 @@
+version: 2
+seeds:
+- name: data_quality__crosswalk_mart_to_outcome_measure
+  description: >
+    Crosswalk table that defines which marts impact which outcome measures.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: _value_set_crosswalk_mart_to_outcome_measure
+    column_types:
+      mart_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      measure_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+

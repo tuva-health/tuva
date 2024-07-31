@@ -1,0 +1,28 @@
+version: 2
+seeds:
+- name: terminology__icd_9_cm
+  description: 'Seed containing ICD-9-CM codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: icd_9_cm
+    tags:
+    - terminology
+    - claims_preprocessing
+    - readmissions
+    - data_profiling
+    column_types:
+      icd_9_cm: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      long_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      short_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: icd_9_cm
+    description: 'The ICD-9-CM code.'
+  - name: long_description
+    description: 'The long description of the ICD-9-CM code.'
+  - name: short_description
+    description: 'The short description of the ICD-9-CM code.'
+

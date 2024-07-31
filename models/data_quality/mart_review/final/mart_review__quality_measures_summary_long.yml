@@ -1,0 +1,42 @@
+version: 2
+models:
+- name: mart_review__quality_measures_summary_long
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__quality_measures_summary_long
+    tags:
+    - mart_review
+    materialized: table
+  columns:
+  - name: patient_id
+    description: ''
+  - name: denominator_flag
+    description: ''
+  - name: numerator_flag
+    description: ''
+  - name: exclusion_flag
+    description: ''
+  - name: performance_flag
+    description: ''
+  - name: evidence_date
+    description: ''
+  - name: evidence_value
+    description: ''
+  - name: exclusion_date
+    description: ''
+  - name: exclusion_reason
+    description: ''
+  - name: performance_period_begin
+    description: ''
+  - name: performance_period_end
+    description: ''
+  - name: measure_id
+    description: ''
+  - name: measure_name
+    description: ''
+  - name: measure_version
+    description: ''
+  - name: tuva_last_run
+    description: ''

@@ -1,0 +1,18 @@
+version: 2
+seeds:
+- name: terminology__gender
+  description: 'Seed containing gender codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: gender
+    tags:
+    - terminology
+    - data_profiling
+    column_types:
+      gender: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: gender
+    description: 'The gender code.'
+

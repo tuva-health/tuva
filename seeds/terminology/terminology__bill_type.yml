@@ -1,0 +1,28 @@
+version: 2
+seeds:
+- name: terminology__bill_type
+  description: 'Seed containing NUBC billing types and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: bill_type
+    tags:
+    - terminology
+    - data_profiling
+    column_types:
+      bill_type_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      bill_type_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      deprecated: integer
+      deprecated_date: date
+  columns:
+  - name: bill_type_code
+    description: 'The code representing the type of bill.'
+  - name: bill_type_description
+    description: 'A description of the billing type.'
+  - name: deprecated
+    description: 'Indicates if the billing type is deprecated.'
+  - name: deprecated_date
+    description: 'The date when the billing type code was deprecated.'
+

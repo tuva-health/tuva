@@ -1,0 +1,38 @@
+version: 2
+models:
+- name: core__stg_claims_location
+  description: Staging core claims locations
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: _stg_claims_location
+    tags: core_stage_claims
+    materialized: table
+  columns:
+  - name: location_id
+    description: ''
+  - name: npi
+    description: ''
+  - name: name
+    description: ''
+  - name: facility_type
+    description: ''
+  - name: parent_organization
+    description: ''
+  - name: address
+    description: ''
+  - name: city
+    description: ''
+  - name: state
+    description: ''
+  - name: zip_code
+    description: ''
+  - name: latitude
+    description: ''
+  - name: longitude
+    description: ''
+  - name: data_source
+    description: ''
+  - name: tuva_last_run
+    description: ''

@@ -1,0 +1,22 @@
+version: 2
+models:
+- name: service_category__dq_multiple_service_categories_professional
+  description: N/A
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _dq_multiple_service_categories_professional
+    materialized: table
+    tags:
+    - service_category_grouper
+    - claims_preprocessing
+  columns:
+  - name: claim_id
+    description: ''
+  - name: claim_line_number
+    description: ''
+  - name: distinct_service_category_count
+    description: ''
+  - name: tuva_last_run
+    description: ''

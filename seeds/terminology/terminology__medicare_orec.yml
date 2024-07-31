@@ -1,0 +1,24 @@
+version: 2
+seeds:
+- name: terminology__medicare_orec
+  description: 'Seed containing Medicare original reason for entitlement (OREC) codes
+    and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: medicare_orec
+    tags:
+    - terminology
+    - claims_preprocessing
+    - data_profiling
+    column_types:
+      original_reason_entitlement_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      original_reason_entitlement_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: original_reason_entitlement_code
+    description: 'The code representing the original reason for Medicare entitlement.'
+  - name: original_reason_entitlement_description
+    description: 'A description of the original reason for Medicare entitlement.'
+

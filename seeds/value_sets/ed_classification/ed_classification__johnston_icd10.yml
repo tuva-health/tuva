@@ -1,0 +1,54 @@
+version: 2
+seeds:
+- name: ed_classification__johnston_icd10
+  description: A probabilistic mapping of ICD-10 codes to ED classification categories
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
+    alias: _value_set_johnston_icd10
+    tags: ed_classification
+    enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      icd10: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      edcnnpa: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      edcnpa: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      noner: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      epct: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      injury: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      psych: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      alcohol: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      drug: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: icd10
+    description: ICD-10 code
+    tests:
+    - unique
+    - not_null
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+  - name: edcnnpa
+    description: ED CNNPA category
+  - name: edcnpa
+    description: ED CNPA category
+  - name: epct
+    description: EPCT category
+  - name: noner
+    description: Non-ER category
+  - name: injury
+    description: Injury category
+  - name: psych
+    description: Psych category
+  - name: alcohol
+    description: Alcohol category
+  - name: drug
+    description: Drug category

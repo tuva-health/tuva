@@ -1,0 +1,28 @@
+version: 2
+models:
+- name: mart_review__stg_member_month
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__stg_member_month
+    tags:
+    - mart_review
+    materialized: table
+  columns:
+  - name: patient_id
+    description: ''
+  - name: year_month
+    description: ''
+  - name: payer
+    description: ''
+  - name: plan
+    description: ''
+  - name: data_source
+    description: ''
+  - name: tuva_last_run
+    description: ''
+  - name: year_month_int
+    description: ''
+  - name: year_month_date
+    description: ''

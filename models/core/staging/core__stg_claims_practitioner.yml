@@ -1,0 +1,30 @@
+version: 2
+models:
+- name: core__stg_claims_practitioner
+  description: Staging core providers in the claims dataset
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: _stg_claims_practitioner
+    tags: core_stage_claims
+    materialized: table
+  columns:
+  - name: practitioner_id
+    description: ''
+  - name: npi
+    description: ''
+  - name: provider_first_name
+    description: ''
+  - name: provider_last_name
+    description: ''
+  - name: practice_affiliation
+    description: ''
+  - name: specialty
+    description: ''
+  - name: sub_specialty
+    description: ''
+  - name: data_source
+    description: ''
+  - name: tuva_last_run
+    description: ''

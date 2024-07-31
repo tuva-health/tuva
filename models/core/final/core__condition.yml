@@ -1,0 +1,59 @@
+version: 2
+models:
+- name: core__condition
+  description: >
+    The core condition table contains information related to medical  conditions patients
+    have, including problems, admitting diagnosis codes,  and billable diagnosis codes.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: condition
+    tags: core
+    materialized: table
+  columns:
+  - name: CONDITION_ID
+    description: ''
+  - name: PATIENT_ID
+    description: ''
+  - name: ENCOUNTER_ID
+    description: ''
+  - name: CLAIM_ID
+    description: ''
+  - name: RECORDED_DATE
+    description: ''
+  - name: ONSET_DATE
+    description: ''
+  - name: RESOLVED_DATE
+    description: ''
+  - name: STATUS
+    description: ''
+  - name: CONDITION_TYPE
+    description: ''
+  - name: SOURCE_CODE_TYPE
+    description: ''
+  - name: SOURCE_CODE
+    description: ''
+  - name: SOURCE_DESCRIPTION
+    description: ''
+  - name: NORMALIZED_CODE_TYPE
+    description: ''
+  - name: NORMALIZED_CODE
+    description: ''
+  - name: NORMALIZED_DESCRIPTION
+    description: ''
+  - name: mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: CONDITION_RANK
+    description: ''
+  - name: PRESENT_ON_ADMIT_CODE
+    description: ''
+  - name: PRESENT_ON_ADMIT_DESCRIPTION
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: TUVA_LAST_RUN
+    description: ''

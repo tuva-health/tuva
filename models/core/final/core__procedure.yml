@@ -1,0 +1,57 @@
+version: 2
+models:
+- name: core__procedure
+  description: >
+    The procedure table contains information on procedures that were performed  on
+    patients in the dataset.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: procedure
+    tags: core
+    materialized: table
+  columns:
+  - name: PROCEDURE_ID
+    description: ''
+  - name: PATIENT_ID
+    description: ''
+  - name: ENCOUNTER_ID
+    description: ''
+  - name: CLAIM_ID
+    description: ''
+  - name: PROCEDURE_DATE
+    description: ''
+  - name: SOURCE_CODE_TYPE
+    description: ''
+  - name: SOURCE_CODE
+    description: ''
+  - name: SOURCE_DESCRIPTION
+    description: ''
+  - name: NORMALIZED_CODE_TYPE
+    description: ''
+  - name: NORMALIZED_CODE
+    description: ''
+  - name: NORMALIZED_DESCRIPTION
+    description: ''
+  - name: mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: MODIFIER_1
+    description: ''
+  - name: MODIFIER_2
+    description: ''
+  - name: MODIFIER_3
+    description: ''
+  - name: MODIFIER_4
+    description: ''
+  - name: MODIFIER_5
+    description: ''
+  - name: PRACTITIONER_ID
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: TUVA_LAST_RUN
+    description: ''

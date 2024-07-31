@@ -1,0 +1,29 @@
+version: 2
+models:
+- name: hcc_suspecting__int_prep_egfr_labs
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+    alias: _int_prep_egfr_labs
+    tags: hcc_suspecting
+    materialized: table
+  description: Preparing eGFR labs with clean numeric results.
+  columns:
+  - name: patient_id
+    description: Unique ID for the patient.
+  - name: data_source
+    description: >
+      User-configured field that indicates the data source (e.g. typically  named
+      after the payer and state "BCBS Tennessee").
+  - name: code_type
+    description: The normalized code type or source code type.
+  - name: code
+    description: The normalized code or source code.
+  - name: result_date
+    description: Date of the test result.
+  - name: result
+    description: Cleaned numeric result of the lab test.
+  - name: tuva_last_run
+    description: The date the model was run.
+
+  ## Staging

@@ -1,0 +1,42 @@
+version: 2
+models:
+- name: acute_inpatient__encounter_data_for_medical_claims
+  description: All encounter-related fields that will be added to medical_claim
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_encounter_data_for_medical_claims
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: view
+  columns:
+  - name: patient_id
+    description: ''
+  - name: claim_id
+    description: ''
+  - name: start_date
+    description: ''
+  - name: end_date
+    description: ''
+  - name: encounter_type
+    description: ''
+  - name: encounter_id
+    description: ''
+  - name: encounter_start_date
+    description: ''
+  - name: encounter_end_date
+    description: ''
+  - name: encounter_admit_source_code
+    description: ''
+  - name: encounter_admit_type_code
+    description: ''
+  - name: encounter_discharge_disposition_code
+    description: ''
+  - name: orphan_claim_flag
+    description: ''
+  - name: encounter_count
+    description: ''
+  - name: tuva_last_run
+    description: ''

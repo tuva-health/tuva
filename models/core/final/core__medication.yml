@@ -1,0 +1,73 @@
+version: 2
+models:
+- name: core__medication
+  description: >
+    The medication table contains information on medications ordered and/or  administered
+    during a patient encounter.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: medication
+    tags: core
+    materialized: table
+  columns:
+  - name: MEDICATION_ID
+    description: ''
+  - name: PATIENT_ID
+    description: ''
+  - name: ENCOUNTER_ID
+    description: ''
+  - name: DISPENSING_DATE
+    description: ''
+  - name: PRESCRIBING_DATE
+    description: ''
+  - name: SOURCE_CODE_TYPE
+    description: ''
+  - name: SOURCE_CODE
+    description: ''
+  - name: SOURCE_DESCRIPTION
+    description: ''
+  - name: NDC_CODE
+    description: ''
+  - name: NDC_DESCRIPTION
+    description: ''
+  - name: ndc_mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: RXNORM_CODE
+    description: ''
+  - name: RXNORM_DESCRIPTION
+    description: ''
+  - name: rxnorm_mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: ATC_CODE
+    description: ''
+  - name: ATC_DESCRIPTION
+    description: ''
+  - name: atc_mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: ROUTE
+    description: ''
+  - name: STRENGTH
+    description: ''
+  - name: QUANTITY
+    description: ''
+  - name: QUANTITY_UNIT
+    description: ''
+  - name: DAYS_SUPPLY
+    description: ''
+  - name: PRACTITIONER_ID
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: TUVA_LAST_RUN
+    description: ''

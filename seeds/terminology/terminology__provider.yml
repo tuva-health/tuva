@@ -1,0 +1,80 @@
+version: 2
+seeds:
+- name: terminology__provider
+  description: 'Seed containing provider information.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    tags:
+    - terminology
+    - claims_preprocessing
+    alias: provider
+    column_types:
+      npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+      entity_type_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(26) {%- endif -%}
+      entity_type_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(37) {%- endif -%}
+      primary_taxonomy_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+      primary_specialty_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
+      provider_first_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+      provider_last_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+      provider_organization_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+      parent_organization_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+      practice_address_line_1: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+      practice_address_line_2: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+      practice_city: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
+      practice_state: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(65) {%- endif -%}
+      practice_zip_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(42) {%- endif -%}
+      last_updated: date
+      deactivation_date: date
+      deactivation_flag: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+  columns:
+  - name: npi
+    description: 'The National Provider Identifier (NPI).'
+  - name: entity_type_code
+    description: 'The entity type code of the provider.'
+  - name: entity_type_description
+    description: 'The entity type description of the provider.'
+  - name: primary_taxonomy_code
+    description: 'The primary taxonomy code of the provider.'
+  - name: primary_specialty_description
+    description: 'The primary specialty description of the provider.'
+  - name: provider_first_name
+    description: 'The first name of the provider.'
+  - name: provider_last_name
+    description: 'The last name of the provider.'
+  - name: provider_organization_name
+    description: 'The organization name of the provider.'
+  - name: parent_organization_name
+    description: 'The parent organization name of the provider.'
+  - name: practice_address_line_1
+    description: 'The first line of the practice address.'
+  - name: practice_address_line_2
+    description: 'The second line of the practice address.'
+  - name: practice_city
+    description: 'The city of the practice address.'
+  - name: practice_state
+    description: 'The state of the practice address.'
+  - name: practice_zip_code
+    description: 'The ZIP code of the practice address.'
+  - name: last_updated
+    description: 'The date when the provider information was last updated.'
+  - name: deactivation_date
+    description: 'The date when the provider was deactivated.'
+  - name: deactivation_flag
+    description: 'Flag indicating if the provider is deactivated.'
+

@@ -1,0 +1,19 @@
+version: 2
+seeds:
+- name: terminology__discharge_disposition
+  description: 'Seed containing NUBC discharge disposition codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: discharge_disposition
+    column_types:
+      discharge_disposition_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      discharge_disposition_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: discharge_disposition_code
+    description: 'The code representing the discharge disposition.'
+  - name: discharge_disposition_description
+    description: 'A description of the discharge disposition.'
+

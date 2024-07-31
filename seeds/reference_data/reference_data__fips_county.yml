@@ -1,0 +1,26 @@
+version: 2
+seeds:
+- name: reference_data__fips_county
+  description: 'Seed containing FIPS county codes and names.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
+    alias: fips_county
+    tags:
+    - terminology
+    - reference_data
+    column_types:
+      fips_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      county: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      state: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: fips_code
+    description: 'The FIPS code for the county.'
+  - name: county
+    description: 'The name of the county.'
+  - name: state
+    description: 'The state where the county is located.'
+

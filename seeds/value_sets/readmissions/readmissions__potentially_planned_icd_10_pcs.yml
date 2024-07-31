@@ -1,0 +1,24 @@
+version: 2
+seeds:
+- name: readmissions__potentially_planned_icd_10_pcs
+  description: Potentially planned ICD-10-PCS codes for readmissions.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+    alias: _value_set_potentially_planned_icd_10_pcs
+    tags: readmissions
+    enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      icd_10_pcs: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: icd_10_pcs
+    description: ICD-10-PCS code
+    meta:
+      terminology: 
+        https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+  - name: description
+    description: Description of the ICD-10-PCS code
+

@@ -1,0 +1,25 @@
+version: 2
+seeds:
+- name: readmissions__exclusion_ccs_diagnosis_category
+  description: Exclusion CCS diagnosis categories for readmissions.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
+    alias: _value_set_exclusion_ccs_diagnosis_category
+    tags: readmissions
+    enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      ccs_diagnosis_category: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      exclusion_category: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: ccs_diagnosis_category
+    description: CCS diagnosis category code
+  - name: description
+    description: Description of the CCS diagnosis category
+  - name: exclusion_category
+    description: Exclusion category for the CCS diagnosis
+

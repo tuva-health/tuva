@@ -1,0 +1,27 @@
+version: 2
+models:
+- name: normalized_input__int_diagnosis_code_normalize
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_normalized_input_diagnosis_code_normalize
+    materialized: table
+    tags:
+    - normalized_input
+    - claims_preprocessing
+  columns:
+  - name: claim_id
+    description: ''
+  - name: data_source
+    description: ''
+  - name: diagnosis_code_type
+    description: ''
+  - name: diagnosis_column
+    description: ''
+  - name: normalized_diagnosis_code
+    description: ''
+  - name: diagnosis_code_occurrence_count
+    description: ''
+  - name: tuva_last_run
+    description: ''

@@ -1,0 +1,30 @@
+version: 2
+models:
+- name: quality_measures__int_cqm438_exclusions
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_cqm438_exclusions
+    tags: quality_measures
+    materialized: table
+  description: >
+    Combined exclusion logic for the reporting version of CQM 438, Statin Therapy
+    for the Prevention and Treatment of Cardiovascular Disease.
+  columns:
+  - name: patient_id
+    description: Unique patient_id for each person.
+  - name: exclusion_date
+    description: >
+      Date of event or service that excludes patient from the measure.
+  - name: exclusion_reason
+    description: >
+      Reason (usually the value set concept name) that excludes patient  from the
+      measure.
+  - name: exclusion_flag
+    description: >
+      Specifications of those characteristics that would cause groups of  individuals
+      to be removed from the numerator and/or denominator of  a measure although they
+      experience the denominator index event.
+  - name: tuva_last_run
+    description: The date and timestamp of the dbt run.
+

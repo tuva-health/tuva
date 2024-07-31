@@ -1,0 +1,24 @@
+version: 2
+models:
+- name: ahrq_measures__int_pqi_03_denom
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+    alias: _int_pqi_03_denom
+    tags:
+    - ahrq_measures
+    - pqi
+    materialized: view
+  description: >
+    Denominator for PQI 03 measure calculation.
+  columns:
+  - name: year_number
+    description: ''
+  - name: patient_id
+    description: ''
+  - name: data_source
+    description: ''
+  - name: age
+    description: ''
+  - name: tuva_last_run
+    description: ''

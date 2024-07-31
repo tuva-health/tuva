@@ -1,0 +1,33 @@
+version: 2
+seeds:
+- name: terminology__other_provider_taxonomy
+  description: 'Seed containing other provider taxonomy codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    tags:
+    - terminology
+    - claims_preprocessing
+    alias: other_provider_taxonomy
+    column_types:
+      npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+      taxonomy_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
+      medicare_specialty_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(173) {%- endif -%}
+      description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(101) {%- endif -%}
+      primary_flag: integer
+  columns:
+  - name: npi
+    description: 'The National Provider Identifier (NPI).'
+  - name: taxonomy_code
+    description: 'The provider taxonomy code.'
+  - name: medicare_specialty_code
+    description: 'The Medicare specialty code.'
+  - name: description
+    description: 'Description of the provider taxonomy.'
+  - name: primary_flag
+    description: 'Indicates if this is the primary taxonomy (1) or not (0).'
+

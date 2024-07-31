@@ -1,0 +1,27 @@
+version: 2
+seeds:
+- name: data_quality__crosswalk_field_info
+  description: >
+    Target thresholds at the field level determining red, yellow, and green values
+    in the Data Quality dashboard.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: _value_set_crosswalk_field_info
+    column_types:
+      input_layer_table_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      claim_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      field_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      red: |
+        integer
+      green: |
+        integer
+      unique_values_expected_flag: |
+        integer
+
+
+

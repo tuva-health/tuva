@@ -1,0 +1,28 @@
+version: 2
+seeds:
+- name: terminology__admit_source
+  description: 'NUBC Admit Sources'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: admit_source
+    tags:
+    - terminology
+    - claims_preprocessing
+    - data_profiling
+    column_types:
+      admit_source_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      admit_source_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      newborn_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: admit_source_code
+    description: 'The code representing the source of admission.'
+  - name: admit_source_description
+    description: 'A description of the admission source.'
+  - name: newborn_description
+    description: 'Description related to newborn admission. For use when admit type
+      code = 4 (Newborn)'
+

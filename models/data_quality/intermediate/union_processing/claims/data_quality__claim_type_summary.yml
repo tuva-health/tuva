@@ -1,0 +1,24 @@
+version: 2
+models:
+- name: data_quality__claim_type_summary
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: claim_type_summary
+    tags:
+    - claims
+    - union all_processing
+    - intermediate
+    materialized: table
+  columns:
+  - name: data_source
+    description: ''
+  - name: claim_type
+    description: ''
+  - name: claim_count
+    description: ''
+  - name: paid_amount
+    description: ''
+  - name: tuva_last_run
+    description: ''

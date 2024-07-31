@@ -1,0 +1,28 @@
+version: 2
+seeds:
+- name: quality_measures__value_sets
+  description: Concepts to value sets crosswalk. List of codes in each concept.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _value_set_codes
+    tags: quality_measures
+    enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
+    column_types:
+      concept_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      concept_oid: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      code_system: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: concept_name
+    description: Name of the clinical concept
+  - name: concept_oid
+    description: OID of the clinical concept
+  - name: code
+    description: Code representing the clinical concept
+  - name: code_system
+    description: System used for the code

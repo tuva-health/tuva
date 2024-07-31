@@ -1,0 +1,20 @@
+version: 2
+models:
+- name: acute_inpatient__stg_eligibility
+  config:
+    alias: acute_inpatient__stg_eligibility
+    tags:
+    - acute_inpatient
+    - claims_preprocessing
+    materialized: ephemeral
+  columns:
+  - name: patient_id
+    description: ''
+  - name: birth_date
+    description: ''
+  - name: gender
+    description: ''
+  - name: race
+    description: ''
+  - name: tuva_last_run
+    description: ''

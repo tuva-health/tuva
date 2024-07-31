@@ -1,0 +1,18 @@
+version: 2
+models:
+- name: hcc_suspecting__stg_core__observation
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
+    alias: _stg_observation
+    tags: hcc_suspecting
+    materialized: ephemeral
+  description: Staging observations from core.
+  columns:
+  - name: patient_id
+  - name: observation_date
+  - name: result
+  - name: code_type
+  - name: code
+  - name: data_source
+

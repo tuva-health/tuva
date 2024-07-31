@@ -1,0 +1,27 @@
+version: 2
+models:
+- name: quality_measures__int_shared_exclusions_dementia
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_shared_exclusions_dementia
+    tags: quality_measures
+    materialized: table
+  description: >
+    Exclusion logic for patients with frailty and taking dementia medications for
+    entire patient population.
+  columns:
+  - name: patient_id
+    description: ''
+  - name: exclusion_date
+    description: ''
+  - name: exclusion_reason
+    description: ''
+  - name: exclusion_type
+    description: ''
+  - name: dispensing_date
+    description: ''
+  - name: paid_date
+    description: ''
+  - name: tuva_last_run
+    description: ''

@@ -1,0 +1,22 @@
+version: 2
+models:
+- name: quality_measures__int_nqf0034_numerator
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+    alias: _int_nqf0034_numerator
+    tags: quality_measures
+    materialized: table
+  description: >
+    Numerator logic for the reporting version of NQF 0034,
+    Colorectal Cancer Screening
+  columns:
+  - name: patient_id
+    description: Unique patient_id for each person.
+  - name: evidence_date
+    description: >
+      Date of event or service that places patient in the numerator.
+  - name: evidence
+    description: Reason (usually the value set concept name) that includes patient
+      from the measure.
+

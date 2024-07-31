@@ -1,0 +1,19 @@
+version: 2
+seeds:
+- name: reference_data__code_type
+  description: 'Seed containing code types.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
+    alias: code_type
+    tags:
+    - terminology
+    - data_profiling
+    - reference_data
+    column_types:
+      code_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: code_type
+    description: 'The type of the code.'
+

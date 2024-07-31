@@ -1,0 +1,27 @@
+version: 2
+models:
+- name: normalized_input__int_eligibility_dates_normalize
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+      {% else %}claims_preprocessing{%- endif -%}
+    alias: _int_normalized_input_eligibility_dates_normalize
+    materialized: table
+    tags:
+    - normalized_input
+    - claims_preprocessing
+  columns:
+  - name: patient_id
+    description: ''
+  - name: patient_id_key
+    description: ''
+  - name: normalized_birth_date
+    description: ''
+  - name: normalized_death_date
+    description: ''
+  - name: normalized_enrollment_start_date
+    description: ''
+  - name: normalized_enrollment_end_date
+    description: ''
+  - name: tuva_last_run
+    description: ''

@@ -1,0 +1,32 @@
+version: 2
+models:
+- name: mart_review__patient_risk_scores
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__patient_risk_scores
+    tags:
+    - mart_review
+    materialized: table
+  columns:
+  - name: patient_id
+    description: ''
+  - name: v24_risk_score
+    description: ''
+  - name: v28_risk_score
+    description: ''
+  - name: blended_risk_score
+    description: ''
+  - name: normalized_risk_score
+    description: ''
+  - name: payment_risk_score
+    description: ''
+  - name: payment_risk_score_weighted_by_months
+    description: ''
+  - name: member_months
+    description: ''
+  - name: payment_year
+    description: ''
+  - name: tuva_last_run
+    description: ''

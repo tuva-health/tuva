@@ -1,0 +1,20 @@
+version: 2
+models:
+- name: ahrq_measures__int_pqi_shared_exclusion_transfer
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
+    alias: _int_pqi_shared_exclusion_transfer
+    tags:
+    - ahrq_measures
+    - pqi
+    materialized: view
+  description: >
+    Excludes transferred patients from PQI calculations.
+  columns:
+  - name: encounter_id
+    description: ''
+  - name: data_source
+    description: ''
+  - name: tuva_last_run
+    description: ''

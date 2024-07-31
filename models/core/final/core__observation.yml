@@ -1,0 +1,61 @@
+version: 2
+models:
+- name: core__observation
+  description: >
+    The observation table contains information on measurements other than  lab tests
+    e.g. blood pressure, height, and weight.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+      {% else %}core{%- endif -%}
+    alias: observation
+    tags: core
+    materialized: table
+  columns:
+  - name: OBSERVATION_ID
+    description: ''
+  - name: PATIENT_ID
+    description: ''
+  - name: ENCOUNTER_ID
+    description: ''
+  - name: PANEL_ID
+    description: ''
+  - name: OBSERVATION_DATE
+    description: ''
+  - name: OBSERVATION_TYPE
+    description: ''
+  - name: SOURCE_CODE_TYPE
+    description: ''
+  - name: SOURCE_CODE
+    description: ''
+  - name: SOURCE_DESCRIPTION
+    description: ''
+  - name: NORMALIZED_CODE_TYPE
+    description: ''
+  - name: NORMALIZED_CODE
+    description: ''
+  - name: NORMALIZED_DESCRIPTION
+    description: ''
+  - name: mapping_method
+    description: mapping method used to populate the normalized codes and descriptions.  Can
+      be manual (fields were populated in input layer), automatic (dictionary codes
+      matching the source code were found and was automatically populated) or custom
+      (populated by normalization engine)
+  - name: RESULT
+    description: ''
+  - name: SOURCE_UNITS
+    description: ''
+  - name: NORMALIZED_UNITS
+    description: ''
+  - name: SOURCE_REFERENCE_RANGE_LOW
+    description: ''
+  - name: SOURCE_REFERENCE_RANGE_HIGH
+    description: ''
+  - name: NORMALIZED_REFERENCE_RANGE_LOW
+    description: ''
+  - name: NORMALIZED_REFERENCE_RANGE_HIGH
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: TUVA_LAST_RUN
+    description: ''

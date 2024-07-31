@@ -1,0 +1,41 @@
+version: 2
+seeds:
+- name: terminology__loinc_deprecated_mapping
+  description: 'Seed containing deprecated LOINC codes and their replacements.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: loinc_deprecated_mapping
+    tags:
+    - terminology
+    column_types:
+      loinc: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      map_to: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      comment: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      final_map_to: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      all_comments: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      depth: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+  columns:
+  - name: loinc
+    description: 'The deprecated term to which the replacement term(s) apply.'
+  - name: map_to
+    description: 'A replacement term that is to be used in place of the deprecated
+      or discouraged term.'
+  - name: comment
+    description: 'Narrative text that explains the rationale for using the recommended
+      replacement term.'
+  - name: final_map_to
+    description: 'If there are multiple steps of deprecated codes, this is the final
+      (active) code.'
+  - name: all_comments
+    description: 'An aggregation of comments for any mapping steps between the deprecated
+      code and the active code.'
+  - name: depth
+    description: 'How many steps this mapping is to the active code.'
+

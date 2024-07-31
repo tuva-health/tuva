@@ -1,0 +1,40 @@
+version: 2
+seeds:
+- name: terminology__ms_drg
+  description: 'Seed containing Medicare Severity Diagnosis Related Groups (MS-DRG)
+    codes and descriptions.'
+  config:
+    schema: |
+      {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+    alias: ms_drg
+    tags:
+    - terminology
+    - readmissions
+    - data_profiling
+    - claims_preprocessing
+    column_types:
+      ms_drg_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      mdc_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      medical_surgical: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      ms_drg_description: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+      deprecated: integer
+      deprecated_date: date
+  columns:
+  - name: ms_drg_code
+    description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
+  - name: mdc_code
+    description: 'The Major Diagnostic Category (MDC) code associated with the MS-DRG.'
+  - name: medical_surgical
+    description: 'Indicates whether the DRG is medical or surgical.'
+  - name: ms_drg_description
+    description: 'The description of the Medicare Severity Diagnosis Related Group
+      (MS-DRG).'
+  - name: deprecated
+    description: 'Indicates if the MS-DRG code is deprecated (1) or not (0).'
+  - name: deprecated_date
+    description: 'The date when the MS-DRG code was deprecated.'
+

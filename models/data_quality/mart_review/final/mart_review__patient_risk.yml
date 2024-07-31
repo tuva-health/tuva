@@ -1,0 +1,26 @@
+version: 2
+models:
+- name: mart_review__patient_risk
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__patient_risk
+    tags:
+    - mart_review
+    materialized: table
+  columns:
+  - name: risk_score_bucket
+    description: ''
+  - name: payment_year
+    description: ''
+  - name: patient_id
+    description: ''
+  - name: model_version
+    description: ''
+  - name: patient_risk_sk
+    description: ''
+  - name: risk_score
+    description: ''
+  - name: tuva_last_run
+    description: ''
