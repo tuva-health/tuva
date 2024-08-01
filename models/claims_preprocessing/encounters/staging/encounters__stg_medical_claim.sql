@@ -6,8 +6,9 @@ select
     m.apr_drg_code
   , m.claim_id
   , m.claim_line_number
-  , m.claim_id || cast(m.claim_line_number as {{dbt.type_string() }} ) as claim_line_id
+  , m.claim_id || '|' || cast(m.claim_line_number as {{dbt.type_string() }} ) as claim_line_id
   , m.claim_type
+  , m.patient_id
   , coalesce(m.admission_date,m.claim_start_date,m.claim_line_start_date) as start_date
   , coalesce(m.discharge_date,m.claim_end_date,m.claim_line_end_date) as end_date
   , g.service_category_1
@@ -20,10 +21,13 @@ select
   , c.ccs_category_description
   , m.ms_drg_code
   , drg.ms_drg_description
+  , m.admit_source_code
+  , m.admit_type_code
   , m.place_of_service_code
   , pos.place_of_service_description
   , m.revenue_center_code
   , r.revenue_center_description
+  , m.diagnosis_code_type
   , m.diagnosis_code_1
   , dx.default_ccsr_category_ip
   , dx.default_ccsr_category_op
@@ -33,6 +37,12 @@ select
   , p.primary_specialty_description
   , n.modality
   , m.billing_id
+  , m.facility_id
+  , m.discharge_disposition_code
+  , m.paid_amount
+  , m.charge_amount
+  , m.allowed_amount
+  , m.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
   , row_number() over (order by random()) as rn
 from {{ ref('normalized_input__medical_claim') }} m

@@ -2,6 +2,288 @@ version: 2
 
 models:
 #### Encounters
+
+## Final
+  - name: inpatient_psych__encounter_grain
+    description: "Encounters for inpatient psych. One row per encounter."
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{ var('tuva_schema_prefix') }}_claims_preprocessing
+        {% else %}
+          claims_preprocessing
+        {%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for each encounter."
+        tests:
+          - unique
+
+  - name: inpatient_rehab__encounter_grain
+    description: "Encounters for inpatient rehab. One row per encounter."
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{ var('tuva_schema_prefix') }}_claims_preprocessing
+        {% else %}
+          claims_preprocessing
+        {%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for each encounter."
+        tests:
+          - unique
+
+  - name: inpatient_snf__encounter_grain
+    description: "Encounters for inpatient rehab. One row per encounter."
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{ var('tuva_schema_prefix') }}_claims_preprocessing
+        {% else %}
+          claims_preprocessing
+        {%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for each encounter."
+        tests:
+          - unique
+
+  - name: inpatient_substance_use__encounter_grain
+    description: "Encounters for inpatient rehab. One row per encounter."
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{ var('tuva_schema_prefix') }}_claims_preprocessing
+        {% else %}
+          claims_preprocessing
+        {%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for each encounter."
+        tests:
+          - unique
+
+  - name: inpatient_hospice__encounter_grain
+    description: "Encounters for inpatient rehab. One row per encounter."
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{ var('tuva_schema_prefix') }}_claims_preprocessing
+        {% else %}
+          claims_preprocessing
+        {%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters
+    columns:
+      - name: encounter_id
+        description: "The unique identifier for each encounter."
+        tests:
+          - unique
+
+  - name: encounters__combined_claim_line_crosswalk
+    description: all claim lines that belong to an encounter
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+## Intermediate
+  - name: inpatient_psych__generate_encounter_id
+    description: generate encounter id and stitch inpatient psych claims together
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_psych__start_end_dates
+    description: calculate start and end date of encounter 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_psych__prof_claims
+    description: match corresponding prof claims to institutional claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+
+##inpatient rehab
+  - name: inpatient_rehab__generate_encounter_id
+    description: generate encounter id and stitch inpatient rehab claims together
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_rehab__start_end_dates
+    description: calculate start and end date of encounter 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_rehab__prof_claims
+    description: match corresponding prof claims to institutional claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+
+##inpatient snf
+  - name: inpatient_snf__generate_encounter_id
+    description: generate encounter id and stitch inpatient snf claims together
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_snf__start_end_dates
+    description: calculate start and end date of encounter 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_snf__prof_claims
+    description: match corresponding prof claims to institutional claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+##inpatient substance use
+  - name: inpatient_substance_use__generate_encounter_id
+    description: generate encounter id and stitch inpatient substance_use claims together
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_substance_use__start_end_dates
+    description: calculate start and end date of encounter 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_substance_use__prof_claims
+    description: match corresponding prof claims to institutional claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+##inpatient hospice
+  - name: inpatient_hospice__generate_encounter_id
+    description: generate encounter id and stitch inpatient hospice claims together
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_hospice__start_end_dates
+    description: calculate start and end date of encounter 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: inpatient_hospice__prof_claims
+    description: match corresponding prof claims to institutional claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+
+
 ## Staging
   - name: encounters__stg_medical_claim
     description: Staging med claims for encounter grouper
@@ -35,6 +317,16 @@ models:
         - encounters
 
   - name: encounters__stg_professional
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: encounters__stg_eligibility
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing

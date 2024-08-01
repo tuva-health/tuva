@@ -41,7 +41,7 @@ select
 , service_category_3
 , tuva_last_run
 , source_model_name
-from {{ ref('service_category__acute_inpatient_institutional_substance_use') }}
+from {{ ref('service_category__inpatient_substance_use_institutional') }}
 
 union all
 
@@ -87,6 +87,15 @@ select   claim_id
 , tuva_last_run
 , source_model_name
 from {{ ref('service_category__inpatient_hospice_institutional') }}
+
+union all
+
+select   claim_id
+, service_category_2
+, service_category_3
+, tuva_last_run
+, source_model_name
+from {{ ref('service_category__outpatient_hospice_institutional') }}
 
 union all
 
@@ -171,6 +180,14 @@ select   claim_id
 , source_model_name
 from {{ ref('service_category__inpatient_psychiatric_institutional') }}
 
+union all
+
+select   claim_id
+, service_category_2
+, service_category_3
+, tuva_last_run
+, source_model_name
+from {{ ref('service_category__inpatient_rehab_institutional') }}
 
 )
 
