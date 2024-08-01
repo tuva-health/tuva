@@ -9,7 +9,6 @@ select
   , m.claim_line_number
   , m.claim_id || '|' || cast(m.claim_line_number as {{dbt.type_string() }} ) as claim_line_id
   , m.claim_type
-  , m.patient_id
   , coalesce(m.admission_date,m.claim_start_date,m.claim_line_start_date) as start_date
   , coalesce(m.discharge_date,m.claim_end_date,m.claim_line_end_date) as end_date
   , g.service_category_1
