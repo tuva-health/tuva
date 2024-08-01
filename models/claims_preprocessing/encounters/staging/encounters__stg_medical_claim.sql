@@ -40,6 +40,7 @@ from {{ ref('normalized_input__medical_claim') }} m
 inner join {{ ref('service_category__service_category_grouper') }} g on m.claim_id = g.claim_id
 and
 m.claim_line_number = g.claim_line_number
+and g.duplicate_row_number = 1
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} dx on m.diagnosis_code_1 = dx.icd_10_cm_code
 left join {{ ref('terminology__provider') }} p on m.facility_id = p.npi
 left join {{ ref('terminology__ccs_services_procedures') }} c on m.hcpcs_code = c.hcpcs_code
