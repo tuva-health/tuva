@@ -208,6 +208,18 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
+  
+  - name: service_category__outpatient_hospice_institutional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_outpatient_hospice_institutional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
 
   - name: service_category__inpatient_hospice_professional
     description: N/A
@@ -252,6 +264,18 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
       alias: _int_inpatient_rehab_professional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+  
+  - name: service_category__inpatient_rehab_institutional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_inpatient_rehab_institutional
       materialized: table
       tags:
         - service_category_grouper
@@ -457,13 +481,13 @@ models:
         - claims_preprocessing
 
 
-  - name: service_category__acute_inpatient_institutional_substance_use
+  - name: service_category__inpatient_substance_use_institutional
     description: Auto-generated model entry
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: _int_acute_inpatient_institutional_substance_use
+      alias: _int_inpatient_substance_use_institutional
       materialized: table
       tags:
         - service_category_grouper
