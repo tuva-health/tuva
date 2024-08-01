@@ -9,7 +9,16 @@ select
 from {{ ref('encounters__int_office_visits')}} ov
 inner join {{ ref('encounters__stg_medical_claim')}} mc on mc.claim_id = ov.claim_id
     and mc.claim_line_number = ov.claim_line_number
+left join {{ ref('terminology__provider')}} provider on mc.rendering_id = provider.npi
 where 
-    hcpcs_code in ( /* List from CMS Therapy Services codes https://www.cms.gov/medicare/coding-billing/therapy-services/annual-therapy-update */
-        '90901','90912','90913','92507','92508','92520','92521','92522','92523','92524','92526','92597','92605','92606','92607','92608','92609','92610','92611','92612','92614','92616','92618','95851','95852','95992','96105','96111','96125','97010','97012','97016','97018','97022','97024','97026','97028','97032','97033','97034','97035','97036','97039','97110','97112','97113','97116','97124','97129','97130','97139','97140','97150','97161','97162','97163','97164','97165','97166','97167','97168','97530','97533','97535','97537','97542','97550','97551','97552','97597','97598','97602','97605','97606','97607','97608','97610','97750','97755','97760','97761','97763','97799','98966','98967','98968','98970','98971','98972','98975','98976','98977','98980','98981','G0281','G0283','G0329','G0451','G2250','G2251'
+    primary_specialty_description IN (
+        'Occupational Health'
+        ,'Occupational Medicine'
+        ,'Occupational Therapist in Private Practice'
+        ,'Occupational Therapy Assistant'
+        ,'Physical Therapist'
+        ,'Physical Therapist in Private Practice'
+        ,'Physical Therapy Assistant'
+        ,'Speech Language Pathologist'
+        ,'Speech-Language Assistant'
     )
