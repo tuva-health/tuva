@@ -75,10 +75,15 @@ with medical_claims as (
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'professional'
-        and extract(year from claim_end_date) = {{ collection_year }}
+        {% if target.type == 'fabric' %}
+            and YEAR(claim_end_date) = {{ collection_year }}
+        {% else %}
+            and extract(year from claim_end_date) = {{ collection_year }}
+        {% endif %}
         and cpt_hcpcs_list.payment_year = {{ payment_year }}
 
 )
+
 
 , inpatient_claims as (
 
@@ -93,7 +98,11 @@ with medical_claims as (
         , medical_claims.hcpcs_code
     from medical_claims
     where claim_type = 'institutional'
-        and extract(year from claim_end_date) = {{ collection_year }}
+        {% if target.type == 'fabric' %}
+            and YEAR(claim_end_date) = {{ collection_year }}
+        {% else %}
+            and extract(year from claim_end_date) = {{ collection_year }}
+        {% endif %}
         and substring(bill_type_code, 1, 2) in ('11','41')
 
 )
@@ -113,7 +122,11 @@ with medical_claims as (
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'institutional'
-        and extract(year from claim_end_date) = {{ collection_year }}
+        {% if target.type == 'fabric' %}
+            and YEAR(claim_end_date) = {{ collection_year }}
+        {% else %}
+            and extract(year from claim_end_date) = {{ collection_year }}
+        {% endif %}
         and cpt_hcpcs_list.payment_year = {{ payment_year }}
         and substring(bill_type_code, 1, 2) in ('12','13','43','71','73','76','77','85')
 

@@ -66,11 +66,19 @@ with all_conditions as (
         , hcc_grouped.first_recorded
         , hcc_grouped.last_recorded
         , hcc_billed.last_billed
-        , case
-            when extract(year from hcc_billed.last_billed) = extract(year from {{ dbt.current_timestamp() }} )
-            then 1
-            else 0
-          end as current_year_billed
+        {% if target.type == 'fabric' %}
+            , case
+                when YEAR(hcc_billed.last_billed) = YEAR( {{ dbt.current_timestamp() }} )
+                then 1
+                else 0
+              end as current_year_billed
+        {% else %}
+            , case
+                when extract(year from hcc_billed.last_billed) = extract(year from {{ dbt.current_timestamp() }} )
+                then 1
+                else 0
+              end as current_year_billed
+        {% endif %}
     from hcc_grouped
          left join hcc_billed
          on hcc_grouped.patient_id = hcc_billed.patient_id

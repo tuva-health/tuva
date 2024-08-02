@@ -37,12 +37,21 @@ with stg_eligibility as (
     from {{ ref('cms_hcc__stg_core__eligibility') }}
     where (
         /* filter to members with eligibility in collection or payment year */
-        extract(year from enrollment_start_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
-        or extract(year from enrollment_end_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
+        {% if target.type == 'fabric' %}
+            YEAR(enrollment_start_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+            or YEAR(enrollment_end_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+        {% else %}
+            extract(year from enrollment_start_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+            or extract(year from enrollment_end_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+        {% endif %}
     )
 
 )
@@ -79,12 +88,21 @@ with stg_eligibility as (
     from stg_eligibility
     where (
         /* filter to members with eligibility in collection or payment year */
-        extract(year from enrollment_start_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
-        or extract(year from enrollment_end_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
+        {% if target.type == 'fabric' %}
+            YEAR(enrollment_start_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+            or YEAR(enrollment_end_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+        {% else %}
+            extract(year from enrollment_start_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+            or extract(year from enrollment_end_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+        {% endif %}
     )
 
 )

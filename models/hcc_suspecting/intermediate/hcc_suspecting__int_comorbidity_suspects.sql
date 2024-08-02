@@ -149,7 +149,11 @@ with conditions as (
             on diabetes_dedupe.patient_id = ckd_stage_1_or_2_dedupe.patient_id
             and diabetes_dedupe.data_source = ckd_stage_1_or_2_dedupe.data_source
             /* ensure conditions overlap in the same year */
-            and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(diabetes_dedupe.recorded_date) = YEAR(ckd_stage_1_or_2_dedupe.recorded_date)
+            {% else %}
+                and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '37'
 

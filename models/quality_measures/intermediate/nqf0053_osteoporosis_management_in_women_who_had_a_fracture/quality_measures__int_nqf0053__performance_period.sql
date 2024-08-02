@@ -66,14 +66,14 @@ SELECT
   *,
  {% if target.type == 'fabric' %}
       CASE
-        WHEN performance_period_end >= CAST(CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) + '-06-30' AS DATE)
-          THEN CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) + '-06-30'
-        ELSE CAST(extract(year FROM performance_period_begin) AS {{ dbt.type_string() }}) + '-06-30'
+        WHEN performance_period_end >= CAST(CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-06-30' AS DATE)
+          THEN CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-06-30'
+        ELSE CAST(YEAR(performance_period_begin) AS {{ dbt.type_string() }}) + '-06-30'
       END AS lookback_period_june,
       CASE
-        WHEN performance_period_end >= CAST(CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) + '-12-31' AS DATE)
-          THEN CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) + '-12-31'
-        ELSE CAST(extract(year FROM performance_period_begin) AS {{ dbt.type_string() }}) + '-12-31'
+        WHEN performance_period_end >= CAST(CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-12-31' AS DATE)
+          THEN CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-12-31'
+        ELSE CAST(YEAR(performance_period_begin) AS {{ dbt.type_string() }}) + '-12-31'
       END AS lookback_period_december
 {% else %}
       CASE

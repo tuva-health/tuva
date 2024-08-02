@@ -165,7 +165,11 @@ with conditions as (
         inner join obstructive_sleep_apnea
             on numeric_observations.patient_id = obstructive_sleep_apnea.patient_id
             /* ensure bmi and condition overlaps in the same year */
-            and extract(year from numeric_observations.observation_date) = extract(year from obstructive_sleep_apnea.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(numeric_observations.observation_date) = YEAR(obstructive_sleep_apnea.recorded_date)
+            {% else %}
+                and extract(year from numeric_observations.observation_date) = extract(year from obstructive_sleep_apnea.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
@@ -192,7 +196,11 @@ with conditions as (
         inner join diabetes
             on numeric_observations.patient_id = diabetes.patient_id
             /* ensure bmi and condition overlaps in the same year */
-            and extract(year from numeric_observations.observation_date) = extract(year from diabetes.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(numeric_observations.observation_date) = YEAR(diabetes.recorded_date)
+            {% else %}
+                and extract(year from numeric_observations.observation_date) = extract(year from diabetes.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
@@ -219,7 +227,11 @@ with conditions as (
         inner join hypertension
             on numeric_observations.patient_id = hypertension.patient_id
             /* ensure bmi and condition overlaps in the same year */
-            and extract(year from numeric_observations.observation_date) = extract(year from hypertension.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(numeric_observations.observation_date) = YEAR(hypertension.recorded_date)
+            {% else %}
+                and extract(year from numeric_observations.observation_date) = extract(year from hypertension.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
