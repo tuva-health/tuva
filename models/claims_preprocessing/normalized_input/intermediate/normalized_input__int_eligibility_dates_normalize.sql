@@ -8,11 +8,8 @@
 select distinct
   elig.patient_id
   {% if target.type == 'fabric' %}
-
     , elig.patient_id + coalesce(elig.data_source,'') + coalesce(elig.payer,'') + coalesce(elig."plan",'') + coalesce(cast(elig.enrollment_start_date as {{ dbt.type_string() }}),'') + coalesce(cast(elig.enrollment_end_date as {{ dbt.type_string() }}),'') as patient_id_key
-
   {% else %}
-
     , elig.patient_id||coalesce(elig.data_source,'')||coalesce(elig.payer,'')||coalesce(elig."plan",'')||coalesce(cast(elig.enrollment_start_date as {{ dbt.type_string() }}),'')||coalesce(cast(elig.enrollment_end_date as {{ dbt.type_string() }}),'') as patient_id_key
 
   {% endif %}

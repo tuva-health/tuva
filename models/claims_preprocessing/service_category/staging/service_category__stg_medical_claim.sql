@@ -12,6 +12,6 @@ claim_type,
 hcpcs_code,
 ms_drg_code,
 place_of_service_code,
-REVENUE_CENTER_CODE,
+revenue_center_code,
 '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }}
