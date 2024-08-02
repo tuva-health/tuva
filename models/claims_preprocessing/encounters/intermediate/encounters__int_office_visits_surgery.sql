@@ -9,10 +9,5 @@ select
 from {{ ref('encounters__int_office_visits')}} ov
 inner join {{ ref('encounters__stg_medical_claim')}} mc on mc.claim_id = ov.claim_id
     and mc.claim_line_number = ov.claim_line_number
-where
-    hcpcs_code REGEXP '^[0-9]{5}$'
-    AND ( 
-        hcpcs_code BETWEEN '10021' AND '69999'
-        OR
-        hcpcs_code BETWEEN '90281' AND '99607'
-    )
+inner join {{ ref('service_category__office_based_surgery_professional')}} scsurg on mc.claim_id = scsurg.claim_id
+    and mc.claim_line_number = scsurg.claim_line_number
