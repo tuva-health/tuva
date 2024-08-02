@@ -4,14 +4,14 @@
 }}
 
 select
-APR_DRG_CODE,
-BILL_TYPE_CODE,
-CLAIM_ID,
-CLAIM_LINE_NUMBER,
-CLAIM_TYPE,
-HCPCS_CODE,
-MS_DRG_CODE,
-PLACE_OF_SERVICE_CODE,
+apr_drg_code,
+bill_type_code,
+claim_id,
+claim_line_number,
+claim_type,
+hcpcs_code,
+ms_drg_code,
+place_of_service_code,
 REVENUE_CENTER_CODE,
 '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }}
