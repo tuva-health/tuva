@@ -297,7 +297,8 @@ WITH (
 {% if execute %}
 {# debugging { log(sql, True)} #}
 {% set results = load_result('fabricsql') %}
-{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ results['data']|sum(attribute=2),True) }}
+{% set rows_loaded = results['response'].rows_affected|default(0) %}
+{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "\n  rows: " ~ rows_loaded, True) }}
 {# debugging { log(results, True)} #}
 {% endif %}
 
