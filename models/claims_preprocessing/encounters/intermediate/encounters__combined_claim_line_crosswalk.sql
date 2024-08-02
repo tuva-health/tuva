@@ -101,7 +101,8 @@ inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.
 select 
   claim_id
 , claim_line_number
-, encounter_id
+, encounter_id as old_encounter_id
+, row_number() over (order by encounter_type, claim_id) as encounter_id
 , encounter_type
 , priority_number
 , row_number() over (partition by claim_id , claim_line_number order by priority_number) as claim_line_attribution_number
