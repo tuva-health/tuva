@@ -11,7 +11,7 @@ inner join {{ ref('encounters__stg_medical_claim')}} mc on mc.claim_id = ov.clai
     and mc.claim_line_number = ov.claim_line_number
 left join {{ ref('terminology__provider')}} provider on mc.rendering_id = provider.npi
 where 
-    primary_specialty_description IN (
+    provider.primary_specialty_description IN (
         'Occupational Health'
         ,'Occupational Medicine'
         ,'Occupational Therapist in Private Practice'

@@ -37,6 +37,7 @@ select
   , p.primary_specialty_description
   , n.modality
   , m.billing_id
+  , m.rendering_id
   , m.facility_id
   , m.discharge_disposition_code
   , m.paid_amount
