@@ -1,12 +1,13 @@
 {{ config(
-    enabled = var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
-) }}
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+   )
+}}
 
 {# Since HCPCS is a string, we need to exclude values that would fall in our comparison range for alphanumeric values #}
 with numeric_hcpcs as (
     select *
     from {{ ref('service_category__stg_medical_claim') }} as med
-    where {{ dbt_utils.is_numeric('hcpcs_code') }}
+    where {{ safe_cast('hcpcs_code', 'int')}} is not null
 )
 
 , final as (

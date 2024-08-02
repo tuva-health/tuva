@@ -284,8 +284,8 @@ models:
 
 
 
-## Intermediate
-  - name: encounters__int_office_visits_injections
+##office visits
+  - name: office_visits__int_office_visits_injections
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -295,7 +295,7 @@ models:
       - claims_preprocessing
       - encounters
 
-  - name: encounters__int_office_visits_ptotst
+  - name: office_visits__int_office_visits_ptotst
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -305,7 +305,7 @@ models:
       - claims_preprocessing
       - encounters
 
-  - name: encounters__int_office_visits_surgery
+  - name: office_visits__int_office_visits_surgery
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -315,7 +315,7 @@ models:
       - claims_preprocessing
       - encounters
 
-  - name: encounters__int_office_visits
+  - name: office_visits__int_office_visits
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing

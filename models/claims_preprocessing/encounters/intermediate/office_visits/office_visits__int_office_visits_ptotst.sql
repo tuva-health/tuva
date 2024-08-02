@@ -6,7 +6,7 @@
 select 
     ov.encounter_id
     ,mc.*
-from {{ ref('encounters__int_office_visits')}} ov
+from {{ ref('office_visits__int_office_visits')}} ov
 inner join {{ ref('encounters__stg_medical_claim')}} mc on mc.claim_id = ov.claim_id
     and mc.claim_line_number = ov.claim_line_number
 left join {{ ref('terminology__provider')}} provider on mc.rendering_id = provider.npi
