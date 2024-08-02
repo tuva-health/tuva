@@ -12,8 +12,13 @@
 
 
 select
-        cast(member_id as {{ dbt.type_string() }} ) || '-' || cast(enrollment_start_date as {{ dbt.type_string() }} ) || '-' || cast(enrollment_end_date as {{ dbt.type_string() }} )
+        {% if target.type == 'fabric' %}
+            cast(member_id as {{ dbt.type_string() }} ) + '-' + cast(enrollment_start_date as {{ dbt.type_string() }} ) + '-' + cast(enrollment_end_date as {{ dbt.type_string() }} )
+                + '-' +  cast(payer as {{ dbt.type_string() }} ) + '-' + cast("plan" as {{ dbt.type_string() }} ) as eligibility_id
+        {% else %}
+             cast(member_id as {{ dbt.type_string() }} ) || '-' || cast(enrollment_start_date as {{ dbt.type_string() }} ) || '-' || cast(enrollment_end_date as {{ dbt.type_string() }} )
             || '-' ||  cast(payer as {{ dbt.type_string() }} ) || '-' || cast("plan" as {{ dbt.type_string() }} ) as eligibility_id
+        {% endif %}
        , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(subscriber_id as {{ dbt.type_string() }} ) as subscriber_id

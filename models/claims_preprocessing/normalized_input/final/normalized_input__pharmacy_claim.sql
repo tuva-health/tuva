@@ -13,9 +13,17 @@ select
     , cast(payer as {{ dbt.type_string() }} ) as payer
     , cast("plan" as {{ dbt.type_string() }} ) as "plan"
     , cast(prescribing_provider_npi as {{ dbt.type_string() }} ) as prescribing_provider_id
-    , cast(coalesce(pres.provider_last_name||', '|| pres.provider_first_name, pres.provider_organization_name) as {{ dbt.type_string() }} ) as prescribing_provider_name
+    {% if target.type == 'fabric' %}
+        , cast(coalesce(pres.provider_last_name + ', ' + pres.provider_first_name, pres.provider_organization_name) as {{ dbt.type_string() }} ) as prescribing_provider_name
+    {% else %}
+        , cast(coalesce(pres.provider_last_name||', '|| pres.provider_first_name, pres.provider_organization_name) as {{ dbt.type_string() }} ) as prescribing_provider_name
+    {% endif %}
     , cast(dispensing_provider_npi as {{ dbt.type_string() }} ) as dispensing_provider_id
-     , cast(coalesce(disp.provider_last_name||', '|| disp.provider_first_name, disp.provider_organization_name) as {{ dbt.type_string() }} ) as dispensing_provider_name
+    {% if target.type == 'fabric' %}
+        , cast(coalesce(disp.provider_last_name + ', ' + disp.provider_first_name, disp.provider_organization_name) as {{ dbt.type_string() }} ) as dispensing_provider_name
+    {% else %}
+        , cast(coalesce(disp.provider_last_name||', '|| disp.provider_first_name, disp.provider_organization_name) as {{ dbt.type_string() }} ) as dispensing_provider_name
+    {% endif %}
     , cast(dispensing_date as date ) as dispensing_date
     , cast(ndc_code as {{ dbt.type_string() }} ) as ndc_code
     , cast(ndc.fda_description as {{ dbt.type_string() }} ) as ndc_description

@@ -7,29 +7,55 @@ with demographic_factors as (
     select
           patient_id
         /* concatenate demographic risk factors */
-        , gender
-            || ', '
-            || age_group
-            || ' Years'
-            || ', '
-            || enrollment_status
-            || ' Enrollee'
-            || ', '
-            || case
-                when medicaid_status = 'Yes' then 'Medicaid'
-                else 'Non-Medicaid'
-                end
-            || ', '
-            || dual_status
-            || ' Dual'
-            || ', '
-            || orec
-            || ', '
-            || case
-                when institutional_status = 'Yes' then 'Institutional'
-                else 'Non-Institutional'
-                end
-          as description
+        {% if target.type == 'fabric' %}
+            , gender
+                + ', '
+                + age_group
+                + ' Years'
+                + ', '
+                + enrollment_status
+                + ' Enrollee'
+                + ', '
+                + case
+                    when medicaid_status = 'Yes' then 'Medicaid'
+                    else 'Non-Medicaid'
+                    end
+                + ', '
+                + dual_status
+                + ' Dual'
+                + ', '
+                + orec
+                + ', '
+                + case
+                    when institutional_status = 'Yes' then 'Institutional'
+                    else 'Non-Institutional'
+                    end
+              as description
+        {% else %}
+            , gender
+                || ', '
+                || age_group
+                || ' Years'
+                || ', '
+                || enrollment_status
+                || ' Enrollee'
+                || ', '
+                || case
+                    when medicaid_status = 'Yes' then 'Medicaid'
+                    else 'Non-Medicaid'
+                    end
+                || ', '
+                || dual_status
+                || ' Dual'
+                || ', '
+                || orec
+                || ', '
+                || case
+                    when institutional_status = 'Yes' then 'Institutional'
+                    else 'Non-Institutional'
+                    end
+              as description
+        {% endif %}
         , coefficient
         , factor_type
         , model_version
@@ -55,7 +81,11 @@ with demographic_factors as (
 
     select
           patient_id
-        , hcc_description || ' (HCC ' || hcc_code || ')' as description
+        {% if target.type == 'fabric' %}
+            , hcc_description + ' (HCC ' + hcc_code + ')' as description
+        {% else %}
+            , hcc_description || ' (HCC ' || hcc_code || ')' as description
+        {% endif %}
         , coefficient
         , factor_type
         , model_version

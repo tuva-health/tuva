@@ -24,7 +24,13 @@ with claims_with_service_categories as (
     , "plan"
     , service_category_1
     , service_category_2
-    , cast({{ date_part("year", "claim_date" ) }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "claim_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
+    {% if target.type == 'fabric' %}
+        , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
+          + RIGHT(REPLICATE('0', 2) + cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }} ), 2) AS year_month
+    {% else %}
+        , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
+          || lpad(cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }} ), 2, '0') AS year_month
+    {% endif %}
     , paid_amount
     , allowed_amount
     , data_source

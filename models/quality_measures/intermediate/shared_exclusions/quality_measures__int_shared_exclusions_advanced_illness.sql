@@ -139,12 +139,21 @@ with patients_with_frailty as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || med_claim_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
+        {% if target.type == 'fabric' %}
+            , patients_with_frailty.exclusion_reason
+                + ' with '
+                + med_claim_exclusions.concept_name
+                + ' and '
+                + condition_exclusions.concept_name
+              as exclusion_reason
+        {% else %}
+            , patients_with_frailty.exclusion_reason
+                || ' with '
+                || med_claim_exclusions.concept_name
+                || ' and '
+                || condition_exclusions.concept_name
+              as exclusion_reason
+        {% endif %}
         , med_claim_exclusions.claim_start_date
         , med_claim_exclusions.claim_end_date
         , cast(null as date) as procedure_date
@@ -160,12 +169,21 @@ with patients_with_frailty as (
     select distinct
           patients_with_frailty.patient_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || procedure_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
+        {% if target.type == 'fabric' %}
+            , patients_with_frailty.exclusion_reason
+                + ' with '
+                + procedure_exclusions.concept_name
+                + ' and '
+                + condition_exclusions.concept_name
+              as exclusion_reason
+        {% else %}
+            , patients_with_frailty.exclusion_reason
+                || ' with '
+                || procedure_exclusions.concept_name
+                || ' and '
+                || condition_exclusions.concept_name
+              as exclusion_reason
+        {% endif %}
         , cast(null as date) as claim_start_date
         , cast(null as date) as claim_end_date
         , procedure_exclusions.procedure_date
@@ -187,12 +205,21 @@ with patients_with_frailty as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || med_claim_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
+        {% if target.type == 'fabric' %}
+            , patients_with_frailty.exclusion_reason
+                + ' with '
+                + med_claim_exclusions.concept_name
+                + ' and '
+                + condition_exclusions.concept_name
+              as exclusion_reason
+        {% else %}
+            , patients_with_frailty.exclusion_reason
+                || ' with '
+                || med_claim_exclusions.concept_name
+                || ' and '
+                || condition_exclusions.concept_name
+              as exclusion_reason
+        {% endif %}
         , med_claim_exclusions.claim_start_date
         , med_claim_exclusions.claim_end_date
         , cast(null as date) as procedure_date
@@ -214,12 +241,21 @@ with patients_with_frailty as (
     select distinct
           patients_with_frailty.patient_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , patients_with_frailty.exclusion_reason
-            || ' with '
-            || procedure_exclusions.concept_name
-            || ' and '
-            || condition_exclusions.concept_name
-          as exclusion_reason
+        {% if target.type == 'fabric' %}
+            , patients_with_frailty.exclusion_reason
+                + ' with '
+                + procedure_exclusions.concept_name
+                + ' and '
+                + condition_exclusions.concept_name
+              as exclusion_reason
+        {% else %}
+            , patients_with_frailty.exclusion_reason
+                || ' with '
+                || procedure_exclusions.concept_name
+                || ' and '
+                || condition_exclusions.concept_name
+              as exclusion_reason
+        {% endif %}
         , cast(null as date) as claim_start_date
         , cast(null as date) as claim_end_date
         , procedure_exclusions.procedure_date

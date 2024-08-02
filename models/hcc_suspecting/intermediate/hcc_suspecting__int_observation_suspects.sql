@@ -274,6 +274,21 @@ with conditions as (
         , condition_concept_name
         , hcc_code
         , hcc_description
+        {% if target.type == 'fabric' %}
+            , 'BMI result '
+                + CAST(observation_result AS {{ dbt.type_string() }})
+                + CASE
+                    WHEN condition_code IS NULL THEN ''
+                    ELSE ' with '
+                        + CAST(condition_concept_name AS {{ dbt.type_string() }})
+                        + ' ('
+                        + CAST(condition_code AS {{ dbt.type_string() }})
+                        + ' on '
+                        + CAST(condition_date AS {{ dbt.type_string() }})
+                        + ')'
+                    END
+              AS contributing_factor
+        {% else %}
         , 'BMI result '
             || CAST(observation_result AS {{ dbt.type_string() }})
             || CASE
@@ -287,6 +302,7 @@ with conditions as (
                     || ')'
                 END
           AS contributing_factor
+        {% endif %}
     from hcc_48_unioned
 
 )
@@ -350,11 +366,19 @@ with conditions as (
         , depression_assessments_ordered.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
-        , 'PHQ-9 result '
-            || CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
-          as contributing_factor
+        {% if target.type == 'fabric' %}
+            , 'PHQ-9 result '
+                + CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
+              as contributing_factor
+        {% else %}
+            , 'PHQ-9 result '
+                || CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
+              as contributing_factor
+        {% endif %}
     from depression_assessments_ordered
         inner join seed_hcc_descriptions
             on hcc_code = '155'

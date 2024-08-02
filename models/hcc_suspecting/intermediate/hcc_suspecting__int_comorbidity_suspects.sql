@@ -199,21 +199,37 @@ with conditions as (
         , condition_2_recorded_date
         , current_year_billed
         , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
-        , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
-            || ' ('
-            || CAST(condition_1_code AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
-            || ')'
-            || ' and '
-            || CAST(condition_2_concept_name AS {{ dbt.type_string() }})
-            || ' ('
-            || CAST(condition_2_code AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
-            || ')'
-
-          as contributing_factor
+        {% if target.type == 'fabric' %}
+            , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
+                + ' ('
+                + CAST(condition_1_code AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
+                + ')'
+                + ' and '
+                + CAST(condition_2_concept_name AS {{ dbt.type_string() }})
+                + ' ('
+                + CAST(condition_2_code AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
+                + ')'
+              as contributing_factor
+        {% else %}
+            , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
+                || ' ('
+                || CAST(condition_1_code AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
+                || ')'
+                || ' and '
+                || CAST(condition_2_concept_name AS {{ dbt.type_string() }})
+                || ' ('
+                || CAST(condition_2_code AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
+                || ')'
+              as contributing_factor
+        {% endif %}
         , condition_1_recorded_date as suspect_date
     from add_billed_flag
 

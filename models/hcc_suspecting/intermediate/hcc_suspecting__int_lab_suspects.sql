@@ -124,14 +124,23 @@ with egfr_labs as (
             when result between 30 and 44 then '328'
             when result between 45 and 59 then '329'
           end as hcc_code
-        , 'eGFR ('
-            || CAST(code AS {{ dbt.type_string() }})
-            || ') result '
-            || CAST(result AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(result_date AS {{ dbt.type_string() }})
-          AS contributing_factor
-
+        {% if target.type == 'fabric' %}
+            , 'eGFR ('
+                + CAST(code AS {{ dbt.type_string() }})
+                + ') result '
+                + CAST(result AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(result_date AS {{ dbt.type_string() }})
+              AS contributing_factor
+        {% else %}
+            , 'eGFR ('
+                || CAST(code AS {{ dbt.type_string() }})
+                || ') result '
+                || CAST(result AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(result_date AS {{ dbt.type_string() }})
+              AS contributing_factor
+        {% endif %}
     from eligible_labs
     where row_num = 1
 
