@@ -13,7 +13,7 @@
 
 select
         cast(member_id as {{ dbt.type_string() }} ) || '-' || cast(enrollment_start_date as {{ dbt.type_string() }} ) || '-' || cast(enrollment_end_date as {{ dbt.type_string() }} )
-            || '-' ||  cast(payer as {{ dbt.type_string() }} ) || '-' || cast(plan as {{ dbt.type_string() }} ) as eligibility_id
+            || '-' ||  cast(payer as {{ dbt.type_string() }} ) || '-' || cast("plan" as {{ dbt.type_string() }} ) as eligibility_id
        , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(subscriber_id as {{ dbt.type_string() }} ) as subscriber_id
@@ -23,7 +23,7 @@ select
        , cast(enrollment_end_date as date ) as enrollment_end_date
        , cast(payer as {{ dbt.type_string() }} ) as payer
        , cast(payer_type as {{ dbt.type_string() }} ) as payer_type
-       , cast(plan as {{ dbt.type_string() }} ) as plan
+       , cast("plan" as {{ dbt.type_string() }} ) as "plan"
        , cast(original_reason_entitlement_code as {{ dbt.type_string() }} ) as original_reason_entitlement_code
        , cast(dual_status_code as {{ dbt.type_string() }} ) as dual_status_code
        , cast(medicare_status_code as {{ dbt.type_string() }} ) as medicare_status_code

@@ -11,7 +11,7 @@ select
     , patient_id
     , member_id
     , payer
-    , plan
+    , "plan"
     , claim_start_date
     , claim_end_date
     , claim_line_start_date

@@ -10,7 +10,7 @@ with claim_dates as(
         cast(claim_id as {{ dbt.type_string() }} )|| '-' ||cast(claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
         , patient_id
         , payer
-        , plan
+        , "plan"
         , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date
         , coalesce(claim_line_end_date, claim_end_date, discharge_date) as inferred_claim_end_date
         , case
@@ -31,7 +31,7 @@ with claim_dates as(
         medical_claim_id
         , patient_id
         , payer
-        , plan
+        , "plan"
         , inferred_claim_start_date
         , inferred_claim_end_date
         , inferred_claim_start_column_used
@@ -46,7 +46,7 @@ select distinct
     claim.medical_claim_id
     , claim.patient_id
     , claim.payer
-    , claim.plan
+    , claim."plan"
     , claim.inferred_claim_start_year_month
     , claim.inferred_claim_end_year_month
     , claim.inferred_claim_start_column_used
