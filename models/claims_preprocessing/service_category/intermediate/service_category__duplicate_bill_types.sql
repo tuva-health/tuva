@@ -7,5 +7,5 @@ select distinct
   claim_id
 , count(distinct bill_type_code) as cnt
 from {{ ref('service_category__stg_medical_claim') }}
-group by 1
+group by claim_id
 having count(distinct bill_type_code) > 1

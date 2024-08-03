@@ -146,10 +146,17 @@ with stg_eligibility as (
             when add_enrollment.enrollment_status is null then 'New'
             else add_enrollment.enrollment_status
           end as enrollment_status
-        , case
-            when add_enrollment.enrollment_status is null then TRUE
-            else FALSE
-          end as enrollment_status_default
+        {% if target.type == 'fabric' %}
+            , case
+                when add_enrollment.enrollment_status is null then 1
+                else 0
+              end as enrollment_status_default
+        {% else %}
+            , case
+                when add_enrollment.enrollment_status is null then TRUE
+                else FALSE
+              end as enrollment_status_default
+        {% endif %}
     from stg_eligibility
         left join add_enrollment
             on stg_eligibility.patient_id = add_enrollment.patient_id
