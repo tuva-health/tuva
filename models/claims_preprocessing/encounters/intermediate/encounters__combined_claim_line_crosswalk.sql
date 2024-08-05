@@ -96,6 +96,43 @@ select enc.claim_id
 ,5 as priority_number
 from {{ ref('inpatient_substance_use__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
+
+union
+
+select claim_id
+,claim_line_number
+,encounter_id
+,'office visit surgery' as encounter_type
+,6 as priority_number
+from {{ ref('office_visits__int_office_visits_surgery') }}
+
+union
+
+select claim_id
+,claim_line_number
+,encounter_id
+,'office visit injections' as encounter_type
+,7 as priority_number
+from {{ ref('office_visits__int_office_visits_injections') }}
+
+union
+
+select claim_id
+,claim_line_number
+,encounter_id
+,'office visit PT, OT, ST' as encounter_type
+,8 as priority_number
+from {{ ref('office_visits__int_office_visits_ptotst') }}
+
+union
+
+select claim_id
+,claim_line_number
+,encounter_id
+,'office visits' as encounter_type
+,9 as priority_number
+from {{ ref('office_visits__int_office_visits') }}
+
 )
 
 select 

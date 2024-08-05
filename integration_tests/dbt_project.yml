@@ -2,7 +2,7 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: default
+profile: default_prod
 
 vars:
   error_empty_seeds: true
@@ -12,7 +12,7 @@ vars:
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva
+  input_database: medicare_lds_five_percent
   input_schema: input_layer
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
