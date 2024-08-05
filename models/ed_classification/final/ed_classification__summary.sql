@@ -11,8 +11,8 @@ select
     , class.patient_id
     , class.encounter_end_date
     {% if target.type == 'fabric' %}
-        , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
-          + substring('0'+cast({{ date_part("month", "class.encounter_end_date") }} as {{ dbt.type_string() }}),-2)
+        , cast({{ YEAR("class.encounter_end_date") }} as {{ dbt.type_string() }})
+          + substring('0'+cast({{ MONTH("class.encounter_end_date") }} as {{ dbt.type_string() }}),-2)
         as year_month
     {% else %}
         , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
