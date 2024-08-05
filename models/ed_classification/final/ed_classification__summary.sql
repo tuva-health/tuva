@@ -39,7 +39,7 @@ select
     , race as patient_race
 from {{ ref('ed_classification__int_filter_encounter_with_classification') }} class
 inner join {{ ref('ed_classification__categories') }} cat
-    using(classification)
+    on class.classification = cat.classification
 left join {{ ref('terminology__provider') }} fac_prov 
     on class.facility_id = fac_prov.npi
 left join {{ ref('ed_classification__stg_patient') }} pat
