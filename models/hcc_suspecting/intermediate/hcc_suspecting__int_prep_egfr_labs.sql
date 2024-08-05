@@ -56,7 +56,12 @@ with lab_result as (
         , result_date
         , cast(result as {{ dbt.type_numeric() }}) as result
     from egfr_labs
-    where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
+   {if target.type == 'fabric'}
+        WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
+        AND result NOT LIKE '%[^0-9.]%'
+    {% else %}
+        where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
+    {% endif %}
 
 )
 
@@ -78,7 +83,12 @@ with lab_result as (
             else null
           end as {{ dbt.type_numeric() }}) as clean_result
     from egfr_labs
-    where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }} = False
+    {% if target.type == 'fabric' %}
+        WHERE NOT (result LIKE '%.%' OR result LIKE '%[0-9]%'
+        AND result NOT LIKE '%[^0-9.]%')
+    {% else %}
+        where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }} = False
+    {% endif %}
 
 )
 

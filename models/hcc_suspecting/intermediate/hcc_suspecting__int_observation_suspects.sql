@@ -339,7 +339,10 @@ with conditions as (
             partition by
                   depression_assessment.patient_id
                 , depression_assessment.data_source
-            order by depression_assessment.observation_date desc nulls last
+            --order by depression_assessment.observation_date desc nulls last
+            order by
+                case when depression_assessment.observation_date is null then 1 else 0 end,
+                depression_assessment.observation_date desc
         ) assessment_order
     from depression_assessment
 
@@ -359,7 +362,10 @@ with conditions as (
             partition by
                   patient_id
                 , data_source
-            order by result desc nulls last
+            --order by result desc nulls last
+            order by
+                case when result is null then 1 else 0 end,
+                result desc
         ) as result_order --order the last three assessments by result value
     from eligible_depression_assessments
     where assessment_order <= 3

@@ -15,6 +15,10 @@ select
     {{ var('dxccsr_version') }} as dxccsr_version,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ref('ccsr__long_condition_category')}}
-where 
-    is_{{ var('record_type', 'ip') }}_default_category = 'true'
+where
+    {% if target.type == 'fabric' %}
+        is_{{ var('record_type', 'ip') }}_default_category = 1
+    {% else %}
+        is_{{ var('record_type', 'ip') }}_default_category = true
+    {% endif %}
     and condition_rank = 1
