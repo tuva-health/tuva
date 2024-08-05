@@ -34,7 +34,11 @@ with conditions as (
     select
           patient_id
         , observation_date
+        {% if target.type == 'fabric' %}
+         , TRY_CAST(result AS {{ dbt.type_numeric() }}) AS result
+        {% else %}
         , CAST(result AS {{ dbt.type_numeric() }}) AS result
+        {% endif %}
         , code_type
         , code
         , data_source
