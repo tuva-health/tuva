@@ -15,7 +15,11 @@ select
   , patient_id
   , facility_id
   , paid_amount
-  , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
+  {% if target.type == 'fabric' %}
+    , {{ YEAR('encounter_start_date') }} as year_number
+  {% else %}
+    , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
+  {% endif %}
 from 
     {{ ref('core__encounter') }}
 where 
