@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -14,7 +15,7 @@ from {{ ref('emergency_department__int_institutional_encounter_id') }} inst
 left join {{ ref('emergency_department__stg_medical_claim') }} med
     on inst.claim_id = med.claim_id
 
-union distinct
+union
 
 select
   patient_id,

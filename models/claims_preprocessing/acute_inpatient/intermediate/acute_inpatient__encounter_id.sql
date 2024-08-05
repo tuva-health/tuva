@@ -31,7 +31,7 @@ from {{ ref('acute_inpatient__institutional_encounter_id') }} inst
 left join {{ ref('acute_inpatient__stg_medical_claim') }} med
     on inst.claim_id = med.claim_id
 
-union distinct
+union
 
 select
   patient_id,
