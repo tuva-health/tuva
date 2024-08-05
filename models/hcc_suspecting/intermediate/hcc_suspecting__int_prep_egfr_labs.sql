@@ -56,7 +56,7 @@ with lab_result as (
         , result_date
         , cast(result as {{ dbt.type_numeric() }}) as result
     from egfr_labs
-   {if target.type == 'fabric'}
+   {% if target.type == 'fabric' %}
         WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
         AND result NOT LIKE '%[^0-9.]%'
     {% else %}
