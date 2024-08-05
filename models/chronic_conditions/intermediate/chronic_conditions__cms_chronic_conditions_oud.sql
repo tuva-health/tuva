@@ -171,9 +171,9 @@ with chronic_conditions as (
 , inclusions_unioned as (
 
     select * from inclusions_diagnosis
-    union distinct
+    union
     select * from inclusions_procedure
-    union distinct
+    union
     select * from inclusions_medication
 
 )

@@ -14,9 +14,9 @@ with agg_cte as (
     select * From {{ref('normalize__stg_unmapped_procedure')}}
 )
 
-select SOURCE_CODE_TYPE,
-       SOURCE_CODE,
-       SOURCE_DESCRIPTION,
+select source_code_type,
+       source_code,
+       source_description,
        item_count,
        domains,
        data_sources,
@@ -31,12 +31,12 @@ select SOURCE_CODE_TYPE,
        notes
 from {{ ref('custom_mapped') }}
 
-union distinct
+union
 
 
-select un.SOURCE_CODE_TYPE,
-       un.SOURCE_CODE,
-       un.SOURCE_DESCRIPTION,
+select un.source_code_type,
+       un.source_code,
+       un.source_description,
        un.item_count,
        un.domains,
        un.data_sources,
