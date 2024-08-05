@@ -52,12 +52,12 @@ select
         when icd10.icd_10_cm is not null then 'icd-10-cm'
         when icd9.icd_9_cm is not null then 'icd-9-cm'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
-        else null end as NORMALIZED_CODE_TYPE
+        else null end as normalized_code_type
   , coalesce(
         all_conditions.normalized_code
       , icd10.icd_10_cm
       , icd9.icd_9_cm
-      , snomed_ct.snomed_ct) as NORMALIZED_CODE
+      , snomed_ct.snomed_ct) as normalized_code
   , coalesce(
         all_conditions.normalized_description
       , icd10.short_description
@@ -106,7 +106,7 @@ select
         when icd10.icd_10_cm is not null then 'icd-10-cm'
         when icd9.icd_9_cm is not null then 'icd-9-cm'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
-        else custom_mapped.normalized_code_type end as NORMALIZED_CODE_TYPE
+        else custom_mapped.normalized_code_type end as normalized_code_type
   , coalesce(
         all_conditions.normalized_code
       , icd10.icd_10_cm

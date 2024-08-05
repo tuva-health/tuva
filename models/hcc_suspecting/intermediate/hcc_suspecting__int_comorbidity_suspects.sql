@@ -253,7 +253,11 @@ with conditions as (
         , cast(condition_2_concept_name as {{ dbt.type_string() }}) as condition_2_concept_name
         , cast(condition_2_code as {{ dbt.type_string() }}) as condition_2_code
         , cast(condition_2_recorded_date as date) as condition_2_recorded_date
-        , cast(current_year_billed as boolean) as current_year_billed
+        {% if target.type == 'fabric' %}
+            , cast(current_year_billed as bit) as current_year_billed
+        {% else %}
+            , cast(current_year_billed as boolean) as current_year_billed
+        {% endif %}
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
         , cast(suspect_date as date) as suspect_date

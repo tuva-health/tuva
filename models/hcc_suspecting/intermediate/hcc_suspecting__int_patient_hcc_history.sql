@@ -174,7 +174,11 @@ with all_conditions as (
         , cast(first_recorded as date) as first_recorded
         , cast(last_recorded as date) as last_recorded
         , cast(last_billed as date) as last_billed
-        , cast(current_year_billed as boolean) as current_year_billed
+        {% if target.type == 'fabric' %}
+            , cast(current_year_billed as bit) as current_year_billed
+        {% else %}
+            , cast(current_year_billed as boolean) as current_year_billed
+        {% endif %}
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
         , cast(suspect_date as date) as suspect_date

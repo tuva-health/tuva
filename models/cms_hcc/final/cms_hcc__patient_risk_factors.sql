@@ -186,10 +186,17 @@ with demographic_factors as (
 
     select
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
-        , cast(enrollment_status_default as boolean) as enrollment_status_default
-        , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
-        , cast(orec_default as boolean) as orec_default
-        , cast(institutional_status_default as boolean) as institutional_status_default
+        {% if target.type == 'fabric' %}
+            , cast(enrollment_status_default as bit) as enrollment_status_default
+            , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
+            , cast(orec_default as bit) as orec_default
+            , cast(institutional_status_default as bit) as institutional_status_default
+        {% else %}
+            , cast(enrollment_status_default as boolean) as enrollment_status_default
+            , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
+            , cast(orec_default as boolean) as orec_default
+            , cast(institutional_status_default as boolean) as institutional_status_default
+        {% endif %}
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(risk_factor_description as {{ dbt.type_string() }}) as risk_factor_description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
