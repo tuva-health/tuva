@@ -35,42 +35,42 @@ from {{ ref('core__stg_claims_condition') }}
 {# is the default code that gets executed as long as an enable_normalize_engine var is false or not defined #}
 {% if var('enable_normalize_engine',false) != true %}
 select
-    all_conditions.CONDITION_ID
-  , all_conditions.PATIENT_ID
-  , all_conditions.ENCOUNTER_ID
-  , all_conditions.CLAIM_ID
-  , all_conditions.RECORDED_DATE
-  , all_conditions.ONSET_DATE
-  , all_conditions.RESOLVED_DATE
-  , all_conditions.STATUS
-  , all_conditions.CONDITION_TYPE
-  , all_conditions.SOURCE_CODE_TYPE
-  , all_conditions.SOURCE_CODE
-  , all_conditions.SOURCE_DESCRIPTION
+    all_conditions.condition_id
+  , all_conditions.patient_id
+  , all_conditions.encounter_id
+  , all_conditions.claim_id
+  , all_conditions.recorded_date
+  , all_conditions.onset_date
+  , all_conditions.resolved_date
+  , all_conditions.status
+  , all_conditions.condition_type
+  , all_conditions.source_code_type
+  , all_conditions.source_code
+  , all_conditions.source_description
   , case
-        when all_conditions.NORMALIZED_CODE_TYPE is not null then all_conditions.NORMALIZED_CODE_TYPE
+        when all_conditions.normalized_code_type is not null then all_conditions.normalized_code_type
         when icd10.icd_10_cm is not null then 'icd-10-cm'
         when icd9.icd_9_cm is not null then 'icd-9-cm'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
         else null end as NORMALIZED_CODE_TYPE
   , coalesce(
-        all_conditions.NORMALIZED_CODE
+        all_conditions.normalized_code
       , icd10.icd_10_cm
       , icd9.icd_9_cm
       , snomed_ct.snomed_ct) as NORMALIZED_CODE
   , coalesce(
-        all_conditions.NORMALIZED_DESCRIPTION
+        all_conditions.normalized_description
       , icd10.short_description
       , icd9.short_description
-      , snomed_ct.description) as NORMALIZED_DESCRIPTION
-  , case when coalesce(all_conditions.NORMALIZED_CODE, all_conditions.NORMALIZED_DESCRIPTION) is not null then 'manual'
+      , snomed_ct.description) as normalized_description
+  , case when coalesce(all_conditions.normalized_code, all_conditions.normalized_description) is not null then 'manual'
          when coalesce(icd10.icd_10_cm,icd9.icd_9_cm, snomed_ct.snomed_ct) is not null then 'automatic'
          end as mapping_method
-  , all_conditions.CONDITION_RANK
-  , all_conditions.PRESENT_ON_ADMIT_CODE
-  , all_conditions.PRESENT_ON_ADMIT_DESCRIPTION
-  , all_conditions.DATA_SOURCE
-  , all_conditions.TUVA_LAST_RUN
+  , all_conditions.condition_rank
+  , all_conditions.present_on_admit_code
+  , all_conditions.present_on_admit_description
+  , all_conditions.data_source
+  , all_conditions.tuva_last_run
 from
 all_conditions
 left join {{ ref('terminology__icd_10_cm') }} icd10
@@ -89,48 +89,48 @@ left join {{ ref('terminology__snomed_ct') }} snomed_ct
     it expects a seed file called  #}
 {% else %}
 select
-    all_conditions.CONDITION_ID
-  , all_conditions.PATIENT_ID
-  , all_conditions.ENCOUNTER_ID
-  , all_conditions.CLAIM_ID
-  , all_conditions.RECORDED_DATE
-  , all_conditions.ONSET_DATE
-  , all_conditions.RESOLVED_DATE
-  , all_conditions.STATUS
-  , all_conditions.CONDITION_TYPE
-  , all_conditions.SOURCE_CODE_TYPE
-  , all_conditions.SOURCE_CODE
-  , all_conditions.SOURCE_DESCRIPTION
+    all_conditions.condition_id
+  , all_conditions.patient_id
+  , all_conditions.encounter_id
+  , all_conditions.claim_id
+  , all_conditions.recorded_date
+  , all_conditions.onset_date
+  , all_conditions.resolved_date
+  , all_conditions.status
+  , all_conditions.condition_type
+  , all_conditions.source_code_type
+  , all_conditions.source_code
+  , all_conditions.source_description
   , case
-        when all_conditions.NORMALIZED_CODE_TYPE is not null then all_conditions.NORMALIZED_CODE_TYPE
+        when all_conditions.normalized_code_type is not null then all_conditions.normalized_code_type
         when icd10.icd_10_cm is not null then 'icd-10-cm'
         when icd9.icd_9_cm is not null then 'icd-9-cm'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
         else custom_mapped.normalized_code_type end as NORMALIZED_CODE_TYPE
   , coalesce(
-        all_conditions.NORMALIZED_CODE
+        all_conditions.normalized_code
       , icd10.icd_10_cm
       , icd9.icd_9_cm
       , snomed_ct.snomed_ct
       , custom_mapped.normalized_code
       ) as NORMALIZED_CODE
   , coalesce(
-        all_conditions.NORMALIZED_DESCRIPTION
+        all_conditions.normalized_description
       , icd10.short_description
       , icd9.short_description
       , snomed_ct.description
       , custom_mapped.normalized_description
-      ) as NORMALIZED_DESCRIPTION
-  , case when coalesce(all_conditions.NORMALIZED_CODE, all_conditions.NORMALIZED_DESCRIPTION) is not null then 'manual'
+      ) as normalized_description
+  , case when coalesce(all_conditions.normalized_code, all_conditions.normalized_description) is not null then 'manual'
          when coalesce(icd10.icd_10_cm,icd9.icd_9_cm, snomed_ct.snomed_ct) is not null then 'automatic'
          when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
          when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
          end as mapping_method
-  , all_conditions.CONDITION_RANK
-  , all_conditions.PRESENT_ON_ADMIT_CODE
-  , all_conditions.PRESENT_ON_ADMIT_DESCRIPTION
-  , all_conditions.DATA_SOURCE
-  , all_conditions.TUVA_LAST_RUN
+  , all_conditions.condition_rank
+  , all_conditions.present_on_admit_code
+  , all_conditions.present_on_admit_description
+  , all_conditions.data_source
+  , all_conditions.tuva_last_run
 from
 all_conditions
 left join {{ ref('terminology__icd_10_cm') }} icd10
