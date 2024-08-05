@@ -3,7 +3,7 @@
    )
 }}
 
-with procedure as (
+with "procedure" as (
     
     select * from {{ ref('ccsr__stg_core__procedure') }}
 
@@ -16,10 +16,10 @@ with procedure as (
 )
 
 select distinct
-      procedure.encounter_id
-    , procedure.claim_id
-    , procedure.patient_id
-    , procedure.normalized_code
+      "procedure".encounter_id
+    , "procedure".claim_id
+    , "procedure".patient_id
+    , "procedure".normalized_code
     , ccsr__procedure_category_map.code_description
     , ccsr__procedure_category_map.ccsr_parent_category
     , ccsr__procedure_category_map.ccsr_category
@@ -29,4 +29,4 @@ select distinct
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from "procedure"
 left join ccsr__procedure_category_map
-    on procedure.normalized_code = ccsr__procedure_category_map.code
+    on "procedure".normalized_code = ccsr__procedure_category_map.code

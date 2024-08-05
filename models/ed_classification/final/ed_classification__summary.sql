@@ -12,7 +12,7 @@ select
     , class.encounter_end_date
     {% if target.type == 'fabric' %}
         , cast(YEAR("class.encounter_end_date") as {{ dbt.type_string() }})
-          + substring('0'+cast(MONTH("class.encounter_end_date") as {{ dbt.type_string() }}),-2)
+          + RIGHT('0' + CAST(MONTH("class.encounter_end_date") AS {{ dbt.type_string() }}), 2)
         as year_month
     {% else %}
         , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
