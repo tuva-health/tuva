@@ -16,7 +16,7 @@ select
   , facility_id
   , paid_amount
   {% if target.type == 'fabric' %}
-    , YEAR('encounter_start_date') as year_number
+    , YEAR(encounter_start_date) as year_number
   {% else %}
     , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
   {% endif %}
