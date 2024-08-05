@@ -59,8 +59,8 @@ with claims_with_service_categories as (
     , service_category_1
     , service_category_2
     {% if target.type == 'fabric' %}
-        , cast({{ YEAR("claim_date") }} as {{ dbt.type_string() }} )
-        + RIGHT(REPLICATE('0', 2) + cast({{ MONTH("claim_date") }} as {{ dbt.type_string() }}), 2) AS year_month
+        , cast(YEAR("claim_date") as {{ dbt.type_string() }} )
+        + RIGHT(REPLICATE('0', 2) + cast(MONTH("claim_date") as {{ dbt.type_string() }}), 2) AS year_month
     {% else %}
         , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
         || lpad(cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }}), 2, '0') AS year_month
