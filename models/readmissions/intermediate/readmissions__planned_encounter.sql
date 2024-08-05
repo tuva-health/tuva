@@ -89,7 +89,7 @@ where acute_encounters.encounter_id is null
 -- Aggregate of all encounter_ids for planned encounters
 
 select * , '{{ var('tuva_last_run')}}' as tuva_last_run from always_planned_px
-union distinct
+union
 select *, '{{ var('tuva_last_run')}}' as tuva_last_run from always_planned_dx
-union distinct
+union
 select *, '{{ var('tuva_last_run')}}' as tuva_last_run from potentially_planned_that_are_actually_planned
