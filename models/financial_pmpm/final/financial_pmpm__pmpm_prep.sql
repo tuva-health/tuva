@@ -8,7 +8,11 @@ SELECT
   a.patient_id,
   a.year_month,
   a.payer,
-  a."plan",
+  {% if target.type == 'fabric' %}
+      a."plan",
+  {% else %}
+      a.plan,
+  {% endif %}
   a.data_source,
   
   -- service cat 1 paid
@@ -69,22 +73,38 @@ left join {{ ref('financial_pmpm__service_category_1_paid_pivot') }} b
   on a.patient_id = b.patient_id
   and a.year_month = b.year_month
   and a.payer = b.payer
-  and a."plan" = b."plan"
+  {% if target.type == 'fabric' %}
+      and a."plan" = b."plan"
+  {% else %}
+      and a.plan = b.plan
+  {% endif %}
 left join {{ ref('financial_pmpm__service_category_2_paid_pivot') }} c
   on a.patient_id = c.patient_id
   and a.year_month = c.year_month
   and a.payer = c.payer
-  and a."plan" = c."plan"
+  {% if target.type == 'fabric' %}
+      and a."plan" = c."plan"
+  {% else %}
+      and a.plan = c.plan
+  {% endif %}
 left join {{ ref('financial_pmpm__service_category_1_allowed_pivot') }} d
   on a.patient_id = d.patient_id
   and a.year_month = d.year_month
   and a.payer = d.payer
-  and a."plan" = d."plan"
+  {% if target.type == 'fabric' %}
+      and a."plan" = d."plan"
+  {% else %}
+      and a.plan = d.plan
+  {% endif %}
 left join {{ ref('financial_pmpm__service_category_2_allowed_pivot') }} e
   on a.patient_id = e.patient_id
   and a.year_month = e.year_month
   and a.payer = e.payer
-  and a."plan" = e."plan"
+  {% if target.type == 'fabric' %}
+    and a."plan" = e."plan"
+  {% else %}
+    and a.plan = e.plan
+  {% endif %}
 )
 
 select *

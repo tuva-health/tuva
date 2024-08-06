@@ -11,7 +11,11 @@ SELECT
     , paid_amount
     , allowed_amount
     , payer
-    , "plan"
+    {% if target.type == 'fabric' %}
+        , "plan"
+    {% else %}
+        , plan
+    {% endif %}
     , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }}

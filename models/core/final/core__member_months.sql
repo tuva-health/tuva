@@ -20,7 +20,11 @@ select distinct
     a.patient_id
   , year_month
   , a.payer
-  , a."plan"
+  {% if target.type == 'fabric' %}
+    , a."plan"
+  {% else %}
+    , a.plan
+  {% endif %}
   , data_source
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__eligibility') }} a

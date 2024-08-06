@@ -14,7 +14,11 @@ with claim_dates as(
         {% endif %}
         , patient_id
         , payer
-        , "plan"
+        {% if target.type == 'fabric' %}
+            , "plan"
+        {% else %}
+            , plan
+        {% endif %}
         , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date
         , coalesce(claim_line_end_date, claim_end_date, discharge_date) as inferred_claim_end_date
         , case
@@ -35,7 +39,11 @@ with claim_dates as(
         medical_claim_id
         , patient_id
         , payer
-        , "plan"
+        {% if target.type == 'fabric' %}
+            , "plan"
+        {% else %}
+            , plan
+        {% endif %}
         , inferred_claim_start_date
         , inferred_claim_end_date
         , inferred_claim_start_column_used
@@ -59,7 +67,11 @@ select distinct
     claim.medical_claim_id
     , claim.patient_id
     , claim.payer
-    , claim."plan"
+    {% if target.type == 'fabric' %}
+        , claim."plan"
+    {% else %}
+        , claim.plan
+    {% endif %}
     , claim.inferred_claim_start_year_month
     , claim.inferred_claim_end_year_month
     , claim.inferred_claim_start_column_used
@@ -69,7 +81,11 @@ from {{ ref('core__member_months')}} mm
 inner join claim_year_month claim
     on mm.patient_id = claim.patient_id
     and mm.payer = claim.payer
-    and mm."plan" = claim."plan"
+    {% if target.type == 'fabric' %}
+        and mm."plan" = claim."plan"
+    {% else %}
+        and mm.plan = claim.plan
+    {% endif %}
     and mm.year_month >= claim.inferred_claim_start_year_month
     and mm.year_month <= claim.inferred_claim_end_year_month
 

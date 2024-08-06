@@ -41,7 +41,11 @@ inner join {{ ref('ahrq_measures__int_pqi_16_denom') }} as denom
   on e.patient_id = denom.patient_id
   and e.data_source = denom.data_source
   and e.year_number = denom.year_number
-inner join "procedure" as p
+{% if target.type == 'fabric' %}
+    inner join "procedure" as p
+{% else %}
+    inner join procedure as p
+{% endif %}
   on e.encounter_id = p.encounter_id
   and e.data_source = p.data_source
 left join {{ ref('ahrq_measures__int_pqi_16_exclusions') }} as shared

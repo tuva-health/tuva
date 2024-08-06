@@ -8,7 +8,11 @@ with service_cat_2 as (
     patient_id
   , year_month
   , payer
-  , "plan"
+  {% if target.type == 'fabric' %}
+      , "plan"
+  {% else %}
+      , plan
+  {% endif %}
   , service_category_2
   , data_source
   , sum(total_allowed) as total_allowed
@@ -17,7 +21,11 @@ with service_cat_2 as (
     patient_id
   , year_month
   , payer
-  , "plan"
+  {% if target.type == 'fabric' %}
+    , "plan"
+  {% else %}
+    , plan
+  {% endif %}
   , service_category_2
   , data_source
 )
@@ -26,7 +34,11 @@ select
   patient_id 
 , year_month 
 , payer
-, "plan"
+{% if target.type == 'fabric' %}
+    , "plan"
+{% else %}
+    , plan
+{% endif %}
 , data_source
 , {{ dbt_utils.pivot(
     column='service_category_2'
@@ -60,5 +72,9 @@ group by
   patient_id
 , year_month
 , payer
-, "plan"
+{% if target.type == 'fabric' %}
+    , "plan"
+{% else %}
+    , plan
+{% endif %}
 , data_source

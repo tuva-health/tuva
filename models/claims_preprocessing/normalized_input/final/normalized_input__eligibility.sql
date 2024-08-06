@@ -17,8 +17,12 @@ select
     , cast(date_norm.normalized_enrollment_start_date as date ) as enrollment_start_date
     , cast(date_norm.normalized_enrollment_end_date as date ) as enrollment_end_date
     , cast(elig.payer as {{ dbt.type_string() }} ) as payer
-    , cast(elig.payer_type as {{ dbt.type_string() }} ) as payer_type
-    , cast(elig."plan" as {{ dbt.type_string() }} ) as "plan"
+    , cast(elig.payer_type as {{ dbt.type_string() }} ) as
+    {% if target.type == 'fabric' %}
+        , cast(elig."plan" as {{ dbt.type_string() }} ) as "plan"
+    {% else %}
+        , cast(elig.plan as {{ dbt.type_string() }} ) as plan
+    {% endif %}
     , cast(elig.original_reason_entitlement_code as {{ dbt.type_string() }} ) as original_reason_entitlement_code
     , cast(elig.dual_status_code as {{ dbt.type_string() }} ) as dual_status_code
     , cast(elig.medicare_status_code as {{ dbt.type_string() }} ) as medicare_status_code

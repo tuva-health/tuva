@@ -11,7 +11,11 @@ select
     , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(member_id as {{ dbt.type_string() }} ) as member_id
     , cast(payer as {{ dbt.type_string() }} ) as payer
-    , cast("plan" as {{ dbt.type_string() }} ) as "plan"
+    {% if target.type == 'fabric' %}
+        , cast("plan" as {{ dbt.type_string() }} ) as "plan"
+    {% else %}
+        , cast(plan as {{ dbt.type_string() }} ) as plan
+    {% endif %}
     , cast(prescribing_provider_npi as {{ dbt.type_string() }} ) as prescribing_provider_id
     {% if target.type == 'fabric' %}
         , cast(coalesce(pres.provider_last_name + ', ' + pres.provider_first_name, pres.provider_organization_name) as {{ dbt.type_string() }} ) as prescribing_provider_name
