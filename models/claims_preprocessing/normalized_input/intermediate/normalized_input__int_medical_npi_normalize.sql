@@ -11,11 +11,23 @@ select distinct
   , med.claim_type
   , med.data_source
   , rend_prov.npi as normalized_rendering_npi
+  {% if target.type == 'fabric' %}
+    , cast(coalesce(rend_prov.provider_last_name+', '+ rend_prov.provider_first_name, rend_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_rendering_name
+  {% else %}
   , cast(coalesce(rend_prov.provider_last_name||', '|| rend_prov.provider_first_name, rend_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_rendering_name
+  {% endif %}
   , bill_prov.npi as normalized_billing_npi
-  , cast(coalesce(bill_prov.provider_last_name||', '|| bill_prov.provider_first_name, bill_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_billing_name
+  {% if target.type == 'fabric' %}
+    , cast(coalesce(bill_prov.provider_last_name+', '+ bill_prov.provider_first_name, bill_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_billing_name
+  {% else %}
+    , cast(coalesce(bill_prov.provider_last_name||', '|| bill_prov.provider_first_name, bill_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_billing_name
+  {% endif %}
   , fac_prov.npi as normalized_facility_npi
-  , cast(coalesce(fac_prov.provider_last_name||', '|| fac_prov.provider_first_name, fac_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_facility_name
+  {% if target.type == 'fabric' %}
+    , cast(coalesce(fac_prov.provider_last_name+', '+ fac_prov.provider_first_name, fac_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_facility_name
+  {% else %}
+    , cast(coalesce(fac_prov.provider_last_name||', '|| fac_prov.provider_first_name, fac_prov.provider_organization_name) as {{ dbt.type_string() }} ) as normalized_facility_name
+  {% endif %}
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__stg_medical_claim') }} med
 left join {{ ref('terminology__provider') }} rend_prov

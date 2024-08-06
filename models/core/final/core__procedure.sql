@@ -26,41 +26,41 @@ select * from {{ ref('core__stg_claims_procedure') }}
 {% if var('enable_normalize_engine',false) != true %}
 
 select
-    all_procedures.PROCEDURE_ID
-  , all_procedures.PATIENT_ID
-  , all_procedures.ENCOUNTER_ID
-  , all_procedures.CLAIM_ID
-  , all_procedures.PROCEDURE_DATE
-  , all_procedures.SOURCE_CODE_TYPE
-  , all_procedures.SOURCE_CODE
-  , all_procedures.SOURCE_DESCRIPTION
-  , case when all_procedures.NORMALIZED_CODE_TYPE is not null then  all_procedures.NORMALIZED_CODE_TYPE
+    all_procedures.procedure_id
+  , all_procedures.patient_id
+  , all_procedures.encounter_id
+  , all_procedures.claim_id
+  , all_procedures.procedure_date
+  , all_procedures.source_code_type
+  , all_procedures.source_code
+  , all_procedures.source_description
+  , case when all_procedures.normalized_code_type is not null then  all_procedures.normalized_code_type
       when icd10.icd_10_pcs is not null then 'icd-10-pcs'
       when icd9.icd_9_pcs is not null then 'icd-9-pcs'
       when hcpcs.hcpcs is not null then 'hcpcs'
       when snomed_ct.snomed_ct is not null then 'snomed-ct'
-      end as NORMALIZED_CODE_TYPE
-  , coalesce(all_procedures.NORMALIZED_CODE
+      end as normalized_code_type
+  , coalesce(all_procedures.normalized_code
       , icd10.icd_10_pcs
       , icd9.icd_9_pcs
       , hcpcs.hcpcs
-      ,snomed_ct.snomed_ct ) as NORMALIZED_CODE
-  ,  coalesce(all_procedures.NORMALIZED_DESCRIPTION
+      ,snomed_ct.snomed_ct ) as normalized_code
+  ,  coalesce(all_procedures.normalized_description
       , icd10.description
       , icd9.short_description
       , hcpcs.short_description
-      , snomed_ct.description) NORMALIZED_DESCRIPTION
-  , case when coalesce(all_procedures.NORMALIZED_CODE, all_procedures.NORMALIZED_DESCRIPTION) is not null then 'manual'
+      , snomed_ct.description) normalized_description
+  , case when coalesce(all_procedures.normalized_code, all_procedures.normalized_description) is not null then 'manual'
          when coalesce(icd10.icd_10_pcs,icd9.icd_9_pcs, hcpcs.hcpcs, snomed_ct.snomed_ct) is not null then 'automatic'
          end as mapping_method
-  , all_procedures.MODIFIER_1
-  , all_procedures.MODIFIER_2
-  , all_procedures.MODIFIER_3
-  , all_procedures.MODIFIER_4
-  , all_procedures.MODIFIER_5
-  , all_procedures.PRACTITIONER_ID
-  , all_procedures.DATA_SOURCE
-  , all_procedures.TUVA_LAST_RUN
+  , all_procedures.modifier_1
+  , all_procedures.modifier_2
+  , all_procedures.modifier_3
+  , all_procedures.modifier_4
+  , all_procedures.modifier_5
+  , all_procedures.practitioner_id
+  , all_procedures.data_source
+  , all_procedures.tuva_last_run
 from all_procedures
 left join {{ ref('terminology__icd_10_pcs') }} icd10
     on all_procedures.source_code_type = 'icd-10-pcs'
@@ -80,45 +80,45 @@ left join {{ ref('terminology__snomed_ct')}} snomed_ct
 
 
 select
-    all_procedures.PROCEDURE_ID
-  , all_procedures.PATIENT_ID
-  , all_procedures.ENCOUNTER_ID
-  , all_procedures.CLAIM_ID
-  , all_procedures.PROCEDURE_DATE
-  , all_procedures.SOURCE_CODE_TYPE
-  , all_procedures.SOURCE_CODE
-  , all_procedures.SOURCE_DESCRIPTION
-  , case when all_procedures.NORMALIZED_CODE_TYPE is not null then  all_procedures.NORMALIZED_CODE_TYPE
+    all_procedures.procedure_id
+  , all_procedures.patient_id
+  , all_procedures.encounter_id
+  , all_procedures.claim_id
+  , all_procedures.procedure_date
+  , all_procedures.source_code_type
+  , all_procedures.source_code
+  , all_procedures.source_description
+  , case when all_procedures.normalized_code_type is not null then  all_procedures.normalized_code_type
       when icd10.icd_10_pcs is not null then 'icd-10-pcs'
       when icd9.icd_9_pcs is not null then 'icd-9-pcs'
       when hcpcs.hcpcs is not null then 'hcpcs'
       when snomed_ct.snomed_ct is not null then 'snomed-ct'
-      else custom_mapped.normalized_code_type end as NORMALIZED_CODE_TYPE
-  , coalesce(all_procedures.NORMALIZED_CODE
+      else custom_mapped.normalized_code_type end as normalized_code_type
+  , coalesce(all_procedures.normalized_code
       , icd10.icd_10_pcs
       , icd9.icd_9_pcs
       , hcpcs.hcpcs
       ,snomed_ct.snomed_ct
-      ,custom_mapped.normalized_code  ) as NORMALIZED_CODE
-  ,  coalesce(all_procedures.NORMALIZED_DESCRIPTION
+      ,custom_mapped.normalized_code  ) as normalized_code
+  ,  coalesce(all_procedures.normalized_description
       , icd10.description
       , icd9.short_description
       , hcpcs.short_description
       , snomed_ct.description
-      , custom_mapped.normalized_description) as NORMALIZED_DESCRIPTION
-  , case when coalesce(all_procedures.NORMALIZED_CODE ,all_procedures.NORMALIZED_DESCRIPTION) is not null then 'manual'
+      , custom_mapped.normalized_description) as normalized_description
+  , case when coalesce(all_procedures.normalized_code ,all_procedures.normalized_description) is not null then 'manual'
          when coalesce(icd10.icd_10_pcs,icd9.icd_9_pcs, hcpcs.hcpcs, snomed_ct.snomed_ct) is not null then 'automatic'
          when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
          when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
          end as mapping_method
-  , all_procedures.MODIFIER_1
-  , all_procedures.MODIFIER_2
-  , all_procedures.MODIFIER_3
-  , all_procedures.MODIFIER_4
-  , all_procedures.MODIFIER_5
-  , all_procedures.PRACTITIONER_ID
-  , all_procedures.DATA_SOURCE
-  , all_procedures.TUVA_LAST_RUN
+  , all_procedures.modifier_1
+  , all_procedures.modifier_2
+  , all_procedures.modifier_3
+  , all_procedures.modifier_4
+  , all_procedures.modifier_5
+  , all_procedures.practitioner_id
+  , all_procedures.data_source
+  , all_procedures.tuva_last_run
 from all_procedures
 left join {{ ref('terminology__icd_10_pcs') }} icd10
     on all_procedures.source_code_type = 'icd-10-pcs'

@@ -34,7 +34,11 @@ with conditions as (
     select
           patient_id
         , observation_date
+        {% if target.type == 'fabric' %}
+         , TRY_CAST(result AS {{ dbt.type_numeric() }}) AS result
+        {% else %}
         , CAST(result AS {{ dbt.type_numeric() }}) AS result
+        {% endif %}
         , code_type
         , code
         , data_source
@@ -165,7 +169,11 @@ with conditions as (
         inner join obstructive_sleep_apnea
             on numeric_observations.patient_id = obstructive_sleep_apnea.patient_id
             /* ensure bmi and condition overlaps in the same year */
-            and extract(year from numeric_observations.observation_date) = extract(year from obstructive_sleep_apnea.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(numeric_observations.observation_date) = YEAR(obstructive_sleep_apnea.recorded_date)
+            {% else %}
+                and extract(year from numeric_observations.observation_date) = extract(year from obstructive_sleep_apnea.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
@@ -192,7 +200,11 @@ with conditions as (
         inner join diabetes
             on numeric_observations.patient_id = diabetes.patient_id
             /* ensure bmi and condition overlaps in the same year */
-            and extract(year from numeric_observations.observation_date) = extract(year from diabetes.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(numeric_observations.observation_date) = YEAR(diabetes.recorded_date)
+            {% else %}
+                and extract(year from numeric_observations.observation_date) = extract(year from diabetes.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
@@ -219,7 +231,11 @@ with conditions as (
         inner join hypertension
             on numeric_observations.patient_id = hypertension.patient_id
             /* ensure bmi and condition overlaps in the same year */
-            and extract(year from numeric_observations.observation_date) = extract(year from hypertension.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(numeric_observations.observation_date) = YEAR(hypertension.recorded_date)
+            {% else %}
+                and extract(year from numeric_observations.observation_date) = extract(year from hypertension.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
     where lower(seed_clinical_concepts.concept_name) = 'bmi'
@@ -274,6 +290,21 @@ with conditions as (
         , condition_concept_name
         , hcc_code
         , hcc_description
+        {% if target.type == 'fabric' %}
+            , 'BMI result '
+                + CAST(observation_result AS {{ dbt.type_string() }})
+                + CASE
+                    WHEN condition_code IS NULL THEN ''
+                    ELSE ' with '
+                        + CAST(condition_concept_name AS {{ dbt.type_string() }})
+                        + ' ('
+                        + CAST(condition_code AS {{ dbt.type_string() }})
+                        + ' on '
+                        + CAST(condition_date AS {{ dbt.type_string() }})
+                        + ')'
+                    END
+              AS contributing_factor
+        {% else %}
         , 'BMI result '
             || CAST(observation_result AS {{ dbt.type_string() }})
             || CASE
@@ -287,6 +318,7 @@ with conditions as (
                     || ')'
                 END
           AS contributing_factor
+        {% endif %}
     from hcc_48_unioned
 
 )
@@ -311,7 +343,10 @@ with conditions as (
             partition by
                   depression_assessment.patient_id
                 , depression_assessment.data_source
-            order by depression_assessment.observation_date desc nulls last
+            --order by depression_assessment.observation_date desc nulls last
+            order by
+                case when depression_assessment.observation_date is null then 1 else 0 end,
+                depression_assessment.observation_date desc
         ) assessment_order
     from depression_assessment
 
@@ -331,7 +366,10 @@ with conditions as (
             partition by
                   patient_id
                 , data_source
-            order by result desc nulls last
+            --order by result desc nulls last
+            order by
+                case when result is null then 1 else 0 end,
+                result desc
         ) as result_order --order the last three assessments by result value
     from eligible_depression_assessments
     where assessment_order <= 3
@@ -350,11 +388,19 @@ with conditions as (
         , depression_assessments_ordered.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
-        , 'PHQ-9 result '
-            || CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
-          as contributing_factor
+        {% if target.type == 'fabric' %}
+            , 'PHQ-9 result '
+                + CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
+              as contributing_factor
+        {% else %}
+            , 'PHQ-9 result '
+                || CAST(depression_assessments_ordered.result AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(depression_assessments_ordered.observation_date AS {{ dbt.type_string() }})
+              as contributing_factor
+        {% endif %}
     from depression_assessments_ordered
         inner join seed_hcc_descriptions
             on hcc_code = '155'
@@ -427,7 +473,11 @@ with conditions as (
         , cast(condition_concept_name as {{ dbt.type_string() }}) as condition_concept_name
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
-        , cast(current_year_billed as boolean) as current_year_billed
+        {% if target.type == 'fabric' %}
+            , cast(current_year_billed as bit) as current_year_billed
+        {% else %}
+            , cast(current_year_billed as boolean) as current_year_billed
+        {% endif %}
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
         , cast(suspect_date as date) as suspect_date

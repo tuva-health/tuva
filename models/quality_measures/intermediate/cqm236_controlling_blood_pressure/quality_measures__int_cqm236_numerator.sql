@@ -363,7 +363,11 @@ with controlled_bp_codes as (
     select
           patient_id
         , observation_date
+        {% if target.type == 'fabric' %}
+            , try_cast(result as {{ dbt.type_float() }}) as bp_reading
+        {% else %}
         , cast(result as {{ dbt.type_float() }}) as bp_reading
+        {% endif %}
         , normalized_description
         , measure_id
         , measure_name
@@ -379,7 +383,11 @@ with controlled_bp_codes as (
     select
           patient_id
         , observation_date
-        , cast(result as {{ dbt.type_float() }}) as bp_reading
+        {% if target.type == 'fabric' %}
+            , try_cast(result as {{ dbt.type_float() }}) as bp_reading
+        {% else %}
+            , cast(result as {{ dbt.type_float() }}) as bp_reading
+        {% endif %}
         , cast(null as {{ dbt.type_string() }}) as normalized_description
         , measure_id
         , measure_name

@@ -53,4 +53,8 @@ left join {{ ref('pharmacy__int_claims_current_cost') }} as gc
   and gc.data_source = p.data_source
 where 
     ga.product_startmarketingdate is not null
-  and cast(ga.product_startmarketingdate as date) <= current_date
+    {% if target.type == 'fabric' %}
+        and cast(ga.product_startmarketingdate as date) <= GETDATE()
+    {% else %}
+        and cast(ga.product_startmarketingdate as date) <= current_date
+{% endif %}

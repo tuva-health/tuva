@@ -27,13 +27,23 @@ from {{ ref('core__observation') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select
+{% if target.type == 'fabric' %}
+    select top 0
       cast(null as {{ dbt.type_string() }} ) as patient_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as observation_date
     , cast(null as {{ dbt.type_string() }} ) as result
     , cast(null as {{ dbt.type_string() }} ) as code_type
     , cast(null as {{ dbt.type_string() }} ) as code
     , cast(null as {{ dbt.type_string() }} ) as data_source
-limit 0
+{% else %}
+    select
+          cast(null as {{ dbt.type_string() }} ) as patient_id
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as observation_date
+        , cast(null as {{ dbt.type_string() }} ) as result
+        , cast(null as {{ dbt.type_string() }} ) as code_type
+        , cast(null as {{ dbt.type_string() }} ) as code
+        , cast(null as {{ dbt.type_string() }} ) as data_source
+    limit 0
+{%- endif %}
 
 {%- endif %}

@@ -98,9 +98,14 @@ with denominator as (
                 , performance_period_end
                 , measure_id
                 , measure_name
-            order by
-                  evidence_date desc nulls last
-                , exclusion_date desc nulls last
+--            order by
+--                  evidence_date desc nulls last
+--                , exclusion_date desc nulls last
+                order by
+                    case when evidence_date is null then 1 else 0 end,
+                    evidence_date desc
+                  , case when exclusion_date is null then 1 else 0 end,
+                    exclusion_date desc
           ) as row_num
     from measure_flags
 

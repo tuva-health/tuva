@@ -8,49 +8,49 @@
 
 
 select
-      labs.LAB_RESULT_ID
-    , labs.PATIENT_ID
-    , labs.ENCOUNTER_ID
-    , labs.ACCESSION_NUMBER
-    , labs.SOURCE_CODE_TYPE
-    , labs.SOURCE_CODE
-    , labs.SOURCE_DESCRIPTION
-    , labs.SOURCE_COMPONENT
+      labs.lab_result_id
+    , labs.patient_id
+    , labs.encounter_id
+    , labs.accession_number
+    , labs.source_code_type
+    , labs.source_code
+    , labs.source_description
+    , labs.source_component
     , case
         when labs.normalized_code_type is not null then labs.normalized_code_type
         when loinc.loinc is not null then 'loinc'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
-        else null end as NORMALIZED_CODE_TYPE
+        else null end as normalized_code_type
     , coalesce(
         labs.normalized_code
         , loinc.loinc
         , snomed_ct.snomed_ct
-        ) as NORMALIZED_CODE
+        ) as normalized_code
     , coalesce(
         labs.normalized_description
         , loinc.long_common_name
         , snomed_ct.description
-        ) NORMALIZED_DESCRIPTION
-    , case when coalesce(labs.NORMALIZED_CODE, labs.NORMALIZED_DESCRIPTION) is not null then 'manual'
-         when coalesce(LOINC.loinc,snomed_ct.snomed_ct) is not null then 'automatic'
+        ) normalized_description
+    , case when coalesce(labs.normalized_code, labs.normalized_description) is not null then 'manual'
+         when coalesce(loinc.loinc,snomed_ct.snomed_ct) is not null then 'automatic'
          end as mapping_method
-    , labs.NORMALIZED_COMPONENT
-    , labs.STATUS
-    , labs.RESULT
-    , labs.RESULT_DATE
-    , labs.COLLECTION_DATE
-    , labs.SOURCE_UNITS
-    , labs.NORMALIZED_UNITS
-    , labs.SOURCE_REFERENCE_RANGE_LOW
-    , labs.SOURCE_REFERENCE_RANGE_HIGH
-    , labs.NORMALIZED_REFERENCE_RANGE_LOW
-    , labs.NORMALIZED_REFERENCE_RANGE_HIGH
-    , labs.SOURCE_ABNORMAL_FLAG
-    , labs.NORMALIZED_ABNORMAL_FLAG
-    , labs.SPECIMEN
-    , labs.ORDERING_PRACTITIONER_ID
-    , labs.DATA_SOURCE
-    , labs.TUVA_LAST_RUN
+    , labs.normalized_component
+    , labs.status
+    , labs.result
+    , labs.result_date
+    , labs.collection_date
+    , labs.source_units
+    , labs.normalized_units
+    , labs.source_reference_range_low
+    , labs.source_reference_range_high
+    , labs.normalized_reference_range_low
+    , labs.normalized_reference_range_high
+    , labs.source_abnormal_flag
+    , labs.normalized_abnormal_flag
+    , labs.specimen
+    , labs.ordering_practitioner_id
+    , labs.data_source
+    , labs.tuva_last_run
 From {{ ref('core__stg_clinical_lab_result')}} as labs
 left join {{ ref('terminology__loinc') }} loinc
     on labs.source_code_type = 'loinc'
@@ -62,53 +62,53 @@ left join {{ref('terminology__snomed_ct')}} snomed_ct
  {% else %}
 
 select
-      labs.LAB_RESULT_ID
-    , labs.PATIENT_ID
-    , labs.ENCOUNTER_ID
-    , labs.ACCESSION_NUMBER
-    , labs.SOURCE_CODE_TYPE
-    , labs.SOURCE_CODE
-    , labs.SOURCE_DESCRIPTION
-    , labs.SOURCE_COMPONENT
+      labs.lab_result_id
+    , labs.patient_id
+    , labs.encounter_id
+    , labs.accession_number
+    , labs.source_code_type
+    , labs.source_code
+    , labs.source_description
+    , labs.source_component
     , case
-        when labs.NORMALIZED_CODE_TYPE is not null then labs.NORMALIZED_CODE_TYPE
+        when labs.normalized_code_type is not null then labs.normalized_code_type
         when loinc.loinc is not null then 'loinc'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
-        else custom_mapped.normalized_code_type end as NORMALIZED_CODE_TYPE
+        else custom_mapped.normalized_code_type end as normalized_code_type
     , coalesce(
         labs.normalized_code
         , loinc.loinc
         , snomed_ct.snomed_ct
         , custom_mapped.normalized_code
-        ) as NORMALIZED_CODE
+        ) as normalized_code
     , coalesce(
         labs.normalized_description
         , loinc.long_common_name
         , snomed_ct.description
         , custom_mapped.normalized_description
-        ) NORMALIZED_DESCRIPTION
-  , case  when coalesce(labs.NORMALIZED_CODE, labs.NORMALIZED_DESCRIPTION) is not null then 'manual'
-        when coalesce(LOINC.loinc,snomed_ct.snomed_ct) is not null then 'automatic'
+        ) normalized_description
+  , case  when coalesce(labs.normalized_code, labs.normalized_description) is not null then 'manual'
+        when coalesce(loinc.loinc,snomed_ct.snomed_ct) is not null then 'automatic'
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
         when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
         end as mapping_method
-    , labs.NORMALIZED_COMPONENT
-    , labs.STATUS
-    , labs.RESULT
-    , labs.RESULT_DATE
-    , labs.COLLECTION_DATE
-    , labs.SOURCE_UNITS
-    , labs.NORMALIZED_UNITS
-    , labs.SOURCE_REFERENCE_RANGE_LOW
-    , labs.SOURCE_REFERENCE_RANGE_HIGH
-    , labs.NORMALIZED_REFERENCE_RANGE_LOW
-    , labs.NORMALIZED_REFERENCE_RANGE_HIGH
-    , labs.SOURCE_ABNORMAL_FLAG
-    , labs.NORMALIZED_ABNORMAL_FLAG
-    , labs.SPECIMEN
-    , labs.ORDERING_PRACTITIONER_ID
-    , labs.DATA_SOURCE
-    , labs.TUVA_LAST_RUN
+    , labs.normalized_component
+    , labs.status
+    , labs.result
+    , labs.result_date
+    , labs.collection_date
+    , labs.source_units
+    , labs.normalized_units
+    , labs.source_reference_range_low
+    , labs.source_reference_range_high
+    , labs.normalized_reference_range_low
+    , labs.normalized_reference_range_high
+    , labs.source_abnormal_flag
+    , labs.normalized_abnormal_flag
+    , labs.specimen
+    , labs.ordering_practitioner_id
+    , labs.data_source
+    , labs.tuva_last_run
 From  {{ ref('core__stg_clinical_lab_result')}} as labs
 left join {{ ref('terminology__loinc') }} loinc
     on labs.source_code_type = 'loinc'

@@ -21,7 +21,7 @@ from {{ ref('normalized_input__stg_medical_claim') }} med
 left join {{ ref('reference_data__calendar') }} cal_claim_start
     on med.claim_start_date = cal_claim_start.full_date
 left join {{ ref('reference_data__calendar') }} cal_claim_end
-    on med.claim_end_Date = cal_claim_end.full_date
+    on med.claim_end_date = cal_claim_end.full_date
 left join {{ ref('reference_data__calendar') }} cal_claim_line_start
     on med.claim_line_start_date = cal_claim_line_start.full_date
 left join {{ ref('reference_data__calendar') }} cal_claim_line_end

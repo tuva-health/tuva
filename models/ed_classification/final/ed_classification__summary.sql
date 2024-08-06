@@ -10,9 +10,15 @@ select
     , cat.classification_order as ed_classification_order
     , class.patient_id
     , class.encounter_end_date
-    , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
-      || substring('0'||cast({{ date_part("month", "class.encounter_end_date") }} as {{ dbt.type_string() }}),-2)
-    as year_month
+    {% if target.type == 'fabric' %}
+        , cast(YEAR(class.encounter_end_date) as {{ dbt.type_string() }})
+          + RIGHT('0' + CAST(MONTH(class.encounter_end_date) AS {{ dbt.type_string() }}), 2)
+        as year_month
+    {% else %}
+        , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
+          || substring('0'||cast({{ date_part("month", "class.encounter_end_date") }} as {{ dbt.type_string() }}),-2)
+        as year_month
+    {% endif %}
     , class.primary_diagnosis_code
     , class.primary_diagnosis_description
     , class.paid_amount
@@ -33,7 +39,7 @@ select
     , race as patient_race
 from {{ ref('ed_classification__int_filter_encounter_with_classification') }} class
 inner join {{ ref('ed_classification__categories') }} cat
-    using(classification)
+    on class.classification = cat.classification
 left join {{ ref('terminology__provider') }} fac_prov 
     on class.facility_id = fac_prov.npi
 left join {{ ref('ed_classification__stg_patient') }} pat

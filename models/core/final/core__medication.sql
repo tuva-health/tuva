@@ -8,23 +8,23 @@
 with source_mapping as (
 {% if var('enable_normalize_engine',false) != true %}
     select
-     meds.MEDICATION_ID
-   , meds.PATIENT_ID
-   , meds.ENCOUNTER_ID
-   , meds.DISPENSING_DATE
-   , meds.PRESCRIBING_DATE
-   , meds.SOURCE_CODE_TYPE
-   , meds.SOURCE_CODE
-   , meds.SOURCE_DESCRIPTION
+     meds.medication_id
+   , meds.patient_id
+   , meds.encounter_id
+   , meds.dispensing_date
+   , meds.prescribing_date
+   , meds.source_code_type
+   , meds.source_code
+   , meds.source_description
    , coalesce(
        meds.ndc_code
        , ndc.ndc
-       ) as NDC_CODE
+       ) as ndc_code
    ,  coalesce(
        meds.ndc_description
        , ndc.fda_description
        , ndc.rxnorm_description
-       ) as NDC_DESCRIPTION
+       ) as ndc_description
    , case
         when meds.ndc_code is not null then 'manual'
         when ndc.ndc is not null then 'automatic'
@@ -32,11 +32,11 @@ with source_mapping as (
    , coalesce(
         meds.rxnorm_code
         , rxatc.rxcui
-        ) as RXNORM_CODE
+        ) as rxnorm_code
    , coalesce(
        meds.rxnorm_description
        , rxatc.rxnorm_description
-       ) as RXNORM_DESCRIPTION
+       ) as rxnorm_description
    , case
         when meds.rxnorm_code is not null then 'manual'
         when rxatc.rxcui is not null then 'automatic'
@@ -44,23 +44,23 @@ with source_mapping as (
    , coalesce(
         meds.atc_code
         , rxatc.atc_3_code
-        ) as ATC_CODE
+        ) as atc_code
    , coalesce(
         meds.atc_description
         , rxatc.atc_4_name
-        ) as ATC_DESCRIPTION
+        ) as atc_description
    , case
         when meds.atc_code is not null then 'manual'
         when rxatc.atc_3_name is not null then 'automatic'
         end as atc_mapping_method
-   , meds.ROUTE
-   , meds.STRENGTH
-   , meds.QUANTITY
-   , meds.QUANTITY_UNIT
-   , meds.DAYS_SUPPLY
-   , meds.PRACTITIONER_ID
-   , meds.DATA_SOURCE
-   , meds.TUVA_LAST_RUN
+   , meds.route
+   , meds.strength
+   , meds.quantity
+   , meds.quantity_unit
+   , meds.days_supply
+   , meds.practitioner_id
+   , meds.data_source
+   , meds.tuva_last_run
 from {{ ref('core__stg_clinical_medication')}} meds
     left join {{ref('terminology__ndc')}} ndc
         on meds.source_code_type = 'ndc'
@@ -73,25 +73,25 @@ from {{ ref('core__stg_clinical_medication')}} meds
 {% else %}
 
  select
-     meds.MEDICATION_ID
-   , meds.PATIENT_ID
-   , meds.ENCOUNTER_ID
-   , meds.DISPENSING_DATE
-   , meds.PRESCRIBING_DATE
-   , meds.SOURCE_CODE_TYPE
-   , meds.SOURCE_CODE
-   , meds.SOURCE_DESCRIPTION
+     meds.medication_id
+   , meds.patient_id
+   , meds.encounter_id
+   , meds.dispensing_date
+   , meds.prescribing_date
+   , meds.source_code_type
+   , meds.source_code
+   , meds.source_description
    , coalesce(
         meds.ndc_code
         , ndc.ndc
         , custom_mapped_ndc.normalized_code
-        ) as NDC_CODE
+        ) as ndc_code
    , coalesce(
         meds.ndc_description
         , ndc.fda_description
         , ndc.rxnorm_description
         , custom_mapped_ndc.normalized_description
-        ) as NDC_DESCRIPTION
+        ) as ndc_description
    , case
         when meds.ndc_code is not null then 'manual'
         when ndc.ndc is not null then 'automatic'
@@ -99,15 +99,15 @@ from {{ ref('core__stg_clinical_medication')}} meds
         when custom_mapped_ndc.normalized_code is not null then 'custom'
         end as ndc_mapping_method
    , coalesce(
-        meds.RXNORM_CODE
+        meds.rxnorm_code
         , rxatc.rxcui
         , custom_mapped_rxnorm.normalized_code
-        ) as RXNORM_CODE
+        ) as rxnorm_code
    , coalesce(
-        meds.RXNORM_CODE
+        meds.rxnorm_code
         , rxatc.rxnorm_description
         , custom_mapped_rxnorm.normalized_description
-        ) as RXNORM_DESCRIPTION
+        ) as rxnorm_description
    , case
         when meds.rxnorm_code is not null then 'manual'
         when rxatc.rxcui is not null then 'automatic'
@@ -118,26 +118,26 @@ from {{ ref('core__stg_clinical_medication')}} meds
         meds.atc_code
         , rxatc.atc_3_code
         , custom_mapped_atc.normalized_code
-        ) as ATC_CODE
+        ) as atc_code
    , coalesce(
         meds.atc_description
         , rxatc.atc_3_name
         , custom_mapped_atc.normalized_description
-        ) as ATC_DESCRIPTION
+        ) as atc_description
    , case
         when meds.atc_code is not null then 'manual'
         when rxatc.atc_3_code is not null then 'automatic'
         when custom_mapped_atc.not_mapped is not null then custom_mapped_atc.not_mapped
         when custom_mapped_atc.normalized_code is not null then 'custom'
         end as atc_mapping_method
-   , meds.ROUTE
-   , meds.STRENGTH
-   , meds.QUANTITY
-   , meds.QUANTITY_UNIT
-   , meds.DAYS_SUPPLY
-   , meds.PRACTITIONER_ID
-   , meds.DATA_SOURCE
-   , meds.TUVA_LAST_RUN
+   , meds.route
+   , meds.strength
+   , meds.quantity
+   , meds.quantity_unit
+   , meds.days_supply
+   , meds.practitioner_id
+   , meds.data_source
+   , meds.tuva_last_run
 from {{ ref('core__stg_clinical_medication')}} meds
     left join {{ref('terminology__ndc')}} ndc
         on meds.source_code_type = 'ndc'
@@ -187,25 +187,25 @@ from {{ ref('core__stg_clinical_medication')}} meds
 
 -- add auto rxnorm + atc
 select
-     sm.MEDICATION_ID
-   , sm.PATIENT_ID
-   , sm.ENCOUNTER_ID
-   , sm.DISPENSING_DATE
-   , sm.PRESCRIBING_DATE
-   , sm.SOURCE_CODE_TYPE
-   , sm.SOURCE_CODE
-   , sm.SOURCE_DESCRIPTION
-   , sm.NDC_CODE
-   , sm.NDC_DESCRIPTION
+     sm.medication_id
+   , sm.patient_id
+   , sm.encounter_id
+   , sm.dispensing_date
+   , sm.prescribing_date
+   , sm.source_code_type
+   , sm.source_code
+   , sm.source_description
+   , sm.ndc_code
+   , sm.ndc_description
    , sm.ndc_mapping_method
    , coalesce(
         sm.rxnorm_code
         , ndc.rxcui
-        ) as RXNORM_CODE
+        ) as rxnorm_code
    , coalesce(
-        sm.RXNORM_description
+        sm.rxnorm_description
         , ndc.rxnorm_description
-        ) as RXNORM_DESCRIPTION
+        ) as rxnorm_description
    , case
         when sm.rxnorm_mapping_method is not null then sm.rxnorm_mapping_method
         when ndc.rxcui is not null then 'automatic'
@@ -213,23 +213,23 @@ select
    , coalesce(
         sm.atc_code
         , rxatc.atc_3_code
-        ) as ATC_CODE
+        ) as atc_code
    , coalesce(
         sm.atc_description
         , rxatc.atc_3_name
-        ) as ATC_DESCRIPTION
+        ) as atc_description
    , case
         when sm.atc_mapping_method is not null then sm.atc_mapping_method
         when rxatc.atc_3_name is not null then 'automatic'
         end as atc_mapping_method
-   , sm.ROUTE
-   , sm.STRENGTH
-   , sm.QUANTITY
-   , sm.QUANTITY_UNIT
-   , sm.DAYS_SUPPLY
-   , sm.PRACTITIONER_ID
-   , sm.DATA_SOURCE
-   , sm.TUVA_LAST_RUN
+   , sm.route
+   , sm.strength
+   , sm.quantity
+   , sm.quantity_unit
+   , sm.days_supply
+   , sm.practitioner_id
+   , sm.data_source
+   , sm.tuva_last_run
 from source_mapping sm
     left join {{ref('terminology__ndc')}} ndc
         on sm.ndc_code = ndc.ndc

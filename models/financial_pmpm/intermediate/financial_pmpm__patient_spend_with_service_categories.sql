@@ -7,7 +7,11 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    {% if target.type == 'fabric' %}
+        , "plan"
+    {% else %}
+        , plan
+    {% endif %}
     , service_category_1
     , service_category_2
     , coalesce(claim_start_date,claim_end_date) as claim_date
@@ -21,10 +25,20 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    {% if target.type == 'fabric' %}
+        , "plan"
+    {% else %}
+        , plan
+    {% endif %}
     , service_category_1
     , service_category_2
-    , cast({{ date_part("year", "claim_date" ) }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "claim_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
+    {% if target.type == 'fabric' %}
+        , cast(YEAR(claim_date) as {{ dbt.type_string() }} )
+          + RIGHT(REPLICATE('0', 2) + cast(MONTH(claim_date) as {{ dbt.type_string() }} ), 2) AS year_month
+    {% else %}
+        , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
+          || lpad(cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }} ), 2, '0') AS year_month
+    {% endif %}
     , paid_amount
     , allowed_amount
     , data_source
@@ -35,7 +49,11 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    {% if target.type == 'fabric' %}
+        , "plan"
+    {% else %}
+        , plan
+    {% endif %}
     , 'Pharmacy' as service_category_1
     , cast(null as {{ dbt.type_string() }}) as service_category_2
     , coalesce(dispensing_date, paid_date) as claim_date
@@ -49,10 +67,20 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    {% if target.type == 'fabric' %}
+        , "plan"
+    {% else %}
+        , plan
+    {% endif %}
     , service_category_1
     , service_category_2
-    , cast({{ date_part("year", "claim_date" ) }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "claim_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
+    {% if target.type == 'fabric' %}
+        , cast(YEAR("claim_date") as {{ dbt.type_string() }} )
+        + RIGHT(REPLICATE('0', 2) + cast(MONTH("claim_date") as {{ dbt.type_string() }}), 2) AS year_month
+    {% else %}
+        , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
+        || lpad(cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }}), 2, '0') AS year_month
+    {% endif %}
     , paid_amount
     , allowed_amount
     , data_source
@@ -73,7 +101,11 @@ select
     patient_id
   , year_month
   , payer
-  , plan
+  {% if target.type == 'fabric' %}
+      , "plan"
+  {% else %}
+      , plan
+  {% endif %}
   , service_category_1
   , service_category_2
   , sum(paid_amount) as total_paid
@@ -85,7 +117,11 @@ group by
     patient_id
   , year_month
   , payer
-  , plan
+  {% if target.type == 'fabric' %}
+    , "plan"
+  {% else %}
+    , plan
+  {% endif %}
   , service_category_1
   , service_category_2
   , data_source

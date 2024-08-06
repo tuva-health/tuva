@@ -24,12 +24,21 @@ from {{ ref('core__pharmacy_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select
-      cast(null as {{ dbt.type_string() }} ) as patient_id
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
-    , cast(null as {{ dbt.type_string() }} ) as ndc_code
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
-    , cast(null as {{ dbt.type_string() }} ) as data_source
-limit 0
+{% if target.type == 'fabric' %}
+    select top 0
+          cast(null as {{ dbt.type_string() }} ) as patient_id
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+        , cast(null as {{ dbt.type_string() }} ) as ndc_code
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
+        , cast(null as {{ dbt.type_string() }} ) as data_source
+{% else %}
+    select
+          cast(null as {{ dbt.type_string() }} ) as patient_id
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+        , cast(null as {{ dbt.type_string() }} ) as ndc_code
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
+        , cast(null as {{ dbt.type_string() }} ) as data_source
+    limit 0
+{%- endif %}
 
 {%- endif %}

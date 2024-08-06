@@ -31,15 +31,27 @@ from {{ ref('core__lab_result') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select
-      cast(null as {{ dbt.type_string() }} ) as lab_result_id
-    , cast(null as {{ dbt.type_string() }} ) as patient_id
-    , cast(null as {{ dbt.type_string() }} ) as code_type
-    , cast(null as {{ dbt.type_string() }} ) as code
-    , cast(null as {{ dbt.type_string() }} ) as status
-    , cast(null as {{ dbt.type_string() }} ) as result
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
-    , cast(null as {{ dbt.type_string() }} ) as data_source
-limit 0
+{% if target.type == 'fabric' %}
+    select top 0
+          cast(null as {{ dbt.type_string() }} ) as lab_result_id
+        , cast(null as {{ dbt.type_string() }} ) as patient_id
+        , cast(null as {{ dbt.type_string() }} ) as code_type
+        , cast(null as {{ dbt.type_string() }} ) as code
+        , cast(null as {{ dbt.type_string() }} ) as status
+        , cast(null as {{ dbt.type_string() }} ) as result
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
+        , cast(null as {{ dbt.type_string() }} ) as data_source
+{% else %}
+    select
+          cast(null as {{ dbt.type_string() }} ) as lab_result_id
+        , cast(null as {{ dbt.type_string() }} ) as patient_id
+        , cast(null as {{ dbt.type_string() }} ) as code_type
+        , cast(null as {{ dbt.type_string() }} ) as code
+        , cast(null as {{ dbt.type_string() }} ) as status
+        , cast(null as {{ dbt.type_string() }} ) as result
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
+        , cast(null as {{ dbt.type_string() }} ) as data_source
+    limit 0
+{%- endif %}
 
 {%- endif %}

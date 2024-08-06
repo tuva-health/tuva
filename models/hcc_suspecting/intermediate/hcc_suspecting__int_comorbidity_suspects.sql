@@ -149,7 +149,11 @@ with conditions as (
             on diabetes_dedupe.patient_id = ckd_stage_1_or_2_dedupe.patient_id
             and diabetes_dedupe.data_source = ckd_stage_1_or_2_dedupe.data_source
             /* ensure conditions overlap in the same year */
-            and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
+            {% if target.type == 'fabric' %}
+                and YEAR(diabetes_dedupe.recorded_date) = YEAR(ckd_stage_1_or_2_dedupe.recorded_date)
+            {% else %}
+                and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
+            {% endif %}
         inner join seed_hcc_descriptions
             on hcc_code = '37'
 
@@ -199,21 +203,37 @@ with conditions as (
         , condition_2_recorded_date
         , current_year_billed
         , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
-        , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
-            || ' ('
-            || CAST(condition_1_code AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
-            || ')'
-            || ' and '
-            || CAST(condition_2_concept_name AS {{ dbt.type_string() }})
-            || ' ('
-            || CAST(condition_2_code AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
-            || ')'
-
-          as contributing_factor
+        {% if target.type == 'fabric' %}
+            , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
+                + ' ('
+                + CAST(condition_1_code AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
+                + ')'
+                + ' and '
+                + CAST(condition_2_concept_name AS {{ dbt.type_string() }})
+                + ' ('
+                + CAST(condition_2_code AS {{ dbt.type_string() }})
+                + ' on '
+                + CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
+                + ')'
+              as contributing_factor
+        {% else %}
+            , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
+                || ' ('
+                || CAST(condition_1_code AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
+                || ')'
+                || ' and '
+                || CAST(condition_2_concept_name AS {{ dbt.type_string() }})
+                || ' ('
+                || CAST(condition_2_code AS {{ dbt.type_string() }})
+                || ' on '
+                || CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
+                || ')'
+              as contributing_factor
+        {% endif %}
         , condition_1_recorded_date as suspect_date
     from add_billed_flag
 
@@ -233,7 +253,11 @@ with conditions as (
         , cast(condition_2_concept_name as {{ dbt.type_string() }}) as condition_2_concept_name
         , cast(condition_2_code as {{ dbt.type_string() }}) as condition_2_code
         , cast(condition_2_recorded_date as date) as condition_2_recorded_date
-        , cast(current_year_billed as boolean) as current_year_billed
+        {% if target.type == 'fabric' %}
+            , cast(current_year_billed as bit) as current_year_billed
+        {% else %}
+            , cast(current_year_billed as boolean) as current_year_billed
+        {% endif %}
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
         , cast(suspect_date as date) as suspect_date
