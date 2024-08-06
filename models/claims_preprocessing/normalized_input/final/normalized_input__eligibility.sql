@@ -17,7 +17,7 @@ select
     , cast(date_norm.normalized_enrollment_start_date as date ) as enrollment_start_date
     , cast(date_norm.normalized_enrollment_end_date as date ) as enrollment_end_date
     , cast(elig.payer as {{ dbt.type_string() }} ) as payer
-    , cast(elig.payer_type as {{ dbt.type_string() }} ) as
+    , cast(elig.payer_type as {{ dbt.type_string() }} ) as payer_type
     {% if target.type == 'fabric' %}
         , cast(elig."plan" as {{ dbt.type_string() }} ) as "plan"
     {% else %}
