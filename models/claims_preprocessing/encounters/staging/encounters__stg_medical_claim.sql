@@ -17,6 +17,11 @@ select
   , m.bill_type_code
   , bt.bill_type_description
   , m.hcpcs_code
+  , m.hcpcs_modifier_1
+  , m.hcpcs_modifier_2
+  , m.hcpcs_modifier_3
+  , m.hcpcs_modifier_4
+  , m.hcpcs_modifier_5
   , c.ccs_category
   , c.ccs_category_description
   , m.ms_drg_code
