@@ -131,6 +131,15 @@ select claim_id
 ,encounter_id
 ,'office visits' as encounter_type
 ,9 as priority_number
+from {{ ref('office_visits__int_office_visits_imaging') }}
+
+union
+
+select claim_id
+,claim_line_number
+,encounter_id
+,'office visits' as encounter_type
+,10 as priority_number
 from {{ ref('office_visits__int_office_visits') }}
 
 )
