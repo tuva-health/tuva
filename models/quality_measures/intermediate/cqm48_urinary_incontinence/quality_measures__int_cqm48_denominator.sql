@@ -56,7 +56,7 @@ with visit_codes as (
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ ref('quality_measures__stg_core__encounter') }} encounter
-    inner join {{ ref('quality_measures__int_cbe0101__performance_period') }} as pp
+    inner join {{ ref('quality_measures__int_cqm48__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
             and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
@@ -76,7 +76,7 @@ with visit_codes as (
         , procedure_date as min_date
         , procedure_date as max_date
     from procedures
-    inner join {{ ref('quality_measures__int_cbe0101__performance_period') }}  as pp
+    inner join {{ ref('quality_measures__int_cqm48__performance_period') }}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join visit_codes
         on procedures.code = visit_codes.code
@@ -90,7 +90,7 @@ with visit_codes as (
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
     from medical_claim
-    inner join {{ ref('quality_measures__int_cbe0101__performance_period') }}  as pp 
+    inner join {{ ref('quality_measures__int_cqm48__performance_period') }}  as pp 
         on coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
             and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join visit_codes
