@@ -15,7 +15,11 @@ with diagnosis as (
     where c.encounter_id is not null
 ),
 
-"procedure" as (
+{% if target.type == 'fabric' %}
+    "procedure" as (
+{% else %}
+    procedure as (
+{% endif %}
     select distinct
         p.encounter_id
       , p.data_source
