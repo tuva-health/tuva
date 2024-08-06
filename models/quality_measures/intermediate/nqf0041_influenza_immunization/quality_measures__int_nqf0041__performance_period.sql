@@ -73,8 +73,8 @@ with period_end as (
       *
     , case
         when extract(month from performance_period_end) between 1 and 8
-            then (extract(year from performance_period_end) - 1) || '-08-01'
-        else extract(year from performance_period_end) || '-08-01'
+            then cast((extract(year from performance_period_end) - 1) AS {{ dbt.type_string() }}) || '-08-01'
+        else cast(extract(year from performance_period_end) AS {{ dbt.type_string() }}) || '-08-01'
       end as lookback_period_august
   from period_begin
 
