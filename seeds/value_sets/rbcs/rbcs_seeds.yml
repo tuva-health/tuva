@@ -5,7 +5,7 @@ seeds:
     description: HCPCS to RBDS crosswalk.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{% else %}claims_preprocessing{%- endif -%}
       alias: _value_set_hcpcs_to_rbcs
       tags: rbetos
       enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
