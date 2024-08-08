@@ -82,6 +82,13 @@ models:
           The normalized risk score multiplied by the MA coding pattern 
           adjustment factor for the corresponding HCC model version 
           and payment year's rate announcement from CMS.
+      - name: payment_risk_score_weighted_by_months
+        description: >
+          Payment risk score multiplied by member_months.
+      - name: member_months
+        description: >
+          Member months derived from the finanicial_pmpm mart utilizing 
+          payment year eligibility.
       - name: payment_year
         description: >
           The payment year the HCC and risk scores are being calculated for.
