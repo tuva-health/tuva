@@ -80,6 +80,7 @@ with visit_codes as (
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join visit_codes
         on procedures.code = visit_codes.code
+            and procedures.code_type = visit_codes.code_system
 
 )
 
@@ -95,6 +96,7 @@ with visit_codes as (
             and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
     inner join visit_codes
         on medical_claim.hcpcs_code = visit_codes.code
+            and visit_codes.code_system = 'hcpcs'
 
 )
 
