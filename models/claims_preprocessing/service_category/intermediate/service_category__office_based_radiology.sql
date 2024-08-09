@@ -20,15 +20,8 @@ from {{ ref('service_category__stg_medical_claim') }} med
 inner join {{ ref('service_category__stg_professional') }} o on med.claim_id = o.claim_id
 and
 med.claim_line_number = o.claim_line_number
-where (med.ccs_category in ('207' --radioisotope
-,'208' --radioisotope
-,'209' --radioisotope
-,'210' --radioisotope
-,'226' --other radioisotope
-)
-OR 
+where 
 med.modality is not null
-)
 and
 med.place_of_service_code = '11'
 
