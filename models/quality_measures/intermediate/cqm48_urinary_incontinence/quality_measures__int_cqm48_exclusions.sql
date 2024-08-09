@@ -52,7 +52,7 @@ with valid_hospice_exclusions as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
-        , 1 as exclusion_flag
+        , cast(1 as integer) as exclusion_flag
     from combined_exclusions
 
 )
