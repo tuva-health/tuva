@@ -34,12 +34,16 @@ models:
         description: The race of the patient.
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
-      - name: facility_npi
-        description: The NPI for the facility where the encounter occurred.
-      - name: provider_first_name
-        description: The first name of the provider.
-      - name: provider_last_name
-        description: The last name of the provider.
+      - name: primary_diagnosis_code_type
+        description: Code type for the primary diagnosis.
+      - name: primary_diagnosis_code
+        description: Code for the primary diagnosis.
+      - name: primary_diagnosis_description
+        description: Description for the primary diagnosis.
+      - name: facility_id
+        description: The ID for the facility where the encounter occurred.
+      - name: facility_name
+        description: The name of the facility where the encounter occurred.
       - name: ms_drg_code
         description: The MS-DRG code associted with the inpatient visit
         meta:
