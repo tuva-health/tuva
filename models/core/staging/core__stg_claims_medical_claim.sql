@@ -18,7 +18,7 @@ with medical_claim_stage as(
         cast(med.claim_id as {{ dbt.type_string() }} )|| '-' ||cast(med.claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
         , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
         , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
-        , cast(coalesce(ap.encounter_id,ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
+        , cast(x.encounter_id as int ) as encounter_id
         , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
         , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
         , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
@@ -78,12 +78,12 @@ with medical_claim_stage as(
     left join {{ ref('service_category__service_category_grouper') }} srv_group
         on med.claim_id = srv_group.claim_id
         and med.claim_line_number = srv_group.claim_line_number
-    left join {{ ref('acute_inpatient__encounter_id') }} ap
-        on med.claim_id = ap.claim_id
-        and med.claim_line_number = ap.claim_line_number
-    left join {{ ref('emergency_department__int_encounter_id') }} ed
-        on med.claim_id = ed.claim_id
-        and med.claim_line_number = ed.claim_line_number
+    left join {{ ref('encounters__combined_claim_line_crosswalk') }} x on med.claim_id = x.claim_id
+    and
+    med.claim_line_number = x.claim_line_number
+    and
+    x.claim_line_attribution_number = 1
+
 )
 select
     cast(med.medical_claim_id as {{ dbt.type_string() }} ) as medical_claim_id
