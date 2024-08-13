@@ -496,7 +496,7 @@ select distinct
             ||case when unpivot_cte.practitioner_npi is not null then '_'||unpivot_cte.practitioner_npi else '' end
       as {{ dbt.type_string() }} ) as procedure_id
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
-    , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
+    , cast(x.encounter_id as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
     , {{ try_to_cast_date('unpivot_cte.procedure_date', 'YYYY-MM-DD') }} as procedure_date
     , cast(unpivot_cte.source_code_type as {{ dbt.type_string() }} ) as source_code_type
@@ -529,11 +529,13 @@ select distinct
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from unpivot_cte
+inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
+and
+unpivot_cte.claim_line_number = x.claim_line_number
+and
+x.claim_line_attribution_number = 1
 left join {{ ref('terminology__icd_10_pcs') }} as icd
     on unpivot_cte.source_code = icd.icd_10_pcs
 left join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on unpivot_cte.source_code = hcpcs.hcpcs
-left join {{ ref('acute_inpatient__encounter_id')}} as ap
-    on unpivot_cte.claim_id = ap.claim_id
-left join {{ ref('emergency_department__int_encounter_id')}} as ed
-    on unpivot_cte.claim_id = ed.claim_id
+

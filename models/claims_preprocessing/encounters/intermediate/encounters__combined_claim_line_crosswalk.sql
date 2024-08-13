@@ -1,10 +1,51 @@
-with cte as (
+with cte as 
+(
 select claim_id
  ,claim_line_number
  ,encounter_id
- ,'inpatient hospice' as encounter_type
+ ,'acute inpatient' as encounter_type
+ ,0 as priority_number
+from {{ ref('acute_inpatient__prof_claims') }}
+where claim_attribution_number = 1
+
+union 
+
+select enc.claim_id
+,med.claim_line_number
+,enc.encounter_id
+,'acute inpatient' as encounter_type
+,0 as priority_number
+from {{ ref('acute_inpatient__generate_encounter_id') }} enc
+inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
+
+union
+
+select claim_id
+ ,claim_line_number
+ ,encounter_id
+ ,'emergency department' as encounter_type
  ,1 as priority_number
-from {{ ref('inpatient_hospice__prof_claims') }}
+from {{ ref('acute_inpatient__prof_claims') }}
+where claim_attribution_number = 1
+
+union 
+
+select enc.claim_id
+,med.claim_line_number
+,enc.encounter_id
+,'emergency department' as encounter_type
+,1 as priority_number
+from {{ ref('emergency_department__generate_encounter_id') }} enc
+inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
+
+union
+
+select claim_id
+ ,claim_line_number
+ ,encounter_id
+ ,'emergency department' as encounter_type
+ ,1 as priority_number
+from {{ ref('emergency_department__prof_claims') }}
 where claim_attribution_number = 1
 
 union 

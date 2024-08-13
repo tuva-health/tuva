@@ -167,7 +167,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: encounter
-      tags: core
+      tags: 
+        - core
+        - encounters
       materialized: table
     columns:
       - name: encounter_id
@@ -431,7 +433,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: medical_claim
-      tags: core
+      tags: 
+        - core
+        - encounters
       materialized: table
     columns:
       - name: medical_claim_id
@@ -1089,7 +1093,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_medical_claim
-      tags: core_stage_claims
+      tags: 
+        - core_stage_claims
+        - encounters
       materialized: table
 
   - name: core__stg_claims_encounter
@@ -1099,7 +1105,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_encounter
-      tags: core_stage_claims
+      tags: 
+        - core_stage_claims
+        - encounters
       materialized: table
 
   - name: core__stg_claims_location

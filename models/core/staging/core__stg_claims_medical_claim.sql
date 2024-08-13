@@ -75,10 +75,10 @@ with medical_claim_stage as(
         , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
         , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
     from {{ ref('normalized_input__medical_claim') }} med
-    left join {{ ref('service_category__service_category_grouper') }} srv_group
+    inner join {{ ref('service_category__service_category_grouper') }} srv_group
         on med.claim_id = srv_group.claim_id
         and med.claim_line_number = srv_group.claim_line_number
-    left join {{ ref('encounters__combined_claim_line_crosswalk') }} x on med.claim_id = x.claim_id
+    inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on med.claim_id = x.claim_id
     and
     med.claim_line_number = x.claim_line_number
     and
