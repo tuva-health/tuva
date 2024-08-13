@@ -6,6 +6,7 @@
 with detail_values as (
     select stg.*
     ,cli.encounter_id
+    ,cli.old_encounter_id
     ,ed.encounter_start_date
     ,ed.encounter_end_date
     ,cli.encounter_type
@@ -17,7 +18,13 @@ with detail_values as (
     cli.encounter_type = 'inpatient substance use'
     and
     cli.claim_line_attribution_number = 1
-    inner join {{ ref('inpatient_substance_use__start_end_dates') }} ed on cli.encounter_id = ed.encounter_id
+    inner join {{ ref('inpatient_substance_use__start_end_dates') }} ed on cli.old_encounter_id = ed.encounter_id
+)
+
+,encounter_cross_walk as (
+  select distinct encounter_id
+  ,old_encounter_id
+  from detail_values
 )
 
 ,first_last_inst_inst_values as (
@@ -74,10 +81,11 @@ where claim_type = 'institutional'
 from detail_values
 group by encounter_id
 , encounter_type
+
 )
 
 select
-  a.encounter_id
+  x.encounter_id
 , a.encounter_start_date
 , a.encounter_end_date
 , c.patient_id
@@ -115,9 +123,10 @@ select
 , c.data_source
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('inpatient_substance_use__start_end_dates') }} a
-inner join total_amounts tot on a.encounter_id = tot.encounter_id
+inner join encounter_cross_walk x on a.encounter_id = x.old_encounter_id
+inner join total_amounts tot on x.encounter_id = tot.encounter_id
 left join institutional_claim_details c
-  on a.encounter_id = c.encounter_id
+  on x.encounter_id = c.encounter_id
 left join patient e
   on c.patient_id = e.patient_id
 left join {{ ref('terminology__provider') }} b

@@ -10,7 +10,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: acute_inpatient_summary
+      alias: acute_inpatient__encounter_grain
       tags: 
         - acute_inpatient
         - claims_preprocessing
@@ -98,7 +98,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {% else %}claims_preprocessing{%- endif -%}
-      alias: emergency_department_summary
+      alias: emergency_department__encounter_grain
       tags: 
         - emergency_department
         - claims_preprocessing

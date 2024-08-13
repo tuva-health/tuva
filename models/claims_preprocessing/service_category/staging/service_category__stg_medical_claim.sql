@@ -5,7 +5,7 @@ with random_claims as (
     select distinct claim_id
     from {{ ref('normalized_input__medical_claim') }}
     order by random()
-    limit 100000
+    limit 1000000
 ),
 cte as (
 select

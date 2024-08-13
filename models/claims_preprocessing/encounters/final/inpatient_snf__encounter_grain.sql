@@ -18,7 +18,7 @@ with detail_values as (
     cli.encounter_type = 'inpatient skilled nursing'
     and
     cli.claim_line_attribution_number = 1
-    inner join {{ ref('inpatient_snf__start_end_dates') }} ed on cli.encounter_id = ed.encounter_id
+    inner join {{ ref('inpatient_snf__start_end_dates') }} ed on cli.old_encounter_id = ed.encounter_id
 )
 
 ,encounter_cross_walk as (
