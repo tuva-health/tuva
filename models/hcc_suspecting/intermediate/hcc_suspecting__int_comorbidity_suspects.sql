@@ -149,11 +149,7 @@ with conditions as (
             on diabetes_dedupe.patient_id = ckd_stage_1_or_2_dedupe.patient_id
             and diabetes_dedupe.data_source = ckd_stage_1_or_2_dedupe.data_source
             /* ensure conditions overlap in the same year */
-            {% if target.type == 'fabric' %}
-                and YEAR(diabetes_dedupe.recorded_date) = YEAR(ckd_stage_1_or_2_dedupe.recorded_date)
-            {% else %}
-                and extract(year from diabetes_dedupe.recorded_date) = extract(year from ckd_stage_1_or_2_dedupe.recorded_date)
-            {% endif %}
+            and {{ date_part('year', 'diabetes_dedupe.recorded_date') }} = {{ date_part('year', 'ckd_stage_1_or_2_dedupe.recorded_date') }}
         inner join seed_hcc_descriptions
             on hcc_code = '37'
 
@@ -203,37 +199,19 @@ with conditions as (
         , condition_2_recorded_date
         , current_year_billed
         , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
-        {% if target.type == 'fabric' %}
-            , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
-                + ' ('
-                + CAST(condition_1_code AS {{ dbt.type_string() }})
-                + ' on '
-                + CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
-                + ')'
-                + ' and '
-                + CAST(condition_2_concept_name AS {{ dbt.type_string() }})
-                + ' ('
-                + CAST(condition_2_code AS {{ dbt.type_string() }})
-                + ' on '
-                + CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
-                + ')'
-              as contributing_factor
-        {% else %}
-            , CAST(condition_1_concept_name AS {{ dbt.type_string() }})
-                || ' ('
-                || CAST(condition_1_code AS {{ dbt.type_string() }})
-                || ' on '
-                || CAST(condition_1_recorded_date AS {{ dbt.type_string() }})
-                || ')'
-                || ' and '
-                || CAST(condition_2_concept_name AS {{ dbt.type_string() }})
-                || ' ('
-                || CAST(condition_2_code AS {{ dbt.type_string() }})
-                || ' on '
-                || CAST(condition_2_recorded_date AS {{ dbt.type_string() }})
-                || ')'
-              as contributing_factor
-        {% endif %}
+        , {{ dbt.concat([
+            "condition_1_concept_name",
+            "' ('",
+            "condition_1_code",
+            "') on '",
+            "condition_1_recorded_date",
+            "') and '",
+            "condition_2_concept_name",
+            "' ('",
+            "condition_2_code",
+            "') on '",
+            "condition_2_recorded_date"
+        ]) }} as contributing_factor
         , condition_1_recorded_date as suspect_date
     from add_billed_flag
 

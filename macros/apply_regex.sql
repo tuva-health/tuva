@@ -40,9 +40,4 @@
 
 {%- endmacro -%}
 
-{% macro fabric__apply_regex(column_name, regex) %}
-
-    PATINDEX('%{{ regex }}%', {{ column_name }}) > 0
-
-{% endmacro %}
 

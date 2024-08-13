@@ -66,19 +66,12 @@ with all_conditions as (
         , hcc_grouped.first_recorded
         , hcc_grouped.last_recorded
         , hcc_billed.last_billed
-        {% if target.type == 'fabric' %}
-            , case
-                when YEAR(hcc_billed.last_billed) = YEAR( {{ dbt.current_timestamp() }} )
-                then 1
-                else 0
-              end as current_year_billed
-        {% else %}
-            , case
-                when extract(year from hcc_billed.last_billed) = extract(year from {{ dbt.current_timestamp() }} )
-                then 1
-                else 0
-              end as current_year_billed
-        {% endif %}
+        , case
+            when {{ date_part('year', 'hcc_billed.last_billed') }} = {{ date_part('year', dbt.current_timestamp()) }}
+            then 1
+            else 0
+          end as current_year_billed
+
     from hcc_grouped
          left join hcc_billed
          on hcc_grouped.patient_id = hcc_billed.patient_id
@@ -102,21 +95,16 @@ with all_conditions as (
         , add_flag.last_billed
         , add_flag.current_year_billed
         , cast('Prior coding history' as {{ dbt.type_string() }}) as reason
-        {% if target.type == 'fabric' %}
-            , icd_10_cm_code
-                + case
-                    when last_billed is not null then ' last billed on ' + cast(last_billed as {{ dbt.type_string() }})
-                    when last_billed is null and last_recorded is not null then ' last recorded on ' + cast(last_recorded as {{ dbt.type_string() }})
-                    else ' (missing recorded and billing dates) '
-              end as contributing_factor
-        {% else %}
-            , icd_10_cm_code
-                || case
-                    when last_billed is not null then ' last billed on ' || cast(last_billed as {{ dbt.type_string() }})
-                    when last_billed is null and last_recorded is not null then ' last recorded on ' || cast(last_recorded as {{ dbt.type_string() }})
-                    else ' (missing recorded and billing dates) '
-              end as contributing_factor
-        {% endif %}
+        , {{ dbt.concat([
+            "icd_10_cm_code",
+            "case"
+            " when last_billed is not null then " ~
+            dbt.concat(["' last billed on '", "last_billed"]) ~
+            " when last_billed is null and last_recorded is not null then " ~
+            dbt.concat(["' last recorded on '", "last_recorded"]) ~
+            " else ' (missing recorded and billing dates) '"
+            " end"
+        ]) }} as contributing_factor
         , coalesce(last_billed, last_recorded) as condition_date
     from all_conditions
          left join add_flag
@@ -141,21 +129,16 @@ with all_conditions as (
         , last_billed
         , current_year_billed
         , 'Prior coding history' as reason
-        {% if target.type == 'fabric' %}
-            , icd_10_cm_code
-                + case
-                    when last_billed is not null then ' last billed on ' + cast(last_billed as {{ dbt.type_string() }})
-                    when last_billed is null and last_recorded is not null then ' last recorded on ' + cast(last_recorded as {{ dbt.type_string() }})
-                    else ' (missing recorded and billing dates) '
-              end as contributing_factor
-        {% else %}
-            , icd_10_cm_code
-                || case
-                    when last_billed is not null then ' last billed on ' || cast(last_billed as {{ dbt.type_string() }})
-                    when last_billed is null and last_recorded is not null then ' last recorded on ' || cast(last_recorded as {{ dbt.type_string() }})
-                    else ' (missing recorded and billing dates) '
-              end as contributing_factor
-        {% endif %}
+        , {{ dbt.concat([
+            "icd_10_cm_code",
+            "case"
+            " when last_billed is not null then " ~
+            dbt.concat(["' last billed on '", "last_billed"]) ~
+            " when last_billed is null and last_recorded is not null then " ~
+            dbt.concat(["' last recorded on '", "last_recorded"]) ~
+            " else ' (missing recorded and billing dates) '"
+            " end"
+        ]) }} as contributing_factor
         , coalesce(last_billed, last_recorded) as suspect_date
     from all_conditions_with_flag
 

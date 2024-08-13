@@ -106,17 +106,11 @@ with patients_with_frailty as (
     select
           patients_with_frailty.patient_id
         , patients_with_frailty.exclusion_date
-        {% if target.type == 'fabric' %}
-            , patients_with_frailty.exclusion_reason
-                + ' with '
-                + pharmacy_claim_exclusions.concept_name
-              as exclusion_reason
-        {% else %}
-            , patients_with_frailty.exclusion_reason
-                || ' with '
-                || pharmacy_claim_exclusions.concept_name
-              as exclusion_reason
-        {% endif %}
+        , {{ dbt.concat([
+            "patients_with_frailty.exclusion_reason",
+            "' with '",
+            "pharmacy_claim_exclusions.concept_name"
+        ]) }} as exclusion_reason
         , pharmacy_claim_exclusions.dispensing_date
         , pharmacy_claim_exclusions.paid_date
     from patients_with_frailty
@@ -128,17 +122,11 @@ with patients_with_frailty as (
     select
           patients_with_frailty.patient_id
         , medication_exclusions.dispensing_date as exclusion_date
-        {% if target.type == 'fabric' %}
-            , patients_with_frailty.exclusion_reason
-                + ' with '
-                + medication_exclusions.concept_name
-              as exclusion_reason
-        {% else %}
-            , patients_with_frailty.exclusion_reason
-                || ' with '
-                || medication_exclusions.concept_name
-              as exclusion_reason
-        {% endif %}
+        , {{ dbt.concat([
+            "patients_with_frailty.exclusion_reason",
+            "' with '",
+            "medication_exclusions.concept_name"
+        ]) }} as exclusion_reason
         , medication_exclusions.dispensing_date
         , null as paid_date
     from patients_with_frailty

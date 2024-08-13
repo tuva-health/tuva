@@ -31,8 +31,11 @@ select source_code_type,
        notes
 from {{ ref('custom_mapped') }}
 
+{% if target.type == 'fabric' %}
 union
-
+{% else %}
+union distinct
+{% endif %}
 
 select un.source_code_type,
        un.source_code,

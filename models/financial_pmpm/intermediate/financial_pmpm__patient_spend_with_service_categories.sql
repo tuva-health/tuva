@@ -32,13 +32,10 @@ with claims_with_service_categories as (
     {% endif %}
     , service_category_1
     , service_category_2
-    {% if target.type == 'fabric' %}
-        , cast(YEAR(claim_date) as {{ dbt.type_string() }} )
-          + RIGHT(REPLICATE('0', 2) + cast(MONTH(claim_date) as {{ dbt.type_string() }} ), 2) AS year_month
-    {% else %}
-        , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
-          || lpad(cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }} ), 2, '0') AS year_month
-    {% endif %}
+    , {{  dbt.concat([date_part('year', 'claim_date'),
+                      dbt.right(
+                      dbt.concat(["'0'", date_part('month', 'claim_date')])
+                      , 2)]) }} as year_month
     , paid_amount
     , allowed_amount
     , data_source
@@ -74,13 +71,10 @@ with claims_with_service_categories as (
     {% endif %}
     , service_category_1
     , service_category_2
-    {% if target.type == 'fabric' %}
-        , cast(YEAR("claim_date") as {{ dbt.type_string() }} )
-        + RIGHT(REPLICATE('0', 2) + cast(MONTH("claim_date") as {{ dbt.type_string() }}), 2) AS year_month
-    {% else %}
-        , cast({{ date_part("year", "claim_date") }} as {{ dbt.type_string() }} )
-        || lpad(cast({{ date_part("month", "claim_date") }} as {{ dbt.type_string() }}), 2, '0') AS year_month
-    {% endif %}
+    , {{  dbt.concat([date_part('year', 'claim_date'),
+                      dbt.right(
+                      dbt.concat(["'0'", date_part('month', 'claim_date')])
+                      , 2)]) }} as year_month
     , paid_amount
     , allowed_amount
     , data_source

@@ -15,7 +15,11 @@ from {{ ref('emergency_department__int_institutional_encounter_id') }} inst
 left join {{ ref('emergency_department__stg_medical_claim') }} med
     on inst.claim_id = med.claim_id
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select
   patient_id,

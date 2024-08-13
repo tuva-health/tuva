@@ -3,6 +3,7 @@
    )
 }}
 
+{% if target.type == 'fabric' %}
 with conditions_unioned as (
 
     select * from {{ ref('chronic_conditions__cms_chronic_conditions_all') }}
@@ -12,6 +13,17 @@ with conditions_unioned as (
     select * from {{ ref('chronic_conditions__cms_chronic_conditions_oud') }}
 
 )
+{% else %}
+with conditions_unioned as (
+
+    select * from {{ ref('chronic_conditions__cms_chronic_conditions_all') }}
+    union distinct
+    select * from {{ ref('chronic_conditions__cms_chronic_conditions_hiv_aids') }}
+    union distinct
+    select * from {{ ref('chronic_conditions__cms_chronic_conditions_oud') }}
+
+)
+{% endif %}
 
 select
       patient_id

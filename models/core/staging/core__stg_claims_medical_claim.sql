@@ -15,11 +15,11 @@
 
 with medical_claim_stage as(
     select
-        {% if target.type == 'fabric' %}
-            cast(med.claim_id as {{ dbt.type_string() }} ) + '-' + cast(med.claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
-        {% else %}
-            cast(med.claim_id as {{ dbt.type_string() }} )|| '-' ||cast(med.claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
-        {% endif %}
+        {{  dbt.concat([
+        dbt.safe_cast("med.claim_id", api.Column.translate_type("string")),
+        "'-'",
+        dbt.safe_cast("med.claim_line_number", api.Column.translate_type("string"))
+        ]) }} as medical_claim_id
         , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
         , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
         , cast(coalesce(ap.encounter_id,ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id

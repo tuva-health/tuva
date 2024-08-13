@@ -7,55 +7,34 @@ with demographic_factors as (
     select
           patient_id
         /* concatenate demographic risk factors */
-        {% if target.type == 'fabric' %}
-            , gender
-                + ', '
-                + age_group
-                + ' Years'
-                + ', '
-                + enrollment_status
-                + ' Enrollee'
-                + ', '
-                + case
-                    when medicaid_status = 'Yes' then 'Medicaid'
-                    else 'Non-Medicaid'
-                    end
-                + ', '
-                + dual_status
-                + ' Dual'
-                + ', '
-                + orec
-                + ', '
-                + case
-                    when institutional_status = 'Yes' then 'Institutional'
-                    else 'Non-Institutional'
-                    end
-              as description
-        {% else %}
-            , gender
-                || ', '
-                || age_group
-                || ' Years'
-                || ', '
-                || enrollment_status
-                || ' Enrollee'
-                || ', '
-                || case
-                    when medicaid_status = 'Yes' then 'Medicaid'
-                    else 'Non-Medicaid'
-                    end
-                || ', '
-                || dual_status
-                || ' Dual'
-                || ', '
-                || orec
-                || ', '
-                || case
-                    when institutional_status = 'Yes' then 'Institutional'
-                    else 'Non-Institutional'
-                    end
-              as description
-        {% endif %}
+
+    , {{ dbt.concat(
+        [
+            "gender",
+            "', '",
+            "age_group",
+            "' Years'",
+            "', '",
+            "enrollment_status",
+            "' Enrollee'",
+            "', '",
+            "CASE"
+            "   WHEN medicaid_status = 'Yes' THEN 'Medicaid'"
+            "   ELSE 'Non-Medicaid'"
+            " END",
+            "', '",
+            "dual_status",
+            "' Dual'",
+            "', '",
+            "orec",
+            "', '",
+            "CASE"
+            "   WHEN institutional_status = 'Yes' THEN 'Institutional'"
+            "   ELSE 'Non-Institutional'"
+            " END"
+        ]
+    ) }} as description
+
         , coefficient
         , factor_type
         , model_version
@@ -81,11 +60,7 @@ with demographic_factors as (
 
     select
           patient_id
-        {% if target.type == 'fabric' %}
-            , hcc_description + ' (HCC ' + hcc_code + ')' as description
-        {% else %}
-            , hcc_description || ' (HCC ' || hcc_code || ')' as description
-        {% endif %}
+        , {{ dbt.concat(["hcc_description", "' (HCC '", "hcc_code", "')'"]) }} as description
         , coefficient
         , factor_type
         , model_version

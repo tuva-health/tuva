@@ -71,19 +71,19 @@ with period_end as (
 
   select
       *
-    {% if target.type == 'fabric' %}
         , case
-            when MONTH(performance_period_end) between 1 and 8
-                then cast((YEAR(performance_period_end) - 1) AS {{ dbt.type_string() }}) + '-08-01'
-            else cast(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-08-01'
-          end as lookback_period_august
-    {% else %}
-        , case
-            when extract(month from performance_period_end) between 1 and 8
-                then cast((extract(year from performance_period_end) - 1) AS {{ dbt.type_string() }}) || '-08-01'
-            else cast(extract(year from performance_period_end) AS {{ dbt.type_string() }}) || '-08-01'
-          end as lookback_period_august
-    {% endif %}
+            when {{ date_part('month', 'performance_period_end') | as_number }} between 1 and 8
+            then {{ dbt.concat([
+                "cast(" ~
+                date_part('year', 'performance_period_end') ~
+                " as integer) - 1",
+                "'-08-01'"
+            ]) }}
+            else {{ dbt.concat([
+                date_part('year', 'performance_period_end'),
+                "'-08-01'"
+            ]) }}
+        end as lookback_period_august
   from period_begin
 
 )

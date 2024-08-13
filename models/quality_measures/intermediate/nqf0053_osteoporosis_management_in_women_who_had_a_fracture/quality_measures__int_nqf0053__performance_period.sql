@@ -63,30 +63,17 @@ with period_end as (
 , lookback_period as (
 
 SELECT
-  *,
- {% if target.type == 'fabric' %}
-      CASE
-        WHEN performance_period_end >= CAST(CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-06-30' AS DATE)
-          THEN CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-06-30'
-        ELSE CAST(YEAR(performance_period_begin) AS {{ dbt.type_string() }}) + '-06-30'
-      END AS lookback_period_june,
-      CASE
-        WHEN performance_period_end >= CAST(CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-12-31' AS DATE)
-          THEN CAST(YEAR(performance_period_end) AS {{ dbt.type_string() }}) + '-12-31'
-        ELSE CAST(YEAR(performance_period_begin) AS {{ dbt.type_string() }}) + '-12-31'
-      END AS lookback_period_december
-{% else %}
-      CASE
-        WHEN performance_period_end >= CAST(CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-06-30' AS DATE)
-          THEN CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-06-30'
-        ELSE CAST(extract(year FROM performance_period_begin) AS {{ dbt.type_string() }}) || '-06-30'
-      END AS lookback_period_june,
-      CASE
-        WHEN performance_period_end >= CAST(CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-12-31' AS DATE)
-          THEN CAST(extract(year FROM performance_period_end) AS {{ dbt.type_string() }}) || '-12-31'
-        ELSE CAST(extract(year FROM performance_period_begin) AS {{ dbt.type_string() }}) || '-12-31'
-      END AS lookback_period_december
-{% endif %}
+  *
+  , case
+      when performance_period_end >= {{ dbt.concat([date_part('year', 'performance_period_end'), "'-06-30'"]) }}
+      then {{ dbt.concat([date_part('year', 'performance_period_end'), "'-06-30'"]) }}
+      else {{ dbt.concat([date_part('year', 'performance_period_begin'), "'-06-30'"]) }}
+    end as lookback_period_june
+  , case
+      when performance_period_end >= {{ dbt.concat([date_part('year', 'performance_period_end'), "'-12-31'"]) }}
+      then {{ dbt.concat([date_part('year', 'performance_period_end'), "'-12-31'"]) }}
+      else {{ dbt.concat([date_part('year', 'performance_period_begin'), "'-12-31'"]) }}
+    end as lookback_period_december
 FROM period_begin
 
 )

@@ -111,23 +111,11 @@ with all_medications as (
         , drug_code
         , current_year_billed
         , cast('Medication suspect' as {{ dbt.type_string() }}) as reason
-        {% if target.type == 'fabric' %}
-            , concept_name
-                + ' ('
-                + CAST(drug_code AS {{ dbt.type_string() }})
-                + ')'
-                + ' dispensed on '
-                + CAST(dispensing_date AS {{ dbt.type_string() }})
-              AS contributing_factor
-        {% else %}
-            , concept_name
-                || ' ('
-                || CAST(drug_code AS {{ dbt.type_string() }})
-                || ')'
-                || ' dispensed on '
-                || CAST(dispensing_date AS {{ dbt.type_string() }})
-              AS contributing_factor
-        {% endif %}
+        , {{ dbt.concat([
+            "concept_name",
+            "drug_code",
+            "') dispensed on '",
+            "dispensing_date" ]) }} as contributing_factor
         , dispensing_date as suspect_date
     from add_billed_flag
 

@@ -13,11 +13,11 @@
 
 
 select
-        {% if target.type == 'fabric' %}
-            cast(claim_id as {{ dbt.type_string() }} ) + '-' + cast(claim_line_number as {{ dbt.type_string() }} ) as pharmacy_claim_id
-        {% else %}
-            cast(claim_id as {{ dbt.type_string() }} ) || '-' || cast(claim_line_number as {{ dbt.type_string() }} ) as pharmacy_claim_id
-        {% endif %}
+    {{ dbt.concat([
+        "cast(claim_id as " ~ dbt.type_string() ~ ")",
+        "'-'",
+        "cast(claim_line_number as " ~ dbt.type_string() ~ ")"
+         ]) }} as pharmacy_claim_id
        , cast(claim_id as {{ dbt.type_string() }} ) as claim_id
        , cast(claim_line_number as integer ) as claim_line_number
        , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
