@@ -65,12 +65,12 @@ with period_end as (
 SELECT
   *
   , case
-      when performance_period_end >= {{ dbt.concat([date_part('year', 'performance_period_end'), "'-06-30'"]) }}
+      when performance_period_end >= ({{ dbt.concat([date_part('year', 'performance_period_end'), "'-06-30'"]) }})
       then {{ dbt.concat([date_part('year', 'performance_period_end'), "'-06-30'"]) }}
       else {{ dbt.concat([date_part('year', 'performance_period_begin'), "'-06-30'"]) }}
     end as lookback_period_june
   , case
-      when performance_period_end >= {{ dbt.concat([date_part('year', 'performance_period_end'), "'-12-31'"]) }}
+      when performance_period_end >= ({{ dbt.concat([date_part('year', 'performance_period_end'), "'-12-31'"]) }})
       then {{ dbt.concat([date_part('year', 'performance_period_end'), "'-12-31'"]) }}
       else {{ dbt.concat([date_part('year', 'performance_period_begin'), "'-12-31'"]) }}
     end as lookback_period_december
