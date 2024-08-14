@@ -46,19 +46,11 @@ with visit_codes as (
           patient_id
         , procedure_date as min_date
         , procedure_date as max_date
-    {% if target.type == 'fabric' %}
-        from {{ref('quality_measures__stg_core__procedure')}} "proc"
-    {% else %}
-        from {{ref('quality_measures__stg_core__procedure')}} proc
-    {% endif %}
+        from {{ref('quality_measures__stg_core__procedure')}} procs
     inner join {{ref('quality_measures__int_nqf0059__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join  visit_codes
-        {% if target.type == 'fabric' %}
-            on coalesce("proc".normalized_code,"proc".source_code) = visit_codes.code
-        {% else %}
-            on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
-        {% endif %}
+            on coalesce(procs.normalized_code,procs.source_code) = visit_codes.code
 
 )
 

@@ -15,11 +15,8 @@ with diagnosis as (
     where c.encounter_id is not null
 ),
 
-{% if target.type == 'fabric' %}
-    "procedure" as (
-{% else %}
-    procedure as (
-{% endif %}
+
+procedures as (
     select distinct
         p.encounter_id
       , p.data_source
@@ -45,11 +42,7 @@ inner join {{ ref('ahrq_measures__int_pqi_16_denom') }} as denom
   on e.patient_id = denom.patient_id
   and e.data_source = denom.data_source
   and e.year_number = denom.year_number
-{% if target.type == 'fabric' %}
-    inner join "procedure" as p
-{% else %}
-    inner join procedure as p
-{% endif %}
+    inner join procedures as p
   on e.encounter_id = p.encounter_id
   and e.data_source = p.data_source
 left join {{ ref('ahrq_measures__int_pqi_16_exclusions') }} as shared
