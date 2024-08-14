@@ -70,21 +70,25 @@ left join {{ ref('financial_pmpm__service_category_1_paid_pivot') }} b
   and a.year_month = b.year_month
   and a.payer = b.payer
   and a.plan = b.plan
+  and a.data_source = b.data_source
 left join {{ ref('financial_pmpm__service_category_2_paid_pivot') }} c
   on a.patient_id = c.patient_id
   and a.year_month = c.year_month
   and a.payer = c.payer
   and a.plan = c.plan
+  and a.data_source = b.data_source
 left join {{ ref('financial_pmpm__service_category_1_allowed_pivot') }} d
   on a.patient_id = d.patient_id
   and a.year_month = d.year_month
   and a.payer = d.payer
   and a.plan = d.plan
+  and a.data_source = b.data_source
 left join {{ ref('financial_pmpm__service_category_2_allowed_pivot') }} e
   on a.patient_id = e.patient_id
   and a.year_month = e.year_month
   and a.payer = e.payer
-  and a.plan = e.plan   
+  and a.plan = e.plan
+  and a.data_source = b.data_source   
 )
 
 select *
