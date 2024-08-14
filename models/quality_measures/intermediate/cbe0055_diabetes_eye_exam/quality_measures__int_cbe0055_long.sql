@@ -76,9 +76,6 @@ with denominator as (
                 , denominator.performance_period_end
                 , denominator.measure_id
                 , denominator.measure_name
---            order by
---                  numerator.evidence_date desc nulls last
---                , exclusions.exclusion_date desc nulls last
               order by
                   case when numerator.evidence_date is null then 1 else 0 end,
                   numerator.evidence_date desc
