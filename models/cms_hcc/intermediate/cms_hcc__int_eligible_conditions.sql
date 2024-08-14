@@ -75,11 +75,7 @@ with medical_claims as (
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
     where claim_type = 'professional'
-        {% if target.type == 'fabric' %}
-            and YEAR(claim_end_date) = {{ collection_year }}
-        {% else %}
-            and extract(year from claim_end_date) = {{ collection_year }}
-        {% endif %}
+              and {{ date_part('year', 'claim_end_date') }} = {{ collection_year }}
         and cpt_hcpcs_list.payment_year = {{ payment_year }}
 
 )

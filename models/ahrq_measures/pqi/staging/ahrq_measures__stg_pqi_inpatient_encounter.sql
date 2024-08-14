@@ -15,12 +15,8 @@ select
   , patient_id
   , facility_id
   , paid_amount
-  {% if target.type == 'fabric' %}
-    , YEAR(encounter_start_date) as year_number
-  {% else %}
-    , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
-  {% endif %}
-from 
+  , {{ date_part('year', 'encounter_start_date') }} as year_number
+from
     {{ ref('core__encounter') }}
 where 
     encounter_type = 'acute inpatient'
