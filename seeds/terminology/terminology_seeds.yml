@@ -214,6 +214,75 @@ seeds:
       - name: short_description
         description: 'The short description of the HCPCS code.'
 
+  - name: terminology__hcpcs_to_rbcs
+    description: HCPCS to RBDS crosswalk.
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: hcpcs_to_rbcs
+      tags: terminology
+      enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        HCPCS_Cd: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_ID: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_Cat: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_Cat_Desc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_Cat_Subcat: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_Subcat_Desc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_FamNumb: |
+          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- else -%} numeric {%- endif -%}
+        RBCS_Family_Desc: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        RBCS_Major_Ind: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+        HCPCS_Cd_Add_Dt: |
+          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+        HCPCS_Cd_End_Dt: |
+          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+        RBCS_Assignment_Eff_Dt: |
+          {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+    columns:
+      - name: HCPCS_Cd
+        description: HCPCS or CPT code.
+      - name: RBCS_ID
+        description: |
+          RBCS identifier which is comprised of 6 characters. The first 
+          character identifies the category; the second character identifies
+          the subcategory; the third, fourth, and fifth characters identify
+          the family, and the sixth character identifies whether the service
+          is a major procedure.
+      - name: RBCS_Cat
+        description: First character for the RBCS taxonomy ID, which represents the RBCS ID category.
+      - name: RBCS_Cat_Desc
+        description: Category description.
+      - name: RBCS_Cat_Subcat
+        description: First 2 characters for the RBCS taxonomy ID, which represents the RBCS ID's category and subcategory.
+      - name: RBCS_Subcat_Desc
+        description: Subcategory description.
+      - name: RBCS_FamNumb
+        description: Third, fourth, and fifth characters, which represents the RBCS family number.
+      - name: RBCS_Family_Desc
+        description: Family description.
+      - name: RBCS_Major_Ind
+        description: |
+          Sixth character for the RBCS taxonomy ID, which identifies whether
+          the HCPCS code is a Major procedure (M), Other (O), or non-procedure
+          code (N).
+      - name: HCPCS_Cd_Add_Dt
+        description: HCPCS Code Effective Date.
+      - name: HCPCS_Cd_End_Dt
+        description: HCPCS Code End Date.
+      - name: RBCS_Assignment_Eff_Dt
+        description: Provides users with the earliest date that the RBCS ID is effective.
+      - name: current_flag
+        description: Flag where 1 = the current version of the RBCS for that particular HCPCS_CD, 0 = old version. 
+
   - name: terminology__icd_9_cm
     description: 'Seed containing ICD-9-CM codes and descriptions.'
     config:
