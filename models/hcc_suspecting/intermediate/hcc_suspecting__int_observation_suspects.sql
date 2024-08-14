@@ -322,7 +322,6 @@ with conditions as (
             partition by
                   depression_assessment.patient_id
                 , depression_assessment.data_source
-            --order by depression_assessment.observation_date desc nulls last
             order by
                 case when depression_assessment.observation_date is null then 1 else 0 end,
                 depression_assessment.observation_date desc
