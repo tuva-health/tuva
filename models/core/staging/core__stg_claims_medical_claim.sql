@@ -16,9 +16,9 @@
 with medical_claim_stage as(
     select
         {{  dbt.concat([
-        dbt.safe_cast("med.claim_id", api.Column.translate_type("string")),
+        "med.claim_id",
         "'-'",
-        dbt.safe_cast("med.claim_line_number", api.Column.translate_type("string"))
+        "med.claim_line_number"
         ]) }} as medical_claim_id
         , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
         , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number

@@ -8,9 +8,9 @@
 with claim_dates as(
     select
          {{ dbt.concat([
-            dbt.safe_cast("claim_id", api.Column.translate_type("string")),
+            "claim_id",
             "'-'",
-            dbt.safe_cast("claim_line_number", api.Column.translate_type("string"))
+            "claim_line_number"
             ]) }} as medical_claim_id
         , patient_id
         , payer
@@ -49,29 +49,23 @@ with claim_dates as(
         , inferred_claim_start_column_used
         , inferred_claim_end_column_used
 
-        {% set year_part = date_part('year', 'inferred_claim_start_date') %}
-        {% set month_part = date_part('month', 'inferred_claim_start_date') %}
-
         , {{ dbt.concat([
-                dbt.safe_cast(year_part, api.Column.translate_type("string")),
+                date_part('year', 'inferred_claim_start_date'),
                 dbt.right(
                     dbt.concat([
                         "'0'",
-                        dbt.safe_cast(month_part, api.Column.translate_type("string")),
+                        date_part('month', 'inferred_claim_start_date'),
                     ]),
                     2
                 )
             ]) }} as inferred_claim_start_year_month
 
-    {% set year_part = date_part('year', 'inferred_claim_end_date') %}
-    {% set month_part = date_part('month', 'inferred_claim_end_date') %}
-
     , {{ dbt.concat([
-            dbt.safe_cast(year_part, api.Column.translate_type("string")),
+            date_part('year', 'inferred_claim_end_date'),
             dbt.right(
                 dbt.concat([
                     "'0'",
-                    dbt.safe_cast(month_part, api.Column.translate_type("string")),
+                    date_part('month', 'inferred_claim_end_date'),
                 ]),
                 2
             )
