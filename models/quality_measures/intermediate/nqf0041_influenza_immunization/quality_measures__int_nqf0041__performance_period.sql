@@ -74,9 +74,9 @@ with period_end as (
         , case
             when {{ date_part('month', 'performance_period_end') | as_number }} between 1 and 8
             then {{ dbt.concat([
-                "cast(" ~
+                "(cast(" ~
                 date_part('year', 'performance_period_end') ~
-                " as integer) - 1",
+                " as integer) - 1)",
                 "'-08-01'"
             ]) }}
             else {{ dbt.concat([
