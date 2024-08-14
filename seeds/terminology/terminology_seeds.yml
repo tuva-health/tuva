@@ -247,6 +247,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
         RBCS_Assignment_Eff_Dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
+        current_flag: |
+          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- else -%} numeric {%- endif -%}
     columns:
       - name: HCPCS_Cd
         description: HCPCS or CPT code.
