@@ -33,7 +33,8 @@ from {{ ref('core__lab_result') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select
+{% if target.type == 'fabric' %}
+    select top 0
       cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as result
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
@@ -43,6 +44,18 @@ select
     , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
     , cast(null as {{ dbt.type_string() }} ) as normalized_code
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
-limit 0
+{% else %}
+    select
+      cast(null as {{ dbt.type_string() }} ) as patient_id
+    , cast(null as {{ dbt.type_string() }} ) as result
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
+    ,  {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date
+    , cast(null as {{ dbt.type_string() }} ) as source_code_type
+    , cast(null as {{ dbt.type_string() }} ) as source_code
+    , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
+    , cast(null as {{ dbt.type_string() }} ) as normalized_code
+    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    limit 0
+{%- endif %}
 
 {%- endif %}

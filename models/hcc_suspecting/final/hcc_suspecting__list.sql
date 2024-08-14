@@ -14,8 +14,13 @@ with hcc_history_suspects as (
         , contributing_factor
         , suspect_date
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
-    where (current_year_billed = false
-        or current_year_billed is null)
+    {% if target.type == 'fabric' %}
+        where (current_year_billed = 0
+            or current_year_billed is null)
+    {% else %}
+        where (current_year_billed = false
+            or current_year_billed is null)
+    {% endif %}
 
 )
 
@@ -30,8 +35,13 @@ with hcc_history_suspects as (
         , contributing_factor
         , suspect_date
     from {{ ref('hcc_suspecting__int_comorbidity_suspects') }}
-    where (current_year_billed = false
-        or current_year_billed is null)
+    {% if target.type == 'fabric' %}
+        where (current_year_billed = 0
+            or current_year_billed is null)
+    {% else %}
+        where (current_year_billed = false
+            or current_year_billed is null)
+    {% endif %}
 
 )
 
@@ -46,8 +56,13 @@ with hcc_history_suspects as (
         , contributing_factor
         , suspect_date
     from {{ ref('hcc_suspecting__int_observation_suspects') }}
-    where (current_year_billed = false
-        or current_year_billed is null)
+    {% if target.type == 'fabric' %}
+        where (current_year_billed = 0
+            or current_year_billed is null)
+    {% else %}
+        where (current_year_billed = false
+            or current_year_billed is null)
+    {% endif %}
 
 )
 
@@ -62,8 +77,13 @@ with hcc_history_suspects as (
         , contributing_factor
         , suspect_date
     from {{ ref('hcc_suspecting__int_lab_suspects') }}
-    where (current_year_billed = false
-        or current_year_billed is null)
+    {% if target.type == 'fabric' %}
+        where (current_year_billed = 0
+            or current_year_billed is null)
+    {% else %}
+        where (current_year_billed = false
+            or current_year_billed is null)
+    {% endif %}
 
 )
 
@@ -78,8 +98,13 @@ with hcc_history_suspects as (
         , contributing_factor
         , suspect_date
     from {{ ref('hcc_suspecting__int_medication_suspects') }}
-    where (current_year_billed = false
-        or current_year_billed is null)
+    {% if target.type == 'fabric' %}
+        where (current_year_billed = 0
+            or current_year_billed is null)
+    {% else %}
+        where (current_year_billed = false
+            or current_year_billed is null)
+    {% endif %}
 
 )
 

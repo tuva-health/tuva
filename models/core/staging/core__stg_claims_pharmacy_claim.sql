@@ -13,13 +13,21 @@
 
 
 select
-        cast(claim_id as {{ dbt.type_string() }} ) || '-' || cast(claim_line_number as {{ dbt.type_string() }} ) as pharmacy_claim_id
+    {{ dbt.concat([
+        "cast(claim_id as " ~ dbt.type_string() ~ ")",
+        "'-'",
+        "cast(claim_line_number as " ~ dbt.type_string() ~ ")"
+         ]) }} as pharmacy_claim_id
        , cast(claim_id as {{ dbt.type_string() }} ) as claim_id
        , cast(claim_line_number as integer ) as claim_line_number
        , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(payer as {{ dbt.type_string() }} ) as payer
-       , cast(plan as {{ dbt.type_string() }} ) as plan
+       {% if target.type == 'fabric' %}
+           , cast("plan" as {{ dbt.type_string() }} ) as "plan"
+       {% else %}
+           , cast(plan as {{ dbt.type_string() }} ) as plan
+       {% endif %}
        , cast(prescribing_provider_id as {{ dbt.type_string() }} ) as prescribing_provider_id
        , cast(prescribing_provider_name as {{ dbt.type_string() }} ) as prescribing_provider_name
        , cast(dispensing_provider_id as {{ dbt.type_string() }} ) as dispensing_provider_id

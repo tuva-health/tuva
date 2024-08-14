@@ -110,6 +110,17 @@ with chronic_conditions as (
 
 )
 
+{% if target.type == 'fabric' %}
+, inclusions_unioned as (
+
+    select * from inclusions_diagnosis
+    union
+    select * from inclusions_ms_drg
+    union
+    select * from exception_diagnosis
+
+)
+{% else %}
 , inclusions_unioned as (
 
     select * from inclusions_diagnosis
@@ -119,6 +130,7 @@ with chronic_conditions as (
     select * from exception_diagnosis
 
 )
+{% endif %}
 
 select distinct
       cast(inclusions_unioned.patient_id as {{ dbt.type_string() }}) as patient_id

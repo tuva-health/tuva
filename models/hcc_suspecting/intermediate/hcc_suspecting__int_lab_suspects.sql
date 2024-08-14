@@ -124,14 +124,14 @@ with egfr_labs as (
             when result between 30 and 44 then '328'
             when result between 45 and 59 then '329'
           end as hcc_code
-        , 'eGFR ('
-            || CAST(code AS {{ dbt.type_string() }})
-            || ') result '
-            || CAST(result AS {{ dbt.type_string() }})
-            || ' on '
-            || CAST(result_date AS {{ dbt.type_string() }})
-          AS contributing_factor
-
+        , {{ dbt.concat([
+            "'eGFR ('",
+            "code",
+            "') result '",
+            "result",
+            "' on '",
+            "result_date"
+        ]) }} as contributing_factor
     from eligible_labs
     where row_num = 1
 
@@ -194,7 +194,11 @@ with egfr_labs as (
         , cast(lab_code as {{ dbt.type_string() }}) as lab_code
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
-        , cast(current_year_billed as boolean) as current_year_billed
+        {% if target.type == 'fabric' %}
+            , cast(current_year_billed as bit) as current_year_billed
+        {% else %}
+            , cast(current_year_billed as boolean) as current_year_billed
+        {% endif %}
         , cast(reason as {{ dbt.type_string() }}) as reason
         , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
         , cast(suspect_date as date) as suspect_date

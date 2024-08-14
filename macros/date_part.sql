@@ -15,3 +15,13 @@
 {% macro athena__date_part(datepart, date) -%}
     extract({{ datepart }} from {{ date }})
 {%- endmacro %}
+
+{% macro fabric__date_part(datepart, date) %}
+    {% if datepart == 'year' %}
+        YEAR({{ date }})
+    {% elif datepart == 'month' %}
+        MONTH({{ date }})
+    {% else %}
+        NULL
+    {% endif %}
+{% endmacro %}

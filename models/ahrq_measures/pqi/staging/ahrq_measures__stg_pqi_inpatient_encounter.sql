@@ -15,8 +15,8 @@ select
   , patient_id
   , facility_id
   , paid_amount
-  , {{ date_part('YEAR', 'encounter_start_date') }} as year_number
-from 
+  , {{ date_part('year', 'encounter_start_date') }} as year_number
+from
     {{ ref('core__encounter') }}
 where 
     encounter_type = 'acute inpatient'

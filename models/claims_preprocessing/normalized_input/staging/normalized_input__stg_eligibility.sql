@@ -7,7 +7,11 @@
 
 select
       patient_id
-    , patient_id||coalesce(data_source,'')||coalesce(payer,'')||coalesce(plan,'')||coalesce(cast(enrollment_start_date as {{ dbt.type_string() }}),'')||coalesce(cast(enrollment_end_date as {{ dbt.type_string() }}),'') as patient_id_key
+    {% if target.type == 'fabric' %}
+        , patient_id+coalesce(data_source,'')+coalesce(payer,'')+coalesce("plan",'')+coalesce(cast(enrollment_start_date as {{ dbt.type_string() }}),'')+coalesce(cast(enrollment_end_date as {{ dbt.type_string() }}),'') as patient_id_key
+    {% else %}
+        , patient_id||coalesce(data_source,'')||coalesce(payer,'')||coalesce(plan,'')||coalesce(cast(enrollment_start_date as {{ dbt.type_string() }}),'')||coalesce(cast(enrollment_end_date as {{ dbt.type_string() }}),'') as patient_id_key
+    {% endif %}
     , member_id
     , subscriber_id
     , gender
@@ -19,7 +23,11 @@ select
     , enrollment_end_date
     , payer
     , payer_type
-    , plan
+    {% if target.type == 'fabric' %}
+        , "plan"
+    {% else %}
+        , plan
+    {% endif %}
     , subscriber_relation
     , original_reason_entitlement_code
     , dual_status_code

@@ -10,9 +10,10 @@ select
     , cat.classification_order as ed_classification_order
     , class.patient_id
     , class.encounter_end_date
-    , cast({{ date_part("year", "class.encounter_end_date") }} as {{ dbt.type_string() }})
-      || substring('0'||cast({{ date_part("month", "class.encounter_end_date") }} as {{ dbt.type_string() }}),-2)
-    as year_month
+    , {{  dbt.concat([date_part('year', 'class.encounter_end_date'),
+                      dbt.right(
+                      dbt.concat(["'00'", date_part('month', 'class.encounter_end_date')])
+                      , 2)]) }} as year_month
     , class.primary_diagnosis_code
     , class.primary_diagnosis_description
     , class.paid_amount
@@ -23,8 +24,6 @@ select
     , practice_state as facility_state
     , practice_city as facility_city
     , practice_zip_code as facility_zip_code
---     , null as facility_latitude
---     , null as facility_longitude
     , pat.sex as patient_sex
     , floor({{ datediff('pat.birth_date', 'class.encounter_end_date', 'hour') }} / 8766.0) as patient_age
     , zip_code as patient_zip_code
@@ -33,7 +32,7 @@ select
     , race as patient_race
 from {{ ref('ed_classification__int_filter_encounter_with_classification') }} class
 inner join {{ ref('ed_classification__categories') }} cat
-    using(classification)
+    on class.classification = cat.classification
 left join {{ ref('terminology__provider') }} fac_prov 
     on class.facility_id = fac_prov.npi
 left join {{ ref('ed_classification__stg_patient') }} pat

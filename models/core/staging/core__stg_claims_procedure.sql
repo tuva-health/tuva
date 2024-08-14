@@ -30,7 +30,11 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where hcpcs_code is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -48,7 +52,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_1 is not null
     
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -66,7 +74,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_2 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -84,7 +96,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_3 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -102,7 +118,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_4 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -120,7 +140,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_5 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -138,7 +162,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_6 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -156,7 +184,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_7 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -174,7 +206,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_8 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -192,7 +228,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_9 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -210,7 +250,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_10 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -227,7 +271,12 @@ select
   , data_source as data_source
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_11 is not null
+
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -245,7 +294,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_12 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -263,7 +316,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_13 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -281,7 +338,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_14 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -299,7 +360,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_15 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -317,7 +382,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_16 is not null
     
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -335,7 +404,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_17 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -353,7 +426,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_18 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -371,7 +448,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_19 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -389,7 +470,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_20 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -407,7 +492,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_21 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -425,7 +514,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_22 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -443,7 +536,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_23 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -461,7 +558,11 @@ select
 from {{ ref('normalized_input__medical_claim') }} 
 where procedure_code_24 is not null
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select
     claim_id as claim_id
@@ -482,19 +583,21 @@ where procedure_code_25 is not null
 )
 
 select distinct
-      cast(
-        unpivot_cte.data_source
-            ||'_'
-            ||unpivot_cte.claim_id
-            ||'_'
-            ||unpivot_cte.source_code
-            ||case when unpivot_cte.modifier_1 is not null then '_'||unpivot_cte.modifier_1 else '' end
-            ||case when unpivot_cte.modifier_2 is not null then '_'||unpivot_cte.modifier_2 else '' end
-            ||case when unpivot_cte.modifier_3 is not null then '_'||unpivot_cte.modifier_3 else '' end
-            ||case when unpivot_cte.modifier_4 is not null then '_'||unpivot_cte.modifier_4 else '' end
-            ||case when unpivot_cte.modifier_5 is not null then '_'||unpivot_cte.modifier_5 else '' end
-            ||case when unpivot_cte.practitioner_npi is not null then '_'||unpivot_cte.practitioner_npi else '' end
-      as {{ dbt.type_string() }} ) as procedure_id
+{{ dbt.safe_cast(
+    dbt.concat([
+        "unpivot_cte.data_source",
+        "'_'",
+        "unpivot_cte.claim_id",
+        "'_'",
+        "unpivot_cte.source_code",
+        "case when unpivot_cte.modifier_1 is not null then CONCAT('_', unpivot_cte.modifier_1) else '' end",
+        "case when unpivot_cte.modifier_2 is not null then CONCAT('_', unpivot_cte.modifier_2) else '' end",
+        "case when unpivot_cte.modifier_3 is not null then CONCAT('_', unpivot_cte.modifier_3) else '' end",
+        "case when unpivot_cte.modifier_4 is not null then CONCAT('_', unpivot_cte.modifier_4) else '' end",
+        "case when unpivot_cte.modifier_5 is not null then CONCAT('_', unpivot_cte.modifier_5) else '' end",
+        "case when unpivot_cte.practitioner_npi is not null then CONCAT('_', unpivot_cte.practitioner_npi) else '' end"
+    ]), api.Column.translate_type("string"))
+ }} as procedure_id
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
