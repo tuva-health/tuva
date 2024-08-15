@@ -2,60 +2,60 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-WITH BASE as (
+WITH base as (
     SELECT * 
     FROM {{ ref('eligibility')}}
 
 ),
-UNIQUE_FIELD as (
-    SELECT DISTINCT MEMBER_ID
-        ,cast(BIRTH_DATE as {{ dbt.type_string() }}) as Field
-        ,DATA_SOURCE
-    FROM BASE
+unique_field as (
+    SELECT DISTINCT member_id
+        ,cast(birth_date as {{ dbt.type_string() }}) as field
+        ,data_source
+    FROM base
 ),
-CLAIM_GRAIN as (
-    SELECT MEMBER_ID
-        ,DATA_SOURCE
-        ,count(*) as FREQUENCY
-    from UNIQUE_FIELD 
-    GROUP BY MEMBER_ID
-        ,DATA_SOURCE
+claim_grain as (
+    SELECT member_id
+        ,data_source
+        ,count(*) as frequency
+    from unique_field
+    GROUP BY member_id
+        ,data_source
 ),
-CLAIM_AGG as (
+claim_agg as (
 SELECT
-    MEMBER_ID,
-    DATA_SOURCE,
-    {{ dbt.listagg(measure="coalesce(Field, 'null')", delimiter_text="', '", order_by_clause="order by Field desc") }} AS FIELD_AGGREGATED
+    member_id,
+    data_source,
+    {{ dbt.listagg(measure="coalesce(field, 'null')", delimiter_text="', '", order_by_clause="order by field desc") }} AS field_aggregated
 FROM
-    UNIQUE_FIELD
+    unique_field
 GROUP BY
-    DATA_SOURCE,
-    MEMBER_ID
+    data_source,
+    member_id
 )
 SELECT DISTINCT
-    M.Data_SOURCE
-    ,coalesce(cast(M.ENROLLMENT_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'ELIGIBILITY' AS TABLE_NAME
-    ,'Member ID' AS DRILL_DOWN_KEY
-    ,coalesce(M.Member_ID, 'NULL') as DRILL_DOWN_VALUE
-    ,'ELIGIBILITY' AS CLAIM_TYPE
-    ,'BIRTH_DATE' AS FIELD_NAME
+    m.data_source
+    ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'ELIGIBILITY' AS table_name
+    ,'Member ID' AS drill_down_key
+    ,coalesce(M.member_id, 'NULL') as drill_down_value
+    ,'ELIGIBILITY' AS claim_type
+    ,'BIRTH_DATE' AS field_name
     ,CASE 
-        WHEN CG.FREQUENCY > 1 THEN 'multiple'      
-        WHEN M.BIRTH_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
-        WHEN M.BIRTH_DATE <= cast('1901-01-01' as date) THEN 'invalid'
-        WHEN M.BIRTH_DATE IS NULL THEN 'null'
+        WHEN cg.frequency > 1 THEN 'multiple'
+        WHEN m.birth_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
+        WHEN m.birth_date <= cast('1901-01-01' as date) THEN 'invalid'
+        WHEN m.birth_date IS NULL THEN 'null'
         ELSE 'valid' 
-    END AS BUCKET_NAME
+    END AS bucket_name
     ,CASE 
-        WHEN CG.FREQUENCY > 1 THEN 'multiple'      
-        WHEN M.BIRTH_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
-        WHEN M.BIRTH_DATE <= cast('1901-01-01' as date) THEN 'too old'
+        WHEN Cg.frequency > 1 THEN 'multiple'
+        WHEN m.birth_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
+        WHEN m.birth_date <= cast('1901-01-01' as date) THEN 'too old'
         else null
-    END AS INVALID_REASON
-,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} as {{ dbt.type_string() }}) AS FIELD_VALUE
+    END AS invalid_reason
+,CAST({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) AS field_value
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM BASE M
-LEFT JOIN CLAIM_GRAIN CG ON M.MEMBER_ID = CG.MEMBER_ID AND M.Data_Source = CG.Data_Source
-LEFT JOIN CLAIM_AGG AGG ON M.MEMBER_ID = AGG.MEMBER_ID AND M.Data_Source = AGG.Data_Source
+FROM base m
+left join claim_grain cg on m.member_id = cg.member_id and m.data_source = cg.data_source
+left join claim_agg agg on m.member_id = agg.member_id and m.data_source = agg.data_source
 

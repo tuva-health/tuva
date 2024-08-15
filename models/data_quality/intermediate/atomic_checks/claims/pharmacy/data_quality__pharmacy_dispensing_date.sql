@@ -5,25 +5,25 @@ with tuva_last_run as(
     select cast(substring('{{ var('tuva_last_run') }}',1,10) as date) as tuva_last_run
 )
 SELECT  
-    M.Data_SOURCE
-    ,coalesce(cast(M.PAID_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'PHARMACY_CLAIM' AS TABLE_NAME
-    ,'Claim ID | Claim Line Number' AS DRILL_DOWN_KEY
-    ,COALESCE(CAST(M.CLAIM_ID as {{ dbt.type_string() }}), 'NULL') || '|' || COALESCE(CAST(M.CLAIM_LINE_NUMBER as {{ dbt.type_string() }}), 'NULL') AS DRILL_DOWN_VALUE
-    ,'PHARMACY' AS CLAIM_TYPE
-    ,'DISPENSING_DATE' AS FIELD_NAME
-    ,CASE 
-        WHEN M.DISPENSING_DATE > tuva_last_run THEN 'invalid'
-        WHEN M.DISPENSING_DATE < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} THEN 'invalid'
-        WHEN M.DISPENSING_DATE IS NULL THEN 'null'
-        ELSE 'valid' 
-    END AS BUCKET_NAME
-    ,CASE 
-        WHEN M.DISPENSING_DATE > tuva_last_run THEN 'future'
-        WHEN M.DISPENSING_DATE < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} THEN 'too old'
+    m.data_source
+    ,coalesce(cast(m.paid_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'PHARMACY_CLAIM' AS table_name
+    ,'Claim ID | Claim Line Number' AS drill_down_key
+    ,coalesce(cast(m.claim_id as {{ dbt.type_string() }}), 'null') || '|' || coalesce(cast(m.claim_line_number as {{ dbt.type_string() }}), 'NULL') AS drill_down_value
+    ,'PHARMACY' AS claim_type
+    ,'DISPENSING_DATE' AS field_name
+    ,case
+        when m.dispensing_date > tuva_last_run then 'invalid'
+        when m.dispensing_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'invalid'
+        when m.dispensing_date is null then 'null'
+        else 'valid'
+    end as bucket_name
+    ,case
+        when m.dispensing_date > tuva_last_run then 'future'
+        when m.dispensing_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'too old'
         else null
-        END AS INVALID_REASON
-    ,CAST(DISPENSING_DATE as {{ dbt.type_string() }}) AS FIELD_VALUE
+        end as invalid_reason
+    ,cast(dispensing_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('pharmacy_claim')}} M
+from {{ ref('pharmacy_claim')}} m
 cross join tuva_last_run cte

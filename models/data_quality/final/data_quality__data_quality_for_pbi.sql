@@ -6,68 +6,68 @@
 {% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 
 SELECT
-    DATA_SOURCE,
-    FIELD_NAME,
-    TABLE_NAME,
-    CLAIM_TYPE,
-    BUCKET_NAME,
-    FIELD_VALUE,
-    DRILL_DOWN_KEY,
-    DRILL_DOWN_VALUE,
-    INVALID_REASON,
-    SUMMARY_SK,
-    FREQUENCY,
+    data_source,
+    field_name,
+    table_name,
+    claim_type,
+    bucket_name,
+    field_value,
+    drill_down_key,
+    drill_down_value,
+    invalid_reason,
+    summary_sk,
+    frequency,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_for_pbi') }}
 
 union all
 
 SELECT
-    DATA_SOURCE,
-    FIELD_NAME,
-    TABLE_NAME,
-    'CLINICAL' AS CLAIM_TYPE,
-    BUCKET_NAME,
-    FIELD_VALUE,
-    DRILL_DOWN_KEY,
-    DRILL_DOWN_VALUE,
-    INVALID_REASON,
-    SUMMARY_SK,
-    FREQUENCY,
+    data_source,
+    field_name,
+    table_name,
+    'CLINICAL' AS claim_type,
+    bucket_name,
+    field_value,
+    drill_down_key,
+    drill_down_value,
+    invalid_reason,
+    summary_sk,
+    frequency,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_for_pbi') }}
 
 {% elif var('claims_enabled', False) == true -%}
 
 SELECT
-    DATA_SOURCE,
-    FIELD_NAME,
-    TABLE_NAME,
-    CLAIM_TYPE,
-    BUCKET_NAME,
-    FIELD_VALUE,
-    DRILL_DOWN_KEY,
-    DRILL_DOWN_VALUE,
-    INVALID_REASON,
-    SUMMARY_SK,
-    FREQUENCY,
+    data_source,
+    field_name,
+    table_name,
+    claim_type,
+    bucket_name,
+    field_value,
+    drill_down_key,
+    drill_down_value,
+    invalid_reason,
+    summary_sk,
+    frequency,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_for_pbi') }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
 SELECT
-    DATA_SOURCE,
-    FIELD_NAME,
-    TABLE_NAME,
-    'CLINICAL' AS CLAIM_TYPE,
-    BUCKET_NAME,
-    FIELD_VALUE,
-    DRILL_DOWN_KEY,
-    DRILL_DOWN_VALUE,
-    INVALID_REASON,
-    SUMMARY_SK,
-    FREQUENCY,
+    data_source,
+    field_name,
+    table_name,
+    'CLINICAL' AS claim_type,
+    bucket_name,
+    field_value,
+    drill_down_key,
+    drill_down_value,
+    invalid_reason,
+    summary_sk,
+    frequency,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_for_pbi') }}
 

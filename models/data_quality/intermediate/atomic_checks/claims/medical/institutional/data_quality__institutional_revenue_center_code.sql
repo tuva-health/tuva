@@ -3,24 +3,24 @@
 ) }}
 
 SELECT 
-    M.Data_SOURCE
-    ,coalesce(cast(M.CLAIM_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'MEDICAL_CLAIM' AS TABLE_NAME
-    ,'Claim ID | Claim Line Number' AS DRILL_DOWN_KEY
-    ,COALESCE(CAST(M.CLAIM_ID as {{ dbt.type_string() }}), 'NULL') || '|' || COALESCE(CAST(M.CLAIM_LINE_NUMBER as {{ dbt.type_string() }}), 'NULL') AS DRILL_DOWN_VALUE
-    ,'institutional' AS CLAIM_TYPE
-    ,'REVENUE_CENTER_CODE' AS FIELD_NAME
+    m.data_source
+    ,coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'MEDICAL_CLAIM' AS table_name
+    ,'Claim ID | Claim Line Number' AS drill_down_key
+    ,coalesce(cast(m.claim_id as {{ dbt.type_string() }}), 'null') || '|' || coalesce(cast(m.claim_line_number as {{ dbt.type_string() }}), 'NULL') AS drill_down_value
+    ,'institutional' AS claim_type
+    ,'REVENUE_CENTER_CODE' AS field_name
     ,case 
-          when TERM.REVENUE_CENTER_CODE is not null then 'valid'
-          when M.REVENUE_CENTER_CODE is not null    then 'invalid'      
-                                                    else 'null' end as BUCKET_NAME
+          when term.revenue_center_code is not null then 'valid'
+          when m.revenue_center_code is not null    then 'invalid'
+                                                    else 'null' end as bucket_name
     ,case
-        when M.REVENUE_CENTER_CODE is not null
-            and term.REVENUE_CENTER_CODE is null
+        when m.revenue_center_code is not null
+            and term.revenue_center_code is null
             then 'Revenue center code does not join to Terminology Revenue Center table'
         else null
-    end as INVALID_REASON                        
-    ,CAST(M.REVENUE_CENTER_CODE || '|' || TERM.REVENUE_CENTER_DESCRIPTION as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    ,cast(m.revenue_center_code || '|' || term.revenue_center_description as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-    FROM {{ ref('medical_claim')}} M
-LEFT JOIN {{ ref('terminology__revenue_center')}} AS TERM ON M.REVENUE_CENTER_CODE = TERM.REVENUE_CENTER_CODE
+    from {{ ref('medical_claim')}} m
+left join {{ ref('terminology__revenue_center')}} as term on m.revenue_center_code = term.revenue_center_code

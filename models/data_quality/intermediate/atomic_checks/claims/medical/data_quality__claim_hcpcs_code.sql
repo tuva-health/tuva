@@ -3,23 +3,23 @@
 ) }}
 
 SELECT 
-    M.Data_SOURCE
-    ,coalesce(cast(M.CLAIM_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'MEDICAL_CLAIM' AS TABLE_NAME
-    ,'Claim ID | Claim Line Number' AS DRILL_DOWN_KEY
-    ,COALESCE(CAST(M.CLAIM_ID as {{ dbt.type_string() }}), 'NULL') || '|' || COALESCE(CAST(M.CLAIM_LINE_NUMBER as {{ dbt.type_string() }}), 'NULL') AS DRILL_DOWN_VALUE
-    ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'HCPCS_CODE' AS FIELD_NAME
+    m.data_source
+    ,coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'MEDICAL_CLAIM' AS table_name
+    ,'Claim ID | Claim Line Number' AS drill_down_key
+    ,coalesce(cast(m.claim_id as {{ dbt.type_string() }}), 'null') || '|' || coalesce(cast(m.claim_line_number as {{ dbt.type_string() }}), 'NULL') AS drill_down_value
+    ,m.claim_type as claim_type
+    ,'HCPCS_CODE' AS field_name
     ,case 
-          when TERM.HCPCS is not null then 'valid'
-          when M.HCPCS_CODE is not null then 'invalid'      
-          else 'null' 
-    end as BUCKET_NAME
+          when term.hcpcs is not null then 'valid'
+          when m.hcpcs_code is not null then 'invalid'
+          else 'null'
+    end as bucket_name
     ,case
         when M.HCPCS_CODE is not null AND TERM.HCPCS is null then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
         else null
-     end as INVALID_REASON
-    ,CAST(M.HCPCS_CODE || '|' || COALESCE(TERM.SHORT_DESCRIPTION, '') as {{ dbt.type_string() }}) AS FIELD_VALUE
+     end as invalid_reason
+    ,cast(m.hcpcs_code || '|' || coalesce(term.short_description, '') as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-    FROM {{ ref('medical_claim')}} M
-LEFT JOIN {{ ref('terminology__hcpcs_level_2')}} AS TERM ON M.HCPCS_CODE = TERM.HCPCS
+    from {{ ref('medical_claim')}} m
+left join {{ ref('terminology__hcpcs_level_2')}} as term on m.hcpcs_code = term.hcpcs

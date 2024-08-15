@@ -4,46 +4,46 @@
 }}
 
 WITH CTE AS (
-    SELECT DISTINCT FM.FIELD_NAME
-    ,FM.INPUT_LAYER_TABLE_NAME
-    ,FM.CLAIM_TYPE
-    ,TABLE_CLAIM_TYPE_FIELD_SK
-    FROM {{ ref('data_quality__crosswalk_field_to_mart_sk') }} FM
+    SELECT DISTINCT fm.field_name
+    ,fm.input_layer_table_name
+    ,fm.claim_type
+    ,table_claim_type_field_sk
+    FROM {{ ref('data_quality__crosswalk_field_to_mart_sk') }} fm
 )
 
 SELECT 
-    SUMMARY_SK,
-    FM.TABLE_CLAIM_TYPE_FIELD_SK,
-    DATA_SOURCE,
-    X.TABLE_NAME,
-    X.CLAIM_TYPE,
-    X.FIELD_NAME,
-    SCT.RED,
-    SCT.GREEN,
-    SUM(CASE WHEN BUCKET_NAME = 'valid' THEN 1 ELSE 0 END) as VALID_NUM,
-    SUM(CASE WHEN BUCKET_NAME <> 'null' THEN 1 ELSE 0 END) as FILL_NUM,
-    COUNT(DRILL_DOWN_VALUE) as DENOM,
+    summary_sk,
+    fm.table_claim_type_field_sk,
+    data_source,
+    x.table_name,
+    x.claim_type,
+    x.field_name,
+    sct.red,
+    sct.green,
+    sum(case when bucket_name = 'valid' then 1 else 0 end) as valid_num,
+    sum(case when bucket_name <> 'null' then 1 else 0 end) as fill_num,
+    count(drill_down_value) as denom,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM
-    {{ ref('data_quality__data_quality_detail') }} X
+    {{ ref('data_quality__data_quality_detail') }} x
 LEFT JOIN CTE FM 
-    ON X.FIELD_NAME = FM.FIELD_NAME
-    AND
-    FM.INPUT_LAYER_TABLE_NAME = X.TABLE_NAME
-    AND
-    FM.CLAIM_TYPE = X.CLAIM_TYPE
-LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} SCT
-    ON X.FIELD_NAME = SCT.FIELD_NAME
-    AND
-    SCT.INPUT_LAYER_TABLE_NAME = X.TABLE_NAME
-    AND
-    SCT.CLAIM_TYPE = x.CLAIM_TYPE
+    on x.field_name = fm.field_name
+    and
+    fm.input_layer_table_name = x.table_name
+    and
+    fm.claim_type = x.claim_type
+LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} sct
+    on x.field_name = sct.field_name
+    and
+    sct.input_layer_table_name = x.table_name
+    and
+    sct.claim_type = x.claim_type
 GROUP BY 
-    SUMMARY_SK,
-    DATA_SOURCE,
-    FM.TABLE_CLAIM_TYPE_FIELD_SK,
-    X.CLAIM_TYPE,
-    X.TABLE_NAME,
-    X.FIELD_NAME,
-    SCT.RED,
-    SCT.GREEN
+    summary_sk,
+    data_source,
+    fm.table_claim_type_field_sk,
+    x.claim_type,
+    x.table_name,
+    x.field_name,
+    sct.red,
+    sct.green
