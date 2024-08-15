@@ -102,6 +102,8 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.4','gender.csv',compression=true,null_marker=true) }}"
       terminology__hcpcs_level_2:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.4','hcpcs_level_2.csv',compression=true,null_marker=true) }}"
+      terminology__hcpcs_to_rbcs:
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.5','hcpcs_to_rbcs.csv',compression=true,null_marker=true) }}"      
       terminology__icd_10_cm:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.4','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
@@ -220,9 +222,6 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.4','quality_measures_measures.csv',compression=true,null_marker=true) }}"
         quality_measures__value_sets:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.4','quality_measures_value_set_codes.csv',compression=true,null_marker=true) }}"
-      rbcs:
-        rbcs__hcpcs_to_rbcs:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.4','rbcs_hcpcs_to_rbcs.csv',compression=true,null_marker=true) }}"
       readmissions:
         readmissions__acute_diagnosis_ccs:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.4','acute_diagnosis_ccs.csv',compression=true,null_marker=true) }}"
