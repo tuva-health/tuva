@@ -37,7 +37,7 @@ SELECT DISTINCT
     ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     ,'ELIGIBILITY' AS table_name
     ,'Member ID' AS drill_down_key
-    ,coalesce(M.member_id, 'NULL') as drill_down_value
+    ,coalesce(m.member_id, 'NULL') as drill_down_value
     ,'ELIGIBILITY' AS claim_type
     ,'BIRTH_DATE' AS field_name
     ,CASE 

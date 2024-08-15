@@ -8,7 +8,7 @@ SELECT
     ,'MEDICAL_CLAIM' AS table_name
     ,'Claim ID | Claim Line Number' AS drill_down_key
     ,coalesce(cast(m.claim_id as {{ dbt.type_string() }}), 'null') || '|' || coalesce(cast(m.claim_line_number as {{ dbt.type_string() }}), 'NULL') AS drill_down_value
-    ,M.CLAIM_TYPE AS claim_type
+    ,m.claim_type as claim_type
     ,'ALLOWED_AMOUNT' AS field_name
     ,case when m.allowed_amount is null then 'null'
                                     else 'valid' end as bucket_name

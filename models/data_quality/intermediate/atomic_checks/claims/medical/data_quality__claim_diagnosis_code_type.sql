@@ -14,7 +14,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
           when term.code_type is null then 'invalid'
                              else 'valid' end as bucket_name
     ,case
-        when M.DIAGNOSIS_CODE_TYPE is not null and TERM.CODE_TYPE is null then 'Diagnosis Code Type does not join to Terminology Code Type table'
+        when m.diagnosis_code_type is not null and term.code_type is null then 'Diagnosis Code Type does not join to Terminology Code Type table'
         else null
     end as invalid_reason
     ,cast(m.diagnosis_code_type as {{ dbt.type_string() }}) as field_value
