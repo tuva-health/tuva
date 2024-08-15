@@ -223,67 +223,67 @@ seeds:
       tags: terminology
       enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
-        HCPCS_Cd: |
+        hcpcs_cd: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_ID: |
+        rbcs_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_Cat: |
+        rbcs_cat: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_Cat_Desc: |
+        rbcs_cat_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_Cat_Subcat: |
+        rbcs_cat_subcat: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_Subcat_Desc: |
+        rbcs_subcat_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_FamNumb: |
+        rbcs_famnumb: |
           {%- if target.type in ("bigquery", "databricks") -%} numeric {%- else -%} numeric {%- endif -%}
-        RBCS_Family_Desc: |
+        rbcs_family_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        RBCS_Major_Ind: |
+        rbcs_major_ind: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
-        HCPCS_Cd_Add_Dt: |
+        hcpcs_cd_add_dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
-        HCPCS_Cd_End_Dt: |
+        hcpcs_cd_end_dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
-        RBCS_Assignment_Eff_Dt: |
+        rbcs_assignment_eff_dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
         current_flag: |
           {%- if target.type in ("bigquery", "databricks") -%} numeric {%- else -%} numeric {%- endif -%}
     columns:
-      - name: HCPCS_Cd
+      - name: hcpcs_cd
         description: HCPCS or CPT code.
-      - name: RBCS_ID
+      - name: rbcs_id
         description: |
           RBCS identifier which is comprised of 6 characters. The first 
           character identifies the category; the second character identifies
           the subcategory; the third, fourth, and fifth characters identify
           the family, and the sixth character identifies whether the service
           is a major procedure.
-      - name: RBCS_Cat
+      - name: rbcs_cat
         description: First character for the RBCS taxonomy ID, which represents the RBCS ID category.
-      - name: RBCS_Cat_Desc
+      - name: rbcs_cat_desc
         description: Category description.
-      - name: RBCS_Cat_Subcat
+      - name: rbcs_cat_subcat
         description: First 2 characters for the RBCS taxonomy ID, which represents the RBCS ID's category and subcategory.
-      - name: RBCS_Subcat_Desc
+      - name: rbcs_subcat_desc
         description: Subcategory description.
-      - name: RBCS_FamNumb
+      - name: rbcs_famnumb
         description: Third, fourth, and fifth characters, which represents the RBCS family number.
-      - name: RBCS_Family_Desc
+      - name: rbcs_family_desc
         description: Family description.
-      - name: RBCS_Major_Ind
+      - name: rbcs_major_ind
         description: |
           Sixth character for the RBCS taxonomy ID, which identifies whether
           the HCPCS code is a Major procedure (M), Other (O), or non-procedure
           code (N).
-      - name: HCPCS_Cd_Add_Dt
+      - name: hcpcs_cd_add_dt
         description: HCPCS Code Effective Date.
-      - name: HCPCS_Cd_End_Dt
+      - name: hcpcs_cd_end_dt
         description: HCPCS Code End Date.
-      - name: RBCS_Assignment_Eff_Dt
+      - name: rbcs_assignment_eff_dt
         description: Provides users with the earliest date that the RBCS ID is effective.
       - name: current_flag
-        description: Flag where 1 = the current version of the RBCS for that particular HCPCS_CD, 0 = old version. 
+        description: Flag where 1 = the current version of the RBCS for that particular HCPCS_CD, 0 = old version.
 
   - name: terminology__icd_9_cm
     description: 'Seed containing ICD-9-CM codes and descriptions.'
