@@ -297,6 +297,17 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: urgent_care__encounter_grain
+    description: one row per urgent care encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
 ## Intermediate
 ## acute inpatient
   - name: acute_inpatient__generate_encounter_id
