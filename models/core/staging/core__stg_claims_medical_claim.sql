@@ -78,6 +78,8 @@ with medical_claim_stage as(
     inner join {{ ref('service_category__service_category_grouper') }} srv_group
         on med.claim_id = srv_group.claim_id
         and med.claim_line_number = srv_group.claim_line_number
+        and
+        srv_group.duplicate_row_number = 1
     inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on med.claim_id = x.claim_id
     and
     med.claim_line_number = x.claim_line_number

@@ -183,6 +183,15 @@ select claim_id
 ,10 as priority_number
 from {{ ref('office_visits__int_office_visits') }}
 
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'urgent care' as encounter_type
+,11 as priority_number --urgent care needs to be lower than ed and inpatient
+from {{ ref('urgent_care__match_claims_to_anchor') }}
+
 )
 
 select 

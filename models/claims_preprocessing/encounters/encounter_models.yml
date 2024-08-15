@@ -591,6 +591,38 @@ models:
       - claims_preprocessing
       - encounters
 
+  - name: urgent_care__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - urgent_care
+
+  - name: urgent_care__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - urgent_care
+
+  - name: urgent_care__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - urgent_care
 
 ## Staging
   - name: encounters__stg_medical_claim
