@@ -10,7 +10,7 @@ with base as (
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["discharge_disposition_code", "'|'", "coalesce(term.discharge_disposition_description, '')"]) }} as field
+        , {{ dbt.concat(["base.discharge_disposition_code", "'|'", "coalesce(term.discharge_disposition_description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__discharge_disposition')}} as term on base.discharge_disposition_code = term.discharge_disposition_code

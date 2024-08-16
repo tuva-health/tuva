@@ -25,7 +25,7 @@ select
             then 'Place of Service Code does not join to Terminology Place of Service table'
         else null
     end as invalid_reason
-    . {{ dbt.concat(["m.place_of_service_code", "'|'", "coalesce(term.place_of_service_description, '')"]) }} as field_value
+    , {{ dbt.concat(["m.place_of_service_code", "'|'", "coalesce(term.place_of_service_description, '')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from base m
 left join {{ ref('terminology__place_of_service')}} as term on m.place_of_service_code = term.place_of_service_code
