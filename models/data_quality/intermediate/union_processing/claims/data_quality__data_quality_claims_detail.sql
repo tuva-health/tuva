@@ -3,7 +3,7 @@
    )
 }}
 
-WITH CTE as (
+WITH cte as (
 SELECT
     cast(data_source as {{ dbt.type_string() }}) as data_source
 	, cast(source_date as {{ dbt.type_string() }}) as source_date
@@ -1529,5 +1529,5 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
 	, cast(field_value as {{ dbt.type_string() }}) as field_value
 	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
-,DENSE_RANK() OVER (ORDER BY DATA_SOURCE, TABLE_NAME, CLAIM_TYPE, FIELD_NAME) as SUMMARY_SK
-FROM CTE
+,DENSE_RANK() OVER (ORDER BY data_source, table_name, claim_type, field_name) as summary_sk
+FROM cte
