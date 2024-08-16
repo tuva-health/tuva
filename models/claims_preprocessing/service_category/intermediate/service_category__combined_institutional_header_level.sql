@@ -189,6 +189,15 @@ select   claim_id
 , source_model_name
 from {{ ref('service_category__inpatient_rehab_institutional') }}
 
+union all
+
+select   claim_id
+, service_category_2
+, service_category_3
+, tuva_last_run
+, source_model_name
+from {{ ref('service_category__outpatient_rehab_institutional') }}
+
 )
 
 

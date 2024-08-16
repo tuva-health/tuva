@@ -3,10 +3,11 @@
    )
 }}
 
+with multiple_sources as (
 select distinct 
     med.claim_id
-    , 'Ambulatory Sugery Center' as service_category_2
-    , 'Ambulatory Sugery Center' as service_category_3
+    , 'Ambulatory Surgery Center' as service_category_2
+    , 'Ambulatory Surgery Center' as service_category_3
     , '{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
@@ -14,3 +15,23 @@ inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatien
     on med.claim_id = outpatient.claim_id
 where revenue_center_code in ('0490','0499')
 
+union 
+
+select distinct 
+    med.claim_id
+    , 'Ambulatory Surgery Center' as service_category_2
+    , 'Ambulatory Surgery Center' as service_category_3
+    , '{{ this.name }}' as source_model_name
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }} med
+inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatient
+    on med.claim_id = outpatient.claim_id
+where med.primary_taxonomy_code = '261QA1903X'
+)
+
+select distinct claim_id
+,service_category_2
+,service_category_3
+,source_model_name
+,tuva_last_run
+from multiple_sources

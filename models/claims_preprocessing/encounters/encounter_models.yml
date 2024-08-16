@@ -308,6 +308,50 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: outpatient_psych__encounter_grain
+    description: one row per outpatient psych encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: outpatient_rehab__encounter_grain
+    description: one row per outpatient rehab encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+  
+  - name: outpatient_hospital_or_clinic__encounter_grain
+    description: one row per outpatient rehab encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: asc__encounter_grain
+    description: one row per asc encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
 ## Intermediate
 ## acute inpatient
   - name: acute_inpatient__generate_encounter_id
@@ -343,7 +387,7 @@ models:
         - claims_preprocessing
         - encounters
 
-## acute inpatient
+## ed
   - name: emergency_department__generate_encounter_id
     description: generate encounter id and stitch inpatient psych claims together
     config:
@@ -633,7 +677,150 @@ models:
       tags:
       - claims_preprocessing
       - encounters
-      - urgent_care
+
+  - name: outpatient_psych__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_psych
+
+  - name: outpatient_psych__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_psych
+
+  - name: outpatient_psych__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_psych
+
+  - name: outpatient_rehab__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_rehab
+
+  - name: outpatient_rehab__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_rehab
+
+  - name: outpatient_rehab__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_rehab
+
+  - name: outpatient_hospital_or_clinic__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_hospital_or_clinic
+
+  - name: outpatient_hospital_or_clinic__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_hospital_or_clinic
+
+  - name: outpatient_hospital_or_clinic__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_hospital_or_clinic
+
+
+  - name: asc__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - asc
+
+  - name: asc__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - asc
+
+  - name: asc__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - asc
+
+  - name: asc__start_end_dates
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - asc
 
 ## Staging
   - name: encounters__stg_medical_claim

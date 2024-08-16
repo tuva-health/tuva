@@ -28,7 +28,7 @@ select distinct
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'professional'
-and hcpcs in ('S9088','99051','S9083')
+and hcpcs_code in ('S9088','99051','S9083')
 
 )
 
@@ -36,9 +36,10 @@ and hcpcs in ('S9088','99051','S9083')
 select distinct 
 claim_id
 ,claim_line_number
+,claim_line_id
 ,service_category_2
 ,service_category_3
 ,source_model_name
 ,tuva_last_run
-from multiple_sources
+from multiple_source
   

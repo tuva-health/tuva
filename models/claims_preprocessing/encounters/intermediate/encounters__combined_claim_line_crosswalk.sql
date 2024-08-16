@@ -192,6 +192,43 @@ select claim_id
 ,11 as priority_number --urgent care needs to be lower than ed and inpatient
 from {{ ref('urgent_care__match_claims_to_anchor') }}
 
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient psych' as encounter_type
+,12 as priority_number 
+from {{ ref('outpatient_psych__match_claims_to_anchor') }}
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient rehab' as encounter_type
+,13 as priority_number 
+from {{ ref('outpatient_rehab__match_claims_to_anchor') }}
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'ambulatory surgery center' as encounter_type
+,14 as priority_number 
+from {{ ref('asc__match_claims_to_anchor') }}
+
+union
+
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient hospital or clinic' as encounter_type
+,999 as priority_number 
+from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }} --lowest outpatient priority, roll up to more specific encounter type when available
+
 )
 
 select 

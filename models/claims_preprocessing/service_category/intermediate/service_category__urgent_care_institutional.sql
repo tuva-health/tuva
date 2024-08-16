@@ -26,7 +26,7 @@ select distinct
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 where claim_type = 'institutional'
-  and hcpcs in ('S9088','99051','S9083',)
+  and hcpcs_code in ('S9088','99051','S9083')
 
 )
 
