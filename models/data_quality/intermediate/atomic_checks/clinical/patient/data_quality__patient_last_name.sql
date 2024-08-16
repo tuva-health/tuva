@@ -3,17 +3,15 @@
 ) }}
 
 
-            SELECT
-                M.Data_SOURCE
-                ,coalesce(current_date,cast('1900-01-01' as date)) AS SOURCE_DATE
-                ,'PATIENT' AS TABLE_NAME
-                ,'Patient ID' as DRILL_DOWN_KEY
-                , coalesce(patient_id, 'NULL') AS DRILL_DOWN_VALUE
-                -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-                ,'LAST_NAME' AS FIELD_NAME
-                ,case when M.LAST_NAME is not null then 'valid' else 'null' end as BUCKET_NAME
-                ,cast(null as {{ dbt.type_string() }}) as INVALID_REASON
-                ,CAST(LAST_NAME as {{ dbt.type_string() }}) AS FIELD_VALUE
-                , '{{ var('tuva_last_run')}}' as tuva_last_run
-            FROM {{ ref('patient')}} M
-            
+SELECT
+      m.data_source
+    , coalesce(current_date,cast('1900-01-01' as date)) as source_date
+    , 'PATIENT' AS table_name
+    , 'Patient ID' as drill_down_key
+    , coalesce(patient_id, 'NULL') AS drill_down_value
+    , 'LAST_NAME' AS field_name
+    , case when m.last_name is not null then 'valid' else 'null' end as bucket_name
+    , cast(null as {{ dbt.type_string() }}) as invalid_reason
+    , cast(last_name as {{ dbt.type_string() }}) as field_value
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from {{ ref('patient')}} m

@@ -4,21 +4,20 @@
 
 
 SELECT
-    M.Data_SOURCE
-    ,coalesce(M.RESULT_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
-    ,'LAB_RESULT' AS TABLE_NAME
-    ,'Lab Result ID' as DRILL_DOWN_KEY
-    , coalesce(lab_result_id, 'NULL') AS DRILL_DOWN_VALUE
-    -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'NORMALIZED_CODE' AS FIELD_NAME
-    ,case when TERM.loinc is not null then 'valid'
-          when M.NORMALIZED_CODE is not null then 'invalid'
-          else 'null' 
-    end as BUCKET_NAME
-    ,case when M.NORMALIZED_CODE is not null and TERM.loinc is null
-          then 'Normalized code does not join to Terminology loinc table'
-    else null end as INVALID_REASON
-    ,CAST(NORMALIZED_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
+      m.data_source
+    , coalesce(m.result_date,cast('1900-01-01' as date)) as source_date
+    , 'LAB_RESULT' AS table_name
+    , 'Lab Result ID' as drill_down_key
+    , coalesce(lab_result_id, 'NULL') AS drill_down_value
+    , 'NORMALIZED_CODE' as field_name
+    , case when term.loinc is not null then 'valid'
+          when m.normalized_code is not null then 'invalid'
+          else 'null'
+    end as bucket_name
+    , case when m.normalized_code is not null and term.loinc is null
+           then 'Normalized code does not join to Terminology loinc table'
+           else null end as invalid_reason
+    , cast(normalized_code as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('lab_result')}} M
-LEFT JOIN {{ ref('terminology__loinc')}} term on m.NORMALIZED_CODE = term.loinc
+from {{ ref('lab_result')}} m
+left join {{ ref('terminology__loinc')}} term on m.normalized_code = term.loinc

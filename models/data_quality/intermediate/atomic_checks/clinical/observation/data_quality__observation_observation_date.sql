@@ -4,24 +4,23 @@
 
 
 SELECT
-    M.Data_SOURCE
-    ,coalesce(M.OBSERVATION_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
-    ,'OBSERVATION' AS TABLE_NAME
-    ,'Observation ID' as DRILL_DOWN_KEY
-    , coalesce(observation_id, 'NULL') AS DRILL_DOWN_VALUE
-    -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'OBSERVATION_DATE' AS FIELD_NAME
-    ,CASE 
-        WHEN M.OBSERVATION_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
-        WHEN M.OBSERVATION_DATE <= cast('1901-01-01' as date) THEN 'invalid'
-        WHEN M.OBSERVATION_DATE IS NULL THEN 'null'
-        ELSE 'valid' 
-    END AS BUCKET_NAME
-    ,CASE 
-        WHEN M.OBSERVATION_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
-        WHEN M.OBSERVATION_DATE <= cast('1901-01-01' as date) THEN 'too old'
+      m.data_source
+    , coalesce(m.observation_date,cast('1900-01-01' as date)) as source_date
+    , 'OBSERVATION' AS table_name
+    , 'Observation ID' as drill_down_key
+    , coalesce(observation_id, 'NULL') AS drill_down_value
+    , 'OBSERVATION_DATE' as field_name
+    , case
+        when m.observation_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'invalid'
+        when m.observation_date <= cast('1901-01-01' as date) then 'invalid'
+        when m.observation_date is null then 'null'
+        else 'valid'
+    end as bucket_name
+    , case
+        when m.observation_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'future'
+        when m.observation_date <= cast('1901-01-01' as date) then 'too old'
         else null
-    END AS INVALID_REASON
-    ,CAST(OBSERVATION_DATE as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    , cast(observation_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('observation')}} M
+from {{ ref('observation')}} m

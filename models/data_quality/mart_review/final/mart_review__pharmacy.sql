@@ -19,12 +19,16 @@ dedup_loc AS (
     FROM {{ ref('core__location')}}
 )
 
-SELECT 
+SELECT
     p.claim_id,
     p.claim_line_number,
     p.patient_id,
     p.data_source,
-    p.patient_id || '|' || p.data_source AS patient_source_key,
+    {{ dbt.concat([
+        'p.patient_id',
+        "'|'",
+        'p.data_source'
+    ]) }} as patient_source_key,
     p.ndc_code,
     COALESCE(n.fda_description, n.rxnorm_description) AS ndc_description,
     p.paid_amount,
