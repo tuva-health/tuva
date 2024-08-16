@@ -9,23 +9,23 @@ with base as (
 )
 
 select
-    m.data_source
-    ,coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
-    ,'MEDICAL_CLAIM' AS table_name
-    ,'Claim ID | Claim Line Number' AS drill_down_key
-    ,coalesce(cast(m.claim_id as {{ dbt.type_string() }}), 'null') || '|' || coalesce(cast(m.claim_line_number as {{ dbt.type_string() }}), 'NULL') AS drill_down_value
-    ,'professional' AS claim_type
-    ,'FACILITY_NPI' AS field_name
-    ,case when term.npi is not null          then        'valid'
+      m.data_source
+    , coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    , 'MEDICAL_CLAIM' AS table_name
+    , 'Claim ID | Claim Line Number' AS drill_down_key
+    , {{ dbt.concat(["coalesce(m.claim_id, 'null')", "'|'", "coalesce(m.claim_line_number, 'NULL')"]) }} as drill_down_value
+    , 'professional' AS claim_type
+    , 'FACILITY_NPI' AS field_name
+    , case when term.npi is not null          then        'valid'
           when m.facility_npi is not null    then 'invalid'
                                              else 'null' end as bucket_name
-    ,case
+    , case
         when m.facility_npi is not null
             and term.npi is null
             then 'Facility NPI does not join to Terminology Provider Table'
         else null
     end as invalid_reason
-    ,cast(m.facility_npi as {{ dbt.type_string() }}) as field_value
+    , cast(m.facility_npi as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from base m
 left join {{ ref('terminology__provider')}} as term on m.facility_npi = term.npi

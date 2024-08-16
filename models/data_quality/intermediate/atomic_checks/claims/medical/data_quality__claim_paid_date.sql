@@ -8,27 +8,27 @@ with tuva_last_run as(
 
 )
 SELECT  
-    m.data_source
-    ,coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
-    ,'MEDICAL_CLAIM' AS table_name
-    ,'Claim ID | Claim Line Number' AS drill_down_key
-    ,coalesce(cast(m.claim_id as {{ dbt.type_string() }}), 'null') || '|' || coalesce(cast(m.claim_line_number as {{ dbt.type_string() }}), 'NULL') AS drill_down_value
-    ,m.claim_type as claim_type
-    ,'PAID_DATE' AS field_name
-    ,case
+      m.data_source
+    , coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    , 'MEDICAL_CLAIM' AS table_name
+    , 'Claim ID | Claim Line Number' AS drill_down_key
+    , {{ dbt.concat(["coalescem.claim_id, 'null')", "'|'", "coalesce(m.claim_line_number, 'NULL')"]) }} as drill_down_value
+    , m.claim_type as claim_type
+    , 'PAID_DATE' AS field_name
+    , case
         when m.paid_date > tuva_last_run then 'invalid'
         when m.paid_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'invalid'
         when m.paid_date < m.claim_start_date then 'invalid'
         when m.paid_date is null then 'null'
         else 'valid'
     end as bucket_name
-    ,case
+    , case
         when m.paid_date > tuva_last_run then 'future'
         when m.paid_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'too old'
         when m.paid_date < m.claim_start_date then 'paid date before claim start date'
         else null
     end as invalid_reason
-    ,cast(claim_line_start_date as {{ dbt.type_string() }}) as field_value
+    , cast(claim_line_start_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim')}} m
 cross join tuva_last_run cte

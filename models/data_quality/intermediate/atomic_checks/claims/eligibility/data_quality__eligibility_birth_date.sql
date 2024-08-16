@@ -48,7 +48,7 @@ SELECT DISTINCT
         ELSE 'valid' 
     END AS bucket_name
     ,CASE 
-        WHEN Cg.frequency > 1 THEN 'multiple'
+        WHEN cg.frequency > 1 THEN 'multiple'
         WHEN m.birth_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
         WHEN m.birth_date <= cast('1901-01-01' as date) THEN 'too old'
         else null

@@ -10,8 +10,14 @@ SELECT DISTINCT
     ,coalesce(m.member_id, 'NULL') as drill_down_value
     ,'ELIGIBILITY' AS claim_type
     ,'PLAN' AS field_name
+    {% if target.type == 'fabric' %}
+    ,case when m."plan" is not null then 'valid' else 'null' end as bucket_name
+    ,cast(null as {{ dbt.type_string() }}) as invalid_reason
+    ,cast(m."plan" as {{ dbt.type_string() }}) as field_value
+    {% else %}
     ,case when m.plan is not null then 'valid' else 'null' end as bucket_name
     ,cast(null as {{ dbt.type_string() }}) as invalid_reason
     ,cast(m.plan as {{ dbt.type_string() }}) as field_value
+    {% endif %}
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility')}} m
