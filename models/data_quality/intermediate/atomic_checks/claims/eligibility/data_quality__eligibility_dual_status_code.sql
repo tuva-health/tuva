@@ -2,12 +2,12 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-SELECT DISTINCT 
+SELECT DISTINCT
     m.data_source
     ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     ,'ELIGIBILITY' AS table_name
     ,'Member ID | Enrollment Start Date' AS drill_down_key
-        ,coalesce(M.Member_ID, 'NULL') as drill_down_value
+        ,coalesce(m.member_id, 'NULL') as drill_down_value
     ,'ELIGIBILITY' AS claim_type
     ,'DUAL_STATUS_CODE' AS field_name
     ,case when m.dual_status_code is null then 'null'

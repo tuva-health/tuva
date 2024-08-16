@@ -9,7 +9,7 @@ from {{ ref('data_quality__stg_institutional_inpatient') }}
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["admit_type_code", "'|'", "coalesce(term.admit_type_description, '')"]) }} as field
+        , {{ dbt.concat(["base.admit_type_code", "'|'", "coalesce(term.admit_type_description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__admit_type')}} as term on base.admit_type_code = term.admit_type_code
@@ -53,7 +53,7 @@ select distinct -- to bring to claim_id grain
             and term.admit_type_code is null
             and cg.frequency = 1
             then 'Admit Type Code does not join to Terminology Admit Type table'
-        else null 
+        else null
     end as invalid_reason
     , cast({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run

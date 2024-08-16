@@ -7,7 +7,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
     ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     ,'ELIGIBILITY' AS table_name
     ,'Member ID | Enrollment Start Date' AS drill_down_key
-    ,coalesce(M.Member_ID, 'NULL') as drill_down_value
+    ,coalesce(m.member_id, 'NULL') as drill_down_value
     ,'ELIGIBILITY' AS claim_type
     ,'ZIP_CODE' AS field_name
     {% if target.type == 'fabric' %}

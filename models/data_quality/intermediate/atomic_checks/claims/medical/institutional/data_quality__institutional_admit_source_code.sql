@@ -9,7 +9,7 @@ from {{ ref('data_quality__stg_institutional_inpatient') }}
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["admit_source_code", "'|'", "coalesce(term.admit_source_description, '')"]) }} as field
+        , {{ dbt.concat(["base.admit_source_code", "'|'", "coalesce(term.admit_source_description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__admit_source')}} as term on base.admit_source_code = term.admit_source_code
@@ -52,7 +52,7 @@ select distinct -- to bring to claim_id grain
         when m.admit_source_code is not null
             and term.admit_source_code is null
             and cg. frequency = 1
-            then 'Admit source code does not join to Terminology Admit Source table' 
+            then 'Admit source code does not join to Terminology Admit Source table'
         else null
     end as invalid_reason
     , cast({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) as field_value

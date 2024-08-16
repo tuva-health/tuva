@@ -16,7 +16,7 @@ SELECT
           else 'null'
     end as bucket_name
     , case
-        when M.HCPCS_CODE is not null AND TERM.HCPCS is null then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
+        when m.hcpcs_code is not null and term.hcpcs is null then 'HCPCS does not join to Terminology HCPCS_LEVEL_2 table'
         else null
      end as invalid_reason
     , {{ dbt.concat(["m.hcpcs_code", "'|'", "coalesce(term.short_description, '')"]) }} as field_value

@@ -19,7 +19,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
             then 'NDC Code does not join to Terminology NDC table'
         else null
     end as invalid_reason
-    , {{ dbt_concat(["m.ndc_code", "'|'", "coalesce(term.rxnorm_description, term.fda_description, '')"]) }} as field_value
+    , {{ dbt.concat(["m.ndc_code", "'|'", "coalesce(term.rxnorm_description, term.fda_description, '')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy_claim')}} m
 left join {{ ref('terminology__ndc')}} as term on m.ndc_code = term.ndc
