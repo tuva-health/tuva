@@ -11,7 +11,7 @@ WITH CTE AS (
     FROM {{ ref('data_quality__crosswalk_field_to_mart_sk') }} fm
 )
 
-SELECT 
+SELECT
     summary_sk,
     fm.table_claim_type_field_sk,
     data_source,
@@ -26,7 +26,7 @@ SELECT
     '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM
     {{ ref('data_quality__data_quality_detail') }} x
-LEFT JOIN CTE FM 
+LEFT JOIN CTE fm
     on x.field_name = fm.field_name
     and
     fm.input_layer_table_name = x.table_name
@@ -38,7 +38,7 @@ LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} sct
     sct.input_layer_table_name = x.table_name
     and
     sct.claim_type = x.claim_type
-GROUP BY 
+GROUP BY
     summary_sk,
     data_source,
     fm.table_claim_type_field_sk,
