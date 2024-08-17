@@ -108,7 +108,7 @@ models:
       corresponding HCC model version and payment year.
     tests:
       - unique:
-          column_name: "(patient_id||'-'||model_version)"
+          column_name: {{ dbt.concat(["patient_id", "'|'", "model_version"]) }}
     columns:
       - name: patient_id
         description: Unique ID for the patient.

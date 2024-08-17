@@ -20,7 +20,7 @@ models:
       materialized: table
     tests:
       - unique:
-          column_name: "(patient_id || '_' || condition)"
+          column_name: {{ dbt.concat(["patient_id", "'_'", "condition"]) }}
     columns:
         - name: patient_id
           description: The unique identifier for a patient
