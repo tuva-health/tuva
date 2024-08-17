@@ -20,7 +20,7 @@ SELECT
     , case
         when m.result_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'future'
         when m.result_date <= cast('1901-01-01' as date) then 'too old'
-        WHEN M.RESULT_DATE < M.COLLECTION_DATE THEN 'Result date before collection date'
+        when m.result_date < m.collection_date then 'Result date before collection date'
         else null
     end as invalid_reason
     , cast(result_date as {{ dbt.type_string() }}) as field_value

@@ -13,4 +13,4 @@ SELECT
     , cast(null as {{ dbt.type_string() }}) as invalid_reason
     , cast(claim_id as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('condition')}} M
+FROM {{ ref('condition')}} m

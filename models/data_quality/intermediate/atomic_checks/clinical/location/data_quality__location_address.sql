@@ -5,7 +5,7 @@
 
 SELECT
       m.data_source
-    , coalesce(current_date,cast('1900-01-01' as date)) as source_date
+    , coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as date)) as source_date
     , 'LOCATION' AS table_name
     , 'Location ID' as drill_down_key
     , coalesce(location_id, 'NULL') AS drill_down_value

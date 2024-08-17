@@ -20,7 +20,11 @@ SELECT
     e.paid_amount,
     e.primary_diagnosis_code,
     e.primary_diagnosis_description,
-    e.primary_diagnosis_code || ' | ' || e.primary_diagnosis_description as primary_diagnosis_and_description,
+    {{ dbt.concat([
+        'e.primary_diagnosis_code',
+        "' | '",
+        'e.primary_diagnosis_description'
+    ]) }} as primary_diagnosis_and_description,
     p.ccsr_parent_category,
     p.ccsr_category,
     p.ccsr_category_description,
