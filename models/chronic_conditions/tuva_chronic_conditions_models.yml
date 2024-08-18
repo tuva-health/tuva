@@ -19,7 +19,7 @@ models:
         - chronic_conditions
       materialized: table
     tests:
-      - unique_combination_of_columns:
+      - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - patient_id
             - condition

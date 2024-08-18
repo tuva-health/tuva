@@ -60,10 +60,10 @@ with denominator as (
         on labs.patient_id = denominator.patient_id
     where coalesce(collection_date,result_date) <= denominator.performance_period_end
    {% if target.type == 'fabric' %}
-        WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
+        and result LIKE '%.%' OR result LIKE '%[0-9]%'
         AND result NOT LIKE '%[^0-9.]%'
     {% else %}
-        where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
+        and {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
     {% endif %}
 
 )
