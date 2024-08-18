@@ -99,24 +99,29 @@ with cholesterol_codes as (
     , labs.result as evidence_value
     , coalesce(collection_date, result_date) as evidence_date
     , cholesterol_codes.concept_name
-    , row_number() over(partition by labs.patient_id order by 
+    , row_number() over(partition by labs.patient_id order by
                           labs.result desc
                         , result_date desc) as rn
     from labs
     inner join cholesterol_codes
       on coalesce(labs.normalized_code, labs.source_code) = cholesterol_codes.code
         and coalesce(labs.normalized_code_type, labs.source_code_type) = cholesterol_codes.code_system
-    where {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
+   {% if target.type == 'fabric' %}
+        WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
+        AND result NOT LIKE '%[^0-9.]%'
+    {% else %}
+        where {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
+    {% endif %}
 
 )
 
 , cholesterol_labs as (
 
-    select 
+    select
           patient_id
         , evidence_date
     from cholesterol_tests_with_result
-    where rn= 1 
+    where rn= 1
         and cast(evidence_value as {{ dbt.type_numeric() }}) >= 190
 
 )
@@ -153,7 +158,7 @@ with cholesterol_codes as (
         , performance_period_end
         , measure_id
         , measure_name
-        , measure_version 
+        , measure_version
     from all_patients_with_cholesterol
     inner join {{ref('quality_measures__int_cqm438__performance_period')}} pp
     on evidence_date <= pp.performance_period_end
@@ -173,7 +178,7 @@ with cholesterol_codes as (
 
 )
 
-select 
+select
       patient_id
     , performance_period_begin
     , performance_period_end

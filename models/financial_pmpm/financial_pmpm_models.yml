@@ -13,9 +13,11 @@ models:
         - financial_pmpm
       materialized: table
     tests:
-       - unique:
-           column_name: |
-            {{ dbt.concat(["patient_id", "'_'", "year_month", "'_'", "plan"]) }}
+      - unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - year_month
+            - plan
     description: >
       Computes all the paid and allowed statistics for every patient_id and year_month combination.
     columns:
