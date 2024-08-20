@@ -432,7 +432,7 @@ models:
         description: Patient's maximum age during encounter as of the performance_period.
       - name: qualifying_types
         description: Indicative letter of patient's type of encounter.
-      
+
   - name: quality_measures__int_nqf0034_exclude_colectomy_cancer
     config:
       schema: |
@@ -453,7 +453,7 @@ models:
           from the measure.
       - name: exclusion_type
         description: Measure specific exclusion for historical record of colectomy cancer.
-      - name: tuva_last_run 
+      - name: tuva_last_run
         desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0034_exclusions
@@ -464,7 +464,7 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of NQF 0034, Colorectal Cancer Screening.      
+      Combined exclusion logic for the reporting version of NQF 0034, Colorectal Cancer Screening.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
@@ -535,7 +535,7 @@ models:
         description: Version of the measure.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
-      
+
   - name: quality_measures__int_nqf0034_numerator
     config:
       schema: |
@@ -565,7 +565,7 @@ models:
       materialized: view
     description: >
       Performance Period definition for NQF 0034 Colorectal Cancer screening.
-    
+
 ### Diabetes Hemoglobin a1c
   - name: quality_measures__int_nqf0059__performance_period
     config:
@@ -968,6 +968,30 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
+  - name: quality_measures__int_nqf0053_exclusions_stage_1
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_exclusions_stage_1
+      tags: quality_measures
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture.
+      First stage of final exclusion logic.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_type
+        description: >
+          Type of exclusion from the measure. 
+
   - name: quality_measures__int_nqf0053_exclusions
     config:
       schema: |
@@ -994,7 +1018,7 @@ models:
           a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
-        
+
   - name: quality_measures__int_nqf0053_exclude_procedures_medications
     config:
       schema: |
@@ -1015,7 +1039,7 @@ models:
           from the measure.
       - name: exclusion_type
         description: measure specific exclusion for procedure medication.
-      - name: tuva_last_run 
+      - name: tuva_last_run
         desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0053_long
@@ -1396,7 +1420,7 @@ models:
       materialized: view
     description: >
       Performance Period definition for Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
-  
+
   - name: quality_measures__int_cqm438_denominator_criteria1
     config:
       schema: |
