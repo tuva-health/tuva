@@ -9,7 +9,7 @@ SELECT DISTINCT -- to bring to claim_ID grain
     , 'Claim ID | Claim Line Number' AS drill_down_key
     , {{ dbt.concat(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
                     "'|'",
-                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'NULL')"]) }} as drill_down_value
+                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'null')"]) }} as drill_down_value
     , 'PHARMACY' AS claim_type
     , 'COPAYMENT_AMOUNT' AS field_name
     , case when m.copayment_amount is null then 'null'

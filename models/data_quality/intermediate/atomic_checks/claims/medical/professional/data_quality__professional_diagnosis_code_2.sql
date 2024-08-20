@@ -15,7 +15,7 @@ select
     , 'Claim ID | Claim Line Number' AS drill_down_key
     , {{ dbt.concat(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
                     "'|'",
-                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'NULL')"]) }} as drill_down_value
+                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'null')"]) }} as drill_down_value
     , 'professional' AS claim_type
     , 'DIAGNOSIS_CODE_2' AS field_name
     , case when term.icd_10_cm is not null          then 'valid'
