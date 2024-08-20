@@ -136,6 +136,7 @@ select
     , s.place_of_service_description
     , s.revenue_center_code
     , s.revenue_center_description
+    , s.hcpcs_code
     , s.default_ccsr_category_ip
     , s.default_ccsr_category_op
     , s.default_ccsr_category_description_ip

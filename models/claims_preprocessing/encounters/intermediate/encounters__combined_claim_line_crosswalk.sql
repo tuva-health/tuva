@@ -229,6 +229,42 @@ select claim_id
 ,999 as priority_number 
 from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }} --lowest outpatient priority, roll up to more specific encounter type when available
 
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'dialysis' as encounter_type
+,15 as priority_number 
+from {{ ref('dialysis__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient hospice' as encounter_type
+,16 as priority_number 
+from {{ ref('outpatient_hospice__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'home health' as encounter_type
+,17 as priority_number 
+from {{ ref('home_health__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient injections' as encounter_type
+,18 as priority_number 
+from {{ ref('outpatient_injections__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+
 )
 
 select 

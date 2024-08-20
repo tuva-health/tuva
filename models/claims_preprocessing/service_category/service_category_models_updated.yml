@@ -221,6 +221,18 @@ models:
         - service_category_grouper
         - claims_preprocessing
 
+  - name: service_category__outpatient_hospice_professional
+    description: N/A
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_outpatient_hospice_professional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
   - name: service_category__inpatient_hospice_professional
     description: N/A
     config:
@@ -563,6 +575,18 @@ models:
       tags:
         - service_category_grouper
         - needs_review
+
+  - name: service_category__outpatient_pharmacy_professional
+    description: Auto-generated model entry
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      alias: service_category__outpatient_pharmacy_professional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - needs_review
+  
   - name: service_category__outpatient_physical_therapy_institutional
     description: Auto-generated model entry
     config:

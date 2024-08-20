@@ -11,13 +11,9 @@ select distinct
     ,'{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
-inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatient
-    on med.claim_id = outpatient.claim_id
-and (substring(revenue_center_code,1,3) in ('025' --pharmacy
-,'026' --iv therapy
-,'063' --pharmacy
-,'089' --pharmacy
-)
-or revenue_center_code = '0547'
-or ccs_category = '240' --medications
-)
+inner join {{ ref('service_category__stg_professional') }} prof on med.claim_id = prof.claim_id 
+and
+med.claim_line_number = prof.claim_line_number
+where
+ccs_category = '240' --medications
+and place_of_service_code <> '11'

@@ -3,25 +3,23 @@
    )
 }}
 
-
-
 with detail_values as (
     select stg.*
     ,cli.encounter_id
     ,cli.old_encounter_id
     ,cli.encounter_type
     ,ed.encounter_start_date 
-    ,ed.encounter_end_date 
+    ,ed.encounter_end_date
     , row_number() over (partition by cli.encounter_id order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
     from  {{ ref('encounters__stg_medical_claim') }} stg
     inner join {{ ref('encounters__combined_claim_line_crosswalk') }} cli on stg.claim_id = cli.claim_id  
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'ambulatory surgery center'
+    cli.encounter_type = 'outpatient injections'
     and
     cli.claim_line_attribution_number = 1
-    inner join {{ ref('asc__start_end_dates') }} ed on cli.old_encounter_id = ed.old_encounter_id
+    inner join {{ ref('inpatient_hospice__start_end_dates') }} ed on cli.old_encounter_id = ed.encounter_id
 )
 
 , patient as (
@@ -90,13 +88,14 @@ group by encounter_id
   , hcpcs_code
 )
 
+
 select   d.encounter_id
 , d.encounter_start_date
 , d.encounter_end_date
 , d.patient_id
 , tot.encounter_type
 , {{ dbt.datediff("birth_date","d.encounter_start_date","day")}}/365 as admit_age
-, {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day")}} as length_of_stay
+, {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day") }} as length_of_stay
 , e.gender
 , e.race
 , hp.diagnosis_code_type as primary_diagnosis_code_type
@@ -126,12 +125,12 @@ and
 hcpc.paid_order = 1
 left join patient e
   on d.patient_id = e.patient_id
-left join {{ ref('terminology__provider') }} b
+left join dev_brad.terminology.provider b
   on hf.facility_id = b.npi
-left join {{ ref('terminology__icd_10_cm')}} icd10cm
+left join dev_brad.terminology.icd_10_cm icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm
   and hp.diagnosis_code_type = 'icd-10-cm'
-left join {{ ref('terminology__icd_9_cm')}} icd9cm
+left join dev_brad.terminology.icd_9_cm icd9cm
   on hp.diagnosis_code_1 = icd9cm.icd_9_cm
   and hp.diagnosis_code_type = 'icd-9-cm'
 where d.encounter_row_number = 1

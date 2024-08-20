@@ -352,6 +352,51 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: dialysis__encounter_grain
+    description: one row per dialysis encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: outpatient_hospice__encounter_grain
+    description: one row per outpatient hospice encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: home_health__encounter_grain
+    description: one row per outpatient hospice encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: outpatient_injections__encounter_grain
+    description: one row per outpatient hospice encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+
 ## Intermediate
 ## acute inpatient
   - name: acute_inpatient__generate_encounter_id
@@ -821,6 +866,138 @@ models:
       - claims_preprocessing
       - encounters
       - asc
+
+  - name: dialysis__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - dialysis
+
+  - name: dialysis__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - dialysis
+
+  - name: dialysis__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - dialysis
+
+  - name: outpatient_hospice__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_hospice
+
+  - name: outpatient_hospice__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_hospice
+
+  - name: outpatient_hospice__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_hospice
+
+  - name: home_health__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - home_health
+
+  - name: home_health__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - home_health
+
+  - name: home_health__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - home_health
+
+  - name: outpatient_injections__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_injections
+
+  - name: outpatient_injections__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_injections
+
+  - name: outpatient_injections__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_injections
 
 ## Staging
   - name: encounters__stg_medical_claim
