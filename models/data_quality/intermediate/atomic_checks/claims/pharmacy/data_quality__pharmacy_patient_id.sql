@@ -7,7 +7,9 @@ SELECT
     , coalesce(cast(m.paid_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     , 'PHARMACY_CLAIM' AS table_name
     , 'Claim ID | Claim Line Number' AS drill_down_key
-    , {{ dbt.concat(["coalesce(m.claim_id, 'null')", "'|'", "coalesce(m.claim_line_number, 'NULL')"]) }} as drill_down_value
+    , {{ dbt.concat(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
+                    "'|'",
+                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'NULL')"]) }} as drill_down_value
     , 'PHARMACY' AS claim_type
     , 'PATIENT_ID' AS field_name
     , case

@@ -2,12 +2,14 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-SELECT  
+SELECT
       m.data_source
     , coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     , 'MEDICAL_CLAIM' AS table_name
     , 'Claim ID | Claim Line Number' AS drill_down_key
-    , {{ dbt.concat(["coalesce(m.claim_id, 'null')", "'|'", "coalesce(m.claim_line_number, 'NULL')"]) }} as drill_down_value
+    , {{ dbt.concat(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
+                    "'|'",
+                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'NULL')"]) }} as drill_down_value
     , m.claim_type as claim_type
     , 'service_unit_quantity' as field_name
     , case when m.service_unit_quantity is null then 'null'
