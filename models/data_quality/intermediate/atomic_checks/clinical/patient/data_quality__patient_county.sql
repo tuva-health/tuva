@@ -6,9 +6,9 @@
 SELECT
     m.data_source
     {% if target.type == 'bigquery' %}
-        , coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as timestamp)) as source_date
+        , cast(coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as timestamp)) as date) as source_date
     {% else %}
-        , coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as date)) as source_date
+        , cast(coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as date)) as date) as source_date
     {% endif %}
     ,'PATIENT' AS table_name
     ,'Patient ID' as drill_down_key
