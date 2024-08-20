@@ -4,26 +4,29 @@
 
 
 SELECT
-    M.Data_SOURCE
-    ,coalesce(current_date,cast('1900-01-01' as date)) AS SOURCE_DATE
-    ,'PATIENT' AS TABLE_NAME
-    ,'Patient ID' as DRILL_DOWN_KEY
-    , coalesce(patient_id, 'NULL') AS DRILL_DOWN_VALUE
-    -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'BIRTH_DATE' AS FIELD_NAME
-    ,CASE 
-        WHEN M.BIRTH_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
-        WHEN M.BIRTH_DATE <= cast('1901-01-01' as date) THEN 'invalid'
-        WHEN M.BIRTH_DATE > M.DEATH_DATE THEN 'invalid'
-        WHEN M.BIRTH_DATE IS NULL THEN 'null'
-        ELSE 'valid' 
-    END AS BUCKET_NAME
-    ,CASE 
-        WHEN M.BIRTH_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
-        WHEN M.BIRTH_DATE <= cast('1901-01-01' as date) THEN 'too old'
-        WHEN M.BIRTH_DATE > M.DEATH_DATE THEN 'Birth date after death date'
+      m.data_source
+    {% if target.type == 'bigquery' %}
+        , cast(coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as timestamp)) as date) as source_date
+    {% else %}
+        , cast(coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as date)) as date) as source_date
+    {% endif %}
+    , 'PATIENT' AS table_name
+    , 'Patient ID' as drill_down_key
+    , coalesce(patient_id, 'NULL') AS drill_down_value
+    , 'BIRTH_DATE' AS field_name
+    , case
+        when m.birth_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'invalid'
+        when m.birth_date <= cast('1901-01-01' as date) then 'invalid'
+        when m.birth_date > m.death_date then 'invalid'
+        when m.birth_date is null then 'null'
+        else 'valid'
+    end as bucket_name
+    , case
+        when m.birth_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'future'
+        when m.birth_date <= cast('1901-01-01' as date) then 'too old'
+        when m.birth_date > m.death_date then 'Birth date after death date'
         else null
-    END AS INVALID_REASON
-    ,CAST(BIRTH_DATE as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    , cast(birth_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('patient')}} M
+from {{ ref('patient')}} m

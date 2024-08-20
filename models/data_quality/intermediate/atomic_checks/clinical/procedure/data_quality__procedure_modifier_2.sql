@@ -4,21 +4,20 @@
 
 
 SELECT
-    M.Data_SOURCE
-    ,coalesce(M.PROCEDURE_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
-    ,'PROCEDURE' AS TABLE_NAME
-    ,'Procedure ID' as DRILL_DOWN_KEY
-    , coalesce(procedure_id, 'NULL') AS DRILL_DOWN_VALUE
-    -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'MODIFIER_2' AS FIELD_NAME
-    ,case when TERM.HCPCS is not null then 'valid'
-          when M.MODIFIER_2 is not null then 'invalid'
-          else 'null' 
-    end as BUCKET_NAME
-    ,case when M.MODIFIER_2 is not null and TERM.HCPCS is null
-          then 'Modifier 2 does not join to Terminology hcpcs_level_2 table'
-    else null end as INVALID_REASON
-    ,CAST(MODIFIER_2 as {{ dbt.type_string() }}) AS FIELD_VALUE
+      m.data_source
+    , coalesce(m.procedure_date,cast('1900-01-01' as date)) as source_date
+    , 'PROCEDURE' AS table_name
+    , 'Procedure ID' as drill_down_key
+    , coalesce(procedure_id, 'NULL') AS drill_down_value
+    , 'MODIFIER_2' as field_name
+    , case when term.hcpcs is not null then 'valid'
+           when m.modifier_2 is not null then 'invalid'
+           else 'null'
+    end as bucket_name
+    , case when m.modifier_2 is not null and term.hcpcs is null
+           then 'Modifier 2 does not join to Terminology hcpcs_level_2 table'
+           else null end as invalid_reason
+    , cast(modifier_2 as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('procedure')}} M
-LEFT JOIN {{ ref('terminology__hcpcs_level_2')}} TERM on m.MODIFIER_2 = term.HCPCS
+from {{ ref('procedure')}} m
+left join {{ ref('terminology__hcpcs_level_2')}} term on m.modifier_2 = term.hcpcs

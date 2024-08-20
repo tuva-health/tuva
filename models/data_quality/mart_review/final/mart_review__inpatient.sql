@@ -10,20 +10,52 @@ WITH cte AS (
 )
 
 SELECT e.*,
-    e.patient_id || '|' || e.data_source AS patient_source_key,
-    e.encounter_id || '|' || e.data_source AS encounter_source_key,
-    e.ms_drg_code || ' | ' || e.ms_drg_description AS DRGwithDescription,
-    e.primary_diagnosis_code || ' | ' || e.primary_diagnosis_description AS Primary_Diagnosis_and_Description,
-    e.admit_source_code || ' | ' || e.admit_source_description AS Admit_Source_code_and_Description,
-    e.admit_type_code || ' | ' || e.admit_type_description AS admit_type_code_and_description,
-    e.discharge_disposition_code || ' | ' || e.discharge_disposition_description AS discharge_code_and_description,
-    P.CCSR_PARENT_CATEGORY,
-    P.CCSR_Category,
-    P.CCSR_CATEGORY_DESCRIPTION,
-    P.CCSR_Category || ' | ' || P.CCSR_CATEGORY_DESCRIPTION AS CCSR_CATEGORY_AND_DESCRIPTION,
-    B.BODY_SYSTEM
-FROM {{ ref('core__encounter')}} e
-LEFT JOIN cte l ON e.facility_id = l.location_id
-LEFT JOIN {{ ref('ccsr__dx_vertical_pivot') }} P ON e.primary_diagnosis_code = P.Code AND P.CCSR_CATEGORY_RANK = 1
-LEFT JOIN {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} B ON P.CCSR_PARENT_CATEGORY = B.CCSR_PARENT_CATEGORY
-WHERE e.encounter_type = 'acute inpatient'
+    {{ dbt.concat([
+        'e.patient_id',
+        "'|'",
+        'e.data_source'
+    ]) }} as patient_source_key,
+    {{ dbt.concat([
+        'e.encounter_id',
+        "'|'",
+        'e.data_source'
+    ]) }} as encounter_source_key,
+    {{ dbt.concat([
+        'e.ms_drg_code',
+        "' | '",
+        'e.ms_drg_description'
+    ]) }} as drgwithdescription,
+    {{ dbt.concat([
+        'e.primary_diagnosis_code',
+        "' | '",
+        'e.primary_diagnosis_description'
+    ]) }} as primary_diagnosis_and_description,
+    {{ dbt.concat([
+        'e.admit_source_code',
+        "' | '",
+        'e.admit_source_description'
+    ]) }} as admit_source_code_and_description,
+    {{ dbt.concat([
+        'e.admit_type_code',
+        "' | '",
+        'e.admit_type_description'
+    ]) }} as admit_type_code_and_description,
+    {{ dbt.concat([
+        'e.discharge_disposition_code',
+        "' | '",
+        'e.discharge_disposition_description'
+    ]) }} as discharge_code_and_description,
+    p.ccsr_parent_category,
+    p.ccsr_category,
+    p.ccsr_category_description,
+    {{ dbt.concat([
+        'p.ccsr_category',
+        "' | '",
+        'p.ccsr_category_description'
+    ]) }} as ccsr_category_and_description,
+    b.body_system
+from {{ ref('core__encounter')}} e
+left join cte l on e.facility_id = l.location_id
+left join {{ ref('ccsr__dx_vertical_pivot') }} p on e.primary_diagnosis_code = p.code and p.ccsr_category_rank = 1
+left join {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} b on p.ccsr_parent_category = b.ccsr_parent_category
+where e.encounter_type = 'acute inpatient'

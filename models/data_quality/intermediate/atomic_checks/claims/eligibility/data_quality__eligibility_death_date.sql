@@ -2,61 +2,61 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-WITH BASE as (
+WITH base as (
     SELECT * 
     FROM {{ ref('eligibility')}}
 
 ),
-UNIQUE_FIELD as (
-    SELECT DISTINCT MEMBER_ID
-        ,cast(DEATH_DATE as {{ dbt.type_string() }}) as Field
-        ,DATA_SOURCE
-    FROM BASE
+unique_field as (
+    select distinct member_id
+        ,cast(death_date as {{ dbt.type_string() }}) as field
+        ,data_source
+    from base
 ),
-CLAIM_GRAIN as (
-    SELECT MEMBER_ID
-        ,DATA_SOURCE
-        ,count(*) as FREQUENCY
-    from UNIQUE_FIELD 
-    GROUP BY MEMBER_ID
-        ,DATA_SOURCE
+claim_grain as (
+    select member_id
+        ,data_source
+        ,count(*) as frequency
+    from unique_field
+    group by member_id
+        ,data_source
 ),
-CLAIM_AGG as (
-SELECT
-    MEMBER_ID,
-    DATA_SOURCE,
-    {{ dbt.listagg(measure="coalesce(Field, 'null')", delimiter_text="', '", order_by_clause="order by Field desc") }} AS FIELD_AGGREGATED
-FROM
-    UNIQUE_FIELD
-GROUP BY
-    DATA_SOURCE,
-    MEMBER_ID
+claim_agg as (
+select
+    member_id,
+    data_source,
+    {{ dbt.listagg(measure="coalesce(field, 'null')", delimiter_text="', '", order_by_clause="order by field desc") }} as field_aggregated
+from
+    unique_field
+group by
+    data_source,
+    member_id
 )
-SELECT DISTINCT
-    M.Data_SOURCE
-    ,coalesce(cast(M.ENROLLMENT_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'ELIGIBILITY' AS TABLE_NAME
-    ,'Member ID' AS DRILL_DOWN_KEY
-    ,coalesce(M.Member_ID, 'NULL') as drill_down_value
-    ,'ELIGIBILITY' AS CLAIM_TYPE
-    ,'DEATH_DATE' AS FIELD_NAME
-    ,CASE 
-        WHEN CG.FREQUENCY > 1 THEN 'multiple'      
-        WHEN M.DEATH_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
-        WHEN M.DEATH_DATE <= cast('1901-01-01' as date) THEN 'invalid'
-        WHEN M.DEATH_DATE <= M.BIRTH_DATE THEN 'invalid'
-        WHEN M.DEATH_DATE IS NULL THEN 'null'
-        ELSE 'valid' 
-    END AS BUCKET_NAME
-    ,CASE 
-        WHEN CG.FREQUENCY > 1 THEN 'multiple'      
-        WHEN M.DEATH_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
-        WHEN M.DEATH_DATE <= cast('1901-01-01' as date) THEN 'too old'
-        WHEN M.DEATH_DATE <= M.BIRTH_DATE THEN 'death date before birth date'
+select distinct
+    m.data_source
+    ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'ELIGIBILITY' AS table_name
+    ,'Member ID' AS drill_down_key
+    ,coalesce(m.member_id, 'NULL') as drill_down_value
+    ,'ELIGIBILITY' AS claim_type
+    ,'DEATH_DATE' AS field_name
+    ,case
+        when cg.frequency > 1 then 'multiple'
+        when m.death_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'invalid'
+        when m.death_date <= cast('1901-01-01' as date) then 'invalid'
+        when m.death_date <= m.birth_date then 'invalid'
+        when m.death_date is null then 'null'
+        else 'valid'
+    end as bucket_name
+    ,case
+        when cg.frequency > 1 then 'multiple'
+        when m.death_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'future'
+        when m.death_date <= cast('1901-01-01' as date) then 'too old'
+        when m.death_date <= m.birth_date then 'death date before birth date'
         else null
-    END AS INVALID_REASON
-    ,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    ,cast({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM BASE M
-LEFT JOIN CLAIM_GRAIN CG ON M.MEMBER_ID = CG.MEMBER_ID AND M.Data_Source = CG.Data_Source
-LEFT JOIN CLAIM_AGG AGG ON M.MEMBER_ID = AGG.MEMBER_ID AND M.Data_Source = AGG.Data_Source
+from base m
+left join claim_grain cg on m.member_id = cg.member_id and m.data_source = cg.data_source
+left join claim_agg agg on m.member_id = agg.member_id and m.data_source = agg.data_source

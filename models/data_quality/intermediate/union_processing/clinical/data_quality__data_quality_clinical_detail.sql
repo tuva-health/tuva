@@ -669,15 +669,15 @@ SELECT * FROM {{ ref('data_quality__observation_patient_id') }}
 )
 
 SELECT
-    Data_SOURCE,
-    cast(SOURCE_DATE as {{ dbt.type_string() }}) as source_date,
-    TABLE_NAME,
-    DRILL_DOWN_KEY,
-    DRILL_DOWN_VALUE,
-    FIELD_NAME,
-    BUCKET_NAME,
-    INVALID_REASON,
-    FIELD_VALUE,
+    data_source,
+    cast(source_date as {{ dbt.type_string() }}) as source_date,
+    table_name,
+    drill_down_key,
+    drill_down_value,
+    field_name,
+    bucket_name,
+    invalid_reason,
+    field_value,
     tuva_last_run,
-    DENSE_RANK() OVER (ORDER BY Data_SOURCE, TABLE_NAME, FIELD_NAME) + 100000 as SUMMARY_SK
+    dense_rank() over (order by data_source, table_name, field_name) + 100000 as summary_sk
 FROM CTE

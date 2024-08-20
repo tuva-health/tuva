@@ -14,5 +14,8 @@ SELECT *,
        office_visit_paid * member_months AS office_visit_paid_absolute,
        ancillary_paid * member_months AS ancillary_paid_absolute,
        other_paid * member_months AS other_paid_absolute,
-       data_source || '|' || year_month AS data_source_month_key
+        {{ dbt.concat([
+            'data_source',
+            "'|'",
+            'year_month']) }} as data_source_month_key
 FROM {{ ref('financial_pmpm__pmpm_payer') }}
