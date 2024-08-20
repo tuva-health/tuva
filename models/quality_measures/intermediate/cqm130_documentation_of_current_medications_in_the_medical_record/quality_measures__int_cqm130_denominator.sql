@@ -7,46 +7,26 @@
 with visit_codes as (
 
     select
-          concept_name
-        , code
+          code
         , code_system
     from {{ ref('quality_measures__value_sets') }}
-
-)
-
-, valid_concepts as (
-
-    select
-        concept_name
-    from {{ ref('quality_measures__concepts') }}
-    where concept_name in (
+    where lower(concept_name) in (
             'encounter to document medications'
     )
-    
-)
-
-, valid_visit_codes as (
-
-    select
-          visit_codes.concept_name
-        , visit_codes.code
-        , visit_codes.code_system
-    from visit_codes
-    inner join valid_concepts
-        on visit_codes.concept_name = valid_concepts.concept_name
 
 )
 
 , visits_encounters as (
 
-    select patient_id
-         , encounter.encounter_end_date
-         , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
-         , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
-    from {{ref('quality_measures__stg_core__encounter')}} encounter
-    inner join {{ref('quality_measures__int_cqm130__performance_period')}} as pp
+    select 
+          patient_id
+        , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
+        , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
+    from {{ ref('quality_measures__stg_core__encounter') }} encounter
+    inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
-        and coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
+            and coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
+
 )
 
 , procedure_encounters as (
@@ -55,11 +35,11 @@ with visit_codes as (
           patient_id
         , procedure_date as min_date
         , procedure_date as max_date
-    from {{ref('quality_measures__stg_core__procedure')}} proc
-    inner join {{ref('quality_measures__int_cqm130__performance_period')}}  as pp
+    from {{ ref('quality_measures__stg_core__procedure') }} procs
+    inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
-    inner join valid_visit_codes
-        on coalesce(proc.normalized_code,proc.source_code) = valid_visit_codes.code
+    inner join visit_codes
+        on coalesce(procs.normalized_code,procs.source_code) = visit_codes.code
 
 )
 
@@ -69,57 +49,39 @@ with visit_codes as (
           patient_id
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
-    from {{ref('quality_measures__stg_medical_claim')}} medical_claim
-    inner join {{ref('quality_measures__int_cqm130__performance_period')}}  as pp on
-        coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
-         and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
-    inner join  valid_visit_codes
-        on medical_claim.hcpcs_code= valid_visit_codes.code
+    from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
+    inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp 
+        on coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
+            and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
+    inner join visit_codes
+        on medical_claim.hcpcs_code = visit_codes.code
 
 )
 
 , all_encounters as (
 
-    select
-          patient_id
-        , min_date
-        , max_date
-        , 'v' as visit_enc
-        , cast(null as {{ dbt.type_string() }}) as proc_enc
-        , cast(null as {{ dbt.type_string() }}) as claim_enc
+    select *, 'v' as visit_enc, cast(null as {{ dbt.type_string() }}) as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from visits_encounters
 
     union all
 
-    select
-          patient_id
-        , min_date
-        , max_date
-        , cast(null as {{ dbt.type_string() }}) as visit_enc
-        , 'p' as proc_enc
-        , cast(null as {{ dbt.type_string() }}) as claim_enc
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc, 'p' as proc_enc, cast(null as {{ dbt.type_string() }}) as claim_enc
     from procedure_encounters
 
     union all
     
-    select
-          patient_id
-        , min_date
-        , max_date
-        , cast(null as {{ dbt.type_string() }}) as visit_enc
-        , cast(null as {{ dbt.type_string() }}) as proc_enc
-        , 'c' as claim_enc
+    select *, cast(null as {{ dbt.type_string() }}) as visit_enc, cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
 
 )
 
 , encounters_by_patient as (
 
-    select patient_id,min(min_date) min_date, max(max_date) max_date,
+    select patient_id, min(min_date) min_date, max(max_date) max_date,
         concat(concat(
-            coalesce(min(visit_enc),'')
-            ,coalesce(min(proc_enc),''))
-            ,coalesce(min(claim_enc),'')
+              coalesce(min(visit_enc),'')
+            , coalesce(min(proc_enc),''))
+            , coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
     group by patient_id
@@ -135,7 +97,7 @@ with visit_codes as (
         , max_date
         , floor({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0) as max_age
         , qualifying_types
-    from {{ref('quality_measures__stg_core__patient')}} p
+    from {{ ref('quality_measures__stg_core__patient') }} p
     inner join encounters_by_patient e
         on p.patient_id = e.patient_id
     where p.death_date is null
@@ -156,9 +118,7 @@ with visit_codes as (
         , pp.measure_version
         , 1 as denominator_flag
     from patients_with_age
-    cross join {{ref('quality_measures__int_cqm130__performance_period')}} pp
-    inner join visits_encounters
-        on patients_with_age.patient_id = visits_encounters.patient_id
+    cross join {{ ref('quality_measures__int_cqm130__performance_period') }} pp
     where max_age >= 18
     
 )
