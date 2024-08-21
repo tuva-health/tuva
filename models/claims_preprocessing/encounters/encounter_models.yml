@@ -418,6 +418,28 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: outpatient_radiology__encounter_grain
+    description: one row per outpatient radiology encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: office_visit_surgery__encounter_grain
+    description: one row per outpatient office visit surgery encounter id summarizing encounter level metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
 
 ## Intermediate
 ## acute inpatient
@@ -1022,7 +1044,7 @@ models:
       - outpatient_injections
 
 ##
-      - name: outpatient_ptotst__anchor_events
+  - name: outpatient_ptotst__anchor_events
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
@@ -1088,6 +1110,39 @@ models:
       - claims_preprocessing
       - encounters
       - outpatient_substance_use
+##
+  - name: outpatient_radiology__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_radiology
+
+  - name: outpatient_radiology__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_radiology
+
+  - name: outpatient_radiology__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - outpatient_radiology
 
 ## Staging
   - name: encounters__stg_medical_claim

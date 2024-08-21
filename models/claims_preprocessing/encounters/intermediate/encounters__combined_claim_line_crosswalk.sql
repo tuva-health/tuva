@@ -142,7 +142,7 @@ union
 
 select claim_id
 ,claim_line_number
-,encounter_id
+,old_encounter_id
 ,'office visit surgery' as encounter_type
 ,6 as priority_number
 from {{ ref('office_visits__int_office_visits_surgery') }}
@@ -151,7 +151,7 @@ union
 
 select claim_id
 ,claim_line_number
-,encounter_id
+,old_encounter_id
 ,'office visit injections' as encounter_type
 ,7 as priority_number
 from {{ ref('office_visits__int_office_visits_injections') }}
@@ -160,8 +160,8 @@ union
 
 select claim_id
 ,claim_line_number
-,encounter_id
-,'office visit PT, OT, ST' as encounter_type
+,old_encounter_id
+,'office visit pt/ot/st' as encounter_type
 ,8 as priority_number
 from {{ ref('office_visits__int_office_visits_ptotst') }}
 
@@ -169,7 +169,7 @@ union
 
 select claim_id
 ,claim_line_number
-,encounter_id
+,old_encounter_id
 ,'office visit radiology' as encounter_type
 ,9 as priority_number
 from {{ ref('office_visits__int_office_visits_radiology') }}
@@ -178,9 +178,9 @@ union
 
 select claim_id
 ,claim_line_number
-,encounter_id
-,'office visits' as encounter_type
-,10 as priority_number
+,old_encounter_id
+,'office visit' as encounter_type
+,9999 as priority_number
 from {{ ref('office_visits__int_office_visits') }}
 
 union
@@ -272,7 +272,7 @@ select claim_id
 ,old_encounter_id
 ,'outpatient pt/ot/st' as encounter_type
 ,19 as priority_number 
-from {{ ref('home_health__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+from {{ ref('outpatient_ptotst__match_claims_to_anchor') }} --should come before generic office and outpatient visit
 
 union
 
@@ -281,8 +281,16 @@ select claim_id
 ,old_encounter_id
 ,'outpatient substance use' as encounter_type
 ,20 as priority_number 
-from {{ ref('outpatient_injections__match_claims_to_anchor') }} --should come before generic office and outpatient visit. 
+from {{ ref('outpatient_substance_use__match_claims_to_anchor') }} --should come before generic office and outpatient visit. 
 
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient radiology' as encounter_type
+,21 as priority_number 
+from {{ ref('outpatient_radiology__match_claims_to_anchor') }} --should come after ED but before generic office and outpatient visit. 
 
 )
 

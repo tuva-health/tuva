@@ -43,6 +43,7 @@ select
   , n.modality
   , m.billing_id
   , m.rendering_id
+  , rend.primary_specialty_description as rend_primary_specialty_description
   , m.facility_id
   , m.discharge_disposition_code
   , m.paid_amount
@@ -64,3 +65,4 @@ left join {{ ref('terminology__ms_drg') }} drg on m.ms_drg_code = drg.ms_drg_cod
 left join {{ ref('terminology__revenue_center') }} r on m.revenue_center_code = r.revenue_center_code
 left join {{ ref('terminology__place_of_service') }} pos on m.place_of_service_code = pos.place_of_service_code
 left join {{ ref('terminology__bill_type') }} bt on m.bill_type_code = bt.bill_type_code
+left join {{ ref('terminology__provider')}} rend on m.rendering_id = rend.npi

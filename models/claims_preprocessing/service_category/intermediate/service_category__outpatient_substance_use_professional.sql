@@ -6,6 +6,7 @@
 select distinct 
     med.claim_id
     , med.claim_line_number
+    , med.claim_line_id
     , 'Outpatient Substance Use' as service_category_2
     , 'Outpatient Substance Use' as service_category_3
     ,'{{ this.name }}' as source_model_name
@@ -23,4 +24,4 @@ default_ccsr_category_description_op in ('MBD026'
                                         )
 
 and
-place_of_service_code <> = '11'                                      
+place_of_service_code <> '11'                                      

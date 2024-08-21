@@ -17,14 +17,7 @@ select distinct
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
 inner join {{ ref('service_category__stg_outpatient_institutional') }} o on med.claim_id = o.claim_id
-where med.ccs_category in ('207' --radioisotope
-,'208' --radioisotope
-,'209' --radioisotope
-,'210' --radioisotope
-,'226' --other radioisotope
-)
-OR 
-med.modality is not null
+where med.modality is not null
 
 
 

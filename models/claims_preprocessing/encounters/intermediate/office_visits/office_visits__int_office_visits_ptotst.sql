@@ -4,14 +4,16 @@
 }}
 
 select 
-    ov.encounter_id
-    ,mc.*
+    ov.patient_id
+    ,ov.start_date
+    ,ov.claim_id
+    ,ov.claim_line_number
+    ,ov.old_encounter_id
 from {{ ref('office_visits__int_office_visits')}} ov
 inner join {{ ref('encounters__stg_medical_claim')}} mc on mc.claim_id = ov.claim_id
     and mc.claim_line_number = ov.claim_line_number
-left join {{ ref('terminology__provider')}} provider on mc.rendering_id = provider.npi
 where 
-    provider.primary_specialty_description IN (
+    mc.rend_primary_specialty_description IN (
         'Occupational Health'
         ,'Occupational Medicine'
         ,'Occupational Therapist in Private Practice'
