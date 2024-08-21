@@ -15,11 +15,7 @@ SELECT
     , paid_amount
     , allowed_amount
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , data_source
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('core__medical_claim') }}
