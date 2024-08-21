@@ -6,7 +6,7 @@
 with encounter_date as (
   select distinct old_encounter_id
   ,start_date as encounter_start_date
-  from {{ ref('outpatient_injections__generate_encounter_id') }}
+  from {{ ref('outpatient_substance_use__generate_encounter_id') }}
 )
 
 ,detail_values as (
@@ -21,7 +21,7 @@ with encounter_date as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'outpatient injections'
+    cli.encounter_type = 'outpatient substance use'
     and
     cli.claim_line_attribution_number = 1
     inner join encounter_date d on cli.old_encounter_id = d.old_encounter_id
@@ -80,20 +80,6 @@ group by encounter_id
   , facility_id
 )
 
-,highest_paid_hcpc as 
-(
-  select encounter_id
-  , hcpcs_code
-  , row_number() over (partition by encounter_id order by sum(paid_amount) desc ) as paid_order
-  , sum(paid_amount) as paid_amount
-  from detail_values
-  where substring(hcpcs_code,1,1)='J'
-
-  group by 
-   encounter_id
-  , hcpcs_code
-)
-
 
 select   d.encounter_id
 , d.encounter_start_date
@@ -107,7 +93,6 @@ select   d.encounter_id
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
 , hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
-, hcpc.hcpcs_code
 , tot.total_paid_amount
 , tot.total_allowed_amount
 , tot.total_charge_amount
@@ -124,9 +109,6 @@ hp.paid_order = 1
 left join highest_paid_facility hf on d.encounter_id = hf.encounter_id
 and
 hf.paid_order = 1
-left join highest_paid_hcpc hcpc on d.encounter_id = hcpc.encounter_id
-and
-hcpc.paid_order = 1
 left join patient e
   on d.patient_id = e.patient_id
 left join dev_brad.terminology.provider b

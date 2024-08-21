@@ -263,7 +263,26 @@ select claim_id
 ,old_encounter_id
 ,'outpatient injections' as encounter_type
 ,18 as priority_number 
-from {{ ref('outpatient_injections__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+from {{ ref('outpatient_injections__match_claims_to_anchor') }} --should come before generic office and outpatient visit. below 
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient pt/ot/st' as encounter_type
+,19 as priority_number 
+from {{ ref('home_health__match_claims_to_anchor') }} --should come before generic office and outpatient visit
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'outpatient substance use' as encounter_type
+,20 as priority_number 
+from {{ ref('outpatient_injections__match_claims_to_anchor') }} --should come before generic office and outpatient visit. 
+
 
 )
 

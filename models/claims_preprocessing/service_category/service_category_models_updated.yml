@@ -597,6 +597,18 @@ models:
       tags:
         - service_category_grouper
         - needs_review
+
+  - name: service_category__outpatient_physical_therapy_professional
+    description: Auto-generated model entry
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      alias: service_category__outpatient_physical_therapy_professional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - needs_review
+
   - name: service_category__outpatient_radiology
     description: Auto-generated model entry
     config:
@@ -617,6 +629,18 @@ models:
       tags:
         - service_category_grouper
         - needs_review
+
+  - name: service_category__outpatient_substance_use_professional
+    description: Auto-generated model entry
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      alias: service_category__outpatient_substance_use_professional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - needs_review
+
   - name: service_category__outpatient_surgery_institutional
     description: Auto-generated model entry
     config:

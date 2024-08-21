@@ -11,15 +11,16 @@ select distinct
     ,'{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
-inner join {{ ref('service_category__stg_outpatient_institutional') }} o on med.claim_id = o.claim_id
-where default_ccsr_category_description_op in ('MBD026'
+inner join {{ ref('service_category__stg_professional') }} prof on med.claim_id = prof.claim_id 
+and
+med.claim_line_number = prof.claim_line_number
+where 
+default_ccsr_category_description_op in ('MBD026'
                                         ,'SYM008'
                                         ,'MBD025'
                                         ,'SYM009'
                                         ,'MBD034'
                                         )
-or
-med.primary_taxonomy_code in 
-('324500000X'
-,'261QR0405X'
-,'101YA0400X')                                        
+
+and
+place_of_service_code <> = '11'                                      
