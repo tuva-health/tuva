@@ -44,9 +44,9 @@ with period_end as (
 )
 
 /*
-    set performance period begin to a year and a day prior
-    for a complete calendar year
+    set performance period begin to following day of 1 year prior
 */
+
 , period_begin as (
 
     select
