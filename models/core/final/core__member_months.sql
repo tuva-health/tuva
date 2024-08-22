@@ -5,10 +5,8 @@
 
 with month_start_and_end_dates as (
   select
-    {{ dbt.concat([date_part('year', 'year'),
-                      dbt.right(
-                      dbt.concat(["'0'", date_part('month', 'month')])
-                      , 2)]) }} as year_month
+    {{ dbt.concat(["year",
+                  dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
     , min(full_date) as month_start_date
     , max(full_date) as month_end_date
   from {{ ref('reference_data__calendar')}}
