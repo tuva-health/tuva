@@ -7,11 +7,7 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
     , coalesce(claim_start_date,claim_end_date) as claim_date
@@ -25,11 +21,7 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
     , {{  dbt.concat([date_part('year', 'claim_date'),
@@ -46,11 +38,7 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , 'Pharmacy' as service_category_1
     , cast(null as {{ dbt.type_string() }}) as service_category_2
     , coalesce(dispensing_date, paid_date) as claim_date
@@ -64,11 +52,7 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
     , {{  dbt.concat([date_part('year', 'claim_date'),
@@ -95,11 +79,7 @@ select
     patient_id
   , year_month
   , payer
-  {% if target.type == 'fabric' %}
-      , "plan"
-  {% else %}
-      , plan
-  {% endif %}
+  , {{ quote_column('plan') }}
   , service_category_1
   , service_category_2
   , sum(paid_amount) as total_paid
@@ -111,11 +91,7 @@ group by
     patient_id
   , year_month
   , payer
-  {% if target.type == 'fabric' %}
-    , "plan"
-  {% else %}
-    , plan
-  {% endif %}
+  , {{ quote_column('plan') }}
   , service_category_1
   , service_category_2
   , data_source
