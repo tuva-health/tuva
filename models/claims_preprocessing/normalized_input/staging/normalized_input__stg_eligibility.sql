@@ -12,8 +12,8 @@ select
         "coalesce(data_source,'')",
         "coalesce(payer,'')",
         "coalesce(" ~ quote_column('plan') ~ ",'')",
-        "coalesce(enrollment_start_date,'')",
-        "coalesce(enrollment_end_date,'')"
+        "coalesce(cast(enrollment_start_date as " ~ dbt.type_string() ~ "),'')",
+        "coalesce(cast(enrollment_end_date as " ~ dbt.type_string() ~ "),'')"
     ]) }} as patient_id_key
     , member_id
     , subscriber_id
