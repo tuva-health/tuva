@@ -71,7 +71,7 @@ select distinct
     claim.medical_claim_id
     , claim.patient_id
     , claim.payer
-    , {{ quote_column('plan') }}
+    , claim.{{ quote_column('plan') }}
     , claim.inferred_claim_start_year_month
     , claim.inferred_claim_end_year_month
     , claim.inferred_claim_start_column_used
