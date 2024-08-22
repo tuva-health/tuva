@@ -597,25 +597,25 @@ seeds:
         - data_profiling
         - claims_preprocessing
       column_types:
-        ms_drg : |
+        ms_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        fy_2024_final_post_acute_drg : |
+        fy_2024_final_post_acute_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} boolean {%- else -%} boolean {%- endif -%}
-        fy_2024_final_special_pay_drg : |
+        fy_2024_final_special_pay_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} boolean {%- else -%} boolean {%- endif -%}
-        mdc : |
+        mdc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        type : |
+        type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        ms_drg_title : |
+        ms_drg_title: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        drg_weight_raw : |
+        drg_weight_raw: |
           {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,4) {%- endif -%}
-        drg_weight : |
+        drg_weight: |
           {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,4) {%- endif -%}
-        geometric_mean_los : |
+        geometric_mean_los: |
           {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,2) {%- endif -%}
-        arithmetic_mean_los : |
+        arithmetic_mean_los: |
           {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,2) {%- endif -%}
     columns:
       - name: ms_drg
