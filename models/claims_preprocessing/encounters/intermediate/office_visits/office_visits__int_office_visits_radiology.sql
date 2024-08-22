@@ -3,7 +3,7 @@
    )
 }}
 
-select
+select distinct
     ov.patient_id
     ,ov.start_date
     ,ov.claim_id

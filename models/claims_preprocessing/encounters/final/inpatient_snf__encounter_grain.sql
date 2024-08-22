@@ -97,6 +97,7 @@ select
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
 , c.facility_id as facility_id
 , b.provider_organization_name as facility_name
+, b.primary_specialty_description as facility_type
 , c.ms_drg_code
 , j.ms_drg_description
 , j.medical_surgical

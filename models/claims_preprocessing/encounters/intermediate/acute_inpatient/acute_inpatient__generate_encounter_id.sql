@@ -1,12 +1,25 @@
-with base as (
-  select distinct
-      claim_id
-    , patient_id
-    , start_date
-    , end_date
-    , facility_id
-    , discharge_disposition_code
+with claim_start_end as (
+select claim_id
+,patient_id
+,min(start_date) as start_date
+,max(end_date) as end_date 
   from {{ ref('encounters__stg_medical_claim') }}
+  group by claim_id
+  ,patient_id
+)
+
+, base as (
+  select distinct
+      enc.claim_id
+    , enc.patient_id
+    , c.start_date
+    , c.end_date
+    , enc.facility_id
+    , enc.discharge_disposition_code
+  from {{ ref('encounters__stg_medical_claim') }} enc
+    inner join claim_start_end c on enc.claim_id = c.claim_id
+  and
+  c.patient_id = enc.patient_id
   where
     service_category_2 in ('Medical','Surgical','Labor and Delivery','Acute Inpatient - Other')
     and claim_type = 'institutional'
@@ -53,6 +66,7 @@ with base as (
   inner join add_row_num as bb
     on aa.patient_id = bb.patient_id
     and aa.row_num < bb.row_num
+  where aa.claim_id <> bb.claim_id
 )
 
 , merges_with_larger_row_num as (

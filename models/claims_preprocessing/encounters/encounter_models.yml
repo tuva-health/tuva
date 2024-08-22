@@ -429,7 +429,7 @@ models:
         - claims_preprocessing
         - encounters
 
-  - name: office_visit_surgery__encounter_grain
+  - name: office_visit__encounter_grain
     description: one row per outpatient office visit surgery encounter id summarizing encounter level metrics
     config:
       schema: |
@@ -726,6 +726,36 @@ models:
       - encounters
 
   - name: office_visits__int_office_visits
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+
+  - name: office_visits__int_office_visits_encounter_ranking
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+
+  - name: office_visits__int_office_visits_claim_line
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+
+  - name: office_visits__int_office_visits_union
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing

@@ -6,7 +6,36 @@
 with encounter_date as (
   select distinct old_encounter_id
   ,start_date as encounter_start_date
+  ,'office visit surgery' as encounter_type
   from {{ ref('office_visits__int_office_visits_surgery') }}
+
+  UNION 
+
+select distinct old_encounter_id
+  ,start_date as encounter_start_date
+  ,'office visit injections' as encounter_type
+  from {{ ref('office_visits__int_office_visits_injections') }}
+
+  UNION 
+
+select distinct old_encounter_id
+  ,start_date as encounter_start_date
+  ,'office visit radiology' as encounter_type
+  from {{ ref('office_visits__int_office_visits_radiology') }}
+
+  UNION 
+
+select distinct old_encounter_id
+  ,start_date as encounter_start_date
+  ,'office visit' as encounter_type
+  from {{ ref('office_visits__int_office_visits') }}
+
+    UNION 
+
+select distinct old_encounter_id
+  ,start_date as encounter_start_date
+  ,'office visit pt/ot/st' as encounter_type
+  from {{ ref('office_visits__int_office_visits') }}
 )
 
 ,detail_values as (
@@ -21,10 +50,12 @@ with encounter_date as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'office visit surgery'
+    cli.encounter_type in ( 'office visit surgery', 'office visit', 'office visit pt/ot/st', 'office visit radiology', 'office visit injections')
     and
     cli.claim_line_attribution_number = 1
     inner join encounter_date d on cli.old_encounter_id = d.old_encounter_id
+    and
+    d.encounter_type = cli.encounter_type
 )
 
 , patient as (
@@ -97,6 +128,8 @@ group by encounter_id
 (
   select encounter_id
   , hcpcs_code
+  , ccs_category
+  , ccs_category_description
   , row_number() over (partition by encounter_id order by sum(paid_amount) desc ) as paid_order
   , sum(paid_amount) as paid_amount
   from detail_values
@@ -104,6 +137,8 @@ group by encounter_id
   group by 
    encounter_id
   , hcpcs_code
+  , ccs_category
+  , ccs_category_description
 )
 
 
@@ -120,8 +155,11 @@ select   d.encounter_id
 , hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
 , phy.billing_id
-, concat(b2.provider_first_name,' ',b2.provider_last_name) as provider_last_name
+, concat(b2.provider_first_name,' ',b2.provider_last_name) as provider_name
 , b2.primary_specialty_description as provider_specialty
+, hcpc.hcpcs_code
+, hcpc.ccs_category
+, hcpc.ccs_category_description
 , tot.total_paid_amount
 , tot.total_allowed_amount
 , tot.total_charge_amount
@@ -149,7 +187,7 @@ left join patient e
 left join dev_brad.terminology.provider b
   on hf.facility_id = b.npi
 left join dev_brad.terminology.provider b2
-  on phy.billing_id = b.npi
+  on phy.billing_id = b2.npi
 left join dev_brad.terminology.icd_10_cm icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm
   and hp.diagnosis_code_type = 'icd-10-cm'

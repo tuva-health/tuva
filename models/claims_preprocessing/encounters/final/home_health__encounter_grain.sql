@@ -6,7 +6,7 @@
 with encounter_date as (
   select distinct old_encounter_id
   ,start_date as encounter_start_date
-  from {{ ref('outpatient_hospital_or_clinic__generate_encounter_id') }}
+  from {{ ref('home_health__generate_encounter_id') }}
 )
 
 ,detail_values as (
@@ -21,7 +21,7 @@ with encounter_date as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'outpatient hospital or clinic'
+    cli.encounter_type = 'home health'
     and
     cli.claim_line_attribution_number = 1
     inner join encounter_date d on cli.old_encounter_id = d.old_encounter_id
@@ -93,6 +93,7 @@ select   d.encounter_id
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
 , hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
+, b.primary_specialty_description as facility_type
 , tot.total_paid_amount
 , tot.total_allowed_amount
 , tot.total_charge_amount

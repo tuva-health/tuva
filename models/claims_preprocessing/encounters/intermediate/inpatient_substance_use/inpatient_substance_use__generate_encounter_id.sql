@@ -1,59 +1,66 @@
-with base as (
-  select distinct
-      claim_id
-    , patient_id
-    , start_date
-    , end_date
-    , facility_id
-    , discharge_disposition_code
+with claim_start_end as (
+  select
+    claim_id,
+    patient_id,
+    min(start_date) as start_date,
+    max(end_date) as end_date
   from {{ ref('encounters__stg_medical_claim') }}
+  group by claim_id, patient_id
+)
+
+, base as (
+  select distinct
+    enc.claim_id,
+    enc.patient_id,
+    c.start_date,
+    c.end_date,
+    enc.facility_id,
+    enc.discharge_disposition_code
+  from {{ ref('encounters__stg_medical_claim') }} enc
+  inner join claim_start_end c 
+    on enc.claim_id = c.claim_id
+    and c.patient_id = enc.patient_id
   where
-    service_category_2 = 'Inpatient Substance Use'
-    and claim_type = 'institutional'
+    enc.service_category_2 = 'Inpatient Substance Use'
+    and enc.claim_type = 'institutional'
 )
 
 , add_row_num as (
   select
-      patient_id
-    , claim_id
-    , start_date
-    , end_date
-    , discharge_disposition_code
-    , facility_id
-    , row_number() over (partition by patient_id order by end_date, start_date, claim_id) as row_num
+    patient_id,
+    claim_id,
+    start_date,
+    end_date,
+    discharge_disposition_code,
+    facility_id,
+    row_number() over (partition by patient_id order by end_date, start_date, claim_id) as row_num
   from base
 )
 
 , check_for_merges_with_larger_row_num as (
   select
-      aa.patient_id
-    , aa.claim_id as claim_id_a
-    , bb.claim_id as claim_id_b
-    , aa.row_num as row_num_a
-    , bb.row_num as row_num_b
-    , case
-        -- Claims with same end_date and same facility_id should be merged:
-        when aa.end_date = bb.end_date
-          and aa.facility_id = bb.facility_id then 1
-
-        -- Claims with different end_date and start_date that are
-        -- adjacent (i.e. separated by 1 day) should be merged:
-        when {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
-          and aa.facility_id = bb.facility_id
-          and aa.discharge_disposition_code = '30' then 1
-
-        -- Claims with different end_date 
-        -- should be merged if they overlap:
-        when aa.end_date <> bb.end_date
-          and aa.end_date >= bb.start_date
-          and aa.facility_id = bb.facility_id then 1
-        else 0
-      end as merge_flag
+    aa.patient_id,
+    aa.claim_id as claim_id_a,
+    bb.claim_id as claim_id_b,
+    aa.row_num as row_num_a,
+    bb.row_num as row_num_b,
+    case
+      when aa.end_date = bb.end_date and aa.facility_id = bb.facility_id then 1
+      when {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
+        and aa.facility_id = bb.facility_id
+        and aa.discharge_disposition_code = '30' then 1
+      when aa.end_date <> bb.end_date
+        and aa.end_date >= bb.start_date
+        and aa.facility_id = bb.facility_id then 1
+      else 0
+    end as merge_flag
   from add_row_num as aa
   inner join add_row_num as bb
     on aa.patient_id = bb.patient_id
     and aa.row_num < bb.row_num
+    and aa.claim_id <> bb.claim_id
 )
+
 
 , merges_with_larger_row_num as (
   select

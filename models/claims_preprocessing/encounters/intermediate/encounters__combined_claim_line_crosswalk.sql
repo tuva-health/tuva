@@ -143,45 +143,9 @@ union
 select claim_id
 ,claim_line_number
 ,old_encounter_id
-,'office visit surgery' as encounter_type
-,6 as priority_number
-from {{ ref('office_visits__int_office_visits_surgery') }}
-
-union
-
-select claim_id
-,claim_line_number
-,old_encounter_id
-,'office visit injections' as encounter_type
-,7 as priority_number
-from {{ ref('office_visits__int_office_visits_injections') }}
-
-union
-
-select claim_id
-,claim_line_number
-,old_encounter_id
-,'office visit pt/ot/st' as encounter_type
-,8 as priority_number
-from {{ ref('office_visits__int_office_visits_ptotst') }}
-
-union
-
-select claim_id
-,claim_line_number
-,old_encounter_id
-,'office visit radiology' as encounter_type
-,9 as priority_number
-from {{ ref('office_visits__int_office_visits_radiology') }}
-
-union
-
-select claim_id
-,claim_line_number
-,old_encounter_id
-,'office visit' as encounter_type
-,9999 as priority_number
-from {{ ref('office_visits__int_office_visits') }}
+,encounter_type
+,10 as priority_number --priority set in combined office visit encounter ranking model
+from {{ ref('office_visits__int_office_visits_claim_line') }}
 
 union
 
