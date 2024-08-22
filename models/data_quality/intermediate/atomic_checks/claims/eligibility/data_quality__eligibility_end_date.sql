@@ -3,25 +3,25 @@
 ) }}
 
 SELECT DISTINCT
-    M.Data_SOURCE
-    ,coalesce(cast(M.ENROLLMENT_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'ELIGIBILITY' AS TABLE_NAME
-    ,'Member ID' AS DRILL_DOWN_KEY
-    ,coalesce(m.member_id,'NULL') AS DRILL_DOWN_VALUE
-    ,'ELIGIBILITY' AS CLAIM_TYPE
-    ,'ENROLLMENT_END_DATE' AS FIELD_NAME
-    ,CASE 
-        WHEN M.ENROLLMENT_END_DATE <= cast('1901-01-01' as date) THEN 'invalid'
-        WHEN M.ENROLLMENT_END_DATE < M.ENROLLMENT_START_DATE THEN 'invalid'
-        WHEN M.ENROLLMENT_END_DATE IS NULL THEN 'null'
-        ELSE 'valid' 
-    END AS BUCKET_NAME
-    ,CASE 
-    
-        WHEN M.ENROLLMENT_END_DATE <= cast('1901-01-01' as date) THEN 'too old'
-        WHEN M.ENROLLMENT_END_DATE < M.ENROLLMENT_START_DATE THEN 'end date before start date'
+    m.data_source
+    ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'ELIGIBILITY' AS table_name
+    ,'Member ID' AS drill_down_key
+    ,coalesce(m.member_id,'NULL') AS drill_down_value
+    ,'ELIGIBILITY' AS claim_type
+    ,'ENROLLMENT_END_DATE' AS field_name
+    ,case
+        when m.enrollment_end_date <= cast('1901-01-01' as date) then 'invalid'
+        when m.enrollment_end_date < m.enrollment_start_date then 'invalid'
+        when m.enrollment_end_date is null then 'null'
+        else 'valid'
+    end as bucket_name
+    ,case
+
+        when m.enrollment_end_date <= cast('1901-01-01' as date) then 'too old'
+        when m.enrollment_end_date < m.enrollment_start_date then 'end date before start date'
         else null
-    END AS INVALID_REASON
-    ,CAST(ENROLLMENT_END_DATE as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    ,cast(enrollment_end_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('eligibility')}} M
+from {{ ref('eligibility')}} m

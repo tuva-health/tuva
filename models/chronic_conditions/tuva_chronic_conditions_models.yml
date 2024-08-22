@@ -19,8 +19,10 @@ models:
         - chronic_conditions
       materialized: table
     tests:
-      - unique:
-          column_name: "(patient_id || '_' || condition)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - condition
     columns:
         - name: patient_id
           description: The unique identifier for a patient

@@ -2,9 +2,9 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-WITH BASE as (
-SELECT * 
-FROM {{ ref('data_quality__stg_institutional_inpatient') }}
+with base as (
+select *
+from {{ ref('data_quality__stg_institutional_inpatient') }}
 )
 , tuva_last_run as(
 
@@ -12,58 +12,58 @@ FROM {{ ref('data_quality__stg_institutional_inpatient') }}
 
 )
 
-,UNIQUE_FIELD as (
-    SELECT DISTINCT CLAIM_ID
-        ,cast(Procedure_Date_3 as {{ dbt.type_string() }})  as Field
-        ,DATA_SOURCE
-    FROM BASE
+,unique_field as (
+    select distinct claim_id
+        ,cast(procedure_date_3 as {{ dbt.type_string() }})  as field
+        ,data_source
+    from base
 
 ),
-CLAIM_GRAIN as (
-    SELECT CLAIM_ID
-        ,DATA_SOURCE
-        ,count(*) as FREQUENCY
-    from UNIQUE_FIELD 
-    GROUP BY CLAIM_ID
-        ,DATA_SOURCE
+claim_grain as (
+    select claim_id
+        ,data_source
+        ,count(*) as frequency
+    from unique_field
+    group by claim_id
+        ,data_source
 ),
-CLAIM_AGG as (
-SELECT
-    CLAIM_ID,
-    DATA_SOURCE,
-    {{ dbt.listagg(measure="coalesce(Field, 'null')", delimiter_text="', '", order_by_clause="order by Field desc") }} AS FIELD_AGGREGATED
-FROM
-    UNIQUE_FIELD
-GROUP BY
-    CLAIM_ID,
-    DATA_SOURCE
+claim_agg as (
+select
+    claim_id,
+    data_source,
+    {{ dbt.listagg(measure="coalesce(field, 'null')", delimiter_text="', '", order_by_clause="order by field desc") }} as field_aggregated
+from
+    unique_field
+group by
+    claim_id,
+    data_source
 	)
-SELECT DISTINCT -- to bring to claim_ID grain 
-    M.Data_SOURCE
-    ,coalesce(cast(M.CLAIM_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'MEDICAL_CLAIM' AS TABLE_NAME
-    ,'Claim ID' AS DRILL_DOWN_KEY
-    ,coalesce(M.CLAIM_ID, 'NULL') AS DRILL_DOWN_VALUE
-    ,'institutional' AS CLAIM_TYPE
-    ,'PROCEDURE_DATE_3' AS FIELD_NAME
-    ,CASE 
-        WHEN CG.FREQUENCY > 1 THEN 'multiple'      
-        WHEN M.Procedure_Date_3 > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
-        WHEN M.Procedure_Date_3 < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} THEN 'invalid'
-        WHEN NOT (M.Procedure_Date_3 BETWEEN M.CLAIM_START_DATE AND M.CLAIM_END_DATE) THEN 'invalid'
-        WHEN M.Procedure_Date_3 IS NULL THEN 'null'
-        ELSE 'valid'
-    END AS BUCKET_NAME
-    ,CASE 
-        WHEN CG.FREQUENCY > 1 THEN 'multiple'      
-        WHEN M.Procedure_Date_3 > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
-        WHEN M.Procedure_Date_3 < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} THEN 'too old'
-        WHEN NOT (M.Procedure_Date_3 BETWEEN M.CLAIM_START_DATE AND M.CLAIM_END_DATE) THEN 'procedure date not between claim start and end dates'
+select distinct -- to bring to claim_id grain
+    m.data_source
+    ,coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'MEDICAL_CLAIM' AS table_name
+    ,'Claim ID' AS drill_down_key
+    ,coalesce(m.claim_id, 'NULL') AS drill_down_value
+    ,'institutional' AS claim_type
+    ,'PROCEDURE_DATE_3' AS field_name
+    ,case
+        when cg.frequency > 1 then 'multiple'
+        when m.procedure_date_3 > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'invalid'
+        when m.procedure_date_3 < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'invalid'
+        when not (m.procedure_date_3 between m.claim_start_date and m.claim_end_date) then 'invalid'
+        when m.procedure_date_3 is null then 'null'
+        else 'valid'
+    end as bucket_name
+    ,case
+        when cg.frequency > 1 then 'multiple'
+        when m.procedure_date_3 > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'future'
+        when m.procedure_date_3 < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'too old'
+        when not (m.procedure_date_3 between m.claim_start_date and m.claim_end_date) then 'procedure date not between claim start and end dates'
         else null
-        END AS INVALID_REASON
-    ,CAST({{ substring('AGG.FIELD_AGGREGATED', 1, 255) }} as {{ dbt.type_string() }}) AS FIELD_VALUE
+        end as invalid_reason
+    ,cast({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM BASE M
-LEFT JOIN CLAIM_GRAIN CG ON M.CLAIM_ID = CG.CLAIM_ID AND M.Data_Source = CG.Data_Source
-LEFT JOIN CLAIM_AGG AGG ON M.CLAIM_ID = AGG.CLAIM_ID AND M.Data_Source = AGG.Data_Source
+from base m
+left join claim_grain cg on m.claim_id = cg.claim_id and m.data_source = cg.data_source
+left join claim_agg agg on m.claim_id = agg.claim_id and m.data_source = agg.data_source
 cross join tuva_last_run cte

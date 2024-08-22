@@ -9,14 +9,17 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: pmpm_prep
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     tests:
-       - unique:
-           column_name: "(patient_id || '_' || year_month || '_' || plan)"
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_id
+            - year_month
+            - plan
     description: >
-      Computes all the paid and allowed statistics for every patient_id and year_month combination.  
+      Computes all the paid and allowed statistics for every patient_id and year_month combination.
     columns:
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
@@ -142,7 +145,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: pmpm_payer_plan
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -273,7 +276,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: pmpm_payer
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -404,7 +407,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: _int_patient_spend_with_service_categories
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -416,7 +419,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_1_allowed_pivot
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -428,7 +431,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_2_allowed_pivot
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -440,7 +443,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_1_paid_pivot
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -452,7 +455,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
         {% else %}financial_pmpm{%- endif -%}
       alias: _int_service_category_2_paid_pivot
-      tags: 
+      tags:
         - financial_pmpm
       materialized: table
     description: >
@@ -461,7 +464,7 @@ models:
 ## Staging
   - name: financial_pmpm__stg_eligibility
     config:
-      tags: 
+      tags:
         - financial_pmpm
       materialized: ephemeral
 

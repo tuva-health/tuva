@@ -5,136 +5,136 @@
 
 WITH Ranked_Examples as (
        SELECT
-              SUMMARY_SK,
-              DATA_SOURCE,
-              TABLE_NAME,
-              FIELD_NAME,
-              BUCKET_NAME,
-              INVALID_REASON,
-              DRILL_DOWN_KEY,
-              DRILL_DOWN_VALUE as DRILL_DOWN_VALUE,
-              FIELD_VALUE as FIELD_VALUE,
-              COUNT(DRILL_DOWN_VALUE) as FREQUENCY,
-              ROW_NUMBER() OVER (PARTITION BY SUMMARY_SK, BUCKET_NAME, FIELD_VALUE ORDER BY FIELD_VALUE) AS RN
+              summary_sk,
+              data_source,
+              table_name,
+              field_name,
+              bucket_name,
+              invalid_reason,
+              drill_down_key,
+              drill_down_value as drill_down_value,
+              field_value as field_value,
+              count(drill_down_value) as frequency,
+              row_number() over (partition by summary_sk, bucket_name, field_value order by field_value) as rn
               , '{{ var('tuva_last_run')}}' as tuva_last_run
        FROM {{ ref('data_quality__data_quality_clinical_detail') }}
-       WHERE BUCKET_NAME not in ('valid', 'null')
-       GROUP BY
-              DATA_SOURCE,
-              FIELD_NAME,
-              TABLE_NAME,
-              BUCKET_NAME,
-              FIELD_VALUE,
-              DRILL_DOWN_KEY,
-              DRILL_DOWN_VALUE,
-              INVALID_REASON,
-              SUMMARY_SK
+       where bucket_name not in ('valid', 'null')
+       group by
+              data_source,
+              field_name,
+              table_name,
+              bucket_name,
+              field_value,
+              drill_down_key,
+              drill_down_value,
+              invalid_reason,
+              summary_sk
 
 ),
 
 pk_examples as (
        SELECT
-              detail.SUMMARY_SK,
-              detail.DATA_SOURCE,
-              detail.TABLE_NAME,
-              detail.FIELD_NAME,
-              detail.BUCKET_NAME,
-              detail.INVALID_REASON,
-              detail.DRILL_DOWN_KEY,
-              detail.DRILL_DOWN_VALUE as DRILL_DOWN_VALUE,
-              detail.FIELD_VALUE as FIELD_VALUE,
-              COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY,
-              ROW_NUMBER() OVER (PARTITION BY detail.SUMMARY_SK ORDER BY detail.SUMMARY_SK) AS RN
+              detail.summary_sk,
+              detail.data_source,
+              detail.table_name,
+              detail.field_name,
+              detail.bucket_name,
+              detail.invalid_reason,
+              detail.drill_down_key,
+              detail.drill_down_value as drill_down_value,
+              detail.field_value as field_value,
+              count(detail.drill_down_value) as frequency,
+              row_number() over (partition by detail.summary_sk order by detail.summary_sk) as rn
               , '{{ var('tuva_last_run')}}' as tuva_last_run
-       FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
-              left join {{ ref('data_quality__crosswalk_field_info')}} as field_info on detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
+       from {{ ref('data_quality__data_quality_clinical_detail') }} as detail
+              left join {{ ref('data_quality__crosswalk_field_info')}} as field_info on detail.table_name = field_info.input_layer_table_name
                      and detail.field_name = field_info.field_name
-       WHERE detail.BUCKET_NAME = 'valid'
-              AND field_info.UNIQUE_VALUES_EXPECTED_FLAG = 1
+       where detail.bucket_name = 'valid'
+              and field_info.unique_values_expected_flag = 1
        GROUP BY
-              detail.DATA_SOURCE,
-              detail.FIELD_NAME,
-              detail.TABLE_NAME,
-              detail.BUCKET_NAME,
-              detail.FIELD_VALUE,
-              detail.DRILL_DOWN_KEY,
-              detail.DRILL_DOWN_VALUE,
-              detail.INVALID_REASON,
-              detail.SUMMARY_SK
+              detail.data_source,
+              detail.field_name,
+              detail.table_name,
+              detail.bucket_name,
+              detail.field_value,
+              detail.drill_down_key,
+              detail.drill_down_value,
+              detail.invalid_reason,
+              detail.summary_sk
 
 )
 --- Null Values
 
 SELECT
-       SUMMARY_SK,
-       DATA_SOURCE,
-       TABLE_NAME,
-       FIELD_NAME,
-       BUCKET_NAME,
-       INVALID_REASON,
-       DRILL_DOWN_KEY,
-       MAX(DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE,
-       null as FIELD_VALUE,
-       COUNT(DRILL_DOWN_VALUE) as FREQUENCY
+       summary_sk,
+       data_source,
+       table_name,
+       field_name,
+       bucket_name,
+       invalid_reason,
+       drill_down_key,
+       max(drill_down_value) as drill_down_value,
+       null as field_value,
+       count(drill_down_value) as frequency
        , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('data_quality__data_quality_clinical_detail') }}
-WHERE BUCKET_NAME = 'null'
-GROUP BY
-       DATA_SOURCE,
-       FIELD_NAME,
-       TABLE_NAME,
-       BUCKET_NAME,
-       INVALID_REASON,
-       DRILL_DOWN_KEY,
-       SUMMARY_SK
+from {{ ref('data_quality__data_quality_clinical_detail') }}
+where bucket_name = 'null'
+group by
+       data_source,
+       field_name,
+       table_name,
+       bucket_name,
+       invalid_reason,
+       drill_down_key,
+       summary_sk
 
 union all
 
 --- Valid Values except PKs
 
 SELECT
-       detail.SUMMARY_SK,
-       detail.DATA_SOURCE,
-       detail.TABLE_NAME,
-       detail.FIELD_NAME,
-       detail.BUCKET_NAME,
-       detail.INVALID_REASON,
-       detail.DRILL_DOWN_KEY,
-       MAX(detail.DRILL_DOWN_VALUE) as DRILL_DOWN_VALUE,
-       detail.FIELD_VALUE as FIELD_VALUE,
-       COUNT(detail.DRILL_DOWN_VALUE) as FREQUENCY
+       detail.summary_sk,
+       detail.data_source,
+       detail.table_name,
+       detail.field_name,
+       detail.bucket_name,
+       detail.invalid_reason,
+       detail.drill_down_key,
+       max(detail.drill_down_value) as drill_down_value,
+       detail.field_value as field_value,
+       count(detail.drill_down_value) as frequency
        , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('data_quality__data_quality_clinical_detail') }} as detail
-LEFT JOIN {{ ref('data_quality__crosswalk_field_info') }} as field_info ON detail.table_name = field_info.INPUT_LAYER_TABLE_NAME
+from {{ ref('data_quality__data_quality_clinical_detail') }} as detail
+left join {{ ref('data_quality__crosswalk_field_info') }} as field_info on detail.table_name = field_info.input_layer_table_name
        and detail.field_name = field_info.field_name
-WHERE 
-       detail.BUCKET_NAME = 'valid'
-       AND field_info.UNIQUE_VALUES_EXPECTED_FLAG = 0 --- Need to handle PKs differently since every value is supposed to be unique
-GROUP BY
-       detail.DATA_SOURCE,
-       detail.FIELD_NAME,
-       detail.TABLE_NAME,
-       detail.BUCKET_NAME,
-       detail.FIELD_VALUE,
-       detail.INVALID_REASON,
-       detail.DRILL_DOWN_KEY,
-       detail.SUMMARY_SK
+WHERE
+       detail.bucket_name = 'valid'
+       and field_info.unique_values_expected_flag = 0 --- need to handle pks differently since every value is supposed to be unique
+group by
+       detail.data_source,
+       detail.field_name,
+       detail.table_name,
+       detail.bucket_name,
+       detail.field_value,
+       detail.invalid_reason,
+       detail.drill_down_key,
+       detail.summary_sk
 
 union all
 
 -- 5 Examples of each invalid example
 
 SELECT
-       SUMMARY_SK,
-       DATA_SOURCE,
-       TABLE_NAME,
-       FIELD_NAME,
-       BUCKET_NAME,
-       INVALID_REASON,
-       DRILL_DOWN_KEY,
-       DRILL_DOWN_VALUE as DRILL_DOWN_VALUE,
-       FIELD_VALUE as FIELD_VALUE,
-       FREQUENCY
+       summary_sk,
+       data_source,
+       table_name,
+       field_name,
+       bucket_name,
+       invalid_reason,
+       drill_down_key,
+       drill_down_value as drill_down_value,
+       field_value as field_value,
+       frequency
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM Ranked_Examples
 WHERE rn <= 5
@@ -144,44 +144,44 @@ union all
 --- Aggregating all other invalid examples into single row
 
 SELECT
-       SUMMARY_SK,
-       DATA_SOURCE,
-       TABLE_NAME,
-       FIELD_NAME,
-       BUCKET_NAME,
-       INVALID_REASON,
-       DRILL_DOWN_KEY,
-       'All Others' as DRILL_DOWN_VALUE,
-       FIELD_VALUE as FIELD_VALUE,
-       SUM(FREQUENCY) AS FREQUENCY
+       summary_sk,
+       data_source,
+       table_name,
+       field_name,
+       bucket_name,
+       invalid_reason,
+       drill_down_key,
+       'all others' as drill_down_value,
+       field_value as field_value,
+       sum(frequency) as frequency
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM Ranked_Examples
 WHERE rn > 5 --- Aggregating all other rows
 GROUP BY
-    SUMMARY_SK,
-    DATA_SOURCE,
-    TABLE_NAME,
-    FIELD_NAME,
-    BUCKET_NAME,
-    INVALID_REASON,
-    DRILL_DOWN_KEY,
-    FIELD_VALUE
+    summary_sk,
+    data_source,
+    table_name,
+    field_name,
+    bucket_name,
+    invalid_reason,
+    drill_down_key,
+    field_value
 
 union all
 
 --- 5 Examples of valid primary key values
 
 SELECT
-       SUMMARY_SK,
-       DATA_SOURCE,
-       TABLE_NAME,
-       FIELD_NAME,
-       BUCKET_NAME,
-       INVALID_REASON,
-       DRILL_DOWN_KEY,
-       DRILL_DOWN_VALUE as DRILL_DOWN_VALUE,
-       FIELD_VALUE as FIELD_VALUE,
-       FREQUENCY
+       summary_sk,
+       data_source,
+       table_name,
+       field_name,
+       bucket_name,
+       invalid_reason,
+       drill_down_key,
+       drill_down_value as drill_down_value,
+       field_value as field_value,
+       frequency
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM pk_examples
 WHERE rn <= 5
@@ -191,25 +191,25 @@ union all
 --- Aggegating all other valid primary key value examples
 
 SELECT
-       SUMMARY_SK,
-       DATA_SOURCE,
-       TABLE_NAME,
-       FIELD_NAME,
-       BUCKET_NAME,
-       INVALID_REASON,
-       DRILL_DOWN_KEY,
-       'All Others' as DRILL_DOWN_VALUE,
-       'All Others' as FIELD_VALUE,
-       SUM(FREQUENCY) AS FREQUENCY
+       summary_sk,
+       data_source,
+       table_name,
+       field_name,
+       bucket_name,
+       invalid_reason,
+       drill_down_key,
+       'All Others' as drill_down_value,
+       'All Others' as field_value,
+       sum(frequency) as frequency
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM pk_examples
 WHERE rn > 5 --- Aggregating all other rows
 GROUP BY
-    SUMMARY_SK,
-    DATA_SOURCE,
-    TABLE_NAME,
-    FIELD_NAME,
-    BUCKET_NAME,
-    INVALID_REASON,
-    DRILL_DOWN_KEY,
-    FIELD_VALUE
+    summary_sk,
+    data_source,
+    table_name,
+    field_name,
+    bucket_name,
+    invalid_reason,
+    drill_down_key,
+    field_value
