@@ -586,6 +586,59 @@ seeds:
       - name: medicare_status_description
         description: 'A description of the Medicare status.'
 
+  - name: terminology__ms_drg_weights_los
+    description: 'Seed containing Medicare Severity Diagnosis Related Groups (MS-DRG) weights and benchmark length of stay values from CMS.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: ms_drg_weights_los
+      tags:
+        - terminology
+        - data_profiling
+        - claims_preprocessing
+      column_types:
+        ms_drg : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        fy_2024_final_post_acute_drg : |
+          {%- if target.type in ("bigquery", "databricks") -%} boolean {%- else -%} boolean {%- endif -%}
+        fy_2024_final_special_pay_drg : |
+          {%- if target.type in ("bigquery", "databricks") -%} boolean {%- else -%} boolean {%- endif -%}
+        mdc : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        type : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        ms_drg_title : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        drg_weight_raw : |
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,4) {%- endif -%}
+        drg_weight : |
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,4) {%- endif -%}
+        geometric_mean_los : |
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,2) {%- endif -%}
+        arithmetic_mean_los : |
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- else -%} numeric(18,2) {%- endif -%}
+    columns:
+      - name: ms_drg
+        description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
+      - name: fy_2024_final_post_acute_drg
+        description: 'Indicates if this is a FY 2024 final post-acute DRG.'
+      - name: fy_2024_final_special_pay_drg
+        description: 'Indicates if this is a FY 2024 final special pay DRG.'
+      - name: mdc
+        description: 'The Major Diagnostic Category (MDC) code associated with the MS-DRG.'
+      - name: type
+        description: 'The type of the DRG.'
+      - name: ms_drg_title
+        description: 'The title of the Medicare Severity Diagnosis Related Group (MS-DRG).'
+      - name: drg_weight_raw
+        description: 'The raw DRG weight.'
+      - name: drg_weight
+        description: 'The adjusted DRG weight.'
+      - name: geometric_mean_los
+        description: 'The geometric mean length of stay for this DRG.'
+      - name: arithmetic_mean_los
+        description: 'The arithmetic mean length of stay for this DRG.'
+
   - name: terminology__ms_drg
     description: 'Seed containing Medicare Severity Diagnosis Related Groups (MS-DRG) codes and descriptions.'
     config:
