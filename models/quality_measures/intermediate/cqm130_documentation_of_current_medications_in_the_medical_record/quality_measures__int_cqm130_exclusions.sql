@@ -115,6 +115,20 @@ with exclusion_codes as (
 
 )
 
+, med_claim_exclusions as (
+
+    select
+          medical_claim.patient_id
+        , coalesce(medical_claim.claim_end_date, medical_claim.claim_start_date) as exclusion_date
+        , medical_claim.hcpcs_code
+        , exclusion_codes.concept_name as concept_name
+    from medical_claim
+    inner join exclusion_codes
+      on medical_claim.hcpcs_code = exclusion_codes.code
+        and exclusion_codes.code_system = 'hcpcs'
+
+)
+
 , patients_with_exclusions as (
     
     select 
@@ -131,19 +145,13 @@ with exclusion_codes as (
         , concept_name as exclusion_reason
     from procedure_exclusions
 
-)
-
-, med_claim_exclusions as (
+    union all
 
     select
-          medical_claim.patient_id
-        , coalesce(medical_claim.claim_end_date, medical_claim.claim_start_date) as exclusion_date
-        , medical_claim.hcpcs_code
-        , exclusion_codes.concept_name as concept_name
-    from medical_claim
-    inner join exclusion_codes
-      on medical_claim.hcpcs_code = exclusion_codes.code
-        and exclusion_codes.code_system = 'hcpcs'
+          patient_id
+        , exclusion_date
+        , concept_name as exclusion_reason
+    from med_claim_exclusions
 
 )
 
