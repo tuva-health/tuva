@@ -8,7 +8,6 @@
   select 
     performance_period_begin
   from {{ ref('quality_measures__int_cqm130__performance_period') }}
-
 )
 {%- endset -%}
 
@@ -17,7 +16,6 @@
   select 
     performance_period_end
   from {{ ref('quality_measures__int_cqm130__performance_period') }}
-
 )
 {%- endset -%}
 
@@ -56,7 +54,6 @@ with exclusion_codes as (
 
 )
 
-
 , procedures as (
 
     select
@@ -91,7 +88,6 @@ with exclusion_codes as (
 
 )
 
-
 , condition_exclusions as (
 
     select
@@ -106,7 +102,6 @@ with exclusion_codes as (
 
 )
 
-
 , procedure_exclusions as (
 
     select
@@ -119,7 +114,6 @@ with exclusion_codes as (
         and procedures.code_type = exclusion_codes.code_system
 
 )
-
 
 , patients_with_exclusions as (
     

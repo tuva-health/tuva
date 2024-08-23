@@ -1,5 +1,3 @@
--- v2 with unusual changes
-
 {{ config(
      enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False))))
      | as_bool
@@ -22,8 +20,8 @@ with visit_codes as (
 
     select 
           patient_id
-        , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as procedure_encounter_date
-        , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as claims_encounter_date
+        , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as procedure_encounter_date -- alias only to enable union later
+        , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as claims_encounter_date -- alias only to enable union later
     from {{ ref('quality_measures__stg_core__encounter') }} encounter
     inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
@@ -58,8 +56,6 @@ with visit_codes as (
           patient_id
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as procedure_encounter_date
         , coalesce(claim_end_date,claim_start_date) as claims_encounter_date
-		/* claim_start_date and claim_end_date are usually same for cpt code for this measure
-           , except for hospice */
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
     inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp 
         on coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
@@ -92,7 +88,7 @@ with visit_codes as (
           patient_id
         , procedure_encounter_date
         , claims_encounter_date
-        , case when procedure_encounter_date > claims_encounter_date
+        , case when procedure_encounter_date >= claims_encounter_date
                 then procedure_encounter_date
             else claims_encounter_date
           end as max_encounter_date
