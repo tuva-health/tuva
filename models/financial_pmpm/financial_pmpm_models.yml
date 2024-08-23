@@ -17,7 +17,7 @@ models:
           combination_of_columns:
             - patient_id
             - year_month
-            - plan
+            - "{{ quote_column('plan') }}"
     description: >
       Computes all the paid and allowed statistics for every patient_id and year_month combination.
     columns:

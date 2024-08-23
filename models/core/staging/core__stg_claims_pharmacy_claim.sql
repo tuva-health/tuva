@@ -23,11 +23,7 @@ select
        , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(payer as {{ dbt.type_string() }} ) as payer
-       {% if target.type == 'fabric' %}
-           , cast("plan" as {{ dbt.type_string() }} ) as "plan"
-       {% else %}
-           , cast(plan as {{ dbt.type_string() }} ) as plan
-       {% endif %}
+       , {{ quote_column('plan') }}
        , cast(prescribing_provider_id as {{ dbt.type_string() }} ) as prescribing_provider_id
        , cast(prescribing_provider_name as {{ dbt.type_string() }} ) as prescribing_provider_name
        , cast(dispensing_provider_id as {{ dbt.type_string() }} ) as dispensing_provider_id

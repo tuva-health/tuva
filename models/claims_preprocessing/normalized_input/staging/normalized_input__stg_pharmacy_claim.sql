@@ -11,11 +11,7 @@ select
     , patient_id
     , member_id
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , prescribing_provider_npi
     , dispensing_provider_npi
     , dispensing_date
