@@ -124,6 +124,8 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.5','medicare_orec.csv',compression=true,null_marker=true) }}"
       terminology__medicare_status:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.5','medicare_status.csv',compression=true,null_marker=true) }}"
+      terminology__ms_drg_weights_los:
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.6','ms_drg_weights_los.csv',compression=true,null_marker=true) }}"      
       terminology__ms_drg:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.5','ms_drg.csv',compression=true,null_marker=true) }}"
       terminology__ndc:
