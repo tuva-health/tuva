@@ -12,16 +12,9 @@ SELECT
                     "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'null')"]) }} as drill_down_value
     , 'PHARMACY' AS claim_type
     , 'PLAN' AS field_name
-    {% if target.type == 'fabric' %}
     , case
-        when m."plan" is null then 'null' else 'valid' end as bucket_name
+        when m.{{ quote_column('plan') }} is null then 'null' else 'valid' end as bucket_name
     , cast(null as {{ dbt.type_string() }}) as invalid_reason
-    , cast("plan" as {{ dbt.type_string() }}) as field_value
-    {% else %}
-    , case
-        when m.plan is null then 'null' else 'valid' end as bucket_name
-    , cast(null as {{ dbt.type_string() }}) as invalid_reason
-    , cast(plan as {{ dbt.type_string() }}) as field_value
-    {% endif %}
+    , cast({{ quote_column('plan') }} as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('pharmacy_claim')}} m

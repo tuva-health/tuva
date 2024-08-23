@@ -8,13 +8,9 @@ SELECT
   a.patient_id,
   a.year_month,
   a.payer,
-  {% if target.type == 'fabric' %}
-      a."plan",
-  {% else %}
-      a.plan,
-  {% endif %}
+  a.{{ quote_column('plan') }},
   a.data_source,
-  
+
   -- service cat 1 paid
   COALESCE(b.inpatient_paid, 0) AS inpatient_paid,
   COALESCE(b.outpatient_paid, 0) AS outpatient_paid,
@@ -22,7 +18,7 @@ SELECT
   COALESCE(b.ancillary_paid, 0) AS ancillary_paid,
   COALESCE(b.pharmacy_paid, 0) AS pharmacy_paid,
   COALESCE(b.other_paid, 0) AS other_paid,
-  
+
   -- service cat 2 paid
   COALESCE(c.acute_inpatient_paid, 0) AS acute_inpatient_paid,
   COALESCE(c.ambulance_paid, 0) AS ambulance_paid,
@@ -41,7 +37,7 @@ SELECT
   COALESCE(c.outpatient_rehabilitation_paid, 0) AS outpatient_rehabilitation_paid,
   COALESCE(c.skilled_nursing_paid, 0) AS skilled_nursing_paid,
   COALESCE(c.urgent_care_paid, 0) AS urgent_care_paid,
-  
+
   -- service cat 1 allowed
   COALESCE(d.inpatient_allowed, 0) AS inpatient_allowed,
   COALESCE(d.outpatient_allowed, 0) AS outpatient_allowed,
@@ -49,7 +45,7 @@ SELECT
   COALESCE(d.ancillary_allowed, 0) AS ancillary_allowed,
   COALESCE(d.pharmacy_allowed, 0) AS pharmacy_allowed,
   COALESCE(d.other_allowed, 0) AS other_allowed,
-  
+
   -- service cat 2 allowed
   COALESCE(e.acute_inpatient_allowed, 0) AS acute_inpatient_allowed,
   COALESCE(e.ambulance_allowed, 0) AS ambulance_allowed,
@@ -73,38 +69,26 @@ left join {{ ref('financial_pmpm__service_category_1_paid_pivot') }} b
   on a.patient_id = b.patient_id
   and a.year_month = b.year_month
   and a.payer = b.payer
-  {% if target.type == 'fabric' %}
-      and a."plan" = b."plan"
-  {% else %}
-      and a.plan = b.plan
-  {% endif %}
+  and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
+
 left join {{ ref('financial_pmpm__service_category_2_paid_pivot') }} c
   on a.patient_id = c.patient_id
   and a.year_month = c.year_month
   and a.payer = c.payer
-  {% if target.type == 'fabric' %}
-      and a."plan" = c."plan"
-  {% else %}
-      and a.plan = c.plan
-  {% endif %}
+  and a.{{ quote_column('plan') }} = c.{{ quote_column('plan') }}
+
 left join {{ ref('financial_pmpm__service_category_1_allowed_pivot') }} d
   on a.patient_id = d.patient_id
   and a.year_month = d.year_month
   and a.payer = d.payer
-  {% if target.type == 'fabric' %}
-      and a."plan" = d."plan"
-  {% else %}
-      and a.plan = d.plan
-  {% endif %}
+  and a.{{ quote_column('plan') }} = d.{{ quote_column('plan') }}
+
 left join {{ ref('financial_pmpm__service_category_2_allowed_pivot') }} e
   on a.patient_id = e.patient_id
   and a.year_month = e.year_month
   and a.payer = e.payer
-  {% if target.type == 'fabric' %}
-    and a."plan" = e."plan"
-  {% else %}
-    and a.plan = e.plan
-  {% endif %}
+  and a.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
+
 )
 
 select *

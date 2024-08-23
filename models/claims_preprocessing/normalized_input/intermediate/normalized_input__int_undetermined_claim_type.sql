@@ -12,11 +12,7 @@ select
     , patient_id
     , member_id
     , payer
-    {% if target.type == 'fabric' %}
-        , "plan"
-    {% else %}
-        , plan
-    {% endif %}
+    , {{ quote_column('plan') }}
     , claim_start_date
     , claim_end_date
     , claim_line_start_date

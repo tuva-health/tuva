@@ -27,11 +27,7 @@ with medical_claim_stage as(
         , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
         , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
         , cast(med.payer as {{ dbt.type_string() }} ) as payer
-        {% if target.type == 'fabric' %}
-            , cast(med."plan" as {{ dbt.type_string() }} ) as "plan"
-        {% else %}
-            , cast(med.plan as {{ dbt.type_string() }} ) as plan
-        {% endif %}
+        , med.{{ quote_column('plan') }}
         , {{ try_to_cast_date('med.claim_start_date', 'YYYY-MM-DD') }} as claim_start_date
         , {{ try_to_cast_date('med.claim_end_date', 'YYYY-MM-DD') }} as claim_end_date
         , {{ try_to_cast_date('med.claim_line_start_date', 'YYYY-MM-DD') }} as claim_line_start_date
@@ -102,11 +98,7 @@ select
     , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
     , cast(med.payer as {{ dbt.type_string() }} ) as payer
-    {% if target.type == 'fabric' %}
-        , cast(med."plan" as {{ dbt.type_string() }} ) as "plan"
-    {% else %}
-        , cast(med.plan as {{ dbt.type_string() }} ) as plan
-    {% endif %}
+    , med.{{ quote_column('plan') }}
     , {{ try_to_cast_date('med.claim_start_date', 'YYYY-MM-DD') }} as claim_start_date
     , {{ try_to_cast_date('med.claim_end_date', 'YYYY-MM-DD') }} as claim_end_date
     , {{ try_to_cast_date('med.claim_line_start_date', 'YYYY-MM-DD') }} as claim_line_start_date
@@ -165,4 +157,3 @@ select
 from medical_claim_stage med
 left join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} enroll
     on med.medical_claim_id = enroll.medical_claim_id
-
