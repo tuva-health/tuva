@@ -21,7 +21,7 @@ with claim_start_end as (
     on enc.claim_id = c.claim_id
     and c.patient_id = enc.patient_id
   where
-    enc.service_category_2 in ('Medical','Surgical','Labor and Delivery','Acute Inpatient - Other')
+    enc.service_category_2 in ('Inpatient Hospice')
     and enc.claim_type = 'institutional'
 )
 

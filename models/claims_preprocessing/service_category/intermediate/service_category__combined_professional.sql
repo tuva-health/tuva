@@ -3,8 +3,6 @@
    )
 }}
 
-
-with combined as (
 select     
       claim_id
     , claim_line_number
@@ -303,48 +301,39 @@ select
     , tuva_last_run
 , source_model_name
 from {{ ref('service_category__outpatient_radiology_professional') }}
-)
 
+union all
 
-select 
-  claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
+select     
+      claim_id
+    , claim_line_number
+    , claim_line_id
+    , service_category_2
+    , service_category_3
+    , tuva_last_run
+, source_model_name
+from {{ ref('service_category__observation_professional') }}
+
+union all
+
+select     
+      claim_id
+    , claim_line_number
+    , claim_line_id
+    , service_category_2
+    , service_category_3
+    , tuva_last_run
 , source_model_name
 from {{ ref('service_category__dme_professional') }}
 
 union all
 
-select 
-  a.claim_id
-, a.claim_line_number
-, a.service_category_2
-, a.service_category_3
-, a.tuva_last_run
-, a.source_model_name
-from {{ ref('service_category__ambulance_professional') }} a
-left join {{ ref('service_category__dme_professional') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_line_number = b.claim_line_number
-where (b.claim_id is null and b.claim_line_number is null)
-
-union all
-
-select 
-  a.claim_id
-, a.claim_line_number
-, a.service_category_2
-, a.service_category_3
-, a.tuva_last_run
-, a.source_model_name
-from combined a
-left join {{ ref('service_category__dme_professional') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_line_number = b.claim_line_number
-left join {{ ref('service_category__ambulance_professional') }} c
-  on a.claim_id = c.claim_id
-  and a.claim_line_number = c.claim_line_number
-where (b.claim_id is null and b.claim_line_number is null)
-  and (c.claim_id is null and c.claim_line_number is null)
+select     
+      claim_id
+    , claim_line_number
+    , claim_line_id
+    , service_category_2
+    , service_category_3
+    , tuva_last_run
+, source_model_name
+from {{ ref('service_category__ambulance_professional') }}

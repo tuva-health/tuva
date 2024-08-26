@@ -4,7 +4,7 @@
 }}
 
 select distinct 
-  claim_id
+  med.claim_id
 , 'Lab' as service_category_2
 , 'Lab' as service_category_3
 ,'{{ this.name }}' as source_model_name
@@ -12,7 +12,7 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} med
 inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatient
     on med.claim_id = outpatient.claim_id
-and substring(bill_type_code, 1, 2) in ('14')
+where substring(med.bill_type_code, 1, 2) in ('14')
 OR
 med.ccs_category in ('233' -- lab
 ,'235' --other lab

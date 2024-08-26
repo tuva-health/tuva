@@ -440,6 +440,52 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: lab__encounter_grain
+    description: one row per lab encounter id summarizing encounter level metrics. labs will roll up to other encounters unless they appear on their own day with no other claims.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: dme__encounter_grain
+    description: one row per dme encounter id summarizing encounter level metrics. dmes will roll up to other encounters unless they appear on their own day with no other claims.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: ambulance__encounter_grain
+    description: one row per ambulance encounter id summarizing encounter level metrics. ambulances will roll up to other encounters unless they appear on their own day with no other claims.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+  - name: orphaned_claim__encounter_grain
+    description: orphaned claims (usually professional claims) that don't roll up to an anchor event, get assigned their own encounter id for completeness. 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
+
+
 
 ## Intermediate
 ## acute inpatient
@@ -1173,6 +1219,116 @@ models:
       - claims_preprocessing
       - encounters
       - outpatient_radiology
+##
+  - name: lab__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - lab
+
+  - name: lab__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - lab
+
+  - name: lab__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - lab
+##
+  - name: dme__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - dme
+
+  - name: dme__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - dme
+
+  - name: dme__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - dme
+
+##
+  - name: ambulance__anchor_events
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - ambulance
+
+  - name: ambulance__generate_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - ambulance
+
+  - name: ambulance__match_claims_to_anchor
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
+      - ambulance
+
+  - name: encounters__orphaned_claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+      - claims_preprocessing
+      - encounters
 
 ## Staging
   - name: encounters__stg_medical_claim

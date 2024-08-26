@@ -7,7 +7,7 @@ select distinct
     claim_id
     , claim_line_number
     , claim_line_id
-, 'Acute Inpatient - Other' as service_category_2
+, 'Acute Inpatient' as service_category_2
 , 'Acute Inpatient - Other' as service_category_3
 , '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run

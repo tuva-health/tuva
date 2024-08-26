@@ -8,20 +8,14 @@ with service_category_1_mapping as(
         a.claim_id
         , a.claim_line_number
         , a.claim_type
-        , case
-            when s.service_category_1 is null then 'Value not in seed table'
-            else s.service_category_1
-          end service_category_1
-        , case
-            when b.service_category_2 is null then 'Not Mapped'
-            when s.service_category_2 is null then 'Value not in seed table'
+        , s.service_category_1
+        , case when s.service_category_2 is null and b.service_category_2 is not null then 'Service cat value not in seed table'
             else s.service_category_2
           end service_category_2
         , case
-            when s.service_category_3 is null then 'Value not in seed table'
+            when s.service_category_3 is null and b.service_category_3 is not null then 'Service cat value not in seed table'
             else s.service_category_3
           end service_category_3
-        
         ,b.service_category_2 as original_service_cat_2
         ,b.service_category_3 as original_service_cat_3
         , s.priority
@@ -42,17 +36,12 @@ with service_category_1_mapping as(
         a.claim_id
         , a.claim_line_number
         , a.claim_type
-        , case
-            when s.service_category_1 is null then 'Value not in seed table'
-            else s.service_category_1
-          end service_category_1
-        , case
-            when b.service_category_2 is null then 'Not Mapped'
-            when s.service_category_2 is null then 'Value not in seed table'
+        , s.service_category_1
+        , case when s.service_category_2 is null and b.service_category_2 is not null then 'Service cat value not in seed table'
             else s.service_category_2
           end service_category_2
         , case
-            when s.service_category_3 is null then 'Value not in seed table'
+            when s.service_category_3 is null and b.service_category_3 is not null then 'Service cat value not in seed table'
             else s.service_category_3
           end service_category_3
         ,b.service_category_2 as original_service_cat_2
@@ -74,17 +63,12 @@ with service_category_1_mapping as(
         a.claim_id
         , a.claim_line_number
         , a.claim_type
-        , case
-            when s.service_category_1 is null then 'Value not in seed table'
-            else s.service_category_1
-          end service_category_1
-        , case
-            when b.service_category_2 is null then 'Not Mapped'
-            when s.service_category_2 is null then 'Value not in seed table'
+        , s.service_category_1
+        , case when s.service_category_2 is null and b.service_category_2 is not null then 'Service cat value not in seed table'
             else s.service_category_2
           end service_category_2
         , case
-            when s.service_category_3 is null then 'Value not in seed table'
+            when s.service_category_3 is null and b.service_category_3 is not null then 'Service cat value not in seed table'
             else s.service_category_3
           end service_category_3
         ,b.service_category_2 as original_service_cat_2
@@ -122,9 +106,9 @@ select
     , d.claim_line_number
     , d.claim_type
     , d.claim_id || '|' || d.claim_line_number as claim_line_id
-    , service_category_1
-    , service_category_2
-    , service_category_3
+    , coalesce(service_category_1,'Other') as service_category_1
+    , coalesce(service_category_2,'Other') as service_category_2
+    , coalesce(service_category_3,'Other') as service_category_3
     , original_service_cat_2
     , original_service_cat_3
     , duplicate_row_number

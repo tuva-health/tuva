@@ -256,7 +256,35 @@ select claim_id
 ,21 as priority_number 
 from {{ ref('outpatient_radiology__match_claims_to_anchor') }} --should come after ED but before generic office and outpatient visit. 
 
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'lab' as encounter_type
+,1000000 as priority_number 
+from {{ ref('lab__match_claims_to_anchor') }} --should be last
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'dme - orphaned' as encounter_type
+,1000001 as priority_number 
+from {{ ref('dme__match_claims_to_anchor') }} --should be last
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'ambulance - orphaned' as encounter_type
+,1000002 as priority_number 
+from {{ ref('ambulance__match_claims_to_anchor') }} --should be last
+
 )
+
 
 select 
   claim_id

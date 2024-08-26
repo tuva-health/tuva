@@ -20,7 +20,7 @@ with numeric_hcpcs as (
       , '{{ this.name }}' as source_model_name
       , '{{ var('tuva_last_run') }}' as tuva_last_run
     from numeric_hcpcs as med
-    inner join {{ ref('service_category__stg_professional') }} as prof
+    inner join {{ ref('service_category__stg_office_based') }} as prof
       on med.claim_id = prof.claim_id
       and med.claim_line_number = prof.claim_line_number
     where 

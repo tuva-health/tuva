@@ -10,8 +10,8 @@ with service_category as (
     , start_date
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 in ('Outpatient Hospital or Clinic'--both prof and inst
-    ,'Observation') --orphaned obs that didn't roll up to other encounter
+    service_category_2 = 'Durable Medical Equipment' --both inst and prof
+    
 )
 
 select distinct 

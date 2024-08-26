@@ -24,7 +24,6 @@ where claim_type = 'institutional'
   ,'12' --hospital inpatient 
   ,'21' --SNF inpatient
   ,'82' --Inpatient Hospice
-  ,'81' --Inpatient Hospice
   )
 )
 

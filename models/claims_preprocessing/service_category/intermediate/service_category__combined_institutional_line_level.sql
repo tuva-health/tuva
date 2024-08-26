@@ -55,6 +55,17 @@ select claim_id
 , source_model_name
 from {{ ref('service_category__outpatient_radiology_institutional') }}
 
+union all
+
+select   claim_id
+, claim_line_number
+, service_category_2
+, service_category_3
+, tuva_last_run
+, source_model_name
+from {{ ref('service_category__observation_institutional') }}
+
+
 )
 
 select

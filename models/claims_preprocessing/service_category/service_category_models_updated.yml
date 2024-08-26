@@ -491,6 +491,17 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
+  
+  - name: service_category__observation_professional
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      alias: _int_observation_professional
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
 
 
   - name: service_category__inpatient_substance_use_institutional
@@ -698,6 +709,13 @@ models:
         - claims_preprocessing
 
   - name: service_category__stg_professional
+    config:
+      materialized: table
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: service_category__stg_office_based
     config:
       materialized: table
       tags:

@@ -113,15 +113,6 @@ select   claim_id
 , service_category_3
 , tuva_last_run
 , source_model_name
-from {{ ref('service_category__observation_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
 from {{ ref('service_category__outpatient_hospital_or_clinic_institutional') }}
 
 union all

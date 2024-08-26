@@ -19,6 +19,7 @@ with medical_claim_stage as(
         , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
         , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
         , cast(x.encounter_id as int ) as encounter_id
+        , cast(x.encounter_type as {{ dbt.type_string() }} ) as encounter_type
         , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
         , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
         , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
@@ -92,6 +93,7 @@ select
     , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
     , cast(med.encounter_id as {{ dbt.type_string() }} ) as encounter_id
+    , cast(med.encounter_type as {{ dbt.type_string() }} ) as encounter_type
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
     , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
