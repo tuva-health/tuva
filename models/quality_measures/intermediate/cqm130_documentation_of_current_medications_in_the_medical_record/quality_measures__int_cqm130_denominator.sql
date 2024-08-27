@@ -92,11 +92,11 @@ with visit_codes as (
                 then procedure_encounter_date
             else claims_encounter_date
           end as max_encounter_date
-        , concat(concat(
-              coalesce(min(visit_enc),'')
-            , coalesce(min(proc_enc),''))
-            , coalesce(min(claim_enc),'')
-            ) as qualifying_types
+        , {{ dbt.concat([
+              "coalesce(min(visit_enc), '')"
+            , "coalesce(min(proc_enc), '')"
+            , "coalesce(min(claim_enc), '')"
+        ]) }} as qualifying_types
     from all_encounters
     group by patient_id, procedure_encounter_date, claims_encounter_date
 
