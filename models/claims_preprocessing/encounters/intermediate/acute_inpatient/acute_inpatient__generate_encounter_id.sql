@@ -21,7 +21,7 @@ select claim_id
   and
   c.patient_id = enc.patient_id
   where
-    service_category_2 in ('Medical','Surgical','Labor and Delivery','Acute Inpatient - Other')
+    service_category_2 in ('Acute Inpatient')
     and claim_type = 'institutional'
 )
 

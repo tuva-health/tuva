@@ -27,5 +27,6 @@ select
 , claim_line_number
 , dense_rank() over (order by patient_id, claim_id) + max_encounter.max_encounter_id as encounter_id
 , 'orphaned claim' as encounter_type
+, 'other' as encounter_group
 from cte
 cross join max_encounter

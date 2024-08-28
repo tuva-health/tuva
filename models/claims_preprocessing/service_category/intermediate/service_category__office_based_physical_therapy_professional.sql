@@ -17,5 +17,17 @@ and
 med.claim_line_number = prof.claim_line_number
 where
 ccs_category in ('213','212','215')
+and
+ med.rend_primary_specialty_description IN (
+        'Occupational Health'
+        ,'Occupational Medicine'
+        ,'Occupational Therapist in Private Practice'
+        ,'Occupational Therapy Assistant'
+        ,'Physical Therapist'
+        ,'Physical Therapist in Private Practice'
+        ,'Physical Therapy Assistant'
+        ,'Speech Language Pathologist'
+        ,'Speech-Language Assistant'
+    )
 and place_of_service_code = '11'
 

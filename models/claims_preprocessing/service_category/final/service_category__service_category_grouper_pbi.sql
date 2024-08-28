@@ -14,6 +14,7 @@ select
     , original_service_cat_3
     , ccs_category
     , ccs_category_description
+    , hcpcs_code
     , ms_drg_code
     , ms_drg_description
     , place_of_service_code
@@ -43,6 +44,7 @@ group by
     , original_service_cat_3
     , ccs_category
     , ccs_category_description
+    , hcpcs_code
     , ms_drg_code
     , ms_drg_description
     , place_of_service_code

@@ -9,7 +9,8 @@ with detail_values as (
     select stg.*
     ,cli.encounter_id
     ,cli.old_encounter_id
-    ,cli.encounter_type
+      ,cli.encounter_type
+    ,cli.encounter_group
     ,ed.encounter_start_date 
     ,ed.encounter_end_date 
     , row_number() over (partition by cli.encounter_id order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
@@ -38,6 +39,7 @@ with detail_values as (
     select 
     encounter_id
     , encounter_type
+    , encounter_group
     , sum(paid_amount) as total_paid_amount
     , sum(allowed_amount) as total_allowed_amount
     , sum(charge_amount) as total_charge_amount
@@ -46,7 +48,8 @@ with detail_values as (
     , count(distinct(case when claim_type = 'professional' then claim_id else null end))  as prof_claim_count
 from detail_values
 group by encounter_id
-,encounter_type -- not changing grain, but bringing into final
+,encounter_type 
+,encounter_group
 )
 
 
@@ -94,7 +97,8 @@ select   d.encounter_id
 , d.encounter_start_date
 , d.encounter_end_date
 , d.patient_id
-, tot.encounter_type
+,tot.encounter_type
+,tot.encounter_group
 , {{ dbt.datediff("birth_date","d.encounter_start_date","day")}}/365 as admit_age
 , {{ dbt.datediff("d.encounter_start_date","d.encounter_end_date","day")}} as length_of_stay
 , e.gender

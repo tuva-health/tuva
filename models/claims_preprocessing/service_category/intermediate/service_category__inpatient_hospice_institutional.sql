@@ -4,11 +4,12 @@
 }}
 
 select distinct 
-  claim_id
+  s.claim_id
 , 'Inpatient Hospice' as service_category_2
 , 'Inpatient Hospice' as service_category_3
 ,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_inpatient_institutional') }}
-  and substring(bill_type_code, 1, 2) in ('82')
+from {{ ref('service_category__stg_medical_claim') }} s
+inner join {{ ref('service_category__stg_inpatient_institutional') }} a on s.claim_id = a.claim_id
+where substring(s.bill_type_code, 1, 2) in ('82')
   

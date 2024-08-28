@@ -9,7 +9,8 @@ with detail_values as (
     ,cli.old_encounter_id
     ,ed.encounter_start_date
     ,ed.encounter_end_date
-    ,cli.encounter_type
+      ,cli.encounter_type
+    ,cli.encounter_group
     from  {{ ref('encounters__stg_medical_claim') }} stg
     inner join {{ ref('encounters__combined_claim_line_crosswalk') }} cli on stg.claim_id = cli.claim_id  --replace this ref with the deduped version when complete
     and
@@ -72,6 +73,7 @@ where claim_type = 'institutional'
     select 
     encounter_id
     ,encounter_type
+    , encounter_group
     , sum(paid_amount) as total_paid_amount
     , sum(allowed_amount) as total_allowed_amount
     , sum(charge_amount) as total_charge_amount
@@ -81,6 +83,7 @@ where claim_type = 'institutional'
 from detail_values
 group by encounter_id
 ,encounter_type -- not changing grain, but bringing into final
+, encounter_group
 )
 
 select
@@ -88,7 +91,8 @@ select
 , a.encounter_start_date
 , a.encounter_end_date
 , c.patient_id
-, tot.encounter_type
+,tot.encounter_type
+,tot.encounter_group
 , {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race

@@ -7,7 +7,8 @@
 
 with claim_dates as(
     select
-        cast(claim_id as {{ dbt.type_string() }} )|| '-' ||cast(claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
+        claim_id
+        , claim_line_number
         , patient_id
         , payer
         , plan
@@ -28,7 +29,8 @@ with claim_dates as(
 
 , claim_year_month as(
     select
-        medical_claim_id
+          claim_id
+        , claim_line_number
         , patient_id
         , payer
         , plan
@@ -43,7 +45,8 @@ with claim_dates as(
 )
 
 select distinct
-    claim.medical_claim_id
+     claim.claim_id
+    , claim.claim_line_number
     , claim.patient_id
     , claim.payer
     , claim.plan

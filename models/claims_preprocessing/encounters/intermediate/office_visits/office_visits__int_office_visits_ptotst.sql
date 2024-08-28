@@ -12,15 +12,5 @@ select distinct
 from {{ ref('office_visits__int_office_visits')}} ov
 inner join {{ ref('encounters__stg_medical_claim')}} mc on mc.claim_id = ov.claim_id
     and mc.claim_line_number = ov.claim_line_number
-where 
-    mc.rend_primary_specialty_description IN (
-        'Occupational Health'
-        ,'Occupational Medicine'
-        ,'Occupational Therapist in Private Practice'
-        ,'Occupational Therapy Assistant'
-        ,'Physical Therapist'
-        ,'Physical Therapist in Private Practice'
-        ,'Physical Therapy Assistant'
-        ,'Speech Language Pathologist'
-        ,'Speech-Language Assistant'
-    )
+inner join {{ ref('service_category__office_based_physical_therapy_professional')}} pt on pt.claim_id = ov.claim_id
+    and pt.claim_line_number = ov.claim_line_number

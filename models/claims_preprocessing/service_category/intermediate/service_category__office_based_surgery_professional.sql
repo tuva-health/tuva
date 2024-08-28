@@ -25,7 +25,7 @@ with numeric_hcpcs as (
       and med.claim_line_number = prof.claim_line_number
     where 
       (hcpcs_code between '10021' and '69999')
-      or (hcpcs_code between '90281' and '99091')
+      --or (hcpcs_code between '90281' and '99091')
 )
 
 select * from final
