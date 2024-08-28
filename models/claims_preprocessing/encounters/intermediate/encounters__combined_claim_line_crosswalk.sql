@@ -159,8 +159,22 @@ select claim_id
 ,old_encounter_id
 ,encounter_type
 ,'office based' as encounter_group
+,9 as priority_number --priority set in combined office visit encounter ranking model
+from {{ ref('office_visits__int_office_visits_claim_line') }}
+where encounter_type = 'office visit radiology'
+
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,encounter_type
+,'office based' as encounter_group
 ,10 as priority_number --priority set in combined office visit encounter ranking model
 from {{ ref('office_visits__int_office_visits_claim_line') }}
+where encounter_type <> 'office visit radiology'
+
 
 union
 

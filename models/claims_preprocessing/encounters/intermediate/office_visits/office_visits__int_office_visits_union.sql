@@ -3,6 +3,16 @@
    )
 }}
 
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'office visit radiology' as encounter_type
+,0 as priority_number
+from {{ ref('office_visits__int_office_visits_radiology') }}
+
+union
+
 select claim_id
 ,claim_line_number
 ,old_encounter_id
@@ -27,15 +37,6 @@ select claim_id
 ,'office visit pt/ot/st' as encounter_type
 ,3 as priority_number
 from {{ ref('office_visits__int_office_visits_ptotst') }}
-
-union
-
-select claim_id
-,claim_line_number
-,old_encounter_id
-,'office visit radiology' as encounter_type
-,4 as priority_number
-from {{ ref('office_visits__int_office_visits_radiology') }}
 
 union
 

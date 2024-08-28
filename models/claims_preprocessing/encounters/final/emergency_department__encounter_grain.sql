@@ -86,6 +86,25 @@ group by encounter_id
 , encounter_group
 )
 
+
+-- join in observation from service category before prioritization to capture all obs
+, service_category_flags as (
+    select 
+        d.encounter_id
+       ,max(case when oi.service_category_2 = 'Observation' then 1 
+                 when op.service_category_2 = 'Observation' then 1 
+            else 0 end) as observation_flag
+    from detail_values d
+    left join {{ ref('service_category__observation_institutional') }} oi on d.claim_id = oi.claim_id 
+    and
+    d.claim_line_number = oi.claim_line_number
+    left join {{ ref('service_category__observation_professional') }} op on d.claim_id = op.claim_id 
+    and
+    d.claim_line_number = op.claim_line_number
+    group by d.encounter_id
+)
+
+
 select
   x.encounter_id
 , a.encounter_start_date
@@ -99,6 +118,7 @@ select
 , c.diagnosis_code_type as primary_diagnosis_code_type
 , c.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
+, sc.observation_flag
 , c.facility_id as facility_id
 , b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
@@ -129,6 +149,7 @@ select
 from {{ ref('emergency_department__start_end_dates') }} a
 inner join encounter_cross_walk x on a.encounter_id = x.old_encounter_id
 inner join total_amounts tot on x.encounter_id = tot.encounter_id
+inner join service_category_flags sc on x.encounter_id = sc.encounter_id
 left join institutional_claim_details c
   on x.encounter_id = c.encounter_id
 left join patient e

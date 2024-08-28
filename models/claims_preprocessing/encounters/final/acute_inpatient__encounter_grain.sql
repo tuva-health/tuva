@@ -56,8 +56,22 @@ where claim_type = 'institutional'
     inner join first_last_inst_inst_values l on d.encounter_id = l.encounter_id
     and
     l.last_num = 1 
-
 )
+
+, service_category_flags as (
+    select 
+        d.encounter_id
+       ,max(case when d.service_category_3 in ( 'vaginal delivery','cesarean delivery') then 1 else 0 end ) as delivery_flag
+       ,max(case when d.service_category_3 ='cesarean delivery' then 1 else 0 end ) as cesarean_delivery
+       ,max(case when d.service_category_3 ='vaginal delivery' then 1 else 0 end ) as vaginal_delivery
+       ,max(case when d.service_category_3 ='newborn' then 1 else 0 end ) as newborn_flag
+       ,max(case when d.service_category_3 ='NICU' then 1 else 0 end ) as nicu_flag
+       ,max(case when d.service_category_2 = 'Observation' then 1 else 0 end) as observation_flag
+    from detail_values d
+    group by d.encounter_id
+)
+
+
 
 , patient as (
     select 
@@ -102,8 +116,15 @@ select
 , c.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
 , c.facility_id as facility_id
+, sc.observation_flag
 , b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
+, sc.delivery_flag
+, case when sc.cesarean_delivery = 1 then 'cesarean'
+       when sc.vaginal_delivery = 1 then 'vaginal'
+       else null end as delivery_type
+, sc.newborn_flag
+, sc.nicu_flag
 , c.ms_drg_code
 , j.ms_drg_description
 , j.medical_surgical
@@ -131,6 +152,7 @@ select
 from {{ ref('acute_inpatient__start_end_dates') }} a
 inner join encounter_cross_walk x on a.encounter_id = x.old_encounter_id
 inner join total_amounts tot on x.encounter_id = tot.encounter_id
+inner join service_category_flags sc on x.encounter_id = sc.encounter_id
 left join institutional_claim_details c
   on x.encounter_id = c.encounter_id
 left join patient e
