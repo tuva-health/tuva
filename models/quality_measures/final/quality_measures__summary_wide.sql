@@ -130,6 +130,16 @@ with measures_long as (
 
 )
 
+, cqm_130 as (
+
+    select
+          patient_id
+        , performance_flag
+    from measures_long
+    where measure_id = 'CQM130'
+
+)
+
 , joined as (
 
     select
@@ -145,6 +155,7 @@ with measures_long as (
         , max(nqf_0041.performance_flag) as nqf_0041
         , max(cbe_0101.performance_flag) as cbe_0101
         , max(cqm_48.performance_flag) as cqm_48
+        , max(cqm_130.performance_flag) as cqm_130
     from measures_long
         left join nqf_2372
             on measures_long.patient_id = nqf_2372.patient_id
@@ -168,6 +179,8 @@ with measures_long as (
             on measures_long.patient_id = cbe_0101.patient_id
         left join cqm_48
             on measures_long.patient_id = cqm_48.patient_id
+        left join cqm_130
+            on measures_long.patient_id = cqm_130.patient_id
     group by measures_long.patient_id
 
 )
@@ -187,6 +200,7 @@ with measures_long as (
         , cast(nqf_0041 as integer) as nqf_0041
         , cast(cbe_0101 as integer) as cbe_0101
         , cast(cqm_48 as integer) as cqm_48
+        , cast(cqm_130 as integer) as cqm_130
     from joined
 
 )
@@ -204,5 +218,6 @@ select
     , nqf_0041
     , cbe_0101
     , cqm_48
+    , cqm_130
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
