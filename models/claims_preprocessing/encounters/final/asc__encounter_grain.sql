@@ -93,6 +93,26 @@ group by encounter_id
   , hcpcs_code
 )
 
+--bring in all service categories regardless of prioritization
+, service_category_ranking as (
+  select *
+  from {{ ref('service_category__service_category_grouper') }}
+  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment')
+)
+
+, service_category_flags as (
+    select distinct
+        d.encounter_id
+       ,max(case when scr.service_category_2 = 'Lab' then 1 else 0 end) as lab_flag
+       ,max(case when scr.service_category_2 = 'Ambulance' then 1 else 0 end) as ambulance_flag
+       ,max(case when scr.service_category_2 = 'Durable Medical Equipment' then 1 else 0 end) as dme_flag
+    from detail_values d
+    left join service_category_ranking scr on d.claim_id = scr.claim_id 
+    and
+    scr.claim_line_number = d.claim_line_number
+    group by d.encounter_id
+)
+
 select   d.encounter_id
 , d.encounter_start_date
 , d.encounter_end_date
@@ -109,6 +129,10 @@ select   d.encounter_id
 , hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
+, sc.lab_flag
+, sc.dme_flag
+, sc.ambulance_flag
+
 , hcpc.hcpcs_code
 , tot.total_paid_amount
 , tot.total_allowed_amount
@@ -120,6 +144,7 @@ select   d.encounter_id
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from detail_values d
 inner join total_amounts tot on d.encounter_id = tot.encounter_id
+inner join service_category_flags sc on d.encounter_id = sc.encounter_id
 left join highest_paid_diagnosis hp on d.encounter_id = hp.encounter_id
 and
 hp.paid_order = 1

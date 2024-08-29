@@ -58,16 +58,30 @@ where claim_type = 'institutional'
     l.last_num = 1 
 )
 
+--bring in all service categories regardless of prioritization
+, service_category_ranking as (
+  select *
+  from {{ ref('service_category__service_category_grouper') }}
+  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment')
+)
+
 , service_category_flags as (
-    select 
+    select distinct
         d.encounter_id
        ,max(case when d.service_category_3 in ( 'vaginal delivery','cesarean delivery') then 1 else 0 end ) as delivery_flag
        ,max(case when d.service_category_3 ='cesarean delivery' then 1 else 0 end ) as cesarean_delivery
        ,max(case when d.service_category_3 ='vaginal delivery' then 1 else 0 end ) as vaginal_delivery
        ,max(case when d.service_category_3 ='newborn' then 1 else 0 end ) as newborn_flag
        ,max(case when d.service_category_3 ='NICU' then 1 else 0 end ) as nicu_flag
-       ,max(case when d.service_category_2 = 'Observation' then 1 else 0 end) as observation_flag
+       ,max(case when scr.service_category_2 = 'Observation' then 1 else 0 end) as observation_flag
+       ,max(case when scr.service_category_2 = 'Emergency Department' then 1 else 0 end) as ed_flag
+       ,max(case when scr.service_category_2 = 'Lab' then 1 else 0 end) as lab_flag
+       ,max(case when scr.service_category_2 = 'Ambulance' then 1 else 0 end) as ambulance_flag
+       ,max(case when scr.service_category_2 = 'Durable Medical Equipment' then 1 else 0 end) as dme_flag
     from detail_values d
+    left join service_category_ranking scr on d.claim_id = scr.claim_id 
+    and
+    scr.claim_line_number = d.claim_line_number
     group by d.encounter_id
 )
 
@@ -117,6 +131,10 @@ select
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
 , c.facility_id as facility_id
 , sc.observation_flag
+, sc.ed_flag
+, sc.lab_flag
+, sc.dme_flag
+, sc.ambulance_flag
 , b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
 , sc.delivery_flag

@@ -302,7 +302,7 @@ union
 select claim_id
 ,claim_line_number
 ,old_encounter_id
-,'lab' as encounter_type
+,'lab - orphaned' as encounter_type
 ,'other' as encounter_group
 ,1000000 as priority_number 
 from {{ ref('lab__match_claims_to_anchor') }} --should be last
