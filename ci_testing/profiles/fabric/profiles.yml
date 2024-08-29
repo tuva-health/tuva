@@ -1,0 +1,14 @@
+default:
+  target: dev
+  outputs:
+    dev:
+      type: fabric
+      host: 4v6dzozie2iuzdhpqal4mekzpa-dr5m5tv37drujeetnspeqzr3za.datawarehouse.fabric.microsoft.com
+      database: "{{ env_var('DBT_FABRIC_CI_DATABASE') }}"
+      schema: "{{ env_var('DBT_FABRIC_CI_SCHEMA') }}"
+      authentication: ServicePrincipal
+      driver: ODBC Driver 18 for SQL Server
+      client_id: "{{ env_var('DBT_FABRIC_SERVICE_PRINCIPAL_ID') }}"
+      client_secret: "{{ env_var('DBT_FABRIC_SERVICE_PRINCIPAL_SECRET') }}"
+      tenant_id: "{{ env_var('DBT_FABRIC_TENANT_ID') }}"
+      threads: 4
