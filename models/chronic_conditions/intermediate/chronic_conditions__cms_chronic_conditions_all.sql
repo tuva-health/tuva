@@ -31,7 +31,7 @@ with chronic_conditions as (
         , 'MS-DRG' as code_type
         , ms_drg_code as code
         , data_source
-    from {{ ref('cms_chronic_conditions__stg_medical_claim') }}
+    from {{ ref('cms_chronic_conditions__stg_core__medical_claim') }}
 
 )
 
