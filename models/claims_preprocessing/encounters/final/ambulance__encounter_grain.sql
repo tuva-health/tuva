@@ -104,7 +104,7 @@ group by encounter_id
 , service_category_ranking as (
   select *
   from {{ ref('service_category__service_category_grouper') }}
-  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment','Outpatient Pharmacy','Office-Based Pharmacy')
+  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment','Pharmacy')
 )
 
 , service_category_flags as (

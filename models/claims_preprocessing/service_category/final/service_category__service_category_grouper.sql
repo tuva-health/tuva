@@ -8,7 +8,9 @@ with service_category_1_mapping as(
         a.claim_id
         , a.claim_line_number
         , a.claim_type
-        , s.service_category_1
+        , case when s.service_category_1 is null and b.service_category_1 is not null then 'Service cat value not in seed table'
+            else b.service_category_1
+          end service_category_1
         , case when s.service_category_2 is null and b.service_category_2 is not null then 'Service cat value not in seed table'
             else s.service_category_2
           end service_category_2
@@ -37,7 +39,7 @@ with service_category_1_mapping as(
         , a.claim_line_number
         , a.claim_type
         , case when s.service_category_1 is null and b.service_category_1 is not null then 'Service cat value not in seed table'
-            else s.service_category_1
+            else b.service_category_1
           end service_category_1
         , case when s.service_category_2 is null and b.service_category_2 is not null then 'Service cat value not in seed table'
             else s.service_category_2
@@ -66,7 +68,7 @@ with service_category_1_mapping as(
         , a.claim_line_number
         , a.claim_type
         , case when s.service_category_1 is null and b.service_category_1 is not null then 'Service cat value not in seed table'
-            else s.service_category_1
+            else b.service_category_1
           end service_category_1
         , case when s.service_category_2 is null and b.service_category_2 is not null then 'Service cat value not in seed table'
             else s.service_category_2
