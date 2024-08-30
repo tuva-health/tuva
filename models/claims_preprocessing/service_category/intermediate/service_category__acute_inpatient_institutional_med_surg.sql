@@ -10,6 +10,7 @@ select distinct
 ,'Acute Inpatient' as service_category_2
 , case when m.medical_surgical = 'M' then 'Medical'
        when m.medical_surgical = 'P' then 'Surgical'
+       when m.medical_surgical = 'Surgical' then 'Surgical'
        else 'Acute Inpatient - Other' end    as service_category_3
 , '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run

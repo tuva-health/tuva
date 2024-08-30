@@ -64,6 +64,7 @@ SELECT
   cast(lab_flag as {{ dbt.type_int() }} ) as lab_flag,
   cast(dme_flag as {{ dbt.type_int() }} ) as dme_flag,
   cast(ambulance_flag as {{ dbt.type_int() }} ) as ambulance_flag,
+  cast(pharmacy_flag as {{ dbt.type_int() }} ) as pharmacy_flag,
   cast(primary_diagnosis_code_type as {{ dbt.type_string() }} ) as primary_diagnosis_code_type,
   cast(primary_diagnosis_code as {{ dbt.type_string() }} ) as primary_diagnosis_code,
   cast(primary_diagnosis_description as {{ dbt.type_string() }} ) as primary_diagnosis_description,

@@ -91,7 +91,7 @@ group by encounter_id
 , service_category_ranking as (
   select *
   from {{ ref('service_category__service_category_grouper') }}
-  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment')
+  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment','Outpatient Pharmacy','Office-Based Pharmacy')
 )
 
 , service_category_flags as (
@@ -101,6 +101,8 @@ group by encounter_id
        ,max(case when scr.service_category_2 = 'Ambulance' then 1 else 0 end) as ambulance_flag
        ,max(case when scr.service_category_2 = 'Durable Medical Equipment' then 1 else 0 end) as dme_flag
        ,max(case when scr.service_category_2 = 'Observation' then 1 else 0 end) as observation_flag
+       ,max(case when scr.service_category_2 = 'Outpatient Pharmacy' then 1 
+                 when scr.service_category_2 = 'Office-Based Pharmacy' then 1 else 0 end) as pharmacy_flag
     from detail_values d
     left join service_category_ranking scr on d.claim_id = scr.claim_id 
     and
@@ -127,7 +129,7 @@ select
 , sc.lab_flag
 , sc.dme_flag
 , sc.ambulance_flag
-, sc.observation_flag
+, sc.pharmacy_flag, sc.observation_flag
 , c.ms_drg_code
 , j.ms_drg_description
 , j.medical_surgical

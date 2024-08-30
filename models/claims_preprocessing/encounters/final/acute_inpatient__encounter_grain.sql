@@ -62,7 +62,7 @@ where claim_type = 'institutional'
 , service_category_ranking as (
   select *
   from {{ ref('service_category__service_category_grouper') }}
-  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment')
+  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment','Outpatient Pharmacy','Office-Based Pharmacy')
 )
 
 , service_category_flags as (
@@ -78,6 +78,8 @@ where claim_type = 'institutional'
        ,max(case when scr.service_category_2 = 'Lab' then 1 else 0 end) as lab_flag
        ,max(case when scr.service_category_2 = 'Ambulance' then 1 else 0 end) as ambulance_flag
        ,max(case when scr.service_category_2 = 'Durable Medical Equipment' then 1 else 0 end) as dme_flag
+       ,max(case when scr.service_category_2 = 'Outpatient Pharmacy' then 1 
+                 when scr.service_category_2 = 'Office-Based Pharmacy' then 1 else 0 end) as pharmacy_flag
     from detail_values d
     left join service_category_ranking scr on d.claim_id = scr.claim_id 
     and
@@ -135,7 +137,7 @@ select
 , sc.lab_flag
 , sc.dme_flag
 , sc.ambulance_flag
-, b.provider_organization_name as facility_name
+, sc.pharmacy_flag, b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
 , sc.delivery_flag
 , case when sc.cesarean_delivery = 1 then 'cesarean'
