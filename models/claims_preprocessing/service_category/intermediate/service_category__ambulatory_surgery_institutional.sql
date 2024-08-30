@@ -30,6 +30,7 @@ where med.primary_taxonomy_code = '261QA1903X'
 )
 
 select distinct claim_id
+, 'Professional' as service_category_1
 ,service_category_2
 ,service_category_3
 ,source_model_name

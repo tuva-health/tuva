@@ -3,183 +3,36 @@
    )
 }}
 
-with combine_header_models as 
-(
-select
-  claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__acute_inpatient_institutional_other') }}
-
-union all
-
-select
-  claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__acute_inpatient_institutional_maternity') }}
-
-union all
-
-select
-  claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__acute_inpatient_institutional_med_surg') }}
-
-union all
-
-select
-  claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__inpatient_substance_use_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__ambulatory_surgery_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__dialysis_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__emergency_department_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__home_health_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__inpatient_hospice_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_hospice_institutional') }}
-
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_hospital_or_clinic_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_physical_therapy_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_psychiatric_institutional') }}
-
-
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__inpatient_skilled_nursing_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__urgent_care_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__inpatient_psychiatric_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__inpatient_rehab_institutional') }}
-
-union all
-
-select   claim_id
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_rehab_institutional') }}
-
+WITH combine_header_models AS (
+  {{ dbt_utils.union_relations(
+    relations=[
+      ref('service_category__acute_inpatient_institutional_other'),
+      ref('service_category__acute_inpatient_institutional_maternity'),
+      ref('service_category__acute_inpatient_institutional_med_surg'),
+      ref('service_category__inpatient_substance_use_institutional'),
+      ref('service_category__ambulatory_surgery_institutional'),
+      ref('service_category__dialysis_institutional'),
+      ref('service_category__emergency_department_institutional'),
+      ref('service_category__home_health_institutional'),
+      ref('service_category__inpatient_hospice_institutional'),
+      ref('service_category__outpatient_hospice_institutional'),
+      ref('service_category__outpatient_hospital_or_clinic_institutional'),
+      ref('service_category__outpatient_physical_therapy_institutional'),
+      ref('service_category__outpatient_psychiatric_institutional'),
+      ref('service_category__inpatient_skilled_nursing_institutional'),
+      ref('service_category__urgent_care_institutional'),
+      ref('service_category__inpatient_psychiatric_institutional'),
+      ref('service_category__inpatient_rehab_institutional'),
+      ref('service_category__outpatient_rehab_institutional')
+    ],
+    exclude=["_loaded_at"]
+  ) }}
 )
 
-
-
-select
-  h.claim_id
-, h.service_category_2
-, h.service_category_3
-, source_model_name
-from combine_header_models h
-
+SELECT
+  h.claim_id,
+  h.service_category_1,
+  h.service_category_2,
+  h.service_category_3,
+  h.source_model_name
+FROM combine_header_models h

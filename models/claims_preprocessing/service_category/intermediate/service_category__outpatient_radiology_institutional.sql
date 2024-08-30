@@ -6,6 +6,7 @@
 select distinct 
     med.claim_id
     , med.claim_line_number
+    ,'Outpatient' as service_category_1    
     , 'Outpatient Radiology' as service_category_2
     , case when med.modality = 'Nuclear medicine' then 'PET'
            when med.modality = 'Magnetic resonance' then 'MRI'

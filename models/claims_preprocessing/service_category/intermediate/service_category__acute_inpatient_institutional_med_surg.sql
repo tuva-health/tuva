@@ -7,6 +7,7 @@
 
 select distinct 
   a.claim_id
+  , 'Inpatient' as service_category_1
 ,'Acute Inpatient' as service_category_2
 , case when m.medical_surgical = 'M' then 'Medical'
        when m.medical_surgical = 'P' then 'Surgical'

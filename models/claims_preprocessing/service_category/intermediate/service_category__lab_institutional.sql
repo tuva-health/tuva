@@ -6,6 +6,7 @@
 select distinct 
   med.claim_id
   ,med.claim_line_number
+, 'Ancillary' as service_category_1  
 , 'Lab' as service_category_2
 , 'Lab' as service_category_3
 ,'{{ this.name }}' as source_model_name

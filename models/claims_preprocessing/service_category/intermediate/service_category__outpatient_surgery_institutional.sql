@@ -6,6 +6,7 @@
 select distinct 
     med.claim_id
     , med.claim_line_number
+    ,'Outpatient' as service_category_1    
     , 'Outpatient Surgery' as service_category_2
     , 'Outpatient Surgery' as service_category_3
     ,'{{ this.name }}' as source_model_name

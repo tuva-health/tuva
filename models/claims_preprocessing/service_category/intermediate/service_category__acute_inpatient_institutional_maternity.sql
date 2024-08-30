@@ -7,6 +7,7 @@
 
 select distinct 
   a.claim_id
+, 'Inpatient' as service_category_1
 , 'Labor and Delivery'    as service_category_2
 , case when s.ms_drg_code in ('768','796','797','798','805','806','807') then 'vaginal delivery' 
        when s.ms_drg_code in ('783','784','785','786','787','788') then 'cesarean delivery' 

@@ -5,6 +5,7 @@
 
 select distinct 
   claim_id
+  , 'Outpatient' as service_category_1
 , 'Home Health' as service_category_2
 , 'Home Health' as service_category_3
 , '{{ this.name }}' as source_model_name

@@ -5,6 +5,7 @@
 
 select distinct 
   med.claim_id
+, 'Outpatient' as service_category_1
 , 'Dialysis' as service_category_2
 , 'Dialysis' as service_category_3
 , '{{ this.name }}' as source_model_name

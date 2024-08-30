@@ -7,6 +7,7 @@
 
 select distinct 
   a.claim_id
+  , 'Inpatient' as service_category_1
 , 'Acute Inpatient' as service_category_2
 , 'Acute Inpatient - Other' as service_category_3
 , '{{ this.name }}' as source_model_name

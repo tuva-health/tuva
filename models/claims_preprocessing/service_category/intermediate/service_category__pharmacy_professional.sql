@@ -7,8 +7,9 @@ select distinct
     med.claim_id
     , med.claim_line_number
     , med.claim_line_id
-    , 'Outpatient Pharmacy' as service_category_2
-    , 'Outpatient Pharmacy' as service_category_3
+    , case when place_of_service_code = 11 then 'Professional' else 'Outpatient' end as service_category_1
+    , 'Pharmacy' as service_category_2
+    , 'Pharmacy' as service_category_3
     ,'{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
@@ -17,4 +18,4 @@ and
 med.claim_line_number = prof.claim_line_number
 where
 ccs_category = '240' --medications
-and place_of_service_code <> '11'
+

@@ -35,6 +35,7 @@ where revenue_center_code in ('0450','0451','0452','0459','0981')
 )
 
 select claim_id
+, 'Outpatient' as service_category_1
 ,service_category_2
 ,service_category_3
 ,tuva_last_run

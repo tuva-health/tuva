@@ -7,6 +7,7 @@ select distinct
     a.claim_id
     , a.claim_line_number
     , a.claim_line_id
+    , 'Inpatient' as service_category_1
 , 'Skilled Nursing' as service_category_2
 , 'Skilled Nursing' as service_category_3
 ,'{{ this.name }}' as source_model_name

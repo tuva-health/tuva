@@ -525,16 +525,7 @@ models:
       tags:
         - service_category_grouper
         - needs_review
-  - name: service_category__office_based_pharmacy_professional
-    description: Auto-generated model entry
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
-      alias: service_category__office_based_pharmacy_professional
-      materialized: table
-      tags:
-        - service_category_grouper
-        - needs_review
+
   - name: service_category__office_based_physical_therapy_professional
     description: Auto-generated model entry
     config:
@@ -566,33 +557,23 @@ models:
         - service_category_grouper
         - needs_review
 
-  - name: service_category__outpatient_path_lab
+  - name: service_category__pharmacy_institutional
     description: Auto-generated model entry
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
-      alias: service_category__outpatient_path_lab
-      materialized: table
-      tags:
-        - service_category_grouper
-        - needs_review
-  - name: service_category__outpatient_pharmacy_institutional
-    description: Auto-generated model entry
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
-      alias: service_category__outpatient_pharmacy_institutional
+      alias: service_category__pharmacy_institutional
       materialized: table
       tags:
         - service_category_grouper
         - needs_review
 
-  - name: service_category__outpatient_pharmacy_professional
+  - name: service_category__pharmacy_professional
     description: Auto-generated model entry
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
-      alias: service_category__outpatient_pharmacy_professional
+      alias: service_category__pharmacy_professional
       materialized: table
       tags:
         - service_category_grouper

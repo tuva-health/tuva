@@ -10,11 +10,12 @@ with numeric_hcpcs as (
     where {{ safe_cast('hcpcs_code', 'int')}} is not null
 )
 
-, final as (
+
     select distinct 
         med.claim_id
       , med.claim_line_number
       , med.claim_line_id
+      ,'Professional' as service_category_1    
       , 'Office-Based Surgery' as service_category_2
       , 'Office-Based Surgery' as service_category_3
       , '{{ this.name }}' as source_model_name
@@ -26,6 +27,5 @@ with numeric_hcpcs as (
     where 
       (hcpcs_code between '10021' and '69999')
       --or (hcpcs_code between '90281' and '99091')
-)
 
-select * from final
+

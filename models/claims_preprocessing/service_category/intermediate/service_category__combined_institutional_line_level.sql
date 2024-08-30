@@ -3,87 +3,25 @@
    )
 }}
 
-with combine_line_models as (
-
-
-select claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_path_lab') }}
-
-union all
-
-select claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_pharmacy_institutional') }}
-
-union all
-
-
-select claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_substance_use_institutional') }}
-
-union all
-
-select claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_surgery_institutional') }}
-
-union all
-
-select claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__outpatient_radiology_institutional') }}
-
-union all
-
-select   claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__observation_institutional') }}
-
-union all
-
-select   claim_id
-, claim_line_number
-, service_category_2
-, service_category_3
-, tuva_last_run
-, source_model_name
-from {{ ref('service_category__lab_institutional') }}
-
-
-
+WITH combine_line_models AS (
+  {{ dbt_utils.union_relations(
+    relations=[
+      ref('service_category__pharmacy_institutional'),
+      ref('service_category__outpatient_substance_use_institutional'),
+      ref('service_category__outpatient_surgery_institutional'),
+      ref('service_category__outpatient_radiology_institutional'),
+      ref('service_category__observation_institutional'),
+      ref('service_category__lab_institutional')
+    ],
+    exclude=["_loaded_at"]
+  ) }}
 )
 
-select
-  l.claim_id
-, l.claim_line_number
-, l.service_category_2
-, l.service_category_3
-, source_model_name
-from combine_line_models l
- 
+SELECT
+  l.claim_id,
+  l.claim_line_number,
+  l.service_category_1,
+  l.service_category_2,
+  l.service_category_3,
+  l.source_model_name
+FROM combine_line_models l

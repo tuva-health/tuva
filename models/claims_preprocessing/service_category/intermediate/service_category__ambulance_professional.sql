@@ -7,6 +7,7 @@ select distinct
     claim_id
     , claim_line_number
     , claim_line_id
+    , 'Professional' as service_category_1
 , 'Ambulance' as service_category_2
 , 'Ambulance' as service_category_3
 , '{{ this.name }}' as source_model_name

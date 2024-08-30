@@ -32,6 +32,7 @@ where claim_type = 'institutional'
 
 select distinct 
 claim_id
+,'Outpatient' as service_category_1    
 ,service_category_2
 ,service_category_3
 ,source_model_name
