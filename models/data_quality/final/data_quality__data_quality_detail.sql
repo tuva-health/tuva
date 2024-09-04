@@ -5,68 +5,68 @@
 
 {% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 SELECT
-    DATA_SOURCE,
-	SOURCE_DATE,
-	TABLE_NAME,
-	DRILL_DOWN_KEY,
-	DRILL_DOWN_VALUE,
-	CLAIM_TYPE,
-	FIELD_NAME,
-	BUCKET_NAME,
-	INVALID_REASON,
-	FIELD_VALUE,
-	SUMMARY_SK,
+    data_source,
+	source_date,
+	table_name,
+	drill_down_key,
+	drill_down_value,
+	claim_type,
+	field_name,
+	bucket_name,
+	invalid_reason,
+	field_value,
+	summary_sk,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_detail') }}
 
 union all
 
 SELECT
-    DATA_SOURCE,
-	SOURCE_DATE,
-	TABLE_NAME,
-	DRILL_DOWN_KEY,
-	DRILL_DOWN_VALUE,
-	'CLINICAL' AS CLAIM_TYPE,
-	FIELD_NAME,
-	BUCKET_NAME,
-	INVALID_REASON,
-	FIELD_VALUE,
-	SUMMARY_SK,
+    data_source,
+	source_date,
+	table_name,
+	drill_down_key,
+	drill_down_value,
+	'CLINICAL' AS claim_type,
+	field_name,
+	bucket_name,
+	invalid_reason,
+	field_value,
+	summary_sk,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_detail') }}
 
 {% elif var('claims_enabled', False) == true -%}
 
 SELECT
-    DATA_SOURCE,
-	SOURCE_DATE,
-	TABLE_NAME,
-	DRILL_DOWN_KEY,
-	DRILL_DOWN_VALUE,
-	CLAIM_TYPE,
-	FIELD_NAME,
-	BUCKET_NAME,
-	INVALID_REASON,
-	FIELD_VALUE,
-	SUMMARY_SK,
+    data_source,
+	source_date,
+	table_name,
+	drill_down_key,
+	drill_down_value,
+	claim_type,
+	field_name,
+	bucket_name,
+	invalid_reason,
+	field_value,
+	summary_sk,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_claims_detail') }}
 
 {% elif var('clinical_enabled', False) == true -%}
 
 SELECT
-    DATA_SOURCE,
-	SOURCE_DATE,
-	TABLE_NAME,
-	DRILL_DOWN_KEY,
-	DRILL_DOWN_VALUE,
-	'CLINICAL' AS CLAIM_TYPE,
-	FIELD_NAME,
-	BUCKET_NAME,
-	INVALID_REASON,
-	FIELD_VALUE,
-	SUMMARY_SK,
+    data_source,
+	source_date,
+	table_name,
+	drill_down_key,
+	drill_down_value,
+	'clinical' as claim_type,
+	field_name,
+	bucket_name,
+	invalid_reason,
+	field_value,
+	summary_sk,
 	'{{ var('tuva_last_run')}}' as tuva_last_run
 FROM {{ ref('data_quality__data_quality_clinical_detail') }}
 

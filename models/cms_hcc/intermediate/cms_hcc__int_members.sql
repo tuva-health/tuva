@@ -37,12 +37,12 @@ with stg_eligibility as (
     from {{ ref('cms_hcc__stg_core__eligibility') }}
     where (
         /* filter to members with eligibility in collection or payment year */
-        extract(year from enrollment_start_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
-        or extract(year from enrollment_end_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
+              {{ date_part('year', 'enrollment_start_date') }}
+                between {{ collection_year }}
+                and {{ payment_year }}
+             or {{ date_part('year', 'enrollment_end_date') }}
+                between {{ collection_year }}
+                and {{ payment_year }}
     )
 
 )
@@ -79,12 +79,21 @@ with stg_eligibility as (
     from stg_eligibility
     where (
         /* filter to members with eligibility in collection or payment year */
-        extract(year from enrollment_start_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
-        or extract(year from enrollment_end_date)
-            between {{ collection_year }}
-            and {{ payment_year }}
+        {% if target.type == 'fabric' %}
+            YEAR(enrollment_start_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+            or YEAR(enrollment_end_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+        {% else %}
+            extract(year from enrollment_start_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+            or extract(year from enrollment_end_date)
+                between {{ collection_year }}
+                and {{ payment_year }}
+        {% endif %}
     )
 
 )
@@ -128,10 +137,17 @@ with stg_eligibility as (
             when add_enrollment.enrollment_status is null then 'New'
             else add_enrollment.enrollment_status
           end as enrollment_status
-        , case
-            when add_enrollment.enrollment_status is null then TRUE
-            else FALSE
-          end as enrollment_status_default
+        {% if target.type == 'fabric' %}
+            , case
+                when add_enrollment.enrollment_status is null then 1
+                else 0
+              end as enrollment_status_default
+        {% else %}
+            , case
+                when add_enrollment.enrollment_status is null then TRUE
+                else FALSE
+              end as enrollment_status_default
+        {% endif %}
     from stg_eligibility
         left join add_enrollment
             on stg_eligibility.patient_id = add_enrollment.patient_id
@@ -222,18 +238,34 @@ with stg_eligibility as (
         , cast('No' as {{ dbt.type_string() }}) as institutional_status
         , enrollment_status_default
         , case
-            when dual_status_code is null then TRUE
-            else FALSE
+            {% if target.type == 'fabric' %}
+                when dual_status_code is null then 1
+                else 0
+            {% else %}
+                when dual_status_code is null then TRUE
+                else FALSE
+            {% endif %}
           end as medicaid_dual_status_default
         /* Setting default true when OREC or Medicare Status is ESRD, or null */
         , case
-            when original_reason_entitlement_code in ('2') then TRUE
-            when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
-            when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
-            else FALSE
+            {% if target.type == 'fabric' %}
+                when original_reason_entitlement_code in ('2') then 1
+                when original_reason_entitlement_code is null and medicare_status_code in ('31') then 1
+                when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 1
+                else 0
+            {% else %}
+                when original_reason_entitlement_code in ('2') then TRUE
+                when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
+                when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
+                else FALSE
+            {% endif %}
           end as orec_default
         /* Setting default true until institutional logic is added */
-        , TRUE as institutional_status_default
+        {% if target.type == 'fabric' %}
+            , 1 as institutional_status_default
+        {% else %}
+            , TRUE as institutional_status_default
+        {% endif %}
     from add_age_group
 
 )
@@ -249,10 +281,17 @@ with stg_eligibility as (
         , cast(dual_status as {{ dbt.type_string() }}) as dual_status
         , cast(orec as {{ dbt.type_string() }}) as orec
         , cast(institutional_status as {{ dbt.type_string() }}) as institutional_status
-        , cast(enrollment_status_default as boolean) as enrollment_status_default
-        , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
-        , cast(orec_default as boolean) as orec_default
-        , cast(institutional_status_default as boolean) as institutional_status_default
+        {% if target.type == 'fabric' %}
+            , cast(enrollment_status_default as bit) as enrollment_status_default
+            , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
+            , cast(orec_default as bit) as orec_default
+            , cast(institutional_status_default as bit) as institutional_status_default
+        {% else %}
+            , cast(enrollment_status_default as boolean) as enrollment_status_default
+            , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
+            , cast(orec_default as boolean) as orec_default
+            , cast(institutional_status_default as boolean) as institutional_status_default
+        {% endif %}
         , cast('{{ payment_year }}' as integer) as payment_year
     from add_status_logic
 

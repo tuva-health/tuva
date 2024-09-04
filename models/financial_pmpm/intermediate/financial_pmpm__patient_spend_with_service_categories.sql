@@ -7,7 +7,7 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
     , coalesce(claim_start_date,claim_end_date) as claim_date
@@ -21,10 +21,13 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , cast({{ date_part("year", "claim_date" ) }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "claim_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
+    , {{  dbt.concat([date_part('year', 'claim_date'),
+                      dbt.right(
+                      dbt.concat(["'0'", date_part('month', 'claim_date')])
+                      , 2)]) }} as year_month
     , paid_amount
     , allowed_amount
     , data_source
@@ -35,7 +38,7 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , 'Pharmacy' as service_category_1
     , cast(null as {{ dbt.type_string() }}) as service_category_2
     , coalesce(dispensing_date, paid_date) as claim_date
@@ -49,10 +52,13 @@ with claims_with_service_categories as (
   select
       patient_id
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , cast({{ date_part("year", "claim_date" ) }} as {{ dbt.type_string() }} ) || lpad(cast({{ date_part("month", "claim_date" ) }} as {{ dbt.type_string() }} ),2,'0') AS year_month
+    , {{  dbt.concat([date_part('year', 'claim_date'),
+                      dbt.right(
+                      dbt.concat(["'0'", date_part('month', 'claim_date')])
+                      , 2)]) }} as year_month
     , paid_amount
     , allowed_amount
     , data_source
@@ -73,7 +79,7 @@ select
     patient_id
   , year_month
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , service_category_1
   , service_category_2
   , sum(paid_amount) as total_paid
@@ -85,7 +91,7 @@ group by
     patient_id
   , year_month
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , service_category_1
   , service_category_2
   , data_source

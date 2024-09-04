@@ -8,7 +8,7 @@ select distinct
 , 'Multiple claim_type' as dq_problem
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
-group by 1
+group by claim_id
 having count(distinct claim_type) > 1
 
 union all
@@ -18,7 +18,7 @@ select distinct
 , 'Multiple bill_type_code' as dq_problem
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
-group by 1
+group by claim_id
 having count(distinct bill_type_code) > 1
 
 union all

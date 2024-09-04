@@ -6,17 +6,17 @@
 
 {% if var('enable_normalize_engine',false) != true %}
 select
-      obs.OBSERVATION_ID
-    , obs.PATIENT_ID
-    , obs.ENCOUNTER_ID
-    , obs.PANEL_ID
-    , obs.OBSERVATION_DATE
-    , obs.OBSERVATION_TYPE
-    , obs.SOURCE_CODE_TYPE
-    , obs.SOURCE_CODE
-    , obs.SOURCE_DESCRIPTION
+      obs.observation_id
+    , obs.patient_id
+    , obs.encounter_id
+    , obs.panel_id
+    , obs.observation_date
+    , obs.observation_type
+    , obs.source_code_type
+    , obs.source_code
+    , obs.source_description
     , case
-        when obs.NORMALIZED_CODE_TYPE is not null then obs.NORMALIZED_CODE_TYPE
+        when obs.normalized_code_type is not null then obs.normalized_code_type
         when icd10cm.icd_10_cm is not null then 'icd-10-cm'
         when icd9cm.icd_9_cm is not null then 'icd-9-cm'
         when icd10pcs.icd_10_pcs is not null then 'icd-10-pcs'
@@ -24,9 +24,9 @@ select
         when hcpcs.hcpcs is not null then 'hcpcs'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
         when loinc.loinc is not null then 'loinc'
-        end as NORMALIZED_CODE_TYPE
+        end as normalized_code_type
   , coalesce(
-        obs.NORMALIZED_CODE
+        obs.normalized_code
       , icd10cm.icd_10_cm
       , icd9cm.icd_9_cm
       , icd10pcs.icd_10_pcs
@@ -34,9 +34,9 @@ select
       , hcpcs.hcpcs
       , snomed_ct.snomed_ct
       , loinc.loinc
-      ) as NORMALIZED_CODE
+      ) as normalized_code
       , coalesce(
-        obs.NORMALIZED_DESCRIPTION
+        obs.normalized_description
       , icd10cm.short_description
       , icd9cm.short_description
       , icd10pcs.description
@@ -44,9 +44,9 @@ select
       , hcpcs.short_description
       , snomed_ct.description
       , loinc.long_common_name
-      ) as NORMALIZED_DESCRIPTION
+      ) as normalized_description
      , case
-         when coalesce(obs.NORMALIZED_CODE, obs.NORMALIZED_DESCRIPTION) is not null then 'manual'
+         when coalesce(obs.normalized_code, obs.normalized_description) is not null then 'manual'
          when coalesce(
             icd10cm.icd_10_cm
           , icd9cm.icd_9_cm
@@ -56,15 +56,15 @@ select
           , snomed_ct.snomed_ct
           , loinc.loinc) is not null then 'automatic'
          end as mapping_method
-    , obs.RESULT
-    , obs.SOURCE_UNITS
-    , obs.NORMALIZED_UNITS
-    , obs.SOURCE_REFERENCE_RANGE_LOW
-    , obs.SOURCE_REFERENCE_RANGE_HIGH
-    , obs.NORMALIZED_REFERENCE_RANGE_LOW
-    , obs.NORMALIZED_REFERENCE_RANGE_HIGH
-    , obs.DATA_SOURCE
-    , obs.TUVA_LAST_RUN
+    , obs.result
+    , obs.source_units
+    , obs.normalized_units
+    , obs.source_reference_range_low
+    , obs.source_reference_range_high
+    , obs.normalized_reference_range_low
+    , obs.normalized_reference_range_high
+    , obs.data_source
+    , obs.tuva_last_run
 from {{ ref('core__stg_clinical_observation')}} obs
 left join {{ ref('terminology__icd_10_cm') }} icd10cm
     on obs.source_code_type = 'icd-10-cm'
@@ -91,17 +91,17 @@ left join {{ ref('terminology__loinc') }} loinc
 {% else %}
 
 select
-      obs.OBSERVATION_ID
-    , obs.PATIENT_ID
-    , obs.ENCOUNTER_ID
-    , obs.PANEL_ID
-    , obs.OBSERVATION_DATE
-    , obs.OBSERVATION_TYPE
-    , obs.SOURCE_CODE_TYPE
-    , obs.SOURCE_CODE
-    , obs.SOURCE_DESCRIPTION
+      obs.observation_id
+    , obs.patient_id
+    , obs.encounter_id
+    , obs.panel_id
+    , obs.observation_date
+    , obs.observation_type
+    , obs.source_code_type
+    , obs.source_code
+    , obs.source_description
     , case
-        when obs.NORMALIZED_CODE_TYPE is not null then obs.NORMALIZED_CODE_TYPE
+        when obs.normalized_code_type is not null then obs.normalized_code_type
         when icd10cm.icd_10_cm is not null then 'icd-10-cm'
         when icd9cm.icd_9_cm is not null then 'icd-9-cm'
         when icd10pcs.icd_10_pcs is not null then 'icd-10-pcs'
@@ -109,9 +109,9 @@ select
         when hcpcs.hcpcs is not null then 'hcpcs'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
         when loinc.loinc is not null then 'loinc'
-        else custom_mapped.normalized_code_type end as NORMALIZED_CODE_TYPE
+        else custom_mapped.normalized_code_type end as normalized_code_type
    , coalesce(
-        obs.NORMALIZED_CODE
+        obs.normalized_code
       , icd10cm.icd_10_cm
       , icd9cm.icd_9_cm
       , icd10pcs.icd_10_pcs
@@ -120,9 +120,9 @@ select
       , snomed_ct.snomed_ct
       , loinc.loinc
       , custom_mapped.normalized_code
-      ) as NORMALIZED_CODE
+      ) as normalized_code
    , coalesce(
-        obs.NORMALIZED_DESCRIPTION
+        obs.normalized_description
       , icd10cm.short_description
       , icd9cm.short_description
       , icd10pcs.description
@@ -131,9 +131,9 @@ select
       , snomed_ct.description
       , loinc.long_common_name
       , custom_mapped.normalized_description
-      ) as NORMALIZED_DESCRIPTION
+      ) as normalized_description
    , case
-         when coalesce(obs.NORMALIZED_CODE, obs.NORMALIZED_DESCRIPTION) is not null then 'manual'
+         when coalesce(obs.normalized_code, obs.normalized_description) is not null then 'manual'
          when coalesce(
             icd10cm.icd_10_cm
           , icd9cm.icd_9_cm
@@ -145,15 +145,15 @@ select
          when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
          when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
          end as mapping_method
-    , obs.RESULT
-    , obs.SOURCE_UNITS
-    , obs.NORMALIZED_UNITS
-    , obs.SOURCE_REFERENCE_RANGE_LOW
-    , obs.SOURCE_REFERENCE_RANGE_HIGH
-    , obs.NORMALIZED_REFERENCE_RANGE_LOW
-    , obs.NORMALIZED_REFERENCE_RANGE_HIGH
-    , obs.DATA_SOURCE
-    , obs.TUVA_LAST_RUN
+    , obs.result
+    , obs.source_units
+    , obs.normalized_units
+    , obs.source_reference_range_low
+    , obs.source_reference_range_high
+    , obs.normalized_reference_range_low
+    , obs.normalized_reference_range_high
+    , obs.data_source
+    , obs.tuva_last_run
 from {{ ref('core__stg_clinical_observation')}} obs
 left join {{ ref('terminology__icd_10_cm') }} icd10cm
     on obs.source_code_type = 'icd-10-cm'

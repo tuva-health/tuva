@@ -46,7 +46,7 @@ with chronic_conditions as (
         , paid_date as start_date
         , replace(ndc_code,'.','') as code
         , data_source
-    from {{ ref('cms_chronic_conditions__stg_pharmacy_claim') }}
+    from {{ ref('cms_chronic_conditions__stg_core__pharmacy_claim') }}
 
 )
 
@@ -168,6 +168,17 @@ with chronic_conditions as (
 
 )
 
+{% if target.type == 'fabric' %}
+, inclusions_unioned as (
+
+    select * from inclusions_diagnosis
+    union
+    select * from inclusions_procedure
+    union
+    select * from inclusions_medication
+
+)
+{% else %}
 , inclusions_unioned as (
 
     select * from inclusions_diagnosis
@@ -177,6 +188,7 @@ with chronic_conditions as (
     select * from inclusions_medication
 
 )
+{% endif %}
 
 select distinct
       cast(inclusions_unioned.patient_id as {{ dbt.type_string() }}) as patient_id

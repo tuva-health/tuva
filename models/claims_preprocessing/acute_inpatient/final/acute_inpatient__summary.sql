@@ -63,7 +63,7 @@ inner join {{ ref('acute_inpatient__encounter_start_and_end_dates') }} b
     on a.claim_id = b.claim_id
     and a.claim_line_number = b.claim_line_number
     and a.claim_type = 'professional'
-group by 1
+group by b.encounter_id
 )
 
 , patient as (

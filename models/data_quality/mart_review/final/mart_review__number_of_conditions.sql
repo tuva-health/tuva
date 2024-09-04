@@ -4,22 +4,25 @@
    )
 }}
 
-WITH xwalk AS (
-    SELECT DISTINCT patient_id, data_source
-    FROM {{ ref('core__patient')}}
+with xwalk as (
+    select distinct patient_id, data_source
+    from {{ ref('core__patient')}}
 ),
-cte AS (
-    SELECT L.PATIENT_ID,
+cte as (
+    select l.patient_id,
            x.data_source,
-           COUNT(*) AS NumofConditions
-    FROM {{ ref('chronic_conditions__tuva_chronic_conditions_long') }} L
-    LEFT JOIN xwalk x ON L.patient_id = x.patient_id
-    GROUP BY L.PATIENT_ID, x.data_source
+           count(*) as numofconditions
+    from {{ ref('chronic_conditions__tuva_chronic_conditions_long') }} l
+    left join xwalk x on l.patient_id = x.patient_id
+    group by l.patient_id, x.data_source
 )
-SELECT P.Patient_ID,
-       P.data_source,
-       P.Patient_ID || '|' || P.data_source AS Patient_Source_key,
-       COALESCE(CTE.NumofConditions, 0) AS NumofConditions
+select p.patient_id,
+       p.data_source,
+        {{  dbt.concat([
+            'p.patient_id',
+            "'|'",
+            'p.data_source']) }} as patient_source_key,
+       coalesce(cte.numofconditions, 0) as numofconditions
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('core__patient')}} P
-LEFT JOIN cte ON P.PATIENT_ID = CTE.PATIENT_ID AND P.data_source = CTE.data_source
+from {{ ref('core__patient')}} p
+left join cte on p.patient_id = cte.patient_id and p.data_source = cte.data_source

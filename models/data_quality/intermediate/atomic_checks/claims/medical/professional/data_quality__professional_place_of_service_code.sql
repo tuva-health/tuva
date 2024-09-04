@@ -2,30 +2,32 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-WITH BASE as (
-    SELECT * 
-    FROM {{ ref('medical_claim')}}
-    WHERE CLAIM_TYPE = 'professional'
+with base as (
+    select *
+    from {{ ref('medical_claim')}}
+    where claim_type = 'professional'
 )
 
-SELECT
-    M.Data_SOURCE
-    ,coalesce(cast(M.CLAIM_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'MEDICAL_CLAIM' AS TABLE_NAME
-    ,'Claim ID | Claim Line Number' AS DRILL_DOWN_KEY
-    ,COALESCE(CAST(M.CLAIM_ID as {{ dbt.type_string() }}), 'NULL') || '|' || COALESCE(CAST(M.CLAIM_LINE_NUMBER as {{ dbt.type_string() }}), 'NULL') AS DRILL_DOWN_VALUE
-    ,'professional' AS CLAIM_TYPE
-    ,'PLACE_OF_SERVICE_CODE' AS FIELD_NAME
-    ,case when TERM.PLACE_OF_SERVICE_CODE is not null then 'valid'
-          when M.PLACE_OF_SERVICE_CODE is not null    then 'invalid'      
-                                               else 'null' end as BUCKET_NAME
-    ,case
-        when M.PLACE_OF_SERVICE_CODE is not null
-            and TERM.PLACE_OF_SERVICE_CODE is null
+select
+      m.data_source
+    , coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    , 'MEDICAL_CLAIM' AS table_name
+    , 'Claim ID | Claim Line Number' AS drill_down_key
+    , {{ dbt.concat(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
+                    "'|'",
+                    "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'null')"]) }} as drill_down_value
+    , 'professional' AS claim_type
+    , 'PLACE_OF_SERVICE_CODE' AS field_name
+    , case when term.place_of_service_code is not null then 'valid'
+          when m.place_of_service_code is not null    then 'invalid'
+                                               else 'null' end as bucket_name
+    , case
+        when m.place_of_service_code is not null
+            and term.place_of_service_code is null
             then 'Place of Service Code does not join to Terminology Place of Service table'
         else null
-    end as INVALID_REASON
-    ,CAST(M.PLACE_OF_SERVICE_CODE || '|' || COALESCE(TERM.PLACE_OF_SERVICE_DESCRIPTION, '') as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    , {{ dbt.concat(["m.place_of_service_code", "'|'", "coalesce(term.place_of_service_description, '')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM base M
-LEFT JOIN {{ ref('terminology__place_of_service')}} AS TERM ON M.PLACE_OF_SERVICE_CODE = TERM.PLACE_OF_SERVICE_CODE
+from base m
+left join {{ ref('terminology__place_of_service')}} as term on m.place_of_service_code = term.place_of_service_code

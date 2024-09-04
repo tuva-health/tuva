@@ -39,6 +39,9 @@ with cte as (
 )
 
 select *
-  , patient_id || '|' || data_source as patient_source_key
+   , {{ dbt.concat([
+        'patient_id',
+        "'|'",
+        'data_source']) }} as patient_source_key
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from result

@@ -7,5 +7,5 @@
 
     SELECT *
     FROM {{ ref('medical_claim') }}
-    WHERE CLAIM_TYPE = 'institutional'
+    WHERE claim_type = 'institutional'
     AND {{ substring('bill_type_code', 1, 2) }} = '11'

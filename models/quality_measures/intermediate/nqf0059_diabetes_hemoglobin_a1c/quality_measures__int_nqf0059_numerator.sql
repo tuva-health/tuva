@@ -26,7 +26,7 @@ with denominator as (
     where lower(concept_name) in  (
         'hba1c laboratory test'
     )
-    
+
 )
 
 , labs as (
@@ -59,7 +59,12 @@ with denominator as (
     left join denominator
         on labs.patient_id = denominator.patient_id
     where coalesce(collection_date,result_date) <= denominator.performance_period_end
-        and {{ apply_regex('labs.result', '[+-]?([0-9]*[.])?[0-9]+') }}
+   {% if target.type == 'fabric' %}
+        and result LIKE '%.%' OR result LIKE '%[0-9]%'
+        AND result NOT LIKE '%[^0-9.]%'
+    {% else %}
+        and {{ apply_regex('result', '^[+-]?([0-9]*[.])?[0-9]+$') }}
+    {% endif %}
 
 )
 
@@ -70,7 +75,7 @@ with denominator as (
         , evidence_date
         , evidence_value
     from qualifying_labs
-    where rn = 1 
+    where rn = 1
 
 )
 
@@ -99,7 +104,7 @@ with denominator as (
         , evidence_value
         , 1 as numerator_flag
     from qualifying_patients
-    where 
+    where
         (evidence_date not between performance_period_begin and performance_period_end)
         or evidence_date is null
 
@@ -130,7 +135,7 @@ with denominator as (
     select * from valid_patients
 
     union all
-        
+
     select * from test_not_performed
 
 )

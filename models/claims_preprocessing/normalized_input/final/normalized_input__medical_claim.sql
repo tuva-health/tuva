@@ -12,7 +12,7 @@ select
 	, cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
 	, cast(med.member_id as {{ dbt.type_string() }} ) as member_id
 	, cast(med.payer as {{ dbt.type_string() }} ) as payer
-	, cast(med.plan as {{ dbt.type_string() }} ) as plan
+    , cast(med.{{ quote_column('plan') }} as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
 	, cast(coalesce(dates.minimum_claim_start_date, undetermined.claim_start_date) as date ) as claim_start_date
 	, cast(coalesce(dates.maximum_claim_end_date, undetermined.claim_start_date) as date ) as claim_end_date
 	, cast(coalesce(claim_line_dates.normalized_claim_line_start_date, undetermined.claim_line_start_date) as date ) as claim_line_start_date
@@ -217,4 +217,3 @@ left join {{ref('normalized_input__int_undetermined_claim_type') }} undetermined
     on med.claim_id = undetermined.claim_id
     and med.claim_line_number = undetermined.claim_line_number
     and med.data_source = undetermined.data_source
-

@@ -214,6 +214,9 @@ models:
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: rendering_tin
+        description: >
+          Rendering provider tax identification number (TIN).
       - name: billing_npi
         description: >
           Billing NPI for the claim (typically represents organization billing 
@@ -221,6 +224,9 @@ models:
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: billing_tin
+        description: >
+          Billing provider tax identification number (TIN).
       - name: facility_npi
         description: >
           Facility NPI for the claim (typically represents the facility where 
@@ -679,6 +685,8 @@ models:
         description: Date of the 24th procedure on the claim.
       - name: procedure_date_25
         description: Date of the 25th procedure on the claim.
+      - name: in_network_flag
+        description: Flag indicating if the claim was in or out of network.
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically 
@@ -689,9 +697,6 @@ models:
         description: >
           The date and time the source file was ingested into the data warehouse or
           landed in cloud storage
-          
-          
-          
 
   - name: pharmacy_claim
     config:
@@ -756,6 +761,9 @@ models:
       - name: allowed_amount
         description: >
           Contractual amount allowed to be paid by the payer + patient.
+      - name: charge_amount
+        description: >
+          The total amount charged on the claim by the provider.
       - name: coinsurance_amount
         description: The total coinsurance charged on the claim by the provider.
       - name: copayment_amount
@@ -764,10 +772,18 @@ models:
       - name: deductible_amount
         description: >
           The total amount charged on the claim by the provider.
+      - name: in_network_flag
+        description: Flag indicating if the claim was in or out of network.
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: file_name
+        description: The file name of the source file from the payer
+      - name: ingest_datetime
+        description: >
+          The date and time the source file was ingested into the data warehouse or
+          landed in cloud storage
 
 # Clinical input
   - name: condition
@@ -848,7 +864,6 @@ models:
         description: >
           The date and time the source file was ingested into the data warehouse or
           landed in cloud storage
-          
 
   - name: encounter
     config:
@@ -899,10 +914,12 @@ models:
         description: >
           Description of the discharge_disposition_code for the encounter.
       - name: attending_provider_id
-        description: attending provider for the encounter.
+        description: Attending provider ID for the encounter.
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: attending_provider_name
+        description: Attending provider name for the encounter.
       - name: facility_id
         description: >
           Facility identifier for the encounter (typically represents the facility where services were performed).  Can
@@ -1054,7 +1071,6 @@ models:
         description: >
           The date and time the source file/data was ingested into the data warehouse or
           landed in cloud storage
-          
 
   - name: location
     config:
@@ -1101,7 +1117,6 @@ models:
         description: >
           The date and time the source file/data was ingested into the data warehouse or
           landed in cloud storage
-          
 
   - name: medication
     config:
@@ -1169,8 +1184,6 @@ models:
         description: >
           The date and time the source file/data was ingested into the data warehouse or
           landed in cloud storage
-          
-          
 
   - name: observation
     config:
@@ -1230,7 +1243,6 @@ models:
         description: >
           The date and time the source file/data was ingested into the data warehouse or
           landed in cloud storage
-          
 
   - name: patient
     config:
@@ -1263,6 +1275,8 @@ models:
       - name: death_flag
         description: A flag indicating if the patient has died.
         data_type: boolean
+      - name: social_security_number
+        description: Patient's social security number.
       - name: address
         description: The address of the patient.
       - name: city
@@ -1287,7 +1301,6 @@ models:
         description: >
           The date and time the source file/data was ingested into the data warehouse or
           landed in cloud storage
-          
 
   - name: practitioner
     config:
@@ -1326,8 +1339,6 @@ models:
         description: >
           The date and time the source file/data was ingested into the data warehouse or
           landed in cloud storage
-          
-          
 
   - name: procedure
     config:

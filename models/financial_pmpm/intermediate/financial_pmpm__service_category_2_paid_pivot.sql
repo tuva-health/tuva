@@ -8,7 +8,7 @@ with service_cat_2 as (
     patient_id
   , year_month
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , service_category_2
   , data_source
   , sum(total_paid) as total_paid
@@ -17,7 +17,7 @@ with service_cat_2 as (
     patient_id
   , year_month
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , service_category_2
   , data_source
 )
@@ -26,7 +26,7 @@ select
   patient_id
 , year_month
 , payer
-, plan
+, {{ quote_column('plan') }}
 , data_source
 , {{ dbt_utils.pivot(
       column='service_category_2'
@@ -46,7 +46,7 @@ select
               'Outpatient Psychiatric',
               'Outpatient Rehabilitation',
               'Skilled Nursing',
-              'Urgent Care'                                                 
+              'Urgent Care'
               )
     , agg='sum'
     , then_value='total_paid'
@@ -60,5 +60,5 @@ group by
   patient_id
 , year_month
 , payer
-, plan
+, {{ quote_column('plan') }}
 , data_source

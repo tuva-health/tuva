@@ -191,7 +191,7 @@ PATTERN = '{{ pattern }}*'
 FORMAT_OPTIONS (
   {% if headers == true %} 'skipRows' = '1', {% else %} 'skipRows' = '0', {% endif %}
   {% if null_marker == true %} 'nullValue' = '\\N', {% else %} {% endif %}
-  'enforceSchema' = 'true',
+  'enforceSchema' = 'false',
   'inferSchema' = 'false',
   'sep' = ',',
   'escape' = "\"",
@@ -227,6 +227,82 @@ COPY_OPTIONS (
 {% endif %}
 {% endmacro %}
 
+
+
+-- postgres - note this requires some pre-work on your part -  you need to clone
+-- the data from the tuva public resource bucket to re-assemble it into a single
+-- file per seed with quoted null's unquoted - also ensure you've set the
+-- Content-Type system header on each to be gzip
+-- (https://stackoverflow.com/a/74439053) otherwise the extension won't know to
+-- decompress it.
+--
+-- TODO: revisit removing column list, I think it'll work fine with '' for cols
+{% macro postgres__load_seed(uri,pattern,compression,headers,null_marker) %}
+{%- set columns = adapter.get_columns_in_relation(this) -%}
+{%- set collist = [] -%}
+{%- for col in columns -%}
+  {%- do collist.append(col.name) -%}
+{%- endfor -%}
+{%- set cols = collist|join(",") -%}
+
+{%- set s3_bucket = var("tuva_seeds_s3_bucket", uri.split("/")[0]) -%}
+{%- set s3_key = uri.split("/")[1:]|join("/") + "/" + pattern + "_0.csv.gz" -%}
+{%- if var("tuva_seeds_s3_key_prefix", "") != "" -%}
+{%- set s3_key = var("tuva_seeds_s3_key_prefix") + "/" + s3_key -%}
+{%- endif -%}
+{%- set s3_region = "us-east-1" -%}
+{%- set options = ["(", "format csv", ", encoding ''utf8''"] -%}
+{%- do options.append(", null ''\\N''") if null_marker == true -%}
+{%- do options.append(")") -%}
+{%- set options_s = options | join("") -%}
+
+{% set sql %}
+SELECT aws_s3.table_import_from_s3(
+   '{{ this }}',
+   '{{ cols }}',
+   '{{ options_s }}',
+   aws_commons.create_s3_uri('{{s3_bucket}}', '{{s3_key}}', '{{s3_region}}')
+)
+{% endset %}
+
+{% call statement('postgressql',fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% if execute %}
+{# debugging { log(sql, True)} #}
+{% set results = load_result('postgressql') %}
+{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ s3_bucket ~ "/" ~ s3_key ,True) }}
+{# debugging { log(results, True) } #}
+{% endif %}
+
+{% endmacro %}
+
+
+{% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
+{% set sql %}
+COPY INTO {{ this }}
+FROM 'https://tuvapublicresources.blob.core.windows.net/{{ uri }}/{{ pattern }}'
+WITH (
+    FILE_TYPE = 'CSV',
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n'
+    {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
+);
+{% endset %}
+{% call statement('fabricsql', fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% if execute %}
+{# debugging { log(sql, True)} #}
+{% set results = load_result('fabricsql') %}
+{% set rows_loaded = results['response'].rows_affected|default(0) %}
+{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "\n  rows: " ~ rows_loaded, True) }}
+{# debugging { log(results, True)} #}
+{% endif %}
+
+{% endmacro %}
 
 
 {% macro default__load_seed(uri,pattern,compression,headers,null_marker) %}

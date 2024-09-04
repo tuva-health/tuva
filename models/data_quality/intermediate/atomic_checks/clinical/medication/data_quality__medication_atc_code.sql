@@ -4,24 +4,23 @@
 
 
 SELECT
-    M.Data_SOURCE
-    ,coalesce(M.DISPENSING_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
-    ,'MEDICATION' AS TABLE_NAME
-    ,'Medication ID' as DRILL_DOWN_KEY
-    , coalesce(medication_id, 'NULL') AS DRILL_DOWN_VALUE
-    -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'ATC_CODE' AS FIELD_NAME
-    ,case when COALESCE(TERM_1.atc_1_name,TERM_2.atc_2_name,TERM_3.atc_3_name,TERM_4.atc_4_name) is not null then 'valid'
-          when M.ATC_CODE is not null then 'invalid'
-          else 'null' 
-    end as BUCKET_NAME
-    ,case when M.ATC_CODE is not null and COALESCE(TERM_1.atc_1_name,TERM_2.atc_2_name,TERM_3.atc_3_name,TERM_4.atc_4_name) is null
-          then 'ATC Code does not join to Terminology rxnorm_to_atc table on any atc level'
-    else null end as INVALID_REASON
-    ,CAST(ATC_CODE as {{ dbt.type_string() }}) AS FIELD_VALUE
+      m.data_source
+    , coalesce(m.dispensing_date,cast('1900-01-01' as date)) as source_date
+    , 'MEDICATION' AS table_name
+    , 'Medication ID' as drill_down_key
+    , coalesce(medication_id, 'NULL') AS drill_down_value
+    , 'ATC_CODE' as field_name
+    , case when coalesce(term_1.atc_1_name,term_2.atc_2_name,term_3.atc_3_name,term_4.atc_4_name) is not null then 'valid'
+           when m.atc_code is not null then 'invalid'
+           else 'null'
+    end as bucket_name
+    , case when m.atc_code is not null and coalesce(term_1.atc_1_name,term_2.atc_2_name,term_3.atc_3_name,term_4.atc_4_name) is null
+           then 'ATC Code does not join to Terminology rxnorm_to_atc table on any atc level'
+           else null end as invalid_reason
+    , cast(atc_code as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('medication')}} M
-LEFT JOIN {{ ref('terminology__rxnorm_to_atc')}} TERM_1 on m.ATC_CODE = TERM_1.atc_1_name
-LEFT JOIN {{ ref('terminology__rxnorm_to_atc')}} TERM_2 on m.ATC_CODE = TERM_2.atc_2_name
-LEFT JOIN {{ ref('terminology__rxnorm_to_atc')}} TERM_3 on m.ATC_CODE = TERM_3.atc_3_name
-LEFT JOIN {{ ref('terminology__rxnorm_to_atc')}} TERM_4 on m.ATC_CODE = TERM_4.atc_4_name
+from {{ ref('medication')}} m
+left join {{ ref('terminology__rxnorm_to_atc')}} term_1 on m.atc_code = term_1.atc_1_name
+left join {{ ref('terminology__rxnorm_to_atc')}} term_2 on m.atc_code = term_2.atc_2_name
+left join {{ ref('terminology__rxnorm_to_atc')}} term_3 on m.atc_code = term_3.atc_3_name
+left join {{ ref('terminology__rxnorm_to_atc')}} term_4 on m.atc_code = term_4.atc_4_name

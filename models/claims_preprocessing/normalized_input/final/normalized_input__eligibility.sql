@@ -18,7 +18,7 @@ select
     , cast(date_norm.normalized_enrollment_end_date as date ) as enrollment_end_date
     , cast(elig.payer as {{ dbt.type_string() }} ) as payer
     , cast(elig.payer_type as {{ dbt.type_string() }} ) as payer_type
-    , cast(elig.plan as {{ dbt.type_string() }} ) as plan
+    , cast(elig.{{ quote_column('plan') }} as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
     , cast(elig.original_reason_entitlement_code as {{ dbt.type_string() }} ) as original_reason_entitlement_code
     , cast(elig.dual_status_code as {{ dbt.type_string() }} ) as dual_status_code
     , cast(elig.medicare_status_code as {{ dbt.type_string() }} ) as medicare_status_code
@@ -36,4 +36,3 @@ select
 from {{ ref('normalized_input__stg_eligibility') }} elig
 left join {{ ref('normalized_input__int_eligibility_dates_normalize') }} date_norm
     on elig.patient_id_key = date_norm.patient_id_key
-
