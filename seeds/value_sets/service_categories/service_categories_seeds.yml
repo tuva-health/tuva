@@ -1,16 +1,13 @@
 version: 2
 
 seeds:
-  - name: service_category__service_categories
-    description: List of service categories and sub-categories
+  - name: service_category__service_category
+    description: >
+      Heirarchy and ranking of Tuva service category logic
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{% else %}claims_preprocessing{%- endif -%}
-      alias: _value_set_service_categories
-      tags:
-        - service_category
-        - claims_preprocessing
-      enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}claims_preprocessing{%- endif -%}
+      alias: service_category__service_category
       column_types:
         service_category_1: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
@@ -19,13 +16,13 @@ seeds:
         service_category_3: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
         priority: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}          
+          int
     columns:
       - name: service_category_1
-        description: high level service category
+        description: service category 1 in the Tuva model 
       - name: service_category_2
-        description: sub-category of service category
+        description: service category 2 in the Tuva model
       - name: service_category_3
-        description: sub-category of service category        
+        description: service category 3 in the Tuva model, only populated for a group of the service category 2 values.
       - name: priority
-        description: sub-category of service category        
+        description: priority ranking of the service categories that will be used if a claim qualifies under multiple logic.
