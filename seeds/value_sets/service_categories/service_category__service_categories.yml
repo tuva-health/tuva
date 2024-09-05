@@ -1,13 +1,12 @@
 version: 2
 
 seeds:
-  - name: claims_preprocessing__service_category_seed
+  - name: service_category__service_categories
     description: >
       Heirarchy and ranking of Tuva service category logic
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}claims_preprocessing{%- endif -%}
-      alias: claims_preprocessing__service_category_seed
       column_types:
         service_category_1: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}

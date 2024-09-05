@@ -7,6 +7,7 @@ select distinct
     claim_id
     , claim_line_number
     , claim_line_id
+, 'Ancillary' as service_category_1
 , 'Durable Medical Equipment' as service_category_2
 , 'Durable Medical Equipment' as service_category_3
 , '{{ this.name }}' as source_model_name

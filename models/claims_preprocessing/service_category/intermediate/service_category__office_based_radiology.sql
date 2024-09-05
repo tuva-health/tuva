@@ -7,7 +7,7 @@ select distinct
     med.claim_id
     , med.claim_line_number
     , med.claim_line_id
-    ,'Professional' as service_category_1    
+    ,'Office-Based' as service_category_1    
     , 'Office-Based Radiology' as service_category_2
     , case when med.modality = 'Nuclear medicine' then 'PET'
            when med.modality = 'Magnetic resonance' then 'MRI'

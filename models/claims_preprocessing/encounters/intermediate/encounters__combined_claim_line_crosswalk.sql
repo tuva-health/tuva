@@ -232,6 +232,17 @@ union
 select claim_id
 ,claim_line_number
 ,old_encounter_id
+,'outpatient surgery' as encounter_type
+,'outpatient' as encounter_group
+,18 as priority_number 
+from {{ ref('outpatient_surgery__match_claims_to_anchor') }} --lowest outpatient priority, roll up to more specific encounter type when available
+
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
 ,'dialysis' as encounter_type
 ,'outpatient' as encounter_group
 ,15 as priority_number 
@@ -264,7 +275,7 @@ select claim_id
 ,old_encounter_id
 ,'outpatient injections' as encounter_type
 ,'outpatient' as encounter_group
-,18 as priority_number 
+,19 as priority_number 
 from {{ ref('outpatient_injections__match_claims_to_anchor') }} --should come before generic office and outpatient visit. below 
 
 union
@@ -274,7 +285,7 @@ select claim_id
 ,old_encounter_id
 ,'outpatient pt/ot/st' as encounter_type
 ,'outpatient' as encounter_group
-,19 as priority_number 
+,20 as priority_number 
 from {{ ref('outpatient_ptotst__match_claims_to_anchor') }} --should come before generic office and outpatient visit
 
 union
@@ -284,7 +295,7 @@ select claim_id
 ,old_encounter_id
 ,'outpatient substance use' as encounter_type
 ,'outpatient' as encounter_group
-,20 as priority_number 
+,21 as priority_number 
 from {{ ref('outpatient_substance_use__match_claims_to_anchor') }} --should come before generic office and outpatient visit. 
 
 union
@@ -294,7 +305,7 @@ select claim_id
 ,old_encounter_id
 ,'outpatient radiology' as encounter_type
 ,'outpatient' as encounter_group
-,21 as priority_number 
+,22 as priority_number 
 from {{ ref('outpatient_radiology__match_claims_to_anchor') }} --should come after ED but before generic office and outpatient visit. 
 
 union

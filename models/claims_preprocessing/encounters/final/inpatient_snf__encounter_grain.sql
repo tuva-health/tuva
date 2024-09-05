@@ -100,6 +100,7 @@ group by encounter_id
        ,max(case when scr.service_category_2 = 'Ambulance' then 1 else 0 end) as ambulance_flag
        ,max(case when scr.service_category_2 = 'Durable Medical Equipment' then 1 else 0 end) as dme_flag
        ,max(case when scr.service_category_2 = 'Observation' then 1 else 0 end) as observation_flag
+       ,max(case when scr.service_category_2 = 'Emergency Department' then 1 else 0 end) as ed_flag
        ,max(case when scr.service_category_2 = 'Pharmacy' then 1 
               else 0 end) as pharmacy_flag
     from detail_values d
@@ -128,7 +129,9 @@ select
 , sc.lab_flag
 , sc.dme_flag
 , sc.ambulance_flag
-, sc.pharmacy_flag, sc.observation_flag
+, sc.pharmacy_flag
+, sc.observation_flag
+, sc.ed_flag
 , c.ms_drg_code
 , j.ms_drg_description
 , j.medical_surgical

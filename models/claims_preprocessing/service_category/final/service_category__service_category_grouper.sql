@@ -27,7 +27,7 @@ with service_category_1_mapping as(
     left join {{ ref('service_category__combined_professional') }} b
     on a.claim_id = b.claim_id
     and a.claim_line_number = b.claim_line_number
-    left join {{ ref('claims_preprocessing__service_category_seed') }} s on b.service_category_2 = s.service_category_2
+    left join {{ ref('service_category__service_categories') }} s on b.service_category_2 = s.service_category_2
     and
     b.service_category_3 = s.service_category_3
     where a.claim_type = 'professional'
@@ -56,7 +56,7 @@ with service_category_1_mapping as(
     from {{ ref('service_category__stg_medical_claim') }} a
     left join {{ ref('service_category__combined_institutional_header_level') }} b
     on a.claim_id = b.claim_id
-    left join {{ ref('claims_preprocessing__service_category_seed') }} s on b.service_category_2 = s.service_category_2
+    left join {{ ref('service_category__service_categories') }} s on b.service_category_2 = s.service_category_2
     and
     b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
@@ -86,7 +86,7 @@ with service_category_1_mapping as(
     left join {{ ref('service_category__combined_institutional_line_level') }} b
     on a.claim_id = b.claim_id
     and a.claim_line_number = b.claim_line_number
-    left join {{ ref('claims_preprocessing__service_category_seed') }} s on b.service_category_2 = s.service_category_2
+    left join {{ ref('service_category__service_categories') }} s on b.service_category_2 = s.service_category_2
     and
     b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'

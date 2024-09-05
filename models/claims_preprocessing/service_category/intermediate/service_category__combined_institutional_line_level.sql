@@ -7,8 +7,6 @@ WITH combine_line_models AS (
   {{ dbt_utils.union_relations(
     relations=[
       ref('service_category__pharmacy_institutional'),
-      ref('service_category__outpatient_substance_use_institutional'),
-      ref('service_category__outpatient_surgery_institutional'),
       ref('service_category__outpatient_radiology_institutional'),
       ref('service_category__observation_institutional'),
       ref('service_category__lab_institutional')

@@ -5,7 +5,6 @@
 
 select distinct 
     med.claim_id
-    , med.claim_line_number
     ,'Outpatient' as service_category_1    
     , 'Outpatient Substance Use' as service_category_2
     , 'Outpatient Substance Use' as service_category_3

@@ -13,5 +13,8 @@ from {{ ref('service_category__stg_medical_claim') }} a
 inner join  {{ ref('service_category__stg_professional') }} p on a.claim_id = p.claim_id 
 and
 a.claim_line_number = p.claim_line_number
-where a.place_of_service_code = '11'
+where a.place_of_service_code in ( '11' -- office
+,'02' --telehealth 
+,'10' --telehealth
+)
 

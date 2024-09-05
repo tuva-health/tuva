@@ -44,5 +44,23 @@ select claim_id
 ,claim_line_number
 ,old_encounter_id
 ,'office visit' as encounter_type
+,4 as priority_number
+from {{ ref('office_visits__int_office_visits_em') }}
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'telehealth' as encounter_type
+,5 as priority_number
+from {{ ref('office_visits__int_office_visits_telehealth') }}
+
+union
+
+select claim_id
+,claim_line_number
+,old_encounter_id
+,'office visit - other' as encounter_type
 ,9999 as priority_number
 from {{ ref('office_visits__int_office_visits') }}

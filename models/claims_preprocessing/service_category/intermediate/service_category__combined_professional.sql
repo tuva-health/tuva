@@ -32,7 +32,8 @@ WITH combined_professional_services AS (
       ref('service_category__outpatient_radiology_professional'),
       ref('service_category__observation_professional'),
       ref('service_category__dme_professional'),
-      ref('service_category__ambulance_professional')
+      ref('service_category__ambulance_professional'),
+      ref('service_category__outpatient_surgery_professional')
     ],
     exclude=["_loaded_at"]
   ) }}

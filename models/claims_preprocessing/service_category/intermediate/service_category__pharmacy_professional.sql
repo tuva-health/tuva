@@ -7,7 +7,7 @@ select distinct
     med.claim_id
     , med.claim_line_number
     , med.claim_line_id
-    , case when place_of_service_code = 11 then 'Professional' else 'Outpatient' end as service_category_1
+    , case when place_of_service_code = 11 then 'Office-Based' else 'Outpatient' end as service_category_1
     , 'Pharmacy' as service_category_2
     , 'Pharmacy' as service_category_3
     ,'{{ this.name }}' as source_model_name

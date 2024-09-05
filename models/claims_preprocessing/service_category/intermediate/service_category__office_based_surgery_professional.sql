@@ -15,7 +15,7 @@ with numeric_hcpcs as (
         med.claim_id
       , med.claim_line_number
       , med.claim_line_id
-      ,'Professional' as service_category_1    
+      ,'Office-Based' as service_category_1    
       , 'Office-Based Surgery' as service_category_2
       , 'Office-Based Surgery' as service_category_3
       , '{{ this.name }}' as source_model_name
