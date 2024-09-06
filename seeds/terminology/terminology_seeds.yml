@@ -600,9 +600,9 @@ seeds:
         ms_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         fy_2024_final_post_acute_drg: |
-          {%- if target.type in ("bigquery", "databricks") -%} boolean {%- else -%} boolean {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         fy_2024_final_special_pay_drg: |
-          {%- if target.type in ("bigquery", "databricks") -%} boolean {%- else -%} boolean {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         mdc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         type: |

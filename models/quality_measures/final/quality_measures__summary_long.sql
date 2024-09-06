@@ -20,6 +20,7 @@ with union_measures as (
             , ref('quality_measures__int_nqf0041_long')
             , ref('quality_measures__int_cbe0101_long')
             , ref('quality_measures__int_cqm48_long')
+            , ref('quality_measures__int_cqm130_long')
         ]
 
     ) }}
