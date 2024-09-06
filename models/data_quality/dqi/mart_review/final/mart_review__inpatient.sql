@@ -32,7 +32,9 @@ with cte as (
             when e.length_of_stay <= 7 then '4. 6-7 days'
             when e.length_of_stay <= 14 then '5. 8-14 days'
             when e.length_of_stay <= 30 then '6. 15-30 days'
+            else '7. 31+ Days'
         end as los_groups
+      , weights.drg_weight
     from {{ ref('core__encounter') }} as e
     left join cte as l
       on e.facility_id = l.location_id
@@ -41,6 +43,8 @@ with cte as (
       and p.ccsr_category_rank = 1
     left join {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} as b
       on p.ccsr_parent_category = b.ccsr_parent_category
+    left join {{ ref('terminology__ms_drg_weights_los')}} as weights
+      on e.ms_drg_code = weights.ms_drg
     where e.encounter_type = 'acute inpatient'
 )
 
