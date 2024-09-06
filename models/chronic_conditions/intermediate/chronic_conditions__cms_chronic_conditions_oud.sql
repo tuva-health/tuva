@@ -46,7 +46,7 @@ with chronic_conditions as (
         , paid_date as start_date
         , replace(ndc_code,'.','') as code
         , data_source
-    from {{ ref('cms_chronic_conditions__stg_pharmacy_claim') }}
+    from {{ ref('cms_chronic_conditions__stg_core__pharmacy_claim') }}
 
 )
 
