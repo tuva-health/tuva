@@ -137,8 +137,9 @@ select
     , s.bill_type_code
     , s.bill_type_description
     , d.source_model_name
+    , s.data_source
 from service_category_2_deduplication d
-left join {{ ref('service_category__stg_medical_claim') }} s on d.claim_id = s.claim_id
+inner join {{ ref('service_category__stg_medical_claim') }} s on d.claim_id = s.claim_id
 and
 d.claim_line_number = s.claim_line_number
 --where duplicate_row_number = 1

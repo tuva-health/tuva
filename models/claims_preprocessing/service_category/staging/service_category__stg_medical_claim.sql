@@ -6,8 +6,9 @@ with random_members as (
     from {{ ref('normalized_input__medical_claim') }}
     order by random()
     limit 10000
-),
-cte as (
+)
+
+
 select
     m.apr_drg_code
   , m.claim_id
@@ -40,8 +41,9 @@ select
   , dx.default_ccsr_category_description_op
   , p.primary_taxonomy_code
   , p.primary_specialty_description
-    , rend.primary_specialty_description as rend_primary_specialty_description
+  , rend.primary_specialty_description as rend_primary_specialty_description
   , n.modality
+  , m.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} m
 inner join random_members rc on m.member_id = rc.member_id
@@ -54,8 +56,5 @@ left join {{ ref('terminology__revenue_center') }} r on m.revenue_center_code = 
 left join {{ ref('terminology__place_of_service') }} pos on m.place_of_service_code = pos.place_of_service_code
 left join {{ ref('terminology__bill_type') }} bt on m.bill_type_code = bt.bill_type_code
 left join {{ ref('terminology__provider')}} rend on m.rendering_id = rend.npi
-)
 
-select *
-from cte
 
