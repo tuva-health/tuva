@@ -43,6 +43,16 @@ models:
       - mart_review
     materialized: table
 
+- name: mart_review__generics
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__generics
+    tags:
+      - mart_review
+    materialized: table
+
 - name: mart_review__inpatient
   config:
     schema: |
@@ -123,16 +133,6 @@ models:
       - mart_review
     materialized: table
 
-- name: mart_review__readmissions
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__readmissions
-    tags:
-      - mart_review
-    materialized: table
-
 - name: mart_review__tuva_chronic_conditions
   config:
     schema: |
@@ -193,7 +193,25 @@ models:
       - mart_review
     materialized: table
 
+- name: mart_review__readmissions
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__readmissions
+    tags:
+      - mart_review
+    materialized: table
 
+- name: mart_review__service_categories_long
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__service_categories_long
+    tags:
+      - mart_review
+    materialized: table    
 
 
 ## Stage
