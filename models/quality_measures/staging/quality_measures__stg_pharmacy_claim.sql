@@ -8,6 +8,7 @@
 select
       patient_id
     , dispensing_date
+    , days_supply
     , ndc_code
     , paid_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -18,6 +19,7 @@ from {{ ref('core__pharmacy_claim') }}
 select
       patient_id
     , dispensing_date
+    , days_supply
     , ndc_code
     , paid_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -29,6 +31,7 @@ from {{ ref('core__pharmacy_claim') }}
     select top 0
       cast(null as {{ dbt.type_string() }} ) as patient_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+    , cast(days_supply as integer) as days_supply
     , cast(null as {{ dbt.type_string() }} ) as ndc_code
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
@@ -36,6 +39,7 @@ from {{ ref('core__pharmacy_claim') }}
     select
       cast(null as {{ dbt.type_string() }} ) as patient_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+    , cast(days_supply as integer) as days_supply
     , cast(null as {{ dbt.type_string() }} ) as ndc_code
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
