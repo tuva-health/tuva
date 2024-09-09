@@ -1,6 +1,6 @@
 WITH anchor AS (
     SELECT DISTINCT
-        m.patient_id,
+        m.patient_data_source_id,
         m.start_date,
         m.end_date,
         m.claim_id
@@ -9,16 +9,16 @@ WITH anchor AS (
 ),
 sorted_data AS (
     SELECT
-        patient_id,
+        patient_data_source_id,
         start_date,
         end_date,
         claim_id,
-        LAG(end_date) OVER (PARTITION BY patient_id ORDER BY start_date, end_date) AS previous_end_date
+        LAG(end_date) OVER (PARTITION BY patient_data_source_id ORDER BY start_date, end_date) AS previous_end_date
     FROM anchor
 ),
 grouped_data AS (
     SELECT
-        patient_id,
+        patient_data_source_id,
         start_date,
         end_date,
         claim_id,
@@ -30,16 +30,16 @@ grouped_data AS (
 ),
 encounters AS (
     SELECT
-        patient_id,
+        patient_data_source_id,
         start_date,
         end_date,
         claim_id,
-        SUM(is_new_group) OVER (ORDER BY patient_id, start_date) AS old_encounter_id
+        SUM(is_new_group) OVER (ORDER BY patient_data_source_id, start_date) AS old_encounter_id
     FROM grouped_data
 )
 
 SELECT
-    patient_id,
+    patient_data_source_id,
     start_date,
     end_date,
     claim_id,

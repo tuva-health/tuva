@@ -25,5 +25,5 @@ select dat.encounter_id
 ,row_number () over (partition by prof.claim_line_id order by dat.encounter_id) as claim_attribution_number
 from {{ ref('encounters__stg_medical_claim') }} med
 inner join {{ ref('encounters__stg_professional') }} prof on med.claim_line_id = prof.claim_line_id
-inner join join_first_claim_dates dat on med.patient_id = dat.patient_id
+inner join join_first_claim_dates dat on med.patient_data_source_id = dat.patient_data_source_id
 and med.start_date between dat.encounter_start_date and dat.encounter_end_date

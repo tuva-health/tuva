@@ -47,7 +47,7 @@ where claim_type = 'institutional'
         , f.admit_source_code as admit_source_code
         , f.admit_type_code as admit_type_code
         , l.discharge_disposition_code as discharge_disposition_code
-        , d.patient_id
+        , d.patient_data_source_id
         , d.data_source
     from detail_values d
     inner join first_last_inst_inst_values f on d.encounter_id = f.encounter_id
@@ -91,7 +91,7 @@ where claim_type = 'institutional'
 
 , patient as (
     select 
-        patient_id
+        patient_data_source_id
         , birth_date
         , gender
         , race
@@ -122,7 +122,7 @@ select
   x.encounter_id
 , a.encounter_start_date
 , a.encounter_end_date
-, c.patient_id
+, c.patient_data_source_id
 ,tot.encounter_type
 ,tot.encounter_group
 , {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
@@ -176,7 +176,7 @@ inner join service_category_flags sc on x.encounter_id = sc.encounter_id
 left join institutional_claim_details c
   on x.encounter_id = c.encounter_id
 left join patient e
-  on c.patient_id = e.patient_id
+  on c.patient_data_source_id = e.patient_data_source_id
 left join {{ ref('terminology__provider') }} b
   on c.facility_id = b.npi
 left join {{ ref('terminology__discharge_disposition') }} g

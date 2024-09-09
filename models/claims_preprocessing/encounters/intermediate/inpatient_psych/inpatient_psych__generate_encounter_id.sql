@@ -1,17 +1,17 @@
 with claim_start_end as (
   select
     claim_id,
-    patient_id,
+    patient_data_source_id,
     min(start_date) as start_date,
     max(end_date) as end_date
   from {{ ref('encounters__stg_medical_claim') }}
-  group by claim_id, patient_id
+  group by claim_id, patient_data_source_id
 )
 
 , base as (
   select distinct
     enc.claim_id,
-    enc.patient_id,
+    enc.patient_data_source_id,
     c.start_date,
     c.end_date,
     enc.facility_id,
@@ -19,7 +19,7 @@ with claim_start_end as (
   from {{ ref('encounters__stg_medical_claim') }} enc
   inner join claim_start_end c 
     on enc.claim_id = c.claim_id
-    and c.patient_id = enc.patient_id
+    and c.patient_data_source_id = enc.patient_data_source_id
   where
     enc.service_category_2 = 'Inpatient Psychiatric'
     and enc.claim_type = 'institutional'
@@ -27,19 +27,19 @@ with claim_start_end as (
 
 , add_row_num as (
   select
-    patient_id,
+    patient_data_source_id,
     claim_id,
     start_date,
     end_date,
     discharge_disposition_code,
     facility_id,
-    row_number() over (partition by patient_id order by end_date, start_date, claim_id) as row_num
+    row_number() over (partition by patient_data_source_id order by end_date, start_date, claim_id) as row_num
   from base
 )
 
 , check_for_merges_with_larger_row_num as (
   select
-    aa.patient_id,
+    aa.patient_data_source_id,
     aa.claim_id as claim_id_a,
     bb.claim_id as claim_id_b,
     aa.row_num as row_num_a,
@@ -56,7 +56,7 @@ with claim_start_end as (
     end as merge_flag
   from add_row_num as aa
   inner join add_row_num as bb
-    on aa.patient_id = bb.patient_id
+    on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.row_num < bb.row_num
     and aa.claim_id <> bb.claim_id
 )
@@ -64,7 +64,7 @@ with claim_start_end as (
 
 , merges_with_larger_row_num as (
   select
-      patient_id
+      patient_data_source_id
     , claim_id_a
     , claim_id_b
     , row_num_a
@@ -85,14 +85,14 @@ with claim_start_end as (
       aa.claim_id as claim_id
   from add_row_num as aa
   inner join merges_with_larger_row_num as bb
-    on aa.patient_id = bb.patient_id
+    on aa.patient_data_source_id = bb.patient_data_source_id
     and bb.row_num_a < aa.row_num
     and bb.row_num_b > aa.row_num
 )
 
 , close_flags as (
   select
-      aa.patient_id
+      aa.patient_data_source_id
     , aa.claim_id
     , aa.start_date
     , aa.end_date
@@ -113,31 +113,31 @@ with claim_start_end as (
 
 , join_every_row_to_later_closes as (
   select
-      aa.patient_id
+      aa.patient_data_source_id
     , aa.claim_id
     , aa.row_num
     , bb.row_num as row_num_b
   from close_flags as aa
   inner join close_flags as bb
-    on aa.patient_id = bb.patient_id
+    on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.row_num <= bb.row_num
   where bb.close_flag = 1
 )
 
 , find_min_closing_row_num_for_every_claim as (
   select
-      patient_id
+      patient_data_source_id
     , claim_id
     , min(row_num_b) as min_closing_row
   from join_every_row_to_later_closes
   group by
-      patient_id
+      patient_data_source_id
     , claim_id
 )
 
 , add_min_closing_row_to_every_claim as (
   select
-      aa.patient_id
+      aa.patient_data_source_id
     , aa.claim_id
     , aa.start_date
     , aa.end_date
@@ -148,13 +148,13 @@ with claim_start_end as (
     , bb.min_closing_row
   from close_flags as aa
   left join find_min_closing_row_num_for_every_claim as bb
-    on aa.patient_id = bb.patient_id
+    on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.claim_id = bb.claim_id
 )
 
 , add_encounter_id as (
   select
-      aa.patient_id
+      aa.patient_data_source_id
     , aa.claim_id
     , aa.start_date
     , aa.end_date
@@ -166,12 +166,12 @@ with claim_start_end as (
     , bb.claim_id as encounter_id
   from add_min_closing_row_to_every_claim as aa
   left join add_min_closing_row_to_every_claim as bb
-    on aa.patient_id = bb.patient_id
+    on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.min_closing_row = bb.row_num
 )
 
 select
-    patient_id
+    patient_data_source_id
   , claim_id
   , start_date
   , end_date

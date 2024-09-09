@@ -1446,3 +1446,13 @@ models:
       tags:
         - claims_preprocessing
         - encounters
+
+  - name: encounters__patient_data_source_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}
+      materialized: table
+      tags:
+        - claims_preprocessing
+        - encounters

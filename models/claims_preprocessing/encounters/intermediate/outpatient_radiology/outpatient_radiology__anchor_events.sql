@@ -5,7 +5,7 @@
 
 with service_category as (
   select distinct
-    patient_id
+    patient_data_source_id
     , start_date
     , hcpcs_code
   from {{ ref('encounters__stg_medical_claim') }}
@@ -14,7 +14,7 @@ with service_category as (
 )
 
 select distinct 
-    patient_id
+    patient_data_source_id
     , start_date
     , hcpcs_code
 , '{{ var('tuva_last_run')}}' as tuva_last_run

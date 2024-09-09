@@ -1,6 +1,6 @@
 with anchor as (
     SELECT DISTINCT
-        mc.patient_id,
+        mc.patient_data_source_id,
         mc.start_date,
         mc.claim_id,
         mc.claim_line_number,
@@ -14,12 +14,12 @@ with anchor as (
     WHERE mc.service_category_1 = 'Office-Based'
 )
 
-select patient_id
+select patient_data_source_id
 ,start_date
 ,claim_id
 ,claim_line_number
 ,service_category_1
 ,service_category_2
 ,service_category_3
-,dense_rank() over (order by patient_id, start_date) as old_encounter_id
+,dense_rank() over (order by patient_data_source_id, start_date) as old_encounter_id
 from anchor

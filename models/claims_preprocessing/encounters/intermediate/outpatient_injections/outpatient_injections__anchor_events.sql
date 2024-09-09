@@ -6,7 +6,7 @@
 with multiple_sources as 
 (
 select distinct
-    med.patient_id
+    med.patient_data_source_id
     ,med.start_date
 from {{ ref('encounters__stg_medical_claim') }} med
 inner join {{ ref('encounters__stg_outpatient_institutional') }} outpatient
@@ -16,7 +16,7 @@ where substring(med.hcpcs_code,1,1) = 'J'
 
 
 select distinct 
-    patient_id
+    patient_data_source_id
     ,start_date
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from multiple_sources

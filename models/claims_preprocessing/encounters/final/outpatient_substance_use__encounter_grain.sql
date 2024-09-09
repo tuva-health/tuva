@@ -30,7 +30,7 @@ with encounter_date as (
 
 , patient as (
     select 
-        patient_id
+        patient_data_source_id
         , birth_date
         , gender
         , race
@@ -108,7 +108,8 @@ group by encounter_id
 
 select   d.encounter_id
 , d.encounter_start_date
-, d.patient_id
+, d.patient_data_source_id
+
 ,tot.encounter_type
 ,tot.encounter_group
 , {{ dbt.datediff("birth_date","d.encounter_start_date","day")}}/365 as admit_age
@@ -142,7 +143,7 @@ left join highest_paid_facility hf on d.encounter_id = hf.encounter_id
 and
 hf.paid_order = 1
 left join patient e
-  on d.patient_id = e.patient_id
+  on d.patient_data_source_id = e.patient_data_source_id
 left join dev_brad.terminology.provider b
   on hf.facility_id = b.npi
 left join dev_brad.terminology.icd_10_cm icd10cm

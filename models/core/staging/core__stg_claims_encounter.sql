@@ -42,9 +42,11 @@ WITH base AS (
     exclude=["_loaded_at"]
   ) }}
 )
+
 SELECT
   cast(encounter_id as {{ dbt.type_string() }} ) as encounter_id,
-  cast(patient_id as {{ dbt.type_string() }} ) as patient_id,
+  cast(p.patient_id as {{ dbt.type_string() }} ) as patient_id,
+  cast(base.patient_data_source_id as {{ dbt.type_string() }} ) as patient_data_source_id,
   cast(encounter_type as {{ dbt.type_string() }} ) as encounter_type,
   cast(encounter_group as {{ dbt.type_string() }} ) as encounter_group,
   {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date,
@@ -81,9 +83,11 @@ SELECT
   cast(total_paid_amount as {{ dbt.type_numeric() }} ) as paid_amount,
   cast(total_allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount,
   cast(total_charge_amount as {{ dbt.type_numeric() }} ) as charge_amount,
-  cast(data_source as {{ dbt.type_string() }} ) as data_source,
+  cast(base.data_source as {{ dbt.type_string() }} ) as data_source,
   cast(claim_count as  {{ dbt.type_int() }}) as claim_count,
   cast(inst_claim_count as  {{ dbt.type_int() }}) as inst_claim_count,
   cast(prof_claim_count as  {{ dbt.type_int() }}) as prof_claim_count,
   cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as  tuva_last_run
 FROM base
+left join {{ ref('encounters__patient_data_source_id') }} p on base.patient_data_source_id = p.patient_data_source_id
+
