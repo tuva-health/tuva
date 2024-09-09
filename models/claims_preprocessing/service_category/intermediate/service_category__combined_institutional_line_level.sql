@@ -9,6 +9,7 @@ WITH combine_line_models AS (
       ref('service_category__pharmacy_institutional'),
       ref('service_category__outpatient_radiology_institutional'),
       ref('service_category__observation_institutional'),
+      ref('service_category__ambulance_institutional'),
       ref('service_category__lab_institutional')
     ],
     exclude=["_loaded_at"]

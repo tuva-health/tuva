@@ -87,7 +87,8 @@ SELECT
   cast(claim_count as  {{ dbt.type_int() }}) as claim_count,
   cast(inst_claim_count as  {{ dbt.type_int() }}) as inst_claim_count,
   cast(prof_claim_count as  {{ dbt.type_int() }}) as prof_claim_count,
+  cast(_dbt_source_relation  as  {{ dbt.type_string() }}) as source_model,
   cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as  tuva_last_run
 FROM base
-left join {{ ref('encounters__patient_data_source_id') }} p on base.patient_data_source_id = p.patient_data_source_id
+inner join {{ ref('encounters__patient_data_source_id') }} p on base.patient_data_source_id = p.patient_data_source_id
 

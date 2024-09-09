@@ -36,6 +36,13 @@ from detail_values
 where claim_type = 'institutional'
 )
 
+,encounter_header_values as (
+  select distinct patient_data_source_id
+  ,data_source
+  ,encounter_id
+  from detail_values
+)
+
 , institutional_claim_details as (
     select distinct
         d.encounter_id
@@ -115,10 +122,10 @@ select
   x.encounter_id
 , a.encounter_start_date
 , a.encounter_end_date
-, c.patient_data_source_id
+, ehv.patient_data_source_id
 ,tot.encounter_type
 ,tot.encounter_group
-, {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
+, {{ dbt.datediff("birth_date","a.encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race
 , c.diagnosis_code_type as primary_diagnosis_code_type
@@ -154,12 +161,13 @@ select
     when c.discharge_disposition_code = '20' then 1
     else 0
   end mortality_flag
-, c.data_source
+, ehv.data_source
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('emergency_department__start_end_dates') }} a
 inner join encounter_cross_walk x on a.encounter_id = x.old_encounter_id
 inner join total_amounts tot on x.encounter_id = tot.encounter_id
 inner join service_category_flags sc on x.encounter_id = sc.encounter_id
+inner join encounter_header_values ehv on x.encounter_id = ehv.encounter_id
 left join institutional_claim_details c
   on x.encounter_id = c.encounter_id
 left join patient e
