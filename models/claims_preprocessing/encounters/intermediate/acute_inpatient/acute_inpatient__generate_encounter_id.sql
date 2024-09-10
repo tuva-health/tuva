@@ -21,7 +21,7 @@ select claim_id
   and
   c.patient_data_source_id = enc.patient_data_source_id
   where
-    service_category_2 in ('Acute Inpatient')
+    service_category_2 in ('acute inpatient')
     and claim_type = 'institutional'
 )
 

@@ -6,8 +6,8 @@
 with multiple_sources as (
 select distinct 
     med.claim_id
-    , 'Emergency Department' as service_category_2
-    , 'Emergency Department' as service_category_3
+    , 'emergency department' as service_category_2
+    , 'emergency department' as service_category_3
     , '{{ var('tuva_last_run')}}' as tuva_last_run
     , '{{ this.name }}' as source_model_name
 from {{ ref('service_category__stg_medical_claim') }} med
@@ -23,8 +23,8 @@ UNION
 --Adding in inpatient claims for flagging encounters with ED 
 select distinct 
     med.claim_id
-    , 'Emergency Department' as service_category_2
-    , 'Emergency Department' as service_category_3
+    , 'emergency department' as service_category_2
+    , 'emergency department' as service_category_3
     , '{{ var('tuva_last_run')}}' as tuva_last_run
     , '{{ this.name }}' as source_model_name
 from {{ ref('service_category__stg_medical_claim') }} med
@@ -35,7 +35,7 @@ where revenue_center_code in ('0450','0451','0452','0459','0981')
 )
 
 select claim_id
-, 'Outpatient' as service_category_1
+, 'outpatient' as service_category_1
 ,service_category_2
 ,service_category_3
 ,tuva_last_run

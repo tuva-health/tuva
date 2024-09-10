@@ -11,7 +11,7 @@ with anchor as (
     INNER JOIN {{ ref('encounters__stg_professional') }} p 
         ON mc.claim_id = p.claim_id 
         AND mc.claim_line_number = p.claim_line_number
-    WHERE mc.service_category_1 = 'Office-Based'
+    WHERE mc.service_category_1 = 'office-based'
 )
 
 select patient_data_source_id

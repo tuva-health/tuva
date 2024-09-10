@@ -6,7 +6,7 @@
 
 select distinct 
   a.claim_id
-, 'Outpatient' as service_type
+, 'outpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('encounters__stg_medical_claim') }} a
 left join {{ ref('encounters__stg_inpatient_institutional') }} i on a.claim_id = i.claim_id

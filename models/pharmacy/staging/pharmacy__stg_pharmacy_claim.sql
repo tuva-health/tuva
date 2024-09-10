@@ -23,3 +23,4 @@ select
 from {{ ref('core__pharmacy_claim') }} as p
 left join {{ ref('terminology__ndc') }} as n 
   on p.ndc_code = n.ndc
+

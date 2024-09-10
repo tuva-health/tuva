@@ -21,7 +21,7 @@ with claim_start_end as (
     on enc.claim_id = c.claim_id
     and c.patient_data_source_id = enc.patient_data_source_id
   where
-    enc.service_category_2 = 'Inpatient Substance Use'
+    enc.service_category_2 = 'inpatient substance use'
     and enc.claim_type = 'institutional'
 )
 

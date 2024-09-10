@@ -11,7 +11,7 @@ with service_category as (
     , end_date
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 = 'Ambulatory Surgery Center' -- include both professional and institutional claims as anchor events
+    service_category_2 = 'ambulatory surgery center' -- include both professional and institutional claims as anchor events
  
 )
 

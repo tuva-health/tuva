@@ -91,18 +91,18 @@ group by encounter_id
 , service_category_ranking as (
   select *
   from {{ ref('service_category__service_category_grouper') }}
-  where service_category_2 in ('Observation','Emergency Department','Lab','Ambulance','Durable Medical Equipment','Pharmacy')
+  where service_category_2 in ('observation','emergency department','lab','ambulance','durable medical equipment','pharmacy')
 )
 
 , service_category_flags as (
     select distinct
         d.encounter_id
-       ,max(case when scr.service_category_2 = 'Lab' then 1 else 0 end) as lab_flag
-       ,max(case when scr.service_category_2 = 'Ambulance' then 1 else 0 end) as ambulance_flag
-       ,max(case when scr.service_category_2 = 'Durable Medical Equipment' then 1 else 0 end) as dme_flag
-       ,max(case when scr.service_category_2 = 'Observation' then 1 else 0 end) as observation_flag
-       ,max(case when scr.service_category_2 = 'Emergency Department' then 1 else 0 end) as ed_flag
-       ,max(case when scr.service_category_2 = 'Pharmacy' then 1 
+       ,max(case when scr.service_category_2 = 'lab' then 1 else 0 end) as lab_flag
+       ,max(case when scr.service_category_2 = 'ambulance' then 1 else 0 end) as ambulance_flag
+       ,max(case when scr.service_category_2 = 'durable medical equipment' then 1 else 0 end) as dme_flag
+       ,max(case when scr.service_category_2 = 'observation' then 1 else 0 end) as observation_flag
+       ,max(case when scr.service_category_2 = 'emergency department' then 1 else 0 end) as ed_flag
+       ,max(case when scr.service_category_2 = 'pharmacy' then 1 
               else 0 end) as pharmacy_flag
     from detail_values d
     left join service_category_ranking scr on d.claim_id = scr.claim_id 

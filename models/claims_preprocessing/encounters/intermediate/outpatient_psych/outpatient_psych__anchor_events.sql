@@ -10,7 +10,7 @@ with service_category as (
     , start_date
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 = 'Outpatient Psychiatric' --both inst and prof as anchor
+    service_category_2 = 'outpatient psychiatric' --both inst and prof as anchor
 )
 
 select distinct 

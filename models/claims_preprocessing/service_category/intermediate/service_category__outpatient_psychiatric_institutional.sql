@@ -6,8 +6,8 @@ with multiple_sources as (
 
 select distinct 
   m.claim_id
-, 'Outpatient Psychiatric' as service_category_2
-, 'Outpatient Psychiatric' as service_category_3
+, 'outpatient psychiatric' as service_category_2
+, 'outpatient psychiatric' as service_category_3
 ,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} m
@@ -18,8 +18,8 @@ union
 
 select distinct 
   m.claim_id
-, 'Outpatient Psychiatric' as service_category_2
-, 'Outpatient Psychiatric' as service_category_3
+, 'outpatient psychiatric' as service_category_2
+, 'outpatient psychiatric' as service_category_3
 ,'{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} m
@@ -29,7 +29,7 @@ where m.primary_taxonomy_code in ('283Q00000X'
 )
 
 select distinct claim_id
-,'Outpatient' as service_category_1    
+,'outpatient' as service_category_1    
 ,service_category_2
 ,service_category_3
 ,source_model_name

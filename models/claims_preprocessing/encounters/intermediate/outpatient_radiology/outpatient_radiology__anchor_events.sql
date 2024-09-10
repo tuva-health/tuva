@@ -10,7 +10,7 @@ with service_category as (
     , hcpcs_code
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 = 'Outpatient Radiology' --both professional and inst
+    service_category_2 = 'outpatient radiology' --both professional and inst
 )
 
 select distinct 

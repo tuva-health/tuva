@@ -30,7 +30,7 @@ where claim_type = 'institutional'
 
 select distinct 
   a.claim_id
-, 'Inpatient' as service_type
+, 'inpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('encounters__stg_medical_claim') }} a
 inner join bill_type_requirement d
@@ -40,7 +40,7 @@ union distinct
 
 select distinct 
   a.claim_id
-, 'Inpatient' as service_type
+, 'inpatient' as service_type
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('encounters__stg_medical_claim') }} a
 inner join drg_requirement c

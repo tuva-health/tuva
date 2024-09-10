@@ -6,8 +6,8 @@
 with multiple_sources as (
 select distinct 
     med.claim_id
-    , 'Ambulatory Surgery Center' as service_category_2
-    , 'Ambulatory Surgery Center' as service_category_3
+    , 'ambulatory surgery center' as service_category_2
+    , 'ambulatory surgery center' as service_category_3
     , '{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
@@ -19,8 +19,8 @@ union
 
 select distinct 
     med.claim_id
-    , 'Ambulatory Surgery Center' as service_category_2
-    , 'Ambulatory Surgery Center' as service_category_3
+    , 'ambulatory surgery center' as service_category_2
+    , 'ambulatory surgery center' as service_category_3
     , '{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
@@ -30,7 +30,7 @@ where med.primary_taxonomy_code = '261QA1903X'
 )
 
 select distinct claim_id
-, 'Outpatient' as service_category_1
+, 'outpatient' as service_category_1
 ,service_category_2
 ,service_category_3
 ,source_model_name

@@ -4,13 +4,13 @@
 }}
 
 select distinct
-    a.claim_id
-    , a.claim_line_number
-    , a.claim_line_id
-    , 'Inpatient' as service_category_1
-, 'Skilled Nursing' as service_category_2
-, 'Skilled Nursing' as service_category_3
-,'{{ this.name }}' as source_model_name
+  a.claim_id
+, a.claim_line_number
+, a.claim_line_id
+, 'inpatient' as service_category_1
+, 'skilled nursing' as service_category_2
+, 'skilled nursing' as service_category_3
+, '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
 left join {{ ref('service_category__dme_professional') }} b

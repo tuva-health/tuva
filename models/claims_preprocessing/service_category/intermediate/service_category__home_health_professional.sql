@@ -4,12 +4,12 @@
 }}
 
 select distinct
-    med.claim_id
-    , med.claim_line_number
-    , med.claim_line_id
-    , 'Outpatient' as service_category_1
-, 'Home Health' as service_category_2
-, 'Home Health' as service_category_3
+med.claim_id
+, med.claim_line_number
+, med.claim_line_id
+, 'outpatient' as service_category_1
+, 'home health' as service_category_2
+, 'home health' as service_category_3
 , '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med

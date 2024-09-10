@@ -10,7 +10,7 @@ with service_category as (
     , start_date
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 = 'Home Health' -- both prof and inst as anchors
+    service_category_2 = 'home health' -- both prof and inst as anchors
     
 )
 

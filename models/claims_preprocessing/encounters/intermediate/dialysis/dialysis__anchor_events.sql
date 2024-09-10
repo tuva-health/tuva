@@ -10,7 +10,7 @@ with service_category as (
     , start_date
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 = 'Dialysis' --both inst and professional as anchor
+    service_category_2 = 'dialysis' --both inst and professional as anchor
     
 )
 

@@ -30,23 +30,23 @@ select
 , data_source
 , {{ dbt_utils.pivot(
       column='service_category_2'
-    , values=('Acute Inpatient',
-              'Ambulance',
+    , values=('acute inpatient',
+              'ambulance',
               'Ambulatory Surgery',
-              'Dialysis',
-              'Durable Medical Equipment',
-              'Emergency Department',
-              'Home Health',
+              'dialysis',
+              'durable medical equipment',
+              'emergency department',
+              'home health',
               'Hospice',
-              'Inpatient Psychiatric',
-              'Inpatient Rehabilitation',
-              'Lab',
+              'inpatient psychiatric',
+              'inpatient rehabilitation',
+              'lab',
               'Office Visit',
-              'Outpatient Hospital or Clinic',
-              'Outpatient Psychiatric',
-              'Outpatient Rehabilitation',
-              'Skilled Nursing',
-              'Urgent Care'                                                 
+              'outpatient hospital or clinic',
+              'outpatient psychiatric',
+              'outpatient rehabilitation',
+              'skilled nursing',
+              'urgent care'                                                 
               )
     , agg='sum'
     , then_value='total_paid'

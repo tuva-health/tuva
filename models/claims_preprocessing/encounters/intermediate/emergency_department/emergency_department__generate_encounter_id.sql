@@ -21,7 +21,7 @@ with claim_start_end as (
     on enc.claim_id = c.claim_id
     and c.patient_data_source_id = enc.patient_data_source_id
   where
-    enc.service_category_2 = 'Emergency Department' --both inst and prof
+    enc.service_category_2 = 'emergency department' --both inst and prof
 )
 
 , add_row_num as (

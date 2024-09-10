@@ -10,4 +10,4 @@ select distinct
     ,ov.claim_line_number
     ,ov.old_encounter_id
 from {{ ref('office_visits__int_office_visits')}} ov
-where service_category_2 = 'Office-Based PT/OT/ST'
+where service_category_2 = 'office-based pt/ot/st'

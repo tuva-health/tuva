@@ -7,11 +7,11 @@ select distinct
     claim_id
     , claim_line_number
     , claim_line_id
-    , 'Inpatient' as service_category_1
-, 'Acute Inpatient' as service_category_2
+    , 'inpatient' as service_category_1
+, 'acute inpatient' as service_category_2
 , case when hcpcs_code in ('59400','59409','59410','59610','59612','59614') then 'L/D - Vaginal Delivery'
        when hcpcs_code in ('59510','59514','59515','59618','59620','59622') then 'L/D - Cesarean Delivery'
-       else 'Acute Inpatient - Other' end as service_category_3
+       else 'acute inpatient - other' end as service_category_3
 , '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}

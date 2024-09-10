@@ -8,4 +8,4 @@ from {{ ref('encounters__stg_medical_claim') }} m
 inner join {{ ref('ambulance__generate_encounter_id') }} u on m.patient_data_source_id = u.patient_data_source_id
 and
 m.start_date = u.start_date
-where m.service_category_2 = 'Ambulance'
+where m.service_category_2 = 'ambulance'

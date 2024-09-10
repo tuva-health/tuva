@@ -15,9 +15,9 @@ with numeric_hcpcs as (
         med.claim_id
       , med.claim_line_number
       , med.claim_line_id
-      ,'Office-Based' as service_category_1    
-      , 'Office-Based Surgery' as service_category_2
-      , 'Office-Based Surgery' as service_category_3
+      ,'office-based' as service_category_1    
+      , 'office-based surgery' as service_category_2
+      , 'office-based surgery' as service_category_3
       , '{{ this.name }}' as source_model_name
       , '{{ var('tuva_last_run') }}' as tuva_last_run
     from numeric_hcpcs as med
@@ -26,6 +26,6 @@ with numeric_hcpcs as (
       and med.claim_line_number = prof.claim_line_number
     where 
       (hcpcs_code between '10021' and '69999')
-      --or (hcpcs_code between '90281' and '99091')
+
 
 

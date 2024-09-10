@@ -4,13 +4,13 @@
 }}
 
 select distinct 
-    med.claim_id
-    ,med.claim_line_number
-    ,'Outpatient' as service_category_1
-    , 'Observation' as service_category_2
-    , 'Observation' as service_category_3
-    ,'{{ this.name }}' as source_model_name
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+   med.claim_id
+,  med.claim_line_number
+, 'outpatient' as service_category_1
+, 'observation' as service_category_2
+, 'observation' as service_category_3
+, '{{ this.name }}' as source_model_name
+, '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} med
 where claim_type = 'institutional'
 and (revenue_center_code in ('0762')

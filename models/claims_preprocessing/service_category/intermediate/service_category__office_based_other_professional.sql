@@ -5,13 +5,13 @@
 
 
   select distinct  
-    med.claim_id
-    , med.claim_line_number
-    , med.claim_line_id
-,'Office-Based' as service_category_1    
-, 'Office-Based Other' as service_category_2
-, 'Office-Based Other' as service_category_3
-,'{{ this.name }}' as source_model_name
+  med.claim_id
+, med.claim_line_number
+, med.claim_line_id
+, 'office-based' as service_category_1    
+, 'office-based other' as service_category_2
+, 'office-based other' as service_category_3
+, '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
   from {{ ref('service_category__stg_office_based') }} med
   left join {{ ref('service_category__pharmacy_professional') }} pharm on med.claim_line_id = pharm.claim_line_id

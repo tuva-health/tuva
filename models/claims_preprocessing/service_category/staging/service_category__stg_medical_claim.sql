@@ -1,13 +1,12 @@
 {{ config(
   enabled = var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 ) }}
+
 with random_members as (
     select distinct member_id
     from {{ ref('normalized_input__medical_claim') }}
     order by random()
-    limit 10000
 )
-
 
 select
     m.apr_drg_code

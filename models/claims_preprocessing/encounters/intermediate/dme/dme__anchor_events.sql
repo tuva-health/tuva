@@ -10,7 +10,7 @@ with service_category as (
     , start_date
   from {{ ref('encounters__stg_medical_claim') }}
   where
-    service_category_2 = 'Durable Medical Equipment' --both inst and prof
+    service_category_2 = 'durable medical equipment' --both inst and prof
     
 )
 

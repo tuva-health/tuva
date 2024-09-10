@@ -4,7 +4,7 @@ with first_claim as (
     where encounter_claim_number = 1
 )
 
-,join_first_claim_dates as (
+, join_first_claim_dates as (
     select f.*
     ,dat.encounter_end_date
     ,dat.encounter_start_date
@@ -18,10 +18,6 @@ select dat.encounter_id
 ,dat.encounter_end_date
 ,prof.claim_id
 ,prof.claim_line_number
--- ,med.start_date
--- ,med.end_date
--- ,med.place_of_service_code
--- ,med.place_of_service_description
 ,row_number () over (partition by prof.claim_line_id order by dat.encounter_id) as claim_attribution_number
 from {{ ref('encounters__stg_medical_claim') }} med
 inner join {{ ref('encounters__stg_professional') }} prof on med.claim_line_id = prof.claim_line_id

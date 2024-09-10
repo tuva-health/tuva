@@ -7,13 +7,13 @@ select distinct
     med.claim_id
     , med.claim_line_number
     , med.claim_line_id
-    ,'Office-Based' as service_category_1    
-    , 'Office-Based Radiology' as service_category_2
-    , case when med.modality = 'Nuclear medicine' then 'PET'
-           when med.modality = 'Magnetic resonance' then 'MRI'
-           when med.modality = 'Computerized tomography' then 'CT'
-           when med.modality in ('Invasive', 'Ultrasound', 'Computer-aided detection', 'Three-dimensional reconstruction', 'Radiography') then 'General'
-           else 'General' 
+    , 'office-based' as service_category_1    
+    , 'office-based radiology' as service_category_2
+    , case when med.modality = 'Nuclear medicine' then 'pet'
+           when med.modality = 'Magnetic resonance' then 'mri'
+           when med.modality = 'Computerized tomography' then 'ct'
+           when med.modality in ('Invasive', 'Ultrasound', 'Computer-aided detection', 'Three-dimensional reconstruction', 'Radiography') then 'general'
+           else 'general' 
            end as service_category_3
     ,'{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run') }}' as tuva_last_run
