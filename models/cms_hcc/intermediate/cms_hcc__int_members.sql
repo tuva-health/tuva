@@ -19,7 +19,7 @@ Jinja is used to set payment year variable.
 {% set payment_year_age_date = payment_year ~ '-02-01' -%}
 {% set collection_year = payment_year - 1 -%}
 {% set collection_year_start = "'" ~ collection_year ~ "-01-01'" %}
-{% set collection_year_end = "'" ~ collection_year ~ "-12-31'" %}
+{% set collection_year_end = "'" ~ payment_year ~ "-12-31'" %}
 
 with stg_eligibility as (
 
@@ -36,13 +36,9 @@ with stg_eligibility as (
         ) as row_num /* used to dedupe eligibility */
     from {{ ref('cms_hcc__stg_core__eligibility') }}
     where (
-        /* filter to members with eligibility in collection or payment year */
-              {{ date_part('year', 'enrollment_start_date') }}
-                between {{ collection_year }}
-                and {{ payment_year }}
-             or {{ date_part('year', 'enrollment_end_date') }}
-                between {{ collection_year }}
-                and {{ payment_year }}
+        /* Include members with any overlap in the collection or payment year */
+        enrollment_start_date <= {{ collection_year_end }}
+        and enrollment_end_date >= {{ collection_year_start }}
     )
 
 )
