@@ -110,9 +110,8 @@ group by encounter_id
 select   d.encounter_id
 , d.encounter_start_date
 , d.patient_data_source_id
-
-,tot.encounter_type
-,tot.encounter_group
+, tot.encounter_type
+, tot.encounter_group
 , {{ dbt.datediff("birth_date","d.encounter_start_date","day")}}/365 as admit_age
 , e.gender
 , e.race
@@ -125,7 +124,8 @@ select   d.encounter_id
 , sc.lab_flag
 , sc.dme_flag
 , sc.ambulance_flag
-, sc.pharmacy_flag, sc.observation_flag
+, sc.pharmacy_flag
+, sc.observation_flag
 , tot.total_paid_amount
 , tot.total_allowed_amount
 , tot.total_charge_amount

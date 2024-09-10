@@ -68,11 +68,11 @@ where claim_type = 'institutional'
 , service_category_flags as (
     select distinct
         d.encounter_id
-       ,max(case when d.service_category_3 in ( 'L/D - Cesarean Delivery', 'L/D - Vaginal Delivery') then 1 else 0 end ) as delivery_flag
-       ,max(case when d.service_category_3 ='L/D - Cesarean Delivery' then 1 else 0 end ) as cesarean_delivery
-       ,max(case when d.service_category_3 ='L/D - Vaginal Delivery' then 1 else 0 end ) as vaginal_delivery
-       ,max(case when d.service_category_3 in ('L/D - Newborn','L/D - Newborn NICU') then 1 else 0 end ) as newborn_flag
-       ,max(case when d.service_category_3 ='L/D - Newborn NICU' then 1 else 0 end ) as nicu_flag
+       ,max(case when d.service_category_3 in ( 'l/d - cesarean delivery', 'l/d - vaginal delivery') then 1 else 0 end ) as delivery_flag
+       ,max(case when d.service_category_3 ='l/d - cesarean delivery' then 1 else 0 end ) as cesarean_delivery
+       ,max(case when d.service_category_3 ='l/d - vaginal delivery' then 1 else 0 end ) as vaginal_delivery
+       ,max(case when d.service_category_3 in ('l/d - newborn','l/d - newborn nicu') then 1 else 0 end ) as newborn_flag
+       ,max(case when d.service_category_3 ='l/d - newborn nicu' then 1 else 0 end ) as nicu_flag
        ,max(case when scr.service_category_2 = 'observation' then 1 else 0 end) as observation_flag
        ,max(case when scr.service_category_2 = 'emergency department' then 1 else 0 end) as ed_flag
        ,max(case when scr.service_category_2 = 'lab' then 1 else 0 end) as lab_flag

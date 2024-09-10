@@ -7,7 +7,7 @@ select distinct patient_id
 ,data_source
 from {{ ref('normalized_input__medical_claim') }}
 
-UNION distinct
+union distinct
 
 select distinct patient_id
 ,data_source

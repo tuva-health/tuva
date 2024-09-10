@@ -112,9 +112,9 @@ select
     , d.claim_line_number
     , d.claim_type
     , d.claim_id || '|' || d.claim_line_number as claim_line_id
-    , coalesce(service_category_1,'Other') as service_category_1
-    , coalesce(service_category_2,'Other') as service_category_2
-    , coalesce(service_category_3,'Other') as service_category_3
+    , coalesce(service_category_1,'other') as service_category_1
+    , coalesce(service_category_2,'other') as service_category_2
+    , coalesce(service_category_3,'other') as service_category_3
     , original_service_cat_2
     , original_service_cat_3
     , duplicate_row_number

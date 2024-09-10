@@ -125,7 +125,8 @@ select   d.encounter_id
 , sc.lab_flag
 , sc.dme_flag
 , sc.ambulance_flag
-, sc.pharmacy_flag, sc.observation_flag
+, sc.pharmacy_flag
+, sc.observation_flag
 , tot.total_paid_amount
 , tot.total_allowed_amount
 , tot.total_charge_amount

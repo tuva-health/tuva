@@ -39,7 +39,7 @@ and med.start_date between dat.encounter_start_date and dat.encounter_end_date
 where dat.claim_id <> med.claim_id
 )
 
-select encounter_id
+select distinct encounter_id
 ,encounter_start_date
 ,encounter_end_date
 ,claim_id
