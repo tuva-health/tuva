@@ -30,7 +30,7 @@ select
 , data_source
 , {{ dbt_utils.pivot(
       column='service_category_1'
-    , values=('inpatient','outpatient','Office Visit','ancillary','Other','pharmacy')
+    , values=('inpatient','outpatient','office-based','ancillary','other','pharmacy')
     , agg='sum'
     , then_value='total_allowed'
     , else_value= 0

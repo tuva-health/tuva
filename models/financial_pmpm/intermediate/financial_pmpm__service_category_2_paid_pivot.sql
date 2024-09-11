@@ -29,25 +29,38 @@ select
 , {{ quote_column('plan') }}
 , data_source
 , {{ dbt_utils.pivot(
-      column='service_category_2'
-    , values=('acute inpatient',
-              'ambulance',
-              'Ambulatory Surgery',
-              'dialysis',
-              'durable medical equipment',
-              'emergency department',
-              'home health',
-              'Hospice',
-              'inpatient psychiatric',
-              'inpatient rehabilitation',
-              'lab',
-              'Office Visit',
-              'outpatient hospital or clinic',
-              'outpatient psychiatric',
-              'outpatient rehabilitation',
-              'skilled nursing',
-              'urgent care'                                                 
-              )
+    column='service_category_2'
+  , values=(
+      'acute inpatient', 
+      'ambulance', 
+      'ambulatory surgery center', 
+      'dialysis', 
+      'durable medical equipment', 
+      'emergency department', 
+      'home health', 
+      'inpatient hospice', 
+      'inpatient psychiatric', 
+      'inpatient rehabilitation', 
+      'lab', 
+      'observation', 
+      'office-based other', 
+      'office-based pt/ot/st', 
+      'office-based radiology', 
+      'office-based surgery', 
+      'office-based visit', 
+      'other', 
+      'outpatient hospice', 
+      'outpatient hospital or clinic', 
+      'outpatient pt/ot/st', 
+      'outpatient psychiatric', 
+      'outpatient radiology', 
+      'outpatient rehabilitation', 
+      'outpatient surgery', 
+      'pharmacy', 
+      'skilled nursing', 
+      'telehealth visit', 
+      'urgent care'
+  )
     , agg='sum'
     , then_value='total_paid'
     , else_value= 0

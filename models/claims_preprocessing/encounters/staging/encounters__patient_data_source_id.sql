@@ -7,7 +7,11 @@ select distinct patient_id
 ,data_source
 from {{ ref('normalized_input__medical_claim') }}
 
+{% if target.type == 'fabric' %}
+union
+{% else %}
 union distinct
+{% endif %}
 
 select distinct patient_id
 ,data_source
