@@ -170,6 +170,14 @@ models:
         description: >
           Performance flag for CBE0101, Falls: Plan of Care. A null indicates that the 
           measure was not applicable for the patient.
+      - name: cqm_48
+        description: >
+          Performance flag for CQM48, Urinary Incontinence: Assessment of Presence or Absence of Urinary Incontinence in Women Aged 65 Years and Older. 
+          A null indicates that the measure was not applicable for the patient.
+      - name: cqm_130
+        description: >
+          Performance flag for CQM130, Documentation of Current Medications in the Medical Record. 
+          A null indicates that the measure was not applicable for the patient.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
@@ -428,7 +436,7 @@ models:
         description: Patient's maximum age during encounter as of the performance_period.
       - name: qualifying_types
         description: Indicative letter of patient's type of encounter.
-      
+
   - name: quality_measures__int_nqf0034_exclude_colectomy_cancer
     config:
       schema: |
@@ -449,7 +457,7 @@ models:
           from the measure.
       - name: exclusion_type
         description: Measure specific exclusion for historical record of colectomy cancer.
-      - name: tuva_last_run 
+      - name: tuva_last_run
         desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0034_exclusions
@@ -460,7 +468,7 @@ models:
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of NQF 0034, Colorectal Cancer Screening.      
+      Combined exclusion logic for the reporting version of NQF 0034, Colorectal Cancer Screening.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
@@ -531,7 +539,7 @@ models:
         description: Version of the measure.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
-      
+
   - name: quality_measures__int_nqf0034_numerator
     config:
       schema: |
@@ -561,7 +569,7 @@ models:
       materialized: view
     description: >
       Performance Period definition for NQF 0034 Colorectal Cancer screening.
-    
+
 ### Diabetes Hemoglobin a1c
   - name: quality_measures__int_nqf0059__performance_period
     config:
@@ -964,6 +972,32 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
+  - name: quality_measures__int_nqf0053_exclusions_stage_1
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_nqf0053_exclusions_stage_1
+      tags: quality_measures
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of NQF 0053, Osteoporosis Management in women who had a fracture.
+      First stage of final exclusion logic.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_type
+        description: >
+          Type of exclusion from the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
   - name: quality_measures__int_nqf0053_exclusions
     config:
       schema: |
@@ -990,7 +1024,7 @@ models:
           a measure although they experience the denominator index event.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
-        
+
   - name: quality_measures__int_nqf0053_exclude_procedures_medications
     config:
       schema: |
@@ -1011,7 +1045,7 @@ models:
           from the measure.
       - name: exclusion_type
         description: measure specific exclusion for procedure medication.
-      - name: tuva_last_run 
+      - name: tuva_last_run
         desciption: The date and timestamp of the dbt run.
 
   - name: quality_measures__int_nqf0053_long
@@ -1392,7 +1426,7 @@ models:
       materialized: view
     description: >
       Performance Period definition for Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
-  
+
   - name: quality_measures__int_cqm438_denominator_criteria1
     config:
       schema: |
@@ -1903,6 +1937,326 @@ models:
       materialized: table
     description: >
       Numerator logic for the reporting version of CBE 0101, Falls: Plan of Care.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+### Urinary Incontinence: Assessment of Presence or Absence of Urinary Incontinence in Women Aged 65 Years and Older
+  - name: quality_measures__int_cqm48__performance_period
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm48__performance_period
+      tags: quality_measures
+      materialized: view
+    description: >
+      Performance Period definition for Urinary Incontinence.
+
+  - name: quality_measures__int_cqm48_denominator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm48_denominator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Denominator logic for the reporting version of Urinary Incontinence.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: age
+        description: Patient's age during encounter in the performance period.
+      - name: encounter_date
+        description: Patient's date of encounter in the performance period.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm48_exclusions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm48_exclusions
+      tags: quality_measures
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of CQM 48, Urinary Incontinence.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm48_long
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm48_long
+      tags: quality_measures
+      materialized: table
+    description: >
+      Final preparation of the reporting version of CQM 48, Urinary Incontinence before combining with other measures.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm48_numerator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm48_numerator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Numerator logic for the reporting version of CQM 48, Urinary Incontinence.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+### Documentation of Current Medications in the Medical Record        
+  - name: quality_measures__int_cqm130__performance_period
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm130__performance_period
+      tags: quality_measures
+      materialized: view
+    description: >
+      Performance Period definition for Documentation of Current Medications in the Medical Record.
+
+  - name: quality_measures__int_cqm130_denominator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm130_denominator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Denominator logic for the reporting version of Documentation of Current Medications in the Medical Record.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: age
+        description: Patient's age during latest encounter in the performance period.
+      - name: procedure_encounter_date
+        description: Patient's date of encounter in the performance period for procedures.
+      - name: claims_encounter_date
+        description: Patient's date of encounter in the performance period for medical claims.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm130_exclusions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm130_exclusions
+      tags: quality_measures
+      materialized: table
+    description: >
+      Combined exclusion logic for the reporting version of CQM 130, Documentation of Current Medications in the Medical Record.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm130_long
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm130_long
+      tags: quality_measures
+      materialized: table
+    description: >
+      Final preparation of the reporting version of CQM 130, Documentation of Current Medications in the Medical Record before combining with other measures.
+    columns:
+      - name: patient_id
+        description: Unique patient_id for each person.
+      - name: denominator_flag
+        description: >
+          The denominator is associated with a given patient population that 
+          may be counted as eligible to meet a measure’s inclusion requirements.
+      - name: numerator_flag
+        description: >
+          The numerator reflects the subset of patients in the denominator 
+          for whom a particular service has been provided or for whom a 
+          particular outcome has been achieved.
+      - name: exclusion_flag
+        description: >
+          Specifications of those characteristics that would cause groups of 
+          individuals to be removed from the numerator and/or denominator of 
+          a measure although they experience the denominator index event.
+      - name: evidence_date
+        description: >
+          Date of event or service that places patient in the numerator.
+      - name: evidence_value
+        description: >
+          Observed evidence value for the patients in the numerator.
+      - name: exclusion_date
+        description: >
+          Date of event or service that excludes patient from the measure.
+      - name: exclusion_reason
+        description: >
+          Reason (usually the value set concept name) that excludes patient 
+          from the measure.
+      - name: performance_period_begin
+        description: Beginning date of the performance or measurement period.
+      - name: performance_period_end
+        description: Ending date of the performance or measurement period.
+      - name: measure_id
+        description: Unique measure identification number.
+      - name: measure_name
+        description: Name of the measure.
+      - name: measure_version
+        description: Version of the measure.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+  - name: quality_measures__int_cqm130_numerator
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_cqm130_numerator
+      tags: quality_measures
+      materialized: table
+    description: >
+      Numerator logic for the reporting version of CQM 130, Documentation of Current Medications in the Medical Record.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.

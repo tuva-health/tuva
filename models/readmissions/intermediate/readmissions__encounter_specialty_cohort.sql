@@ -35,13 +35,13 @@ with cohort_ranks as (
 , all_encounter_cohorts as (
 
     --encounter ids in procedure based cohorts
-    select proc.encounter_id, 1 as c_rank
-    from {{ ref('readmissions__procedure_ccs') }} proc
-    left join {{ ref('readmissions__surgery_gynecology_cohort') }} sgc
-        on proc.procedure_code = sgc.icd_10_pcs
-    left join {{ ref('readmissions__specialty_cohort') }} sgsc
-        on proc.ccs_procedure_category = sgsc.ccs and sgsc.specialty_cohort = 'Surgery/Gynecology'
-    where sgc.icd_10_pcs is not null or sgsc.ccs is not null
+        select procs.encounter_id, 1 as c_rank
+        from {{ ref('readmissions__procedure_ccs') }} procs
+        left join {{ ref('readmissions__surgery_gynecology_cohort') }} sgc
+            on procs.procedure_code = sgc.icd_10_pcs
+        left join {{ ref('readmissions__specialty_cohort') }} sgsc
+            on procs.ccs_procedure_category = sgsc.ccs and sgsc.specialty_cohort = 'Surgery/Gynecology'
+        where sgc.icd_10_pcs is not null or sgsc.ccs is not null
 
     union all
 

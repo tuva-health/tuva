@@ -55,11 +55,11 @@ with visit_codes as (
           patient_id
         , procedure_date as min_date
         , procedure_date as max_date
-    from {{ref('quality_measures__stg_core__procedure')}} proc
+        from {{ref('quality_measures__stg_core__procedure')}} procs
     inner join {{ref('quality_measures__int_nqf0053__performance_period')}}  as pp
         on procedure_date between pp.performance_period_begin and  pp.performance_period_end
     inner join  visit_codes
-        on coalesce(proc.normalized_code,proc.source_code) = visit_codes.code
+            on coalesce(procs.normalized_code,procs.source_code) = visit_codes.code
 
 )
 

@@ -39,19 +39,35 @@ from {{ ref('core__medical_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
+{% if target.type == 'fabric' %}
+    select top 0
+         cast(null as {{ dbt.type_string() }} ) as patient_id
+        , cast(null as {{ dbt.type_string() }} ) as claim_id
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
+        , cast(null as {{ dbt.type_string() }} ) as place_of_service_code
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_3
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_4
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_5
+        , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
+{% else %}
 select
-     cast(null as {{ dbt.type_string() }} ) as patient_id
-    , cast(null as {{ dbt.type_string() }} ) as claim_id
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
-    , cast(null as {{ dbt.type_string() }} ) as place_of_service_code
-    , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
-    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
-    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
-    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_3
-    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_4
-    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_5
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
-limit 0
+         cast(null as {{ dbt.type_string() }} ) as patient_id
+        , cast(null as {{ dbt.type_string() }} ) as claim_id
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
+        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
+        , cast(null as {{ dbt.type_string() }} ) as place_of_service_code
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_3
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_4
+        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_5
+        , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    limit 0
+{%- endif %}
 
 {%- endif %}

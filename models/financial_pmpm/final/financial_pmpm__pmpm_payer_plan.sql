@@ -5,7 +5,7 @@
 select
     year_month
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , data_source
   , count(1) as member_months
   , sum(total_paid) / count(1) as total_paid
@@ -63,5 +63,5 @@ from {{ ref('financial_pmpm__pmpm_prep') }} a
 group by
     year_month
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , data_source

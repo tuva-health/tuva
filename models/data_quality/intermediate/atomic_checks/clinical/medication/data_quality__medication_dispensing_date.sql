@@ -4,27 +4,25 @@
 
 
 SELECT
-    M.Data_SOURCE
-    ,coalesce(M.DISPENSING_DATE,cast('1900-01-01' as date)) AS SOURCE_DATE
-    ,'MEDICATION' AS TABLE_NAME
-    ,'Medication ID' as DRILL_DOWN_KEY
-    , coalesce(medication_id, 'NULL') AS DRILL_DOWN_VALUE
-    -- ,M.CLAIM_TYPE AS CLAIM_TYPE
-    ,'DISPENSING_DATE' AS FIELD_NAME
-    ,CASE 
-        WHEN M.DISPENSING_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'invalid'
-        WHEN M.DISPENSING_DATE <= cast('1901-01-01' as date) THEN 'invalid'
-        WHEN M.DISPENSING_DATE < M.PRESCRIBING_DATE THEN 'invalid'
-        WHEN M.DISPENSING_DATE IS NULL THEN 'null'
-        ELSE 'valid' 
-    END AS BUCKET_NAME
-    ,CASE 
-        WHEN M.DISPENSING_DATE > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) THEN 'future'
-        WHEN M.DISPENSING_DATE <= cast('1901-01-01' as date) THEN 'too old'
-        WHEN M.DISPENSING_DATE < M.PRESCRIBING_DATE THEN 'Dispensing date before prescribing date'
+      m.data_source
+    , coalesce(m.dispensing_date,cast('1900-01-01' as date)) as source_date
+    , 'MEDICATION' AS table_name
+    , 'Medication ID' as drill_down_key
+    , coalesce(medication_id, 'NULL') AS drill_down_value
+    , 'DISPENSING_DATE' as field_name
+    , case
+        when m.dispensing_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'invalid'
+        when m.dispensing_date <= cast('1901-01-01' as date) then 'invalid'
+        when m.dispensing_date < m.prescribing_date then 'invalid'
+        when m.dispensing_date is null then 'null'
+        else 'valid'
+    end as bucket_name
+    , case
+        when m.dispensing_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date) then 'future'
+        when m.dispensing_date <= cast('1901-01-01' as date) then 'too old'
+        when m.dispensing_date < m.prescribing_date then 'Dispensing date before prescribing date'
         else null
-    END AS INVALID_REASON
-    ,CAST(DISPENSING_DATE as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    , cast(dispensing_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('medication')}} M
-            
+from {{ ref('medication')}} m

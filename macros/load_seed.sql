@@ -279,6 +279,31 @@ SELECT aws_s3.table_import_from_s3(
 {% endmacro %}
 
 
+{% macro fabric__load_seed(uri, pattern, compression, headers, null_marker) %}
+{% set sql %}
+COPY INTO {{ this }}
+FROM 'https://tuvapublicresources.blob.core.windows.net/{{ uri }}/{{ pattern }}'
+WITH (
+    FILE_TYPE = 'CSV',
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n'
+    {% if headers == true %}, FIRSTROW = 2 {% else %} {% endif %}
+);
+{% endset %}
+{% call statement('fabricsql', fetch_result=true) %}
+{{ sql }}
+{% endcall %}
+
+{% if execute %}
+{# debugging { log(sql, True)} #}
+{% set results = load_result('fabricsql') %}
+{% set rows_loaded = results['response'].rows_affected|default(0) %}
+{{ log("Loaded data from external Azure Blob Storage\n  loaded to: " ~ this ~ "\n  from: " ~ uri ~ "/" ~ pattern ~ "\n  rows: " ~ rows_loaded, True) }}
+{# debugging { log(results, True)} #}
+{% endif %}
+
+{% endmacro %}
+
 
 {% macro default__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% if execute %}

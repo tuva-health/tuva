@@ -9,7 +9,11 @@ with patients as (
           patient_id
         , sex
         , birth_date
-        , floor({{ datediff('birth_date', 'current_date', 'hour') }} / 8766.0) as age
+        {% if target.type == 'fabric' %}
+            , floor({{ datediff('birth_date', 'GETDATE()', 'hour') }} / 8766.0) as age
+        {% else %}
+            , floor({{ datediff('birth_date', 'current_date', 'hour') }} / 8766.0) as age
+        {% endif %}
     from {{ ref('hcc_suspecting__stg_core__patient') }}
     where death_date is null
 

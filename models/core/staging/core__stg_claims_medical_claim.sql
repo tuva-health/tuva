@@ -35,7 +35,11 @@ with all_encounters as (
 
 
     select
-        cast(med.claim_id as {{ dbt.type_string() }} )|| '-' ||cast(med.claim_line_number as {{ dbt.type_string() }} ) as medical_claim_id
+        {{  dbt.concat([
+        "med.claim_id",
+        "'-'",
+        "med.claim_line_number"
+        ]) }} as medical_claim_id
         , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
         , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
         , cast(x.encounter_id as int ) as encounter_id
@@ -45,7 +49,7 @@ with all_encounters as (
         , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
         , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
         , cast(med.payer as {{ dbt.type_string() }} ) as payer
-        , cast(med.plan as {{ dbt.type_string() }} ) as plan
+        , med.{{ quote_column('plan') }}
         , {{ try_to_cast_date('med.claim_start_date', 'YYYY-MM-DD') }} as claim_start_date
         , {{ try_to_cast_date('med.claim_end_date', 'YYYY-MM-DD') }} as claim_end_date
         , {{ try_to_cast_date('med.claim_line_start_date', 'YYYY-MM-DD') }} as claim_line_start_date

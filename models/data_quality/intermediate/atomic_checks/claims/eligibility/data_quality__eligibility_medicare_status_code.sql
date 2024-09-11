@@ -3,21 +3,21 @@
 ) }}
 
 SELECT DISTINCT 
-    M.Data_SOURCE
-    ,coalesce(cast(M.ENROLLMENT_START_DATE as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) AS SOURCE_DATE
-    ,'ELIGIBILITY' AS TABLE_NAME
-    ,'Member ID | Enrollment Start Date' AS DRILL_DOWN_KEY
-    ,coalesce(M.Member_ID, 'NULL') as DRILL_DOWN_VALUE
-    ,'ELIGIBILITY' AS CLAIM_TYPE
-    ,'MEDICARE_STATUS_CODE' AS FIELD_NAME
-    ,case when M.MEDICARE_STATUS_CODE is null then 'null' 
-          when TERM.MEDICARE_STATUS_CODE is null then 'invalid'
-                             else 'valid' end as BUCKET_NAME
+    m.data_source
+    ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
+    ,'ELIGIBILITY' AS table_name
+    ,'Member ID | Enrollment Start Date' AS drill_down_key
+    ,coalesce(m.member_id, 'NULL') as drill_down_value
+    ,'ELIGIBILITY' AS claim_type
+    ,'MEDICARE_STATUS_CODE' AS field_name
+    ,case when m.medicare_status_code is null then 'null'
+          when term.medicare_status_code is null then 'invalid'
+                             else 'valid' end as bucket_name
     ,case
-        when M.MEDICARE_STATUS_CODE is not null and TERM.MEDICARE_STATUS_CODE is null then 'Medicare Status Code does not join to Terminology Medicare Status table'
+        when m.medicare_status_code is not null and term.medicare_status_code is null then 'Medicare Status Code does not join to Terminology Medicare Status table'
         else null
-    end as INVALID_REASON
-    ,CAST(M.MEDICARE_STATUS_CODE || '|' || COALESCE(TERM.MEDICARE_STATUS_DESCRIPTION,'') as {{ dbt.type_string() }}) AS FIELD_VALUE
+    end as invalid_reason
+    , {{ dbt.concat(["m.medicare_status_code", "'|'", "coalesce(term.medicare_status_description,'')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('eligibility')}} M
-LEFT JOIN {{ ref('terminology__medicare_status')}} TERM ON M.MEDICARE_STATUS_CODE = TERM.MEDICARE_STATUS_CODE
+from {{ ref('eligibility')}} m
+left join {{ ref('terminology__medicare_status')}} term on m.medicare_status_code = term.medicare_status_code

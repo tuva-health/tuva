@@ -39,3 +39,5 @@
     regexp_matches({{ column_name }}, '{{ regex }}')
 
 {%- endmacro -%}
+
+

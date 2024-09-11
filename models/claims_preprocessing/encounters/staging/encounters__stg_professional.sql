@@ -5,6 +5,7 @@
 
 select distinct 
   claim_id
+, claim_type
 , claim_line_number
 , claim_line_id
 , service_type
