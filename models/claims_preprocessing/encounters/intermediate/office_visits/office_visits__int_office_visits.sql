@@ -8,10 +8,10 @@ with anchor as (
         mc.service_category_2,
         mc.service_category_3
     FROM {{ ref('encounters__stg_medical_claim') }} mc
-    INNER JOIN {{ ref('encounters__stg_professional') }} p 
+    INNER JOIN {{ ref('service_category__combined_professional') }} p -- joining in all sc regardless of final priority
         ON mc.claim_id = p.claim_id 
         AND mc.claim_line_number = p.claim_line_number
-    WHERE mc.service_category_1 = 'office-based'
+    WHERE p.service_category_1 = 'office-based'
 )
 
 select patient_data_source_id

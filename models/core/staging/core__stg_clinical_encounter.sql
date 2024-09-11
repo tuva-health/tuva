@@ -20,7 +20,7 @@ select
   , cast(attending_provider_name as {{ dbt.type_string() }}) as attending_provider_name
   , cast(facility_id as {{ dbt.type_string() }}) as facility_id
   , cast(facility_name as {{ dbt.type_string() }}) as facility_name
-  , cast(facility_type as {{ dbt.type_string() }}) as facility_type
+  , cast(null as {{ dbt.type_string() }}) as facility_type
   , cast(null as {{ dbt.type_int() }}) as observation_flag
   , cast(null as {{ dbt.type_int() }}) as lab_flag
   , cast(null as {{ dbt.type_int() }}) as dme_flag
