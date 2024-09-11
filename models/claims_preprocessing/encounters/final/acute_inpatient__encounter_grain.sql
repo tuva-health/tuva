@@ -123,8 +123,8 @@ select
 , a.encounter_start_date
 , a.encounter_end_date
 , c.patient_data_source_id
-,tot.encounter_type
-,tot.encounter_group
+, tot.encounter_type
+, tot.encounter_group
 , {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race
@@ -137,7 +137,8 @@ select
 , sc.lab_flag
 , sc.dme_flag
 , sc.ambulance_flag
-, sc.pharmacy_flag, b.provider_organization_name as facility_name
+, sc.pharmacy_flag
+, b.provider_organization_name as facility_name
 , b.primary_specialty_description as facility_type
 , sc.delivery_flag
 , case when sc.cesarean_delivery = 1 then 'cesarean'

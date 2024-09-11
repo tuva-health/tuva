@@ -59,10 +59,10 @@ SELECT
   , cast(discharge_disposition_description as {{ dbt.type_string() }} ) as discharge_disposition_description
   , cast(null as {{ dbt.type_string() }} ) as attending_provider_id
   , cast(null as {{ dbt.type_string() }} ) as attending_provider_name
-  , cast(observation_flag as {{ dbt.type_int() }} ) as observation_flag
   , cast(facility_id as {{ dbt.type_string() }} ) as facility_id
   , cast(facility_name as {{ dbt.type_string() }} ) as facility_name
   , cast(facility_type as {{ dbt.type_string() }} ) as facility_type
+  , cast(observation_flag as {{ dbt.type_int() }} ) as observation_flag
   , cast(lab_flag as {{ dbt.type_int() }} ) as lab_flag
   , cast(dme_flag as {{ dbt.type_int() }} ) as dme_flag
   , cast(ambulance_flag as {{ dbt.type_int() }} ) as ambulance_flag
@@ -82,11 +82,11 @@ SELECT
   , cast(total_paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
   , cast(total_allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
   , cast(total_charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
-  , cast(base.data_source as {{ dbt.type_string() }} ) as data_source
   , cast(claim_count as  {{ dbt.type_int() }}) as claim_count
   , cast(inst_claim_count as  {{ dbt.type_int() }}) as inst_claim_count
   , cast(prof_claim_count as  {{ dbt.type_int() }}) as prof_claim_count
   , cast(_dbt_source_relation  as  {{ dbt.type_string() }}) as source_model
+  , cast(base.data_source as {{ dbt.type_string() }} ) as data_source
   , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as  tuva_last_run
 FROM base
 inner join {{ ref('encounters__patient_data_source_id') }} p on base.patient_data_source_id = p.patient_data_source_id
