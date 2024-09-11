@@ -13,7 +13,7 @@
 WITH base AS (
   {{ dbt_utils.union_relations(
     relations=[
-      , ref('acute_inpatient__encounter_grain')
+       ref('acute_inpatient__encounter_grain')
       , ref('emergency_department__encounter_grain')
       , ref('inpatient_hospice__encounter_grain')
       , ref('inpatient_psych__encounter_grain')
@@ -48,8 +48,8 @@ SELECT
   , cast(p.patient_id as {{ dbt.type_string() }} ) as patient_id
   , cast(encounter_type as {{ dbt.type_string() }} ) as encounter_type
   , cast(encounter_group as {{ dbt.type_string() }} ) as encounter_group
-  , {{ try_to_cast_date('encounter_start_date' 'YYYY-MM-DD') }} as encounter_start_date
-  , {{ try_to_cast_date('encounter_end_date' 'YYYY-MM-DD') }} as encounter_end_date
+  , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date
+  , {{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }} as encounter_end_date
   , cast(length_of_stay as {{ dbt.type_int() }} ) as length_of_stay
   , cast(admit_source_code as {{ dbt.type_string() }} ) as admit_source_code
   , cast(admit_source_description as {{ dbt.type_string() }} ) as admit_source_description
