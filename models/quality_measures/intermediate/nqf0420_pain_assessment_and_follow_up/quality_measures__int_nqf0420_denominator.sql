@@ -55,11 +55,11 @@ with visit_codes as (
             , source_code
           ) as code
     from {{ ref('quality_measures__stg_core__procedure') }}
-    where   coalesce(modifier_1, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(modifier_2, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(modifier_3, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(modifier_4, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(modifier_5, '') not in ('GQ', 'GT', '95', 'POS 02')
+    where   coalesce(modifier_1, '') not in ('GQ', 'GT', '95')
+        and coalesce(modifier_2, '') not in ('GQ', 'GT', '95')
+        and coalesce(modifier_3, '') not in ('GQ', 'GT', '95')
+        and coalesce(modifier_4, '') not in ('GQ', 'GT', '95')
+        and coalesce(modifier_5, '') not in ('GQ', 'GT', '95')
 
 )
 
@@ -71,12 +71,13 @@ with visit_codes as (
         , coalesce(claim_end_date,claim_start_date) as max_date
         , hcpcs_code
     from {{ ref('quality_measures__stg_medical_claim') }}
-    where   coalesce(hcpcs_modifier_1, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(hcpcs_modifier_2, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(hcpcs_modifier_3, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(hcpcs_modifier_4, '') not in ('GQ', 'GT', '95', 'POS 02')
-        and coalesce(hcpcs_modifier_5, '') not in ('GQ', 'GT', '95', 'POS 02')
-
+    where   coalesce(hcpcs_modifier_1, '') not in ('GQ', 'GT', '95')
+        and coalesce(hcpcs_modifier_2, '') not in ('GQ', 'GT', '95')
+        and coalesce(hcpcs_modifier_3, '') not in ('GQ', 'GT', '95')
+        and coalesce(hcpcs_modifier_4, '') not in ('GQ', 'GT', '95')
+        and coalesce(hcpcs_modifier_5, '') not in ('GQ', 'GT', '95')
+        and coalesce(place_of_service_code, '') not in ('02')
+        
 )
 
 , procedure_encounters as (
