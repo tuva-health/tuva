@@ -9,11 +9,11 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}claims_preprocessing{%- endif -%}
       column_types:
         service_category_1: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         service_category_2: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         service_category_3: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         priority: |
           int
     columns:
