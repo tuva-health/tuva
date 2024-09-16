@@ -11,7 +11,11 @@ select claim_id
 ,0 as priority_number
 from {{ ref('office_visits__int_office_visits_radiology') }}
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select claim_id
 ,claim_line_number
@@ -20,7 +24,11 @@ select claim_id
 ,1 as priority_number
 from {{ ref('office_visits__int_office_visits_surgery') }}
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select claim_id
 ,claim_line_number
@@ -29,7 +37,11 @@ select claim_id
 ,2 as priority_number
 from {{ ref('office_visits__int_office_visits_injections') }}
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select claim_id
 ,claim_line_number
@@ -38,7 +50,11 @@ select claim_id
 ,3 as priority_number
 from {{ ref('office_visits__int_office_visits_ptotst') }}
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select claim_id
 ,claim_line_number
@@ -47,7 +63,11 @@ select claim_id
 ,4 as priority_number
 from {{ ref('office_visits__int_office_visits_em') }}
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select claim_id
 ,claim_line_number
@@ -56,7 +76,11 @@ select claim_id
 ,5 as priority_number
 from {{ ref('office_visits__int_office_visits_telehealth') }}
 
+{% if target.type == 'fabric' %}
 union
+{% else %}
+union distinct
+{% endif %}
 
 select claim_id
 ,claim_line_number

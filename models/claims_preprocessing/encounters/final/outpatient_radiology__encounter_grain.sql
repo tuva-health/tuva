@@ -155,12 +155,12 @@ hf.paid_order = 1
 left join hcpcs_code hcpc on d.encounter_id = hcpc.encounter_id
 left join patient e
   on d.patient_data_source_id = e.patient_data_source_id
-left join dev_brad.terminology.provider b
+left join {{ ref('terminology__provider') }} b
   on hf.facility_id = b.npi
-left join dev_brad.terminology.icd_10_cm icd10cm
+left join {{ ref('terminology__icd_10_cm') }} icd10cm
   on hp.diagnosis_code_1 = icd10cm.icd_10_cm
   and hp.diagnosis_code_type = 'icd-10-cm'
-left join dev_brad.terminology.icd_9_cm icd9cm
+left join {{ ref('terminology__icd_9_cm') }} icd9cm
   on hp.diagnosis_code_1 = icd9cm.icd_9_cm
   and hp.diagnosis_code_type = 'icd-9-cm'
 where d.encounter_row_number = 1

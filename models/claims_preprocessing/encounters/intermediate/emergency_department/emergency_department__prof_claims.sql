@@ -30,7 +30,7 @@ inner join {{ ref('encounters__stg_professional') }} prof on med.claim_line_id =
 inner join join_first_claim_dates dat on med.patient_data_source_id = dat.patient_data_source_id
 and med.start_date between dat.encounter_start_date and dat.encounter_end_date
 
-UNION 
+union all 
 
 select dat.encounter_id
 ,dat.encounter_start_date
