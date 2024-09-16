@@ -1,0 +1,14 @@
+version: 2
+models:
+
+
+- name: claim_line_structure
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: claim_line_structure
+    tags:
+      - audit
+    materialized: table
+
