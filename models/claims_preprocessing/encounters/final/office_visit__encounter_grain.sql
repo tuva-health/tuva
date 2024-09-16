@@ -9,42 +9,42 @@ with encounter_date as (
   ,'office visit surgery' as encounter_type
   from {{ ref('office_visits__int_office_visits_surgery') }}
 
-  UNION 
+  union all
 
 select distinct old_encounter_id
   ,start_date as encounter_start_date
   ,'office visit injections' as encounter_type
   from {{ ref('office_visits__int_office_visits_injections') }}
 
-  UNION 
+  union all 
 
 select distinct old_encounter_id
   ,start_date as encounter_start_date
   ,'office visit radiology' as encounter_type
   from {{ ref('office_visits__int_office_visits_radiology') }}
 
-  UNION 
+  union all
 
 select distinct old_encounter_id
   ,start_date as encounter_start_date
   ,'office visit - other' as encounter_type
   from {{ ref('office_visits__int_office_visits') }}
 
-  UNION 
+  union all 
 
 select distinct old_encounter_id
   ,start_date as encounter_start_date
   ,'office visit' as encounter_type
   from {{ ref('office_visits__int_office_visits_em') }}
 
-    UNION 
+  union all 
 
 select distinct old_encounter_id
   ,start_date as encounter_start_date
   ,'telehealth' as encounter_type
   from {{ ref('office_visits__int_office_visits_telehealth') }}
 
-    UNION 
+  union all 
 
 select distinct old_encounter_id
   ,start_date as encounter_start_date

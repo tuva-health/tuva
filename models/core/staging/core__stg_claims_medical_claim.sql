@@ -22,7 +22,7 @@ with all_encounters as (
     from {{ ref('encounters__combined_claim_line_crosswalk') }}
     where claim_line_attribution_number = 1
     
-    UNION 
+    union all 
 
     select  
   claim_id
