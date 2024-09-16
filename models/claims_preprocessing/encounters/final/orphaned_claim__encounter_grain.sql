@@ -5,7 +5,7 @@
 
 with encounter_date as (
     select
-        stg.encounter_id
+        cli.encounter_id
       , min(stg.start_date) as encounter_start_date
       , max(stg.start_date) as encounter_end_date
     from {{ ref('encounters__stg_medical_claim') }} as stg
@@ -13,7 +13,7 @@ with encounter_date as (
       on stg.claim_id = cli.claim_id
       and stg.claim_line_number = cli.claim_line_number
     group by
-        stg.encounter_id
+        cli.encounter_id
 )
 
 ,detail_values as (
