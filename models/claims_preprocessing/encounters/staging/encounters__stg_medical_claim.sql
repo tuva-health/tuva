@@ -60,7 +60,6 @@ select
   , m.allowed_amount
   , m.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-  , row_number() over (order by random()) as rn
 from {{ ref('normalized_input__medical_claim') }} m
 inner join {{ ref('service_category__service_category_grouper') }} g on m.claim_id = g.claim_id
 and
