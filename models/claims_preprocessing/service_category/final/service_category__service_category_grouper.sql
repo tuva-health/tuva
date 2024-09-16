@@ -111,7 +111,7 @@ select
     d.claim_id
     , d.claim_line_number
     , d.claim_type
-    , concat(d.claim_id,'|',d.claim_line_number) as claim_line_id
+    , {{ dbt.concat(["d.claim_id", "'|'", "d.claim_line_number"]) }} as concatenated_field
     , coalesce(service_category_1,'other') as service_category_1
     , coalesce(service_category_2,'other') as service_category_2
     , coalesce(service_category_3,'other') as service_category_3

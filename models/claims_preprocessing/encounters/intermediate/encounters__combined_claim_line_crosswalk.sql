@@ -14,7 +14,7 @@ select claim_id
 from {{ ref('acute_inpatient__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all
 
 select enc.claim_id
 ,med.claim_line_number
@@ -25,7 +25,7 @@ select enc.claim_id
 from {{ ref('acute_inpatient__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
  ,claim_line_number
@@ -36,7 +36,7 @@ select claim_id
 from {{ ref('acute_inpatient__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all
 
 select enc.claim_id
 ,med.claim_line_number
@@ -47,7 +47,7 @@ select enc.claim_id
 from {{ ref('emergency_department__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
  ,claim_line_number
@@ -58,7 +58,7 @@ select claim_id
 from {{ ref('emergency_department__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all
 
 select enc.claim_id
 ,med.claim_line_number
@@ -69,7 +69,7 @@ select enc.claim_id
 from {{ ref('inpatient_hospice__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -80,7 +80,7 @@ select claim_id
 from {{ ref('inpatient_psych__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all
 
 select enc.claim_id
 ,med.claim_line_number
@@ -91,7 +91,7 @@ select enc.claim_id
 from {{ ref('inpatient_psych__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -102,7 +102,7 @@ select claim_id
 from {{ ref('inpatient_rehab__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all 
 
 select enc.claim_id
 ,med.claim_line_number
@@ -113,7 +113,7 @@ select enc.claim_id
 from {{ ref('inpatient_rehab__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -124,7 +124,7 @@ select claim_id
 from {{ ref('inpatient_snf__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all 
 
 select enc.claim_id
 ,med.claim_line_number
@@ -135,7 +135,7 @@ select enc.claim_id
 from {{ ref('inpatient_snf__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -146,7 +146,7 @@ select claim_id
 from {{ ref('inpatient_substance_use__prof_claims') }}
 where claim_attribution_number = 1
 
-union 
+union all 
 
 select enc.claim_id
 ,med.claim_line_number
@@ -157,7 +157,7 @@ select enc.claim_id
 from {{ ref('inpatient_substance_use__generate_encounter_id') }} enc
 inner join {{ ref('encounters__stg_medical_claim') }} med on enc.claim_id = med.claim_id
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -169,7 +169,7 @@ from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type = 'office visit radiology'
 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -181,7 +181,7 @@ from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type <> 'office visit radiology'
 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -191,7 +191,7 @@ select claim_id
 ,11 as priority_number --urgent care needs to be lower than ed and inpatient
 from {{ ref('urgent_care__match_claims_to_anchor') }}
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -201,7 +201,7 @@ select claim_id
 ,12 as priority_number 
 from {{ ref('outpatient_psych__match_claims_to_anchor') }}
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -211,7 +211,7 @@ select claim_id
 ,13 as priority_number 
 from {{ ref('outpatient_rehab__match_claims_to_anchor') }}
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -221,7 +221,7 @@ select claim_id
 ,14 as priority_number 
 from {{ ref('asc__match_claims_to_anchor') }}
 
-union
+union all
 
 
 select claim_id
@@ -232,7 +232,7 @@ select claim_id
 ,999 as priority_number 
 from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }} --lowest outpatient priority, roll up to more specific encounter type when available
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -243,7 +243,7 @@ select claim_id
 from {{ ref('outpatient_surgery__match_claims_to_anchor') }} 
 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -253,7 +253,7 @@ select claim_id
 ,15 as priority_number 
 from {{ ref('dialysis__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -263,7 +263,7 @@ select claim_id
 ,16 as priority_number 
 from {{ ref('outpatient_hospice__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -273,7 +273,7 @@ select claim_id
 ,17 as priority_number 
 from {{ ref('home_health__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -283,7 +283,7 @@ select claim_id
 ,19 as priority_number 
 from {{ ref('outpatient_injections__match_claims_to_anchor') }}
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -293,7 +293,7 @@ select claim_id
 ,20 as priority_number 
 from {{ ref('outpatient_ptotst__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -303,7 +303,7 @@ select claim_id
 ,21 as priority_number 
 from {{ ref('outpatient_substance_use__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -313,7 +313,7 @@ select claim_id
 ,22 as priority_number 
 from {{ ref('outpatient_radiology__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -323,7 +323,7 @@ select claim_id
 ,1000000 as priority_number 
 from {{ ref('lab__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number
@@ -333,7 +333,7 @@ select claim_id
 ,1000001 as priority_number 
 from {{ ref('dme__match_claims_to_anchor') }} 
 
-union
+union all
 
 select claim_id
 ,claim_line_number

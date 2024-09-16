@@ -6,7 +6,7 @@
 select  distinct 
     a.claim_id
   , a.claim_line_number
-  , concat(a.claim_id, '|' ,cast(a.claim_line_number as {{dbt.type_string() }} )) as claim_line_id
+  , {{ dbt.concat(["a.claim_id", "cast(a.claim_line_number as " ~ dbt.type_string() ~ ")"]) }} as claim_line_id
   , 'professional' as service_type
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} a
