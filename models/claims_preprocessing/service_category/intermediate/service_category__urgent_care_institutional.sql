@@ -15,7 +15,7 @@ where claim_type = 'institutional'
   and revenue_center_code = '0456'
   and substring(bill_type_code, 1, 2) in ('13','71','73')
  
-union 
+union all
 
 select distinct 
   a.claim_id

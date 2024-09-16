@@ -20,7 +20,7 @@ with multiple_sources as (
       or med.revenue_center_code = '0547'
       or med.ccs_category = '240') -- medications
 
-    union 
+    union all
 
     select distinct 
         med.claim_id

@@ -17,8 +17,7 @@ where revenue_center_code in ('0450','0451','0452','0459','0981')
 OR
 hcpcs_code in ('99281','99282','99283','99284','99285','G0380','G0381','G0382','G0383','G0384')
   
-UNION 
-
+union all
 
 --Adding in inpatient claims for flagging encounters with ED 
 select distinct 

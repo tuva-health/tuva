@@ -14,7 +14,7 @@ from {{ ref('service_category__stg_medical_claim') }} m
 inner join {{ ref('service_category__stg_outpatient_institutional') }} i on m.claim_id = i.claim_id
 where substring(m.bill_type_code, 1, 2) in ('52')
 
-union
+union all
 
 select distinct 
   m.claim_id

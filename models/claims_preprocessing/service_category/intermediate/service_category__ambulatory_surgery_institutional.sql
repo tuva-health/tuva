@@ -15,7 +15,7 @@ inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatien
     on med.claim_id = outpatient.claim_id
 where revenue_center_code in ('0490','0499')
 
-union 
+union all
 
 select distinct 
     med.claim_id
