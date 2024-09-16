@@ -4,20 +4,22 @@
 }}
 
 with encounter_date as (
-  select encounter_id
-  ,min(start_date) as encounter_start_date
-  ,max(start_date) as encounter_end_date
-    from  {{ ref('encounters__stg_medical_claim') }} stg
-    inner join {{ ref('encounters__orphaned_claims') }} cli on stg.claim_id = cli.claim_id  
-    and
-    stg.claim_line_number = cli.claim_line_number
-    group by encounter_id
+    select
+        stg.encounter_id
+      , min(stg.start_date) as encounter_start_date
+      , max(stg.start_date) as encounter_end_date
+    from {{ ref('encounters__stg_medical_claim') }} as stg
+    inner join {{ ref('encounters__orphaned_claims') }} as cli
+      on stg.claim_id = cli.claim_id
+      and stg.claim_line_number = cli.claim_line_number
+    group by
+        stg.encounter_id
 )
 
 ,detail_values as (
     select stg.*
     ,cli.encounter_id
-      ,cli.encounter_type
+    ,cli.encounter_type
     ,cli.encounter_group
     ,d.encounter_start_date 
     ,d.encounter_end_date

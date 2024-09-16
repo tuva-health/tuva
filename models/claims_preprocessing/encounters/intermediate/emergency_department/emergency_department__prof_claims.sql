@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+   )
+}}
+
 with first_claim as (
     select *
     from {{ ref('emergency_department__generate_encounter_id') }}
