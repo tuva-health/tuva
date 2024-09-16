@@ -43,7 +43,11 @@ with anchor as (
       , start_date
       , end_date
       , claim_id
-      , sum(is_new_group) over (order by patient_data_source_id, start_date) as old_encounter_id
+      , sum(is_new_group) over (
+            partition by patient_data_source_id
+            order by start_date
+            rows between unbounded preceding and current row  -- Frame clause required for Redshift
+          ) as old_encounter_id
     from grouped_data
 )
 
