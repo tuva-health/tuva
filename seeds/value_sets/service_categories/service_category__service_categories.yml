@@ -15,7 +15,7 @@ seeds:
         service_category_3: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         priority: |
-          int
+          integer
     columns:
       - name: service_category_1
         description: service category 1 in the Tuva model 

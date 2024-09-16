@@ -1123,7 +1123,7 @@ seeds:
         ingredient_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         dose_form_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
 
   - name: terminology__ccs_services_procedures
     config:

@@ -2,12 +2,6 @@
   enabled = var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 ) }}
 
-with random_members as (
-    select distinct member_id
-    from {{ ref('normalized_input__medical_claim') }}
-    order by random()
-)
-
 select
     m.apr_drg_code
   , m.claim_id
@@ -45,7 +39,6 @@ select
   , m.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} m
-inner join random_members rc on m.member_id = rc.member_id
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} dx on m.diagnosis_code_1 = dx.icd_10_cm_code
 left join {{ ref('terminology__provider') }} p on m.facility_id = p.npi
 left join {{ ref('terminology__ccs_services_procedures') }} c on m.hcpcs_code = c.hcpcs_code
