@@ -89,7 +89,6 @@ select
 , a.encounter_start_date
 , a.encounter_end_date
 , a.patient_id
-, {{ dbt.datediff("birth_date","encounter_end_date","day")}}/365 as admit_age
 , e.gender
 , e.race
 , c.diagnosis_code_type as primary_diagnosis_code_type
