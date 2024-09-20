@@ -26,7 +26,7 @@ SELECT
     p.data_source,
     {{ dbt.concat([
         'p.patient_id',
-        "'|'",
+        "' | '",
         'p.data_source'
     ]) }} as patient_source_key,
     p.ndc_code,
