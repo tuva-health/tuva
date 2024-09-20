@@ -20,7 +20,7 @@ select p.patient_id,
        p.data_source,
         {{  dbt.concat([
             'p.patient_id',
-            "'|'",
+            "' | '",
             'p.data_source']) }} as patient_source_key,
        coalesce(cte.numofconditions, 0) as numofconditions
     , '{{ var('tuva_last_run')}}' as tuva_last_run
