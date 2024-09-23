@@ -33,6 +33,7 @@ with performance_period as (
         , ndc_code
         , days_supply
     from {{ ref('quality_measures__stg_pharmacy_claim') }}
+
 )
 
 , patient as (
@@ -49,13 +50,13 @@ with performance_period as (
 , patient_with_claim as (
 
     select
-          pc.patient_id
+          pharmacy_claim.patient_id
         , dispensing_date
         , days_supply
         , ndc_code
-    from pharmacy_claim as pc
-    inner join visit_codes as vc
-    on pc.ndc_code = vc.code
+    from pharmacy_claim 
+    inner join visit_codes
+        on pharmacy_claim.ndc_code = visit_codes.code
     
 )
 
@@ -67,11 +68,17 @@ with performance_period as (
         , days_supply
         , performance_period_begin
         , performance_period_end
-    from patient_with_claim as pc
+    from patient_with_claim as claim_patient
     inner join performance_period as pp
-    on pc.dispensing_date between pp.performance_period_begin and pp.performance_period_end
+        on claim_patient.dispensing_date between pp.performance_period_begin and pp.performance_period_end
 
 )
+
+/* 
+    These patients need to pass two checks
+    - First medication fill date should be at least 91 days before the end of measurement period
+    - Should have at least two distinct Date of Service (FillDate) for rx
+*/
 
 , patient_with_row_number as (
 
@@ -86,7 +93,7 @@ with performance_period as (
 
 , patient_with_first_dispensing_date as (
 
-    select distinct
+    select
           patient_id
         , dispensing_date as first_dispensing_date
     from patient_with_row_number
@@ -94,71 +101,87 @@ with performance_period as (
 
 )
 
-, patient_with_first_fill_greater_than_90 as (
+/*
+total days covered is abbreviated as tdc
+*/
+
+, patient_with_tdc as (
 
     select
-          pp.patient_id
-        , pp.dispensing_date
-        , fdd.first_dispensing_date
-        , pp.days_supply
-    from patient_within_performance_period as pp
-    inner join patient_with_first_dispensing_date as fdd
-    on pp.patient_id = fdd.patient_id
-    where {{ datediff('first_dispensing_date', 'performance_period_end', 'day') }} > 89
+          patients1.patient_id
+        , patients1.dispensing_date
+        , patients2.first_dispensing_date
+        , patients1.days_supply
+        , {{ datediff('first_dispensing_date', 'performance_period_end', 'day') }} as days_covered
+    from patient_within_performance_period as patients1
+    inner join patient_with_first_dispensing_date as patients2
+        on patients1.patient_id = patients2.patient_id
 
 )
 
+, first_check_patient as (
 
-, patient_with_more_than_1_prescriptions as (
+    select
+          patient_id
+        , dispensing_date
+        , first_dispensing_date
+        , days_supply
+    from patient_with_tdc
+    where days_covered > 89
+    
+)
 
-    select distinct
+, second_check_patient as (
+
+    select
       patient_id
-      from patient_with_row_number
-      where row_number = 2
+    from patient_with_row_number
+    where row_number = 2
 
 )
 
-, patient_with_mt_1_prescriptions_and_first_fill_gt_90 as (
+, both_check_patient as (
 
     select
-          ff.patient_id
-        , ff.dispensing_date
-        , ff.first_dispensing_date
-        , ff.days_supply
-    from patient_with_first_fill_greater_than_90 as ff
-    inner join patient_with_more_than_1_prescriptions as mt1
-    on ff.patient_id = mt1.patient_id
+          valid_patients1.patient_id
+        , valid_patients1.dispensing_date
+        , valid_patients1.first_dispensing_date
+        , valid_patients1.days_supply
+    from first_check_patient as valid_patients1
+    inner join second_check_patient as valid_patients2
+        on valid_patients1.patient_id = valid_patients2.patient_id
      
 )
 
 , patient_with_age as (
 
     select
-          pp.patient_id
-    from {{ref('quality_measures__stg_core__patient')}} as p
-    inner join patient_within_performance_period as pp
-    on p.patient_id = pp.patient_id
-    where (floor({{ datediff('birth_date', 'pp.performance_period_begin', 'hour') }} / 8760.0)) > 17
+          valid_patients1.patient_id
+        , floor({{ datediff('birth_date', 'valid_patients1.performance_period_begin', 'hour') }} / 8760.0) as age
+    from {{ ref('quality_measures__stg_core__patient') }} as patient
+    inner join patient_within_performance_period as valid_patients1
+        on patient.patient_id = valid_patients1.patient_id
 
 )
 
 , qualifying_patients as (
 
     select
-          pp90.patient_id
-        , pp90.dispensing_date
-        , pp90.first_dispensing_date
-        , pp90.days_supply
+          both_check_patient.patient_id
+        , both_check_patient.dispensing_date
+        , both_check_patient.first_dispensing_date
+        , both_check_patient.days_supply
         , pp.performance_period_begin
         , pp.performance_period_end
         , pp.measure_id
         , pp.measure_name
         , pp.measure_version
         , 1 as denominator_flag
-    from patient_with_mt_1_prescriptions_and_first_fill_gt_90 as pp90
-    inner join patient_with_age as pa
-    on pp90.patient_id = pa.patient_id
+    from both_check_patient 
+    inner join patient_with_age 
+        on both_check_patient.patient_id = patient_with_age.patient_id
     cross join performance_period as pp
+    where patient_with_age.age > 17
 
 )
 
