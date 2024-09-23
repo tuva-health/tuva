@@ -66,6 +66,7 @@ with performance_period as (
           patient_id
         , dispensing_date
         , days_supply
+        , ndc_code
         , performance_period_begin
         , performance_period_end
     from patient_with_claim as claim_patient
@@ -86,6 +87,7 @@ with performance_period as (
           patient_id
         , dispensing_date
         , days_supply
+        , ndc_code
         , row_number() over (partition by patient_id order by dispensing_date) as row_number
     from patient_within_performance_period
 
@@ -134,7 +136,8 @@ total days covered is abbreviated as tdc
 , second_check_patient as (
 
     select
-      patient_id
+          patient_id
+        , ndc_code
     from patient_with_row_number
     where row_number = 2
 
@@ -147,6 +150,7 @@ total days covered is abbreviated as tdc
         , valid_patients1.dispensing_date
         , valid_patients1.first_dispensing_date
         , valid_patients1.days_supply
+        , valid_patients2.ndc_code
     from first_check_patient as valid_patients1
     inner join second_check_patient as valid_patients2
         on valid_patients1.patient_id = valid_patients2.patient_id
@@ -171,6 +175,7 @@ total days covered is abbreviated as tdc
         , both_check_patient.dispensing_date
         , both_check_patient.first_dispensing_date
         , both_check_patient.days_supply
+        , both_check_patient.ndc_code
         , pp.performance_period_begin
         , pp.performance_period_end
         , pp.measure_id
@@ -192,6 +197,7 @@ total days covered is abbreviated as tdc
         , cast(dispensing_date as date) as dispensing_date
         , cast(first_dispensing_date as date) as first_dispensing_date
         , cast(days_supply as integer) as days_supply
+        , cast(ndc_code as {{ dbt.type_string() }}) as ndc_code
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -207,6 +213,7 @@ select
     , dispensing_date
     , first_dispensing_date
     , days_supply
+    , ndc_code
     , performance_period_begin
     , performance_period_end
     , measure_id
