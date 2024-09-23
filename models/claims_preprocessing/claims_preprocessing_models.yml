@@ -15,8 +15,11 @@ models:
         - claims_preprocessing
       materialized: table
     columns:
-      - name: medical_claim_id
-        description: Unique identifier for the medical claim.
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: >
+          Indicates the line number for the particular line of the claim.
       - name: patient_id
         description: Unique identifier for each patient in the dataset.
       - name: payer
