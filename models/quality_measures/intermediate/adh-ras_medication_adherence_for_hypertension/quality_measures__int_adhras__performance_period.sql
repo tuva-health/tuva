@@ -6,25 +6,31 @@
 
 {%- set measure_id -%}
 
-(select id
-from {{ ref('quality_measures__measures') }}
-where id = 'ADH-RAS')
+(
+  select id
+  from {{ ref('quality_measures__measures') }}
+  where id = 'ADH-RAS'
+)
 
 {%- endset -%}
 
 {%- set measure_name -%}
 
-(select name
-from {{ ref('quality_measures__measures') }}
-where id = 'ADH-RAS')
+(
+  select name
+  from {{ ref('quality_measures__measures') }}
+  where id = 'ADH-RAS'
+)
 
 {%- endset -%}
 
 {%- set measure_version -%}
 
-(select version
-from {{ ref('quality_measures__measures') }}
-where id = 'ADH-RAS')
+(
+  select version
+  from {{ ref('quality_measures__measures') }}
+  where id = 'ADH-RAS'
+)
 
 {%- endset -%}
 
@@ -32,6 +38,7 @@ where id = 'ADH-RAS')
     set performance period end to the end of the current calendar year
     or use the quality_measures_period_end variable if provided
 */
+
 with period_end as (
 
     select
@@ -41,12 +48,12 @@ with period_end as (
         cast('{{ var('quality_measures_period_end') }}' as date)
         {%- endif %}
          as performance_period_end
+
 )
 
 /*
     set performance period begin to following day of 1 year prior
 */
-
 
 , period_begin as (
 
@@ -65,16 +72,6 @@ with period_end as (
     from period_end
 
 )
-
-
-/* , period_begin as (
-
-    select
-          performance_period_end
-        ,  {{ date_trunc('year', "performance_period_end") }}  as performance_period_begin
-    from period_end
-)
-*/
 
 select
       cast({{ measure_id }} as {{ dbt.type_string() }}) as measure_id
