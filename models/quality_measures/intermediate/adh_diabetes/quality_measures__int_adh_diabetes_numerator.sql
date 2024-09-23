@@ -325,4 +325,4 @@ select
     , adherence
     , numerator_flag
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from numerator
+from add_data_types
