@@ -92,6 +92,8 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','bill_type.csv',compression=true,null_marker=true) }}"
       terminology__claim_type:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','claim_type.csv',compression=true,null_marker=true) }}"
+      terminology__ccs_services_procedures:
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','ccs_services_procedures.csv',compression=true,null_marker=true) }}"
       terminology__discharge_disposition:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','discharge_disposition.csv',compression=true,null_marker=true) }}"
       terminology__encounter_type:
@@ -130,6 +132,8 @@ seeds:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','ms_drg.csv',compression=true,null_marker=true) }}"
       terminology__ndc:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','ndc.csv',compression=true,null_marker=true) }}"
+      terminology__nitos:
+        +post-hook: "{{ load_seed('tuva-public-resources/versioned_terminology/0.10.8','nitos.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
         +post-hook: "{{ load_seed('tuva-public-resources/versioned_provider_data/0.10.8','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
       terminology__payer_type:
@@ -249,4 +253,4 @@ seeds:
           +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.8','surgery_gynecology_cohort.csv',compression=true,null_marker=true) }}"
       service_categories:
         service_category__service_categories:
-          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.8','service_category_service_categories.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed('tuva-public-resources/versioned_value_sets/0.10.9','service_category__service_categories.csv',compression=true,null_marker=true) }}"

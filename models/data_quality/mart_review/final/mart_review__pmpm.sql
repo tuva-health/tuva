@@ -11,7 +11,7 @@ SELECT *,
        pharmacy_paid * member_months AS pharmacy_paid_absolute,
        inpatient_paid * member_months AS inpatient_paid_absolute,
        outpatient_paid * member_months AS outpatient_paid_absolute,
-       office_visit_paid * member_months AS office_visit_paid_absolute,
+       office_based_paid * member_months AS office_based_paid_absolute,
        ancillary_paid * member_months AS ancillary_paid_absolute,
        other_paid * member_months AS other_paid_absolute,
         {{ dbt.concat([
