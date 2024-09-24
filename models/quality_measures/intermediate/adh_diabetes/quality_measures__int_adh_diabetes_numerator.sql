@@ -284,7 +284,7 @@ with denominator as (
 
     select
           final_covered_days.patient_id
-        , round(cast(actual_covered_days / days_in_treatment_period as {{ dbt.type_numeric() }}), 2) as adherence
+        , round(cast(actual_covered_days / days_in_treatment_period as {{ dbt.type_numeric() }}), 4) as adherence
         , dispensing_date as evidence_date
         , days_supply as evidence_value
     from final_covered_days
