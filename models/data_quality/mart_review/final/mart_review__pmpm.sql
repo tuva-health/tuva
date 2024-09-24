@@ -16,6 +16,6 @@ SELECT *,
        other_paid * member_months AS other_paid_absolute,
         {{ dbt.concat([
             'data_source',
-            "'|'",
+            "' | '",
             'year_month']) }} as data_source_month_key
 FROM {{ ref('financial_pmpm__pmpm_payer') }}
