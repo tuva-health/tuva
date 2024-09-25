@@ -71,14 +71,14 @@ with performance_period as (
     - Should have at least two distinct Date of Service (FillDate) for rx
 */
 
-, patient_with_row_number as (
+, patient_with_rank as (
 
     select
           patient_id
         , dispensing_date
         , days_supply
         , ndc_code
-        , dense_rank() over (partition by patient_id order by dispensing_date) as row_number
+        , dense_rank() over (partition by patient_id order by dispensing_date) as dense_rank
     from patient_within_performance_period
 
 )
@@ -88,7 +88,7 @@ with performance_period as (
     select
           patient_id
         , dispensing_date as first_dispensing_date
-    from patient_with_row_number
+    from patient_with_rank
     where row_number = 1
 
 )
@@ -128,7 +128,7 @@ total days covered is abbreviated as tdc
     select
           patient_id
         , ndc_code
-    from patient_with_row_number
+    from patient_with_rank
     where row_number = 2
 
 )
