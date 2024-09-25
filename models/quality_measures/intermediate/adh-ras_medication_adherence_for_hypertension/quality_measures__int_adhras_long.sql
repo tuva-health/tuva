@@ -24,7 +24,6 @@ with denominator as (
         , evidence_date
         , evidence_value
     from {{ ref('quality_measures__int_adhras_numerator') }}
-    where numerator_flag = 1
 
 )
 
