@@ -89,7 +89,7 @@ with performance_period as (
           patient_id
         , dispensing_date as first_dispensing_date
     from patient_with_rank
-    where row_number = 1
+    where dense_rank = 1
 
 )
 
@@ -129,7 +129,7 @@ total days covered is abbreviated as tdc
           patient_id
         , ndc_code
     from patient_with_rank
-    where row_number = 2
+    where dense_rank = 2
 
 )
 
