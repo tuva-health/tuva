@@ -150,6 +150,15 @@ with measures_long as (
 
 )
 
+, adh_ras as (
+
+    select
+          patient_id
+        , performance_flag
+    from measures_long
+    where measure_id = 'ADH-RAS'
+)
+
 , joined as (
 
     select
@@ -167,6 +176,7 @@ with measures_long as (
         , max(cqm_48.performance_flag) as cqm_48
         , max(cqm_130.performance_flag) as cqm_130
         , max(nqf_0420.performance_flag) as nqf_0420
+        , max(adh_ras.performance_flag) as adh_ras
     from measures_long
         left join nqf_2372
             on measures_long.patient_id = nqf_2372.patient_id
@@ -194,6 +204,8 @@ with measures_long as (
             on measures_long.patient_id = cqm_130.patient_id
         left join nqf_0420
             on measures_long.patient_id = nqf_0420.patient_id
+        left join adh_ras
+            on measures_long.patient_id = adh_ras.patient_id
     group by measures_long.patient_id
 
 )
@@ -215,6 +227,7 @@ with measures_long as (
         , cast(cqm_48 as integer) as cqm_48
         , cast(cqm_130 as integer) as cqm_130
         , cast(nqf_0420 as integer) as nqf_0420
+        , cast(adh_ras as integer) as adh_ras
     from joined
 
 )
@@ -234,5 +247,6 @@ select
     , cqm_48
     , cqm_130
     , nqf_0420
+    , adh_ras
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
