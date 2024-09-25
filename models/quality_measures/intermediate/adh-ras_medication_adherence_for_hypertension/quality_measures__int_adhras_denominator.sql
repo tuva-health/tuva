@@ -27,24 +27,13 @@ with performance_period as (
 )
 
 , pharmacy_claim  as (
-    
+
     select 
           patient_id
         , dispensing_date
         , ndc_code
         , days_supply
     from {{ ref('quality_measures__stg_pharmacy_claim') }}
-
-)
-
-, patient as (
-
-    select
-          patient_id
-        , sex
-        , birth_date
-        , death_date
-    from {{ ref('quality_measures__stg_core__patient') }}
 
 )
 
@@ -89,7 +78,7 @@ with performance_period as (
         , dispensing_date
         , days_supply
         , ndc_code
-        , row_number() over (partition by patient_id order by dispensing_date) as row_number
+        , dense_rank() over (partition by patient_id order by dispensing_date) as row_number
     from patient_within_performance_period
 
 )
