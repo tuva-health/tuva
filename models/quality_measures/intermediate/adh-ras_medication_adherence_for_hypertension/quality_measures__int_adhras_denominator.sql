@@ -27,6 +27,7 @@ with performance_period as (
 )
 
 , pharmacy_claim  as (
+    
     select 
           patient_id
         , dispensing_date
