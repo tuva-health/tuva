@@ -42,7 +42,7 @@ The below 3 cte identifies periods of continuous medication use for each patient
         , dispensing_date
         , ndc_code
         , days_supply
-        , dense_rank() over (partition by patient_id order by dispensing_date) as row_number
+        , dense_rank() over (partition by patient_id order by dispensing_date) as dense_rank
         , lag(ndc_code) over (partition by patient_id order by dispensing_date) as previous_ndc
     from denominator
 
