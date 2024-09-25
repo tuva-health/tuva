@@ -155,6 +155,7 @@ total days covered is abbreviated as tdc
     from {{ ref('quality_measures__stg_core__patient') }} as patient
     inner join patient_within_performance_period as valid_patients1
         on patient.patient_id = valid_patients1.patient_id
+    where pateint.death_date is null
 
 )
 
