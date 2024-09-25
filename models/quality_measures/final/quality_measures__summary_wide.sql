@@ -157,6 +157,7 @@ with measures_long as (
         , performance_flag
     from measures_long
     where measure_id = 'ADH-RAS'
+    
 )
 
 , joined as (

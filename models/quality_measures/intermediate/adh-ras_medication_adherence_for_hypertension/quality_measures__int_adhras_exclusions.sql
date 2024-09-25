@@ -21,6 +21,14 @@
 )
 {%- endset -%}
 
+with denominator as (
+
+    select
+          patient_id
+    from {{ ref('quality_measures__int_adhras_denominator')}}
+
+)
+
 , valid_hospice_palliative as (
 
   select
@@ -32,7 +40,6 @@
 
 )
 
-
 , esrd_codes as (
 
     select
@@ -41,77 +48,114 @@
           , concept_name
     from {{ ref('quality_measures__value_sets') }}
     where concept_name = 'PQA ESRD'
+
 )
 
 , valid_esrd as (
 
     select
-          ct.patient_id
-        , ct.recorded_date as exclusion_date
-        , ec.concept_name as exclusion_reason
-    from {{ ref('quality_measures__stg_core__condition') }} as ct
-    inner join esrd_codes as ec
-    on coalesce(ct.normalized_code, ct.source_code) = ec.code 
-    and 
-    coalesce(ct.normalized_code_type, ct.source_code_type) = ec.code_system
-     where ct.recorded_date between {{ performance_period_begin }} and {{ performance_period_end }}
+          condition.patient_id
+        , condition.recorded_date as exclusion_date
+        , esrd_codes.concept_name as exclusion_reason
+    from {{ ref('quality_measures__stg_core__condition') }} as condition
+    inner join esrd_codes 
+      on coalesce(condition.normalized_code, condition.source_code) = esrd_codes.code 
+        and coalesce(condition.normalized_code_type, condition.source_code_type) = esrd_codes.code_system
+    where condition.recorded_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
 , sacubitril_codes as (
 
     select
-           code
+          code
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
     where concept_name = 'PQA Sacubitril Valsartan Medications'
+    
 )
 
 , sacubitril_pharmacy_claim as (
 
     select
-          pc.patient_id
-        , pc.dispensing_date as exclusion_date
-        , sc.concept_name as exclusion_reason
-    from {{ ref('quality_measures__stg_pharmacy_claim') }} as pc
-    inner join sacubitril_codes as sc
-    on pc.ndc_code = sc.code 
-    where pc.dispensing_date between {{ performance_period_begin }} and {{ performance_period_end }}
+          pharmacy_claim.patient_id
+        , pharmacy_claim.dispensing_date as exclusion_date
+        , sacubitril_codes.concept_name as exclusion_reason
+    from {{ ref('quality_measures__stg_pharmacy_claim') }} as pharmacy_claim
+    inner join sacubitril_codes
+      on pharmacy_claim.ndc_code = sacubitril_codes.code 
+    where pharmacy_claim.dispensing_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
 , sacubitril_medication as (
 
     select
-          cm.patient_id
-        , cm.dispensing_date as exclusion_date
-        , sc.concept_name as exclusion_reason
-    from {{ ref('quality_measures__stg_core__medication') }} as cm
-    inner join sacubitril_codes as sc
-    on cm.source_code = sc.code 
-    and 
-    cm.source_code_type = sc.code_system
-    where cm.dispensing_date between {{ performance_period_begin }} and {{ performance_period_end }}
+          medication.patient_id
+        , medication.dispensing_date as exclusion_date
+        , sacubitril_codes.concept_name as exclusion_reason
+    from {{ ref('quality_measures__stg_core__medication') }} as medication
+    inner join sacubitril_codes
+      on medication.source_code = sacubitril_codes.code 
+        and medication.source_code_type = sacubitril_codes.code_system
+    where medication.dispensing_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
 , valid_sacubitril as (
 
-    select * from sacubitril_pharmacy_claim
+    select 
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from sacubitril_pharmacy_claim
+
     union all
-    select * from sacubitril_medication
+
+    select 
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from sacubitril_medication
 
 )
 
 , exclusions as (
 
-    select * from valid_hospice_palliative
-    union all
-    select * from valid_esrd
-    union all
-    select * from valid_sacubitril
+    select 
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from valid_hospice_palliative
 
+    union all
+
+    select 
+          patient_id
+        , exclusion_date
+        , exclusion_reason
+    from valid_esrd
+
+    union all
+
+    select 
+          patient_id
+        , exclusion_date
+        , exclusion_reason 
+    from valid_sacubitril
+
+)
+
+, measure_exclusions as (
+
+    select 
+          exclusions.patient_id
+        , exclusion_date
+        , exclusion_reason
+    from exclusions
+    inner join denominator
+      on exclusions.patient_id = denominator.patient_id
 )
 
 , add_data_types as (
@@ -122,7 +166,7 @@
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , 1 as exclusion_flag
-  from exclusions
+  from measure_exclusions
 
 )
 
@@ -130,6 +174,5 @@ select
       patient_id
     , exclusion_date
     , exclusion_reason
-    , exclusion_flag
-    
+    , exclusion_flag   
 from add_data_types
