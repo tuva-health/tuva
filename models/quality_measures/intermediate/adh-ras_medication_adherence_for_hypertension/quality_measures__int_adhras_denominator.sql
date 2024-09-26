@@ -151,10 +151,20 @@ total days covered is abbreviated as tdc
 
     select
           valid_patients1.patient_id
-        , floor({{ datediff('birth_date', 'valid_patients1.performance_period_begin', 'hour') }} / 8760.0) as age
+        , floor({{ datediff('birth_date', 'pp.performance_period_begin', 'hour') }} / 8760.0) as age
+        , dispensing_date
+        , first_dispensing_date
+        , days_supply
+        , ndc_code
+        , pp.performance_period_begin
+        , pp.performance_period_end
+        , pp.measure_id
+        , pp.measure_name
+        , pp.measure_version
     from {{ ref('quality_measures__stg_core__patient') }} as patient
-    inner join patient_within_performance_period as valid_patients1
+    inner join both_check_patient as valid_patients1
         on patient.patient_id = valid_patients1.patient_id
+    cross join performance_period as pp
     where patient.death_date is null
 
 )
@@ -162,22 +172,19 @@ total days covered is abbreviated as tdc
 , qualifying_patients as (
 
     select
-          both_check_patient.patient_id
-        , both_check_patient.dispensing_date
-        , both_check_patient.first_dispensing_date
-        , both_check_patient.days_supply
-        , both_check_patient.ndc_code
-        , pp.performance_period_begin
-        , pp.performance_period_end
-        , pp.measure_id
-        , pp.measure_name
-        , pp.measure_version
+          patient_id
+        , dispensing_date
+        , first_dispensing_date
+        , days_supply
+        , ndc_code
+        , performance_period_begin
+        , performance_period_end
+        , measure_id
+        , measure_name
+        , measure_version
         , 1 as denominator_flag
-    from both_check_patient 
-    inner join patient_with_age 
-        on both_check_patient.patient_id = patient_with_age.patient_id
-    cross join performance_period as pp
-    where patient_with_age.age > 17
+    from patient_with_age 
+    where age > 17
 
 )
 
