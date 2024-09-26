@@ -16,7 +16,7 @@ with denominator as (
         , measure_id
         , measure_name
         , measure_version
-    from {{ ref('quality_measures__int_adhras_denominator')}}
+    from {{ ref('quality_measures__int_adhras_denominator') }}
 
 )
 
@@ -55,7 +55,7 @@ The below 3 cte identifies periods of continuous medication use for each patient
         , dispensing_date
         , ndc_code
         , days_supply
-        , row_number
+        , dense_rank
         , case
             when (ndc_code != previous_ndc) or previous_ndc is null then 1
             else 0
@@ -71,7 +71,7 @@ The below 3 cte identifies periods of continuous medication use for each patient
         , ndc_code
         , dispensing_date
         , days_supply
-        , sum(med_change_flag) over (partition by patient_id order by row_number) as group_id
+        , sum(med_change_flag) over (partition by patient_id order by dense_rank) as group_id
     from grouped_meds
 
 )
