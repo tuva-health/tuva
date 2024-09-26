@@ -208,7 +208,7 @@ or use the current rx_fill_date
             case
               when adjusted_fill_date = group_last
               then days_supply
-              else null
+              else 0
             end) over (partition by patient_id, group_id) as group_last_days_supply
     from grouped_fill_ranges
 
@@ -220,7 +220,7 @@ or use the current rx_fill_date
 3. Then, calculates the actual total covered days for each patient.
 */
 
-, covered_days_per_group as (
+, covered_days_per_groups as (
     
     select
           patient_id
@@ -254,7 +254,7 @@ or use the current rx_fill_date
         , covered_days_per_group
         , lag(group_last) over(partition by patient_id order by group_first) as lag_date
         , lag(group_last_days_supply) over(partition by patient_id order by group_first) as lag_days_supply
-    from covered_days_per_group
+    from covered_days_per_groups
 
 )
 
