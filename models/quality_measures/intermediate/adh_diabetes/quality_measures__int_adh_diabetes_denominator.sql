@@ -60,7 +60,7 @@ with diabetics_codes as (
                   patient_id
                 , performance_period_end
             order by dispensing_date
-        ) as rn
+        ) as dr
     from rx_diabetes_in_measurement_period
 
 )
@@ -72,7 +72,7 @@ with diabetics_codes as (
         , dispensing_date
         , performance_period_end
     from rx_fill_order
-    where rn = 1
+    where dr = 1
           
 )
 
@@ -111,7 +111,7 @@ with diabetics_codes as (
     select
           patient_id
     from rx_fill_order
-    where rn = 2
+    where dr = 2
 
 )
 

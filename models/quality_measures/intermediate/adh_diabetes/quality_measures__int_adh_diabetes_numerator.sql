@@ -28,14 +28,21 @@ with denominator as (
 
 )
 
-, cte2 as (
+/*
+  The below 3 cte identifies periods of continuous medication use for each patient by:
+  1. Assigning a row number and tracking the previous medication per patient.
+  2. Flagging when a medication change occurs.
+  3. Grouping consecutive periods of the same medication by assigning a group ID.
+*/
+
+, ranked_patient as (
 
     select
           patient_id
         , dispensing_date
         , ndc_code
         , days_supply
-        , dense_rank() over (partition by patient_id order by dispensing_date) as rn
+        , dense_rank() over (partition by patient_id order by dispensing_date) as dr
         , lag(ndc_code) over (partition by patient_id order by dispensing_date) as previous_ndc
     from denominator
 
@@ -48,12 +55,12 @@ with denominator as (
         , dispensing_date
         , ndc_code
         , days_supply
-        , rn
+        , dr
         , case
             when (ndc_code != previous_ndc) or previous_ndc is null then 1
             else 0
           end as med_change_flag --to increment group when medication changes
-    from cte2
+    from ranked_patient
 
 )
 
@@ -64,10 +71,16 @@ with denominator as (
         , ndc_code
         , dispensing_date
         , days_supply
-        , sum(med_change_flag) over (partition by patient_id order by rn) as group_id
+        , sum(med_change_flag) over (partition by patient_id order by dr) as group_id
     from grouped_meds
 
 )
+
+/*
+  The ctes below calculates adjusted medication fill dates,
+  groups fills by continuous periods of use and ensures accurate start and end dates based 
+  on previous fills and the performance period.
+*/
 
 , fills as (
 
@@ -90,10 +103,8 @@ with denominator as (
 
 )
 
-, adjusted_fillsv1 as (
+, previous_fill_end_date as (
     
-    /* Adjust start dates based on the previous fill's end date + 1,
-    or use the current rx_fill_date */
     select
           patient_id
         , group_id
@@ -132,7 +143,7 @@ with denominator as (
                 )
             , dispensing_date
         ) as adjusted_start_date
-    from adjusted_fillsv1
+    from previous_fill_end_date
 
 )
 
@@ -163,7 +174,7 @@ with denominator as (
 
 )
 
-, final_final_fills as (
+, grouped_fill_ranges as (
 
     select
           patient_id
@@ -195,11 +206,17 @@ with denominator as (
               then days_supply
               else null
             end) over (partition by patient_id, group_id) as last_days_supply
-    from final_final_fills
+    from grouped_fill_ranges
 
 )
 
-, covered_days as (
+/*
+  1. Calculates the total covered days per medication group per patient
+  2. Then calculates the overlap between groups of medication per patient
+  3. Finally calculates the actual total covered days for each patient
+*/
+
+, covered_days_per_group as (
     
     select
           patient_id
@@ -233,7 +250,7 @@ with denominator as (
         , covered_days
         , lag(last_disp_date) over(partition by patient_id order by first_disp_date) as lag_date
         , lag(last_days_supply) over(partition by patient_id order by first_disp_date) as lag_days_supply
-    from covered_days
+    from covered_days_per_group
 
 )
 
@@ -278,7 +295,7 @@ with denominator as (
     from overlap_days
     group by patient_id
 
-)  
+)
 
 , relevant_patients_from_deno as (
 
