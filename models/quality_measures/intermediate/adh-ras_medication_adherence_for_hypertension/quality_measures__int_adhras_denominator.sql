@@ -94,17 +94,17 @@ with performance_period as (
 )
 
 /*
-total days covered is abbreviated as tdc
+treatment period days  is abbreviated as tpd
 */
 
-, patient_with_tdc as (
+, patient_with_tpd as (
 
     select
           patients1.patient_id
         , patients1.dispensing_date
         , patients2.first_dispensing_date
         , patients1.days_supply
-        , {{ datediff('first_dispensing_date', 'performance_period_end', 'day') }} as days_covered
+        , {{ datediff('first_dispensing_date', 'performance_period_end', 'day') }} as tpd
     from patient_within_performance_period as patients1
     inner join patient_with_first_dispensing_date as patients2
         on patients1.patient_id = patients2.patient_id
@@ -118,8 +118,8 @@ total days covered is abbreviated as tdc
         , dispensing_date
         , first_dispensing_date
         , days_supply
-    from patient_with_tdc
-    where days_covered > 89
+    from patient_with_tpd
+    where tpd > 89
     
 )
 

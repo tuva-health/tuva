@@ -314,7 +314,7 @@ or use the current rx_fill_date
 
     select
           final_covered_days.patient_id
-        , round(cast(actual_covered_days / treatment_period_days as {{ dbt.type_numeric() }}), 4) as adherence
+        , round(cast(actual_covered_days * 100 / treatment_period_days as {{ dbt.type_numeric() }}), 4) as adherence
     from final_covered_days
     inner join patient_with_treatment_period_days 
         on final_covered_days.patient_id = patient_with_treatment_period_days.patient_id
