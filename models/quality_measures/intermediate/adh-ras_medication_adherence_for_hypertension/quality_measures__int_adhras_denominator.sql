@@ -94,7 +94,7 @@ with performance_period as (
 )
 
 /*
-treatment period days  is abbreviated as tpd
+treatment period days is abbreviated as tpd
 */
 
 , patient_with_tpd as (
