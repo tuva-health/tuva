@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -30,7 +31,7 @@ select
     , max(case when lower(column_name) = 'procedure_date_22' then normalized_code else null end) as procedure_date_22
     , max(case when lower(column_name) = 'procedure_date_23' then normalized_code else null end) as procedure_date_23
     , max(case when lower(column_name) = 'procedure_date_24' then normalized_code else null end) as procedure_date_24
-    , max(case when lower(column_name) = 'procedure_date_14' then normalized_code else null end) as procedure_date_25
+    , max(case when lower(column_name) = 'procedure_date_25' then normalized_code else null end) as procedure_date_25
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__int_procedure_date_voting') }}
 where (occurrence_row_count = 1

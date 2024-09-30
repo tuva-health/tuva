@@ -250,7 +250,7 @@ with pivot_procedure as(
         , claim_type
         , data_source
         , 'procedure_date_23'  as procedure_column
-        ,  procedure_date_24  as procedure_date
+        ,  procedure_date_23  as procedure_date
     from {{ ref('normalized_input__stg_medical_claim') }}
 
     union all
