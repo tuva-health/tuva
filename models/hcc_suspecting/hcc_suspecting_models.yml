@@ -454,7 +454,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_condition
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging conditions from core.
     columns:
       - name: claim_id
@@ -471,7 +471,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_lab_result
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging conditions from core.
     columns:
       - name: lab_result_id
@@ -489,7 +489,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_medication
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging medications from core.
     columns:
       - name: patient_id
@@ -506,7 +506,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_observation
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging observations from core.
     columns:
       - name: patient_id
@@ -522,7 +522,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_patient
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging patients from core.
     columns:
       - name: patient_id
@@ -536,7 +536,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_pharmacy_claim
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging pharmacy claims from core.
     columns:
      - name: patient_id

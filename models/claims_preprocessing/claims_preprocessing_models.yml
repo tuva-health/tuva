@@ -222,7 +222,7 @@ models:
       tags: 
         - acute_inpatient
         - claims_preprocessing
-      materialized: ephemeral
+      materialized: view
 
   - name: acute_inpatient__stg_medical_claim
     config:
@@ -230,7 +230,7 @@ models:
       tags: 
         - acute_inpatient
         - claims_preprocessing
-      materialized: ephemeral
+      materialized: view
 
   - name: acute_inpatient__stg_service_category
     config:
@@ -238,7 +238,7 @@ models:
       tags: 
         - acute_inpatient
         - claims_preprocessing
-      materialized: ephemeral
+      materialized: view
 
 #### Claims Enrollment
 ## Final
@@ -467,7 +467,7 @@ models:
       tags: 
         - emergency_department
         - claims_preprocessing
-      materialized: ephemeral
+      materialized: view
 
   - name: emergency_department__stg_medical_claim
     config:
@@ -475,7 +475,7 @@ models:
       tags: 
         - emergency_department
         - claims_preprocessing
-      materialized: ephemeral
+      materialized: view
 
   - name: emergency_department__stg_service_category
     config:
@@ -483,7 +483,7 @@ models:
       tags: 
         - emergency_department
         - claims_preprocessing
-      materialized: ephemeral
+      materialized: view
 
 
 
@@ -883,7 +883,7 @@ models:
   - name: service_category__stg_medical_claim
     description: Staging med claims for sc grouper
     config:
-      materialized: ephemeral
+      materialized: view
       tags: 
         - service_category_grouper
         - claims_preprocessing
@@ -2090,21 +2090,21 @@ models:
 ##    Staging
   - name: normalized_input__stg_eligibility
     config:
-      materialized: ephemeral
+      materialized: view
       tags: 
         - normalized_input
         - claims_preprocessing
 
   - name: normalized_input__stg_medical_claim
     config:
-      materialized: ephemeral
+      materialized: view
       tags: 
         - normalized_input
         - claims_preprocessing
 
   - name: normalized_input__stg_pharmacy_claim
     config:
-      materialized: ephemeral
+      materialized: view
       tags: 
         - normalized_input
         - claims_preprocessing

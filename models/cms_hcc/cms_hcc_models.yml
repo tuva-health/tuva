@@ -462,7 +462,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_condition
       tags: cms_hcc
-      materialized: ephemeral
+      materialized: view
     description: Staging conditions from core.
     columns:
       - name: claim_id
@@ -484,7 +484,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_eligibility
       tags: cms_hcc
-      materialized: ephemeral
+      materialized: view
     description: Staging eligibility from core.
     columns:
       - name: patient_id
@@ -506,7 +506,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_medical_claim
       tags: cms_hcc
-      materialized: ephemeral
+      materialized: view
     description: Staging medical claims from core.
     columns:
       - name: claim_id
@@ -535,7 +535,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_patient
       tags: cms_hcc
-      materialized: ephemeral
+      materialized: view
     description: Staging patient from core.
     columns:
       - name: patient_id
@@ -552,7 +552,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_member_months
       tags: cms_hcc
-      materialized: ephemeral
+      materialized: view
     description: Staging member months from financial_pmpm
     columns:
       - name: patient_id

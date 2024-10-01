@@ -113,7 +113,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
       tags: ed_classification
-      materialized: ephemeral
+      materialized: view
 
   - name: ed_classification__stg_patient
     config:
@@ -121,5 +121,5 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
         {% else %}ed_classification{%- endif -%}
       tags: ed_classification
-      materialized: ephemeral
+      materialized: view
 
