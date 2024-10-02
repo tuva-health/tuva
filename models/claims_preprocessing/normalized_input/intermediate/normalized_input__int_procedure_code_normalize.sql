@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -272,7 +273,7 @@ with pivot_procedure as(
         , data_source
         , procedure_code_type
         , 'procedure_code_23'  as procedure_column
-        ,  procedure_code_24  as procedure_code
+        ,  procedure_code_23  as procedure_code
     from {{ ref('normalized_input__stg_medical_claim') }}
 
     union all
