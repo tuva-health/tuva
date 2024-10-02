@@ -12,8 +12,7 @@ with unpivot_cte as (
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , claim_line_number as procedure_sequence_id
   , patient_id as patient_id
   , coalesce(admission_date
            , claim_start_date
@@ -40,8 +39,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 1 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_1 as procedure_date
   , procedure_code_type as source_code_type
@@ -64,8 +62,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 2 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_2 as procedure_date
   , procedure_code_type as source_code_type
@@ -88,8 +85,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 3 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_3 as procedure_date
   , procedure_code_type as source_code_type
@@ -112,8 +108,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 4 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_4 as procedure_date
   , procedure_code_type as source_code_type
@@ -136,8 +131,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 5 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_5 as procedure_date
   , procedure_code_type as source_code_type
@@ -160,8 +154,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 6 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_6 as procedure_date
   , procedure_code_type as source_code_type
@@ -184,8 +177,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 7 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_7 as procedure_date
   , procedure_code_type as source_code_type
@@ -208,8 +200,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 8 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_8 as procedure_date
   , procedure_code_type as source_code_type
@@ -232,8 +223,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 9 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_9 as procedure_date
   , procedure_code_type as source_code_type
@@ -256,8 +246,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 10 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_10 as procedure_date
   , procedure_code_type as source_code_type
@@ -280,8 +269,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 11 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_11 as procedure_date
   , procedure_code_type as source_code_type
@@ -304,8 +292,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 12 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_12 as procedure_date
   , procedure_code_type as source_code_type
@@ -328,8 +315,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 13 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_13 as procedure_date
   , procedure_code_type as source_code_type
@@ -352,8 +338,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 14 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_14 as procedure_date
   , procedure_code_type as source_code_type
@@ -376,8 +361,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 15 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_15 as procedure_date
   , procedure_code_type as source_code_type
@@ -400,8 +384,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 16 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_16 as procedure_date
   , procedure_code_type as source_code_type
@@ -424,8 +407,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 17 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_17 as procedure_date
   , procedure_code_type as source_code_type
@@ -448,8 +430,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 18 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_18 as procedure_date
   , procedure_code_type as source_code_type
@@ -472,8 +453,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 19 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_19 as procedure_date
   , procedure_code_type as source_code_type
@@ -496,8 +476,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 20 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_20 as procedure_date
   , procedure_code_type as source_code_type
@@ -520,8 +499,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 21 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_21 as procedure_date
   , procedure_code_type as source_code_type
@@ -544,8 +522,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 22 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_22 as procedure_date
   , procedure_code_type as source_code_type
@@ -568,8 +545,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 23 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_23 as procedure_date
   , procedure_code_type as source_code_type
@@ -592,8 +568,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 24 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_24 as procedure_date
   , procedure_code_type as source_code_type
@@ -616,8 +591,7 @@ union distinct
 
 select
     claim_id as claim_id
-   ,claim_line_number as claim_line_number
-
+  , 25 as procedure_sequence_id
   , patient_id as patient_id
   , procedure_date_25 as procedure_date
   , procedure_code_type as source_code_type
@@ -640,6 +614,8 @@ select distinct
         "unpivot_cte.data_source",
         "'_'",
         "unpivot_cte.claim_id",
+        "'_'",
+        "unpivot_cte.procedure_sequence_id",
         "'_'",
         "unpivot_cte.source_code",
         "case when unpivot_cte.modifier_1 is not null then CONCAT('_', unpivot_cte.modifier_1) else '' end",
