@@ -31,14 +31,7 @@ FROM
         claim_id
 )
 
-
-/*
-Multiple claim_start_date values
-Multiple claim_end_date values
-Multiple admission_date values
-Multiple discharge_date values
-*/
-
+, summary as (
 select 
 'missing_claim_start_date' AS test_name,
 'medical_claim' AS test_source, 
@@ -143,3 +136,20 @@ FROM
 claim_dates
 where 
 distinct_discharge_dates > 1 
+
+SELECT  
+test_name, 
+test_source, 
+flagged_records,
+'{{ var('tuva_last_run')}}' as tuva_last_run
+FROM  
+summary 
+) 
+
+SELECT  
+test_name, 
+test_source, 
+flagged_records,
+'{{ var('tuva_last_run')}}' as tuva_last_run
+FROM  
+summary 

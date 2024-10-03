@@ -52,6 +52,7 @@ HAVING
     COUNT(*) > 1
 ) 
 
+, summary as (
 -- Final select to handle each case, including when no rows are returned
 SELECT 
     'primary_key_duplicate' AS test_name,
@@ -77,3 +78,12 @@ SELECT
     COALESCE(SUM(duplicate_count), 0) AS flagged_records,
 FROM 
     Pharmacy_Claim_PK
+) 
+
+SELECT  
+test_name, 
+test_source, 
+flagged_records,
+'{{ var('tuva_last_run')}}' as tuva_last_run
+FROM  
+summary 

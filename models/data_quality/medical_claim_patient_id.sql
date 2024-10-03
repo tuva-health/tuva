@@ -37,7 +37,7 @@ eligibility
 ON medical_claim.member_id = eligibility.member_id --need to join on patient_ID as well? 
 ) 
 
---Summary Output
+, summary AS (
 SELECT  
 'multiple_patient_id' AS test_name,
 'medical_claim' AS test_source, 
@@ -62,4 +62,12 @@ SELECT
 COALESCE(SUM(orphaned_claim),0) AS flagged_records
 FROM 
 orphaned_medical_claims
+) 
 
+SELECT  
+test_name, 
+test_source, 
+flagged_records,
+'{{ var('tuva_last_run')}}' as tuva_last_run
+FROM  
+summary 
