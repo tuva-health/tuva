@@ -5,9 +5,9 @@ models:
 
   - name: core__condition
     description: >
-      The core condition table contains information related to medical 
-      conditions patients have, including problems, admitting diagnosis codes, 
-      and billable diagnosis codes.
+      The core condition table contains information related to medical  conditions
+      patients have, including problems, admitting diagnosis codes,  and billable
+      diagnosis codes.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -23,11 +23,11 @@ models:
               config:
                 severity: warn
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: encounter_id
-        description: Unique identifier for each encounter.
+        description: '{{ doc("encounter_id") }}'
       - name: claim_id
-        description: Unique identifier for each claim.
+        description: '{{ doc("claim_id") }}'
       - name: recorded_date
         description: Date when the condition was recorded.
       - name: onset_date
@@ -40,59 +40,65 @@ models:
         description: The type of condition i.e. problem, admitting, or billing.
       - name: source_code_type
         description: >
-          The type of condition code reported in the source system e.g. 
-          ICD-10-CM.
+          The type of condition code reported in the source system e.g.  ICD-10-CM.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: source_code
         description: >
           The condition code in the source system e.g. the ICD-10 code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: source_description
         description: Description of the condition code in the source system.
       - name: normalized_code_type
         description: The normalized type of condition code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: normalized_code
         description: The normalized condition code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: normalized_description
         description: Normalized description of the condition code.
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine) 
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: condition_rank
         description: >
-          The numerical ranking of a diagnosis code in a claim.  Principle 
-          diagnosis code is given a ranking of 1. Claims data typically has a 
-          strict ranking of conditions whereas medical records will often not 
-          have this information or the information won't be accurate.
+          The numerical ranking of a diagnosis code in a claim.  Principle  diagnosis
+          code is given a ranking of 1. Claims data typically has a  strict ranking
+          of conditions whereas medical records will often not  have this information
+          or the information won't be accurate.
         data_type: integer
       - name: present_on_admit_code
         description: The present_on_admit_code related to the condition.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
       - name: present_on_admit_description
         description: >
           The description of the present_on_admit_code for the condition.
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__eligibility
     description: >
-      The eligibility table contains information on patient health plan and 
-      supplemental insurance eligibility.
+      The eligibility table contains information on patient health plan and  supplemental
+      insurance eligibility.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -108,16 +114,17 @@ models:
               config:
                 severity: warn
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: member_id
         description: >
-          Identifier that links a patient to a particular insurance product or 
-          health plan. A patient can have more than one member_id because they 
-          can have more than one insurance product/plan.
+          Identifier that links a patient to a particular insurance product or  health
+          plan. A patient can have more than one member_id because they  can have
+          more than one insurance product/plan.
       - name: subscriber_id
-        description: Identifier that links a patient to a particular insurance product or health plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan.
       - name: birth_date
-        description: Date the patient was born.
+        description: '{{ doc("birth_date") }}'
       - name: death_date
         description: Date the patient died.
       - name: enrollment_start_date
@@ -125,177 +132,171 @@ models:
       - name: enrollment_end_date
         description: Date the patient's insurance eligibility ended.
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: '{{ doc("payer") }}'
       - name: payer_type
         description: Type of payer (e.g. commercial, medicare, medicaid, etc.).
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__payer_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__payer_type.csv
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage.
+        description: '{{ doc("plan") }}'
       - name: original_reason_entitlement_code
         description: Original reason for Medicare entitlement code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_orec.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_orec.csv
       - name: dual_status_code
         description: >
-          Indicates whether the patient is dually eligible for Medicare and 
-          Medicaid.
+          Indicates whether the patient is dually eligible for Medicare and  Medicaid.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_dual_eligibility.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_dual_eligibility.csv
       - name: medicare_status_code
         description: Indicates how the patient became eligible for Medicare.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
       - name: subscriber_relation
-        description: Identifier that links a patient to a particular insurance product or health plan.
+        description: Identifier that links a patient to a particular insurance product
+          or health plan.
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__encounter
     description: >
-      The encounter table contains information about patients visits (i.e. 
-      encounters).  This includes acute inpatient, emergency department, office 
-      visits, SNF stays, etc.
+      The encounter table contains information about patients visits (i.e.  encounters).  This
+      includes acute inpatient, emergency department, office  visits, SNF stays, etc.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: encounter
-      tags: 
+      tags:
         - core
         - encounters
       materialized: table
     columns:
       - name: encounter_id
-        description: Unique identifier for each encounter.
+        description: '{{ doc("encounter_id") }}'
         tests:
           - unique
       - name: patient_id
-        description: Unique identifier for a patient.
+        description: '{{ doc("patient_id") }}'
       - name: patient_data_source_id
-        description: Identifier for the source system from which patient data originated.
+        description: '{{ doc("patient_data_source_id") }}'
       - name: encounter_type
-        description: >
-          Indicates the type of encounter e.g. acute inpatient, emergency 
-          department, etc.
+        description: >-
+          '{{ doc("encounter_type") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__encounter_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__encounter_type.csv
       - name: encounter_group
-        description: Categorization of the encounter into groups based on predefined criteria.
+        description: '{{ doc("encounter_group") }}'
       - name: encounter_start_date
-        description: Date when the encounter started.
+        description: '{{ doc("encounter_start_date") }}'
       - name: encounter_end_date
-        description: Date when the encounter ended.
+        description: '{{ doc("encounter_end_date") }}'
       - name: length_of_stay
-        description: >
-          Length of the encounter calculated as encounter_end_date - 
-          encounter_start_date.
+        description: >-
+          '{{ doc("length_of_stay") }}'
       - name: admit_source_code
-        description: Admission source code for the encounter.
+        description: '{{ doc("admit_source_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
       - name: admit_source_description
-        description: Description of the admit_source_code for the encounter.
+        description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
-        description: Admission type code for the encounter.
+        description: '{{ doc("admit_type_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
       - name: admit_type_description
-        description: Description of the admit_type_code for the encounter.
+        description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
-        description: Discharge disposition code for the encounter.
+        description: '{{ doc("discharge_disposition_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
       - name: discharge_disposition_description
-        description: >
-          Description of the discharge_disposition_code for the encounter.
+        description: '{{ doc("discharge_disposition_description") }}'
       - name: observation_flag
-        description: Indicates whether the encounter was marked as an observation stay (1 for yes, 0 for no).
+        description: '{{ doc("observation_flag") }}'
       - name: lab_flag
-        description: Indicates whether lab services were utilized during the encounter (1 for yes, 0 for no).
+        description: '{{ doc("lab_flag") }}'
       - name: dme_flag
-        description: Indicates whether durable medical equipment (DME) was used during the encounter (1 for yes, 0 for no).
+        description: '{{ doc("dme_flag") }}'
       - name: ambulance_flag
-        description: Indicates whether ambulance services were utilized during the encounter (1 for yes, 0 for no).
+        description: '{{ doc("ambulance_flag") }}'
       - name: pharmacy_flag
-        description: Indicates whether pharmacy services were utilized during the encounter (1 for yes, 0 for no).
+        description: '{{ doc("pharmacy_flag") }}'
       - name: ed_flag
-        description: Indicates whether the encounter involved an emergency department visit (1 for yes, 0 for no).
+        description: '{{ doc("ed_flag") }}'
       - name: delivery_flag
-        description: Indicates whether the encounter involved a delivery (1 for yes, 0 for no).
+        description: '{{ doc("delivery_flag") }}'
       - name: delivery_type
-        description: Type of delivery that occurred during the encounter, if applicable.
+        description: '{{ doc("delivery_type") }}'
       - name: newborn_flag
-        description: Indicates whether the encounter was for a newborn (1 for yes, 0 for no).
+        description: '{{ doc("newborn_flag") }}'
       - name: nicu_flag
-        description: Indicates whether the newborn was admitted to the Neonatal Intensive Care Unit (NICU) during the encounter (1 for yes, 0 for no).
+        description: '{{ doc("nicu_flag") }}'
       - name: primary_diagnosis_code_type
-        description: >
-          The type of condition code reported in the source system e.g. 
-          ICD-10-CM.
+        description: '{{ doc("primary_diagnosis_code_type") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: primary_diagnosis_code
-        description: >
-          Primary diagnosis code for the encounter.  If from claims the primary 
-          diagnosis code comes from the institutional claim.
+        description: '{{ doc("primary_diagnosis_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: primary_diagnosis_description
-        description: Description of the primary diagnosis code.
+        description: '{{ doc("primary_diagnosis_description") }}'
       - name: ms_drg_code
-        description: MS-DRG code for the encounter.
+        description: '{{ doc("ms_drg_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: ms_drg_description
-        description: Description of the ms_drg_code.
+        description: '{{ doc("ms_drg_description") }}'
       - name: apr_drg_code
-        description: APR-DRG code for the encounter.
+        description: '{{ doc("apr_drg_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: apr_drg_description
-        description: Description of the APR-DRG code.
+        description: '{{ doc("apr_drg_description") }}'
       - name: paid_amount
-        description: The total amount paid for the encounter by the insurer.
+        description: '{{ doc("paid_amount") }}'
       - name: allowed_amount
-        description: >
-          The total amount allowed (includes amount paid by the insurer and 
-          patient) on the encounter.
+        description: '{{ doc("allowed_amount") }}'
       - name: charge_amount
-        description: The total amount charged on the encounter by the provider.
+        description: '{{ doc("charge_amount") }}'
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: claim_count
-        description: Total number of claims generated from the encounter.
+        description: '{{ doc("claim_count") }}'
       - name: inst_claim_count
-        description: Number of institutional claims generated from the encounter.
+        description: '{{ doc("inst_claim_count") }}'
       - name: prof_claim_count
-        description: Number of professional claims generated from the encounter.
+        description: '{{ doc("prof_claim_count") }}'
       - name: source_model
         description: Indicates the DBT source relation name from which data is derived.
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
       - name: encounter_source_type
-        description: Indicates whether the encounter is from a claims or clinical data source 
+        description: Indicates whether the encounter is from a claims or clinical
+          data source
 
   - name: core__lab_result
     description: >
-      The lab result table contains information about lab test results, 
-      including the LOINC code and description, units, reference range, and 
-      result.
+      The lab result table contains information about lab test results,  including
+      the LOINC code and description, units, reference range, and  result.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -311,48 +312,63 @@ models:
               config:
                 severity: warn
       - name: patient_id
-        description: Unique identifier for each patient.
+        description: '{{ doc("patient_id") }}'
       - name: encounter_id
-        description: >
-          Unique identifier for each encounter.  Included in this table if the 
-          lab test can be linked to an encounter.
+        description: '{{ doc("encounter_id") }}'
       - name: accession_number
         description: The lab order number from the source system.
       - name: source_code_type
         description: The code type from the source system.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: source_code
         description: The code for the lab from the source system.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: source_description
         description: The description for the lab test from the source system.
       - name: source_component
         description: >
           The description for the component of the test from the source system.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: normalized_code_type
         description: The normalized code type.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: normalized_code
         description: The normalized code e.g. LOINC.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: normalized_description
         description: The normalized description for the code.
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine) 
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: normalized_component
         description: The normalized component.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: status
         description: The status of the lab test.
       - name: result
@@ -383,20 +399,20 @@ models:
         description: >
           Unique identifier for the practitioner who ordered the lab test.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: data_source
-        description: Custom description of the source system e.g. Epic.
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.    
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__location
     description: >
-      The location table contains information on practice and facility locations 
-      where patients receive medical care.
+      The location table contains information on practice and facility locations  where
+      patients receive medical care.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -413,15 +429,17 @@ models:
                 severity: warn
       - name: npi
         description: >
-          The national provider identifier associated with the location e.g. 
-          facility_npi.
+          The national provider identifier associated with the location e.g.  facility_npi.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: name
         description: The name of the location.
       - name: facility_type
-        description: The type of facility e.g. acute care hospital.
+        description: '{{ doc("facility_type") }}'
       - name: parent_organization
         description: The parent organization associated with the facility.
       - name: address
@@ -437,23 +455,20 @@ models:
       - name: longitude
         description: The longitude of the location.
       - name: data_source
-        description: Custom description of the source system e.g. Epic.
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__medical_claim
     description: >
-      The medical claim table contains information on services rendered to 
-      patients and billed by the provider to the insurer as claims.
+      The medical claim table contains information on services rendered to  patients
+      and billed by the provider to the insurer as claims.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: medical_claim
-      tags: 
+      tags:
         - core
         - encounters
       materialized: table
@@ -465,173 +480,186 @@ models:
               config:
                 severity: error
       - name: claim_id
-        description: Unique identifier for each claim.
+        description: '{{ doc("claim_id") }}'
       - name: claim_line_number
-        description: >
-          Indicates the line number for the particular line of the claim.
+        description: '{{ doc("claim_line_number") }}'
         data_type: integer
       - name: encounter_id
-        description: >
-          The encounter_id for the encounter that this claims belongs to.
+        description: '{{ doc("encounter_id") }}'
       - name: claim_type
-        description: >
-          Indicates whether the claim is professional (CMS-1500), institutional 
-          (UB-04), dental, or vision.
+        description: '{{ doc("claim_type") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__claim_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__claim_type.csv
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: member_id
         description: >
-          Identifier that links a patient to a particular insurance product or 
-          health plan. A patient can have more than one member_id because they 
-          can have more than one insurance product/plan.
+          Identifier that links a patient to a particular insurance product or  health
+          plan. A patient can have more than one member_id because they  can have
+          more than one insurance product/plan.
       - name: payer
-        description: Name of the payer
+        description: '{{ doc("payer") }}'
       - name: plan
-        description: Name of the plan
+        description: '{{ doc("plan") }}'
       - name: claim_start_date
-        description: Start date for the claim.
+        description: '{{ doc("claim_start_date") }}'
       - name: claim_end_date
-        description: End date for the claim.
+        description: '{{ doc("claim_end_date") }}'
       - name: claim_line_start_date
-        description: Start date for the claim line.
+        description: '{{ doc("claim_line_start_date") }}'
       - name: claim_line_end_date
-        description: End date for the claim line.
+        description: '{{ doc("claim_line_end_date") }}'
       - name: admission_date
-        description: Admission date for the claim (inpatient claims only).
+        description: '{{ doc("admission_date") }}'
       - name: discharge_date
-        description: Discharge date for the claim (inpatient claims only).
+        description: '{{ doc("discharge_date") }}'
       - name: service_category_1
-        description: The broader service category this claim belongs to.
+        description: '{{ doc("service_category_1") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
       - name: service_category_2
+        description: '{{ doc("service_category_2") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
         description: The more specific service category this claim belongs to.
+      - name: service_category_3
+        description: The most specific service category. Only exists for a small number of service categories.
+        meta:
+          terminology:
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
       - name: admit_source_code
-        description: >
-          Indicates where the patient was before the healthcare encounter 
-          (inpatient claims only).
+        description: '{{ doc("admit_source_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
       - name: admit_source_description
-        description: Admit source description.
+        description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
-        description: Indicates the type of admission (inpatient claims only).
+        description: '{{ doc("admit_type_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
       - name: admit_type_description
-        description: Admit type description.
+        description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
-        description: >
-          Indicates the type of setting the patient was discharged to 
-          (institutional inpatient claims only).
+        description: '{{ doc("discharge_disposition_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
       - name: discharge_disposition_description
-        description: Discharge disposition description.
+        description: '{{ doc("discharge_disposition_description") }}'
       - name: place_of_service_code
-        description: Place of service for the claim (professional claims only).
+        description: '{{ doc("place_of_service_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__place_of_service.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__place_of_service.csv
       - name: place_of_service_description
-        description: Place of service description.
+        description: '{{ doc("place_of_service_description") }}'
       - name: bill_type_code
-        description: Bill type code for the claim (institutional claims only).
+        description: '{{ doc("bill_type_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__bill_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__bill_type.csv
       - name: bill_type_description
-        description: Bill type description.
+        description: '{{ doc("bill_type_description") }}'
       - name: ms_drg_code
-        description: MS-DRG for the claim (inpatient claims only).
+        description: '{{ doc("ms_drg_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: ms_drg_description
-        description: MS-DRG description.
+        description: '{{ doc("ms_drg_description") }}'
       - name: apr_drg_code
-        description: APR-DRG for the claim (inpatient claims only).
+        description: '{{ doc("apr_drg_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: apr_drg_description
-        description: APR-DRG description.
+        description: '{{ doc("apr_drg_description") }}'
       - name: revenue_center_code
-        description: >
-          Revenue center code for the claim line (institutional only and 
-          typically multiple codes per claim).
+        description: '{{ doc("revenue_center_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__revenue_center.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__revenue_center.csv
       - name: revenue_center_description
-        description: Revenue center description.
+        description: '{{ doc("revenue_center_description") }}'
       - name: service_unit_quantity
         description: The number of units for the particular revenue center code.
         data_type: integer
       - name: hcpcs_code
-        description: HCPCS level 1 or level 2 code for the claim line.
+        description: '{{ doc("hcpcs_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: hcpcs_modifier_1
-        description: 1st modifier for HCPCS code.
+        description: '{{ doc("hcpcs_modifier_1") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: hcpcs_modifier_2
-        description: 2nd modifier for HCPCS code.
+        description: '{{ doc("hcpcs_modifier_2") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: hcpcs_modifier_3
-        description: 3rd modifier for HCPCS code.
+        description: '{{ doc("hcpcs_modifier_3") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: hcpcs_modifier_4
-        description: 4th modifier for HCPCS code.
+        description: '{{ doc("hcpcs_modifier_4") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: hcpcs_modifier_5
-        description: 5th modifier for HCPCS code.
+        description: '{{ doc("hcpcs_modifier_5") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: rendering_id
-        description: >
-          Rendering ID for the claim (typically represents the physician or 
-          entity providing services).
+        description: '{{ doc("rendering_id") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: rendering_tin
         description: Rendering provider tax identification number (TIN).
       - name: rendering_name
         description: Rendering provider name.
       - name: billing_id
-        description: >
-          Billing ID for the claim (typically represents organization billing 
-          the claim).
+        description: '{{ doc("billing_id") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: billing_tin
         description: Billing provider tax identification number (TIN).
       - name: billing_name
         description: Billing provider name.
       - name: facility_id
-        description: >
-          Facility ID for the claim (typically represents the facility where 
-          services were performed).
+        description: '{{ doc("facility_id") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: facility_name
-        description: Facility name.
+        description: '{{ doc("facility_name") }}'
       - name: paid_date
         description: The date the claim was paid.
       - name: paid_amount
-        description: The total amount paid on the claim by the insurer.
+        description: '{{ doc("paid_amount") }}'
       - name: allowed_amount
-        description: >
-          The total amount allowed (includes amount paid by the insurer and 
-          patient) on the claim.
+        description: '{{ doc("allowed_amount") }}'
       - name: charge_amount
-        description: The total amount charged on the claim by the provider.
+        description: '{{ doc("charge_amount") }}'
       - name: coinsurance_amount
         description: The total coinsurance charged on the claim by the provider.
       - name: copayment_amount
@@ -643,23 +671,18 @@ models:
       - name: in_network_flag
         description: Flag indicating if the claim was in or out of network.
       - name: enrollment_flag
-        description: > 
-          Flag indicating if the claim has corresponding enrollment during 
-          the same time period the service occurred.
+        description: >
+          Flag indicating if the claim has corresponding enrollment during  the same
+          time period the service occurred.
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__medication
     description: >
-      The medication table contains information on medications ordered and/or 
-      administered during a patient encounter.
+      The medication table contains information on medications ordered and/or  administered
+      during a patient encounter.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -675,9 +698,9 @@ models:
               config:
                 severity: warn
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: encounter_id
-        description: Unique identifier for each encounter in the dataset.
+        description: '{{ doc("encounter_id") }}'
       - name: dispensing_date
         description: Date the medication was dispensed.
       - name: prescribing_date
@@ -685,7 +708,8 @@ models:
       - name: source_code_type
         description: The source code type of the medication.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: source_code
         description: The source code for the medication.
         meta:
@@ -695,11 +719,15 @@ models:
       - name: ndc_code
         description: National drug code associated with the medication.
         meta:
-          terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+          terminology: 
+            https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
       - name: ndc_description
         description: Description for the NDC.
       - name: ndc_mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine) 
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: rxnorm_code
         description: RxNorm code associated with the medication.
         meta:
@@ -707,7 +735,10 @@ models:
       - name: rxnorm_description
         description: Description for the RxNorm code.
       - name: rxnorm_mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: atc_code
         description: ATC code for the medication.
         meta:
@@ -715,7 +746,10 @@ models:
       - name: atc_description
         description: Description for the ATC code.
       - name: atc_mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: route
         description: The route used to administer the medication.
       - name: strength
@@ -730,15 +764,15 @@ models:
         description: >
           Unique identifier for the practitioner who ordered the medication.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: data_source
-        description: Custom description of the source system e.g. Epic.
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__member_months
     description: Creates member months from eligibility data
@@ -752,17 +786,15 @@ models:
       materialized: table
     columns:
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.
       - name: payer
-        description: Name of the payer (i.e. health insurer) providing coverage.
+        description: '{{ doc("payer") }}'
       - name: plan
-        description: Name of the plan (i.e. sub contract) providing coverage.
+        description: '{{ doc("plan") }}'
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
         description: >
           The last time the data was refreshed.  Generated by 
@@ -800,8 +832,8 @@ models:
 
   - name: core__observation
     description: >
-      The observation table contains information on measurements other than 
-      lab tests e.g. blood pressure, height, and weight.
+      The observation table contains information on measurements other than  lab tests
+      e.g. blood pressure, height, and weight.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -817,9 +849,9 @@ models:
               config:
                 severity: warn
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: encounter_id
-        description: Unique identifier for each encounter in the dataset.
+        description: '{{ doc("encounter_id") }}'
       - name: panel_id
         description: Unique identifier for the panel.
       - name: observation_date
@@ -829,7 +861,8 @@ models:
       - name: source_code_type
         description: Source code type of the observation.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: source_code
         description: Source code of the observation.
       - name: source_description
@@ -841,7 +874,10 @@ models:
       - name: normalized_description
         description: Normalized description of the observation.
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: result
         description: The result of the observation.
       - name: source_units
@@ -857,17 +893,13 @@ models:
       - name: normalized_reference_range_high
         description: The normalized high end of the reference range.
       - name: data_source
-        description: Custom description of the source system e.g. Epic.
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__patient
     description: >
-      The patient table contains demographic and geographic information on 
-      patients.
+      The patient table contains demographic and geographic information on  patients.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -877,7 +909,7 @@ models:
       materialized: table
     columns:
       - name: patient_id
-        description: Unique identifier for each person across all datasets.
+        description: '{{ doc("patient_id") }}'
         tests:
           - unique:
               config:
@@ -885,13 +917,15 @@ models:
       - name: sex
         description: The gender of the patient.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: race
-        description: The race of the patient.
+        description: '{{ doc("race") }}'
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
       - name: birth_date
-        description: The birth date of the patient.
+        description: '{{ doc("birth_date") }}'
       - name: death_date
         description: The death date of the patient if there is one.
       - name: death_flag
@@ -921,24 +955,20 @@ models:
         description: The phone number for the patient.
       - name: age
         description: >
-          The age of the patient calculated based on their date of birth and 
-          the last time the data was refreshed.
+          The age of the patient calculated based on their date of birth and  the
+          last time the data was refreshed.
       - name: age_group
-        description: The decade age group the patient falls into based on their calculated age.
+        description: The decade age group the patient falls into based on their calculated
+          age.
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__pharmacy_claim
     description: >
-      The pharmacy claim table contains information on prescription drugs that 
-      were filled and billed to the insurer.
+      The pharmacy claim table contains information on prescription drugs that  were
+      filled and billed to the insurer.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -954,36 +984,41 @@ models:
               config:
                 severity: error
       - name: claim_id
-        description: Unique identifier for each claim.
+        description: '{{ doc("claim_id") }}'
       - name: claim_line_number
-        description: Indicates the line number for the particular line of the claim.
+        description: '{{ doc("claim_line_number") }}'
         data_type: integer
       - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("patient_id") }}'
       - name: member_id
         description: >
-          Identifier that links a patient to a particular insurance product or 
-          health plan. A patient can have more than one member_id because they 
-          can have more than one insurance product/plan.
+          Identifier that links a patient to a particular insurance product or  health
+          plan. A patient can have more than one member_id because they  can have
+          more than one insurance product/plan.
       - name: payer
-        description: Name of the payer
+        description: '{{ doc("payer") }}'
       - name: plan
-        description: Name of the plan
+        description: '{{ doc("plan") }}'
       - name: prescribing_provider_id
         description: >
-          ID for the provider that wrote the prescription (e.g. priamry care 
-          physician).
+          ID for the provider that wrote the prescription (e.g. priamry care  physician).
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: prescribing_provider_name
         description: Prescribing provider name.
       - name: dispensing_provider_id
         description: >
           ID for the provider that dispensed the prescription (e.g. pharmacy).
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: dispensing_provider_name
         description: Dispensing provider name.
       - name: dispensing_date
@@ -991,7 +1026,8 @@ models:
       - name: ndc_code
         description: National drug code on the claim.
         meta:
-          terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
+          terminology: 
+            https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
       - name: ndc_description
         description: National drug description on the claim.
       - name: quantity
@@ -1006,13 +1042,11 @@ models:
       - name: paid_date
         description: Date the claim was paid.
       - name: paid_amount
-        description: Amount paid by the health insurer for the claim.
+        description: '{{ doc("paid_amount") }}'
       - name: allowed_amount
-        description: >
-          Contractual amount allowed to be paid by the payer + patient.
+        description: '{{ doc("allowed_amount") }}'
       - name: charge_amount
-        description: >
-          The total amount charged on the claim by the provider.
+        description: '{{ doc("charge_amount") }}'
       - name: coinsurance_amount
         description: The total coinsurance charged on the claim by the provider.
       - name: copayment_amount
@@ -1022,19 +1056,14 @@ models:
       - name: in_network_flag
         description: Flag indicating if the claim was in or out of network.
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__practitioner
     description: >
-      The practitioner table contains information on the providers in the 
-      dataset e.g. physicians, physicians assistants, etc.
+      The practitioner table contains information on the providers in the  dataset
+      e.g. physicians, physicians assistants, etc.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1052,12 +1081,15 @@ models:
       - name: npi
         description: NPI for the provider.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: provider_first_name
-        description: First name of the provider.
+        description: '{{ doc("provider_first_name") }}'
       - name: provider_last_name
-        description: Last name of the provider.
+        description: '{{ doc("provider_last_name") }}'
       - name: practice_affiliation
         description: Practice affiliation of the provider.
       - name: specialty
@@ -1065,19 +1097,14 @@ models:
       - name: sub_specialty
         description: Sub specialty of the provider.
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: core__procedure
     description: >
-      The procedure table contains information on procedures that were performed 
-      on patients in the dataset.
+      The procedure table contains information on procedures that were performed  on
+      patients in the dataset.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -1093,76 +1120,92 @@ models:
               config:
                 severity: warn
       - name: encounter_id
-        description: >
-          The encounter_id for the encounter where this procedure was performed.
+        description: '{{ doc("encounter_id") }}'
       - name: claim_id
-        description: The claim on which the procedure was recorded.
+        description: '{{ doc("claim_id") }}'
       - name: patient_id
-        description: Unique identifier for each person across all datasets.
+        description: '{{ doc("patient_id") }}'
       - name: procedure_date
         description: Date when the procedure was performed.
       - name: source_code_type
         description: >
           Type of procedure code for the procedure in the source system.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: source_code
         description: The procedure code in the source system.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: source_description
         description: Description of the procedure code.
       - name: normalized_code_type
         description: Normalized type of procedure code for the procedure.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
       - name: normalized_code
         description: The normalized procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: normalized_description
         description: Description of the procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: mapping_method
-        description: mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
+        description: mapping method used to populate the normalized codes and descriptions.  Can
+          be manual (fields were populated in input layer), automatic (dictionary
+          codes matching the source code were found and was automatically populated)
+          or custom (populated by normalization engine)
       - name: modifier_1
         description: First modifier for the procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: modifier_2
         description: Second modifier for the procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: modifier_3
         description: Third modifier for the procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: modifier_4
         description: Fourth modifier for the procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: modifier_5
         description: Fifth modifier for the procedure code.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
       - name: practitioner_id
         description: ID of the provider who performed the procedure.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+          terminology: 
+            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded
+            as a seed and is instead loaded from public cloud storage for supported
+            adapters."
       - name: data_source
-        description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
+
+        
 ## Staging - Claims
   - name: core__stg_claims_medical_claim
     description: Staging core medical claims
