@@ -5,15 +5,7 @@
 }}
 
 
-{% if var('test_data_override') == true -%}
+
+
 
 select * from {{ ref('provider_attribution_seed') }}
-
-{%- else -%}
-
-select * from {{ source('source_input', 'provider_attribution') }}
-
-{%- endif %}
-
-
-
