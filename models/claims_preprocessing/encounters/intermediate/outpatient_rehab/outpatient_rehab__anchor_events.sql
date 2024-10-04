@@ -11,7 +11,6 @@ with service_category as (
   from {{ ref('encounters__stg_medical_claim') }}
   where
     service_category_2 = 'outpatient rehabilitation'
-    and claim_type = 'institutional'
 )
 
 select distinct 
