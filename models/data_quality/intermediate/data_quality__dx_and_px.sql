@@ -82,15 +82,14 @@ with total_claims as(
     where normalized_code is null
 )
 
-select * from missing_primary_dx
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_primary_dx
 union all
-select * from invalid_primary_dx
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_primary_dx
 union all
-select * from multiple_primary_dx
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from multiple_primary_dx
 union all
-select * from invalid_secondary_dx
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_secondary_dx
 union all
-select data_quality_check, percent_claim_with_secondar_dx from claims_with_secondary_dx
+select data_quality_check, percent_claim_with_secondar_dx, '{{ var('tuva_last_run')}}' as tuva_last_run from claims_with_secondary_dx
 union all
-select * from invalid_procedure
-
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_procedure

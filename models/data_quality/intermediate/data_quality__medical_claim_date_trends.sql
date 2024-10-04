@@ -103,6 +103,7 @@ select
     , med_paid_date.distinct_count as medical_paid_date
     , dispensing_date.distinct_count as dispensing_date
     , pharm_paid_date.distinct_count as pharmacy_paid_date
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_date_range all_date
 left join date_stage member_months
     on all_date.year_month = member_months.year_month
