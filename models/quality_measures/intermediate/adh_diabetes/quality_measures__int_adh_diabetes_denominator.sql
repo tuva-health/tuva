@@ -89,7 +89,7 @@ with diabetics_codes as (
             as days_in_treatment_period
         /*  
             Performance Period end minus dispensing date results in 
-            first_date non-inclusive difference, so to include both of these days
+            second_date non-inclusive difference, so to include both of these days
             1 day is added
         */
     from rx_first_fill

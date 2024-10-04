@@ -314,7 +314,7 @@ with denominator as (
 
     select
           patient_id
-        , adherence
+        , adherence * 100 as adherence --percent conversion
         , evidence_date
         , evidence_value
         , 1 as numerator_flag
