@@ -5,7 +5,7 @@
 }}
 
 
-{% if var('test_data_override') == true -%}
+{% if var('use_synthetic_data') == true -%}
 
 select * from {{ ref('provider_attribution_seed') }}
 
