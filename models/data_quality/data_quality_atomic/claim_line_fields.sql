@@ -40,7 +40,7 @@ group by
 , final as (
 select 
     coalesce(sum(revenue_center_code_missing), 0) AS result
-    , 'revenue_center_code_missing' AS data_quality_check
+    , 'revenue center code missing' AS data_quality_check
 from 
     medical_claim_missing
 
@@ -48,7 +48,7 @@ union all
 
 select 
     coalesce(sum(place_of_service_code_missing), 0) AS result
-    , 'place_of_service_code_missing' AS data_quality_check
+    , 'place of service code missing' AS data_quality_check
 from 
     medical_claim_missing
 
@@ -56,7 +56,7 @@ union all
 
 select 
     coalesce(sum(hcpcs_code_missing), 0) AS result
-    , 'medical_claim_hcpcs_code_missing' AS data_quality_check
+    , 'medical claim hcpcs code missing' AS data_quality_check
 from 
     medical_claim_missing
 
@@ -64,7 +64,7 @@ union all
 
 select 
     coalesce(sum(revenue_center_code_invalid), 0) AS result
-    , 'medical_claim_revenue_center_code_invalid' AS data_quality_check
+    , 'medical claim revenue center code invalid' AS data_quality_check
 from 
     medical_claim_missing
 
@@ -72,7 +72,7 @@ union all
 
 select 
     coalesce(sum(place_of_service_code_invalid), 0) AS result
-    , 'medical_claim_place_of_service_code_invalid' AS data_quality_check
+    , 'medical claim place of service code invalid' AS data_quality_check
 from 
     medical_claim_missing
 
@@ -80,7 +80,7 @@ union all
 
 select 
     coalesce(sum(hcpcs_code_invalid), 0) AS result
-    , 'medical_claim_hcpcs_code_invalid' AS data_quality_check
+    , 'medical claim hcpcs code invalid' AS data_quality_check
 from 
     medical_claim_missing
 

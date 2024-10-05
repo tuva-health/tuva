@@ -83,7 +83,7 @@ from
 union all
 
 select 
-     'medical_claim' as table_name
+     'medical claim' as table_name
     , coalesce(sum(duplicate_count), 0) as duplicate_pk,
 from 
     medical_claim_final
@@ -91,7 +91,7 @@ from
 union all
 
 select 
-    'pharmacy_claim' as table_name
+    'pharmacy claim' as table_name
     , coalesce(sum(duplicate_count), 0) as duplicate_pk
 from 
     pharmacy_claim_final

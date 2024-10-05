@@ -58,7 +58,7 @@ group by
 
 , summary AS (
 select  
-    'multiple_patient_ids' AS data_quality_check
+    'multiple patient ids' AS data_quality_check
     , COALESCE(COUNT(*),0) AS result
 from 
     medical_claim_multiple_patient_ids
@@ -66,7 +66,7 @@ from
 union all
 
 select 
-    'missing_patient_ids' AS data_quality_check
+    'missing patient ids' AS data_quality_check
     , COALESCE(SUM(patient_id_null_sum),0) AS result
 from 
     medical_claim_patient_id_null_sum
@@ -74,7 +74,7 @@ from
 union all
 
 select 
-    'orphaned_claims' AS data_quality_check
+    'orphaned claims' AS data_quality_check
     , COALESCE(SUM(orphaned_claim),0) AS result
 from 
     orphaned_medical_claims_final
