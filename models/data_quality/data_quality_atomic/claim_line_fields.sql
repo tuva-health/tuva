@@ -39,63 +39,56 @@ group by
 
 , final as (
 select 
-    coalesce(sum(revenue_center_code_missing), 0) AS flagged_records
-    , 'medical_claim_revenue_center_code_missing' AS test_name
-    , 'medical_claim' AS test_source 
+    coalesce(sum(revenue_center_code_missing), 0) AS result
+    , 'revenue_center_code_missing' AS data_quality_check
 from 
     medical_claim_missing
 
 union all  
 
 select 
-    coalesce(sum(place_of_service_code_missing), 0) AS flagged_records
-    , 'medical_claim_place_of_service_code_missing' AS test_name
-    , 'medical_claim' AS test_source 
+    coalesce(sum(place_of_service_code_missing), 0) AS result
+    , 'place_of_service_code_missing' AS data_quality_check
 from 
     medical_claim_missing
 
 union all 
 
 select 
-    coalesce(sum(hcpcs_code_missing), 0) AS flagged_records
-    , 'medical_claim_hcpcs_code_missing' AS test_name
-    , 'medical_claim' AS test_source 
+    coalesce(sum(hcpcs_code_missing), 0) AS result
+    , 'medical_claim_hcpcs_code_missing' AS data_quality_check
 from 
     medical_claim_missing
 
 union all 
 
 select 
-    coalesce(sum(revenue_center_code_invalid), 0) AS flagged_records
-    , 'medical_claim_revenue_center_code_invalid' AS test_name
-    , 'medical_claim' AS test_source 
+    coalesce(sum(revenue_center_code_invalid), 0) AS result
+    , 'medical_claim_revenue_center_code_invalid' AS data_quality_check
 from 
     medical_claim_missing
 
 union all 
 
 select 
-    coalesce(sum(place_of_service_code_invalid), 0) AS flagged_records
-    , 'medical_claim_place_of_service_code_invalid' AS test_name
-    , 'medical_claim' AS test_source 
+    coalesce(sum(place_of_service_code_invalid), 0) AS result
+    , 'medical_claim_place_of_service_code_invalid' AS data_quality_check
 from 
     medical_claim_missing
 
 union all 
 
 select 
-    coalesce(sum(hcpcs_code_invalid), 0) AS flagged_records
-    , 'medical_claim_hcpcs_code_invalid' AS test_name
-    , 'medical_claim' AS test_source 
+    coalesce(sum(hcpcs_code_invalid), 0) AS result
+    , 'medical_claim_hcpcs_code_invalid' AS data_quality_check
 from 
     medical_claim_missing
 
 ) 
 
 select 
-    test_name 
-    , test_source
-    , flagged_records
+    data_quality_check
+    , result 
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from 
     final 

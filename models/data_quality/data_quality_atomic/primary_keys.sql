@@ -75,35 +75,31 @@ group by
 , summary as (
 -- Final select to handle each case, including when no rows are returned
 select 
-    'primary_key_duplicate' as test_name
-    , 'eligibility' as test_source
-    , coalesce(sum(duplicate_count), 0) as flagged_records,
+    'eligibility' as table_name
+    , coalesce(sum(duplicate_count), 0) as duplicate_pk,
 from 
     eligibility_pk
 
 union all
 
 select 
-    'primary_key_duplicate' as test_name
-    , 'medical_claim' as test_source
-    , coalesce(sum(duplicate_count), 0) as flagged_records,
+     'medical_claim' as table_name
+    , coalesce(sum(duplicate_count), 0) as duplicate_pk,
 from 
     medical_claim_final
 
 union all
 
 select 
-    'primary_key_duplicate' as test_name
-    , 'pharmacy_claim' as test_source
-    , coalesce(sum(duplicate_count), 0) as flagged_records
+    'pharmacy_claim' as table_name
+    , coalesce(sum(duplicate_count), 0) as duplicate_pk
 from 
     pharmacy_claim_final
 ) 
 
 select  
-    test_name
-    , test_source 
-    , flagged_records
+    table_name 
+    , duplicate_pk
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from  
 summary 

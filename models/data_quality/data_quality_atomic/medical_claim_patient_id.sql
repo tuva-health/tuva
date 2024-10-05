@@ -58,35 +58,31 @@ group by
 
 , summary AS (
 select  
-    'multiple_patient_id' AS test_name
-    , 'medical_claim' AS test_source 
-    , COALESCE(COUNT(*),0) AS flagged_records
+    'multiple_patient_ids' AS data_quality_check
+    , COALESCE(COUNT(*),0) AS result
 from 
     medical_claim_multiple_patient_ids
 
 union all
 
 select 
-    'missing_patient_id' AS test_name
-    , 'medical_claim' AS test_source
-    , COALESCE(SUM(patient_id_null_sum),0) AS flagged_records
+    'missing_patient_ids' AS data_quality_check
+    , COALESCE(SUM(patient_id_null_sum),0) AS result
 from 
     medical_claim_patient_id_null_sum
 
 union all
 
 select 
-    'orphaned_claim' AS test_name
-    , 'medical_claim' AS test_source
-    , COALESCE(SUM(orphaned_claim),0) AS flagged_records
+    'orphaned_claims' AS data_quality_check
+    , COALESCE(SUM(orphaned_claim),0) AS result
 from 
     orphaned_medical_claims_final
 ) 
 
 select  
-    test_name 
-    , test_source 
-    , flagged_records
+    data_quality_check 
+    , result 
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from  
     summary 
