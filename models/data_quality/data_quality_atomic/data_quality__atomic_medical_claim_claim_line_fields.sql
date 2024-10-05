@@ -7,6 +7,14 @@ with missing_medical_claim_fields as (
 select 
     claim_id 
     , claim_line_number
+    {% if target.type == 'fabric' %}
+    , case when revenue_center_code is null then 0 when strlen(revenue_center_code) != 2 then 1 else 0 end as revenue_center_code_invalid 
+    , case when place_of_service_code is null then 0 when strlen(place_of_service_code) != 2 then 1 else 0 end as place_of_service_code_invalid
+    , case when is null then 0 when strlen(hcpcs_code) != 5 then 1 else 0 end as hcpcs_code_invalid 
+    {% else %}
+    , case when revenue_center_code is null then 0 when length(revenue_center_code) != 2 then 1 else 0 end as revenue_center_code_invalid 
+    , case when place_of_service_code is null then 0 when length(place_of_service_code) != 2 then 1 else 0 end as place_of_service_code_invalid
+    , case when is null then 0 when length(hcpcs_code) != 5 then 1 else 0 end as hcpcs_code_invalid 
     , case when revenue_center_code is null then 1 else 0 end as revenue_center_code_missing
     , case when place_of_service_code is null then 1 else 0 end as place_of_service_code_missing 
     , case when hcpcs_code is null then 1 else 0 end as hcpcs_code_missing
@@ -19,7 +27,10 @@ select
     claim_id
     , sum(revenue_center_code_missing) AS revenue_center_code_missing 
     , sum(place_of_service_code_missing) AS place_of_service_code_missing
-    , sum(hcpcs_code_missing) AS hcpcs_code_missing 
+    , sum(hcpcs_code_missing) AS hcpcs_code_missing
+    , sum(revenue_center_code_invalid) AS revenue_center_code_invalid 
+    , sum(place_of_service_code_invalid) AS place_of_service_code_invalid
+    , sum(hcpcs_code_invalid) AS hcpcs_code_invalid  
 from
     missing_medical_claim_fields
 group by 
@@ -51,6 +62,34 @@ select
     , 'medical_claim' AS test_source 
 from 
     medical_claim_missing
+
+union all 
+
+select 
+    coalesce(sum(revenue_center_code_invalid), 0) AS flagged_records
+    , 'medical_claim_revenue_center_code_invalid' AS test_name
+    , 'medical_claim' AS test_source 
+from 
+    medical_claim_missing
+
+union all 
+
+select 
+    coalesce(sum(place_of_service_code_invalid), 0) AS flagged_records
+    , 'medical_claim_place_of_service_code_invalid' AS test_name
+    , 'medical_claim' AS test_source 
+from 
+    medical_claim_missing
+
+union all 
+
+select 
+    coalesce(sum(hcpcs_code_invalid), 0) AS flagged_records
+    , 'medical_claim_hcpcs_code_invalid' AS test_name
+    , 'medical_claim' AS test_source 
+from 
+    medical_claim_missing
+
 ) 
 
 select 
