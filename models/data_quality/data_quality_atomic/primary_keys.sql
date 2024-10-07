@@ -12,7 +12,7 @@ select
     , enrollment_end_date 
     , count(*) as duplicate_eligibility
 from 
-    {{ref('core__eligibility')}}
+    {{ref('eligibility')}}
 group by 
     patient_id
     , member_id 
@@ -38,7 +38,7 @@ select
     claim_id 
     , MAX(claim_line_number) as expected_pks
 from 
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 group by 
     claim_id 
 )
@@ -51,7 +51,7 @@ select
     , data_source
     , count(*) as duplicate_count
 from 
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 group by 
     claim_id
     , claim_line_number
@@ -78,7 +78,7 @@ select
     claim_id 
     , MAX(claim_line_number) as expected_pks
 from 
-    {{ref('core__pharmacy_claim')}} 
+    {{ref('pharmacy_claim')}} 
 group by 
     claim_id 
 )
@@ -91,7 +91,7 @@ select
     , data_source
     , count(*) as duplicate_count
 from 
-    {{ref('core__pharmacy_claim')}} 
+    {{ref('pharmacy_claim')}} 
 group by 
     claim_id
     , claim_line_number

@@ -8,7 +8,7 @@ select
     claim_id 
     , case when patient_id is null then 1 else 0 end as patient_id_null
 from 
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 ) 
 
 , medical_claim_patient_id_null_sum as (
@@ -26,7 +26,7 @@ select
     claim_id
     , count(distinct patient_id) as number_of_patient_ids
 from 
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 group by claim_id
 ) 
 
@@ -45,7 +45,7 @@ select
     , eligibility.member_ID as eligibility_member_ID 
     , case when eligibility.member_id is null then 1 else 0 end as orphaned_claim
 from  
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 left join
     {{ref('core__eligibility')}}
     on medical_claim.member_id = eligibility.member_id

@@ -19,7 +19,7 @@ select
     , case when place_of_service_code is null then 1 else 0 end as place_of_service_code_missing 
     , case when hcpcs_code is null then 1 else 0 end as hcpcs_code_missing
 from 
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 ) 
 
 , medical_claim_missing_or_invald_prep AS (

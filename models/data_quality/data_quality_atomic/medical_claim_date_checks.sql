@@ -15,7 +15,7 @@ select
     , case when (claim_type = 'institutional' and discharge_date is null) then 1 else 0 end as discharge_date_null 
     , case when paid_date is null then 1 else 0 end as paid_date_null
 from 
-    {{ref('core__medical_claim')}}
+    {{ref('medical_claim')}}
 ) 
 
 , medical_claim_null as ( 
@@ -42,7 +42,7 @@ claim_id
         , count(distinct admission_date) as distinct_admission_dates
         , count(distinct discharge_date) as distinct_discharge_dates
     from 
-        {{ref('core__medical_claim')}}
+        {{ref('medical_claim')}}
     group by  
         claim_id
 )
