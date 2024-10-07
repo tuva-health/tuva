@@ -2,7 +2,7 @@
 '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
 {% enddocs %}
 
-{% docs terminology_code_type %}
+{% docs terminology__code_type %}
 https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
 {% enddocs %}
 
