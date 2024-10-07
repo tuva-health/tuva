@@ -40,23 +40,23 @@ models:
   - name: source_code_type
     description: '{{ doc("source_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology__code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: source_code
     description: '{{ doc("source_code") }}'
     meta:
-      terminology: '{{ doc("terminology__icd_10_cm") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: source_description
     description: '{{ doc("source_description") }}'
   - name: normalized_code_type
     description: '{{ doc("normalized_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: normalized_code
     description: '{{ doc("normalized_code") }}'
     meta:
-      terminology: '{{ doc("terminology__icd_10_cm") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: normalized_description
     description: '{{ doc("normalized_description") }}'
   - name: mapping_method
@@ -67,7 +67,7 @@ models:
   - name: present_on_admit_code
     description: '{{ doc("present_on_admit_code") }}'
     meta:
-      terminology: '{{ doc("terminology__present_on_admission") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__present_on_admission.csv
   - name: present_on_admit_description
     description: '{{ doc("present_on_admit_description") }}'
   - name: data_source
@@ -113,21 +113,21 @@ models:
   - name: payer_type
     description: '{{ doc("payer_type") }}'
     meta:
-      terminology: '{{ doc("terminology__payer_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__payer_type.csv
   - name: plan
     description: '{{ doc("plan") }}'
   - name: original_reason_entitlement_code
     description: '{{ doc("original_reason_entitlement_code") }}'
     meta:
-      terminology: '{{ doc("terminology__medicare_orec") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_orec.csv
   - name: dual_status_code
     description: '{{ doc("dual_status_code") }}'
     meta:
-      terminology: '{{ doc("terminology__medicare_dual_eligibility") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_dual_eligibility.csv
   - name: medicare_status_code
     description: '{{ doc("medicare_status_code") }}'
     meta:
-      terminology: '{{ doc("terminology__medicare_status") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__medicare_status.csv
   - name: subscriber_relation
     description: '{{ doc("subscriber_relation") }}'
   - name: data_source
@@ -161,7 +161,7 @@ models:
   - name: encounter_type
     description: '{{ doc("encounter_type") }}'
     meta:
-      terminology: '{{ doc("terminology__encounter_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__encounter_type.csv
   - name: encounter_group
     description: '{{ doc("encounter_group") }}'
   - name: encounter_start_date
@@ -173,19 +173,19 @@ models:
   - name: admit_source_code
     description: '{{ doc("admit_source_code") }}'
     meta:
-      terminology: '{{ doc("terminology__admit_source") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
   - name: admit_source_description
     description: '{{ doc("admit_source_description") }}'
   - name: admit_type_code
     description: '{{ doc("admit_type_code") }}'
     meta:
-      terminology: '{{ doc("terminology__admit_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
   - name: admit_type_description
     description: '{{ doc("admit_type_description") }}'
   - name: discharge_disposition_code
     description: '{{ doc("discharge_disposition_code") }}'
     meta:
-      terminology: '{{ doc("terminology__discharge_disposition") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
   - name: discharge_disposition_description
     description: '{{ doc("discharge_disposition_description") }}'
   - name: observation_flag
@@ -211,24 +211,24 @@ models:
   - name: primary_diagnosis_code_type
     description: '{{ doc("primary_diagnosis_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: primary_diagnosis_code
     description: '{{ doc("primary_diagnosis_code") }}'
     meta:
-      terminology: '{{ doc("terminology__icd_10_cm") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: primary_diagnosis_description
     description: '{{ doc("primary_diagnosis_description") }}'
   - name: ms_drg_code
     description: '{{ doc("ms_drg_code") }}'
     meta:
-      terminology: '{{ doc("terminology__ms_drg") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
   - name: ms_drg_description
     description: '{{ doc("ms_drg_description") }}'
   - name: apr_drg_code
     description: '{{ doc("apr_drg_code") }}'
     meta:
-      terminology: '{{ doc("terminology__apr_drg") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
   - name: apr_drg_description
     description: '{{ doc("apr_drg_description") }}'
   - name: paid_amount
@@ -290,28 +290,28 @@ models:
   - name: source_code_type
     description: '{{ doc("source_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: source_code
     description: '{{ doc("source_code") }}'
     meta:
-      terminology: '{{ doc("terminology__loinc") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: source_description
     description: '{{ doc("source_description") }}'
   - name: source_component
     description: '{{ doc("source_component") }}'
     meta:
-      terminology: '{{ doc("terminology__loinc") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: normalized_code_type
     description: '{{ doc("normalized_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: normalized_code
     description: '{{ doc("normalized_code") }}'
     meta:
-      terminology: '{{ doc("terminology__loinc") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: normalized_description
     description: '{{ doc("normalized_description") }}'
   - name: mapping_method
@@ -319,8 +319,8 @@ models:
   - name: normalized_component
     description: '{{ doc("normalized_component") }}'
     meta:
-      terminology: '{{ doc("terminology__loinc") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: status
     description: '{{ doc("status") }}'
   - name: result
@@ -350,8 +350,8 @@ models:
   - name: ordering_practitioner_id
     description: '{{ doc("ordering_practitioner_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: data_source
     description: '{{ doc("data_source") }}'
   - name: tuva_last_run
@@ -379,8 +379,8 @@ models:
   - name: npi
     description: '{{ doc("npi") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: name
     description: '{{ doc("name") }}'
   - name: facility_type
@@ -439,7 +439,7 @@ models:
   - name: claim_type
     description: '{{ doc("claim_type") }}'
     meta:
-      terminology: '{{ doc("terminology__claim_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__claim_type.csv
   - name: patient_id
     description: '{{ doc("patient_id") }}'
   - name: member_id
@@ -463,57 +463,57 @@ models:
   - name: service_category_1
     description: '{{ doc("service_category_1") }}'
     meta:
-      terminology: '{{ doc("terminology__service_categories") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
   - name: service_category_2
     meta:
-      terminology: '{{ doc("terminology__service_categories") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
     description: '{{ doc("service_category_2") }}'
   - name: admit_source_code
     description: '{{ doc("admit_source_code") }}'
     meta:
-      terminology: '{{ doc("terminology__admit_source") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
   - name: admit_source_description
     description: '{{ doc("admit_source_description") }}'
   - name: admit_type_code
     description: '{{ doc("admit_type_code") }}'
     meta:
-      terminology: '{{ doc("terminology__admit_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
   - name: admit_type_description
     description: '{{ doc("admit_type_description") }}'
   - name: discharge_disposition_code
     description: '{{ doc("discharge_disposition_code") }}'
     meta:
-      terminology: '{{ doc("terminology__discharge_disposition") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
   - name: discharge_disposition_description
     description: '{{ doc("discharge_disposition_description") }}'
   - name: place_of_service_code
     description: '{{ doc("place_of_service_code") }}'
     meta:
-      terminology: '{{ doc("terminology__place_of_service") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__place_of_service.csv
   - name: place_of_service_description
     description: '{{ doc("place_of_service_description") }}'
   - name: bill_type_code
     description: '{{ doc("bill_type_code") }}'
     meta:
-      terminology: '{{ doc("terminology__bill_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__bill_type.csv
   - name: bill_type_description
     description: '{{ doc("bill_type_description") }}'
   - name: ms_drg_code
     description: '{{ doc("ms_drg_code") }}'
     meta:
-      terminology: '{{ doc("terminology__ms_drg") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
   - name: ms_drg_description
     description: '{{ doc("ms_drg_description") }}'
   - name: apr_drg_code
     description: '{{ doc("apr_drg_code") }}'
     meta:
-      terminology: '{{ doc("terminology__apr_drg") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
   - name: apr_drg_description
     description: '{{ doc("apr_drg_description") }}'
   - name: revenue_center_code
     description: '{{ doc("revenue_center_code") }}'
     meta:
-      terminology: '{{ doc("terminology__revenue_center") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__revenue_center.csv
   - name: revenue_center_description
     description: '{{ doc("revenue_center_description") }}'
   - name: service_unit_quantity
@@ -522,32 +522,32 @@ models:
   - name: hcpcs_code
     description: '{{ doc("hcpcs_code") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: hcpcs_modifier_1
     description: '{{ doc("hcpcs_modifier_1") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: hcpcs_modifier_2
     description: '{{ doc("hcpcs_modifier_2") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: hcpcs_modifier_3
     description: '{{ doc("hcpcs_modifier_3") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: hcpcs_modifier_4
     description: '{{ doc("hcpcs_modifier_4") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: hcpcs_modifier_5
     description: '{{ doc("hcpcs_modifier_5") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: rendering_id
     description: '{{ doc("rendering_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: rendering_tin
     description: '{{ doc("rendering_tin") }}'
   - name: rendering_name
@@ -555,8 +555,8 @@ models:
   - name: billing_id
     description: '{{ doc("billing_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: billing_tin
     description: '{{ doc("billing_tin") }}'
   - name: billing_name
@@ -564,8 +564,8 @@ models:
   - name: facility_id
     description: '{{ doc("facility_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: facility_name
     description: '{{ doc("facility_name") }}'
   - name: paid_date
@@ -623,17 +623,17 @@ models:
   - name: source_code_type
     description: '{{ doc("source_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: source_code
     description: '{{ doc("source_code") }}'
     meta:
-      terminology: '{{ doc("terminology__rx_norm") }}'
+      terminology: https://www.nlm.nih.gov/research/umls/rxnorm/index.html
   - name: source_description
     description: '{{ doc("source_description") }}'
   - name: ndc_code
     description: '{{ doc("ndc_code") }}'
     meta:
-      terminology: '{{ doc("terminology__ndc") }}'
+      terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
   - name: ndc_description
     description: '{{ doc("ndc_description") }}'
   - name: ndc_mapping_method
@@ -641,7 +641,7 @@ models:
   - name: rxnorm_code
     description: '{{ doc("rxnorm_code") }}'
     meta:
-      terminology: '{{ doc("terminology__rx_norm") }}'
+      terminology: https://www.nlm.nih.gov/research/umls/rxnorm/index.html
   - name: rxnorm_description
     description: '{{ doc("rxnorm_description") }}'
   - name: rxnorm_mapping_method
@@ -649,7 +649,7 @@ models:
   - name: atc_code
     description: '{{ doc("atc_code") }}'
     meta:
-      terminology: '{{ doc("terminology__atc") }}'
+      terminology: https://www.who.int/tools/atc-ddd-toolkit/atc-classification
   - name: atc_description
     description: '{{ doc("atc_description") }}'
   - name: atc_mapping_method
@@ -667,8 +667,8 @@ models:
   - name: practitioner_id
     description: '{{ doc("practitioner_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: data_source
     description: '{{ doc("data_source") }}'
   - name: tuva_last_run
@@ -731,7 +731,7 @@ models:
   - name: source_code_type
     description: '{{ doc("source_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: source_code
     description: '{{ doc("source_code") }}'
   - name: source_description
@@ -785,11 +785,11 @@ models:
   - name: sex
     description: '{{ doc("sex") }}'
     meta:
-      terminology: '{{ doc("terminology__gender") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
   - name: race
     description: '{{ doc("race") }}'
     meta:
-      terminology: '{{ doc("terminology__race") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
   - name: birth_date
     description: '{{ doc("birth_date") }}'
   - name: death_date
@@ -863,15 +863,15 @@ models:
   - name: prescribing_provider_id
     description: '{{ doc("prescribing_provider_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: prescribing_provider_name
     description: '{{ doc("prescribing_provider_name") }}'
   - name: dispensing_provider_id
     description: '{{ doc("dispensing_provider_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: dispensing_provider_name
     description: '{{ doc("dispensing_provider_name") }}'
   - name: dispensing_date
@@ -879,7 +879,7 @@ models:
   - name: ndc_code
     description: '{{ doc("ndc_code") }}'
     meta:
-      terminology: '{{ doc("terminology__ndc") }}'
+      terminology: https://www.fda.gov/drugs/drug-approvals-and-databases/national-drug-code-directory
   - name: ndc_description
     description: '{{ doc("ndc_description") }}'
   - name: quantity
@@ -934,8 +934,8 @@ models:
   - name: npi
     description: '{{ doc("npi") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: provider_first_name
     description: '{{ doc("provider_first_name") }}'
   - name: provider_last_name
@@ -981,54 +981,54 @@ models:
   - name: source_code_type
     description: '{{ doc("source_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: source_code
     description: '{{ doc("source_code") }}'
     meta:
-      terminology: '{{ doc("terminology__icd_10_pcs") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: source_description
     description: '{{ doc("source_description") }}'
   - name: normalized_code_type
     description: '{{ doc("normalized_code_type") }}'
     meta:
-      terminology: '{{ doc("terminology_code_type") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
   - name: normalized_code
     description: '{{ doc("normalized_code") }}'
     meta:
-      terminology: '{{ doc("terminology__icd_10_pcs") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_pcs.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: normalized_description
     description: '{{ doc("normalized_description") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: mapping_method
     description: '{{ doc("mapping_method") }}'
   - name: modifier_1
     description: '{{ doc("modifier_1") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: modifier_2
     description: '{{ doc("modifier_2") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: modifier_3
     description: '{{ doc("modifier_3") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: modifier_4
     description: '{{ doc("modifier_4") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: modifier_5
     description: '{{ doc("modifier_5") }}'
     meta:
-      terminology: '{{ doc("terminology__hcpcs_level_2") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__hcpcs_level_2.csv
   - name: practitioner_id
     description: '{{ doc("practitioner_id") }}'
     meta:
-      terminology: '{{ doc("terminology__provider") }}'
-      terminology_note: '{{ doc("terminology_note") }}'
+      terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+      terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
   - name: data_source
     description: '{{ doc("data_source") }}'
   - name: tuva_last_run
