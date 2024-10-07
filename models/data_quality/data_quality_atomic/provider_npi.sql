@@ -188,7 +188,7 @@ group by
 , summary as (
 select  
     'invalid billing npis' AS data_quality_check
-    , COALESCE(SUM(billing_npi_invalid_npi),0) AS result
+    , COALESCE(SUM(billing_npi_invalid_npi),0) AS result_count
 from 
     invalid_npi
 
@@ -196,7 +196,7 @@ union all
 
 select  
     'invalid rendering npis' AS data_quality_check
-    , COALESCE(SUM(rendering_npi_invalid_npi),0) AS result
+    , COALESCE(SUM(rendering_npi_invalid_npi),0) AS result_count
 from 
     invalid_npi
 
@@ -204,7 +204,7 @@ union all
 
 select  
     'invalid facility npis' AS data_quality_check
-    , COALESCE(SUM(facility_npi_invalid_npi),0) AS result
+    , COALESCE(SUM(facility_npi_invalid_npi),0) AS result_count
 from 
     invalid_npi
 
@@ -212,7 +212,7 @@ union all
 
 select 
     'missing billing npi' AS data_quality_check
-    , COALESCE(SUM(missing_billing_npi),0) AS result
+    , COALESCE(SUM(missing_billing_npi),0) AS result_count
 from 
     billing_npi_missing_checks
 
@@ -220,7 +220,7 @@ union all
 
 select 
     'multiple billing npi' AS data_quality_check
-    , COALESCE(SUM(multiple_billing_npi),0) AS result
+    , COALESCE(SUM(multiple_billing_npi),0) AS result_count
 from 
     billing_npi_multiple_checks
 
@@ -228,7 +228,7 @@ union all
 
 select 
     'missing rendering npi' AS data_quality_check
-    , COALESCE(SUM(missing_rendering_npi),0) AS result
+    , COALESCE(SUM(missing_rendering_npi),0) AS result_count
 from 
     rendering_npi_missing_checks
 
@@ -236,7 +236,7 @@ union all
 
 select 
     'wrong entity type rendering npi' AS data_quality_check 
-    , COALESCE(SUM(wrong_entity_type_rendering_npi),0) AS result
+    , COALESCE(SUM(wrong_entity_type_rendering_npi),0) AS result_count
 from 
     rendering_npi_entity_type
 
@@ -244,7 +244,7 @@ union all
 
 select 
     'missing facility npi' AS data_quality_check
-    , COALESCE(SUM(missing_facility_npi),0) AS result
+    , COALESCE(SUM(missing_facility_npi),0) AS result_count
 from 
     facility_npi_missing_npi
 
@@ -252,7 +252,7 @@ union all
 
 select 
     'multiple facility npi' AS data_quality_check
-    , COALESCE(SUM(multiple_facility_npi),0) AS result
+    , COALESCE(SUM(multiple_facility_npi),0) AS result_count
 from 
     facility_npi_multiple_checks
 
@@ -260,14 +260,14 @@ union all
 
 select 
     'wrong entity type facility npi' AS data_quality_check
-    , COALESCE(SUM(wrong_entity_type_facility_id),0) AS result
+    , COALESCE(SUM(wrong_entity_type_facility_id),0) AS result_count
 from 
     facility_npi_wrong_entity_type
 ) 
 
 select  
     data_quality_check 
-    , result 
+    , result_count 
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from  
     summary 

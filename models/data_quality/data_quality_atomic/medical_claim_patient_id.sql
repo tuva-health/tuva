@@ -64,7 +64,7 @@ group by
 , summary AS (
 select  
     'multiple patient ids' AS data_quality_check
-    , coalesce(sum(duplicate_patient_ids),0) AS result
+    , coalesce(sum(duplicate_patient_ids),0) AS result_count
 from 
     medical_claim_multiple_patient_ids
 
@@ -72,7 +72,7 @@ union all
 
 select 
     'missing patient ids' AS data_quality_check
-    , coalesce(sum(patient_id_null_sum),0) AS result
+    , coalesce(sum(patient_id_null_sum),0) AS result_count
 from 
     medical_claim_patient_id_null_sum
 
@@ -80,14 +80,14 @@ union all
 
 select 
     'orphaned claims' AS data_quality_check
-    , coalesce(sum(orphaned_claim),0) AS result
+    , coalesce(sum(orphaned_claim),0) AS result_count
 from 
     orphaned_medical_claims_final
 ) 
 
 select  
     data_quality_check 
-    , result 
+    , result_count 
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from  
     summary 

@@ -52,7 +52,7 @@ medical_claim_missing_or_invald_prep
 
 , final as (
 select 
-    coalesce(sum(revenue_center_code_missing), 0) AS result
+    coalesce(sum(revenue_center_code_missing), 0) AS result_count
     , 'medical claim revenue_center_code missing' AS data_quality_check
 from 
     medical_claim_missing_or_invalid
@@ -60,7 +60,7 @@ from
 union all  
 
 select 
-    coalesce(sum(place_of_service_code_missing), 0) AS result
+    coalesce(sum(place_of_service_code_missing), 0) AS result_count
     , 'medical claim place_of_service code missing' AS data_quality_check
 from 
     medical_claim_missing_or_invalid
@@ -68,7 +68,7 @@ from
 union all 
 
 select 
-    coalesce(sum(hcpcs_code_missing), 0) AS result
+    coalesce(sum(hcpcs_code_missing), 0) AS result_count
     , 'medical claim hcpcs_code missing' AS data_quality_check
 from 
     medical_claim_missing_or_invalid
@@ -76,7 +76,7 @@ from
 union all 
 
 select 
-    coalesce(sum(revenue_center_code_invalid), 0) AS result
+    coalesce(sum(revenue_center_code_invalid), 0) AS result_count
     , 'medical claim revenue_center_code invalid' AS data_quality_check
 from 
     medical_claim_missing_or_invalid
@@ -84,7 +84,7 @@ from
 union all 
 
 select 
-    coalesce(sum(place_of_service_code_invalid), 0) AS result
+    coalesce(sum(place_of_service_code_invalid), 0) AS result_count
     , 'medical claim place_of_service code invalid' AS data_quality_check
 from 
     medical_claim_missing_or_invalid
@@ -92,7 +92,7 @@ from
 union all 
 
 select 
-    coalesce(sum(hcpcs_code_invalid), 0) AS result
+    coalesce(sum(hcpcs_code_invalid), 0) AS result_count
     , 'medical claim hcpcs_code invalid' AS data_quality_check
 from 
     medical_claim_missing_or_invalid
@@ -100,7 +100,7 @@ from
 
 select 
     data_quality_check
-    , result 
+    , result_count 
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from 
     final 

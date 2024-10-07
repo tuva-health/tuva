@@ -61,7 +61,7 @@ claim_dates_prep
 , summary as (
 select 
     'missing claim start date' as data_quality_check
-    , coalesce(sum(claim_start_date_null),0) as result
+    , coalesce(sum(claim_start_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -69,7 +69,7 @@ union all
 
 select 
     'missing claim end date' as data_quality_check
-    , coalesce(sum(claim_end_date_null),0) as result
+    , coalesce(sum(claim_end_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -77,7 +77,7 @@ union all
 
 select 
     'missing claim line start date' as data_quality_check
-    , coalesce(sum(claim_line_start_date_null),0) as result
+    , coalesce(sum(claim_line_start_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -85,7 +85,7 @@ union all
 
 select 
     'missing claim line end date' as data_quality_check
-    , coalesce(sum(claim_line_end_date_null),0) as result
+    , coalesce(sum(claim_line_end_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -93,7 +93,7 @@ union all
 
 select 
     'missing admission date' as data_quality_check
-    , coalesce(sum(admission_date_null),0) as result
+    , coalesce(sum(admission_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -101,7 +101,7 @@ union all
 
 select 
     'missing discharge date' as data_quality_check
-    , coalesce(sum(discharge_date_null),0) as result
+    , coalesce(sum(discharge_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -109,7 +109,7 @@ union all
 
 select 
     'missing paid date' as data_quality_check
-    , coalesce(sum(paid_date_null),0) as result
+    , coalesce(sum(paid_date_null),0) as result_count
 from 
     medical_claim_null
 
@@ -117,7 +117,7 @@ union all
 
 select 
     'multiple claim start dates' as data_quality_check
-    , coalesce(count(distinct_claim_start_dates),0) as result
+    , coalesce(count(distinct_claim_start_dates),0) as result_count
 from 
     claim_dates
 where 
@@ -127,7 +127,7 @@ union all
 
 select 
     'multiple claim end dates' as data_quality_check
-    , coalesce(count(distinct_claim_end_dates),0) as result
+    , coalesce(count(distinct_claim_end_dates),0) as result_count
 from 
     claim_dates
 where 
@@ -137,7 +137,7 @@ union all
 
 select 
     'multiple admission dates' as data_quality_check
-    , coalesce(count(distinct_admission_dates),0) as result
+    , coalesce(count(distinct_admission_dates),0) as result_count
 from 
     claim_dates
 where 
@@ -147,7 +147,7 @@ union all
 
 select 
     'multiple discharge dates' as data_quality_check
-    , coalesce(count(distinct_discharge_dates),0) as result
+    , coalesce(count(distinct_discharge_dates),0) as result_count
 from 
     claim_dates
 where 
@@ -156,7 +156,7 @@ where
 
 select  
     data_quality_check
-    , result 
+    , result_count 
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from  
     summary 
