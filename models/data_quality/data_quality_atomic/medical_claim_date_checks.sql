@@ -3,7 +3,7 @@
    )
 }}
 
-with medical_claim_null as (
+with medical_claim_null_prep as (
 select 
     claim_id
     , claim_line_number
@@ -11,14 +11,30 @@ select
     , case when claim_end_date is null then 1 else 0 end as claim_end_date_null 
     , case when claim_line_start_date is null then 1 else 0 end as claim_line_start_date_null
     , case when claim_line_end_date is null then 1 else 0 end as claim_line_end_date_null 
-    , case when admission_date is null then 1 else 0 end as admission_date_null 
-    , case when discharge_date is null then 1 else 0 end as discharge_date_null 
-    , case when paid_date IS NULL THEN 1 ELSE 0 END as paid_date_null
+    , case when (claim_type = 'institutional' and admission_date is null) then 1 else 0 end as admission_date_null 
+    , case when (claim_type = 'institutional' and discharge_date is null) then 1 else 0 end as discharge_date_null 
+    , case when paid_date is null then 1 else 0 end as paid_date_null
 from 
     {{ref('core__medical_claim')}}
 ) 
 
-, claim_dates as (
+, medical_claim_null as ( 
+select 
+claim_id 
+, case when sum(claim_start_date_null) > 0 then 1 else 0 end as claim_start_date_null
+, case when sum(claim_end_date_null) > 0 then 1 else 0 end as claim_end_date_null
+, case when sum(claim_line_start_date_null) > 0 then 1 else 0 end as claim_line_start_date_null
+, case when sum(claim_line_end_date_null) > 0 then 1 else 0 end as claim_line_end_date_null
+, case when sum(admission_date_null) > 0 then 1 else 0 end as admission_date_null
+, case when sum(discharge_date_null) > 0 then 1 else 0 end as discharge_date_null
+, case when sum(paid_date_null) > 0 then 1 else 0 end as paid_date_null
+from 
+medical_claim_null_prep 
+group by 
+claim_id
+) 
+
+, claim_dates_prep as (
     select 
         claim_id
         , count(distinct claim_start_date) as distinct_claim_start_dates
@@ -27,9 +43,20 @@ from
         , count(distinct discharge_date) as distinct_discharge_dates
     from 
         {{ref('core__medical_claim')}}
-    GROUP BY 
+    group by  
         claim_id
 )
+
+, claim_dates as (
+select 
+claim_id
+, case when distinct_claim_start_dates > 1 then 1 else 0 end as distinct_claim_start_dates
+, case when distinct_claim_end_dates > 1 then 1 else 0 end as distinct_claim_end_dates
+, case when distinct_admission_dates > 1 then 1 else 0 end as distinct_admission_dates
+, case when distinct_discharge_dates > 1 then 1 else 0 end as distinct_discharge_dates
+from 
+claim_dates_prep
+) 
 
 , summary as (
 select 
