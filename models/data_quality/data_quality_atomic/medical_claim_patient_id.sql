@@ -14,22 +14,28 @@ from
 , medical_claim_patient_id_null_sum as (
 select 
     claim_id
-    , SUM(patient_id_null) as patient_id_null_sum 
+    , case when sum(patient_id_null) > 0 then 1 else 0 end as patient_id_null_sum 
 from 
     medical_claim_patient_id_null
 group by 
     claim_id 
 )
 
-, medical_claim_multiple_patient_ids as (
+, medical_claim_multiple_patient_ids_prep as (
 select 
     claim_id
     , count(distinct patient_id) as number_of_patient_ids
 from 
     {{ref('core__medical_claim')}}
 group by claim_id
-having 
-    count(distinct patient_id) > 1
+) 
+
+, medical_claim_multiple_patient_ids as (
+select 
+    claim_id 
+    , case when number_of_patient_ids > 1 then 1 else 0 end as duplicate_patient_ids
+from 
+medical_claim_multiple_patient_ids_prep
 ) 
 
 , orphaned_medical_claims as (
@@ -41,7 +47,7 @@ select
 from  
     {{ref('core__medical_claim')}}
 left join
-    eligibility 
+    {{ref('core__eligibility')}}
     on medical_claim.member_id = eligibility.member_id
 ) 
 
@@ -55,11 +61,10 @@ group by
     claim_id
 )
 
-
 , summary AS (
 select  
     'multiple patient ids' AS data_quality_check
-    , COALESCE(COUNT(*),0) AS result
+    , coalesce(sum(duplicate_patient_ids),0) AS result
 from 
     medical_claim_multiple_patient_ids
 
@@ -67,7 +72,7 @@ union all
 
 select 
     'missing patient ids' AS data_quality_check
-    , COALESCE(SUM(patient_id_null_sum),0) AS result
+    , coalesce(sum(patient_id_null_sum),0) AS result
 from 
     medical_claim_patient_id_null_sum
 
@@ -75,7 +80,7 @@ union all
 
 select 
     'orphaned claims' AS data_quality_check
-    , COALESCE(SUM(orphaned_claim),0) AS result
+    , coalesce(sum(orphaned_claim),0) AS result
 from 
     orphaned_medical_claims_final
 ) 
