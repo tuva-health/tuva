@@ -64,7 +64,7 @@ with total_claims as(
             where condition_rank = 1
             group by
                 claim_id
-            )
+            )x
     where row_nbr > 1
 
 )
