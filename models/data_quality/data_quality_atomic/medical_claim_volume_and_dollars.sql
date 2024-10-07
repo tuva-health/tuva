@@ -17,7 +17,7 @@ with month_start_and_end_dates as (
 , final as (
 select 
     year_month
-    , count(claim_id) AS claim_volume
+    , count(distinct claim_id) AS claim_volume
     , sum(round(paid_amount, 2)) AS paid_amount
 from {{ref('medical_claim')}} a
 inner join 
