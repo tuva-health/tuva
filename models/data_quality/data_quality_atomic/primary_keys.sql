@@ -3,80 +3,120 @@
    )
 }}
 
-with eligibility_pk as ( 
+with eligibility_pk_prep as ( 
 /*Eligibility PK test*/
 select 
     patient_id 
     , member_id
     , enrollment_start_date
     , enrollment_end_date 
-    , count(*) as duplicate_count
+    , count(*) as duplicate_eligibility
 from 
-    {{ref('eligibility')}}
+    {{ref('core__eligibility')}}
 group by 
     patient_id
     , member_id 
     , enrollment_start_date 
     , enrollment_end_date
-having 
-    count(*) > 1
 ) 
 
-, medical_claim_pk as (
-/*Medical Claim PK test*/
+, eligibility_pk as (
 select 
-    claim_id
-    , claim_line_number
-    , count(*) as duplicate_count
+    patient_id 
+    , member_id
+    , enrollment_start_date
+    , enrollment_end_date 
+    , duplicate_eligibility 
 from 
-    {{ref('medical_claim')}}
-group by 
-    claim_id
-    , claim_line_number
-having 
-    count(*) > 1
+    eligibility_pk_prep
+where 
+    duplicate_eligibility > 1 
 ) 
 
-, medical_claim_final as (
+, medical_claim_expected_pk as (
 select 
-    claim_id
-    , SUM(duplicate_count) AS duplicate_count
+    claim_id 
+    , MAX(claim_line_number) as expected_pks
 from 
-    medical_claim_pk 
+    {{ref('core__medical_claim')}}
 group by 
     claim_id 
 )
 
-, Pharmacy_Claim_PK as (
-/*Pharmacy Claim PK test*/
+, medical_claim_pk_prep as (
+/*Medical Claim PK test*/
 select 
     claim_id
     , claim_line_number
-    , count(*) AS duplicate_count
+    , data_source
+    , count(*) as duplicate_count
 from 
-    {{ref('pharmacy_claim')}}
+    {{ref('core__medical_claim')}}
 group by 
     claim_id
     , claim_line_number
-having 
-    count(*) > 1
+    , data_source
 ) 
+
+, medical_claim_final as (
+select 
+    medical_claim_pk_prep.claim_id
+    , case when sum(medical_claim_pk_prep.duplicate_count) > medical_claim_expected_pk.expected_pks then 1 else 0 end as duplicate_medical_claim_pks
+from 
+    medical_claim_pk_prep 
+    inner join 
+    medical_claim_expected_pk 
+    on medical_claim_pk_prep.claim_id = medical_claim_expected_pk.claim_id 
+group by 
+    medical_claim_pk_prep.claim_id 
+    , medical_claim_expected_pk.expected_pks
+)
+
+
+, pharmacy_claim_expected_pk as (
+select 
+    claim_id 
+    , MAX(claim_line_number) as expected_pks
+from 
+    {{ref('core__pharmacy_claim')}} 
+group by 
+    claim_id 
+)
+
+, pharmacy_claim_pk_prep as (
+/*Medical Claim PK test*/
+select 
+    claim_id
+    , claim_line_number
+    , data_source
+    , count(*) as duplicate_count
+from 
+    {{ref('core__pharmacy_claim')}} 
+group by 
+    claim_id
+    , claim_line_number
+    , data_source
+)
 
 , pharmacy_claim_final as (
 select 
-    claim_id
-    , SUM(duplicate_count) as duplicate_count
+    pharmacy_claim_pk_prep.claim_id
+    , case when sum(pharmacy_claim_pk_prep.duplicate_count) > pharmacy_claim_expected_pk.expected_pks then 1 else 0 end as duplicate_pharmacy_claim_pks
 from 
-    pharmacy_claim_pk
+    pharmacy_claim_pk_prep 
+    inner join 
+    pharmacy_claim_expected_pk 
+    on pharmacy_claim_pk_prep.claim_id = pharmacy_claim_expected_pk.claim_id 
 group by 
-    claim_id 
+    pharmacy_claim_pk_prep.claim_id 
+    , pharmacy_claim_expected_pk.expected_pks
 )
 
 , summary as (
 -- Final select to handle each case, including when no rows are returned
 select 
     'eligibility' as table_name
-    , coalesce(sum(duplicate_count), 0) as duplicate_pk,
+    , coalesce(sum(duplicate_eligibility), 0) as duplicate_pk,
 from 
     eligibility_pk
 
@@ -84,7 +124,7 @@ union all
 
 select 
      'medical claim' as table_name
-    , coalesce(sum(duplicate_count), 0) as duplicate_pk,
+    , coalesce(sum(duplicate_medical_claim_pks), 0) as duplicate_pk,
 from 
     medical_claim_final
 
@@ -92,7 +132,7 @@ union all
 
 select 
     'pharmacy claim' as table_name
-    , coalesce(sum(duplicate_count), 0) as duplicate_pk
+    , coalesce(sum(duplicate_pharmacy_claim_pks), 0) as duplicate_pk
 from 
     pharmacy_claim_final
 ) 
