@@ -71,7 +71,11 @@ with denominator as (
         , ndc_code
         , dispensing_date
         , days_supply
-        , sum(med_change_flag) over (partition by patient_id order by dr) as group_id
+        , sum(med_change_flag) over (
+              partition by patient_id 
+              order by dr 
+              rows between unbounded preceding and current row
+          ) as group_id
     from grouped_meds
 
 )
