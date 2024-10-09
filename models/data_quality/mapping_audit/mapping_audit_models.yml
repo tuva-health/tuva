@@ -1,0 +1,335 @@
+version: 2
+models:
+#### Mart review
+## Final
+
+
+- name: mapping_audit__final_table
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__final_table
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_grain_final
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_grain_final
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_claim_grain_final
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_claim_grain_final
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_line_number
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_line_number
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_type
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_member_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_member_id
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_plan
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_plan
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_start_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_start_date
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_end_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_end_date
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_line_start_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_line_start_date
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_claim_line_end_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_claim_line_end_date
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_admission_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_admission_date
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_discharge_date
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_discharge_date
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_discharge_disposition_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_discharge_disposition_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_place_of_service_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_place_of_service_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_bill_type_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_bill_type_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_ms_drg_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_ms_drg_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_apr_drg_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_apr_drg_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_revenue_center_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_revenue_center_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_diagnosis_code_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_diagnosis_code_type
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_diagnosis_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_diagnosis_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_procedure_code_type
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_procedure_code_type
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_procedure_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_procedure_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__mc_data_source
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__mc_data_source
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_claim_line_number
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_claim_line_number
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_member_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_member_id
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_plan
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_plan
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_ndc_code
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_ndc_code
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_quantity
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_quantity
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_days_supply
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_days_supply
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_refills
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_refills
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_in_network_flag
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_in_network_flag
+    tags:
+      - mapping_audit
+    materialized: table
+
+- name: mapping_audit__pc_data_source
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mapping_audit__pc_data_source
+    tags:
+      - mapping_audit
+    materialized: table
