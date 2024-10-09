@@ -1,0 +1,34 @@
+{{ config(
+     enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
+   )
+}}
+
+with medical as  (
+select claim_id
+,count(distinct p.patient_id) as patient_id_count
+,max(case when p.patient_id is null then 1 else 0 end) as missing_patient_id
+,max(case when e.month_start_date is null then 1 else 0 end) missing_eligibility
+from {{ ref('medical_claim')}} p 
+left join {{ ref('data_quality__dq_eligibility_stage')}} e on p.patient_id = e.patient_id
+and
+p.paid_date between e.month_start_date and e.month_end_Date
+group by claim_id
+)
+
+select
+'multiple patient_ids' as data_quality_check
+,sum(case when patient_id_count > 1 then 1 else 0 end) as result_count
+from medical
+
+union all
+
+select
+'missing patient_id' as data_quality_check
+,sum(missing_patient_id) as result_count
+from medical
+
+union all 
+
+select 'orphaned claims' as data_quality_check
+,sum(missing_eligibility) as result_count
+from medical

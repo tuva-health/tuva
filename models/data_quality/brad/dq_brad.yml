@@ -1,0 +1,176 @@
+version: 2
+models:
+
+#### Data Quality
+
+- name: data_quality__dq_pharmacy_patient
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_pharmacy_claim_date_checks
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_pharmacy_claim_date_trends
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_pharmacy_claim_ndc
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_pharmacy_claim_prescription_details
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_pharmacy_claim_npi
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_pharmacy_claim_trended_claim_volume_and_dollars
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_primary_keys
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_medical_claim_patient_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_medical_claim_date_checks
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_medical_claim_inst_header_fields
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_medical_claim_claim_line_fields
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_medical_claim_provider_npi
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_medical_claim_volume_and_dollars
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_data_loss
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_core_populated
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+- name: data_quality__dq_analytics_populated
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: table
+
+#### stage
+- name: data_quality__dq_eligibility_stage
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: view
+
+- name: data_quality__dq_inpatient_stage
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    tags:
+      - data_quality_new
+    materialized: view
