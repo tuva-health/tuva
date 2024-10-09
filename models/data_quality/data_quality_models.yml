@@ -3,21 +3,6 @@ models:
 
 #### Data Quality
 ## Final
-- name: data_quality__eligibility_patient_id
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: eligibility_patient_id
-    tags:
-      - data_quality
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-    - name: result_count
-      description: The number of rows in the input layer that match the data quality check criteria
-
 - name: data_quality__eligibility_basic_dates
   config:
     schema: |
@@ -33,6 +18,35 @@ models:
     - name: result_count
       description: The number of rows in the input layer that match the data quality check criteria
 
+- name: data_quality__eligibility_demographics
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: eligibility_demographics
+    tags:
+      - data_quality
+    materialized: table
+  columns:
+    - name: data_quality_check
+      description: The name of the data quality check
+    - name: result_count
+      description: The number of rows in the input layer that match the data quality check criteria
+
+- name: data_quality__eligibility_missing_patient_id
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: eligibility_missing_patient_id
+    tags:
+      - data_quality
+    materialized: table
+  columns:
+    - name: data_quality_check
+      description: The name of the data quality check
+    - name: result_count
+      description: The number of rows in the input layer that match the data quality check criteria
 
 - name: data_quality__crosswalk_field_to_mart_sk
   config:
