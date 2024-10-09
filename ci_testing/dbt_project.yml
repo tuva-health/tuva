@@ -72,4 +72,4 @@ seeds:
     pharmacy_claim_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','pharmacy_claim.csv',headers=true) }}"
     provider_attribution_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/tuva_synthetic_data','provider_attribution.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','provider_attribution.csv',headers=true) }}"
