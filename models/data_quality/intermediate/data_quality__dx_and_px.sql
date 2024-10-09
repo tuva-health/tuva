@@ -271,7 +271,7 @@ with unpivot_diagnosis as(
 )
 , claims_with_primary_dx as(
     select
-        count(diagnosis_code_1)
+        count(diagnosis_code_1) as distinct_claims_with_primary
     from {{ ref('medical_claim') }}
 )
 
@@ -279,13 +279,13 @@ with unpivot_diagnosis as(
     select
     total_claims
     , cast(secondary_dx_claim_count as integer ) as secondary_dx_claim_count
-    , (cast(secondary_dx_claim_count as integer ) / cast(total_claims as integer )) * 100 as percent_claim_with_secondar_dx
+    , (cast(secondary_dx_claim_count as integer ) / cast(total_claims as integer )) * 100 as result_count
     , 'Percent of claims with secondary diagnosis' as data_quality_check
     from
     (
     select
         tc.total_claims
-        , cast(count(*) as integer ) as secondary_dx_claim_count
+        , cast(count(*) as integer) as secondary_dx_claim_count
     from unpivot_diagnosis
     cross join total_claims tc
     where diagnosis_column <> 'DIAGNOSIS_CODE_1'
@@ -295,14 +295,14 @@ with unpivot_diagnosis as(
 , missing_primary_dx as (
     select
         'missing primary diagnosis' as data_quality_check
-        , cast(count(distinct claim_id) as integer ) as missing_primary_dx_count
+        , cast(count(distinct claim_id) as integer ) as result_count
     from {{ ref('medical_claim') }} m
     where diagnosis_code_1 is null
 )
 , invalid_primary_dx as(
     select
         data_quality_check
-        , count(distinct claim_id) as invalid_primary_dx_count
+        , count(distinct claim_id) as result_count
     from (
     select
         'invalid primary diagnosis' as data_quality_check
@@ -333,7 +333,7 @@ with unpivot_diagnosis as(
 
     select
         'multiple primary diagnosis' as data_quality_check
-        , cast(count(*) as integer ) as multiple_primary_dx_count
+        , cast(count(*) as integer ) as result_count
     from
         (
             select
@@ -350,7 +350,7 @@ with unpivot_diagnosis as(
 , invalid_secondary_dx as(
     select
         data_quality_check
-        , count(*) as invalid_secondary_dx_count
+        , count(*) as result_count
     from (
     select
         'invalid secondary diagnosis' as data_quality_check
@@ -376,7 +376,7 @@ with unpivot_diagnosis as(
 , invalid_procedure as(
     select
         data_quality_check
-        , count(*) as invalid_px_count
+        , count(*) as result_count
     from (
     select
         'invalid procedure' as data_quality_check
@@ -406,6 +406,6 @@ select *, '{{ var('tuva_last_run')}}' as tuva_last_run from multiple_primary_dx
 union all
 select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_secondary_dx
 union all
-select data_quality_check, percent_claim_with_secondar_dx, '{{ var('tuva_last_run')}}' as tuva_last_run from claims_with_secondary_dx
+select data_quality_check, result_count, '{{ var('tuva_last_run')}}' as tuva_last_run from claims_with_secondary_dx
 union all
 select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_procedure
