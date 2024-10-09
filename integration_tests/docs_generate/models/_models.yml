@@ -785,6 +785,65 @@ models:
           The date and time the source file was ingested into the data warehouse or
           landed in cloud storage
 
+
+  - name: provider_attribution
+    config:
+      database: tuva
+      schema: input_layer
+      tags: input_layer
+      materialized: table
+    description: >
+      The provider_attribution table assigns a provider to each patient-member_month
+      of eligibility. The user may assign both a payer attributed provider (as
+      typically assigned by the payer in VBC contracts) as well as custom
+      attributed provider (typically determined by the user).
+      Fields related to each attributed provider (practice, organization,
+      line of business)are also present.
+    columns:
+      - name: patient_id
+        description: Unique identifier for each patient in the dataset.
+      - name: year_month
+        description: >
+          Unique year-month of in the dataset as a 6 character string (yyyymm, e.g. 202401).
+      - name: payer
+        description: Name of the payer (i.e. health insurer) providing coverage.
+      - name: plan
+        description: Name of the plan
+      - name: payer_attributed_provider
+        description: >
+          Unique identifier for the provider assigned to this patient-year_month
+          by the payer.
+      - name: payer_attributed_provider_practice
+        description: >
+          Name of the practice for the payer attributed provider.
+      - name: payer_attributed_provider_organization
+        description: >
+          Name of the organization for the payer attributed provider.
+      - name: payer_attributed_provider_lob
+        description: >
+          Name of the line of business for the payer attributed provider
+          (e.g. medicare, medicaid, commercial).
+      - name: custom_attributed_provider
+        description: >
+          Unique identifier for the provider assigned to this patient-year_month
+          by the user.
+      - name: custom_attributed_provider_practice
+        description: >
+          Name of the practice for the attributed provider assigned by the user.
+      - name: custom_attributed_provider_organization
+        description: >
+          Name of the organization for the attributed provider assigned by the user.
+      - name: custom_attributed_provider_lob
+        description: >
+          Name of the line of business for the attributed provider assigned by the user
+          (e.g. medicare, medicaid, commercial).
+      - name: data_source
+        description: >
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
+
+
+
 # Clinical input
   - name: condition
     config:

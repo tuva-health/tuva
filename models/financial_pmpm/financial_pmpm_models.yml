@@ -33,6 +33,34 @@ models:
         description: >
           User-configured field that indicates the data source (e.g. typically 
           named after the payer and state "BCBS Tennessee").
+      - name: payer_attributed_provider
+        description: >
+          Unique identifier for the provider assigned to this patient-year_month
+          by the payer.
+      - name: payer_attributed_provider_practice
+        description: >
+          Name of the practice for the payer attributed provider.
+      - name: payer_attributed_provider_organization
+        description: >
+          Name of the organization for the payer attributed provider.
+      - name: payer_attributed_provider_lob
+        description: >
+          Name of the line of business for the payer attributed provider
+          (e.g. medicare, medicaid, commercial).
+      - name: custom_attributed_provider
+        description: >
+          Unique identifier for the provider assigned to this patient-year_month
+          by the user.
+      - name: custom_attributed_provider_practice
+        description: >
+          Name of the practice for the attributed provider assigned by the user.
+      - name: custom_attributed_provider_organization
+        description: >
+          Name of the organization for the attributed provider assigned by the user.
+      - name: custom_attributed_provider_lob
+        description: >
+          Name of the line of business for the attributed provider assigned by the user
+          (e.g. medicare, medicaid, commercial).
       - name: inpatient_paid
         description: Total inpatient paid amount per member per month (PMPM).
       - name: outpatient_paid
@@ -474,6 +502,11 @@ models:
       materialized: ephemeral
 
   - name: financial_pmpm__stg_pharmacy_claim
+    config:
+      tags: financial_pmpm
+      materialized: ephemeral
+
+  - name: financial_pmpm__stg_provider_attribution
     config:
       tags: financial_pmpm
       materialized: ephemeral

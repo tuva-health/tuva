@@ -10,6 +10,14 @@ with combine as (
     , a.payer
     , a.{{ quote_column('plan') }}
     , a.data_source
+    , a.payer_attributed_provider
+    , a.payer_attributed_provider_practice
+    , a.payer_attributed_provider_organization
+    , a.payer_attributed_provider_lob
+    , a.custom_attributed_provider
+    , a.custom_attributed_provider_practice
+    , a.custom_attributed_provider_organization
+    , a.custom_attributed_provider_lob
 
     -- service cat 1 paid
     , coalesce(b.inpatient_paid, 0) as inpatient_paid
