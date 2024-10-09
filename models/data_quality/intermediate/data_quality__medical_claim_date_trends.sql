@@ -16,7 +16,7 @@ with date_stage as(
             , cast({{ date_part("year", "claim_start_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "claim_start_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__medical_claim') }}
+        from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "claim_start_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "claim_start_date") }} as {{ dbt.type_string() }})
@@ -35,7 +35,7 @@ with date_stage as(
             , cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__medical_claim') }}
+        from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }})
@@ -54,7 +54,7 @@ with date_stage as(
             , cast({{ date_part("year", "admission_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "admission_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__medical_claim') }}
+        from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "admission_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "admission_date") }} as {{ dbt.type_string() }})
@@ -73,7 +73,7 @@ with date_stage as(
             , cast({{ date_part("year", "discharge_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "discharge_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__medical_claim') }}
+        from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "discharge_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "discharge_date") }} as {{ dbt.type_string() }})
@@ -92,7 +92,7 @@ with date_stage as(
             , cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__medical_claim') }}
+        from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }})
@@ -111,7 +111,7 @@ with date_stage as(
             , cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__pharmacy_claim') }}
+        from {{ ref('pharmacy_claim') }}
         group by
             cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }})
@@ -130,21 +130,12 @@ with date_stage as(
             , cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as distinct_count
-        from {{ ref('core__pharmacy_claim') }}
+        from {{ ref('pharmacy_claim') }}
         group by
             cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }})
     )x
 
-    union all
-
-    select
-        'member_months' as date_field
-        , year_month
-        , count(*) as distinct_count
-    from {{ ref('core__member_months') }}
-    group by
-        year_month
 )
 
 
@@ -159,7 +150,6 @@ with date_stage as(
 
 select
     cast(all_date.year_month as {{ dbt.type_int() }} ) as year_month
-    , member_months.distinct_count as member_months
     , claim_start.distinct_count as claim_start_date
     , claim_end.distinct_count as claim_end_date
     , admission_date.distinct_count as admission_date
@@ -169,9 +159,6 @@ select
     , pharm_paid_date.distinct_count as pharmacy_paid_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_date_range all_date
-left join date_stage member_months
-    on all_date.year_month = member_months.year_month
-    and member_months.date_field = 'member_months'
 left join date_stage claim_start
     on all_date.year_month = claim_start.year_month
     and claim_start.date_field = 'claim_start_date'
