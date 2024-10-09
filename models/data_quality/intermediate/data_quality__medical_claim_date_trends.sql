@@ -8,14 +8,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , distinct_count as result
+        , result_count
     from
     (
         select
             'claim_start_date' as date_field
             , cast({{ date_part("year", "claim_start_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "claim_start_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "claim_start_date") }} as {{ dbt.type_string() }})
@@ -27,14 +27,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , result
+        , result_count
     from
     (
         select
             'claim_end_date' as date_field
             , cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }})
@@ -46,14 +46,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , result
+        , result_count
     from
     (
         select
             'admission_date' as date_field
             , cast({{ date_part("year", "admission_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "admission_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "admission_date") }} as {{ dbt.type_string() }})
@@ -65,14 +65,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , result
+        , result_count
     from
     (
         select
             'discharge_date' as date_field
             , cast({{ date_part("year", "discharge_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "discharge_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "discharge_date") }} as {{ dbt.type_string() }})
@@ -84,14 +84,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , result
+        , result_count
     from
     (
         select
             'medical paid_date' as date_field
             , cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('medical_claim') }}
         group by
             cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }})
@@ -103,14 +103,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , result
+        , result_count
     from
     (
         select
             'dispensing_date' as date_field
             , cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('pharmacy_claim') }}
         group by
             cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }})
@@ -122,14 +122,14 @@ with date_stage as(
     select
         date_field
         , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
-        , result
+        , result_count
     from
     (
         select
             'pharmacy paid_date' as date_field
             , cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }}) as month
-            , count(distinct claim_id) as result
+            , count(distinct claim_id) as result_count
         from {{ ref('pharmacy_claim') }}
         group by
             cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }})
@@ -150,13 +150,13 @@ with date_stage as(
 
 select
     cast(all_date.year_month as {{ dbt.type_int() }} ) as year_month
-    , claim_start.result as claim_start_date
-    , claim_end.result as claim_end_date
-    , admission_date.result as admission_date
-    , discharge_date.result as discharge_date
-    , med_paid_date.result as medical_paid_date
-    , dispensing_date.result as dispensing_date
-    , pharm_paid_date.result as pharmacy_paid_date
+    , claim_start.result_count as claim_start_date
+    , claim_end.result_count as claim_end_date
+    , admission_date.result_count as admission_date
+    , discharge_date.result_count as discharge_date
+    , med_paid_date.result_count as medical_paid_date
+    , dispensing_date.result_count as dispensing_date
+    , pharm_paid_date.result_count as pharmacy_paid_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_date_range all_date
 left join date_stage claim_start
