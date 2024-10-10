@@ -71,7 +71,11 @@ The below 3 cte identifies periods of continuous medication use for each patient
         , ndc_code
         , dispensing_date
         , days_supply
-        , sum(med_change_flag) over (partition by patient_id order by dense_rank) as group_id
+        , sum(med_change_flag) over (
+              partition by patient_id 
+              order by dense_rank 
+              rows between unbounded preceding and current row
+          ) as group_id
     from grouped_meds
 
 )
