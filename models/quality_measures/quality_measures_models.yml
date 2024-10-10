@@ -182,6 +182,10 @@ models:
         description: >
           Performance flag for NQF0420, Pain Assessment and Follow-Up. 
           A null indicates that the measure was not applicable for the patient.
+      - name: adh_diabetes
+        description: >
+          Performance flag for ADH-Diabetes, Medication Adherence for Diabetes Medications. 
+          A null indicates that the measure was not applicable for the patient.
       - name: adh_ras
         description: >
           Performance flag for ADH-RAS, Medication Adherence for Hypertension. 
@@ -2448,38 +2452,40 @@ models:
           particular outcome has been achieved.
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
-        
-### Medication Adherence for Hypertension
-  - name: quality_measures__int_adhras__performance_period
+
+### Medication Adherence for Diabetes Medications
+  - name: quality_measures__int_adh_diabetes__performance_period
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras__performance_period
+      alias: _int_adh_diabetes__performance_period
       tags: quality_measures
       materialized: view
     description: >
-      Performance Period definition for Medication Adherence for Hypertension
+      Performance Period definition for Medication Adherence for Diabetes Medications.
 
-  - name: quality_measures__int_adhras_denominator
+  - name: quality_measures__int_adh_diabetes_denominator
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_denominator
+      alias: _int_adh_diabetes_denominator
       tags: quality_measures
       materialized: table
     description: >
-      Denominator logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
+      Denominator logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
+      - name: age
+        description: Patient's age during latest encounter in the performance period.
       - name: dispensing_date
         description: Date the prescription was filled.
-      - name: first_dispensing_date
-        description: Date the first prescription was filled.
-      - name: days_supply
-        description: Number of days supply.
       - name: ndc_code
         description: National drug code on the claim.
+      - name: days_supply
+        description: Number of days the filled medication lasts for.
+      - name: days_in_treatment_period
+        description: Number of days from first dispensing_date to performance_period_end in the performance or measurement period.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -2497,15 +2503,15 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  - name: quality_measures__int_adhras_exclusions
+  - name: quality_measures__int_adh_diabetes_exclusions
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_exclusions
+      alias: _int_adh_diabetes_exclusions
       tags: quality_measures
       materialized: table
     description: >
-      Combined exclusion logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
+      Combined exclusion logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
@@ -2524,15 +2530,15 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  - name: quality_measures__int_adhras_long
+  - name: quality_measures__int_adh_diabetes_long
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_long
+      alias: _int_adh_diabetes_long
       tags: quality_measures
       materialized: table
     description: >
-      Final preparation of the reporting version of ADH-RAS, Medication Adherence for Hypertension before combining with other measures.
+      Final preparation of the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications before combining with other measures.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
@@ -2576,15 +2582,15 @@ models:
       - name: tuva_last_run
         description: The date and timestamp of the dbt run.
 
-  - name: quality_measures__int_adhras_numerator
+  - name: quality_measures__int_adh_diabetes_numerator
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_numerator
+      alias: _int_adh_diabetes_numerator
       tags: quality_measures
       materialized: table
     description: >
-      Numerator logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
+      Numerator logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
     columns:
       - name: patient_id
         description: Unique patient_id for each person.
@@ -2596,7 +2602,7 @@ models:
           Observed evidence value for the patients in the numerator.
       - name: adherence
         description: >
-          The extent to which a person's behaviour corresponds with taking a medicine optimally.
+          The degree to which the person behaviour corresponds with taking a medicine optimally in percentage.
       - name: numerator_flag
         description: >
           The numerator reflects the subset of patients in the denominator 
@@ -2776,6 +2782,7 @@ models:
       - name: patient_id
       - name: dispensing_date
       - name: ndc_code
+      - name: days_supply
       - name: paid_date
       - name: days_supply
       - name: tuva_last_run

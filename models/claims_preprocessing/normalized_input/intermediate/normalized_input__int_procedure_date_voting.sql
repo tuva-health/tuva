@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -10,7 +11,7 @@ with distinct_count as(
         , procedure_column
         , count(*) as distinct_count
         , '{{ var('tuva_last_run')}}' as tuva_last_run
-    from {{ ref('normalized_input__int_procedure_code_normalize') }}
+    from {{ ref('normalized_input__int_procedure_date_normalize') }}
     group by
         claim_id
         , data_source
