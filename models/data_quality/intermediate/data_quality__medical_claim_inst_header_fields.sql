@@ -28,6 +28,7 @@ with inst_header as (
     group by m.claim_id
 )
 
+,final as (
 select 'invalid bill_type_code' as data_quality_check,
        sum(invalid_bill_type_code) as result_count
 from inst_header
@@ -101,3 +102,8 @@ select 'discharge_disposition_code multiple' as data_quality_check,
        count(distinct claim_id) as result_count
 from inst_header
 where discharge_disposition_code_count > 1
+)
+
+select *
+, '{{ var('tuva_last_run') }}' as tuva_last_run
+from final

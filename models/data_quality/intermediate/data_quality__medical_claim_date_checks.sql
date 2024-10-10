@@ -21,6 +21,7 @@ with medical_claim as (
     group by m.claim_id
 )
 
+,final as (
 select 'missing claim_start_date' as data_quality_check,
        sum(missing_claim_start_date) as result_count
 from medical_claim
@@ -88,3 +89,8 @@ select 'discharge date multiple' as data_quality_check,
        count(distinct claim_id) as result_count
 from medical_claim
 where discharge_date_count > 1
+)
+
+select *
+, '{{ var('tuva_last_run') }}' as tuva_last_run
+from final

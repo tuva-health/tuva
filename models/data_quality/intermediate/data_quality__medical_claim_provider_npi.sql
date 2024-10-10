@@ -32,6 +32,7 @@ with medical_claim as (
         m.claim_id
 )
 
+,final as (
 select
     'invalid rendering_npi' as data_quality_check
   , sum(invalid_rendering_npi) as result_count
@@ -109,3 +110,7 @@ select
   , count(distinct claim_id) as result_count
 from medical_claim
 where facility_npi_count > 1
+)
+
+select *
+from final
