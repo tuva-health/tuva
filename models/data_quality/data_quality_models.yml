@@ -3,12 +3,12 @@ models:
 
 #### Data Quality
 ## Final
-- name: data_quality__eligibility_basic_dates
+- name: data_quality__eligibility_date_checks
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: eligibility_basic_dates
+    alias: eligibility_date_checks
     tags:
       - data_quality
     materialized: table
