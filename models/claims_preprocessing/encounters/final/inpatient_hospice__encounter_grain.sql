@@ -87,12 +87,7 @@ group by encounter_id
 
 )
 
---bring in all service categories regardless of prioritization
-, service_category_ranking as (
-  select *
-  from {{ ref('service_category__service_category_grouper') }}
-  where service_category_2 in ('observation','emergency department','lab','ambulance','durable medical equipment','pharmacy')
-)
+
 
 , service_category_flags as (
     select distinct
@@ -104,7 +99,7 @@ group by encounter_id
        ,max(case when scr.service_category_2 = 'emergency department' then 1 else 0 end) as ed_flag
        ,max(case when scr.service_category_2 = 'pharmacy' then 1 else 0 end) as pharmacy_flag
     from detail_values d
-    left join service_category_ranking scr on d.claim_id = scr.claim_id 
+    left join {{ ref('service_category__service_category_grouper') }} scr on d.claim_id = scr.claim_id 
     and
     scr.claim_line_number = d.claim_line_number
     group by d.encounter_id
