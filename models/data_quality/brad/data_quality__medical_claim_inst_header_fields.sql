@@ -20,7 +20,7 @@ with inst_header as (
            count(distinct case when d.claim_id is not null then m.ms_drg_code  else null end) as ms_drg_code_count,
            count(distinct case when d.claim_id is not null then m.apr_drg_code  else null end) as apr_drg_code_count,
     from {{ ref('medical_claim')}} m
-    left join {{ ref('data_quality__dq_inpatient_stage')}} d on m.claim_id = d.claim_id
+    left join {{ ref('data_quality__inpatient_dq_stage')}} d on m.claim_id = d.claim_id
     left join {{ ref('terminology__bill_type')}} as btc on m.bill_type_code = btc.bill_type_code
     left join {{ ref('terminology__ms_drg')}} as ms on m.ms_drg_code = ms.ms_drg_code
     left join {{ ref('terminology__apr_drg')}} as apr on m.ms_drg_code = apr.apr_drg_code

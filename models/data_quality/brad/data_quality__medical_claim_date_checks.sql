@@ -17,7 +17,7 @@ with medical_claim as (
            count(distinct case when d.claim_id is not null then admission_date else null end) as admission_date_count,
            count(distinct case when d.claim_id is not null then discharge_date else null end) as discharge_date_count
     from {{ ref('medical_claim')}} m
-    left join {{ ref('data_quality__dq_inpatient_stage')}} d on m.claim_id = d.claim_id
+    left join {{ ref('data_quality__inpatient_dq_stage')}} d on m.claim_id = d.claim_id
     group by m.claim_id
 )
 
