@@ -21,6 +21,7 @@ with pharmacy_claim as (
         m.claim_id
 )
 
+,final as (
 select
     'invalid prescribing_npi' as data_quality_check
   , sum(invalid_prescribing_npi) as result_count
@@ -60,3 +61,8 @@ select
     'wrong entity type dispensing_npi' as data_quality_check
   , sum(wrong_entity_type_dispensing_npi) as result_count
 from pharmacy_claim
+)
+
+select *
+, '{{ var('tuva_last_run') }}' as tuva_last_run
+from final
