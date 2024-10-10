@@ -10,7 +10,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: dx_and_px
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns:
     - name: data_quality_check
@@ -27,7 +27,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_date_trends
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns:
     - name: year_month
@@ -56,7 +56,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: data_quality_test_summary
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns:
     - name: data_quality_check
@@ -73,7 +73,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_patient
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__pharmacy_claim_date_checks
@@ -83,7 +83,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_date_checks
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__pharmacy_claim_date_trends
@@ -93,7 +93,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_date_trends
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__pharmacy_claim_ndc
@@ -103,7 +103,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_ndc      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__pharmacy_claim_prescription_details
@@ -113,7 +113,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_prescription_details      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__pharmacy_claim_npi
@@ -123,7 +123,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_npi      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__pharmacy_claim_trended_claim_volume_and_dollars
@@ -133,7 +133,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: pharmacy_claim_trended_claim_volume_and_dollars      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns: 
     - name: year_month
@@ -153,7 +153,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: primary_keys      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__medical_claim_patient_id
@@ -163,7 +163,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_patient_id      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__medical_claim_date_checks
@@ -173,7 +173,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_date_checks      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__medical_claim_inst_header_fields
@@ -183,7 +183,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_inst_header_fields      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__medical_claim_claim_line_fields
@@ -193,7 +193,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_claim_line_fields      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__medical_claim_provider_npi
@@ -203,7 +203,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_provider_npi      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
 
 - name: data_quality__medical_claim_volume_and_dollars
@@ -213,7 +213,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: medical_claim_volume_and_dollars      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns: 
     - name: year_month
@@ -233,7 +233,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: data_loss      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns:
     - name: table_name
@@ -257,7 +257,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: core_populated      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns:
     - name: table_name
@@ -273,7 +273,7 @@ models:
       {% else %}data_quality{%- endif -%}
     alias: analytics_populated      
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: table
   columns:
     - name: table_name
@@ -289,7 +289,7 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: view
 
 - name: data_quality__inpatient_dq_stage
@@ -298,5 +298,5 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
     tags:
-      - data_quality_new
+      - data_quality_audit
     materialized: view
