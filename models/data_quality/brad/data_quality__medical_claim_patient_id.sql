@@ -7,11 +7,15 @@ with medical as  (
 select claim_id
 ,count(distinct p.patient_id) as patient_id_count
 ,max(case when p.patient_id is null then 1 else 0 end) as missing_patient_id
-,max(case when e.month_start_date is null then 1 else 0 end) missing_eligibility
+,max(case when startdts.month_start_date is null then 1
+          when enddts.month_start_date is null then 1 else 0 end) missing_eligibility
 from {{ ref('medical_claim')}} p 
-left join {{ ref('data_quality__dq_eligibility_stage')}} e on p.patient_id = e.patient_id
+left join {{ ref('data_quality__eligibility_dq_stage')}} startdts on p.patient_id = startdts.patient_id
 and
-p.paid_date between e.month_start_date and e.month_end_Date
+p.claim_start_date between startdts.month_start_date and startdts.month_end_Date
+left join {{ ref('data_quality__eligibility_dq_stage')}} enddts on p.patient_id = enddts.patient_id
+and
+p.claim_end_date between enddts.month_start_date and enddts.month_end_Date
 group by claim_id
 )
 

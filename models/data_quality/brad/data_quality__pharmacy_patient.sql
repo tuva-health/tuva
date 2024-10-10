@@ -9,9 +9,9 @@ select claim_id
 ,max(case when p.patient_id is null then 1 else 0 end) as missing_patient_id
 ,max(case when e.month_start_date is null then 1 else 0 end) missing_eligibility
 from {{ ref('pharmacy_claim')}} p 
-left join {{ ref('data_quality__dq_eligibility_stage')}} e on p.patient_id = e.patient_id
+left join {{ ref('data_quality__eligibility_dq_stage')}} e on p.patient_id = e.patient_id
 and
-p.paid_date between e.month_start_date and e.month_end_Date
+coalesce(p.paid_date,p.dispensing_date) between e.month_start_date and e.month_end_Date
 group by claim_id
 )
 

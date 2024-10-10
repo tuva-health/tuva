@@ -10,7 +10,7 @@ select claim_id
 ,max(case when days_supply is null then 1
           when days_supply = 0 then 1 else 0 end) as missing_days_supply
 ,max(case when refills is null then 1
-          when refills = 0 then 1 else 0 end) as missing_refills
+          else 0 end) as missing_refills
 from {{ ref('pharmacy_claim')}} m
 group by claim_id
 )
