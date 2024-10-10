@@ -22,7 +22,7 @@ with encounter_date as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'outpatient rehab'
+    cli.encounter_type = 'outpatient rehabilitation'
     and
     cli.claim_line_attribution_number = 1
     inner join encounter_date d on cli.old_encounter_id = d.old_encounter_id
