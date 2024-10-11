@@ -27,14 +27,14 @@ with eligibility_spans as(
 , missing_birth_date as(
     select
     'Missing birthday' as data_quality_check
-    , count(distinct eligibility_span_id) as result
+    , count(distinct eligibility_span_id) as result_count
     from eligibility_spans
     where birth_date is null
 )
 , invalid_birth_date as(
     select
     'Birthday is not a valid date' as data_quality_check
-    , count(distinct eligibility_span_id) as result
+    , count(distinct eligibility_span_id) as result_count
     from eligibility_spans e
     left join reference_data.calendar c
         on e.birth_date = c.full_date
@@ -43,7 +43,7 @@ with eligibility_spans as(
 , future_birth_date as(
     select
     'Birthday is in the future' as data_quality_check
-    , count(distinct eligibility_span_id) as result
+    , count(distinct eligibility_span_id) as result_count
     from eligibility_spans
     {% if target.type == 'fabric' %}
         where birth_date > GETDATE()
@@ -54,7 +54,7 @@ with eligibility_spans as(
 , past_birth_date as(
     select
     'Birthday is too far in the past' as data_quality_check
-    , count(distinct eligibility_span_id) as result
+    , count(distinct eligibility_span_id) as result_count
     from eligibility_spans
     {% if target.type == 'fabric' %}
         where cast(floor({{ datediff('birth_date', 'getdate()', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) > 110
@@ -66,7 +66,7 @@ with eligibility_spans as(
 , multiple_birth_date as(
     select
     'Patient has multiple birthdays' as data_quality_check
-    , count(distinct patient_id) as result
+    , count(distinct patient_id) as result_count
     from(
         select
             patient_id
@@ -80,14 +80,14 @@ where rank_birth_date > 1
 , missing_gender as(
     select
     'Missing gender' as data_quality_check
-    , count(distinct eligibility_span_id) as result
+    , count(distinct eligibility_span_id) as result_count
     from eligibility_spans
     where birth_date is null
 )
 , invalid_gender as(
     select
     'Patient gender does not join to terminology table' as data_quality_check
-    , count(distinct eligibility_span_id) as result
+    , count(distinct eligibility_span_id) as result_count
     from eligibility_spans
     where birth_date is null
 )

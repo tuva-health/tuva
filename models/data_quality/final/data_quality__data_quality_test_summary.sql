@@ -18,6 +18,10 @@ with unioned_data as (
         , ref('data_quality__pharmacy_claim_prescription_details')
         , ref('data_quality__pharmacy_patient')
         , ref('data_quality__primary_keys')
+        , ref('data_quality__eligibility_date_checks')
+        , ref('data_quality__eligibility_demographics')
+        , ref('data_quality__eligibility_missing_patient_id')
+        , ref('data_quality__eligibility_missing_payer')
       ],
       exclude=["_loaded_at"]
   ) }}
@@ -25,7 +29,7 @@ with unioned_data as (
 )
 
 select
-    data_quality_check
+  data_quality_check
   , result_count
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from unioned_data

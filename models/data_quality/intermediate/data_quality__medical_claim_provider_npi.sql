@@ -113,4 +113,5 @@ where facility_npi_count > 1
 )
 
 select *
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from final
