@@ -44,7 +44,7 @@ invalid_start_date as (
         count(*) as result_count
     from eligibility_spans
     where enrollment_start_date is not null
-    and not try_cast(enrollment_start_date as date) is not null
+    and not {{ try_to_cast_date('enrollment_start_date') }} is not null
 ),
 
 invalid_end_date as (
@@ -53,7 +53,7 @@ invalid_end_date as (
         count(*) as result_count
     from eligibility_spans
     where enrollment_end_date is not null
-    and not try_cast(enrollment_end_date as date) is not null
+    and not {{ try_to_cast_date('enrollment_end_date') }} is not null
 ),
 
 start_after_end as (
