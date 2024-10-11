@@ -206,7 +206,7 @@ union all
 select claim_id
 ,claim_line_number
 ,old_encounter_id
-,'outpatient rehab' as encounter_type
+,'outpatient rehabilitation' as encounter_type
 ,'outpatient' as encounter_group
 ,13 as priority_number 
 from {{ ref('outpatient_rehab__match_claims_to_anchor') }}

@@ -39,9 +39,9 @@ select
   , cast(ms_drg_description as {{ dbt.type_string() }}) as ms_drg_description
   , cast(apr_drg_code as {{ dbt.type_string() }}) as apr_drg_code
   , cast(apr_drg_description as {{ dbt.type_string() }}) as apr_drg_description
-  , cast(null as {{ dbt.type_numeric() }}) as paid_amount
-  , cast(null as {{ dbt.type_numeric() }}) as allowed_amount
-  , cast(null as {{ dbt.type_numeric() }}) as charge_amount
+  , cast(paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
+  , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
+  , cast(charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
   , cast(null as {{ dbt.type_int() }}) as claim_count
   , cast(null as {{ dbt.type_int() }}) as inst_claim_count
   , cast(null as {{ dbt.type_int() }}) as prof_claim_count
