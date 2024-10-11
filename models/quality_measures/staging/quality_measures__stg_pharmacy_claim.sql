@@ -41,7 +41,7 @@ from {{ ref('core__pharmacy_claim') }}
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
     , cast(null as {{ dbt.type_string() }} ) as ndc_code
     , cast(null as {{ dbt.type_int() }} ) as days_supply
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date 
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
     limit 0
 {%- endif %}
