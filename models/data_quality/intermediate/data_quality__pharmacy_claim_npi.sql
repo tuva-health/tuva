@@ -14,9 +14,9 @@ with pharmacy_claim as (
       , max(case when term2.entity_type_code = 1 then 1 else 0 end) as wrong_entity_type_dispensing_npi
     from {{ ref('pharmacy_claim') }} as m
     left join {{ ref('terminology__provider') }} as term
-      on m.prescribing_provider_npi = term.npi
+      on cast(m.prescribing_provider_npi as {{ dbt.type_string() }}) = term.npi
     left join {{ ref('terminology__provider') }} as term2
-      on m.dispensing_provider_npi = term2.npi
+      on cast(m.dispensing_provider_npi as {{ dbt.type_string() }}) = term2.npi
     group by
         m.claim_id
 )
