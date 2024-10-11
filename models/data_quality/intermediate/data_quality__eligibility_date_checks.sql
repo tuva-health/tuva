@@ -72,7 +72,7 @@ future_end_date as (
     {% if target.type == 'fabric' %}
         where enrollment_end_date > GETDATE()
     {% else %}
-        where enrollment_end_date > current_date()
+        where enrollment_end_date > current_date
     {% endif %}
 
 ),

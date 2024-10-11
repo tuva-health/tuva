@@ -59,7 +59,7 @@ with eligibility_spans as(
     {% if target.type == 'fabric' %}
         where cast(floor({{ datediff('birth_date', 'getdate()', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) > 110
     {% else %}
-        where cast(floor({{ datediff('birth_date', 'current_date()', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) > 110
+        where cast(floor({{ datediff('birth_date', 'current_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) > 110
     {% endif %}
 
 )

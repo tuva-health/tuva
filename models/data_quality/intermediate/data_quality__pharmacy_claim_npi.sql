@@ -8,15 +8,15 @@ with pharmacy_claim as (
         m.claim_id
       , max(case when term.npi is null and m.prescribing_provider_npi is not null then 1 else 0 end) as invalid_prescribing_npi
       , max(case when m.prescribing_provider_npi is null then 1 else 0 end) as missing_prescribing_npi
-      , max(case when term.entity_type_code = 2 then 1 else 0 end) as wrong_entity_type_prescribing_npi
+      , max(case when term.entity_type_code = '2' then 1 else 0 end) as wrong_entity_type_prescribing_npi
       , max(case when term2.npi is null and m.dispensing_provider_npi is not null then 1 else 0 end) as invalid_dispensing_npi
       , max(case when m.dispensing_provider_npi is null then 1 else 0 end) as missing_dispensing_npi
-      , max(case when term2.entity_type_code = 1 then 1 else 0 end) as wrong_entity_type_dispensing_npi
+      , max(case when term2.entity_type_code = '1' then 1 else 0 end) as wrong_entity_type_dispensing_npi
     from {{ ref('pharmacy_claim') }} as m
     left join {{ ref('terminology__provider') }} as term
-      on cast(m.prescribing_provider_npi as {{ dbt.type_string() }}) = term.npi
+      on m.prescribing_provider_npi = term.npi
     left join {{ ref('terminology__provider') }} as term2
-      on cast(m.dispensing_provider_npi as {{ dbt.type_string() }}) = term2.npi
+      on m.dispensing_provider_npi  = term2.npi
     group by
         m.claim_id
 )

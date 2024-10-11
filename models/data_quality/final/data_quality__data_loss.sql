@@ -37,7 +37,7 @@ select
       , "'-'"
       , 'payer'
       , "'-'"
-      , 'plan'
+      , quote_column('plan')
     ]) }}) as span_count
 from {{ ref('eligibility') }}
 )

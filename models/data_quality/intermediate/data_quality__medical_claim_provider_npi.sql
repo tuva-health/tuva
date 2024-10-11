@@ -18,16 +18,16 @@ with medical_claim as (
       , count(distinct m.billing_npi) as billing_npi_count
       , count(distinct m.facility_npi) as facility_npi_count
 
-      , max(case when term.entity_type_code = 2 then 1 else 0 end) as wrong_entity_type_rendering_npi
-      , max(case when term3.entity_type_code = 1 then 1 else 0 end) as wrong_entity_type_facility_npi
+      , max(case when term.entity_type_code = '2' then 1 else 0 end) as wrong_entity_type_rendering_npi
+      , max(case when term3.entity_type_code = '1' then 1 else 0 end) as wrong_entity_type_facility_npi
 
     from {{ ref('medical_claim') }} as m
     left join {{ ref('terminology__provider') }} as term
-      on cast(m.rendering_npi as {{ dbt.type_string() }}) = term.npi
+      on m.rendering_npi = term.npi
     left join {{ ref('terminology__provider') }} as term2
-      on cast(m.billing_npi as {{ dbt.type_string() }}) = term2.npi
+      on m.billing_npi  = term2.npi
     left join {{ ref('terminology__provider') }} as term3
-      on cast(m.facility_npi as {{ dbt.type_string() }}) = term3.npi
+      on m.facility_npi = term3.npi
     group by
         m.claim_id
 )
