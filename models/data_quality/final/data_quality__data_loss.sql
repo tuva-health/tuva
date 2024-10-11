@@ -4,7 +4,7 @@
 
 with input_medical as (
   select
-      'medical_claim' as table_name
+      cast('medical_claim' as {{ dbt.type_string() }}) as table_name
     , count(distinct patient_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
@@ -15,7 +15,7 @@ with input_medical as (
 
 , input_pharmacy as (
   select
-      'pharmacy_claim' as table_name
+      cast('pharmacy_claim' as {{ dbt.type_string() }}) as table_name
     , count(distinct patient_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
@@ -26,7 +26,7 @@ with input_medical as (
 
 ,input_eligibility as (
 select
-    'eligibility' as table_name
+    cast('eligibility' as {{ dbt.type_string() }}) as table_name
   , count(distinct patient_id) as patient_count
   , count(distinct {{ dbt.concat([
         'member_id'
@@ -44,7 +44,7 @@ from {{ ref('eligibility') }}
 
   , input_member_months as (
   select
-    'eligibility' as table_name
+      cast('eligibility' as {{ dbt.type_string() }}) as table_name
     , count(*) as member_month_count
   from {{ ref('data_quality__eligibility_dq_stage') }} e
 )
@@ -52,7 +52,7 @@ from {{ ref('eligibility') }}
 -- Core layer CTEs
 , core_medical as (
   select
-      'medical_claim' as table_name
+     cast( 'medical_claim' as {{ dbt.type_string() }}) as table_name
     , count(distinct patient_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
@@ -63,7 +63,7 @@ from {{ ref('eligibility') }}
 
 , core_pharmacy as (
   select
-      'pharmacy_claim' as table_name
+     cast( 'pharmacy_claim' as {{ dbt.type_string() }}) as table_name
     , count(distinct patient_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
@@ -74,7 +74,7 @@ from {{ ref('eligibility') }}
 
 , core_eligibility as (
   select
-    'eligibility' as table_name
+    cast('eligibility'  as {{ dbt.type_string() }})as table_name
     , count(distinct patient_id) as patient_count
     , count(*) as span_count
   from {{ ref('core__eligibility') }}
@@ -82,7 +82,7 @@ from {{ ref('eligibility') }}
 
 , core_member_months as (
   select
-    'eligibility' as table_name
+    cast('member_months' as {{ dbt.type_string() }}) as table_name
     , count(*) as member_month_count
   from {{ ref('core__member_months') }}
 )
@@ -91,7 +91,7 @@ from {{ ref('eligibility') }}
 -- Combining both input and core layers
 select
     input.table_name
-  , 'Total Unique Patients' as metric
+  , cast('Total Unique Patients' as {{ dbt.type_string() }}) as metric
   , input.patient_count as input_layer_value
   , core.patient_count as core_value
 from input_medical as input
@@ -102,7 +102,7 @@ union all
 
 select
     input.table_name
-  , 'Total Unique Claims' as metric
+  , cast('Total Unique Claims' as {{ dbt.type_string() }}) as metric
   , input.claim_count as input_layer_value
   , core.claim_count as core_value
 from input_medical as input
@@ -113,7 +113,7 @@ union all
 
 select
     input.table_name
-  , 'Total Records' as metric
+  , cast('Total Records' as {{ dbt.type_string() }}) as metric
   , input.record_count as input_layer_value
   , core.record_count as core_value
 from input_medical as input
@@ -124,7 +124,7 @@ union all
 
 select
     input.table_name
-  , 'Total Paid Amount' as metric
+  , cast('Total Paid Amount' as {{ dbt.type_string() }}) as metric
   , input.paid_amount as input_layer_value
   , core.paid_amount as core_value
 from input_medical as input
@@ -135,7 +135,7 @@ union all
 
 select
     input.table_name
-  , 'Total Allowed Amount' as metric
+  , cast('Total Allowed Amount' as {{ dbt.type_string() }}) as metric
   , input.allowed_amount as input_layer_value
   , core.allowed_amount as core_value
 from input_medical as input
@@ -147,7 +147,7 @@ union all
 
 select
     input.table_name
-  , 'Total Unique Patients' as metric
+  , cast('Total Unique Patients' as {{ dbt.type_string() }}) as metric
   , input.patient_count as input_layer_value
   , core.patient_count as core_value
 from input_pharmacy as input
@@ -158,7 +158,7 @@ union all
 
 select
     input.table_name
-  , 'Total Unique Claims' as metric
+  , cast('Total Unique Claims' as {{ dbt.type_string() }}) as metric
   , input.claim_count as input_layer_value
   , core.claim_count as core_value
 from input_pharmacy as input
@@ -169,7 +169,7 @@ union all
 
 select
     input.table_name
-  , 'Total Records' as metric
+  , cast('Total Records' as {{ dbt.type_string() }}) as metric
   , input.record_count as input_layer_value
   , core.record_count as core_value
 from input_pharmacy as input
@@ -180,7 +180,7 @@ union all
 
 select
     input.table_name
-  , 'Total Paid Amount' as metric
+  , cast('Total Paid Amount' as {{ dbt.type_string() }}) as metric
   , input.paid_amount as input_layer_value
   , core.paid_amount as core_value
 from input_pharmacy as input
@@ -191,7 +191,7 @@ union all
 
 select
     input.table_name
-  , 'Total Allowed Amount' as metric
+  , cast('Total Allowed Amount' as {{ dbt.type_string() }}) as metric
   , input.allowed_amount as input_layer_value
   , core.allowed_amount as core_value
 from input_pharmacy as input
@@ -203,7 +203,7 @@ union all
 
 select
     input.table_name
-  , 'Total Unique Patients' as metric
+  , cast('Total Unique Patients' as {{ dbt.type_string() }}) as metric
   , input.patient_count as input_layer_value
   , core.patient_count as core_value
 from input_eligibility as input
@@ -215,7 +215,7 @@ union all
 
 select
     input.table_name
-  , 'Total Unique Eligibility Spans' as metric
+  , cast('Total Unique Eligibility Spans' as {{ dbt.type_string() }}) as metric
   , input.span_count as input_layer_value
   , core.span_count as core_value
 from input_eligibility as input
@@ -226,7 +226,7 @@ union all
 
 select
     input.table_name
-  , 'Total Member Months' as metric
+  , cast('Total Member Months' as {{ dbt.type_string() }}) as metric
   , input.member_month_count as input_layer_value
   , core.member_month_count as core_value
 from input_member_months as input
