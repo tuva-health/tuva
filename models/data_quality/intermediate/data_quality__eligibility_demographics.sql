@@ -46,9 +46,9 @@ with eligibility_spans as(
     , count(distinct eligibility_span_id) as result_count
     from eligibility_spans
     {% if target.type == 'fabric' %}
-        where birth_date > GETDATE()
+        where birth_date > GETDATE
     {% else %}
-        where birth_date > current_date()
+        where birth_date > current_date
     {% endif %}
 )
 , past_birth_date as(
