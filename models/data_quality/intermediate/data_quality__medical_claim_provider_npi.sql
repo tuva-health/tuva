@@ -23,11 +23,11 @@ with medical_claim as (
 
     from {{ ref('medical_claim') }} as m
     left join {{ ref('terminology__provider') }} as term
-      on m.rendering_npi = term.npi
+      on cast(m.rendering_npi as {{ dbt.type_string() }}) = term.npi
     left join {{ ref('terminology__provider') }} as term2
-      on m.billing_npi = term2.npi
+      on cast(m.billing_npi as {{ dbt.type_string() }}) = term2.npi
     left join {{ ref('terminology__provider') }} as term3
-      on m.facility_npi = term3.npi
+      on cast(m.facility_npi as {{ dbt.type_string() }}) = term3.npi
     group by
         m.claim_id
 )
