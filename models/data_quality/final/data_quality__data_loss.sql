@@ -74,8 +74,16 @@ from {{ ref('eligibility') }}
 
 , core_eligibility as (
   select
-      'eligibility' as table_name
+    'eligibility' as table_name
     , count(distinct patient_id) as patient_count
+    , count(*) as span_count
+  from {{ ref('core__eligibility') }}
+)
+
+, core_member_months as (
+  select
+    'eligibility' as table_name
+    , count(*) as member_month_count
   from {{ ref('core__member_months') }}
 )
 
