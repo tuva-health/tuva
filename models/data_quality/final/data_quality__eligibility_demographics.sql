@@ -92,16 +92,16 @@ where rank_birth_date > 1
     where birth_date is null
 )
 
-select * from missing_birth_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_birth_date
 union all
-select * from invalid_birth_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_birth_date
 union all
-select * from future_birth_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from future_birth_date
 union all
-select * from past_birth_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from past_birth_date
 union all
-select * from multiple_birth_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from multiple_birth_date
 union all
-select * from missing_gender
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_gender
 union all
-select * from invalid_gender
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_gender

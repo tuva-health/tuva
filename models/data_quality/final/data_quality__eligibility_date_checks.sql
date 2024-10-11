@@ -69,7 +69,12 @@ future_end_date as (
         'Future enrollment_end_date' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
-    where enrollment_end_date > current_date
+    {% if target.type == 'fabric' %}
+        where enrollment_end_date > GETDATE()
+    {% else %}
+        where enrollment_end_date > current_date()
+    {% endif %}
+
 ),
 
 nonsensical_dates as (
@@ -82,16 +87,16 @@ nonsensical_dates as (
     or enrollment_start_date > '2100-01-01'
 )
 
-select * from missing_start_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_start_date
 union all
-select * from missing_end_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_end_date
 union all
-select * from invalid_start_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_start_date
 union all
-select * from invalid_end_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_end_date
 union all
-select * from start_after_end
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from start_after_end
 union all
-select * from future_end_date
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from future_end_date
 union all
-select * from nonsensical_dates
+select *, '{{ var('tuva_last_run')}}' as tuva_last_run from nonsensical_dates
