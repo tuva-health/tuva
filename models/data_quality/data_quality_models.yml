@@ -16,7 +16,7 @@ models:
     - name: data_quality_check
       description: The name of the data quality check
     - name: result_count
-      description: The number of eligibility spans in the input layer that match the data quality check criteria
+      description: The number of rows in the input layer that match the data quality check criteria
     - name: tuva_last_ran
       description: '{{ doc("tuva_last_run") }}'
 
@@ -61,9 +61,9 @@ models:
   columns:
     - name: data_quality_check
       description: The name of the data quality check
-    - name: result_count
+    - name: result_count 
       description: the count of records that match the result of the data quality check
-    - name: tuva_last_run
+    - name: tuva_last_run  
       description: '{{ doc("tuva_last_run") }}'
 
 - name: data_quality__pharmacy_patient
@@ -101,7 +101,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_ndc
+    alias: pharmacy_claim_ndc      
     tags:
       - data_quality_audit
     materialized: table
@@ -111,7 +111,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_prescription_details
+    alias: pharmacy_claim_prescription_details      
     tags:
       - data_quality_audit
     materialized: table
@@ -121,7 +121,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_npi
+    alias: pharmacy_claim_npi      
     tags:
       - data_quality_audit
     materialized: table
@@ -131,11 +131,11 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_trended_claim_volume_and_dollars
+    alias: pharmacy_claim_trended_claim_volume_and_dollars      
     tags:
       - data_quality_audit
     materialized: table
-  columns:
+  columns: 
     - name: year_month
       description: the year and month in format yyyymm
     - name: claim_volume
@@ -144,14 +144,14 @@ models:
       description: '{{ doc("paid_amount") }}'
     - name: tuva_last_ran
       description: '{{ doc("tuva_last_run") }}'
-
+  
 
 - name: data_quality__primary_keys
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: primary_keys
+    alias: primary_keys      
     tags:
       - data_quality_audit
     materialized: table
@@ -161,7 +161,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medical_claim_patient_id
+    alias: medical_claim_patient_id      
     tags:
       - data_quality_audit
     materialized: table
@@ -171,7 +171,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medical_claim_date_checks
+    alias: medical_claim_date_checks      
     tags:
       - data_quality_audit
     materialized: table
@@ -181,7 +181,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medical_claim_inst_header_fields
+    alias: medical_claim_inst_header_fields      
     tags:
       - data_quality_audit
     materialized: table
@@ -191,7 +191,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medical_claim_claim_line_fields
+    alias: medical_claim_claim_line_fields      
     tags:
       - data_quality_audit
     materialized: table
@@ -201,7 +201,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medical_claim_provider_npi
+    alias: medical_claim_provider_npi      
     tags:
       - data_quality_audit
     materialized: table
@@ -211,11 +211,11 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medical_claim_volume_and_dollars
+    alias: medical_claim_volume_and_dollars      
     tags:
       - data_quality_audit
     materialized: table
-  columns:
+  columns: 
     - name: year_month
       description: the year and month in format yyyymm
     - name: claim_volume
@@ -224,14 +224,14 @@ models:
       description: '{{ doc("paid_amount") }}'
     - name: tuva_last_ran
       description: '{{ doc("tuva_last_run") }}'
-
+  
 
 - name: data_quality__data_loss
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: data_loss
+    alias: data_loss      
     tags:
       - data_quality_audit
     materialized: table
@@ -247,7 +247,7 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
+      
 
 
 - name: data_quality__core_populated
@@ -255,7 +255,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: core_populated
+    alias: core_populated      
     tags:
       - data_quality_audit
     materialized: table
@@ -264,14 +264,14 @@ models:
       description: the name of the table's records being counted
     - name: record_count
       description: the total number of records belonging to the specific data quality check
-
+      
 
 - name: data_quality__analytics_populated
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: analytics_populated
+    alias: analytics_populated      
     tags:
       - data_quality_audit
     materialized: table
