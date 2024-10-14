@@ -56,15 +56,14 @@ jobs:
         run: |
           mkdir -p ./ci_testing/profiles/bigquery
           echo "default:
-            target: dev
             outputs:
               dev:
                 type: bigquery
                 method: service-account
                 project: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
                 keyfile: ./ci_testing/creds.json
-                dataset: my_dataset
-                threads: 1
+                dataset: connector
+                threads: 4
                 timeout_seconds: 300
                 priority: interactive" > ./ci_testing/profiles/bigquery/profiles.yml
 
