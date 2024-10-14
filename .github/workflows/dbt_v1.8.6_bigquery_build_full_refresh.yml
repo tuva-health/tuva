@@ -85,6 +85,9 @@ jobs:
       - name: List profiles directory
         run: ls -la ./ci_testing/profiles/bigquery
 
+      - name: Display profiles.yml contents
+        run: cat ./ci_testing/profiles/bigquery/profiles.yml
+
       - name: dbt-deps
         run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
         working-directory: ci_testing
