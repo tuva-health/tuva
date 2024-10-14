@@ -81,6 +81,9 @@ jobs:
                 timeout_seconds: 300
                 priority: interactive" > ./ci_testing/profiles/bigquery/profiles.yml
 
+      - name: List profiles directory
+        run: ls -la ./ci_testing/profiles/bigquery
+
       - name: dbt-deps
         run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
         working-directory: ci_testing
