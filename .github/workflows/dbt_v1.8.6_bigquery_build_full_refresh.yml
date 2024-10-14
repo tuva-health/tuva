@@ -67,6 +67,7 @@ jobs:
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
+          set -x  # Enable debugging
           mkdir -p ./ci_testing/profiles/bigquery
           echo "default:
             target: dev
