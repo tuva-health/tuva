@@ -88,12 +88,12 @@ jobs:
         working-directory: ci_testing
 
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./ci_testing/profiles/bigquery
+        run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./ci_testing/profiles/bigquery --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
