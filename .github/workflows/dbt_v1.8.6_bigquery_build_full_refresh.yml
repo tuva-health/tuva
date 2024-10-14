@@ -92,8 +92,11 @@ jobs:
         run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
         working-directory: ci_testing
 
+      - name: List profiles directory
+        run: ls -la ./ci_testing/profiles
+
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./ci_testing/profiles/bigquery
+        run: dbt debug --profiles-dir ./ci_testing/profiles
         working-directory: ci_testing
 
       - name: dbt-build
