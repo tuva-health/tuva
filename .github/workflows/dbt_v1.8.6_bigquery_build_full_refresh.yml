@@ -79,16 +79,16 @@ jobs:
 #        run: cat ./ci_testing/profiles/bigquery/profiles.yml
 
       - name: dbt-deps
-        run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
+        run: dbt deps --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-      - name: Verify profiles.yml
-        run: |
-          cat ./ci_testing/profiles/bigquery/profiles.yml
-          ls -R ./ci_testing/profiles/
+#      - name: Verify profiles.yml
+#        run: |
+#          cat ./ci_testing/profiles/bigquery/profiles.yml
+#          ls -R ./ci_testing/profiles/
 
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./ci_testing/profiles/bigquery
+        run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
 #      - name: dbt-build
