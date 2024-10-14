@@ -1,3 +1,5 @@
+
+
 {% if var('test_data_override') == true -%}
 
 select * from {{ ref('medical_claim_seed') }}
