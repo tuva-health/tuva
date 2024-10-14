@@ -1,18 +1,17 @@
-name: dbt_v1.8.6_snowflake_build_full_claims
+name: dbt_v1.8.6_bigquery_build_full_refresh
+
 on:
   workflow_dispatch:
   pull_request:
     branches:
       - main
 
+
 env:
-  DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
-  DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
-  DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
-  DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
-  DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
-  DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
-  DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+  DBT_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
+  TUVA_BIGQUERY_PROJECT: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
+
+
   
 jobs:
   clinical_and_claims_enabled:
@@ -34,7 +33,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "CI Testing is start on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                    "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
                   }
                 }
               ]
@@ -48,26 +47,23 @@ jobs:
         with:
           python-version: '3.9'
 
-
-      - name: Install dbt-core and Snowflake adapter
+      - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-snowflake        
+          pip install dbt-core==1.8.6 dbt-bigquery        
 
       - name: dbt-deps
-        run: dbt deps --profiles-dir ./profiles/snowflake
+        run: dbt deps --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./profiles/redshift
+        run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-#        working-directory: ci_testing
-
-
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
