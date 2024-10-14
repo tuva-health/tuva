@@ -264,33 +264,40 @@ with unpivot_diagnosis as(
 
 
 )
+
 , total_claims as(
     select
-        cast(count(claim_id) as integer ) as total_claims
+        cast(count(distinct claim_id) as integer ) as total_claims
     from {{ ref('medical_claim') }}
 )
+
 , claims_with_primary_dx as(
     select
         count(diagnosis_code_1) as distinct_claims_with_primary
     from {{ ref('medical_claim') }}
 )
 
-, claims_with_secondary_dx as(
+, secondary_dx_prep_cte as (    
+    select
+        tc.total_claims
+        , cast(count(distinct claim_id) as integer) as secondary_dx_claim_count
+    from unpivot_diagnosis
+    cross join total_claims tc
+    where diagnosis_column <> 'DIAGNOSIS_CODE_1'
+    and
+    diagnosis_code is not null
+    group by total_claims
+    ) 
+
+, claims_with_secondary_dx as (
     select
     total_claims
     , cast(secondary_dx_claim_count as integer ) as secondary_dx_claim_count
     , (cast(secondary_dx_claim_count as integer ) / cast(total_claims as integer )) * 100 as result_count
     , 'Percent of claims with secondary diagnosis' as data_quality_check
     from
-    (
-    select
-        tc.total_claims
-        , cast(count(*) as integer) as secondary_dx_claim_count
-    from unpivot_diagnosis
-    cross join total_claims tc
-    where diagnosis_column <> 'DIAGNOSIS_CODE_1'
-    group by total_claims
-    ) x
+    secondary_dx_prep_cte
+
 )
 , missing_primary_dx as (
     select
@@ -398,14 +405,39 @@ with unpivot_diagnosis as(
         data_quality_check
 )
 
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_primary_dx
-union all
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_primary_dx
-union all
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run from multiple_primary_dx
-union all
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_secondary_dx
-union all
-select data_quality_check, result_count, '{{ var('tuva_last_run')}}' as tuva_last_run from claims_with_secondary_dx
-union all
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run from invalid_procedure
+, final as (
+    select *
+    from missing_primary_dx
+
+    union all
+
+    select *
+    from invalid_primary_dx
+
+    union all
+
+    select *
+    from multiple_primary_dx
+
+    union all
+
+    select *
+    from invalid_secondary_dx
+
+    union all
+
+    select
+        data_quality_check
+      , result_count
+    from claims_with_secondary_dx
+
+    union all
+
+    select *
+    from invalid_procedure
+)
+
+select
+    *
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
+from final

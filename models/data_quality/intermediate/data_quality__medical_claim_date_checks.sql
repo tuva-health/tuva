@@ -58,7 +58,7 @@ from medical_claim
 
 union all
 
-select 'missing paid_date' as data_quality_check,
+select 'missing medical_claim paid_date' as data_quality_check,
        sum(missing_paid_date) as result_count
 from medical_claim
 

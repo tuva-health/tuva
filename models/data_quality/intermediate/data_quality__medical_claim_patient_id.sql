@@ -27,21 +27,21 @@ with medical as (
 
 , final as (
   select
-      'multiple patient_ids' as data_quality_check
+      'multiple medical_claim patient_ids' as data_quality_check
     , sum(case when patient_id_count > 1 then 1 else 0 end) as result_count
   from medical
 
   union all
 
   select
-      'missing patient_id' as data_quality_check
+      'missing medical_claim patient_id' as data_quality_check
     , sum(missing_patient_id) as result_count
   from medical
 
   union all
 
   select
-      'orphaned claims' as data_quality_check
+      'orphaned medical_claim claims' as data_quality_check
     , sum(missing_eligibility) as result_count
   from medical
 )
