@@ -52,25 +52,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core==1.8.6 dbt-bigquery        
 
-#      - name: Create dbt profiles.yml for BigQuery
-#        run: |
-#          mkdir -p ./ci_testing/profiles/bigquery
-#          echo "default:
-#            outputs:
-#              dev:
-#                type: bigquery
-#                method: service-account
-#                project: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
-#                keyfile: ./ci_testing/creds.json
-#                dataset: connector
-#                threads: 4
-#                timeout_seconds: 300
-#                priority: interactive
-#            target: dev" > ./ci_testing/profiles/bigquery/profiles.yml
-#
-#      - name: Create BigQuery credentials file
-#        run: |
-#          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
+      - name: Create dbt profiles.yml for BigQuery
+        run: |
+          mkdir -p ./ci_testing/profiles/bigquery
+          echo "default:
+            outputs:
+              dev:
+                type: bigquery
+                method: service-account
+                project: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
+                keyfile: ./ci_testing/creds.json
+                dataset: connector
+                threads: 4
+                timeout_seconds: 300
+                priority: interactive
+            target: dev" > ./ci_testing/profiles/bigquery/profiles.yml
+
+      - name: Create BigQuery credentials file
+        run: |
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
 
 #      - name: List profiles directory
 #        run: ls -la ./ci_testing/profiles/bigquery
@@ -82,14 +82,13 @@ jobs:
         run: dbt deps --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-#      - name: Verify profiles.yml
-#        run: |
-#          cat ./ci_testing/profiles/bigquery/profiles.yml
-#          ls -R ./ci_testing/profiles/
+      - name: Verify profiles.yml
+        run: |
+          cat ./ci_testing/profiles/bigquery/profiles.yml
+          ls -R ./ci_testing/profiles/
 
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
-        working-directory: ci_testing
 
 #      - name: dbt-build
 #        run: |
