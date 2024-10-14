@@ -72,6 +72,9 @@ jobs:
         run: |
           echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
 
+      - name: Display credentials file
+        run: cat ./ci_testing/creds.json
+
 #      - name: List profiles directory
 #        run: ls -la ./ci_testing/profiles/bigquery
 #
