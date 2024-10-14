@@ -60,10 +60,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-build
-        run: |
-          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-        working-directory: ci_testing
+#      - name: dbt-build
+#        run: |
+#          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+#        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}

@@ -52,16 +52,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core==1.8.6 dbt-bigquery        
 
-      # Step to handle the BigQuery token secret
       - name: Handle BigQuery token
         run: |
           if [ -n "${{ secrets.TUVA_BIGQUERY_TOKEN }}" ]; then
             echo "Setting up BigQuery credentials..."
-            echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 -d > ./ci_testing/creds.json
+            echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
           else
             echo "No BigQuery credentials provided. Exiting."
             exit 1
           fi
+        shell: bash
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
