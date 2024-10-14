@@ -68,8 +68,7 @@ jobs:
       - name: Create dbt profiles.yml for BigQuery
         run: |
           mkdir -p ./ci_testing/profiles/bigquery
-          cat > ./ci_testing/profiles/bigquery/profiles.yml <<EOL
-          default:
+          echo "default:
             target: dev
             outputs:
               dev:
@@ -80,8 +79,7 @@ jobs:
                 dataset: my_dataset
                 threads: 1
                 timeout_seconds: 300
-                priority: interactive
-          EOL
+                priority: interactive" > ./ci_testing/profiles/bigquery/profiles.yml
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
