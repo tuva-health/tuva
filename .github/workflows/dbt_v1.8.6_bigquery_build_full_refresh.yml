@@ -54,9 +54,11 @@ jobs:
 
       - name: Handle BigQuery token
         run: |
-          if [ -n "${{ secrets.TUVA_BIGQUERY_TOKEN }}" ]; then
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > temp_token.txt
+          if [ -s temp_token.txt ]; then  # Checks if the file has content
             echo "Setting up BigQuery credentials..."
-            echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
+            cat temp_token.txt > ./ci_testing/creds.json
+            rm temp_token.txt  # Clean up the temporary file
           else
             echo "No BigQuery credentials provided. Exiting."
             exit 1
