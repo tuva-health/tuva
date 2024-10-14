@@ -8,7 +8,7 @@ with condition_counts as (
 , total_patients as (
     select 
         count(distinct patient_id) as total_distinct_patients
-    from {{ ref('core__conditions') }}
+    from {{ ref('core__member_months') }} -- Using member months as the denominator as there could be members without conditions
 )
 
 select
