@@ -52,22 +52,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core==1.8.6 dbt-bigquery        
 
-      - name: Handle BigQuery token
-        run: |
-          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > temp_token.txt
-          if [ -s temp_token.txt ]; then  # Checks if the file has content
-            echo "Setting up BigQuery credentials..."
-            cat temp_token.txt > ./ci_testing/creds.json
-            rm temp_token.txt  # Clean up the temporary file
-          else
-            echo "No BigQuery credentials provided. Exiting."
-            exit 1
-          fi
-        shell: bash
-
       - name: Create dbt profiles.yml for BigQuery
         run: |
-          set -x  # Enable debugging
           mkdir -p ./ci_testing/profiles/bigquery
           echo "default:
             target: dev
@@ -82,11 +68,15 @@ jobs:
                 timeout_seconds: 300
                 priority: interactive" > ./ci_testing/profiles/bigquery/profiles.yml
 
-      - name: List profiles directory
-        run: ls -la ./ci_testing/profiles/bigquery
+      - name: Create BigQuery credentials file
+        run: |
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
 
-      - name: Display profiles.yml contents
-        run: cat ./ci_testing/profiles/bigquery/profiles.yml
+#      - name: List profiles directory
+#        run: ls -la ./ci_testing/profiles/bigquery
+#
+#      - name: Display profiles.yml contents
+#        run: cat ./ci_testing/profiles/bigquery/profiles.yml
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
@@ -95,14 +85,14 @@ jobs:
       - name: List profiles directory
         run: ls -la ./ci_testing/profiles/bigquery
 
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./ci_testing/profiles
-#        working-directory: ci_testing
-
-      - name: dbt-build
-        run: |
-          dbt build --full-refresh --profiles-dir ./ci_testing/profiles/bigquery --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./ci_testing/profiles
         working-directory: ci_testing
+
+#      - name: dbt-build
+#        run: |
+#          dbt build --full-refresh --profiles-dir ./ci_testing/profiles/bigquery --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+#        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
