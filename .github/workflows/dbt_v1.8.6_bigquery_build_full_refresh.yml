@@ -70,7 +70,8 @@ jobs:
 
       - name: Create BigQuery credentials file
         run: |
-          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" > ./ci_testing/creds.json
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | sed 's/\\n/\n/g' > ./ci_testing/creds.json
+
 
       - name: Validate credentials file
         run: |
