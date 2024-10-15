@@ -92,6 +92,7 @@ jobs:
       - name: dbt-build
         run: |
           dbt build --full-refresh --profiles-dir ./ci_testing/profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
