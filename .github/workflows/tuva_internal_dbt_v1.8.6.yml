@@ -87,7 +87,7 @@ jobs:
               dev:
                 type: bigquery
                 method: service-account
-                project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
+                project: '{{ env_var('TUVA_BIGQUERY_PROJECT') }}'
                 keyfile: ./creds.json
                 dataset: connector
                 threads: 4
@@ -330,13 +330,13 @@ jobs:
                   "text": {
                     "type": "mrkdwn",
                     "text": "CI testing is done on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}
-                            <ul><li>Workflow has finished with the following statuses:</li></ul>
-                            <ul><li>BigQuery Clinical and Claims: ${{ needs.bigquery_clinical_and_claims_enabled.result }}</li></ul>
-                            <ul><li>Fabric Clinical and Claims: ${{ needs.fabric_clinical_and_claims_enabled.result }}</li></ul>
-                            <ul><li>Redshift Clinical and Claims: ${{ needs.redshift_clinical_and_claims_enabled.result }}</li></ul>
-                            <ul><li>Snowflake Clinical and Claims: ${{ needs.snowflake_clinical_and_claims_enabled.result }}</li></ul>
-                            <ul><li>Snowflake Claims: ${{ needs.snowflake_claims_enabled.result }}</li></ul>
-                            <ul><li>Snowflake Clinical: ${{ needs.snowflake_clinical_enabled.result }}</li></ul>"
+                            \n\nWorkflow has finished with the following statuses:
+                            \n\nBigQuery Clinical and Claims: ${{ needs.bigquery_clinical_and_claims_enabled.result }}
+                            \n\nFabric Clinical and Claims: ${{ needs.fabric_clinical_and_claims_enabled.result }}
+                            \n\nRedshift Clinical and Claims: ${{ needs.redshift_clinical_and_claims_enabled.result }}
+                            \n\nSnowflake Clinical and Claims: ${{ needs.snowflake_clinical_and_claims_enabled.result }}
+                            \n\nSnowflake Claims: ${{ needs.snowflake_claims_enabled.result }}
+                            \n\nSnowflake Clinical: ${{ needs.snowflake_clinical_enabled.result }}"
                   }
                 }
               ]
