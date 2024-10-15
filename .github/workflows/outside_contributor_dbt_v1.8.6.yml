@@ -7,6 +7,10 @@ on:
         description: 'Pull Request Number'
         required: true
 
+concurrency:
+  group: ci-testing
+  cancel-in-progress: false
+
 env:
 #######  BigQuery
   TUVA_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
