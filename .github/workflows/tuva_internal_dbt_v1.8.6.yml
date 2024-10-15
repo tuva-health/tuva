@@ -109,10 +109,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true}'
-#        working-directory: ci_testing
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
@@ -152,10 +152,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
-#        working-directory: ci_testing
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
@@ -187,10 +187,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-#        working-directory: ci_testing
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
@@ -222,10 +222,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-#        working-directory: ci_testing
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
@@ -257,10 +257,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"provider_attribution_enabled":true}'
-#        working-directory: ci_testing
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
@@ -293,10 +293,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
-#        working-directory: ci_testing
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}
