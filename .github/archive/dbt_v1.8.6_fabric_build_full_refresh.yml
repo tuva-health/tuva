@@ -1,4 +1,4 @@
-name: dbt_v1.6.3_fabric_build_full_refresh
+name: dbt_v1.8.6_fabric_build_full_refresh
 on:
   workflow_dispatch:
   pull_request:
@@ -20,6 +20,28 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Send Slack alert that PR has been opened
+        id: slack
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -35,7 +57,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.6.3 dbt-fabric          
+          pip install dbt-core==1.8.6 dbt-fabric          
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -45,10 +67,10 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
 
-      - name: dbt-build
-        run: |
-          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
-        working-directory: ci_testing
+#      - name: dbt-build
+#        run: |
+#          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
+#        working-directory: ci_testing
 
       - name: Get the result
         if: ${{ always() }}

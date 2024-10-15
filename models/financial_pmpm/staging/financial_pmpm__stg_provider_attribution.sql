@@ -43,7 +43,7 @@ from {{ ref('provider_attribution') }}
 select
          cast(null as {{ dbt.type_string() }} ) patient_id
        , cast(null as {{ dbt.type_string() }} ) as year_month
-       , cast(null as date) as payer
+       , cast(null as {{ dbt.type_string() }} ) as payer
        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
        , cast(null as {{ dbt.type_string() }} ) as data_source
        

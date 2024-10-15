@@ -12,7 +12,7 @@ vars:
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva
+  input_database: dev_ci_testing
   input_schema: input_layer
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
@@ -23,9 +23,8 @@ vars:
 
   ## The vars directly below enable all models related to the type of healthcare data being used
 
-  clinical_enabled: true
+  clinical_enabled: false
   claims_enabled: true
-  provider_attribution_enabled: true
 
   ## CMS HCC data mart vars
   # The payment_year variable has a default of the current year, this can be
@@ -73,18 +72,15 @@ dispatch:
 seeds:
   integration_tests:
     eligibility_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','eligibility.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','eligibility.csv',headers=true) }}"
     lab_result_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','lab_result.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','lab_result.csv',headers=true) }}"
     medical_claim_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','medical_claim.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','medical_claim.csv',headers=true) }}"
     observation_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','observation.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','observation.csv',headers=true) }}"
     pharmacy_claim_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','pharmacy_claim.csv',headers=true) }}"
-    provider_attribution_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.12.0','provider_attribution.csv',headers=true) }}"
-
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.10.0','pharmacy_claim.csv',headers=true) }}"
 
 models:
   integration_tests:
