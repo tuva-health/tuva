@@ -329,7 +329,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "CI testing is done on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}\n\n*Workflow has finished with the following statuses:*\n\n• *BigQuery Clinical and Claims:* ${{ needs.bigquery_claims_enabled.result }}\n• *Fabric Clinical and Claims:* ${{ needs.bigquery_claims_enabled.result }}\n• *Redshift Clinical and Claims:* ${{ needs.bigquery_claims_enabled.result }}\n• *Snowflake Clinical and Claims:* ${{ needs.bigquery_claims_enabled.result }}\n• *Snowflake Claims:* ${{ needs.bigquery_claims_enabled.result }}\n• *Snowflake Clinical:* ${{ needs.bigquery_claims_enabled.result }}"
+                    "text": "CI testing is done on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}\n\n*Workflow has finished with the following statuses:*\n\n• *BigQuery Clinical and Claims:* ${{ needs.bigquery_clinical_and_claims_enabled.result }}\n• *Fabric Clinical and Claims:* ${{ needs.fabric_clinical_and_claims_enabled.result }}\n• *Redshift Clinical and Claims:* ${{ needs.redshift_clinical_and_claims_enabled.result }}\n• *Snowflake Clinical and Claims:* ${{ needs.snowflake_clinical_and_claims_enabled.result }}\n• *Snowflake Claims:* ${{ needs.snowflake_claims_enabled.result }}\n• *Snowflake Clinical:* ${{ needs.snowflake_clinical_enabled.result }}"
                   }
                 }
               ]
