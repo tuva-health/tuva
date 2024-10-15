@@ -294,14 +294,14 @@ with unpivot_diagnosis as(
     total_claims
     , cast(secondary_dx_claim_count as integer ) as secondary_dx_claim_count
     , (cast(secondary_dx_claim_count as integer ) / cast(total_claims as integer )) * 100 as result_count
-    , 'Percent of claims with secondary diagnosis' as data_quality_check
+    , cast('Percent of claims with secondary diagnosis' as {{ dbt.type_string() }}) as data_quality_check
     from
     secondary_dx_prep_cte
 
 )
 , missing_primary_dx as (
     select
-        'missing primary diagnosis' as data_quality_check
+     cast('missing primary diagnosis' as {{ dbt.type_string() }}) as data_quality_check
         , cast(count(distinct claim_id) as integer ) as result_count
     from {{ ref('medical_claim') }} m
     where diagnosis_code_1 is null
@@ -312,7 +312,7 @@ with unpivot_diagnosis as(
         , count(distinct claim_id) as result_count
     from (
     select
-        'invalid primary diagnosis' as data_quality_check
+        cast('invalid primary diagnosis' as {{ dbt.type_string() }}) as data_quality_check
         , claim_id
         , diagnosis_code_type
         , diagnosis_column
@@ -339,7 +339,7 @@ with unpivot_diagnosis as(
 , multiple_primary_dx as(
 
     select
-        'multiple primary diagnosis' as data_quality_check
+        cast('multiple primary diagnosis' as {{ dbt.type_string() }}) as data_quality_check
         , cast(count(*) as integer ) as result_count
     from
         (
@@ -360,7 +360,7 @@ with unpivot_diagnosis as(
         , count(*) as result_count
     from (
     select
-        'invalid secondary diagnosis' as data_quality_check
+        cast('invalid secondary diagnosis' as {{ dbt.type_string() }}) as data_quality_check
         , claim_id
         , case
             when icd10.icd_10_cm is null and icd9.icd_9_cm is null
@@ -386,7 +386,7 @@ with unpivot_diagnosis as(
         , count(*) as result_count
     from (
     select
-        'invalid procedure' as data_quality_check
+         cast('invalid procedure' as {{ dbt.type_string() }}) as data_quality_check
         , claim_id
         , case
             when icd10.icd_10_pcs is null and icd9.icd_9_pcs is null
