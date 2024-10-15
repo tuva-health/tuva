@@ -6,7 +6,7 @@ default:
       location: US
       method: service-account
       priority: interactive
-      project: dev-ci-testing
+      project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
       threads: 4
       timeout_seconds: 300
       type: bigquery
