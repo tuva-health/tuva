@@ -160,6 +160,26 @@ models:
     - name: tuva_last_run  
       description: '{{ doc("tuva_last_run") }}'
 
+- name: data_quality__data_quality_analytics_summary
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_analytics_summary
+    tags:
+      - data_quality_audit
+    materialized: table
+  columns:
+    - name: data_quality_check
+      description: The name of the data quality check
+      tests: 
+        - unique
+        - not_null
+    - name: result_count 
+      description: the count of records that match the result of the data quality check
+    - name: tuva_last_run  
+      description: '{{ doc("tuva_last_run") }}'
+
 - name: data_quality__pharmacy_claim_patient_id
   config:
     schema: |
@@ -364,6 +384,28 @@ models:
       description: the name of the table's records being counted
     - name: record_count
       description: the total number of records belonging to the specific data quality check
+
+- name: data_quality__readmissions
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_readmissions      
+    tags:
+      - data_quality_audit
+    materialized: table
+
+
+- name: data_quality__readmissions_reference
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_readmissions_reference      
+    tags:
+      - data_quality_audit
+    materialized: table
+
 
 
 #### stage
