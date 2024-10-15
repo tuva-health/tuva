@@ -2,6 +2,7 @@
 
 ![diagram](./the_tuva_project.jpg)
 
+
 ## 🧰  What is the Tuva Project?
 The Tuva Project code base includes a core data model, data marts, terminology 
 sets, and data quality tests for doing healthcare analytics.
