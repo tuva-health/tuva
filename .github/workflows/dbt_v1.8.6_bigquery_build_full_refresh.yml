@@ -71,7 +71,8 @@ jobs:
 
       - name: Create BigQuery credentials file
         run: |
-          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 --decode > ./ci_testing/creds.json
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 --decode > ./creds.json
+        working-directory: ci_testing
 
 #      - name: Validate credentials file
 #        run: |
