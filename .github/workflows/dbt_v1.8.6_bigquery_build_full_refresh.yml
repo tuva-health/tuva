@@ -54,7 +54,7 @@ jobs:
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
-          mkdir -p ./ci_testing/profiles/bigquery
+          mkdir -p ./profiles/bigquery
           echo "default:
             outputs:
               dev:
@@ -66,7 +66,8 @@ jobs:
                 threads: 4
                 timeout_seconds: 300
                 priority: interactive
-            target: dev" > ./ci_testing/profiles/bigquery/profiles.yml
+            target: dev" > ./profiles/bigquery/profiles.yml
+        working-directory: ci_testing
 
       - name: Create BigQuery credentials file
         run: |
@@ -78,7 +79,8 @@ jobs:
 
 
       - name: dbt-deps
-        run: dbt deps --profiles-dir ./ci_testing/profiles/bigquery
+        run: dbt deps --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
 
 
 #      - name: Verify profiles.yml
@@ -87,11 +89,12 @@ jobs:
 #          ls -R ./ci_testing/profiles/
 
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./ci_testing/profiles/bigquery
+        run: dbt debug --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./ci_testing/profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true}'
         working-directory: ci_testing
 
       - name: Get the result
