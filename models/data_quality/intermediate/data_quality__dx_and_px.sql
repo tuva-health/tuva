@@ -285,7 +285,7 @@ with unpivot_diagnosis as(
     cross join total_claims tc
     where diagnosis_column <> 'DIAGNOSIS_CODE_1'
     and
-    diagnosis_code is not null
+    cast(diagnosis_code as {{ dbt.type_string() }} )   is not null
     group by total_claims
     ) 
 
@@ -406,34 +406,38 @@ with unpivot_diagnosis as(
 )
 
 , final as (
-    select *
+    select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
+    ,result_count
     from missing_primary_dx
 
     union all
 
-    select *
+    select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
+    ,result_count
     from invalid_primary_dx
 
     union all
 
-    select *
+    select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
+    ,result_count
     from multiple_primary_dx
 
     union all
 
-    select *
+    select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
+    ,result_count
     from invalid_secondary_dx
 
     union all
 
-    select
-        data_quality_check
-      , result_count
+    select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
+    ,result_count
     from claims_with_secondary_dx
 
     union all
 
-    select *
+    select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
+    ,result_count
     from invalid_procedure
 )
 
