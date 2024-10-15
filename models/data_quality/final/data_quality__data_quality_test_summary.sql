@@ -16,8 +16,8 @@ with unioned_data as (
         , ref('data_quality__pharmacy_claim_ndc')
         , ref('data_quality__pharmacy_claim_npi')
         , ref('data_quality__pharmacy_claim_prescription_details')
-        , ref('data_quality__pharmacy_patient')
-        , ref('data_quality__primary_keys')
+        , ref('data_quality__pharmacy_claim_patient_id')
+        , ref('data_quality__primary_key_check')
         , ref('data_quality__eligibility_date_checks')
         , ref('data_quality__eligibility_demographics')
         , ref('data_quality__eligibility_missing_patient_id')
@@ -33,3 +33,4 @@ select
   , result_count
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from unioned_data
+where data_quality_check <> 'Percent of claims with secondary diagnosis'

@@ -14,7 +14,7 @@ with pharmacy_claim as (
 
 , final as (
   select
-      'missing paid_date' as data_quality_check
+      'missing pharmacy_claim paid_date' as data_quality_check
     , sum(missing_paid_date) as result_count
   from pharmacy_claim
 
