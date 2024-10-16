@@ -8,6 +8,7 @@ with unioned_data as (
   {{ dbt_utils.union_relations(
       relations=[
           ref('data_quality__readmissions_reference')
+        , ref('data_quality__cms_hcc_reference')
       ],
       exclude=["_loaded_at"]
   ) }}
