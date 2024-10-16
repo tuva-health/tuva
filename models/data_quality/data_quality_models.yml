@@ -497,6 +497,26 @@ models:
       - data_quality_audit
     materialized: table
 
+- name: data_quality__acute_inpatient_reference
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_acute_inpatient_reference
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__acute_inpatient
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_acute_inpatient
+    tags:
+      - data_quality_audit
+    materialized: table
+
 
 
 #### stage

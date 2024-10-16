@@ -12,6 +12,7 @@ with unioned_data as (
           ,ref('data_quality__chronic_conditions_missing_union')
         , ref('data_quality__cms_hcc')
         , ref('data_quality__quality_measures')
+        , ref('data_quality__acute_inpatient')
       ],
       exclude=["_loaded_at"]
   ) }}
