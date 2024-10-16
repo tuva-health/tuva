@@ -1,14 +1,18 @@
+{{ config(
+     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
+)}}
+
 with condition_counts as (
     select
         condition
-        , count(patient_id) as patients
-    from {{ ref('chronic_conditions__tuva_chronic_conditions_long') }}
+        , count(distinct patient_id) as patients
+    from {{ ref('chronic_conditions__cms_chronic_conditions_long') }}
     group by condition
 )
 , total_patients as (
     select 
         count(distinct patient_id) as total_distinct_patients
-    from {{ ref('core__member_months') }} -- Using member months as the denominator as there could be members without conditions
+    from {{ ref('core__eligibility') }}
 )
 , results as (
 select
@@ -25,11 +29,11 @@ select
     , results.patients
     , results.condition_rank
     , results.percent_of_total
-    , ref_data.analytics_value as percent_of_lds_total
-    , ref_data.rank as lds_condition_rank
+    , ref_data.analytics_value as percent_of_medicare_lds_total
+    , ref_data.rank as medicare_lds_condition_rank
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from results
-full outer join {{ ref('data_quality__medicare_reference_data') }} as ref_data on results.condition = ref_data.analytics_measure
-where ref_data.analytics_concept = 'Chronic Condition'
+full outer join {{ ref('data_quality__medicare_reference_data') }} as ref_data on results.condition = ref_data.analytics_measure --Still need to add seed file
+where ref_data.analytics_concept = 'Chronic Condition Top 10'
 order by
     results.condition_rank
