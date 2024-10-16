@@ -8,7 +8,8 @@ with unioned_data as (
   {{ dbt_utils.union_relations(
       relations=[
           ref('data_quality__readmissions_reference')
-          ,ref('data_quality__chronic_conditions_prevalence')
+        , ref('data_quality__cms_hcc_reference')
+        , ref('data_quality__chronic_conditions_prevalence')
       ],
       exclude=["_loaded_at"]
   ) }}
