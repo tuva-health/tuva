@@ -428,7 +428,7 @@ jobs:
 
   fabric_claims_prov_attribution_enabled:
     runs-on: ubuntu-latest
-    needs: fabric_clinical_and_claims_enabled
+    needs: fabric_clinical_enabled
 
     steps:
       - uses: actions/checkout@v2
@@ -583,7 +583,7 @@ jobs:
 
   redshift_claims_prov_attribution_enabled:
     runs-on: ubuntu-latest
-    needs: redshift_clinical_and_claims_enabled
+    needs: redshift_clinical_enabled
 
     steps:
       - uses: actions/checkout@v2
@@ -731,7 +731,7 @@ jobs:
 
   snowflake_claims_prov_attribution_enabled:
     runs-on: ubuntu-latest
-    needs: snowflake_clinical_and_claims_enabled
+    needs: snowflake_clinical_enabled
 
     steps:
       - uses: actions/checkout@v2
