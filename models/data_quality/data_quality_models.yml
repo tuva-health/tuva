@@ -160,15 +160,26 @@ models:
     - name: tuva_last_run  
       description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__data_quality_analytics_summary
+- name: data_quality__analytics_reference_summary
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: data_quality_analytics_summary
+    alias: analytics_reference_summary
     tags:
       - data_quality_audit
     materialized: table
+
+- name: data_quality__analytics_checks_summary
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: analytics_checks_summary
+    tags:
+      - data_quality_audit
+    materialized: table
+
   columns:
     - name: data_quality_check
       description: The name of the data quality check
