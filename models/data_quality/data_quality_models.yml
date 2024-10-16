@@ -133,6 +133,36 @@ models:
     - name: tuva_last_ran
       description: '{{ doc("tuva_last_run") }}'
 
+- name: data_quality__encounters_cost_and_utilization
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: encounters_cost_and_utilization
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__encounters_missing_groups_union
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: encounters_missing_groups_union
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__encounters_missing_groups
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: encounters_missing_groups
+    tags:
+      - data_quality_audit
+    materialized: table
+
 
 - name: data_quality__eligibility_trend
   config:
