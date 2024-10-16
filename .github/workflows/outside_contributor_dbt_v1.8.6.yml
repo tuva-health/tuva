@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: refs/pull/${{ inputs.prNumber }}/merge
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Send Slack alert that PR has been opened
         id: slack
