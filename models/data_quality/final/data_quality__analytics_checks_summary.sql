@@ -10,6 +10,7 @@ with unioned_data as (
           ref('data_quality__readmissions')
           ,ref('data_quality__chronic_conditions_none')
           ,ref('data_quality__chronic_conditions_missing_union')
+          ,ref('data_quality__encounters_missing_groups_union')
       ],
       exclude=["_loaded_at"]
   ) }}
