@@ -126,6 +126,10 @@ jobs:
     needs: bigquery_clinical_and_claims_enabled
 
     steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
