@@ -8,6 +8,8 @@ with unioned_data as (
   {{ dbt_utils.union_relations(
       relations=[
           ref('data_quality__readmissions')
+          ,ref('data_quality__chronic_conditions_none')
+          ,ref('data_quality__chronic_conditions_missing_union')
       ],
       exclude=["_loaded_at"]
   ) }}
@@ -19,4 +21,3 @@ select
   , result_count
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from unioned_data
-
