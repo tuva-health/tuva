@@ -9,6 +9,7 @@ with unioned_data as (
       relations=[
           ref('data_quality__readmissions_reference')
         , ref('data_quality__cms_hcc_reference')
+        , ref('data_quality__chronic_conditions_prevalence')
         , ref('data_quality__quality_measures_reference')
       ],
       exclude=["_loaded_at"]

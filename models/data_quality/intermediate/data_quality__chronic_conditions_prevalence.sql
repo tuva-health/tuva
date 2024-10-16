@@ -25,15 +25,15 @@ cross join total_patients
 )
 
 select
-    results.condition
+    coalesce(results.condition, ref_data.analytics_measure) as analytics_measure
     , results.patients
     , results.condition_rank
-    , results.percent_of_total
-    , ref_data.analytics_value as percent_of_medicare_lds_total
-    , ref_data.rank as medicare_lds_condition_rank
+    , results.percent_of_total as data_source_value
+    , ref_data.analytics_value
+    , ref_data.value_rank as medicare_lds_condition_rank
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from results
-full outer join {{ ref('data_quality__medicare_reference_data') }} as ref_data on results.condition = ref_data.analytics_measure --Still need to add seed file
+full outer join {{ ref('data_quality__reference_mart_analytics') }} as ref_data on results.condition = ref_data.analytics_measure
 where ref_data.analytics_concept = 'Chronic Condition Top 10'
 order by
     results.condition_rank
