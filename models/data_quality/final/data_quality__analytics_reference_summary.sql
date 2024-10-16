@@ -10,6 +10,7 @@ with unioned_data as (
           ref('data_quality__readmissions_reference')
         , ref('data_quality__cms_hcc_reference')
         , ref('data_quality__chronic_conditions_prevalence')
+        , ref('data_quality__quality_measures_reference')
       ],
       exclude=["_loaded_at"]
   ) }}
@@ -17,7 +18,8 @@ with unioned_data as (
 )
 
 select
-  analytics_measure
+    analytics_concept   
+  , analytics_measure
   , data_source_value
   , analytics_value
   , '{{ var('tuva_last_run')}}' as tuva_last_run

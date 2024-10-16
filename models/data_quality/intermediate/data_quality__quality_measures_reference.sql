@@ -3,10 +3,11 @@
 )}}
 
 with cte as (
-select avg(normalized_risk_score) data_source_value
-,cast('normalized risk score' as {{ dbt.type_string() }}) as analytics_measure
-,cast('cms-hcc' as {{ dbt.type_string() }}) as analytics_concept
-from {{ ref('cms_hcc__patient_risk_scores') }}
+select 
+'quality measures' as analytics_concept
+,measure_name as analytics_measure
+,performance_rate as data_source_value
+from {{ ref('quality_measures__summary_counts') }}  r 
 )
 
 select 
@@ -18,6 +19,9 @@ from {{ ref('data_quality__reference_mart_analytics') }} m
 left join cte on cte.analytics_measure = m.analytics_measure
 and
 m.analytics_concept = cte.analytics_concept
-where m.analytics_concept = 'cms-hcc'
-and
-m.analytics_measure = 'normalized risk score'
+where m.analytics_concept = 'quality measures'
+
+
+
+
+
