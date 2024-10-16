@@ -765,6 +765,7 @@ jobs:
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
+
 #######  Post message to the PR with the status of each job (i.e. success or failure)
   post_status_to_PR:
     needs: [
@@ -782,7 +783,7 @@ jobs:
       redshift_claims_prov_attribution_enabled,
       snowflake_clinical_and_claims_enabled,
       snowflake_claims_enabled,
-      snowflake_clinical_enabled
+      snowflake_clinical_enabled,
       snowflake_claims_prov_attribution_enabled,
     ]
     if: always()
@@ -829,7 +830,7 @@ jobs:
       redshift_claims_prov_attribution_enabled,
       snowflake_clinical_and_claims_enabled,
       snowflake_claims_enabled,
-      snowflake_clinical_enabled
+      snowflake_clinical_enabled,
       snowflake_claims_prov_attribution_enabled,
     ]
     if: always()
