@@ -587,6 +587,27 @@ models:
       - data_quality_audit
     materialized: table
 
+- name: data_quality__ed_classification
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_ed_classification
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__ed_classification_reference
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_ed_classification_reference
+    tags:
+      - data_quality_audit
+    materialized: table
+
+
 
 #### stage
 - name: data_quality__eligibility_dq_stage
