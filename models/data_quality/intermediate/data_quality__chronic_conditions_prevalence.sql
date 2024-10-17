@@ -25,7 +25,8 @@ cross join total_patients
 )
 
 select
-    coalesce(results.condition, ref_data.analytics_measure) as analytics_measure
+    ref_data.analytics_concept
+    , coalesce(results.condition, ref_data.analytics_measure) as analytics_measure
     , results.patients
     , results.condition_rank
     , results.percent_of_total as data_source_value

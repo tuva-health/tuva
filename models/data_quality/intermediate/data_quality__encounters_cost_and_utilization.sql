@@ -19,7 +19,7 @@ group by
     enc.encounter_group
     , enc.encounter_type
 )
-,paid_per (
+,paid_per as (
 select
     'Encounters cost and utilization paid per' as analytics_concept
     , enc.encounter_group
