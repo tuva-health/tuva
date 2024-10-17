@@ -53,6 +53,16 @@ models:
       - data_quality_audit
     materialized: table
 
+- name: data_quality__service_category_pmpm_trend
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: service_category_pmpm_trend
+    tags:
+      - data_quality_audit
+    materialized: table
+
 - name: data_quality__dx_and_px
   config:
     schema: |
@@ -493,6 +503,16 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
     alias: data_quality_readmissions_reference      
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__service_categories_pmpm
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: service_categories_pmpm
     tags:
       - data_quality_audit
     materialized: table

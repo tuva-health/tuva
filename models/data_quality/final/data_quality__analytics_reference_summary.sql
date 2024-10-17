@@ -14,6 +14,7 @@ with unioned_data as (
         , ref('data_quality__acute_inpatient_reference')
         , ref('data_quality__acute_inpatient_prevelence')
         , ref('data_quality__encounters_cost_and_utilization')
+        , ref('data_quality__service_categories_pmpm')
       ],
       exclude=["_loaded_at"]
   ) }}
