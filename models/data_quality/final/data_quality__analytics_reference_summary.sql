@@ -12,6 +12,7 @@ with unioned_data as (
         , ref('data_quality__chronic_conditions_prevalence')
         , ref('data_quality__quality_measures_reference')
         , ref('data_quality__acute_inpatient_reference')
+        , ref('data_quality__acute_inpatient_prevelence')
       ],
       exclude=["_loaded_at"]
   ) }}
@@ -23,6 +24,7 @@ select
   , analytics_measure
   , data_source_value
   , analytics_value
+  , value_rank
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from unioned_data
 

@@ -547,6 +547,15 @@ models:
       - data_quality_audit
     materialized: table
 
+- name: data_quality__acute_inpatient_prevelence
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_acute_inpatient_prevelence
+    tags:
+      - data_quality_audit
+    materialized: table
 
 
 #### stage
