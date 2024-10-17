@@ -26,7 +26,7 @@ group by coalesce(ed_classification_description,'Not Classified')
 ,actually_final as (
 select 'ed classification' as analytics_concept
 ,ed_classification_description as analytics_measure
-,percent_of_total as source_value
+,percent_of_total as data_source_value
 ,value_rank as value_rank
 from final
 )
@@ -34,7 +34,7 @@ from final
 
 select m.analytics_concept
 ,m.analytics_measure
-,source_value
+,data_source_value
 ,m.analytics_value
 ,m.value_rank
 from {{ ref('data_quality__reference_mart_analytics') }} m 

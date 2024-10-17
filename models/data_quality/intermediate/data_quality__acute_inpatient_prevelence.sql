@@ -25,7 +25,7 @@ group by concat(ms_drg_code, ' - ', ms_drg_description)
 
 select cte.analytics_concept
 ,ms_drg_code_and_description as analytics_measure
-,encounter_percent as source_value
+,encounter_percent as data_source_value
 ,m.analytics_value
 ,rank_nbr as value_rank
 from {{ ref('data_quality__reference_mart_analytics') }} m 

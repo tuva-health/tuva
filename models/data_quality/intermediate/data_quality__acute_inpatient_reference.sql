@@ -14,21 +14,21 @@ where encounter_type = 'acute inpatient'
 ,long_cte as (
    select 'acute inpatient' as analytics_concept
 ,'length of stay' as analytics_measure
-,los as source_value
+,los as data_source_value
 from cte
 
 union all 
 
    select 'acute inpatient' as analytics_concept
 ,'mortality rate' as analytics_measure
-,mortality_rate as source_value
+,mortality_rate as data_source_value
 from cte
 )
 
 
 select m.analytics_concept
 ,m.analytics_measure
-,source_value
+,data_source_value
 ,m.analytics_value
 from {{ ref('data_quality__reference_mart_analytics') }} m 
 left join long_cte on long_cte.analytics_measure = m.analytics_measure
@@ -42,7 +42,7 @@ union all
 
 select m.analytics_concept
 ,m.analytics_measure
-,source_value
+,data_source_value
 ,m.analytics_value
 from {{ ref('data_quality__reference_mart_analytics') }} m 
 left join long_cte on long_cte.analytics_measure = m.analytics_measure

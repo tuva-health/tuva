@@ -24,5 +24,6 @@ with unioned_data as (
 select
   data_quality_check
   , result_count
+  , coalesce(normally_zero ,1) as normally_zero
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from unioned_data

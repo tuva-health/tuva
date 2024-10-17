@@ -9,7 +9,7 @@ with member_months as (
 )
 ,pkpy as (
 select
-    'Encounters cost and utilization PKPY' as analytics_concept
+    'encounters cost and utilization PKPY' as analytics_concept
     , enc.encounter_group
     , enc.encounter_type as analytics_measure
     , count(enc.encounter_id) / avg(mm.member_months) * 12000 as data_source_value
@@ -21,7 +21,7 @@ group by
 )
 ,paid_per as (
 select
-    'Encounters cost and utilization paid per' as analytics_concept
+    'encounters cost and utilization paid per' as analytics_concept
     , enc.encounter_group
     , enc.encounter_type as analytics_measure
     , sum(enc.paid_amount) / count(enc.encounter_id) as data_source_value
