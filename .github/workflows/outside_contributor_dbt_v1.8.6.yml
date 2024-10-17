@@ -36,27 +36,24 @@ env:
   DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
 
 jobs:
-#######  BigQuery
-  bigquery_clinical_and_claims_enabled:
+  ci_testing_start:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Send Slack alert that PR has been opened
+      - name: Send Slack alert that PR has been opened and CI is starting
         id: slack
         uses: slackapi/slack-github-action@v1.27.0
         with:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "text": "CI Testing is starting on an outside contributor's PR: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
+                    "text": "CI Testing is starting on an outside contributor's PR: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
                   }
                 }
               ]
@@ -64,6 +61,15 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+#######  BigQuery
+  bigquery_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -83,10 +89,10 @@ jobs:
               dev:
                 type: bigquery
                 method: service-account
-                project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
+                project: dev-ci-testing
                 keyfile: ./creds.json
                 dataset: connector
-                threads: 4
+                threads: 8
                 timeout_seconds: 300
                 priority: interactive
             target: dev" > ./profiles/bigquery/profiles.yml
@@ -117,32 +123,12 @@ jobs:
 
   bigquery_claims_enabled:
     runs-on: ubuntu-latest
-    needs: bigquery_clinical_claims_enabled
+    needs: bigquery_clinical_and_claims_enabled
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Send Slack alert that PR has been opened
-        id: slack
-        uses: slackapi/slack-github-action@v1.27.0
         with:
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -162,10 +148,10 @@ jobs:
               dev:
                 type: bigquery
                 method: service-account
-                project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
+                project: dev-ci-testing
                 keyfile: ./creds.json
                 dataset: connector
-                threads: 4
+                threads: 8
                 timeout_seconds: 300
                 priority: interactive
             target: dev" > ./profiles/bigquery/profiles.yml
@@ -194,34 +180,14 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  bigquery_clinical_enabled:
+  bigquery_claims_prov_attribution_enabled:
     runs-on: ubuntu-latest
-    needs: bigqueryclaims_enabled
+    needs: bigquery_claims_enabled
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Send Slack alert that PR has been opened
-        id: slack
-        uses: slackapi/slack-github-action@v1.27.0
         with:
-          # For posting a rich message using Block Kit
-          payload: |
-            {
-              "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "CI Testing is starting on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -241,10 +207,69 @@ jobs:
               dev:
                 type: bigquery
                 method: service-account
-                project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
+                project: dev-ci-testing
                 keyfile: ./creds.json
                 dataset: connector
-                threads: 4
+                threads: 8
+                timeout_seconds: 300
+                priority: interactive
+            target: dev" > ./profiles/bigquery/profiles.yml
+        working-directory: ci_testing
+
+      - name: Create BigQuery credentials file
+        run: |
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 --decode > ./creds.json
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  bigquery_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: bigquery_claims_prov_attribution_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and BigQuery adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-bigquery        
+
+      - name: Create dbt profiles.yml for BigQuery
+        run: |
+          mkdir -p ./profiles/bigquery
+          echo "default:
+            outputs:
+              dev:
+                type: bigquery
+                method: service-account
+                project: dev-ci-testing
+                keyfile: ./creds.json
+                dataset: connector
+                threads: 8
                 timeout_seconds: 300
                 priority: interactive
             target: dev" > ./profiles/bigquery/profiles.yml
@@ -273,12 +298,73 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
+  bigquery_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: bigquery_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and BigQuery adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-bigquery        
+
+      - name: Create dbt profiles.yml for BigQuery
+        run: |
+          mkdir -p ./profiles/bigquery
+          echo "default:
+            outputs:
+              dev:
+                type: bigquery
+                method: service-account
+                project: dev-ci-testing
+                keyfile: ./creds.json
+                dataset: connector
+                threads: 8
+                timeout_seconds: 300
+                priority: interactive
+            target: dev" > ./profiles/bigquery/profiles.yml
+        working-directory: ci_testing
+
+      - name: Create BigQuery credentials file
+        run: |
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 --decode > ./creds.json
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","provider_attribution": true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
 #######  Fabric
   fabric_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -307,7 +393,7 @@ jobs:
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -321,6 +407,52 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install ODBC Driver 18 for SQL Server
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18          
+
+      - name: Install dbt-core and Fabric adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-fabric          
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/fabric
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/fabric
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  fabric_claims_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: fabric_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -359,10 +491,12 @@ jobs:
 
   fabric_clinical_enabled:
     runs-on: ubuntu-latest
-    needs: fabric_claim_enabled
+    needs: fabric_claims_prov_attribution_enabled
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -398,12 +532,59 @@ jobs:
         if: ${{ always() }}
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
+
+  fabric_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: fabric_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install ODBC Driver 18 for SQL Server
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18          
+
+      - name: Install dbt-core and Fabric adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-fabric          
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/fabric
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/fabric
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
 #######  Redshift
   redshift_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -439,6 +620,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -468,12 +651,51 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  redshift_clinical_enabled:
+  redshift_claims_prov_attribution_enabled:
     runs-on: ubuntu-latest
-    needs: redshift_claim_enabled
+    needs: redshift_claims_enabled
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Redshift adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-redshift        
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/redshift
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/redshift
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  redshift_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: redshift_claims_prov_attribution_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -503,12 +725,51 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
+  redshift_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: redshift_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Redshift adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-redshift        
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/redshift
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/redshift
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
 #######  Snowflake
   snowflake_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -540,10 +801,49 @@ jobs:
 
   snowflake_claims_enabled:
     runs-on: ubuntu-latest
-    needs: snowflake_clinical_enabled
+    needs: snowflake_clinical_and_claims_enabled
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake          
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_claims_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -575,10 +875,12 @@ jobs:
 
   snowflake_clinical_enabled:
     runs-on: ubuntu-latest
-    needs: snowflake_clinical_and_claims_enabled
+    needs: snowflake_claims_prov_attribution_enabled
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -600,7 +902,7 @@ jobs:
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -608,20 +910,66 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-  post_status:
+  snowflake_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake          
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+#######  Post message to the PR with the status of each job (i.e. success or failure)
+  post_status_to_PR:
     needs: [
       bigquery_clinical_and_claims_enabled,
       bigquery_claims_enabled,
+      bigquery_claims_prov_attribution_enabled,
       bigquery_clinical_enabled,
+      fabric_prov_attribution_enabled,
       fabric_clinical_and_claims_enabled,
       fabric_claims_enabled,
+      fabric_claims_prov_attribution_enabled,
       fabric_clinical_enabled,
+      fabric_prov_attribution_enabled,
       redshift_clinical_and_claims_enabled,
       redshift_claims_enabled,
+      redshift_claims_prov_attribution_enabled,
       redshift_clinical_enabled,
+      redshift_prov_attribution_enabled,
       snowflake_clinical_and_claims_enabled,
       snowflake_claims_enabled,
-      snowflake_clinical_enabled
+      snowflake_claims_prov_attribution_enabled,
+      snowflake_clinical_enabled,
+      snowflake_prov_attribution_enabled
     ]
     if: always()
     runs-on: ubuntu-latest
@@ -648,3 +996,53 @@ jobs:
           gh pr comment $PR_ID --body "$PR_COMMENT"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+#######  Post message to the PR with the status of each job (i.e. success or failure)
+  ci_testing_end:
+    runs-on: ubuntu-latest
+    needs: [
+      bigquery_clinical_and_claims_enabled,
+      bigquery_claims_enabled,
+      bigquery_claims_prov_attribution_enabled,
+      bigquery_clinical_enabled,
+      fabric_prov_attribution_enabled,
+      fabric_clinical_and_claims_enabled,
+      fabric_claims_enabled,
+      fabric_claims_prov_attribution_enabled,
+      fabric_clinical_enabled,
+      fabric_prov_attribution_enabled,
+      redshift_clinical_and_claims_enabled,
+      redshift_claims_enabled,
+      redshift_claims_prov_attribution_enabled,
+      redshift_clinical_enabled,
+      redshift_prov_attribution_enabled,
+      snowflake_clinical_and_claims_enabled,
+      snowflake_claims_enabled,
+      snowflake_claims_prov_attribution_enabled,
+      snowflake_clinical_enabled,
+      snowflake_prov_attribution_enabled
+    ]
+    if: always()
+    steps:
+
+      - name: Send Slack alert that CI is complete
+        id: slack
+        uses: slackapi/slack-github-action@v1.27.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "CI testing is done on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "CI testing is done on: ${{ github.event.pull_request.html_url || github.event.head_commit.url }}\n\n*Workflow has finished with the following statuses:*\n\n• *BigQuery Clinical and Claims:* ${{ needs.bigquery_clinical_and_claims_enabled.result }}\n• *Fabric Clinical and Claims:* ${{ needs.fabric_clinical_and_claims_enabled.result }}\n• *Redshift Clinical and Claims:* ${{ needs.redshift_clinical_and_claims_enabled.result }}\n• *Snowflake Clinical and Claims:* ${{ needs.snowflake_clinical_and_claims_enabled.result }}\n• *Snowflake Claims:* ${{ needs.snowflake_claims_enabled.result }}\n• *Snowflake Clinical:* ${{ needs.snowflake_clinical_enabled.result }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
