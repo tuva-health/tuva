@@ -3,26 +3,6 @@ models:
 
 #### Data Quality
 ## Final
-- name: data_quality__chronic_conditions_missing_union
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: chronic_conditions_missing_union
-    tags:
-      - data_quality_audit
-    materialized: table
-
-- name: data_quality__chronic_conditions_missing
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: chronic_conditions_missing
-    tags:
-      - data_quality_audit
-    materialized: table
-
 - name: data_quality__chronic_conditions_prevalence
   config:
     schema: |

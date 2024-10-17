@@ -9,7 +9,6 @@ with unioned_data as (
       relations=[
           ref('data_quality__readmissions')
         , ref('data_quality__chronic_conditions_none')
-        , ref('data_quality__chronic_conditions_missing_union')
         , ref('data_quality__cms_hcc')
         , ref('data_quality__quality_measures')
         , ref('data_quality__encounters_missing_groups_union')
