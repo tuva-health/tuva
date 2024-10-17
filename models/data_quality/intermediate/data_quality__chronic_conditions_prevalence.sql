@@ -6,7 +6,7 @@ with condition_counts as (
     select
         condition
         , count(distinct patient_id) as patients
-    from {{ ref('chronic_conditions__cms_chronic_conditions_long') }}
+    from {{ ref('chronic_conditions__tuva_chronic_conditions_long') }}
     group by condition
 )
 , total_patients as (
@@ -35,6 +35,6 @@ select
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from results
 full outer join {{ ref('data_quality__reference_mart_analytics') }} as ref_data on results.condition = ref_data.analytics_measure
-where ref_data.analytics_concept = 'Chronic Condition Top 10'
+where ref_data.analytics_concept = 'Chronic Conditions Top 10'
 order by
     results.condition_rank

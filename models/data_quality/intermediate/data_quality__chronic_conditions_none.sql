@@ -5,10 +5,10 @@
 with results as (
     select 
         'Percent of patients without Chronic Conditions' as data_quality_check
-        , sum(case when cccw.patient_id is null then 1 else 0 end) / count(distinct e.patient_id) * 100 as result_count
+        , sum(case when tccw.patient_id is null then 1 else 0 end) / count(distinct e.patient_id) * 100 as result_count
     from core.eligibility e
-    left join chronic_conditions.cms_chronic_conditions_wide cccw 
-        on e.patient_id = cccw.patient_id
+    left join {{ ref('chronic_conditions__tuva_chronic_conditions_wide')}} tccw 
+        on e.patient_id = tccw.patient_id
 )
 
 select
