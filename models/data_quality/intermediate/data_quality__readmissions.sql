@@ -1,4 +1,8 @@
--- Creating the unpivot transformation with dbt_utils.unpivot
+{{ config(
+     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
+)}}
+
+
 with disqualified_unpivot as (
     {{ dbt_utils.unpivot(
         relation=ref('readmissions__encounter_augmented'),
@@ -33,5 +37,5 @@ select
     ,  count(distinct encounter_id) as result_count
       , '{{ var('tuva_last_run') }}' as tuva_last_run
 from disqualified_unpivot d
-where flagvalue = 1  
+where cast(flagvalue as {{ dbt.type_int() }} ) = 1  
 group by disqualified_reason

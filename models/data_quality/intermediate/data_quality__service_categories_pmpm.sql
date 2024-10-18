@@ -12,7 +12,9 @@ with member_months as (
         , mc.service_category_2 as analytics_measure
         , sum(mc.paid_amount) as total_paid
         , avg(mm.member_months) as member_months
-        , sum(mc.paid_amount) / avg(mm.member_months) as data_source_value
+        , case when avg(mm.member_months) = 0 then null
+               else sum(mc.paid_amount) / avg(mm.member_months)
+          end as data_source_value
     from {{ ref('core__medical_claim') }} mc
     cross join member_months mm
     group by

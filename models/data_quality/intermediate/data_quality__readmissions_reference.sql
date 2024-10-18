@@ -6,7 +6,7 @@ with cte as (
 select 
     cast('readmission rate' as {{dbt.type_string()}}) as analytics_measure
     ,cast('readmissions' as {{dbt.type_string()}}) as analytics_concept
-    ,sum(unplanned_readmit_30_flag)/cast(count(*) as decimal(18,2)) as data_source_value
+    ,sum(unplanned_readmit_30_flag)/cast(count(*) as {{dbt.type_numeric() }} ) as data_source_value
 from {{ ref('readmissions__readmission_summary') }}  r 
 where index_admission_flag = 1
 )
