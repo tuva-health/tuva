@@ -13,5 +13,6 @@ with cte as (
 
 select data_quality_check
 ,result_count
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from cte
 

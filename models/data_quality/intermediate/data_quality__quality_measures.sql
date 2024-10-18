@@ -8,6 +8,7 @@ select sum(case when numerator_sum = 0 then 1 else 0 end) as numerator_zero_coun
 from {{ ref('quality_measures__summary_counts') }} 
 )
 
+,final as (
 select 'quality measure numerator zero' as data_quality_check
 ,numerator_zero_count as result_count
 from cte 
@@ -17,3 +18,8 @@ union all
 select 'quality measure denominator zero' as data_quality_check
 ,denominator_zero_count as result_count
 from cte
+)
+
+select *
+, '{{ var('tuva_last_run') }}' as tuva_last_run
+from final

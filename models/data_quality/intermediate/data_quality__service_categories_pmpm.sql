@@ -8,7 +8,7 @@ with member_months as (
 
 , pmpm as (
     select
-        'service categories pmpm' as analytics_concept
+        cast('service categories pmpm' as {{dbt.type_string() }} ) as analytics_concept
         , mc.service_category_2 as analytics_measure
         , sum(mc.paid_amount) as total_paid
         , avg(mm.member_months) as member_months

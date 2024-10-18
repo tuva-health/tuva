@@ -10,7 +10,7 @@ with chronic_conditions as
 
 ,results as (
     select 
-        'Percent of patients without chronic conditions' as data_quality_check
+        cast('Percent of patients without chronic conditions' as {{dbt.type_string()}}) as data_quality_check
         , sum(case when cccw.patient_id is null then 1 else 0 end) / count(distinct e.patient_id) * 100 as result_count
     from {{ ref('core__patient') }} e
     left join chronic_conditions cccw 
@@ -22,7 +22,8 @@ select
     , results.result_count
     , ref_data.analytics_value as medicare_lds_reference
     , 0 as normally_zero 
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , cast('{{ var('tuva_last_run') }}' as {{dbt.type_string()}}) as tuva_last_run
+    
 from results
 left join {{ ref('data_quality__reference_mart_analytics') }} as ref_data 
     on results.data_quality_check = ref_data.analytics_measure

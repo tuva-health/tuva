@@ -1,34 +1,37 @@
-{{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
-)}}
-
+-- Creating the unpivot transformation with dbt_utils.unpivot
 with disqualified_unpivot as (
-    select encounter_id
-    , disqualified_reason
-    , flagvalue
-    from {{ ref('readmissions__encounter_augmented') }} p
-    unpivot(
-        flagvalue for disqualified_reason in (
-            invalid_discharge_disposition_code_flag
-            , invalid_ms_drg_flag
-            , invalid_primary_diagnosis_code_flag
-            , missing_admit_date_flag
-            , missing_discharge_date_flag
-            , admit_after_discharge_flag
-            , missing_discharge_disposition_code_flag
-            , missing_ms_drg_flag
-            , missing_primary_diagnosis_flag
-            , no_diagnosis_ccs_flag
-            , overlaps_with_another_encounter_flag
-        )
-    ) as unpvt
+    {{ dbt_utils.unpivot(
+        relation=ref('readmissions__encounter_augmented'),
+        cast_to=type_string(),  
+        exclude=['encounter_id'], 
+        field_name='disqualified_reason',
+        value_name='flagvalue',
+        remove=[
+    'encounter_id',
+    'patient_id',
+    'admit_date',
+    'discharge_date',
+    'discharge_disposition_code',
+    'facility_id',
+    'ms_drg_code',
+    'paid_amount',
+    'length_of_stay',
+    'index_admission_flag',
+    'planned_flag',
+    'specialty_cohort',
+    'died_flag',
+    'diagnosis_ccs',
+    'disqualified_encounter_flag',
+    'tuva_last_run'
+]
+    ) }}
 )
 
-
+-- Using the transformed data to perform aggregation
 select 
- {{ dbt.concat(["'inpatient encounter '", "d.disqualified_reason"]) }} as data_quality_check
-, count(distinct encounter_id) as result_count
+    {{ dbt.concat(["'inpatient encounter '", "d.disqualified_reason"]) }} as data_quality_check
+    ,  count(distinct encounter_id) as result_count
+      , '{{ var('tuva_last_run') }}' as tuva_last_run
 from disqualified_unpivot d
-where flagvalue = 1
+where flagvalue = 1  
 group by disqualified_reason
-

@@ -12,6 +12,7 @@ with cte as (
   from {{ ref('ed_classification__summary') }}
 )
 
+,final as (
 select 'ed classification missing ed_care_needed_preventable' as data_quality_check,
        case when ed_care_needed_preventable = 0 then 1 else 0 end as result_count
 from cte
@@ -33,3 +34,8 @@ union all
 select 'ed classification missing non_emergent' as data_quality_check,
        case when non_emergent = 0 then 1 else 0 end as result_count
 from cte
+)
+
+select *
+, '{{ var('tuva_last_run') }}' as tuva_last_run
+from final

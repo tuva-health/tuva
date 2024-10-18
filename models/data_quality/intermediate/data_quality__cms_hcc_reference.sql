@@ -14,6 +14,7 @@ select
 ,m.analytics_measure as analytics_measure
 ,cte.data_source_value
 ,m.analytics_value
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('data_quality__reference_mart_analytics') }} m 
 left join cte on cte.analytics_measure = m.analytics_measure
 and
