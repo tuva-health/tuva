@@ -587,6 +587,26 @@ models:
       - data_quality_audit
     materialized: table
 
+- name: data_quality__financial_pmpm
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_financial_pmpm
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__claim_percent
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: data_quality_claim_percent
+    tags:
+      - data_quality_audit
+    materialized: table
+
 
 
 #### stage
