@@ -10,7 +10,7 @@ select sum(paid_amount) as paid_amount
 from {{ ref('medical_claim') }}
 group by claim_type
 
-union 
+union all
 
 select sum(paid_amount) as paid_amount
 ,'pharmacy' as claim_type
