@@ -15,43 +15,52 @@ Jinja is used to set payment year variable.
  - The collection year is one year prior to the payment year.
 */
 
-{% set payment_year = var('cms_hcc_payment_year') | int() -%}
-{% set payment_year_age_date = payment_year ~ '-02-01' -%}
-{% set collection_year = payment_year - 1 -%}
-{% set collection_year_start = "'" ~ collection_year ~ "-01-01'" %}
-{% set collection_year_end = "'" ~ payment_year ~ "-12-31'" %}
-
 with stg_eligibility as (
 
     select
-          patient_id
-        , enrollment_start_date
-        , enrollment_end_date
-        , original_reason_entitlement_code
-        , dual_status_code
-        , medicare_status_code
+          elig.patient_id
+        , elig.enrollment_start_date
+        , elig.enrollment_end_date
+        , elig.original_reason_entitlement_code
+        , elig.dual_status_code
+        , elig.medicare_status_code
+        , dates.collection_year
+        , dates.payment_year
+        , dates.collection_start_date
+        , dates.collection_end_date
+        , {{ dbt.concat(['dates.payment_year', "'-12-31'"]) }} as payment_year_end_date
         , row_number() over(
-            partition by patient_id
-            order by enrollment_end_date desc
+            partition by elig.patient_id, dates.collection_end_date
+            order by elig.enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
-    from {{ ref('cms_hcc__stg_core__eligibility') }}
-    where (
-        /* Include members with any overlap in the collection or payment year */
-        enrollment_start_date <= {{ collection_year_end }}
-        and enrollment_end_date >= {{ collection_year_start }}
-    )
+    from {{ ref('cms_hcc__stg_core__eligibility') }} as elig
+    inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+        /* filter to members with eligibility in collection or payment year */
+        on elig.enrollment_start_date <= dates.payment_year || '-12-31'
+        and elig.enrollment_end_date >= dates.collection_start_date
+
+)
+
+, payment_year_age_dates as (
+
+    select distinct
+          payment_year
+        , payment_year || '-02-01' as payment_year_age_date
+    from {{ ref('cms_hcc__int_monthly_collection_dates') }}
 
 )
 
 , stg_patient as (
 
     select
-          patient_id
-        , sex
-        , birth_date
-        , floor({{ datediff('birth_date', "'"~payment_year_age_date~"'", 'hour') }} / 8766.0) as payment_year_age
-        , death_date
-    from {{ ref('cms_hcc__stg_core__patient') }}
+          patient.patient_id
+        , patient.sex
+        , patient.birth_date
+        , dates.payment_year
+        , floor({{ datediff('birth_date', 'payment_year_age_date', 'hour') }} / 8766.0) as payment_year_age
+        , patient.death_date
+    from {{ ref('cms_hcc__stg_core__patient') }} as patient
+    cross join payment_year_age_dates as dates
 
 )
 
@@ -62,44 +71,34 @@ with stg_eligibility as (
           patient_id
         , enrollment_start_date
         , enrollment_end_date
+        , payment_year
+        , collection_start_date
+        , collection_end_date
         , case
-            when enrollment_start_date < {{ try_to_cast_date(collection_year_start, 'YYYY-MM-DD') }}
-            then {{ try_to_cast_date(collection_year_start, 'YYYY-MM-DD') }}
+            when enrollment_start_date < {{ try_to_cast_date('collection_start_date', 'YYYY-MM-DD') }}
+            then {{ try_to_cast_date('collection_start_date', 'YYYY-MM-DD') }}
             else enrollment_start_date
           end as proxy_enrollment_start_date
         , case
-            when enrollment_end_date > {{ try_to_cast_date(collection_year_end, 'YYYY-MM-DD') }}
-            then {{ try_to_cast_date(collection_year_end, 'YYYY-MM-DD') }}
+            when enrollment_end_date > {{ try_to_cast_date('payment_year_end_date', 'YYYY-MM-DD') }}
+            then {{ try_to_cast_date('payment_year_end_date', 'YYYY-MM-DD') }}
             else enrollment_end_date
           end as proxy_enrollment_end_date
     from stg_eligibility
-    where (
-        /* filter to members with eligibility in collection or payment year */
-        {% if target.type == 'fabric' %}
-            YEAR(enrollment_start_date)
-                between {{ collection_year }}
-                and {{ payment_year }}
-            or YEAR(enrollment_end_date)
-                between {{ collection_year }}
-                and {{ payment_year }}
-        {% else %}
-            extract(year from enrollment_start_date)
-                between {{ collection_year }}
-                and {{ payment_year }}
-            or extract(year from enrollment_end_date)
-                between {{ collection_year }}
-                and {{ payment_year }}
-        {% endif %}
-    )
-
+    
 )
 
 , calculate_prior_coverage as (
 
     select patient_id
+        , payment_year
+        , collection_end_date
         , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
+        , min({{ datediff('collection_start_date', 'collection_end_date', 'month') }} + 1) as collection_months
     from cap_collection_start_end_dates
     group by patient_id
+        , payment_year
+        , collection_end_date
 
 )
 
@@ -111,8 +110,10 @@ with stg_eligibility as (
 
     select
           patient_id
+        , payment_year
+        , collection_end_date
         , case
-            when coverage_months < 12 then 'New'
+            when coverage_months < collection_months then 'New'
             else 'Continuing'
           end as enrollment_status
     from calculate_prior_coverage
@@ -123,6 +124,9 @@ with stg_eligibility as (
 
     select
           stg_eligibility.patient_id
+        , stg_eligibility.payment_year
+        , stg_eligibility.collection_start_date
+        , stg_eligibility.collection_end_date
         , stg_patient.sex as gender
         , stg_patient.payment_year_age
         , stg_eligibility.original_reason_entitlement_code
@@ -147,8 +151,11 @@ with stg_eligibility as (
     from stg_eligibility
         left join add_enrollment
             on stg_eligibility.patient_id = add_enrollment.patient_id
+            and stg_eligibility.payment_year = add_enrollment.payment_year
+            and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left join stg_patient
             on stg_eligibility.patient_id = stg_patient.patient_id
+            and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
 
 )
@@ -157,6 +164,9 @@ with stg_eligibility as (
 
     select
           patient_id
+        , payment_year
+        , collection_start_date
+        , collection_end_date
         , gender
         , payment_year_age
         , original_reason_entitlement_code
@@ -202,6 +212,9 @@ with stg_eligibility as (
 
     select
           patient_id
+        , payment_year
+        , collection_start_date
+        , collection_end_date
         , enrollment_status
         , case
             when gender = 'female' then 'Female'
@@ -250,17 +263,17 @@ with stg_eligibility as (
                 when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 1
                 else 0
             {% else %}
-                when original_reason_entitlement_code in ('2') then TRUE
-                when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
-                when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
-                else FALSE
+            when original_reason_entitlement_code in ('2') then TRUE
+            when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
+            when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
+            else FALSE
             {% endif %}
           end as orec_default
         /* Setting default true until institutional logic is added */
         {% if target.type == 'fabric' %}
             , 1 as institutional_status_default
         {% else %}
-            , TRUE as institutional_status_default
+        , TRUE as institutional_status_default
         {% endif %}
     from add_age_group
 
@@ -288,7 +301,9 @@ with stg_eligibility as (
             , cast(orec_default as boolean) as orec_default
             , cast(institutional_status_default as boolean) as institutional_status_default
         {% endif %}
-        , cast('{{ payment_year }}' as integer) as payment_year
+        , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from add_status_logic
 
 )
@@ -307,5 +322,7 @@ select
     , orec_default
     , institutional_status_default
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

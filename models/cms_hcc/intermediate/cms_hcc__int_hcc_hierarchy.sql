@@ -17,6 +17,8 @@ with hcc_mapping as (
         , hcc_code
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_hcc_mapping') }}
 
 )
@@ -42,6 +44,8 @@ with hcc_mapping as (
           hcc_mapping.patient_id
         , hcc_mapping.model_version
         , hcc_mapping.payment_year
+        , hcc_mapping.collection_start_date
+        , hcc_mapping.collection_end_date
         , hcc_mapping.hcc_code
     from hcc_mapping
         left join seed_hcc_hierarchy as hcc_top_level
@@ -64,6 +68,8 @@ with hcc_mapping as (
           hcc_mapping.patient_id
         , hcc_mapping.model_version
         , hcc_mapping.payment_year
+        , hcc_mapping.collection_start_date
+        , hcc_mapping.collection_end_date
         , hcc_mapping.hcc_code
         , seed_hcc_hierarchy.hcc_code as top_level_hcc
     from hcc_mapping
@@ -84,6 +90,8 @@ with hcc_mapping as (
           hccs_with_hierarchy.patient_id
         , hccs_with_hierarchy.model_version
         , hccs_with_hierarchy.payment_year
+        , hccs_with_hierarchy.collection_start_date
+        , hccs_with_hierarchy.collection_end_date
         , hccs_with_hierarchy.hcc_code
         , min(hcc_mapping.hcc_code) as top_level_hcc
     from hccs_with_hierarchy
@@ -91,10 +99,14 @@ with hcc_mapping as (
             on hcc_mapping.patient_id = hccs_with_hierarchy.patient_id
             and hcc_mapping.hcc_code = hccs_with_hierarchy.top_level_hcc
             and hcc_mapping.model_version = hccs_with_hierarchy.model_version
+            and hcc_mapping.payment_year = hccs_with_hierarchy.payment_year
+            and hcc_mapping.collection_end_date = hccs_with_hierarchy.collection_end_date
     group by
           hccs_with_hierarchy.patient_id
         , hccs_with_hierarchy.model_version
         , hccs_with_hierarchy.payment_year
+        , hccs_with_hierarchy.collection_start_date
+        , hccs_with_hierarchy.collection_end_date
         , hccs_with_hierarchy.hcc_code
 
 )
@@ -109,6 +121,8 @@ with hcc_mapping as (
           patient_id
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
         , case
             when top_level_hcc is not null then top_level_hcc
             else hcc_code
@@ -127,6 +141,8 @@ with hcc_mapping as (
           hcc_mapping.patient_id
         , hcc_mapping.model_version
         , hcc_mapping.payment_year
+        , hcc_mapping.collection_start_date
+        , hcc_mapping.collection_end_date
         , hcc_mapping.hcc_code
     from hcc_mapping
         inner join seed_hcc_hierarchy
@@ -136,10 +152,14 @@ with hcc_mapping as (
             on hcc_mapping.patient_id = lower_level_inclusions.patient_id
             and hcc_mapping.hcc_code = lower_level_inclusions.hcc_code
             and hcc_mapping.model_version = lower_level_inclusions.model_version
+            and hcc_mapping.payment_year = lower_level_inclusions.payment_year
+            and hcc_mapping.collection_end_date = lower_level_inclusions.collection_end_date
         left join hierarchy_applied
             on hcc_mapping.patient_id = hierarchy_applied.patient_id
             and hcc_mapping.hcc_code = hierarchy_applied.hcc_code
             and hcc_mapping.model_version = hierarchy_applied.model_version
+            and hcc_mapping.payment_year = hierarchy_applied.payment_year
+            and hcc_mapping.collection_end_date = hierarchy_applied.collection_end_date
     where lower_level_inclusions.hcc_code is null
         and hierarchy_applied.top_level_hcc is null
 
@@ -161,6 +181,8 @@ with hcc_mapping as (
           cast(patient_id as {{ dbt.type_string() }}) as patient_id
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
     from unioned
 
@@ -170,6 +192,8 @@ select
       patient_id
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , hcc_code
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

@@ -11,6 +11,8 @@ with demographics as (
         , institutional_status
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_demographic_factors') }}
 
 )
@@ -21,6 +23,9 @@ with demographics as (
           patient_id
         , hcc_code
         , model_version
+        , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
 
 )
@@ -48,11 +53,15 @@ with demographics as (
         , demographics.institutional_status
         , demographics.model_version
         , demographics.payment_year
+        , demographics.collection_start_date
+        , demographics.collection_end_date
         , hcc_hierarchy.hcc_code
     from demographics
         inner join hcc_hierarchy
             on demographics.patient_id = hcc_hierarchy.patient_id
             and demographics.model_version = hcc_hierarchy.model_version
+            and demographics.payment_year = hcc_hierarchy.payment_year
+            and demographics.collection_end_date = hcc_hierarchy.collection_end_date
 
 )
 
@@ -62,6 +71,8 @@ with demographics as (
           demographics_with_hccs.patient_id
         , demographics_with_hccs.model_version
         , demographics_with_hccs.payment_year
+        , demographics_with_hccs.collection_start_date
+        , demographics_with_hccs.collection_end_date
         , seed_interaction_factors.factor_type
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
@@ -83,6 +94,8 @@ select
     , cast(factor_type as {{ dbt.type_string() }}) as factor_type
     , cast(model_version as {{ dbt.type_string() }}) as model_version
     , cast(payment_year as integer) as payment_year
+    , cast(collection_start_date as date) as collection_start_date
+    , cast(collection_end_date as date) as collection_end_date
 from interactions
 
 )
@@ -94,5 +107,7 @@ select
     , factor_type
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
