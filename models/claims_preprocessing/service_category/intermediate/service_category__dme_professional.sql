@@ -3,14 +3,10 @@
    )
 }}
 
-select distinct
-    claim_id
-    , claim_line_number
-    , claim_line_id
-, 'ancillary' as service_category_1
-, 'durable medical equipment' as service_category_2
-, 'durable medical equipment' as service_category_3
-, '{{ this.name }}' as source_model_name
+select distinct 
+  claim_id
+, claim_line_number
+, 'Durable Medical Equipment' as service_category_2
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'professional'

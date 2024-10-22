@@ -7,8 +7,11 @@
 
 with claim_dates as(
     select
-        claim_id
-        , claim_line_number
+         {{ dbt.concat([
+            "claim_id",
+            "'-'",
+            "claim_line_number"
+            ]) }} as medical_claim_id
         , patient_id
         , payer
         , {{ quote_column('plan') }}
@@ -29,8 +32,7 @@ with claim_dates as(
 
 , claim_year_month as(
     select
-          claim_id
-        , claim_line_number
+        medical_claim_id
         , patient_id
         , payer
         , {{ quote_column('plan') }}
@@ -66,8 +68,7 @@ from claim_dates
 )
 
 select distinct
-     claim.claim_id
-    , claim.claim_line_number
+    claim.medical_claim_id
     , claim.patient_id
     , claim.payer
     , claim.{{ quote_column('plan') }}

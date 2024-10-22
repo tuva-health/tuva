@@ -524,7 +524,7 @@ select distinct
  }} as condition_id
 
     , cast(unpivot_cte.patient_id as {{ dbt.type_string() }} ) as patient_id
-    , cast(null as {{ dbt.type_string() }} ) as encounter_id --one claim can be on multiple encounters, so nulling out for now
+    , cast(coalesce(ap.encounter_id, ed.encounter_id) as {{ dbt.type_string() }} ) as encounter_id
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
     , {{ try_to_cast_date('unpivot_cte.recorded_date', 'YYYY-MM-DD') }} as recorded_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as onset_date
@@ -547,11 +547,10 @@ select distinct
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from unpivot_cte
---inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
---and
---unpivot_cte.claim_line_number = x.claim_line_number
---and
---x.claim_line_attribution_number = 1
+left join {{ ref('acute_inpatient__encounter_id')}} as ap
+    on unpivot_cte.claim_id = ap.claim_id
+left join {{ ref('emergency_department__int_encounter_id')}} as ed
+    on unpivot_cte.claim_id = ed.claim_id
 left join {{ ref('terminology__icd_10_cm') }} icd
     on unpivot_cte.source_code = icd.icd_10_cm
 left join {{ ref('terminology__present_on_admission') }} as poa

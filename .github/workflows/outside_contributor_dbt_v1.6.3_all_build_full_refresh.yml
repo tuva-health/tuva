@@ -1,0 +1,337 @@
+name: outside_contributor_dbt_v1.6.3_all_build_full_refresh
+
+on:
+  workflow_dispatch:
+   inputs:
+      prNumber:
+        description: 'Pull Request Number'
+        required: true
+
+env:
+  DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
+  DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
+  DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
+  DBT_SNOWFLAKE_CI_ROLE: ${{ secrets.DBT_SNOWFLAKE_CI_ROLE }}
+  DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
+  DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
+  DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+  
+  DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
+  DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
+  DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
+  DBT_REDSHIFT_CI_PORT: ${{ secrets.DBT_REDSHIFT_CI_PORT }}
+
+  DBT_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
+  TUVA_BIGQUERY_PROJECT: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
+  
+jobs:
+  
+  snowflake_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_clinical_and_claims_enabled
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt run --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/snowflake"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt run --profiles-dir ./profiles/snowflake --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  redshift_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  redshift_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: redshift_clinical_and_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt run --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  redshift_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: redshift_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/redshift"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt run --profiles-dir ./profiles/redshift --vars {"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash 
+        
+  bigquery_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  bigquery_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: bigquery_clinical_and_claims_enabled
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt run --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  bigquery_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: bigquery_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/pull/${{ github.event.inputs.prNumber }}/merge
+
+      - name: dbt-deps
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt deps --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-debug
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: "dbt debug --profiles-dir ./profiles/bigquery"
+          dbt_project_folder: "ci_testing"
+
+      - name: dbt-build
+        uses: mwhitaker/dbt-action@v1.6.3
+        with:
+          dbt_command: 'dbt run --profiles-dir ./profiles/bigquery --vars {"input_database":"dev-ci-testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt_project_folder: "ci_testing"
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+
+  post_status:
+    needs: [
+      snowflake_clinical_and_claims_enabled,
+      snowflake_claims_enabled,
+      snowflake_clinical_enabled,
+      redshift_clinical_and_claims_enabled,
+      redshift_claims_enabled,
+      redshift_clinical_enabled,
+      bigquery_clinical_and_claims_enabled,
+      bigquery_claims_enabled,
+      bigquery_clinical_enabled
+    ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Post comment on PR
+        run: |
+          PR_COMMENT="Workflow has finished with the following statuses:<ul><li>Snowflake: ${{ needs.snowflake_clinical_and_claims_enabled.result }}</li></ul><ul><li>Snowflake: ${{ needs.snowflake_claims_enabled.result }}</li></ul><ul><li>Snowflake: ${{ needs.snowflake_clinical_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_clinical_and_claims_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_claims_enabled.result }}</li></ul><ul><li>Redshift: ${{ needs.redshift_clinical_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_clinical_and_claims_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_claims_enabled.result }}</li></ul><ul><li>BigQuery: ${{ needs.bigquery_clinical_enabled.result }}</li></ul>"
+          PR_ID=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.inputs.prNumber }} --json number -q .number)
+          gh pr comment $PR_ID --body "$PR_COMMENT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
