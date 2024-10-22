@@ -8,7 +8,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: brand_generic_opportunity
@@ -63,7 +63,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: generic_available_list
@@ -115,7 +115,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: pharmacy_claim_expanded
@@ -209,7 +209,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: _int_brand_with_generic_available
@@ -224,7 +224,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: _int_claims_current_cost
@@ -239,7 +239,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: _int_generic_cost
@@ -254,7 +254,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: _int_generic_cost_by_ndc
@@ -271,7 +271,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
+        {% else %}
           pharmacy
         {%- endif -%}
       alias: stg_pharmacy_claim

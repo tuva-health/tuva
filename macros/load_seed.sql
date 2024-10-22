@@ -29,6 +29,9 @@
 {# { log( cols,true) } #}
 
 {% set sql %}
+  set s3_access_key_id='AKIA2EPVNTV4FLAEBFGE';
+  set s3_secret_access_key='TARgblERrFP81Op+52KZW7HrP1Om6ObEDQAUVN2u';
+  set s3_region='us-east-1';
   create or replace table {{this}} as
   select
       *
@@ -56,20 +59,10 @@
 
 {% macro redshift__load_seed(uri,pattern,compression,headers,null_marker) %}
 {% set sql %}
-
-{% set access_key_part_1 = 'AKIA2EPVN' %}
-{% set access_key_part_2 = 'TV4GFRR5377' %}
-
-{% set secret_key_part_1 = 'refUFvpX0ekY6CKEBEM' %}
-{% set secret_key_part_2 = '7BBfwDm/aUwSmmqX/Updi' %}
-
-{% set full_access_key = access_key_part_1 ~ access_key_part_2 %}
-{% set full_secret_key = secret_key_part_1 ~ secret_key_part_2 %}
-
 copy  {{ this }}
   from 's3://{{ uri }}/{{ pattern }}'
-    access_key_id '{{ full_access_key }}'
-    secret_access_key '{{ full_secret_key }}'
+  access_key_id 'AKIA2EPVNTV4FLAEBFGE'
+  secret_access_key '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'
   csv
   {% if compression == true %} gzip {% else %} {% endif %}
   {% if headers == true %} ignoreheader 1 {% else %} {% endif %}
@@ -99,7 +92,7 @@ copy  {{ this }}
 
 
 {% macro snowflake__load_seed(uri,pattern,compression,headers,null_marker) %}
-{% set sql %}
+{% set sql %}    
 copy into {{ this }}
     from s3://{{ uri }}
     file_format = (type = CSV

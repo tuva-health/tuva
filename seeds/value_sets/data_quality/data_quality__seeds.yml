@@ -77,24 +77,3 @@ seeds:
         upper_bound: |
           {%- if target.type in ("athena") -%} double {%- else -%} float {%- endif -%}
 
-  - name: data_quality__reference_mart_analytics
-    description: >
-      reference values for analytics checks from various benchmark sources
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _value_set_reference_mart_analytics
-      column_types:
-        analytics_concept: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        analytics_measure: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        analytics_value: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        value_rank: |
-          integer
-        payer_type: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-      tags:
-        - data_quality_audit

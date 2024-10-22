@@ -30,7 +30,7 @@ select
 , data_source
 , {{ dbt_utils.pivot(
       column='service_category_1'
-    , values=('inpatient','outpatient','office-based','ancillary','other','pharmacy')
+    , values=('Inpatient','Outpatient','Office Visit','Ancillary','Other','Pharmacy')
     , agg='sum'
     , then_value='total_paid'
     , else_value= 0
