@@ -3,40 +3,16 @@
    )
 }}
 
-with multiple_sources as (
 select distinct 
     med.claim_id
-    , 'emergency department' as service_category_2
-    , 'emergency department' as service_category_3
+    , 'Emergency Department' as service_category_2
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-    , '{{ this.name }}' as source_model_name
 from {{ ref('service_category__stg_medical_claim') }} med
-inner join {{ ref('service_category__stg_outpatient_institutional') }} outpatient
-    on med.claim_id = outpatient.claim_id
-where revenue_center_code in ('0450','0451','0452','0459','0981')
-OR
-hcpcs_code in ('99281','99282','99283','99284','99285','G0380','G0381','G0382','G0383','G0384')
-  
-union all
-
---Adding in inpatient claims for flagging encounters with ED 
-select distinct 
-    med.claim_id
-    , 'emergency department' as service_category_2
-    , 'emergency department' as service_category_3
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-    , '{{ this.name }}' as source_model_name
-from {{ ref('service_category__stg_medical_claim') }} med
-inner join {{ ref('service_category__stg_inpatient_institutional') }} inp
-    on med.claim_id = inp.claim_id
-where revenue_center_code in ('0450','0451','0452','0459','0981')
-
-)
-
-select claim_id
-, 'outpatient' as service_category_1
-,service_category_2
-,service_category_3
-,tuva_last_run
-,source_model_name
-from multiple_sources
+left join {{ ref('service_category__acute_inpatient_institutional') }} inpatient
+    on med.claim_id = inpatient.claim_id
+where claim_type = 'institutional'
+and revenue_center_code in ('0450','0451','0452','0459','0981')
+and inpatient.claim_id is null
+-- 0456, urgent care, is included in most published definitions
+-- that also include a requirement of a bill type code for
+-- inpatient or outpatient hospital.

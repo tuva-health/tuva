@@ -40,7 +40,9 @@ with normalize_cte as(
         , bill_type_code as normalized_code
         , bill_type_description as normalized_description
         , bill_type_occurrence_count as occurrence_count
-        , row_number() over (partition by claim_id, data_source order by bill_type_occurrence_count desc, bill_type_code asc) as occurrence_row_count
+        , coalesce(lead(bill_type_occurrence_count) 
+            over (partition by claim_id, data_source order by bill_type_occurrence_count desc),0) as next_occurrence_count
+        , row_number() over (partition by claim_id, data_source order by bill_type_occurrence_count desc) as occurrence_row_count
     from distinct_counts dist
 )
 
@@ -51,6 +53,7 @@ select
     , normalized_code
     , normalized_description
     , occurrence_count
+    , next_occurrence_count
     , occurrence_row_count
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from occurence_comparison

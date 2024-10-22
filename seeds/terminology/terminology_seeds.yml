@@ -1123,43 +1123,4 @@ seeds:
         ingredient_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         dose_form_name: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
-
-  - name: terminology__ccs_services_procedures
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: ccs_services_procedures
-      tags:
-        - terminology
-      column_types:
-        hcpcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
-        ccs_category: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3) {%- endif -%}
-        ccs_category_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-
-  - name: terminology__nitos
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: nitos
-      tags:
-        - terminology
-      column_types:
-        hcpcs_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
-        nitos_code: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
-        nitos_description: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
-        invasive_non_invasive_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-        modality: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-        body_region: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-        focus_area: |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-                                           

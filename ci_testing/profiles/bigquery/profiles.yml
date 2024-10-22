@@ -1,13 +1,13 @@
 default:
+  target: dev
   outputs:
     dev:
-      dataset: connector
-      keyfile:  "{{ env_var('TUVA_BIGQUERY_TOKEN') }}"
-      location: US
-      method: service-account
-      priority: interactive
-      project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
-      threads: 4
-      timeout_seconds: 300
       type: bigquery
-  target: dev
+      method: service-account
+      keyfile: ./creds.json
+      project: "{{ env_var('TUVA_BIGQUERY_PROJECT') }}"
+      dataset: connector
+      threads: 4
+      timeout_seconds: 600
+      location: US
+      priority: interactive
