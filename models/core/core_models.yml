@@ -188,6 +188,16 @@ models:
       terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
   - name: discharge_disposition_description
     description: '{{ doc("discharge_disposition_description") }}'
+  - name: attending_provider_id
+    description: '{{ doc("attending_provider_id") }}'
+  - name: attending_provider_name
+    description: '{{ doc("attending_provider_name") }}'
+  - name: facility_id
+    description: '{{ doc("facility_id") }}'
+  - name: facility_name
+    description: '{{ doc("facility_name") }}'
+  - name: facility_type
+    description: '{{ doc("facility_type") }}'
   - name: observation_flag
     description: '{{ doc("observation_flag") }}'
   - name: lab_flag
@@ -468,6 +478,8 @@ models:
     meta:
       terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/service_categories/service_category__service_categories.csv
     description: '{{ doc("service_category_2") }}'
+  - name: service_category_3
+    description: '{{ doc("service_category_3") }}'
   - name: admit_source_code
     description: '{{ doc("admit_source_code") }}'
     meta:
@@ -699,33 +711,21 @@ models:
   - name: tuva_last_run
     description: '{{ doc("tuva_last_run") }}'
   - name: payer_attributed_provider
-    description: >
-      Unique identifier for the provider assigned to this patient-year_month
-      by the payer.
+    description: '{{ doc("payer_attributed_provider") }}'
   - name: payer_attributed_provider_practice
-    description: >
-      Name of the practice for the payer attributed provider.
+    description: '{{ doc("payer_attributed_provider_practice") }}'
   - name: payer_attributed_provider_organization
-    description: >
-      Name of the organization for the payer attributed provider.
+    description: '{{ doc("payer_attributed_provider_organization") }}'
   - name: payer_attributed_provider_lob
-    description: >
-      Name of the line of business for the payer attributed provider
-      (e.g. medicare, medicaid, commercial).
+    description: '{{ doc("payer_attributed_provider_lob") }}'
   - name: custom_attributed_provider
-    description: >
-      Unique identifier for the provider assigned to this patient-year_month
-      by the user.
+    description: '{{ doc("custom_attributed_provider") }}'
   - name: custom_attributed_provider_practice
-    description: >
-      Name of the practice for the attributed provider assigned by the user.
+    description: '{{ doc("custom_attributed_provider_practice") }}'
   - name: custom_attributed_provider_organization
-    description: >
-      Name of the organization for the attributed provider assigned by the user.
+    description: '{{ doc("custom_attributed_provider_organization") }}'
   - name: custom_attributed_provider_lob
-    description: >
-      Name of the line of business for the attributed provider assigned by the user
-      (e.g. medicare, medicaid, commercial).
+    description: '{{ doc("custom_attributed_provider_lob") }}'
 
 
 - name: core__observation
