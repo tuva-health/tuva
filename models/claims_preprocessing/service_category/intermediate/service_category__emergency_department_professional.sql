@@ -3,12 +3,20 @@
    )
 }}
 
-select distinct 
-  claim_id
-, claim_line_number
-, 'Emergency Department' as service_category_2
+select distinct
+  med.claim_id
+, med.claim_line_number
+, med.claim_line_id
+, 'outpatient' as service_category_1
+, 'emergency department' as service_category_2
+, 'emergency department' as service_category_3
+, '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }}
-where claim_type = 'professional'
-  and place_of_service_code = '23'
+from {{ ref('service_category__stg_medical_claim') }} med
+inner join {{ ref('service_category__stg_professional') }} prof on med.claim_id = prof.claim_id 
+and
+med.claim_line_number = prof.claim_line_number
+where place_of_service_code = '23'
+OR
+hcpcs_code in ('99281','99282','99283','99284','99285','G0380','G0381','G0382','G0383','G0384')
   

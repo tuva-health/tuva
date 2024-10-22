@@ -21,6 +21,9 @@ with union_measures as (
             , ref('quality_measures__int_cbe0101_long')
             , ref('quality_measures__int_cqm48_long')
             , ref('quality_measures__int_cqm130_long')
+            , ref('quality_measures__int_nqf0420_long')
+            , ref('quality_measures__int_adh_diabetes_long')
+            , ref('quality_measures__int_adhras_long')
         ]
 
     ) }}
