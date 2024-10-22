@@ -263,17 +263,17 @@ with stg_eligibility as (
                 when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 1
                 else 0
             {% else %}
-            when original_reason_entitlement_code in ('2') then TRUE
-            when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
-            when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
-            else FALSE
+              when original_reason_entitlement_code in ('2') then TRUE
+              when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
+              when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
+              else FALSE
             {% endif %}
           end as orec_default
         /* Setting default true until institutional logic is added */
         {% if target.type == 'fabric' %}
             , 1 as institutional_status_default
         {% else %}
-        , TRUE as institutional_status_default
+          , TRUE as institutional_status_default
         {% endif %}
     from add_age_group
 
