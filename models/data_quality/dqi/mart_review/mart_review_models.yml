@@ -193,6 +193,25 @@ models:
       - data_quality
     materialized: table
 
+- name: mart_review__generics
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__generics
+    tags:
+      - data_quality
+    materialized: table
+
+- name: mart_review__service_categories_long
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__service_categories_long
+    tags:
+      - data_quality
+    materialized: table  
 
 
 
