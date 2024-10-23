@@ -4,23 +4,17 @@
 
 with encounters as (
     select
-    {{  dbt.concat([date_part('year', 'claim_start_date'),
-                      dbt.right(
-                      dbt.concat(["'0'", date_part('month', 'claim_start_date')])
-                      , 2)]) }} as year_month
+        cast(c.year_month_int as {{ dbt.type_string() }}) as year_month
       , mc.patient_id
       , service_category_1
       , service_category_2
       , count(distinct mc.encounter_id) as visits
     from {{ ref('mart_review__stg_medical_claim')}} as mc
+    left join {{ ref('reference_data__calendar')}} c on mc.claim_start_date = c.full_date
     inner join {{ref ('core__encounter')}} as e
       on mc.encounter_id = e.encounter_id
-    where 1 = 1
     group by
-      {{  dbt.concat([date_part('year', 'claim_start_date'),
-                      dbt.right(
-                      dbt.concat(["'0'", date_part('month', 'claim_start_date')])
-                      , 2)]) }}
+        cast(c.year_month_int as {{ dbt.type_string() }})
       , mc.patient_id
       , service_category_1
       , service_category_2
