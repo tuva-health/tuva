@@ -60,6 +60,7 @@ with controlled_bp_codes as (
               '99473' -- Self-measured blood pressure using a device validated for clinical accuracy; patient education/training and device calibration
             , '99474' -- Separate self-measurements of two readings one minute apart, twice daily over a 30-day period (minimum of 12 readings), collection of data reported by the patient and/or caregiver to the physician or other qualified health care professional, with report of average systolic and diastolic pressures and subsequent communication of a treatment plan to the patient
         )
+        and {{ dbt.safe_cast("result", api.Column.translate_type("numeric")) }} is not null
 
 )
 
@@ -77,6 +78,7 @@ with controlled_bp_codes as (
     ,'8462-4') --diastolic
     and
     normalized_code_type = 'loinc'
+    and {{ dbt.safe_cast("result", api.Column.translate_type("numeric")) }} is not null
 
 )
 
