@@ -182,6 +182,16 @@ models:
 
 
 
+- name: data_quality__crosswalk_field_to_mart_sk
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: crosswalk_field_to_mart_sk
+    tags:
+      - data_quality
+    materialized: table
+
 
 #### Atomic Checks
 ## Claims Eligibility

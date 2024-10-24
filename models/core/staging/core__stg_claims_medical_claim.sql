@@ -42,7 +42,7 @@ select
     ]) }} as medical_claim_id
     , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
-    , cast(x.encounter_id as int ) as encounter_id
+    , cast(x.encounter_id as {{ dbt.type_string() }} ) as encounter_id
     , cast(x.encounter_type as {{ dbt.type_string() }} ) as encounter_type
     , cast(x.encounter_group as {{ dbt.type_string() }} ) as encounter_group
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
