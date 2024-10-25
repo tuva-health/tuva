@@ -9,7 +9,7 @@ with denominator as (
           patient_id
         , dispensing_date
         , first_dispensing_date
-        , days_supply
+        ,30 as days_supply
         , ndc_code
         , performance_period_begin
         , performance_period_end
@@ -71,7 +71,11 @@ The below 3 cte identifies periods of continuous medication use for each patient
         , ndc_code
         , dispensing_date
         , days_supply
-        , sum(med_change_flag) over (partition by patient_id order by dense_rank) as group_id
+        , sum(med_change_flag) over (
+              partition by patient_id 
+              order by dense_rank 
+              rows between unbounded preceding and current row
+          ) as group_id
     from grouped_meds
 
 )
@@ -150,6 +154,7 @@ or use the current rx_fill_date
 
 )
 
+
 , actual_end_dates as (
 
     select
@@ -207,7 +212,7 @@ or use the current rx_fill_date
             case
               when adjusted_fill_date = group_last
               then days_supply
-              else null
+              else 0
             end) over (partition by patient_id, group_id) as group_last_days_supply
     from grouped_fill_ranges
 
@@ -219,7 +224,7 @@ or use the current rx_fill_date
 3. Then, calculates the actual total covered days for each patient.
 */
 
-, covered_days_per_group as (
+, covered_days_per_groups as (
     
     select
           patient_id
@@ -243,7 +248,6 @@ or use the current rx_fill_date
 
 )
 
-
 , with_lag as (
 
     select
@@ -254,7 +258,7 @@ or use the current rx_fill_date
         , covered_days_per_group
         , lag(group_last) over(partition by patient_id order by group_first) as lag_date
         , lag(group_last_days_supply) over(partition by patient_id order by group_first) as lag_days_supply
-    from covered_days_per_group
+    from covered_days_per_groups
 
 )
 
@@ -301,7 +305,6 @@ or use the current rx_fill_date
     group by patient_id
 
 )
-
 
 , patient_with_treatment_period_days as (
     select
