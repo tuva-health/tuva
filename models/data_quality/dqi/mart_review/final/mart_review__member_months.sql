@@ -10,14 +10,14 @@ SELECT m.*,
     COALESCE(p.pharmacy_paid, 0) AS pharmacy_paid,
     {{ dbt.concat([
         'm.patient_id',
-        "' | '",
+        "'|'",
         'm.data_source'
     ]) }} AS patient_data_source_key,
     {{ dbt.concat([
         'm.patient_id',
-        "' | '",
+        "'|'",
         'm.data_source',
-        "' | '",
+        "'|'",
         'm.year_month'
     ]) }} AS member_month_key
 FROM {{ ref('core__member_months')}} m
