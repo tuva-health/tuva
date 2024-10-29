@@ -5,58 +5,58 @@
 
 {% if var('provider_attribution_enabled',False) == true -%}
 
-
 select
-         cast(patient_id as {{ dbt.type_string() }} ) as patient_id
-       , cast(year_month as {{ dbt.type_string() }} ) as year_month
-       , cast(payer as {{ dbt.type_string() }} ) as payer
-       , {{ quote_column('plan') }}
-       , cast(data_source as {{ dbt.type_string() }} ) as data_source
-       
-       , cast(payer_attributed_provider as {{ dbt.type_string() }} )
-                   as payer_attributed_provider
-       , cast(payer_attributed_provider_practice as {{ dbt.type_string() }} )
-                   as payer_attributed_provider_practice
-       , cast(payer_attributed_provider_organization as {{ dbt.type_string() }} )
-                   as payer_attributed_provider_organization
-       , cast(payer_attributed_provider_lob as {{ dbt.type_string() }} )
-                   as payer_attributed_provider_lob
-
-       , cast(custom_attributed_provider as {{ dbt.type_string() }} )
-                   as custom_attributed_provider
-       , cast(custom_attributed_provider_practice as {{ dbt.type_string() }} )
-                   as custom_attributed_provider_practice
-       , cast(custom_attributed_provider_organization as {{ dbt.type_string() }} )
-                   as custom_attributed_provider_organization
-       , cast(custom_attributed_provider_lob as {{ dbt.type_string() }} )
-                   as custom_attributed_provider_lob
-
-       , '{{ var('tuva_last_run')}}' as tuva_last_run
-       
+      cast(patient_id as {{ dbt.type_string() }} ) as patient_id
+    , cast(year_month as {{ dbt.type_string() }} ) as year_month
+    , cast(payer as {{ dbt.type_string() }} ) as payer
+    , {{ quote_column('plan') }}
+    , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast(payer_attributed_provider as {{ dbt.type_string() }} ) as payer_attributed_provider
+    , cast(payer_attributed_provider_practice as {{ dbt.type_string() }} ) as payer_attributed_provider_practice
+    , cast(payer_attributed_provider_organization as {{ dbt.type_string() }} ) as payer_attributed_provider_organization
+    , cast(payer_attributed_provider_lob as {{ dbt.type_string() }} ) as payer_attributed_provider_lob
+    , cast(custom_attributed_provider as {{ dbt.type_string() }} ) as custom_attributed_provider
+    , cast(custom_attributed_provider_practice as {{ dbt.type_string() }} ) as custom_attributed_provider_practice
+    , cast(custom_attributed_provider_organization as {{ dbt.type_string() }} ) as custom_attributed_provider_organization
+    , cast(custom_attributed_provider_lob as {{ dbt.type_string() }} ) as custom_attributed_provider_lob
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('provider_attribution') }}
 
+{% elif var('provider_attribution_enabled',False) ==  false -%}
 
-
-{%- else %}
-
-
+{% if target.type == 'fabric' %}
+select top 0
+      cast(null as {{ dbt.type_string() }} ) patient_id
+    , cast(null as {{ dbt.type_string() }} ) as year_month
+    , cast(null as {{ dbt.type_string() }} ) as payer
+    , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
+    , cast(null as {{ dbt.type_string() }} ) as data_source
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_practice
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_organization
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_lob
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_practice
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_organization
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_lob
+    , cast(null as {{ dbt.type_string() }} ) as tuva_last_run
+{% else %}
 select
-         cast(null as {{ dbt.type_string() }} ) patient_id
-       , cast(null as {{ dbt.type_string() }} ) as year_month
-       , cast(null as {{ dbt.type_string() }} ) as payer
-       , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-       , cast(null as {{ dbt.type_string() }} ) as data_source
-       
-       , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider
-       , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_practice
-       , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_organization
-       , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_lob
-       , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider
-       , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_practice
-       , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_organization
-       , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_lob
-       , cast(null as {{ dbt.type_string() }} ) as tuva_last_run
-
+      cast(null as {{ dbt.type_string() }} ) patient_id
+    , cast(null as {{ dbt.type_string() }} ) as year_month
+    , cast(null as {{ dbt.type_string() }} ) as payer
+    , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
+    , cast(null as {{ dbt.type_string() }} ) as data_source
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_practice
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_organization
+    , cast(null as {{ dbt.type_string() }} ) as payer_attributed_provider_lob
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_practice
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_organization
+    , cast(null as {{ dbt.type_string() }} ) as custom_attributed_provider_lob
+    , cast(null as {{ dbt.type_string() }} ) as tuva_last_run
 limit 0
+{%- endif %}
 
-{%- endif %} 
+{%- endif %}

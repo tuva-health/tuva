@@ -22,7 +22,7 @@ SELECT
     e.primary_diagnosis_description,
     {{ dbt.concat([
         'e.primary_diagnosis_code',
-        "' | '",
+        "'|'",
         'e.primary_diagnosis_description'
     ]) }} as primary_diagnosis_and_description,
     p.ccsr_parent_category,
@@ -30,7 +30,7 @@ SELECT
     p.ccsr_category_description,
     {{ dbt.concat([
         'p.ccsr_category',
-        "' | '",
+        "'|'",
         'p.ccsr_category_description'
     ]) }} as ccsr_parent_category_and_description,
     b.body_system,
@@ -41,12 +41,12 @@ SELECT
     e.length_of_stay,
     {{ dbt.concat([
         "e.discharge_disposition_code",
-        "' | '",
+        "'|'",
         "e.discharge_disposition_description"
     ]) }} as discharge_code_and_description,
     {{ dbt.concat([
         "e.patient_id",
-        "' | '",
+        "'|'",
         "e.data_source"
     ]) }} as patient_source_key,
     e.facility_name,
