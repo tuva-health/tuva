@@ -3,16 +3,19 @@
    )
 }}
 
-select distinct 
-  a.claim_id
-, a.claim_line_number
-, 'Home Health' as service_category_2
+select distinct
+med.claim_id
+, med.claim_line_number
+, med.claim_line_id
+, 'outpatient' as service_category_1
+, 'home health' as service_category_2
+, 'home health' as service_category_3
+, '{{ this.name }}' as source_model_name
 , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} a
-left join {{ ref('service_category__dme_professional') }} b
-  on a.claim_id = b.claim_id
-  and a.claim_line_number = b.claim_line_number
-where a.claim_type = 'professional'
-  and a.place_of_service_code in ('12')
-  and (b.claim_id is null and b.claim_line_number is null)
+from {{ ref('service_category__stg_medical_claim') }} med
+inner join {{ ref('service_category__stg_professional') }} prof on med.claim_id = prof.claim_id 
+and
+med.claim_line_number = prof.claim_line_number
+where med.place_of_service_code in ('12')
+  
   

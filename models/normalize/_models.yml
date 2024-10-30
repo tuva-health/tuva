@@ -74,7 +74,7 @@ models:
       unmapped procedure codes
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
         {% else %}normalize{%- endif -%}
       alias: unmapped_observation
       tags: normalized
