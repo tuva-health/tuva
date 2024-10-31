@@ -19,9 +19,12 @@ with expected_groups as (
 )
 
 select
-    e.encounter_group as missing_encounter_group
+    a.encounter_group
+    , case
+        when a.encounter_group is null then 'missing'
+      else 'populated'
+    end as missing_encounter_group
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from expected_groups e
-    left join actual_groups a
-        on e.encounter_group = a.encounter_group
-where a.encounter_group is null
+left join actual_groups a
+    on e.encounter_group = a.encounter_group

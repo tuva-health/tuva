@@ -407,37 +407,37 @@ with unpivot_diagnosis as(
 
 , final as (
     select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
-    ,result_count
+    , cast( result_count as {{ dbt.type_int() }}) as result_count
     from missing_primary_dx
 
     union all
 
     select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
-    ,result_count
+    , cast( result_count as {{ dbt.type_int() }}) as result_count
     from invalid_primary_dx
 
     union all
 
     select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
-    ,result_count
+    , cast( result_count as {{ dbt.type_int() }}) as result_count
     from multiple_primary_dx
 
     union all
 
     select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
-    ,result_count
+    , cast( result_count as {{ dbt.type_int() }}) as result_count
     from invalid_secondary_dx
 
     union all
 
     select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
-    ,result_count
+    , cast( result_count as {{ dbt.type_int() }}) as result_count
     from claims_with_secondary_dx
 
     union all
 
     select cast(data_quality_check as {{ dbt.type_string() }} ) as data_quality_check
-    ,result_count
+    , cast( result_count as {{ dbt.type_int() }}) as result_count
     from invalid_procedure
 )
 
