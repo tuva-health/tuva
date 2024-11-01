@@ -9,7 +9,7 @@ with denominator as (
           patient_id
         , dispensing_date
         , first_dispensing_date
-        ,30 as days_supply
+        , days_supply
         , ndc_code
         , performance_period_begin
         , performance_period_end
