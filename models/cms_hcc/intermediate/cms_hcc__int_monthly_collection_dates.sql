@@ -6,17 +6,17 @@
 with collection_date_range as (
 
     select 
-        date_trunc('year', min(claim_end_date)) as start_date
-        , max(claim_end_date) as end_date
-    from {{ ref('medical_claim') }}
+          cast(min({{ date_trunc("year", "claim_end_date") }}) as date) as start_date
+        , cast(max(claim_end_date) as date) as end_date
+    from {{ ref('cms_hcc__stg_core__medical_claim') }}
 
 )
 
 select distinct
-    date_trunc(year, calendar.last_day_of_month) as collection_start_date
-    , calendar.last_day_of_month as collection_end_date
-    , calendar.year as collection_year
-    , calendar.year + 1 as payment_year
+      cast({{ date_trunc("year", "calendar.last_day_of_month") }} as date) as collection_start_date
+    , cast(calendar.last_day_of_month as date) as collection_end_date
+    , cast(calendar.year as integer) as collection_year
+    , cast(calendar.year + 1 as integer) as payment_year
 from {{ ref('reference_data__calendar') }} as calendar
 inner join collection_date_range
     on calendar.first_day_of_month 

@@ -143,10 +143,7 @@ with seed_adjustment_rates as (
         , blended.collection_end_date
     from blended
         left join seed_adjustment_rates
-            on least(
-                blended.payment_year, 
-                (select max(payment_year) from seed_adjustment_rates)
-            ) = seed_adjustment_rates.payment_year
+            on blended.payment_year = seed_adjustment_rates.payment_year
 
 )
 
@@ -164,10 +161,7 @@ with seed_adjustment_rates as (
         , normalized.collection_end_date
     from normalized
         left join seed_adjustment_rates
-            on least(
-                normalized.payment_year, 
-                (select max(payment_year) from seed_adjustment_rates)
-            ) = seed_adjustment_rates.payment_year
+            on normalized.payment_year = seed_adjustment_rates.payment_year
 
 )
 
