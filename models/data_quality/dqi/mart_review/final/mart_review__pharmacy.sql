@@ -21,10 +21,17 @@ select
   , p.paid_date
   , p.dispensing_date
   , p.days_supply
-  , p.paid_amount / p.days_supply as cost_per_day
-  , (p.paid_amount / p.days_supply) * 30 as thirty_day_equivalent_cost
   , case 
-      when (p.paid_amount / p.days_supply) * 30 >= 950 then 1 
+      when p.days_supply = 0 then null
+      else p.paid_amount / p.days_supply
+    end as cost_per_day
+  , case 
+      when p.days_supply = 0 then null
+      else (p.paid_amount / p.days_supply) * 30
+    end as thirty_day_equivalent_cost
+  , case 
+      when p.days_supply = 0 then 0
+      when (p.paid_amount / p.days_supply) * 30 >= 950 then 1
       else 0 
     end as specialty_tier -- $950 is the threshold set by CMS for CY 2024
   , n.rxcui
