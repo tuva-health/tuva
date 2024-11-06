@@ -58,7 +58,9 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: datetime
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
+        
 
   - name: lab_result_seed
     config:
@@ -120,7 +122,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: datetime
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%}
         tuva_last_run: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
@@ -379,7 +382,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: datetime
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
 
 
   - name: observation_seed
@@ -431,7 +435,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: datetime
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
 
 
 
@@ -473,7 +478,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ingest_datetime: datetime
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
 
 
   - name: provider_attribution_seed
