@@ -13,7 +13,7 @@ with member_months as (
         , sum(mc.paid_amount) as total_paid
         , avg(mm.member_months) as member_months
         , case when avg(mm.member_months) = 0 then null
-               else sum(mc.paid_amount) / avg(mm.member_months)
+               else sum(mc.paid_amount) / avg(cast(mm.member_months as {{ dbt.type_numeric() }} ))
           end as data_source_value
     from {{ ref('core__medical_claim') }} mc
     cross join member_months mm
