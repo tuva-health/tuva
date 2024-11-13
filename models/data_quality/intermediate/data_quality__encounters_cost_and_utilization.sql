@@ -4,7 +4,7 @@
 
 with member_months as (
     select 
-        count(1) as member_months 
+        cast(count(1) as {{ dbt.type_numeric() }}) as member_months 
     from {{ ref('core__member_months') }}
 )
 ,pkpy as (
@@ -13,7 +13,7 @@ select
     , enc.encounter_group
     , cast(enc.encounter_type as {{dbt.type_string()}}) as analytics_measure
     , case when avg(mm.member_months) = 0 then 0
-           else cast(count(enc.encounter_id) as {{ dbt.type_numeric() }} ) / avg(cast(mm.member_months as {{ dbt.type_numeric() }} )) * 12000 
+           else count(enc.encounter_id)  / avg(mm.member_months ) * 12000 
       end as data_source_value
 from {{ ref('core__encounter') }} as enc
 cross join member_months as mm
@@ -27,7 +27,7 @@ select
     , enc.encounter_group
     , cast(enc.encounter_type as {{dbt.type_string()}}) as analytics_measure
     , case when count(enc.encounter_id) = 0 then 0
-           else sum(enc.paid_amount) / cast(count(enc.encounter_id)  as {{ dbt.type_numeric() }} )
+           else sum(enc.paid_amount) / count(enc.encounter_id) 
       end as data_source_value
 from {{ ref('core__encounter') }} as enc
 cross join member_months as mm
@@ -35,6 +35,7 @@ group by
     enc.encounter_group
     , enc.encounter_type
 )
+
 select
     pkpy.*
     ,ref_data.analytics_value
