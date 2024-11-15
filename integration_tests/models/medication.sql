@@ -8,6 +8,7 @@
 
 select
 cast(null as {{ dbt.type_string() }} ) as medication_id
+, cast(null as {{ dbt.type_string() }} ) as person_id
 , cast(null as {{ dbt.type_string() }} ) as patient_id
 , cast(null as {{ dbt.type_string() }} ) as encounter_id
 , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date

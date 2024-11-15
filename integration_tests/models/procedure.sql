@@ -8,6 +8,7 @@
 
 select
  cast(null as {{ dbt.type_string() }} ) as procedure_id
+, cast(null as {{ dbt.type_string() }} ) as person_id
 , cast(null as {{ dbt.type_string() }} ) as patient_id
 , cast(null as {{ dbt.type_string() }} ) as encounter_id
 , cast(null as {{ dbt.type_string() }} ) as claim_id

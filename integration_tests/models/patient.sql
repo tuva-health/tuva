@@ -9,7 +9,8 @@
 
 
 select
-cast(null as {{ dbt.type_string() }} ) as patient_id
+cast(null as {{ dbt.type_string() }} ) as person_id
+, cast(null as {{ dbt.type_string() }} ) as patient_id
 , cast(null as {{ dbt.type_string() }} ) as first_name
 , cast(null as {{ dbt.type_string() }} ) as last_name
 , cast(null as {{ dbt.type_string() }} ) as sex
