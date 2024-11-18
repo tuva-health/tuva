@@ -5,8 +5,8 @@
 with medical as (
   select
       claim_id
+    , count(distinct claim_id) as claim_id_count
     , count(distinct p.patient_id) as patient_id_count
-    , max(case when p.patient_id is null then 1 else 0 end) as missing_patient_id
     , max(
         case 
           when startdts.month_start_date is null then 1
@@ -25,28 +25,25 @@ with medical as (
       claim_id
 )
 
-, final as (
-  select
-      'multiple medical_claim patient_ids' as data_quality_check
-    , sum(case when patient_id_count > 1 then 1 else 0 end) as result_count
-  from medical
-
-  union all
-
-  select
-      'missing medical_claim patient_id' as data_quality_check
-    , sum(missing_patient_id) as result_count
-  from medical
-
-  union all
-
-  select
-      'orphaned medical_claim claims' as data_quality_check
-    , sum(missing_eligibility) as result_count
-  from medical
+, aggregate_check as(
+select
+    sum(claim_id_count) as total_claim_count
+    , sum(case when patient_id_count > 1 then 1 else 0 end) as multiple_patient_id_count
+    , sum(missing_eligibility) as orphaned_claim_count
+from medical
 )
 
 select
-    *
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-from final
+    'multiple medical_claim patient_ids' as data_quality_check
+    ,  multiple_patient_id_count as result_count
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from aggregate_check
+
+union all
+
+select
+    'percent orphaned medical_claim claims' as data_quality_check
+    , (orphaned_claim_count/total_claim_count)*100 as result_count
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from aggregate_check
+

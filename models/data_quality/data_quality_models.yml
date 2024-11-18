@@ -210,12 +210,12 @@ models:
     - name: tuva_last_ran
       description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__data_quality_test_summary
+- name: data_quality__referential_checks_summary
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: data_quality_test_summary
+    alias: referential_checks_summary
     tags:
       - data_quality_audit
     materialized: table
@@ -597,12 +597,22 @@ models:
       - data_quality_audit
     materialized: table
 
-- name: data_quality__claim_percent
+- name: data_quality__claim_type_percent
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: data_quality_claim_percent
+    alias: claim_type_percent
+    tags:
+      - data_quality_audit
+    materialized: table
+
+- name: data_quality__claim_type_unique
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: claim_type_unique
     tags:
       - data_quality_audit
     materialized: table

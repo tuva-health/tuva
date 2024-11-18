@@ -6,13 +6,6 @@
 with medical_claim as (
     select
         m.claim_id
-      , max(case when term.npi is null and m.rendering_npi is not null then 1 else 0 end) as invalid_rendering_npi
-      , max(case when term2.npi is null and m.billing_npi is not null then 1 else 0 end) as invalid_billing_npi
-      , max(case when term3.npi is null and m.facility_npi is not null then 1 else 0 end) as invalid_facility_npi
-
-      , max(case when m.rendering_npi is null then 1 else 0 end) as missing_rendering_npi
-      , max(case when m.billing_npi is null then 1 else 0 end) as missing_billing_npi
-      , max(case when m.facility_npi is null then 1 else 0 end) as missing_facility_npi
 
       , count(distinct m.rendering_npi) as rendering_npi_count
       , count(distinct m.billing_npi) as billing_npi_count
@@ -33,48 +26,6 @@ with medical_claim as (
 )
 
 ,final as (
-select
-    'invalid rendering_npi' as data_quality_check
-  , sum(invalid_rendering_npi) as result_count
-from medical_claim
-
-union all
-
-select
-    'invalid billing_npi' as data_quality_check
-  , sum(invalid_billing_npi) as result_count
-from medical_claim
-
-union all
-
-select
-    'invalid facility_npi' as data_quality_check
-  , sum(invalid_facility_npi) as result_count
-from medical_claim
-
-union all
-
-select
-    'missing rendering_npi' as data_quality_check
-  , sum(missing_rendering_npi) as result_count
-from medical_claim
-
-union all
-
-select
-    'missing billing_npi' as data_quality_check
-  , sum(missing_billing_npi) as result_count
-from medical_claim
-
-union all
-
-select
-    'missing facility_npi' as data_quality_check
-  , sum(missing_facility_npi) as result_count
-from medical_claim
-
-union all
-
 select
     'wrong entity type rendering_npi' as data_quality_check
   , sum(wrong_entity_type_rendering_npi) as result_count

@@ -17,9 +17,9 @@ seeds:
         field_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         red: |
-          integer
+          numeric
         green: |
-          integer
+          numeric
         unique_values_expected_flag: |
           integer
           

@@ -61,7 +61,7 @@ SELECT
 	table_name,
 	drill_down_key,
 	drill_down_value,
-	'clinical' as claim_type,
+	'CLINICAL' as claim_type,
 	field_name,
 	bucket_name,
 	invalid_reason,

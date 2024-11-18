@@ -1,6 +1,7 @@
 {{ config(
-    enabled = var('claims_enabled', False)
+  enabled=false
 ) }}
+
 
 with tuva_last_run as(
 
