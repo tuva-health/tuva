@@ -647,7 +647,7 @@ Identifier for the source system from which patient data originated.
 {% enddocs %}
 
 {% docs patient_id %}
-Unique identifier for each patient in the dataset.
+Identifier that links a patient to a particular clinical source system.
 {% enddocs %}
 
 {% docs patient_row_num %}
@@ -676,6 +676,10 @@ Name of the line of business for the payer attributed provider (e.g. medicare, m
 
 {% docs payer_type %}
 Type of payer (e.g. commercial, medicare, medicaid, etc.).
+{% enddocs %}
+
+{% docs person_id %}
+Unique identifier for each person in the dataset.
 {% enddocs %}
 
 {% docs pharmacy_claim_id %}
