@@ -31,9 +31,9 @@ with eligibility_spans as(
         max(case when birth_date > enrollment_start_date then 1 else 0 end) as birth_after_enrollment_start,
         max(case when birth_date > enrollment_end_date then 1 else 0 end) as birth_after_enrollment_end,
         max(case when enrollment_start_date > enrollment_end_date then 1 else 0 end) as enrollment_start_after_end,
-        max(case when enrollment_start_date > getdate() then 1 else 0 end) as future_enrollment_start,
-        max(case when birth_date > getdate() then 1 else 0 end) as future_birth,
-        max(case when death_date > getdate() then 1 else 0 end) as future_death,
+        max(case when enrollment_start_date > current_date() then 1 else 0 end) as future_enrollment_start,
+        max(case when birth_date > current_date() then 1 else 0 end) as future_birth,
+        max(case when death_date > current_date() then 1 else 0 end) as future_death
     from eligibility_spans
     group by
         eligibility_span_id
