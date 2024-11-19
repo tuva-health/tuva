@@ -9,7 +9,7 @@ with claim_dates as(
     select
         claim_id
         , claim_line_number
-        , patient_id
+        , person_id
         , payer
         , {{ quote_column('plan') }}
         , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date
@@ -31,7 +31,7 @@ with claim_dates as(
     select
           claim_id
         , claim_line_number
-        , patient_id
+        , person_id
         , payer
         , {{ quote_column('plan') }}
         , inferred_claim_start_date
@@ -68,7 +68,7 @@ from claim_dates
 select distinct
      claim.claim_id
     , claim.claim_line_number
-    , claim.patient_id
+    , claim.person_id
     , claim.payer
     , claim.{{ quote_column('plan') }}
     , claim.inferred_claim_start_year_month
@@ -78,7 +78,7 @@ select distinct
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('core__member_months')}} mm
 inner join claim_year_month claim
-    on mm.patient_id = claim.patient_id
+    on mm.person_id = claim.person_id
     and mm.payer = claim.payer
     and mm.{{ quote_column('plan') }} = claim.{{ quote_column('plan') }}
     and mm.year_month >= claim.inferred_claim_start_year_month

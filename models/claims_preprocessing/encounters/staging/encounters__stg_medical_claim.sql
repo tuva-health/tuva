@@ -6,7 +6,7 @@
 
 select
     m.apr_drg_code
-  , m.patient_id 
+  , m.person_id 
   , d.patient_data_source_id
   , m.claim_id
   , m.claim_line_number
@@ -65,7 +65,7 @@ inner join {{ ref('service_category__service_category_grouper') }} g on m.claim_
 and
 m.claim_line_number = g.claim_line_number
 and g.duplicate_row_number = 1
-inner join {{ ref('encounters__patient_data_source_id') }} d on m.patient_id = d.patient_id
+inner join {{ ref('encounters__patient_data_source_id') }} d on m.person_id = d.person_id
 and
 m.data_source = d.data_source
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} dx on m.diagnosis_code_1 = dx.icd_10_cm_code
