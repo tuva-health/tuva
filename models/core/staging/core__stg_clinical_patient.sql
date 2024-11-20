@@ -9,7 +9,8 @@ with tuva_last_run as(
        , cast(substring('{{ var('tuva_last_run')}}',1,10) as date ) as tuva_last_run_date
 )
 SELECT
-    cast(patient_id as {{ dbt.type_string() }} ) as patient_id
+      cast(person_id as {{ dbt.type_string() }} ) as person_id
+    , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(first_name as {{ dbt.type_string() }} ) as first_name
     , cast(last_name as {{ dbt.type_string() }} ) as last_name
     , cast(sex as {{ dbt.type_string() }} ) as sex

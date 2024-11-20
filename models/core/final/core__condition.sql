@@ -36,6 +36,7 @@ from {{ ref('core__stg_claims_condition') }}
 {% if var('enable_normalize_engine',false) != true %}
 select
     all_conditions.condition_id
+  , all_conditions.person_id
   , all_conditions.patient_id
   , all_conditions.encounter_id
   , all_conditions.claim_id
@@ -90,6 +91,7 @@ left join {{ ref('terminology__snomed_ct') }} snomed_ct
 {% else %}
 select
     all_conditions.condition_id
+  , all_conditions.person_id
   , all_conditions.patient_id
   , all_conditions.encounter_id
   , all_conditions.claim_id

@@ -27,6 +27,7 @@ select * from {{ ref('core__stg_claims_procedure') }}
 
 select
     all_procedures.procedure_id
+  , all_procedures.person_id
   , all_procedures.patient_id
   , all_procedures.encounter_id
   , all_procedures.claim_id
@@ -81,6 +82,7 @@ left join {{ ref('terminology__snomed_ct')}} snomed_ct
 
 select
     all_procedures.procedure_id
+  , all_procedures.person_id
   , all_procedures.patient_id
   , all_procedures.encounter_id
   , all_procedures.claim_id

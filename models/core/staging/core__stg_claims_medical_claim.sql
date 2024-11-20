@@ -46,7 +46,7 @@ select
     , cast(x.encounter_type as {{ dbt.type_string() }} ) as encounter_type
     , cast(x.encounter_group as {{ dbt.type_string() }} ) as encounter_group
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
-    , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
+    , cast(med.person_id as {{ dbt.type_string() }} ) as person_id
     , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
     , cast(med.payer as {{ dbt.type_string() }} ) as payer
     , med.{{ quote_column('plan') }}
