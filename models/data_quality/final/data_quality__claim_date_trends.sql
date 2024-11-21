@@ -150,13 +150,13 @@ with date_stage as(
 
 select
     cast(all_date.year_month as {{ dbt.type_int() }} ) as year_month
-    , claim_start.result_count as claim_start_date
-    , claim_end.result_count as claim_end_date
-    , admission_date.result_count as admission_date
-    , discharge_date.result_count as discharge_date
-    , med_paid_date.result_count as medical_paid_date
-    , dispensing_date.result_count as dispensing_date
-    , pharm_paid_date.result_count as pharmacy_paid_date
+    , coalesce(claim_start.result_count,0) as claim_start_date
+    , coalesce(claim_end.result_count,0) as claim_end_date
+    , coalesce(admission_date.result_count,0) as admission_date
+    , coalesce(discharge_date.result_count,0) as discharge_date
+    , coalesce(med_paid_date.result_count,0) as medical_paid_date
+    , coalesce(dispensing_date.result_count,0) as dispensing_date
+    , coalesce(pharm_paid_date.result_count,0) as pharmacy_paid_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_date_range all_date
 left join date_stage claim_start

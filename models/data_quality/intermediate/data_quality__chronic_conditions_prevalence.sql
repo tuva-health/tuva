@@ -41,10 +41,10 @@ cross join total_patients
 select
     ref_data.analytics_concept
     , coalesce(results.condition, ref_data.analytics_measure) as analytics_measure
-    , results.patients
-    , results.condition_rank as value_rank
-    , results.percent_of_total as data_source_value
+    , coalesce(results.patients,0) as patients
+    , coalesce(results.percent_of_total,0) as data_source_value
     , ref_data.analytics_value
+    , coalesce(results.condition_rank,0) as value_rank
     , ref_data.value_rank as medicare_lds_condition_rank
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('data_quality__reference_mart_analytics') }}  ref_data
