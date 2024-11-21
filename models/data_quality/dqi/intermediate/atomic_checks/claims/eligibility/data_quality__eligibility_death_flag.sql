@@ -11,7 +11,7 @@ SELECT DISTINCT
     ,'ELIGIBILITY' AS claim_type
     ,'DEATH_FLAG' AS field_name
     ,case
-        when m.death_flag in ('1','0') then 'valid'
+        when cast(m.death_flag as {{ dbt.type_string() }}) in ('1','0') then 'valid'
         when m.death_flag is null then 'null'
         else 'invalid'
         end as bucket_name
