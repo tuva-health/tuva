@@ -618,6 +618,23 @@ models:
     materialized: table
 
 
+- name: data_quality__claim_summary_counts
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: claim_summary_counts
+    tags:
+      - data_quality_audit
+    materialized: table
+  columns:
+    - name: data_quality_check
+      description: The name of the data quality check
+    - name: result_count
+      description: The number of rows in the input layer that match the data quality check criteria
+    - name: tuva_last_ran
+      description: '{{ doc("tuva_last_run") }}'
+
 
 #### stage
 - name: data_quality__eligibility_dq_stage
