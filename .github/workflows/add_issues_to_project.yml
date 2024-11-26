@@ -2,9 +2,10 @@ name: add_issues_to_project
 
 on:
   issues:
-    types:
-      - opened
-      - reopened
+    types: [opened, reopened]
+  pull_request:
+    types: [opened, reopened]
+    branches: [main]
 
 jobs:
   add-to-project:
