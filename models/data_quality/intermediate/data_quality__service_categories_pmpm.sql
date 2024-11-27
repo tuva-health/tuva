@@ -2,7 +2,7 @@
 
 with member_months as (
     select
-        count(1) as member_months
+        cast(count(1) as {{ dbt.type_numeric() }}) as member_months 
     from {{ ref('core__member_months') }} mm
 )
 
