@@ -5,7 +5,7 @@
 
 with service_cat_2 as (
   select
-    patient_id
+    person_id
   , year_month
   , payer
   , {{ quote_column('plan') }}
@@ -14,7 +14,7 @@ with service_cat_2 as (
   , sum(total_paid) as total_paid
   from {{ ref('financial_pmpm__patient_spend_with_service_categories') }}
   group by
-    patient_id
+    person_id
   , year_month
   , payer
   , {{ quote_column('plan') }}
@@ -23,7 +23,7 @@ with service_cat_2 as (
 )
 
 select
-  patient_id
+  person_id
 , year_month
 , payer
 , {{ quote_column('plan') }}
@@ -70,7 +70,7 @@ select
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from service_cat_2
 group by
-  patient_id
+  person_id
 , year_month
 , payer
 , {{ quote_column('plan') }}

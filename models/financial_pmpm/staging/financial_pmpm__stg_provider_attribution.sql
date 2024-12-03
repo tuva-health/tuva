@@ -6,7 +6,7 @@
 {% if var('provider_attribution_enabled',False) == true -%}
 
 select
-      cast(patient_id as {{ dbt.type_string() }} ) as patient_id
+      cast(person_id as {{ dbt.type_string() }} ) as person_id
     , cast(year_month as {{ dbt.type_string() }} ) as year_month
     , cast(payer as {{ dbt.type_string() }} ) as payer
     , {{ quote_column('plan') }}
@@ -26,7 +26,7 @@ from {{ ref('provider_attribution') }}
 
 {% if target.type == 'fabric' %}
 select top 0
-      cast(null as {{ dbt.type_string() }} ) patient_id
+      cast(null as {{ dbt.type_string() }} ) person_id
     , cast(null as {{ dbt.type_string() }} ) as year_month
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
@@ -42,7 +42,7 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as tuva_last_run
 {% else %}
 select
-      cast(null as {{ dbt.type_string() }} ) patient_id
+      cast(null as {{ dbt.type_string() }} ) person_id
     , cast(null as {{ dbt.type_string() }} ) as year_month
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
