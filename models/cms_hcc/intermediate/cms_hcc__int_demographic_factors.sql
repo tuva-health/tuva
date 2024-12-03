@@ -6,7 +6,7 @@
 with members as (
 
     select
-          patient_id
+          person_id
         , enrollment_status
         , gender
         , age_group
@@ -44,7 +44,7 @@ with members as (
 , v24_new_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -75,7 +75,7 @@ with members as (
 , v24_continuining_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -108,7 +108,7 @@ with members as (
 , v28_new_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -139,7 +139,7 @@ with members as (
 , v28_continuining_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -184,7 +184,7 @@ with members as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(gender as {{ dbt.type_string() }}) as gender
         , cast(age_group as {{ dbt.type_string() }}) as age_group
@@ -212,7 +212,7 @@ with members as (
 )
 
 select
-      patient_id
+      person_id
     , enrollment_status
     , gender
     , age_group

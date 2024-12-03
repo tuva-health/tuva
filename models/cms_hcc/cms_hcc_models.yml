@@ -13,7 +13,7 @@ models:
       This final model displays the contributing demographic and disease risk 
       factors, interactions, and HCCs for each enrollee in the payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: enrollment_status_default
         description: >
@@ -56,7 +56,7 @@ models:
       normalized risk score, and payment risk score for each enrollee in the 
       payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
         tests:
           - unique
@@ -109,10 +109,10 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - patient_id
+            - person_id
             - model_version
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: enrollment_status
         description: >
@@ -175,7 +175,7 @@ models:
       Disabled and disease interaction factor values for the corresponding 
       HCC model version and payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: description
         description: Description of the disabled and disease interaction.
@@ -206,7 +206,7 @@ models:
       after the hierarchy has been applied and necessary HCCs dropped for the 
       corresponding HCC model version and payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: hcc_code
         description: HCC code.
@@ -239,7 +239,7 @@ models:
       after the hierarchy has been applied and necessary HCCs dropped for the 
       corresponding HCC model version and payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: hcc_code_1
         description: HCC code 1 of the interaction.
@@ -273,7 +273,7 @@ models:
       Conditions from eligible risk-adjustable claims per claim type for the 
       collection year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: condition_code
         description: The condition code.
@@ -298,7 +298,7 @@ models:
       Enrollment interaction factor values for the corresponding HCC model 
       version and payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: description
         description: Description of the enrollment interaction.
@@ -328,7 +328,7 @@ models:
       Final payment-eligible HCC count factor values for the corresponding 
       HCC model version and payment year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: description
         description: HCC counts.
@@ -358,7 +358,7 @@ models:
       HCC hierarchy for the corresponding HCC model version and payment year
       applied to the mapped payment-eligible HCCs.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: model_version
         description: CMS HCC model version.
@@ -381,7 +381,7 @@ models:
       Eligible conditions mapped to HCC codes for the corresponding HCC model 
       version and payment year
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: condition_code
         description: Condition code.
@@ -406,7 +406,7 @@ models:
       Transformed eligibility data into the demographic risk segments required 
       for the CMS HCC and risk calculations.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
         tests:
           - not_null
@@ -467,8 +467,8 @@ models:
     columns:
       - name: claim_id
         description: Unique claim_id for each claim.
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: recorded_date
         description: Date in which the condition was recorded.
       - name: condition_type
@@ -487,7 +487,7 @@ models:
       materialized: ephemeral
     description: Staging eligibility from core.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: enrollment_start_date
         description: Date the patient's insurance eligibility began.
@@ -518,7 +518,7 @@ models:
         description: >
           Indicates whether the claim is professional (CMS-1500), 
           institutional (UB-04), dental, or vision.
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: claim_start_date
         description: Start date for the claim.
@@ -538,7 +538,7 @@ models:
       materialized: ephemeral
     description: Staging patient from core.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: sex
         description: Biological sex of the patient.
@@ -555,7 +555,7 @@ models:
       materialized: ephemeral
     description: Staging member months from financial_pmpm
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.

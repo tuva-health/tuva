@@ -14,7 +14,7 @@ Steps for staging the medical claim data:
 with conditions as (
 
     select
-          patient_id
+          person_id
         , condition_code
         , payment_year
     from {{ ref('cms_hcc__int_eligible_conditions') }}
@@ -38,7 +38,7 @@ with conditions as (
 , v24_mapped as (
 
     select distinct
-          conditions.patient_id
+          conditions.person_id
         , conditions.condition_code
         , conditions.payment_year
         , 'CMS-HCC-V24' as model_version
@@ -54,7 +54,7 @@ with conditions as (
 , v28_mapped as (
 
     select distinct
-          conditions.patient_id
+          conditions.person_id
         , conditions.condition_code
         , conditions.payment_year
         , 'CMS-HCC-V28' as model_version
@@ -78,7 +78,7 @@ with conditions as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(condition_code as {{ dbt.type_string() }}) as condition_code
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(model_version as {{ dbt.type_string() }}) as model_version
@@ -88,7 +88,7 @@ with conditions as (
 )
 
 select
-      patient_id
+      person_id
     , condition_code
     , hcc_code
     , model_version

@@ -6,7 +6,7 @@
 with demographics as (
 
     select
-          patient_id
+          person_id
         , enrollment_status
         , institutional_status
         , model_version
@@ -18,7 +18,7 @@ with demographics as (
 , hcc_hierarchy as (
 
     select
-          patient_id
+          person_id
         , hcc_code
         , model_version
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
@@ -43,7 +43,7 @@ with demographics as (
 , demographics_with_hccs as (
 
     select
-          demographics.patient_id
+          demographics.person_id
         , demographics.enrollment_status
         , demographics.institutional_status
         , demographics.model_version
@@ -51,7 +51,7 @@ with demographics as (
         , hcc_hierarchy.hcc_code
     from demographics
         inner join hcc_hierarchy
-            on demographics.patient_id = hcc_hierarchy.patient_id
+            on demographics.person_id = hcc_hierarchy.person_id
             and demographics.model_version = hcc_hierarchy.model_version
 
 )
@@ -59,7 +59,7 @@ with demographics as (
 , interactions as (
 
     select
-          demographics_with_hccs.patient_id
+          demographics_with_hccs.person_id
         , demographics_with_hccs.model_version
         , demographics_with_hccs.payment_year
         , seed_interaction_factors.factor_type
@@ -77,7 +77,7 @@ with demographics as (
 , add_data_types as (
 
 select
-      cast(patient_id as {{ dbt.type_string() }}) as patient_id
+      cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(description as {{ dbt.type_string() }}) as description
     , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
     , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -88,7 +88,7 @@ from interactions
 )
 
 select
-      patient_id
+      person_id
     , description
     , coefficient
     , factor_type

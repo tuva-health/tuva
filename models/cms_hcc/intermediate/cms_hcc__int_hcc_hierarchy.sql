@@ -13,7 +13,7 @@
 with hcc_mapping as (
 
     select distinct
-          patient_id
+          person_id
         , hcc_code
         , model_version
         , payment_year
@@ -39,7 +39,7 @@ with hcc_mapping as (
 , hccs_without_hierarchy as (
 
     select distinct
-          hcc_mapping.patient_id
+          hcc_mapping.person_id
         , hcc_mapping.model_version
         , hcc_mapping.payment_year
         , hcc_mapping.hcc_code
@@ -61,7 +61,7 @@ with hcc_mapping as (
 , hccs_with_hierarchy as (
 
     select
-          hcc_mapping.patient_id
+          hcc_mapping.person_id
         , hcc_mapping.model_version
         , hcc_mapping.payment_year
         , hcc_mapping.hcc_code
@@ -81,18 +81,18 @@ with hcc_mapping as (
 , hierarchy_applied as (
 
     select
-          hccs_with_hierarchy.patient_id
+          hccs_with_hierarchy.person_id
         , hccs_with_hierarchy.model_version
         , hccs_with_hierarchy.payment_year
         , hccs_with_hierarchy.hcc_code
         , min(hcc_mapping.hcc_code) as top_level_hcc
     from hccs_with_hierarchy
         left join hcc_mapping
-            on hcc_mapping.patient_id = hccs_with_hierarchy.patient_id
+            on hcc_mapping.person_id = hccs_with_hierarchy.person_id
             and hcc_mapping.hcc_code = hccs_with_hierarchy.top_level_hcc
             and hcc_mapping.model_version = hccs_with_hierarchy.model_version
     group by
-          hccs_with_hierarchy.patient_id
+          hccs_with_hierarchy.person_id
         , hccs_with_hierarchy.model_version
         , hccs_with_hierarchy.payment_year
         , hccs_with_hierarchy.hcc_code
@@ -106,7 +106,7 @@ with hcc_mapping as (
 , lower_level_inclusions as (
 
     select distinct
-          patient_id
+          person_id
         , model_version
         , payment_year
         , case
@@ -124,7 +124,7 @@ with hcc_mapping as (
 , top_level_inclusions as (
 
     select distinct
-          hcc_mapping.patient_id
+          hcc_mapping.person_id
         , hcc_mapping.model_version
         , hcc_mapping.payment_year
         , hcc_mapping.hcc_code
@@ -133,11 +133,11 @@ with hcc_mapping as (
             on hcc_mapping.hcc_code = seed_hcc_hierarchy.hcc_code
             and hcc_mapping.model_version = seed_hcc_hierarchy.model_version
         left join lower_level_inclusions
-            on hcc_mapping.patient_id = lower_level_inclusions.patient_id
+            on hcc_mapping.person_id = lower_level_inclusions.person_id
             and hcc_mapping.hcc_code = lower_level_inclusions.hcc_code
             and hcc_mapping.model_version = lower_level_inclusions.model_version
         left join hierarchy_applied
-            on hcc_mapping.patient_id = hierarchy_applied.patient_id
+            on hcc_mapping.person_id = hierarchy_applied.person_id
             and hcc_mapping.hcc_code = hierarchy_applied.hcc_code
             and hcc_mapping.model_version = hierarchy_applied.model_version
     where lower_level_inclusions.hcc_code is null
@@ -158,7 +158,7 @@ with hcc_mapping as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
@@ -167,7 +167,7 @@ with hcc_mapping as (
 )
 
 select
-      patient_id
+      person_id
     , model_version
     , payment_year
     , hcc_code

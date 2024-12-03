@@ -6,7 +6,7 @@
 with demographics as (
 
     select
-          patient_id
+          person_id
         , enrollment_status
         , gender
         , age_group
@@ -42,7 +42,7 @@ with demographics as (
 , non_institutional_interactions as (
 
     select
-          demographics.patient_id
+          demographics.person_id
         , demographics.model_version
         , demographics.payment_year
         , seed_interaction_factors.factor_type
@@ -76,7 +76,7 @@ with demographics as (
 , institutional_interactions as (
 
     select
-          demographics.patient_id
+          demographics.person_id
         , demographics.model_version
         , demographics.payment_year
         , seed_interaction_factors.factor_type
@@ -103,7 +103,7 @@ with demographics as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -114,7 +114,7 @@ with demographics as (
 )
 
 select
-      patient_id
+      person_id
     , description
     , coefficient
     , factor_type
