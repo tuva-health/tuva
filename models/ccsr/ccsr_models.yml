@@ -25,7 +25,7 @@ models:
         description: Unique identifier for each the encounter.
       - name: claim_id
         description: Unique identifier for each claim.
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient.
       - name: normalized_code
         description: "The ICD-10-CM code for the diagnosis."
@@ -101,7 +101,7 @@ models:
         description: Unique identifier for an encounter.
       - name: claim_id
         description: Unique claim_id for each claim.
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient.
       - name: body_system
         description: >
@@ -154,7 +154,7 @@ models:
           The encounter_id for the encounter where this procedure was performed.
       - name: claim_id
         description: Unique identifier for each claim.
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient.
       - name: normalized_code
         description: The ICD-10-PCS code for the procedure.
@@ -295,7 +295,7 @@ models:
     columns:
       - name: encounter_id
       - name: claim_id
-      - name: patient_id
+      - name: person_id
       - name: normalized_code
       - name: condition_rank
 
@@ -307,5 +307,5 @@ models:
     columns:
       - name: encounter_id
       - name: claim_id
-      - name: patient_id
+      - name: person_id
       - name: normalized_code
