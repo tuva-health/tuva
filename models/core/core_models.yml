@@ -23,8 +23,6 @@ models:
               severity: warn
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: patient_id
-      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: claim_id
@@ -98,8 +96,6 @@ models:
               severity: warn
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: member_id
-      description: '{{ doc("member_id") }}'
     - name: subscriber_id
       description: '{{ doc("subscriber_id") }}'
     - name: birth_date
@@ -158,8 +154,6 @@ models:
         - unique
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: patient_id
-      description: '{{ doc("patient_id") }}'
     - name: patient_data_source_id
       description: '{{ doc("patient_data_source_id") }}'
     - name: encounter_type
@@ -297,8 +291,6 @@ models:
               severity: warn
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: patient_id
-      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: accession_number
@@ -458,8 +450,6 @@ models:
         terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__claim_type.csv
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: member_id
-      description: '{{ doc("member_id") }}'
     - name: payer
       description: '{{ doc("payer") }}'
     - name: plan
@@ -632,8 +622,6 @@ models:
               severity: warn
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: patient_id
-      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: dispensing_date
@@ -756,8 +744,6 @@ models:
               severity: warn
     - name: person_id
       description: '{{ doc("person_id") }}'
-    - name: patient_id
-      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: panel_id
@@ -816,8 +802,6 @@ models:
     columns:
       - name: person_id
         description: '{{ doc("person_id") }}'
-      - name: patient_id
-        description: '{{ doc("patient_id") }}'
         tests:
           - unique:
               config:
@@ -894,8 +878,6 @@ models:
         data_type: integer
       - name: person_id
         description: '{{ doc("person_id") }}'
-      - name: member_id
-        description: '{{ doc("member_id") }}'
       - name: payer
         description: '{{ doc("payer") }}'
       - name: plan
@@ -1016,8 +998,6 @@ models:
         description: '{{ doc("claim_id") }}'
       - name: person_id
         description: '{{ doc("person_id") }}'
-      - name: patient_id
-        description: '{{ doc("patient_id") }}'
       - name: procedure_date
         description: '{{ doc("procedure_date") }}'
       - name: source_code_type
