@@ -21,7 +21,6 @@ select
        , cast(claim_id as {{ dbt.type_string() }} ) as claim_id
        , cast(claim_line_number as integer ) as claim_line_number
        , cast(person_id as {{ dbt.type_string() }} ) as person_id
-       , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(payer as {{ dbt.type_string() }} ) as payer
        , {{ quote_column('plan') }}
        , cast(prescribing_provider_id as {{ dbt.type_string() }} ) as prescribing_provider_id

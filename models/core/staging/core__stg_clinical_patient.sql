@@ -10,7 +10,6 @@ with tuva_last_run as(
 )
 SELECT
       cast(person_id as {{ dbt.type_string() }} ) as person_id
-    , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(first_name as {{ dbt.type_string() }} ) as first_name
     , cast(last_name as {{ dbt.type_string() }} ) as last_name
     , cast(sex as {{ dbt.type_string() }} ) as sex
