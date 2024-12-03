@@ -11,8 +11,8 @@ SELECT
         , cast(coalesce({{ dbt.current_timestamp() }}, cast('1900-01-01' as date)) as date) as source_date
     {% endif %}
     , 'PATIENT' AS table_name
-    , 'Patient ID' as drill_down_key
-    , coalesce(patient_id, 'NULL') AS drill_down_value
+    , 'Person ID' as drill_down_key
+    , coalesce(person_id, 'NULL') AS drill_down_value
     , 'LATITUDE' as field_name
     , case when m.latitude is not null then 'valid' else 'null' end as bucket_name
     , cast(null as {{ dbt.type_string() }}) as invalid_reason

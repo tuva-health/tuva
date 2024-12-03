@@ -5,7 +5,7 @@
 with input_medical as (
   select
       cast('medical_claim' as {{ dbt.type_string() }}) as table_name
-    , count(distinct patient_id) as patient_count
+    , count(distinct person_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
@@ -16,7 +16,7 @@ with input_medical as (
 , input_pharmacy as (
   select
       cast('pharmacy_claim' as {{ dbt.type_string() }}) as table_name
-    , count(distinct patient_id) as patient_count
+    , count(distinct person_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
@@ -27,7 +27,7 @@ with input_medical as (
 ,input_eligibility as (
 select
     cast('eligibility' as {{ dbt.type_string() }}) as table_name
-  , count(distinct patient_id) as patient_count
+  , count(distinct person_id) as patient_count
   , count(distinct {{ dbt.concat([
         'member_id'
       , "'-'"
@@ -53,7 +53,7 @@ from {{ ref('eligibility') }}
 , core_medical as (
   select
      cast( 'medical_claim' as {{ dbt.type_string() }}) as table_name
-    , count(distinct patient_id) as patient_count
+    , count(distinct person_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
@@ -64,7 +64,7 @@ from {{ ref('eligibility') }}
 , core_pharmacy as (
   select
      cast( 'pharmacy_claim' as {{ dbt.type_string() }}) as table_name
-    , count(distinct patient_id) as patient_count
+    , count(distinct person_id) as patient_count
     , count(distinct claim_id) as claim_count
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
@@ -75,7 +75,7 @@ from {{ ref('eligibility') }}
 , core_eligibility as (
   select
     cast('eligibility'  as {{ dbt.type_string() }})as table_name
-    , count(distinct patient_id) as patient_count
+    , count(distinct person_id) as patient_count
     , count(*) as span_count
   from {{ ref('core__eligibility') }}
 )

@@ -272,7 +272,7 @@ SELECT
 	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
 	, cast(field_value as {{ dbt.type_string() }}) as field_value
 	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
-	FROM {{ ref('data_quality__claim_patient_id') }}
+	FROM {{ ref('data_quality__claim_person_id') }}
 
 union all
 
@@ -553,7 +553,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
 	, cast(field_value as {{ dbt.type_string() }}) as field_value
 	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
-	FROM {{ ref('data_quality__eligibility_patient_id') }}
+	FROM {{ ref('data_quality__eligibility_person_id') }}
 
 union all
 
@@ -1303,7 +1303,7 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
 	, cast(field_value as {{ dbt.type_string() }}) as field_value
 	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
-	FROM {{ ref('data_quality__pharmacy_patient_id') }}
+	FROM {{ ref('data_quality__pharmacy_person_id') }}
 
 union all
 

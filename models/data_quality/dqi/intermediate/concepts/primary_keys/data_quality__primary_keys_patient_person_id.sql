@@ -7,7 +7,7 @@ WITH valid_conditions AS (
     SELECT
         *
     FROM
-        {{ ref('data_quality__patient_patient_id') }}
+        {{ ref('data_quality__patient_person_id') }}
     WHERE
         bucket_name = 'valid'
 )
@@ -35,7 +35,7 @@ WITH valid_conditions AS (
         bucket_name,
         row_number() over (order by drill_down_key) as row_number_value
     FROM
-        {{ ref('data_quality__patient_patient_id') }}
+        {{ ref('data_quality__patient_person_id') }}
     WHERE
         bucket_name = 'valid'
 
@@ -54,7 +54,7 @@ WITH valid_conditions AS (
         b.duplicate_count,
         row_number() over (order by drill_down_key) as row_number_value
     FROM
-        {{ ref('data_quality__patient_patient_id') }} a
+        {{ ref('data_quality__patient_person_id') }} a
     JOIN
         uniqueness_check b on a.field_value = b.field_value
 )

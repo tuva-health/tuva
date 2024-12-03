@@ -13,7 +13,7 @@ with month_start_and_end_dates as (
 )
 
 select distinct
-    a.patient_id
+    a.person_id
   , b.year_month
   , b.month_start_date
   , b.month_end_date
