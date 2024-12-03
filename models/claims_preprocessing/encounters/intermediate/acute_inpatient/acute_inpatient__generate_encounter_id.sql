@@ -63,7 +63,7 @@ select claim_id
         -- Claims with different end_date 
         -- should be merged if they overlap:
         when aa.end_date <> bb.end_date
-          and aa.end_date >= bb.start_date
+          and aa.end_date > bb.start_date
           and aa.facility_id = bb.facility_id then 1
         else 0
       end as merge_flag

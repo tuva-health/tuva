@@ -24,6 +24,8 @@ with union_measures as (
             , ref('quality_measures__int_nqf0420_long')
             , ref('quality_measures__int_adh_diabetes_long')
             , ref('quality_measures__int_adhras_long')
+            , ref('quality_measures__int_supd_long')
+            , ref('quality_measures__int_adh_statins_long')
         ]
 
     ) }}

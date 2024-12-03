@@ -14,11 +14,12 @@ group by
 {% else -%}
 
 select
-    null as data_source,
-    null as claim_type,
-    null as claim_count,
-    null as paid_amount
+    null as data_source
+    , null as claim_type
+    , null as claim_count
+    , null as paid_amount
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-limit 0
+
+{{ limit_zero()}}
 
 {%- endif %}

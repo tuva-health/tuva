@@ -170,6 +170,26 @@ with measures_long as (
     
 )
 
+, supd as (
+
+    select
+          patient_id
+        , performance_flag
+    from measures_long
+    where measure_id = 'SUPD'
+
+)
+
+, adh_statins as (
+
+    select
+          patient_id
+        , performance_flag
+    from measures_long
+    where measure_id = 'ADH-Statins'
+
+)
+
 , joined as (
 
     select
@@ -189,6 +209,8 @@ with measures_long as (
         , max(nqf_0420.performance_flag) as nqf_0420
         , max(adh_diabetes.performance_flag) as adh_diabetes
         , max(adh_ras.performance_flag) as adh_ras
+        , max(supd.performance_flag) as supd
+        , max(adh_statins.performance_flag) as adh_statins
     from measures_long
         left join nqf_2372
             on measures_long.patient_id = nqf_2372.patient_id
@@ -220,6 +242,10 @@ with measures_long as (
             on measures_long.patient_id = adh_diabetes.patient_id
         left join adh_ras
             on measures_long.patient_id = adh_ras.patient_id
+        left join supd
+            on measures_long.patient_id = supd.patient_id
+        left join adh_statins
+            on measures_long.patient_id = adh_statins.patient_id
     group by measures_long.patient_id
 
 )
@@ -243,6 +269,8 @@ with measures_long as (
         , cast(nqf_0420 as integer) as nqf_0420
         , cast(adh_diabetes as integer) as adh_diabetes
         , cast(adh_ras as integer) as adh_ras
+        , cast(supd as integer) as supd
+        , cast(adh_statins as integer) as adh_statins
     from joined
 
 )
@@ -264,5 +292,7 @@ select
     , nqf_0420
     , adh_diabetes
     , adh_ras
+    , supd
+    , adh_statins
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

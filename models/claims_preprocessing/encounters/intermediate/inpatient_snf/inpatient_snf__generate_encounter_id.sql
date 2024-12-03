@@ -55,7 +55,7 @@ with claim_start_end as (
         and aa.facility_id = bb.facility_id
         and aa.discharge_disposition_code = '30' then 1
       when aa.end_date <> bb.end_date
-        and aa.end_date >= bb.start_date
+        and aa.end_date > bb.start_date
         and aa.facility_id = bb.facility_id then 1
       else 0
     end as merge_flag

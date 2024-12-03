@@ -60,23 +60,33 @@ with controlled_bp_codes as (
               '99473' -- Self-measured blood pressure using a device validated for clinical accuracy; patient education/training and device calibration
             , '99474' -- Separate self-measurements of two readings one minute apart, twice daily over a 30-day period (minimum of 12 readings), collection of data reported by the patient and/or caregiver to the physician or other qualified health care professional, with report of average systolic and diastolic pressures and subsequent communication of a treatment plan to the patient
         )
+        {% if  target.type == 'duckdb' %}
+            and try_cast('result' as numeric) is not null
+        {% else %}
+            and {{ dbt.safe_cast("result", api.Column.translate_type("numeric")) }} is not null
+        {% endif %}
 
 )
 
 , labs as (
 
-    select 
+    select
           patient_id
         , result_date
         , collection_date
         , result
         , normalized_code
     from {{ref('quality_measures__stg_core__lab_result')}}
-    where normalized_code in 
+    where normalized_code in
     ('8480-6' --systolic
     ,'8462-4') --diastolic
     and
     normalized_code_type = 'loinc'
+    {% if  target.type == 'duckdb' %}
+        and try_cast('result' as numeric) is not null
+    {% else %}
+        and {{ dbt.safe_cast("result", api.Column.translate_type("numeric")) }} is not null
+    {% endif %}
 
 )
 
@@ -102,7 +112,7 @@ with controlled_bp_codes as (
 )
 
 , all_medical_claims as (
-    
+
     select
           patient_id
         , claim_start_date
@@ -147,7 +157,7 @@ with controlled_bp_codes as (
     from controlled_bp_procedures
 
     union all
-    
+
     select
           patient_id
         , evidence_date
@@ -197,9 +207,9 @@ with controlled_bp_codes as (
     from controlled_bp_within_range_proc_claims
     left join encounters
         on controlled_bp_within_range_proc_claims.patient_id = encounters.patient_id
-        and controlled_bp_within_range_proc_claims.evidence_date between 
-            encounters.encounter_start_date and encounters.encounter_end_date 
-    
+        and controlled_bp_within_range_proc_claims.evidence_date between
+            encounters.encounter_start_date and encounters.encounter_end_date
+
 )
 
 , valid_procedures_and_claims as (
@@ -276,7 +286,7 @@ with controlled_bp_codes as (
     from observations
     inner join denominator
         on observations.patient_id = denominator.patient_id
-        and observations.observation_date between 
+        and observations.observation_date between
             denominator.performance_period_begin and denominator.performance_period_end
 
 )
@@ -296,7 +306,7 @@ with controlled_bp_codes as (
     from labs
     inner join denominator
         on labs.patient_id = denominator.patient_id
-        and coalesce(labs.result_date,labs.collection_date) between 
+        and coalesce(labs.result_date,labs.collection_date) between
             denominator.performance_period_begin and denominator.performance_period_end
 
 )
@@ -325,7 +335,7 @@ with controlled_bp_codes as (
     from observations_within_range
     left join encounters
         on observations_within_range.patient_id = encounters.patient_id
-        and observations_within_range.observation_date between 
+        and observations_within_range.observation_date between
             encounters.encounter_start_date and encounters.encounter_end_date
 
 )
@@ -355,7 +365,7 @@ with controlled_bp_codes as (
         on labs_within_range.patient_id = encounters.patient_id
         and labs_within_range.observation_date between
             encounters.encounter_start_date and encounters.encounter_end_date
-            
+
 )
 
 , obs_and_labs as (
@@ -366,7 +376,7 @@ with controlled_bp_codes as (
         {% if target.type == 'fabric' %}
             , try_cast(result as {{ dbt.type_float() }}) as bp_reading
         {% else %}
-        , cast(result as {{ dbt.type_float() }}) as bp_reading
+            , cast(result as {{ dbt.type_float() }}) as bp_reading
         {% endif %}
         , normalized_description
         , measure_id
