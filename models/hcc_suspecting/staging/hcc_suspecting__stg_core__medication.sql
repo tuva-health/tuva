@@ -5,7 +5,7 @@
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , dispensing_date
     , source_code
     , source_code_type
@@ -17,7 +17,7 @@ from {{ ref('core__medication') }}
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , dispensing_date
     , source_code
     , source_code_type
@@ -30,7 +30,7 @@ from {{ ref('core__medication') }}
 
 {% if target.type == 'fabric' %}
     select top 0
-          cast(null as {{ dbt.type_string() }} ) as patient_id
+          cast(null as {{ dbt.type_string() }} ) as person_id
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
         , cast(null as {{ dbt.type_string() }} ) as source_code
         , cast(null as {{ dbt.type_string() }} ) as source_code_type
@@ -39,7 +39,7 @@ from {{ ref('core__medication') }}
         , cast(null as {{ dbt.type_string() }} ) as data_source
 {% else %}
 select
-          cast(null as {{ dbt.type_string() }} ) as patient_id
+          cast(null as {{ dbt.type_string() }} ) as person_id
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
         , cast(null as {{ dbt.type_string() }} ) as source_code
         , cast(null as {{ dbt.type_string() }} ) as source_code_type

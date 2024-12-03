@@ -6,7 +6,7 @@
 with all_medications as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , drug_code
         , code_system
@@ -37,7 +37,7 @@ with all_medications as (
 , billed_hccs as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , current_year_billed
@@ -52,7 +52,7 @@ with all_medications as (
 , hcc_155_suspect as (
 
     select
-          all_medications.patient_id
+          all_medications.person_id
         , all_medications.dispensing_date
         , all_medications.drug_code
         , all_medications.code_system
@@ -85,7 +85,7 @@ with all_medications as (
 , add_billed_flag as (
 
     select
-          unioned.patient_id
+          unioned.person_id
         , unioned.data_source
         , unioned.hcc_code
         , unioned.hcc_description
@@ -95,7 +95,7 @@ with all_medications as (
         , billed_hccs.current_year_billed
     from unioned
         left join billed_hccs
-            on unioned.patient_id = billed_hccs.patient_id
+            on unioned.person_id = billed_hccs.person_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
 )
@@ -103,7 +103,7 @@ with all_medications as (
 , add_standard_fields as (
 
     select
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -124,7 +124,7 @@ with all_medications as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
@@ -143,7 +143,7 @@ with all_medications as (
 )
 
 select
-      patient_id
+      person_id
     , data_source
     , hcc_code
     , hcc_description

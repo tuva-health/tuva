@@ -7,7 +7,7 @@
 
 select
       lab_result_id
-    , patient_id
+    , person_id
     , lower(coalesce(normalized_code_type,source_code_type)) as code_type
     , coalesce(normalized_code,source_code) as code
     , status
@@ -20,7 +20,7 @@ from {{ ref('core__lab_result') }}
 
 select
       lab_result_id
-    , patient_id
+    , person_id
     , lower(coalesce(normalized_code_type,source_code_type)) as code_type
     , coalesce(normalized_code,source_code) as code
     , status
@@ -34,7 +34,7 @@ from {{ ref('core__lab_result') }}
 {% if target.type == 'fabric' %}
     select top 0
           cast(null as {{ dbt.type_string() }} ) as lab_result_id
-        , cast(null as {{ dbt.type_string() }} ) as patient_id
+        , cast(null as {{ dbt.type_string() }} ) as person_id
         , cast(null as {{ dbt.type_string() }} ) as code_type
         , cast(null as {{ dbt.type_string() }} ) as code
         , cast(null as {{ dbt.type_string() }} ) as status
@@ -44,7 +44,7 @@ from {{ ref('core__lab_result') }}
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as lab_result_id
-        , cast(null as {{ dbt.type_string() }} ) as patient_id
+        , cast(null as {{ dbt.type_string() }} ) as person_id
         , cast(null as {{ dbt.type_string() }} ) as code_type
         , cast(null as {{ dbt.type_string() }} ) as code
         , cast(null as {{ dbt.type_string() }} ) as status
