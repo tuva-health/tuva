@@ -14,7 +14,7 @@ with encounter_sequence as (
 select
     *,
     row_number() over(
-        partition by patient_id order by admit_date, discharge_date
+        partition by person_id order by admit_date, discharge_date
     ) as encounter_seq
 from {{ ref('readmissions__encounter_augmented') }}
 where disqualified_encounter_flag = 0
@@ -24,7 +24,7 @@ where disqualified_encounter_flag = 0
 readmission_calc as (
 select
     aa.encounter_id,
-    aa.patient_id,
+    aa.person_id,
     aa.admit_date,
     aa.discharge_date,
     aa.discharge_disposition_code,
@@ -67,7 +67,7 @@ select
 from
     encounter_sequence aa
     left join encounter_sequence bb
-    on aa.patient_id = bb.patient_id
+    on aa.person_id = bb.person_id
     and aa.encounter_seq + 1 = bb.encounter_seq
 )
 
