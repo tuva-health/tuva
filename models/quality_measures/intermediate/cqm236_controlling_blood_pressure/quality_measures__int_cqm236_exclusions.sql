@@ -24,7 +24,7 @@
 with frailty as (
 
   select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
   from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
@@ -35,7 +35,7 @@ with frailty as (
 , denominator as (
 
   select
-      patient_id
+      person_id
     , age
   from {{ref('quality_measures__int_cqm236_denominator')}}
 
@@ -47,7 +47,7 @@ with frailty as (
     source.*
   from {{ ref('quality_measures__int_shared_exclusions_advanced_illness') }} as source
   inner join frailty
-    on source.patient_id = frailty.patient_id
+    on source.person_id = frailty.person_id
   where source.exclusion_date
     between
       {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp=performance_period_begin) }}
@@ -76,47 +76,47 @@ with frailty as (
 , acute_inpatient_counts as (
 
     select
-          patient_id
+          person_id
         , exclusion_type
         , count(distinct exclusion_date) as encounter_count
     from acute_inpatient_advanced_illness
-    group by patient_id, exclusion_type
+    group by person_id, exclusion_type
 
 )
 
 , nonacute_outpatient_counts as (
 
     select
-          patient_id
+          person_id
         , exclusion_type
         , count(distinct exclusion_date) as encounter_count
     from nonacute_outpatient_advanced_illness
-    group by patient_id, exclusion_type
+    group by person_id, exclusion_type
 
 )
 
 , valid_advanced_illness_exclusions as (
 
     select
-          acute_inpatient_advanced_illness.patient_id
+          acute_inpatient_advanced_illness.person_id
         , acute_inpatient_advanced_illness.exclusion_date
         , acute_inpatient_advanced_illness.exclusion_reason
         , acute_inpatient_advanced_illness.exclusion_type
     from acute_inpatient_advanced_illness
     left join acute_inpatient_counts
-      on acute_inpatient_advanced_illness.patient_id = acute_inpatient_counts.patient_id
+      on acute_inpatient_advanced_illness.person_id = acute_inpatient_counts.person_id
     where acute_inpatient_counts.encounter_count >= 1
 
     union all
 
     select
-        nonacute_outpatient_advanced_illness.patient_id
+        nonacute_outpatient_advanced_illness.person_id
       , nonacute_outpatient_advanced_illness.exclusion_date
       , nonacute_outpatient_advanced_illness.exclusion_reason
       , nonacute_outpatient_advanced_illness.exclusion_type
     from nonacute_outpatient_advanced_illness
     left join nonacute_outpatient_counts
-      on nonacute_outpatient_advanced_illness.patient_id = nonacute_outpatient_counts.patient_id
+      on nonacute_outpatient_advanced_illness.person_id = nonacute_outpatient_counts.person_id
     where nonacute_outpatient_counts.encounter_count >= 2
 
 
@@ -126,13 +126,13 @@ with frailty as (
 , valid_dementia_exclusions as (
 
   select
-      source.patient_id
+      source.person_id
     , source.exclusion_date
     , source.exclusion_reason
     , source.exclusion_type
   from {{ref('quality_measures__int_shared_exclusions_dementia')}} source
   inner join frailty
-    on source.patient_id = frailty.patient_id
+    on source.person_id = frailty.person_id
   where (
     source.dispensing_date
       between {{ dbt.dateadd(datepart="year", interval=-1, from_date_or_timestamp= performance_period_begin ) }}
@@ -147,7 +147,7 @@ with frailty as (
 , valid_hospice_palliative as (
 
   select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_type
@@ -159,7 +159,7 @@ with frailty as (
 , valid_institutional_snp as (
 
   select 
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_type
@@ -171,7 +171,7 @@ with frailty as (
 , measure_specific_procedure_observation_exclusion as (
 
   select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_type
@@ -214,21 +214,21 @@ with frailty as (
     , denominator.age
   from exclusions
   inner join denominator
-      on exclusions.patient_id = denominator.patient_id
+      on exclusions.person_id = denominator.person_id
 
 )
 
 , frailty_exclusion_older_than_80 as (
 
   select
-      frailty.patient_id
+      frailty.person_id
     , frailty.exclusion_date
     , frailty.exclusion_reason
     , 'measure specific exclusion for patients older than 80' as exclusion_type
     , denominator.age
   from frailty
   inner join denominator
-  on frailty.patient_id = denominator.patient_id
+  on frailty.person_id = denominator.person_id
     where denominator.age >= 81
 
 )
@@ -258,7 +258,7 @@ with frailty as (
 
     select
         distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , 1 as exclusion_flag
@@ -267,7 +267,7 @@ with frailty as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_flag

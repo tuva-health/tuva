@@ -6,7 +6,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -32,7 +32,7 @@ with denominator as (
 , labs as (
 
     select
-        patient_id
+        person_id
         , result
         , result_date
         , collection_date
@@ -47,17 +47,17 @@ with denominator as (
 , qualifying_labs as (
 
     select
-      labs.patient_id
+      labs.person_id
     , labs.result as evidence_value
     , coalesce(collection_date,result_date) as evidence_date
     , hba1c_test_code.concept_name
-    , row_number() over(partition by labs.patient_id order by coalesce(collection_date,result_date) desc) as rn
+    , row_number() over(partition by labs.person_id order by coalesce(collection_date,result_date) desc) as rn
     from labs
     inner join hba1c_test_code
         on coalesce(labs.normalized_code, labs.source_code) = hba1c_test_code.code
             and coalesce(labs.normalized_code_type, labs.source_code_type) = hba1c_test_code.code_system
     left join denominator
-        on labs.patient_id = denominator.patient_id
+        on labs.person_id = denominator.person_id
     where coalesce(collection_date,result_date) <= denominator.performance_period_end
    {% if target.type == 'fabric' %}
         and result LIKE '%.%' OR result LIKE '%[0-9]%'
@@ -71,7 +71,7 @@ with denominator as (
 , recent_readings as (
 
     select
-          patient_id
+          person_id
         , evidence_date
         , evidence_value
     from qualifying_labs
@@ -87,14 +87,14 @@ with denominator as (
         , recent_readings.evidence_value
     from denominator
     left join recent_readings
-        on denominator.patient_id = recent_readings.patient_id
+        on denominator.person_id = recent_readings.person_id
 
 )
 
 , test_not_performed as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -113,7 +113,7 @@ with denominator as (
 , valid_patients as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -143,7 +143,7 @@ with denominator as (
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -157,7 +157,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

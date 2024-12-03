@@ -24,7 +24,7 @@
 with valid_hospice_exclusions as (
 
   select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_type
@@ -39,13 +39,13 @@ with valid_hospice_exclusions as (
 , combined_exclusions as (
 
   select 
-      valid_hospice_exclusions.patient_id
+      valid_hospice_exclusions.person_id
     , valid_hospice_exclusions.exclusion_date
     , valid_hospice_exclusions.exclusion_reason
     , valid_hospice_exclusions.exclusion_type
   from valid_hospice_exclusions
   inner join {{ref('quality_measures__int_nqf0097_denominator')}} as denominator
-      on valid_hospice_exclusions.patient_id = denominator.patient_id
+      on valid_hospice_exclusions.person_id = denominator.person_id
 
 )
 
@@ -53,7 +53,7 @@ with valid_hospice_exclusions as (
 
     select
         distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , 1 as exclusion_flag
@@ -62,7 +62,7 @@ with valid_hospice_exclusions as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_flag

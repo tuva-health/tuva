@@ -7,7 +7,7 @@
 with denominator as (
 
     select 
-          patient_id
+          person_id
         , encounter_date
         , performance_period_begin
         , performance_period_end
@@ -34,7 +34,7 @@ with denominator as (
 , procedures as (
 
     select
-        patient_id
+        person_id
       , procedure_date
       , coalesce (
               normalized_code_type
@@ -55,7 +55,7 @@ with denominator as (
 , qualifying_procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date as evidence_date
     from procedures
     inner join involuntary_urination_codes
@@ -67,7 +67,7 @@ with denominator as (
 , qualifying_claims as (
 
     select
-          patient_id
+          person_id
         , coalesce(claim_end_date, claim_start_date) as evidence_date
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
     inner join involuntary_urination_codes
@@ -79,14 +79,14 @@ with denominator as (
 , qualifying_cares as (
 
     select
-          patient_id
+          person_id
         , evidence_date
     from qualifying_procedures
 
     union all
 
     select
-          patient_id
+          person_id
         , evidence_date
     from qualifying_claims
 
@@ -95,7 +95,7 @@ with denominator as (
 , combined_qualifying_patients as (
 
     select
-          qualifying_cares.patient_id
+          qualifying_cares.person_id
         , qualifying_cares.evidence_date
         , cast(null as {{ dbt.type_string() }}) as evidence_value
         , denominator.performance_period_begin
@@ -106,7 +106,7 @@ with denominator as (
         , 1 as numerator_flag
     from qualifying_cares
     inner join denominator
-        on qualifying_cares.patient_id = denominator.patient_id
+        on qualifying_cares.person_id = denominator.person_id
     where evidence_date between
         {{ dbt.dateadd (
                   datepart = "year"
@@ -122,7 +122,7 @@ with denominator as (
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -136,7 +136,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

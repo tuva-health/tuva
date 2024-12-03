@@ -9,7 +9,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , performance_period_lookback
@@ -33,7 +33,7 @@ with denominator as (
 , medical_claim as (
 
     select
-          patient_id
+          person_id
         , claim_start_date
         , claim_end_date
         , hcpcs_code
@@ -44,7 +44,7 @@ with denominator as (
 , observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , coalesce (
               normalized_code_type
@@ -65,7 +65,7 @@ with denominator as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce(
               normalized_code_type
@@ -86,7 +86,7 @@ with denominator as (
 , qualifying_claims as (
 
     select
-          medical_claim.patient_id
+          medical_claim.person_id
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
     from medical_claim
@@ -99,7 +99,7 @@ with denominator as (
 , qualifying_observations as (
 
     select
-          observations.patient_id
+          observations.person_id
         , observations.observation_date
     from observations
          inner join mammography_codes
@@ -110,7 +110,7 @@ with denominator as (
 , qualifying_procedures as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
     from procedures
          inner join mammography_codes
@@ -128,7 +128,7 @@ with denominator as (
 , patients_with_mammograms as (
 
     select
-          denominator.patient_id
+          denominator.person_id
         , denominator.performance_period_begin
         , denominator.performance_period_end
         , denominator.performance_period_lookback
@@ -175,18 +175,18 @@ with denominator as (
           end as numerator_flag
     from denominator
          left join qualifying_claims
-            on denominator.patient_id = qualifying_claims.patient_id
+            on denominator.person_id = qualifying_claims.person_id
         left join qualifying_observations
-            on denominator.patient_id = qualifying_observations.patient_id
+            on denominator.person_id = qualifying_observations.person_id
         left join qualifying_procedures
-            on denominator.patient_id = qualifying_procedures.patient_id
+            on denominator.person_id = qualifying_procedures.person_id
 
 )
 
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -199,7 +199,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

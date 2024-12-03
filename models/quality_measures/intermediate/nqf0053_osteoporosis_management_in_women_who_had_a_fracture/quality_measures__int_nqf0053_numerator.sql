@@ -7,7 +7,7 @@
 with denominator as (
 
     select 
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , recorded_date
@@ -54,7 +54,7 @@ with denominator as (
 , procedures_osteo_related as (
 
     select
-        patient_id
+        person_id
       , procedure_date
     from {{ref('quality_measures__stg_core__procedure')}} as procs
     inner join osteo_procedure_codes
@@ -66,7 +66,7 @@ with denominator as (
 , qualifying_procedures as (
 
     select
-          procedures_osteo_related.patient_id
+          procedures_osteo_related.person_id
         , procedures_osteo_related.procedure_date
         , denominator.measure_id
         , denominator.measure_name
@@ -76,7 +76,7 @@ with denominator as (
         , denominator.performance_period_end
     from procedures_osteo_related
     inner join denominator
-        on procedures_osteo_related.patient_id = denominator.patient_id
+        on procedures_osteo_related.person_id = denominator.person_id
         and 
             procedures_osteo_related.procedure_date between
             denominator.recorded_date 
@@ -93,7 +93,7 @@ with denominator as (
 , denominator_patients_disqualified_from_procedure as (
     
     select 
-          denominator.patient_id
+          denominator.person_id
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
@@ -102,8 +102,8 @@ with denominator as (
         , denominator.performance_period_end  
     from denominator
     left join qualifying_procedures 
-    on denominator.patient_id = qualifying_procedures.patient_id
-    where qualifying_procedures.patient_id is null
+    on denominator.person_id = qualifying_procedures.person_id
+    where qualifying_procedures.person_id is null
 
 )
 
@@ -129,7 +129,7 @@ with denominator as (
 , pharmacy_claims_osteo_related as (
 
     select
-        patient_id
+        person_id
       , dispensing_date
       , ndc_code  
     from {{ref('quality_measures__stg_pharmacy_claim')}} as pharmacy_claims
@@ -142,7 +142,7 @@ with denominator as (
 , qualifying_pharmacy_claims as (
 
     select 
-          pharmacy_claims_osteo_related.patient_id
+          pharmacy_claims_osteo_related.person_id
         , pharmacy_claims_osteo_related.dispensing_date
         , pharmacy_claims_osteo_related.ndc_code
         , denominator_patients_disqualified_from_procedure.measure_id
@@ -153,7 +153,7 @@ with denominator as (
         , denominator_patients_disqualified_from_procedure.performance_period_end
     from pharmacy_claims_osteo_related
     inner join denominator_patients_disqualified_from_procedure
-        on pharmacy_claims_osteo_related.patient_id = denominator_patients_disqualified_from_procedure.patient_id
+        on pharmacy_claims_osteo_related.person_id = denominator_patients_disqualified_from_procedure.person_id
         and pharmacy_claims_osteo_related.dispensing_date 
             between             
             denominator_patients_disqualified_from_procedure.recorded_date 
@@ -171,7 +171,7 @@ with denominator as (
 , medication_osteo_related as (
 
     select
-        patient_id
+        person_id
       , encounter_id
       , prescribing_date
       , dispensing_date
@@ -189,7 +189,7 @@ with denominator as (
 , qualifying_medications as (
 
     select
-          medication_osteo_related.patient_id
+          medication_osteo_related.person_id
         , medication_osteo_related.encounter_id
         , denominator_patients_disqualified_from_procedure.measure_id
         , denominator_patients_disqualified_from_procedure.measure_name
@@ -199,7 +199,7 @@ with denominator as (
         , denominator_patients_disqualified_from_procedure.performance_period_end
     from medication_osteo_related
     inner join denominator_patients_disqualified_from_procedure
-        on medication_osteo_related.patient_id = denominator_patients_disqualified_from_procedure.patient_id
+        on medication_osteo_related.person_id = denominator_patients_disqualified_from_procedure.person_id
             and coalesce(medication_osteo_related.prescribing_date, medication_osteo_related.dispensing_date) between 
                 denominator_patients_disqualified_from_procedure.recorded_date 
                 and 
@@ -215,7 +215,7 @@ with denominator as (
 , numerator as (
 
     select
-          qualifying_procedures.patient_id
+          qualifying_procedures.person_id
         , qualifying_procedures.performance_period_begin
         , qualifying_procedures.performance_period_end
         , qualifying_procedures.measure_id
@@ -228,7 +228,7 @@ with denominator as (
     union all
 
     select 
-          qualifying_pharmacy_claims.patient_id
+          qualifying_pharmacy_claims.person_id
         , qualifying_pharmacy_claims.performance_period_begin
         , qualifying_pharmacy_claims.performance_period_end
         , qualifying_pharmacy_claims.measure_id
@@ -241,7 +241,7 @@ with denominator as (
     union all
 
     select 
-          qualifying_medications.patient_id
+          qualifying_medications.person_id
         , qualifying_medications.performance_period_begin
         , qualifying_medications.performance_period_end
         , qualifying_medications.measure_id
@@ -256,7 +256,7 @@ with denominator as (
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -270,7 +270,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

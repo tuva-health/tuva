@@ -12,7 +12,7 @@ combined_exclusions as (
     , denominator.age
   from {{ ref('quality_measures__int_nqf0053_exclusions_stage_1') }} as exclusions
   inner join {{ref('quality_measures__int_nqf0053_denominator')}} as denominator
-      on exclusions.patient_id = denominator.patient_id
+      on exclusions.person_id = denominator.person_id
 
 )
 
@@ -62,7 +62,7 @@ combined_exclusions as (
 
     select
         distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , 1 as exclusion_flag
@@ -71,7 +71,7 @@ combined_exclusions as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_flag

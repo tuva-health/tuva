@@ -6,7 +6,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , procedure_encounter_date
         , claims_encounter_date
         , performance_period_begin
@@ -34,7 +34,7 @@ with denominator as (
 , procedures as (
 
     select
-        patient_id
+        person_id
       , procedure_date
       , coalesce (
               normalized_code_type
@@ -55,7 +55,7 @@ with denominator as (
 , documenting_meds_procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
     from procedures
     inner join medication_code
@@ -67,7 +67,7 @@ with denominator as (
 , documenting_meds_claims as (
 
     select
-          patient_id
+          person_id
         , coalesce(claim_end_date,claim_start_date) as encounter_date
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
     inner join medication_code
@@ -79,7 +79,7 @@ with denominator as (
 , qualifying_procedure as (
 
     select 
-          documenting_meds_procedures.patient_id
+          documenting_meds_procedures.person_id
         , documenting_meds_procedures.procedure_date as encounter_date
         , denominator.performance_period_begin
         , denominator.performance_period_end
@@ -88,7 +88,7 @@ with denominator as (
         , denominator.measure_version
     from documenting_meds_procedures
     inner join denominator
-      on documenting_meds_procedures.patient_id = denominator.patient_id
+      on documenting_meds_procedures.person_id = denominator.person_id
         and documenting_meds_procedures.procedure_date = denominator.procedure_encounter_date
 
 )
@@ -96,7 +96,7 @@ with denominator as (
 , qualifying_claims as (
     
     select 
-          documenting_meds_claims.patient_id
+          documenting_meds_claims.person_id
         , documenting_meds_claims.encounter_date
         , denominator.performance_period_begin
         , denominator.performance_period_end
@@ -105,7 +105,7 @@ with denominator as (
         , denominator.measure_version
     from documenting_meds_claims
     inner join denominator
-      on documenting_meds_claims.patient_id = denominator.patient_id
+      on documenting_meds_claims.person_id = denominator.person_id
         and documenting_meds_claims.encounter_date = denominator.claims_encounter_date
 
 )
@@ -113,7 +113,7 @@ with denominator as (
 , qualifying_cares as (
 
     select
-          patient_id
+          person_id
         , encounter_date
         , performance_period_begin
         , performance_period_end
@@ -126,7 +126,7 @@ with denominator as (
     union all
 
     select
-          patient_id
+          person_id
         , encounter_date
         , performance_period_begin
         , performance_period_end
@@ -141,7 +141,7 @@ with denominator as (
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -155,7 +155,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

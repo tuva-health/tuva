@@ -12,7 +12,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
     from {{ ref('quality_measures__int_nqf2372_denominator') }}
@@ -41,7 +41,7 @@ with denominator as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , recorded_date
         , coalesce (
               normalized_code_type
@@ -61,7 +61,7 @@ with denominator as (
 , observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , coalesce (
               normalized_code_type
@@ -82,7 +82,7 @@ with denominator as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -103,7 +103,7 @@ with denominator as (
 , condition_exclusions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date
         , exclusion_codes.concept_name
     from conditions
@@ -116,7 +116,7 @@ with denominator as (
 , observation_exclusions as (
 
     select
-          observations.patient_id
+          observations.person_id
         , observations.observation_date
         , exclusion_codes.concept_name
     from observations
@@ -129,7 +129,7 @@ with denominator as (
 , procedure_exclusions as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
         , exclusion_codes.concept_name
     from procedures
@@ -142,32 +142,32 @@ with denominator as (
 , all_mastectomy as (
 
     select
-          denominator.patient_id
+          denominator.person_id
         , condition_exclusions.recorded_date as exclusion_date
         , condition_exclusions.concept_name as exclusion_reason
     from denominator
          inner join condition_exclusions
-            on denominator.patient_id = condition_exclusions.patient_id
+            on denominator.person_id = condition_exclusions.person_id
 
     union all
 
     select
-          denominator.patient_id
+          denominator.person_id
         , observation_exclusions.observation_date as exclusion_date
         , observation_exclusions.concept_name as exclusion_reason
     from denominator
          inner join observation_exclusions
-            on denominator.patient_id = observation_exclusions.patient_id
+            on denominator.person_id = observation_exclusions.person_id
 
     union all
 
     select
-          denominator.patient_id
+          denominator.person_id
         , procedure_exclusions.procedure_date as exclusion_date
         , procedure_exclusions.concept_name as exclusion_reason
     from denominator
          inner join procedure_exclusions
-            on denominator.patient_id = procedure_exclusions.patient_id
+            on denominator.person_id = procedure_exclusions.person_id
 
 )
 
@@ -178,7 +178,7 @@ with denominator as (
 , bilateral_mastectomy as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from all_mastectomy
@@ -192,7 +192,7 @@ with denominator as (
 , right_mastectomy as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from all_mastectomy
@@ -206,7 +206,7 @@ with denominator as (
 , left_mastectomy as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from all_mastectomy
@@ -220,7 +220,7 @@ with denominator as (
 , unspecified_mastectomy as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from all_mastectomy
@@ -237,22 +237,22 @@ with denominator as (
 , unilateral_mastectomy as (
 
     select
-          right_mastectomy.patient_id
+          right_mastectomy.person_id
         , right_mastectomy.exclusion_date
         , right_mastectomy.exclusion_reason
     from right_mastectomy
          inner join left_mastectomy
-            on right_mastectomy.patient_id = left_mastectomy.patient_id
+            on right_mastectomy.person_id = left_mastectomy.person_id
 
     union all
 
     select
-          unspecified_mastectomy.patient_id
+          unspecified_mastectomy.person_id
         , unspecified_mastectomy.exclusion_date
         , unspecified_mastectomy.exclusion_reason
     from unspecified_mastectomy
          inner join unspecified_mastectomy as self_join
-            on unspecified_mastectomy.patient_id = self_join.patient_id
+            on unspecified_mastectomy.person_id = self_join.person_id
             and unspecified_mastectomy.exclusion_date <> self_join.exclusion_date
 
 )
@@ -265,7 +265,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , '{{ var('tuva_last_run')}}' as tuva_last_run

@@ -7,7 +7,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , age
         , performance_period_begin
         , performance_period_end
@@ -19,7 +19,7 @@ with denominator as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , recorded_date
         , coalesce (
@@ -40,7 +40,7 @@ with denominator as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -79,7 +79,7 @@ with denominator as (
 , condition_exclusions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.claim_id
         , conditions.recorded_date
         , exclusion_codes.concept_name
@@ -93,7 +93,7 @@ with denominator as (
 , procedure_exclusions as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
         , exclusion_codes.concept_name
     from procedures
@@ -106,7 +106,7 @@ with denominator as (
 , exclusions_unioned as (
 
     select
-          patient_id
+          person_id
         , recorded_date as exclusion_date
         , concept_name as exclusion_reason
     from condition_exclusions
@@ -114,7 +114,7 @@ with denominator as (
     union all
 
     select
-          patient_id
+          person_id
         , procedure_date as exclusion_date
         , concept_name as exclusion_reason
     from procedure_exclusions
@@ -124,7 +124,7 @@ with denominator as (
 , excluded_patients as (
 
     select
-          exclusions_unioned.patient_id
+          exclusions_unioned.person_id
         , exclusions_unioned.exclusion_date
         , exclusions_unioned.exclusion_reason
         , case
@@ -136,14 +136,14 @@ with denominator as (
         , denominator.age
     from exclusions_unioned
     inner join denominator
-        on exclusions_unioned.patient_id = denominator.patient_id
+        on exclusions_unioned.person_id = denominator.person_id
 
 )
 
 , exclusions_filtered as (
 
     select
-          patient_id
+          person_id
         , age
         , exclusion_date
         , exclusion_reason
@@ -154,7 +154,7 @@ with denominator as (
     union all
 
     select
-          patient_id
+          person_id
         , age
         , exclusion_date
         , exclusion_reason
@@ -167,7 +167,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , age
