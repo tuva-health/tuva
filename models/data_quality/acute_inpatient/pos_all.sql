@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('claims_enabled', False)
+) }}
+
 with all_pos_codes as (
       select
             aa.claim_id
