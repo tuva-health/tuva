@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('claims_enabled', False)
+) }}
+
 with total_claims_count as (
       select
             count(*) as total_claims_count

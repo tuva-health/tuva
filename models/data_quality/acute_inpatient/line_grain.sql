@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('claims_enabled', False)
+) }}
+
 select 
       claim_id
     , claim_line_number
