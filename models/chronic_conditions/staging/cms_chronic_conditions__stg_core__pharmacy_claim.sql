@@ -5,7 +5,7 @@
 
 select
       claim_id
-    , patient_id
+    , person_id
     , paid_date
     , ndc_code
     , data_source

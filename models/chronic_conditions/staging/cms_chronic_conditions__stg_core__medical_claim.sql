@@ -5,7 +5,7 @@
 
 select
       claim_id
-    , patient_id
+    , person_id
     , claim_start_date
     , ms_drg_code
     , data_source
