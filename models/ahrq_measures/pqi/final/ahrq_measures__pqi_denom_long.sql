@@ -4,7 +4,7 @@
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '01' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -14,7 +14,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '03' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -24,7 +24,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '05' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -34,7 +34,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '07' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -44,7 +44,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '08' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -54,7 +54,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '11' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -64,7 +64,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '12' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -74,7 +74,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '14' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -84,7 +84,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '15' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -94,7 +94,7 @@ union all
 
 select
     d.year_number
-  , d.patient_id
+  , d.person_id
   , d.data_source
   , '16' as pqi_number
   , '{{ var('tuva_last_run')}}' as tuva_last_run
