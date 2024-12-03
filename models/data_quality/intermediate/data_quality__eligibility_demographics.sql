@@ -36,7 +36,7 @@ with eligibility_spans as(
     'Birthday is not a valid date' as data_quality_check
     , count(distinct eligibility_span_id) as result_count
     from eligibility_spans e
-    left join reference_data.calendar c
+    left join {{ ref('reference_data__calendar') }} c
         on e.birth_date = c.full_date
     where c.full_date is null
 )
