@@ -8,7 +8,7 @@ select
     class.encounter_id
     , cat.classification_name as ed_classification_description
     , cat.classification_order as ed_classification_order
-    , class.patient_id
+    , class.person_id
     , class.encounter_end_date
     , {{  dbt.concat([date_part('year', 'class.encounter_end_date'),
                       dbt.right(
@@ -36,4 +36,4 @@ inner join {{ ref('ed_classification__categories') }} cat
 left join {{ ref('terminology__provider') }} fac_prov 
     on class.facility_id = fac_prov.npi
 left join {{ ref('ed_classification__stg_patient') }} pat
-    on class.patient_id = pat.patient_id
+    on class.person_id = pat.person_id
