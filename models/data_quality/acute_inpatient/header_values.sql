@@ -98,3 +98,4 @@ left join {{ ref('discharge_disposition_code_summary') }} ddco
 
 left join {{ ref('diagnosis_code_1_summary') }} dx1
     on bill.claim_id = dx1.claim_id
+    

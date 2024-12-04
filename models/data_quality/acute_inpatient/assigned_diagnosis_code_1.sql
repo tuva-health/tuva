@@ -21,7 +21,7 @@ with unique_codes as (
 , undeterminable_codes as (
     select
           claim_id
-        , null as diagnosis_code_1
+        , cast(null as {{ dbt.type_string() }}) as diagnosis_code_1
         , 'undeterminable' as assignment_method
     from {{ ref('undeterminable_diagnosis_code_1') }}
 )
