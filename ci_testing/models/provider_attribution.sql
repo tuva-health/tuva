@@ -4,8 +4,4 @@
    )
 }}
 
-
-
-
-
 select * from {{ ref('provider_attribution_seed') }}
