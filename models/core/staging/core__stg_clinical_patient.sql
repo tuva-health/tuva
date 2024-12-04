@@ -25,6 +25,7 @@ SELECT
     , cast(county as {{ dbt.type_string() }} ) as county
     , cast(latitude as {{ dbt.type_float() }} ) as latitude
     , cast(longitude as {{ dbt.type_float() }} ) as longitude
+    , cast(phone as {{ dbt.type_string() }}) as phone
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) as age
     , cast(

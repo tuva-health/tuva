@@ -3,10 +3,6 @@
    )
 }}
 
--- *************************************************
--- This dbt model creates the patient table in core.
--- *************************************************
-
 with patient_stage as(
     select
         person_id
@@ -52,6 +48,7 @@ select
     , cast(null as {{ dbt.type_string() }}) as county
     , cast(null as {{ dbt.type_float() }}) as latitude 
     , cast(null as {{ dbt.type_float() }}) as longitude
+    , cast(phone as {{ dbt.type_string() }}) as phone
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) as age
     , cast(

@@ -16,6 +16,7 @@ select
     , cast(null as {{ dbt.type_string() }} ) as county
     , cast(null as {{ dbt.type_float() }} ) as latitude
     , cast(null as {{ dbt.type_float() }} ) as longitude
+    , cast(null as {{ dbt.type_string() }} ) as phone
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name
     , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
