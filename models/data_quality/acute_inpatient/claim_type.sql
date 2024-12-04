@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('claims_enabled', False)
+) }}
+
 with claim_grain_labels as (
       select
             claim_id  
