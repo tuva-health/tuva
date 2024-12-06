@@ -1406,12 +1406,12 @@ models:
     materialized: table
 
 
-- name: data_quality__condition_person_id
+- name: data_quality__condition_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: condition_person_id
+    alias: condition_patient_id
     tags:
       - data_quality
     materialized: table
@@ -1736,12 +1736,12 @@ models:
     materialized: table
 
 
-- name: data_quality__encounter_person_id
+- name: data_quality__encounter_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: encounter_person_id
+    alias: encounter_patient_id
     tags:
       - data_quality
     materialized: table
@@ -2045,12 +2045,12 @@ models:
     materialized: table
 
 
-- name: data_quality__lab_result_person_id
+- name: data_quality__lab_result_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: lab_result_person_id
+    alias: lab_result_patient_id
     tags:
       - data_quality
     materialized: table
@@ -2287,12 +2287,12 @@ models:
     materialized: table
 
 
-- name: data_quality__medication_person_id
+- name: data_quality__medication_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: medication_person_id
+    alias: medication_patient_id
     tags:
       - data_quality
     materialized: table
@@ -2650,12 +2650,12 @@ models:
     materialized: table
 
 
-- name: data_quality__observation_person_id
+- name: data_quality__observation_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: observation_person_id
+    alias: observation_patient_id
     tags:
       - data_quality
     materialized: table
@@ -2826,12 +2826,12 @@ models:
     materialized: table
 
 
-- name: data_quality__patient_person_id
+- name: data_quality__patient_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: patient_person_id
+    alias: patient_patient_id
     tags:
       - data_quality
     materialized: table
@@ -3024,12 +3024,12 @@ models:
     materialized: table
 
 
-- name: data_quality__procedure_person_id
+- name: data_quality__procedure_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: procedure_person_id
+    alias: procedure_patient_id
     tags:
       - data_quality
     materialized: table
@@ -3199,12 +3199,12 @@ models:
     materialized: table
 
 
-- name: data_quality__primary_keys_patient_person_id
+- name: data_quality__primary_keys_patient_patient_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: primary_keys_patient_person_id
+    alias: primary_keys_patient_patient_id
     tags:
       - data_quality
     materialized: table
