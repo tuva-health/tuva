@@ -5,6 +5,7 @@
 with pharmacy as (
   select
       claim_id
+    , count(distinct claim_id) as claim_id_count
     , count(distinct p.patient_id) as patient_id_count
     , max(case when e.month_start_date is null then 1 else 0 end) as missing_eligibility
   from {{ ref('pharmacy_claim') }} p
