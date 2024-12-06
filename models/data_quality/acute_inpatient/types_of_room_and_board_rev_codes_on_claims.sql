@@ -1,3 +1,7 @@
+{{ config(
+    enabled = var('claims_enabled', False)
+) }}
+
 with group_by_types_of_rb_claims as (
 
     select
