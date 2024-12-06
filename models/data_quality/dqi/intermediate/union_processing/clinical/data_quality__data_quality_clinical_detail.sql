@@ -44,7 +44,7 @@ SELECT * FROM {{ ref('data_quality__condition_onset_date') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__condition_person_id') }}
+SELECT * FROM {{ ref('data_quality__condition_patient_id') }}
 
 union all
 
@@ -164,7 +164,7 @@ SELECT * FROM {{ ref('data_quality__encounter_paid_amount') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__encounter_person_id') }}
+SELECT * FROM {{ ref('data_quality__encounter_patient_id') }}
 
 union all
 
@@ -296,7 +296,7 @@ SELECT * FROM {{ ref('data_quality__procedure_data_source') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__procedure_person_id') }}
+SELECT * FROM {{ ref('data_quality__procedure_patient_id') }}
 
 union all
 
@@ -428,7 +428,7 @@ SELECT * FROM {{ ref('data_quality__lab_result_source_code') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__lab_result_person_id') }}
+SELECT * FROM {{ ref('data_quality__lab_result_patient_id') }}
 
 union all
 
@@ -500,7 +500,7 @@ SELECT * FROM {{ ref('data_quality__patient_death_date') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__patient_person_id') }}
+SELECT * FROM {{ ref('data_quality__patient_patient_id') }}
 
 union all
 
@@ -532,7 +532,7 @@ SELECT * FROM {{ ref('data_quality__medication_strength') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__medication_person_id') }}
+SELECT * FROM {{ ref('data_quality__medication_patient_id') }}
 
 union all
 
@@ -664,7 +664,7 @@ SELECT * FROM {{ ref('data_quality__observation_normalized_code_type') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__observation_person_id') }}
+SELECT * FROM {{ ref('data_quality__observation_patient_id') }}
 
 )
 
