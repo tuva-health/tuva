@@ -19,6 +19,8 @@ with members as (
         , orec_default
         , institutional_status_default
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_members') }}
 
 )
@@ -57,6 +59,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -88,6 +92,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -121,6 +127,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -152,6 +160,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -207,6 +217,8 @@ with members as (
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from unioned
 
 )
@@ -228,5 +240,7 @@ select
     , factor_type
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
