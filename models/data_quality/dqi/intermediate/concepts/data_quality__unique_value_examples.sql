@@ -27,7 +27,7 @@ SELECT * FROM {{ ref('data_quality__primary_keys_observation_observation_id') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__primary_keys_patient_person_id') }}
+SELECT * FROM {{ ref('data_quality__primary_keys_patient_patient_id') }}
 
 union all
 
