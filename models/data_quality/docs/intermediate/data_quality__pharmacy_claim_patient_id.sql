@@ -25,15 +25,15 @@ from pharmacy
 , final as (
   select
       'multiple pharmacy_claim patient_ids' as data_quality_check
-    , sum(case when patient_id_count > 1 then 1 else 0 end) as result_count
-  from pharmacy
+    , multiple_patient_id_count as result_count
+  from aggregate_check
 
   union all
 
   select
       'percent orphaned pharmacy_claim claims' as data_quality_check
     , (orphaned_claim_count/total_claim_count)*100 as result_count
-  from pharmacy
+  from aggregate_check
 )
 
 select
