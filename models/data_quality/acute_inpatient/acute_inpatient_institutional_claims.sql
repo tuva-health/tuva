@@ -2,10 +2,6 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-{{ config(
-    enabled = var('claims_enabled', False)
-) }}
-
 with all_aip_inst_claims as (
 
     select
