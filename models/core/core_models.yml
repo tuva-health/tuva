@@ -869,6 +869,39 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
+  - name: core__patient_crosswalk
+    description: >
+      The patient crosswalk table contains all source patient identifiers from 
+      the input layer eligibility (claims) and patient (clinical).
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: patient_crosswalk
+      tags: core
+      materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - patient_id
+            - member_id
+            - payer
+            - plan
+            - data_source
+    columns:
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
+      - name: member_id
+        description: '{{ doc("member_id") }}'
+      - name: payer
+        description: '{{ doc("payer") }}'
+      - name: plan
+        description: '{{ doc("plan") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
 
   - name: core__pharmacy_claim
     description: >
