@@ -14,7 +14,13 @@ with pharmacy as (
   group by
       claim_id
 )
-
+, aggregate_check as(
+select
+    sum(claim_id_count) as total_claim_count
+    , sum(case when patient_id_count > 1 then 1 else 0 end) as multiple_patient_id_count
+    , sum(missing_eligibility) as orphaned_claim_count
+from pharmacy
+)
 , final as (
   select
       'multiple pharmacy_claim patient_ids' as data_quality_check
@@ -24,8 +30,8 @@ with pharmacy as (
   union all
 
   select
-      'orphaned pharmacy_claim claims' as data_quality_check
-    , sum(missing_eligibility) as result_count
+      'percent orphaned pharmacy_claim claims' as data_quality_check
+    , (orphaned_claim_count/total_claim_count)*100 as result_count
   from pharmacy
 )
 

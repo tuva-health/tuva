@@ -18,7 +18,6 @@ select
     , count(*) as result_count
 from {{ ref('medical_claim') }}
 where claim_type = 'professional'
-
 union all
 
 select

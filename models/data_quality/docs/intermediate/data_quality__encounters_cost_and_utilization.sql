@@ -12,7 +12,9 @@ select
     cast('encounters cost and utilization PKPY' as {{dbt.type_string()}}) as analytics_concept
     , enc.encounter_group
     , cast(enc.encounter_type as {{dbt.type_string()}}) as analytics_measure
-    , count(enc.encounter_id) / avg(mm.member_months) * 12000 as data_source_value
+    , case
+        when coalesce(avg(mm.member_months),0) > 0 then count(enc.encounter_id) / avg(mm.member_months) * 12000
+    end as data_source_value
 from {{ ref('core__encounter') }} as enc
 cross join member_months as mm
 group by
@@ -24,7 +26,9 @@ select
     cast('encounters cost and utilization paid per' as {{dbt.type_string()}}) as analytics_concept
     , enc.encounter_group
     , cast(enc.encounter_type as {{dbt.type_string()}}) as analytics_measure
-    , sum(enc.paid_amount) / count(enc.encounter_id) as data_source_value
+    , case
+        when coalesce(count(enc.encounter_id),0) > 0 then sum(enc.paid_amount) / count(enc.encounter_id)
+    end as data_source_value
 from {{ ref('core__encounter') }} as enc
 cross join member_months as mm
 group by

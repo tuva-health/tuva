@@ -30,7 +30,9 @@ union all
 , final_stage as(
     select
         claim_type
-        , paid_amount/total_paid_amount as percent_of_total_paid
+        , case
+            when coalesce(total_paid_amount,0) > 0 then  paid_amount/total_paid_amount
+        end as percent_of_total_paid
         , case
             when claim_type = 'pharmacy' then 1
             else claim_type_count/total_claim_count
