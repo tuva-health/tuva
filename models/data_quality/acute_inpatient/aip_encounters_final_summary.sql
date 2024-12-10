@@ -4,14 +4,14 @@
 
 with aip_encounters as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
 
 )
 
 , aip_encounters_with_dq_problems as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where dq_problem = 1
 
@@ -19,7 +19,7 @@ with aip_encounters as (
 
 , aip_encounters_with_unusable_dx1 as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where usable_diagnosis_code_1 = 0
 
@@ -27,7 +27,7 @@ with aip_encounters as (
 
 , aip_encounters_with_unusable_atc as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where usable_admit_type_code = 0
 
@@ -35,7 +35,7 @@ with aip_encounters as (
 
 , aip_encounters_with_unusable_asc as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where usable_admit_source_code = 0
 
@@ -43,7 +43,7 @@ with aip_encounters as (
 
 , aip_encounters_with_unusable_ddc as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where usable_discharge_disposition_code = 0
 
@@ -51,7 +51,7 @@ with aip_encounters as (
 
 , aip_encounters_with_unusable_facility_npi as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where usable_facility_npi = 0
 
@@ -59,7 +59,7 @@ with aip_encounters as (
 
 , aip_encounters_with_unusable_rendering_npi as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where usable_rendering_npi = 0
 
@@ -67,7 +67,7 @@ with aip_encounters as (
 
 , single_inst_claim_aip_encounters as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where single_claim_encounter = 1
 
@@ -75,7 +75,7 @@ with aip_encounters as (
 
 , multiple_inst_claim_aip_encounters as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where multi_claim_encounter = 1
 
@@ -83,7 +83,7 @@ with aip_encounters as (
 
 , aip_encounters_with_prof_claims as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where has_professional_claims = 1
 
@@ -91,7 +91,7 @@ with aip_encounters as (
 
 , aip_encounters_without_prof_claims as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where has_professional_claims = 0
 
@@ -99,7 +99,7 @@ with aip_encounters as (
 
 , spend_from_prof_claims as (
 
-    select sum(professional_paid_amount)
+    select cast(sum(professional_paid_amount) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where has_professional_claims = 1
 
@@ -115,7 +115,7 @@ with aip_encounters as (
 
 , aip_encounters_with_death as (
 
-    select count(*)
+    select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
     from {{ ref('aip_encounters_final') }}
     where discharge_disposition_code in ('20', '40', '41')
 
@@ -123,14 +123,14 @@ with aip_encounters as (
 
 , average_los as (
 
-    select round(avg(los), 1)
+    select round(cast(avg(los) as {{ dbt.type_numeric() }}), 1)
     from {{ ref('aip_encounters_final') }}
 
 )
 
 , average_total_paid_amount as (
 
-    select round(avg(total_paid_amount), 1)
+    select round(cast(avg(total_paid_amount) as {{ dbt.type_numeric() }}), 1)
     from {{ ref('aip_encounters_final') }}
 
 )
