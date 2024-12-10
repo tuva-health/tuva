@@ -2,7 +2,7 @@ version: 2
 models:
 
 # Data Quality - Acute Inpatient
-- name: acute_inpatient_institutional_claims
+- name: data_quality__acute_inpatient_institutional_claims
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -12,7 +12,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: admit_source_code_summary
+- name: data_quality__admit_source_code_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -22,7 +22,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: admit_type_code_summary
+- name: data_quality__admit_type_code_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -32,7 +32,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_claims_adjacent_and_not_merging
+- name: data_quality__aip_claims_adjacent_and_not_merging
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -42,7 +42,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_claims_belonging_to_multiple_encounters
+- name: data_quality__aip_claims_belonging_to_multiple_encounters
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -52,7 +52,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_claims_not_merging_to_other_claims_in_their_encounter
+- name: data_quality__aip_claims_not_merging_to_other_claims_in_their_encounter
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -62,7 +62,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_claims_overlapping_and_not_merging
+- name: data_quality__aip_claims_overlapping_and_not_merging
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -72,7 +72,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_claims_per_encounter
+- name: data_quality__aip_claims_per_encounter
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -82,7 +82,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_claims_that_merge_to_a_different_claim_within_same_encounter
+- name: data_quality__aip_claims_that_merge_to_a_different_claim_within_same_encounter
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -92,7 +92,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_encounter_id
+- name: data_quality__aip_encounter_id
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -102,7 +102,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_encounters_final_summary
+- name: data_quality__aip_encounters_final_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -112,7 +112,7 @@ models:
       - data_quality_aip
     materialized: table
     
-- name: aip_encounters_final
+- name: data_quality__aip_encounters_final
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -122,7 +122,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_encounters_institutional_definition
+- name: data_quality__aip_encounters_institutional_definition
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -132,7 +132,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_inst_claims_dq_summary
+- name: data_quality__aip_inst_claims_dq_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -142,7 +142,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_multiple_claim_encounter_dq_flags
+- name: data_quality__aip_multiple_claim_encounter_dq_flags
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -152,7 +152,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_multiple_claim_encounter_fields
+- name: data_quality__aip_multiple_claim_encounter_fields
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -162,7 +162,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_multiple_claim_encounters
+- name: data_quality__aip_multiple_claim_encounters
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -172,7 +172,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_single_claim_encounters
+- name: data_quality__aip_single_claim_encounters
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -182,7 +182,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_venn_diagram
+- name: data_quality__aip_venn_diagram
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -192,7 +192,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_venn_diagram_key_areas
+- name: data_quality__aip_venn_diagram_key_areas
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -202,7 +202,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: aip_venn_diagram_summary
+- name: data_quality__aip_venn_diagram_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -212,7 +212,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: all_line_level_room_and_board_rev_codes
+- name: data_quality__all_line_level_room_and_board_rev_codes
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -222,7 +222,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: all_prof_aip_claims
+- name: data_quality__all_prof_aip_claims
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -232,7 +232,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: all_prof_aip_claims_summary
+- name: data_quality__all_prof_aip_claims_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -242,7 +242,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: apr_drg_code_summary
+- name: data_quality__apr_drg_code_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -252,7 +252,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_admit_source_code
+- name: data_quality__assigned_admit_source_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -262,7 +262,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_admit_type_code
+- name: data_quality__assigned_admit_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -272,7 +272,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_apr_drg_code
+- name: data_quality__assigned_apr_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -282,7 +282,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_bill_type_code
+- name: data_quality__assigned_bill_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -292,7 +292,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_diagnosis_code_1
+- name: data_quality__assigned_diagnosis_code_1
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -302,7 +302,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_discharge_disposition_code
+- name: data_quality__assigned_discharge_disposition_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -312,7 +312,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: assigned_ms_drg_code
+- name: data_quality__assigned_ms_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -322,7 +322,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: bill
+- name: data_quality__bill
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -332,7 +332,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: bill_type_code_summary
+- name: data_quality__bill_type_code_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -342,7 +342,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: calculated_claim_type_detailed_breakdown
+- name: data_quality__calculated_claim_type_detailed_breakdown
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -352,7 +352,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: calculated_claim_type_percentages
+- name: data_quality__calculated_claim_type_percentages
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -362,7 +362,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: claim_dates
+- name: data_quality__claim_dates
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -372,7 +372,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: claim_grain_calculated_dates
+- name: data_quality__claim_grain_calculated_dates
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -382,7 +382,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: claim_type
+- name: data_quality__claim_type
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -392,7 +392,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_admit_source_code
+- name: data_quality__determinable_admit_source_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -402,7 +402,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_admit_type_code
+- name: data_quality__determinable_admit_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -412,7 +412,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_apr_drg_code
+- name: data_quality__determinable_apr_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -422,7 +422,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_bill_type_code
+- name: data_quality__determinable_bill_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -432,7 +432,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_diagnosis_code_1
+- name: data_quality__determinable_diagnosis_code_1
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -442,7 +442,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_discharge_disposition_code
+- name: data_quality__determinable_discharge_disposition_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -452,7 +452,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: determinable_ms_drg_code
+- name: data_quality__determinable_ms_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -462,7 +462,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: diagnosis_code_1_summary
+- name: data_quality__diagnosis_code_1_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -472,7 +472,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: discharge_disposition_code_summary
+- name: data_quality__discharge_disposition_code_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -482,7 +482,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: distinct_room_and_board_rev_codes_per_claim
+- name: data_quality__distinct_room_and_board_rev_codes_per_claim
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -492,7 +492,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: drg
+- name: data_quality__drg
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -502,7 +502,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: header_values
+- name: data_quality__header_values
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -512,7 +512,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: header_values_graph
+- name: data_quality__header_values_graph
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -522,7 +522,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: header_values_summary
+- name: data_quality__header_values_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -532,7 +532,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_admit_source_code_occurs
+- name: data_quality__how_often_each_admit_source_code_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -542,7 +542,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_admit_type_code_occurs
+- name: data_quality__how_often_each_admit_type_code_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -552,7 +552,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_apr_drg_code_occurs
+- name: data_quality__how_often_each_apr_drg_code_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -562,7 +562,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_bill_type_code_occurs
+- name: data_quality__how_often_each_bill_type_code_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -572,7 +572,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_diagnosis_code_1_occurs
+- name: data_quality__how_often_each_diagnosis_code_1_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -582,7 +582,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_discharge_disposition_code_occurs
+- name: data_quality__how_often_each_discharge_disposition_code_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -592,7 +592,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: how_often_each_ms_drg_code_occurs
+- name: data_quality__how_often_each_ms_drg_code_occurs
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -602,7 +602,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: line_grain
+- name: data_quality__line_grain
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -612,7 +612,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: ms_drg_code_summary
+- name: data_quality__ms_drg_code_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -622,7 +622,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: other_header_values
+- name: data_quality__other_header_values
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -632,7 +632,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: pos_all
+- name: data_quality__pos_all
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -642,7 +642,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: pos_invalid
+- name: data_quality__pos_invalid
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -652,7 +652,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: prof_aip_overlap_summary
+- name: data_quality__prof_aip_overlap_summary
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -662,7 +662,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: prof_claims_overlapping_with_aip_encounters
+- name: data_quality__prof_claims_overlapping_with_aip_encounters
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -672,7 +672,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: prof_claims_overlapping_with_multiple_encounters
+- name: data_quality__prof_claims_overlapping_with_multiple_encounters
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -682,7 +682,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: prof_claims_overlapping_with_no_encounters
+- name: data_quality__prof_claims_overlapping_with_no_encounters
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -692,7 +692,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: prof_claims_overlapping_with_one_encounter
+- name: data_quality__prof_claims_overlapping_with_one_encounter
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -702,7 +702,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: rb_claims
+- name: data_quality__rb_claims
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -712,7 +712,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: rev_all
+- name: data_quality__rev_all
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -722,7 +722,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: rev_invalid
+- name: data_quality__rev_invalid
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -732,7 +732,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: types_of_room_and_board_rev_codes_on_claims
+- name: data_quality__types_of_room_and_board_rev_codes_on_claims
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -742,7 +742,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_admit_source_code
+- name: data_quality__undeterminable_admit_source_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -752,7 +752,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_admit_type_code
+- name: data_quality__undeterminable_admit_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -762,7 +762,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_apr_drg_code
+- name: data_quality__undeterminable_apr_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -772,7 +772,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_bill_type_code
+- name: data_quality__undeterminable_bill_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -782,7 +782,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_diagnosis_code_1
+- name: data_quality__undeterminable_diagnosis_code_1
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -792,7 +792,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_discharge_disposition_code
+- name: data_quality__undeterminable_discharge_disposition_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -802,7 +802,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: undeterminable_ms_drg_code
+- name: data_quality__undeterminable_ms_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -812,7 +812,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_admit_source_code
+- name: data_quality__unique_admit_source_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -822,7 +822,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_admit_type_code
+- name: data_quality__unique_admit_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -832,7 +832,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_apr_drg_code
+- name: data_quality__unique_apr_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -842,7 +842,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_bill_type_code
+- name: data_quality__unique_bill_type_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -852,7 +852,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_diagnosis_code_1
+- name: data_quality__unique_diagnosis_code_1
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -862,7 +862,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_discharge_disposition_code
+- name: data_quality__unique_discharge_disposition_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -872,7 +872,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: unique_ms_drg_code
+- name: data_quality__unique_ms_drg_code
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -882,7 +882,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: usable_pos_code_histogram
+- name: data_quality__usable_pos_code_histogram
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -892,7 +892,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: usable_rev_code_histogram
+- name: data_quality__usable_rev_code_histogram
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -902,7 +902,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_admit_source_code_counts
+- name: data_quality__valid_admit_source_code_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -912,7 +912,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_admit_type_code_counts
+- name: data_quality__valid_admit_type_code_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -922,7 +922,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_apr_drg_code_counts
+- name: data_quality__valid_apr_drg_code_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -932,7 +932,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_bill_type_code_counts
+- name: data_quality__valid_bill_type_code_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -942,7 +942,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_diagnosis_code_1_counts
+- name: data_quality__valid_diagnosis_code_1_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -952,7 +952,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_discharge_disposition_code_counts
+- name: data_quality__valid_discharge_disposition_code_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -962,7 +962,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_ms_drg_code_counts
+- name: data_quality__valid_ms_drg_code_counts
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
@@ -972,7 +972,7 @@ models:
       - data_quality_aip
     materialized: table
 
-- name: valid_values
+- name: data_quality__valid_values
   config:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
