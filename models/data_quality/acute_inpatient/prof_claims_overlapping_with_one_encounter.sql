@@ -1,5 +1,6 @@
 {{ config(
     enabled = var('claims_enabled', False)
+    , materialized='table'
 ) }}
 
 with number_of_encounters_each_prof_claim_overlaps_with as (
