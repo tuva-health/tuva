@@ -1,4 +1,3 @@
-
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
    )
@@ -14,6 +13,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -34,6 +34,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
 	       , discharge_date
@@ -54,6 +55,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -74,6 +76,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -94,6 +97,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -114,6 +118,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -134,6 +139,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -154,6 +160,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -174,6 +181,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -194,6 +202,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -214,6 +223,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -234,6 +244,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -254,6 +265,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -274,6 +286,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -294,6 +307,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -314,6 +328,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -334,6 +349,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -354,6 +370,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -374,6 +391,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -394,6 +412,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -414,6 +433,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -434,6 +454,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -454,6 +475,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -474,6 +496,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -494,6 +517,7 @@ select
     claim_id
   , claim_line_number
   , person_id
+  , member_id
   , coalesce(admission_date
            , claim_start_date
            , discharge_date
@@ -522,8 +546,9 @@ select distinct
         "CAST(unpivot_cte.source_code AS " ~ dbt.type_string() ~ ")",
     ]), api.Column.translate_type("string"))
  }} as condition_id
-
     , cast(unpivot_cte.person_id as {{ dbt.type_string() }} ) as person_id
+    , cast(unpivot_cte.member_id as {{ dbt.type_string() }} ) as member_id
+    , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id --one claim can be on multiple encounters, so nulling out for now
     , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
     , {{ try_to_cast_date('unpivot_cte.recorded_date', 'YYYY-MM-DD') }} as recorded_date

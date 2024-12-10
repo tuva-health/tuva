@@ -25,6 +25,10 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: member_id
+      description: '{{ doc("member_id") }}'
+    - name: patient_id
+      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: claim_id
@@ -77,7 +81,6 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__eligibility
     description: >
       The eligibility table contains information on patient health plan
@@ -100,6 +103,8 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: member_id
+      description: '{{ doc("member_id") }}'
     - name: subscriber_id
       description: '{{ doc("subscriber_id") }}'
     - name: birth_date
@@ -136,7 +141,6 @@ models:
       description: '{{ doc("data_source") }}'
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
-
 
   - name: core__encounter
     description: >
@@ -276,7 +280,6 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__lab_result
     description: >
       The lab result table contains information about lab test results,
@@ -299,6 +302,8 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: patient_id
+      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: accession_number
@@ -373,7 +378,6 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__location
     description: >
       The location table contains information on practice and facility locations  where
@@ -420,7 +424,6 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__medical_claim
     description: >
       The medical claim table contains information on services rendered
@@ -460,6 +463,8 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: member_id
+      description: '{{ doc("member_id") }}'
     - name: payer
       description: '{{ doc("payer") }}'
     - name: plan
@@ -611,7 +616,6 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__medication
     description: >
       The medication table contains information on medications ordered and/or
@@ -634,6 +638,8 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: patient_id
+      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: dispensing_date
@@ -694,7 +700,6 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__member_months
     description: Creates member months from eligibility data
     config:
@@ -710,6 +715,8 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: member_id
+      description: '{{ doc("member_id") }}'
     - name: year_month
       description: '{{ doc("year_month") }}'
     - name: payer
@@ -737,7 +744,6 @@ models:
     - name: custom_attributed_provider_lob
       description: '{{ doc("custom_attributed_provider_lob") }}'
 
-
   - name: core__observation
     description: >
       The observation table contains information on measurements other than  lab
@@ -760,6 +766,8 @@ models:
       description: '{{ doc("person_id") }}'
       tests:
         - not_null
+    - name: patient_id
+      description: '{{ doc("patient_id") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
     - name: panel_id
@@ -802,7 +810,6 @@ models:
       description: '{{ doc("data_source") }}'
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
-
 
   - name: core__patient
     description: >
@@ -930,6 +937,8 @@ models:
         description: '{{ doc("person_id") }}'
         tests:
           - not_null
+      - name: member_id
+        description: '{{ doc("member_id") }}'
       - name: payer
         description: '{{ doc("payer") }}'
       - name: plan
@@ -986,7 +995,6 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__practitioner
     description: >
       The practitioner table contains information on the providers in the  dataset
@@ -1025,7 +1033,6 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
-
   - name: core__procedure
     description: >
       The procedure table contains information on procedures that were performed  on
@@ -1052,6 +1059,10 @@ models:
         description: '{{ doc("person_id") }}'
         tests:
           - not_null
+      - name: member_id
+        description: '{{ doc("member_id") }}'
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
       - name: procedure_date
         description: '{{ doc("procedure_date") }}'
       - name: source_code_type
@@ -1110,8 +1121,6 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
-
-        
 ## Staging - Claims
   - name: core__stg_claims_medical_claim
     description: Staging core medical claims

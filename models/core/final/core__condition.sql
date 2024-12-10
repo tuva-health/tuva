@@ -37,6 +37,8 @@ with all_conditions as (
 select
     all_conditions.condition_id
   , all_conditions.person_id
+  , all_conditions.member_id
+  , all_conditions.patient_id
   , all_conditions.encounter_id
   , all_conditions.claim_id
   , all_conditions.recorded_date
@@ -91,6 +93,8 @@ left join {{ ref('terminology__snomed_ct') }} snomed_ct
 select
     all_conditions.condition_id
   , all_conditions.person_id
+  , all_conditions.member_id
+  , all_conditions.patient_id
   , all_conditions.encounter_id
   , all_conditions.claim_id
   , all_conditions.recorded_date

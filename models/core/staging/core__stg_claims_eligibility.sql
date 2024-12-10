@@ -15,6 +15,8 @@ select
        {{ dbt.concat([
             "person_id",
             "'-'",
+            "member_id",
+            "'-'",
             "enrollment_start_date",
             "'-'",
             "enrollment_end_date",
@@ -22,8 +24,11 @@ select
             "payer",
             "'-'",
             quote_column('plan'),
+            "'-'",
+            "data_source"
         ]) }} as eligibility_id
        , cast(person_id as {{ dbt.type_string() }} ) as person_id
+       , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(subscriber_id as {{ dbt.type_string() }} ) as subscriber_id
        , cast(birth_date as date) as birth_date
        , cast(death_date as date) as death_date

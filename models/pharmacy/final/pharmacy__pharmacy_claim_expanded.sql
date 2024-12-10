@@ -8,6 +8,7 @@ with all_drugs as (
     , p.claim_id
     , p.claim_line_number
     , p.person_id
+    , p.member_id
     , p.prescribing_provider_id
     , p.dispensing_provider_id
     , p.dispensing_date

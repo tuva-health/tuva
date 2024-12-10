@@ -8,6 +8,7 @@
 select
       obs.observation_id
     , obs.person_id
+    , obs.patient_id
     , obs.encounter_id
     , obs.panel_id
     , obs.observation_date
@@ -93,6 +94,7 @@ left join {{ ref('terminology__loinc') }} loinc
 select
       obs.observation_id
     , obs.person_id
+    , obs.patient_id
     , obs.encounter_id
     , obs.panel_id
     , obs.observation_date

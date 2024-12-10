@@ -10,6 +10,7 @@
 select
       labs.lab_result_id
     , labs.person_id
+    , labs.patient_id
     , labs.encounter_id
     , labs.accession_number
     , labs.source_code_type
@@ -64,6 +65,7 @@ left join {{ref('terminology__snomed_ct')}} snomed_ct
 select
       labs.lab_result_id
     , labs.person_id
+    , labs.patient_id
     , labs.encounter_id
     , labs.accession_number
     , labs.source_code_type

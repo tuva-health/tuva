@@ -10,6 +10,7 @@ with claim_dates as(
         claim_id
         , claim_line_number
         , person_id
+        , member_id
         , payer
         , {{ quote_column('plan') }}
         , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date
@@ -32,6 +33,7 @@ with claim_dates as(
           claim_id
         , claim_line_number
         , person_id
+        , member_id
         , payer
         , {{ quote_column('plan') }}
         , inferred_claim_start_date
@@ -69,6 +71,7 @@ select distinct
      claim.claim_id
     , claim.claim_line_number
     , claim.person_id
+    , claim.member_id
     , claim.payer
     , claim.{{ quote_column('plan') }}
     , claim.inferred_claim_start_year_month
@@ -79,6 +82,7 @@ select distinct
 from {{ ref('core__member_months')}} mm
 inner join claim_year_month claim
     on mm.person_id = claim.person_id
+    and mm.member_id = claim.member_id
     and mm.payer = claim.payer
     and mm.{{ quote_column('plan') }} = claim.{{ quote_column('plan') }}
     and mm.year_month >= claim.inferred_claim_start_year_month
