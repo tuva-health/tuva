@@ -18,7 +18,7 @@ with number_of_encounters_each_prof_claim_overlaps_with as (
 ,  total_usable_aip_professional_claims as (
 
     select
-          count(distinct claim_id) as total
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as total
     from {{ ref('prof_claims_overlapping_with_aip_encounters') }}
 
 )
@@ -26,7 +26,7 @@ with number_of_encounters_each_prof_claim_overlaps_with as (
 ,  claims_overlapping_with_one_encounter as (
 
     select
-          count(distinct claim_id) as total
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as total
     from number_of_encounters_each_prof_claim_overlaps_with
     where encounters_claim_overlaps_with = 1
 
@@ -35,7 +35,7 @@ with number_of_encounters_each_prof_claim_overlaps_with as (
 ,  claims_overlapping_with_multiple_encounters as (
 
     select
-          count(distinct claim_id) as total
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as total
     from number_of_encounters_each_prof_claim_overlaps_with
     where encounters_claim_overlaps_with > 1
 
@@ -44,7 +44,7 @@ with number_of_encounters_each_prof_claim_overlaps_with as (
 ,  claims_overlapping_with_no_encounters as (
 
     select
-          count(distinct claim_id) as total
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as total
     from number_of_encounters_each_prof_claim_overlaps_with
     where encounters_claim_overlaps_with = 0
 

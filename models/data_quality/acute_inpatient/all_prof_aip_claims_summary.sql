@@ -5,7 +5,7 @@
 with total_aip_prof_claims as (
 
     select
-          count(*) as total
+          cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as total
     from {{ ref('all_prof_aip_claims') }}
 
 )
@@ -13,7 +13,7 @@ with total_aip_prof_claims as (
 ,  aip_prof_claims_with_unusable_patient_id as (
 
     select
-          count(*) as total
+          cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as total
     from {{ ref('all_prof_aip_claims') }}
     where usable_patient_id = 0
 
@@ -22,7 +22,7 @@ with total_aip_prof_claims as (
 ,  aip_prof_claims_with_unusable_merge_dates as (
 
     select
-          count(*) as total
+          cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as total
     from {{ ref('all_prof_aip_claims') }}
     where usable_merge_dates = 0
 
@@ -31,7 +31,7 @@ with total_aip_prof_claims as (
 ,  usable_aip_prof_claims as (
 
     select
-          count(*) as total
+          cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as total
     from {{ ref('all_prof_aip_claims') }}
     where usable_prof_claim = 1
 
