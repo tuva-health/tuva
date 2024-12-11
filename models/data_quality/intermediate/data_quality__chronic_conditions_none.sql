@@ -4,17 +4,17 @@
 
 with chronic_conditions as 
 (
-    select distinct patient_id 
+    select distinct person_id 
     from {{ ref('chronic_conditions__cms_chronic_conditions_long') }}
 )
 
 ,results as (
     select 
         cast('Percent of patients without chronic conditions' as {{dbt.type_string()}}) as data_quality_check
-        , sum(case when cccw.patient_id is null then 1 else 0 end) / count(distinct e.patient_id) * 100 as result_count
+        , sum(case when cccw.person_id is null then 1 else 0 end) / count(distinct e.person_id) * 100 as result_count
     from {{ ref('core__patient') }} e
     left join chronic_conditions cccw 
-        on e.patient_id = cccw.patient_id
+        on e.person_id = cccw.person_id
 )
 
 select

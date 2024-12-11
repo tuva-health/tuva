@@ -6,7 +6,7 @@
 with hcc_history_suspects as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -27,7 +27,7 @@ with hcc_history_suspects as (
 , comorbidity_suspects as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -48,7 +48,7 @@ with hcc_history_suspects as (
 , observation_suspects as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -69,7 +69,7 @@ with hcc_history_suspects as (
 , lab_suspects as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -90,7 +90,7 @@ with hcc_history_suspects as (
 , medication_suspects as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -125,7 +125,7 @@ with hcc_history_suspects as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
@@ -137,7 +137,7 @@ with hcc_history_suspects as (
 )
 
 select
-      patient_id
+      person_id
     , data_source
     , hcc_code
     , hcc_description

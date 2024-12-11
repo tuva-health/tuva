@@ -10,11 +10,11 @@
 with encounters_with_row_num as (
 select
     encounter_id,
-    patient_id,
+    person_id,
     admit_date,
     discharge_date,
     row_number() over (
-        partition by patient_id order by encounter_id
+        partition by person_id order by encounter_id
 	) as row_num
 from {{ ref('readmissions__encounter') }}
 ),
@@ -24,7 +24,7 @@ cartesian as (
 select
     aa.encounter_id as encounter_id_A,
     bb.encounter_id as encounter_id_B,
-    aa.patient_id,
+    aa.person_id,
     aa.admit_date as Ai,
     aa.discharge_date as Af,
     bb.admit_date as Bi,
@@ -37,7 +37,7 @@ select
     end as overlap
     from encounters_with_row_num aa
     left join encounters_with_row_num bb
-    on aa.patient_id = bb.patient_id and aa.row_num < bb.row_num
+    on aa.person_id = bb.person_id and aa.row_num < bb.row_num
 ),
 
 
@@ -45,7 +45,7 @@ overlapping_pairs
 as
 (
     select
-        patient_id,
+        person_id,
         encounter_id_A,
 	encounter_id_B
     from cartesian

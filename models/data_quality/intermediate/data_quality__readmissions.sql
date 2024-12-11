@@ -12,7 +12,7 @@ with disqualified_unpivot as (
         value_name='flagvalue',
         remove=[
     'encounter_id',
-    'patient_id',
+    'person_id',
     'admit_date',
     'discharge_date',
     'discharge_disposition_code',

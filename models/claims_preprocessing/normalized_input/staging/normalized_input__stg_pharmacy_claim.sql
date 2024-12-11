@@ -8,7 +8,7 @@
 select
       claim_id
     , claim_line_number
-    , patient_id
+    , person_id
     , member_id
     , payer
     , {{ quote_column('plan') }}

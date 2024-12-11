@@ -14,7 +14,7 @@ models:
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
-      - name: patient_id
+      - name: person_id
         description: "The unique identifier for the patient"
       - name: admit_date
         description: "The date of admission for the inpatient visit"
@@ -109,7 +109,7 @@ models:
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
-      - name: patient_id
+      - name: person_id
         description: "The unique identifier for the patient"
       - name: admit_date
         description: "The date of admission for the inpatient visit"
@@ -252,7 +252,7 @@ models:
       materialized: view
     description: "This model lists all pairs of encounters that have some date overlap."
     columns:
-      - name: patient_id
+      - name: person_id
         description: "The unique identifier for the patient"
       - name: encounter_id_A
         description: "Unique identifier for one of the overlapping encounters"
@@ -379,7 +379,7 @@ models:
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
-      - name: patient_id
+      - name: person_id
         description: "The unique identifier for the patient"
       - name: admit_date
         description: "The date of admission for the inpatient visit"
@@ -403,7 +403,7 @@ models:
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
-      - name: patient_id
+      - name: person_id
         description: "The unique identifier for the patient"
       - name: admit_date
         description: "The date of admission for the inpatient visit"

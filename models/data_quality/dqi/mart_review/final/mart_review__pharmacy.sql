@@ -6,9 +6,9 @@
 select
     p.claim_id
   , p.claim_line_number
-  , p.patient_id
+  , p.person_id
   , p.data_source
-  , {{ dbt.concat(['p.patient_id', "'|'", 'p.data_source']) }} as patient_source_key
+  , {{ dbt.concat(['p.person_id', "'|'", 'p.data_source']) }} as patient_source_key
   , p.ndc_code
   , coalesce(n.fda_description, n.rxnorm_description) as ndc_description
   , p.paid_amount

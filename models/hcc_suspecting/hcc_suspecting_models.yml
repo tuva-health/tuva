@@ -14,7 +14,7 @@ models:
       data_source, hcc, and diagnosis code with the reason and contributing 
       factors.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -51,7 +51,7 @@ models:
       This final model displays the list of suspecting conditions per patient 
       and hcc with the latest contributing factor rolled up.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: hcc_code
         description: >
@@ -83,7 +83,7 @@ models:
     description: >
       This final model displays a rollup of suspecting conditions per patient.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: patient_sex
         description: The gender of the patient.
@@ -108,7 +108,7 @@ models:
       materialized: table
     description: All historical conditions mapped to HCCs.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: recorded_date
         description: Date in which the condition was recorded.
@@ -138,7 +138,7 @@ models:
       materialized: table
     description: Union of medications and pharmacy claims.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: dispensing_date
         description: Date the medication was dispensed or paid date.
@@ -162,7 +162,7 @@ models:
       materialized: table
     description: Suspecting comorbidities.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -211,7 +211,7 @@ models:
       materialized: table
     description: Suspecting conditions based on labs.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -255,7 +255,7 @@ models:
       materialized: table
     description: Suspecting conditions based on medications.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -297,7 +297,7 @@ models:
       materialized: table
     description: Suspecting observation conditions.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -347,7 +347,7 @@ models:
       This intermediate model displays the full history of a patient's recorded HCCs
       with a flag for recorded during the current year.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -401,7 +401,7 @@ models:
       materialized: table
     description: Preparing conditions; mapping snomed-ct conditions to icd-10-cm.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: recorded_date
         description: Date in which the condition was recorded.
@@ -430,7 +430,7 @@ models:
       materialized: table
     description: Preparing eGFR labs with clean numeric results.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique ID for the patient.
       - name: data_source
         description: >
@@ -458,7 +458,7 @@ models:
     description: Staging conditions from core.
     columns:
       - name: claim_id
-      - name: patient_id
+      - name: person_id
       - name: recorded_date
       - name: condition_type
       - name: code_type
@@ -475,7 +475,7 @@ models:
     description: Staging conditions from core.
     columns:
       - name: lab_result_id
-      - name: patient_id
+      - name: person_id
       - name: code_type
       - name: code
       - name: status
@@ -492,7 +492,7 @@ models:
       materialized: ephemeral
     description: Staging medications from core.
     columns:
-      - name: patient_id
+      - name: person_id
       - name: dispensing_date
       - name: source_code
       - name: source_code_type
@@ -509,7 +509,7 @@ models:
       materialized: ephemeral
     description: Staging observations from core.
     columns:
-      - name: patient_id
+      - name: person_id
       - name: observation_date
       - name: result
       - name: code_type
@@ -525,7 +525,7 @@ models:
       materialized: ephemeral
     description: Staging patients from core.
     columns:
-      - name: patient_id
+      - name: person_id
       - name: sex
       - name: birth_date
       - name: death_date
@@ -539,7 +539,7 @@ models:
       materialized: ephemeral
     description: Staging pharmacy claims from core.
     columns:
-     - name: patient_id
+     - name: person_id
      - name: dispensing_date
      - name: ndc_code
      - name: paid_date

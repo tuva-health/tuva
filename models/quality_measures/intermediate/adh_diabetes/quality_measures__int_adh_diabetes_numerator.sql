@@ -6,7 +6,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
@@ -38,12 +38,12 @@ with denominator as (
 , ranked_patient as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
-        , dense_rank() over (partition by patient_id order by dispensing_date) as dr
-        , lag(ndc_code) over (partition by patient_id order by dispensing_date) as previous_ndc
+        , dense_rank() over (partition by person_id order by dispensing_date) as dr
+        , lag(ndc_code) over (partition by person_id order by dispensing_date) as previous_ndc
     from denominator
 
 )
@@ -51,7 +51,7 @@ with denominator as (
 , grouped_meds as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
@@ -67,12 +67,12 @@ with denominator as (
 , final_groups as (
 
     select
-          patient_id
+          person_id
         , ndc_code
         , dispensing_date
         , days_supply
         , sum(med_change_flag) over (
-              partition by patient_id 
+              partition by person_id 
               order by dr 
               rows between unbounded preceding and current row
           ) as group_id
@@ -89,7 +89,7 @@ with denominator as (
 , fills as (
 
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
@@ -110,14 +110,14 @@ with denominator as (
 , previous_fill_end_date as (
     
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
         , theoretical_end_date
         , lag(theoretical_end_date)
           over (partition by 
-                patient_id
+                person_id
               , group_id  
             order by
                 dispensing_date
@@ -131,7 +131,7 @@ with denominator as (
     /* Adjust start dates based on the previous fill's end date + 1,
     or use the current rx_fill_date */
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
@@ -154,7 +154,7 @@ with denominator as (
 , final_fills as (
 
     select
-        patient_id
+        person_id
       , group_id
       , dispensing_date
       , days_supply
@@ -181,14 +181,14 @@ with denominator as (
 , grouped_fill_ranges as (
 
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
         , adjusted_start_date
         , final_end_date
-        , min(adjusted_start_date) over(partition by patient_id, group_id) as first_disp_date
-        , max(adjusted_start_date) over(partition by patient_id, group_id) as last_disp_date
+        , min(adjusted_start_date) over(partition by person_id, group_id) as first_disp_date
+        , max(adjusted_start_date) over(partition by person_id, group_id) as last_disp_date
     from final_fills
 
 )
@@ -196,7 +196,7 @@ with denominator as (
 , last_med_end_groupwise as (
 
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
@@ -209,7 +209,7 @@ with denominator as (
               when adjusted_start_date = last_disp_date
               then days_supply
               else null
-            end) over (partition by patient_id, group_id) as last_days_supply
+            end) over (partition by person_id, group_id) as last_days_supply
     from grouped_fill_ranges
 
 )
@@ -223,7 +223,7 @@ with denominator as (
 , covered_days_per_group as (
     
     select
-          patient_id
+          person_id
         , group_id
         , first_disp_date
         , last_disp_date
@@ -236,7 +236,7 @@ with denominator as (
             }} ) as covered_days
     from last_med_end_groupwise
     group by 
-          patient_id
+          person_id
         , group_id
         , first_disp_date
         , last_disp_date
@@ -247,13 +247,13 @@ with denominator as (
 , final_with_lag as (
 
     select
-          patient_id
+          person_id
         , group_id
         , first_disp_date
         , last_disp_date
         , covered_days
-        , lag(last_disp_date) over(partition by patient_id order by first_disp_date) as lag_date
-        , lag(last_days_supply) over(partition by patient_id order by first_disp_date) as lag_days_supply
+        , lag(last_disp_date) over(partition by person_id order by first_disp_date) as lag_date
+        , lag(last_days_supply) over(partition by person_id order by first_disp_date) as lag_days_supply
     from covered_days_per_group
 
 )
@@ -261,7 +261,7 @@ with denominator as (
 , overlap_days as (
 
     select
-          patient_id
+          person_id
         , group_id
         , first_disp_date
         , last_disp_date
@@ -294,30 +294,30 @@ with denominator as (
 , final_covered_days as (
 
     select 
-          patient_id
+          person_id
         , sum(covered_days) - sum(overlap) as actual_covered_days
     from overlap_days
-    group by patient_id
+    group by person_id
 
 )
 
 , relevant_patients_from_deno as (
 
     select
-          final_covered_days.patient_id
+          final_covered_days.person_id
         , round(cast(actual_covered_days / days_in_treatment_period as {{ dbt.type_numeric() }}), 4) as adherence
         , dispensing_date as evidence_date
         , days_supply as evidence_value
     from final_covered_days
     inner join denominator
-      on final_covered_days.patient_id = denominator.patient_id
+      on final_covered_days.person_id = denominator.person_id
         
 )
 
 , numerator as (
 
     select
-          patient_id
+          person_id
         , adherence * 100 as adherence --percent conversion
         , evidence_date
         , evidence_value
@@ -330,7 +330,7 @@ with denominator as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(evidence_date as date) as evidence_date
         , cast(evidence_value as {{ dbt.type_string() }}) as evidence_value
         , cast(adherence as {{ dbt.type_numeric() }}) as adherence
@@ -340,7 +340,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , evidence_date
     , evidence_value
     , adherence

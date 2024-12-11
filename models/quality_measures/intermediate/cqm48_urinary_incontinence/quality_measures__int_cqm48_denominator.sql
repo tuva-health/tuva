@@ -21,7 +21,7 @@ with visit_codes as (
 , procedures as (
 
     select
-        patient_id
+        person_id
       , procedure_date
       , coalesce (
               normalized_code_type
@@ -42,7 +42,7 @@ with visit_codes as (
 , medical_claim as (
     
     select
-          patient_id
+          person_id
         , claim_start_date
         , claim_end_date
         , hcpcs_code
@@ -52,7 +52,7 @@ with visit_codes as (
 
 , visits_encounters as (
 
-    select patient_id
+    select person_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ ref('quality_measures__stg_core__encounter') }} encounter
@@ -72,7 +72,7 @@ with visit_codes as (
 , procedure_encounters as (
 
     select 
-          patient_id
+          person_id
         , procedure_date as min_date
         , procedure_date as max_date
     from procedures
@@ -87,7 +87,7 @@ with visit_codes as (
 , claims_encounters as (
     
     select 
-          patient_id
+          person_id
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
     from medical_claim
@@ -119,28 +119,28 @@ with visit_codes as (
 
 , encounters_by_patient as (
 
-    select patient_id, min(min_date) min_date, max(max_date) max_date,
+    select person_id, min(min_date) min_date, max(max_date) max_date,
         concat(concat(
               coalesce(min(visit_enc),'')
             , coalesce(min(proc_enc),''))
             , coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
-    group by patient_id
+    group by person_id
 
 )
 
 , patients_with_age as (
 
     select
-          p.patient_id
+          p.person_id
         , min_date
         , floor({{ datediff('birth_date', 'e.max_date', 'hour') }} / 8760.0) as age
         , max_date
         , qualifying_types
     from {{ ref('quality_measures__stg_core__patient') }} p
     inner join encounters_by_patient e
-        on p.patient_id = e.patient_id
+        on p.person_id = e.person_id
     where p.sex = 'female'
         and p.death_date is null
 
@@ -150,7 +150,7 @@ with visit_codes as (
 
     select
         distinct
-          patients_with_age.patient_id
+          patients_with_age.person_id
         , patients_with_age.age
         , patients_with_age.max_date as encounter_date
         , pp.performance_period_begin
@@ -168,7 +168,7 @@ with visit_codes as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(age as integer) as age
         , cast(encounter_date as date) as encounter_date
         , cast(performance_period_begin as date) as performance_period_begin
@@ -182,7 +182,7 @@ with visit_codes as (
 )
 
 select 
-      patient_id
+      person_id
     , age
     , encounter_date
     , performance_period_begin

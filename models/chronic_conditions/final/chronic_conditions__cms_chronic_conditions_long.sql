@@ -26,7 +26,7 @@ with conditions_unioned as (
 {% endif %}
 
 select
-      patient_id
+      person_id
     , claim_id
     , start_date
     , chronic_condition_type

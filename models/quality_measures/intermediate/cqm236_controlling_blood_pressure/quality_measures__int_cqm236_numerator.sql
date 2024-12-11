@@ -21,7 +21,7 @@ with controlled_bp_codes as (
 , denominator as (
 
     select
-          patient_id
+          person_id
         , measure_id
         , measure_name
         , measure_version
@@ -34,7 +34,7 @@ with controlled_bp_codes as (
 , encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_type
         , encounter_start_date
         , encounter_end_date
@@ -45,7 +45,7 @@ with controlled_bp_codes as (
 , observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , normalized_code
         , normalized_description
@@ -71,7 +71,7 @@ with controlled_bp_codes as (
 , labs as (
 
     select
-          patient_id
+          person_id
         , result_date
         , collection_date
         , result
@@ -93,7 +93,7 @@ with controlled_bp_codes as (
 , all_procedures as (
 
     select
-        patient_id
+        person_id
       , procedure_date
       , coalesce (
               normalized_code_type
@@ -114,7 +114,7 @@ with controlled_bp_codes as (
 , all_medical_claims as (
 
     select
-          patient_id
+          person_id
         , claim_start_date
         , claim_end_date
         , hcpcs_code
@@ -125,7 +125,7 @@ with controlled_bp_codes as (
 , controlled_bp_procedures as (
 
     select
-          all_procedures.patient_id
+          all_procedures.person_id
         , all_procedures.procedure_date as evidence_date
         , controlled_bp_codes.code
     from all_procedures
@@ -138,7 +138,7 @@ with controlled_bp_codes as (
 , controlled_bp_medical_claims as (
 
     select
-          all_medical_claims.patient_id
+          all_medical_claims.person_id
         , coalesce(all_medical_claims.claim_end_date, all_medical_claims.claim_start_date) as evidence_date
         , controlled_bp_codes.code
     from all_medical_claims
@@ -151,7 +151,7 @@ with controlled_bp_codes as (
 , controlled_bp_patients_proc_claims as (
 
     select
-          patient_id
+          person_id
         , evidence_date
         , code
     from controlled_bp_procedures
@@ -159,7 +159,7 @@ with controlled_bp_codes as (
     union all
 
     select
-          patient_id
+          person_id
         , evidence_date
         , code
     from controlled_bp_medical_claims
@@ -169,7 +169,7 @@ with controlled_bp_codes as (
 , controlled_bp_within_range_proc_claims as (
 
     select
-          controlled_bp_patients_proc_claims.patient_id
+          controlled_bp_patients_proc_claims.person_id
         , controlled_bp_patients_proc_claims.evidence_date
         , controlled_bp_patients_proc_claims.code
         , denominator.measure_id
@@ -179,7 +179,7 @@ with controlled_bp_codes as (
         , denominator.performance_period_end
     from controlled_bp_patients_proc_claims
     inner join denominator
-        on controlled_bp_patients_proc_claims.patient_id = denominator.patient_id
+        on controlled_bp_patients_proc_claims.person_id = denominator.person_id
             and controlled_bp_patients_proc_claims.evidence_date between
                 denominator.performance_period_begin and denominator.performance_period_end
 
@@ -188,7 +188,7 @@ with controlled_bp_codes as (
 , procedure_claims_w_encounters as (
 
     select
-          controlled_bp_within_range_proc_claims.patient_id
+          controlled_bp_within_range_proc_claims.person_id
         , controlled_bp_within_range_proc_claims.evidence_date
         , controlled_bp_within_range_proc_claims.code
         , case
@@ -206,7 +206,7 @@ with controlled_bp_codes as (
         , controlled_bp_within_range_proc_claims.performance_period_end
     from controlled_bp_within_range_proc_claims
     left join encounters
-        on controlled_bp_within_range_proc_claims.patient_id = encounters.patient_id
+        on controlled_bp_within_range_proc_claims.person_id = encounters.person_id
         and controlled_bp_within_range_proc_claims.evidence_date between
             encounters.encounter_start_date and encounters.encounter_end_date
 
@@ -215,7 +215,7 @@ with controlled_bp_codes as (
 , valid_procedures_and_claims as (
 
     select
-          patient_id
+          person_id
         , evidence_date
         , code
         , measure_id
@@ -231,7 +231,7 @@ with controlled_bp_codes as (
 , systolic_bp_from_procedure_claims as (
 
     select
-          patient_id
+          person_id
         , evidence_date
         , measure_id
         , measure_name
@@ -246,7 +246,7 @@ with controlled_bp_codes as (
 , diastolic_bp_from_procedure_claims as (
 
     select
-          patient_id
+          person_id
         , evidence_date
     from valid_procedures_and_claims
     where code = 'G8754' --diastolic
@@ -256,7 +256,7 @@ with controlled_bp_codes as (
 , qualifying_controlled_bp_proc_claims as (
 
     select
-          systolic_bp_from_procedure_claims.patient_id
+          systolic_bp_from_procedure_claims.person_id
         , systolic_bp_from_procedure_claims.evidence_date
         , measure_id
         , measure_name
@@ -265,7 +265,7 @@ with controlled_bp_codes as (
         , performance_period_end
     from systolic_bp_from_procedure_claims
     inner join diastolic_bp_from_procedure_claims
-        on systolic_bp_from_procedure_claims.patient_id = diastolic_bp_from_procedure_claims.patient_id
+        on systolic_bp_from_procedure_claims.person_id = diastolic_bp_from_procedure_claims.person_id
             and systolic_bp_from_procedure_claims.evidence_date = diastolic_bp_from_procedure_claims.evidence_date
 
 )
@@ -273,7 +273,7 @@ with controlled_bp_codes as (
 , observations_within_range as (
 
     select
-          observations.patient_id
+          observations.person_id
         , observations.observation_date
         , observations.normalized_code
         , observations.normalized_description
@@ -285,7 +285,7 @@ with controlled_bp_codes as (
         , denominator.performance_period_end
     from observations
     inner join denominator
-        on observations.patient_id = denominator.patient_id
+        on observations.person_id = denominator.person_id
         and observations.observation_date between
             denominator.performance_period_begin and denominator.performance_period_end
 
@@ -294,7 +294,7 @@ with controlled_bp_codes as (
 , labs_within_range as (
 
     select
-          labs.patient_id
+          labs.person_id
         , labs.normalized_code
         , coalesce(labs.result_date, labs.collection_date) as observation_date
         , labs.result
@@ -305,7 +305,7 @@ with controlled_bp_codes as (
         , denominator.performance_period_end
     from labs
     inner join denominator
-        on labs.patient_id = denominator.patient_id
+        on labs.person_id = denominator.person_id
         and coalesce(labs.result_date,labs.collection_date) between
             denominator.performance_period_begin and denominator.performance_period_end
 
@@ -314,7 +314,7 @@ with controlled_bp_codes as (
 , observations_with_encounters as (
 
     select
-          observations_within_range.patient_id
+          observations_within_range.person_id
         , observations_within_range.observation_date
         , observations_within_range.normalized_description
         , observations_within_range.result
@@ -334,7 +334,7 @@ with controlled_bp_codes as (
         , observations_within_range.performance_period_end
     from observations_within_range
     left join encounters
-        on observations_within_range.patient_id = encounters.patient_id
+        on observations_within_range.person_id = encounters.person_id
         and observations_within_range.observation_date between
             encounters.encounter_start_date and encounters.encounter_end_date
 
@@ -343,7 +343,7 @@ with controlled_bp_codes as (
 , labs_with_encounters as (
 
     select
-          labs_within_range.patient_id
+          labs_within_range.person_id
         , labs_within_range.normalized_code
         , labs_within_range.observation_date
         , labs_within_range.result
@@ -362,7 +362,7 @@ with controlled_bp_codes as (
         , labs_within_range.performance_period_end
     from labs_within_range
     left join encounters
-        on labs_within_range.patient_id = encounters.patient_id
+        on labs_within_range.person_id = encounters.person_id
         and labs_within_range.observation_date between
             encounters.encounter_start_date and encounters.encounter_end_date
 
@@ -371,7 +371,7 @@ with controlled_bp_codes as (
 , obs_and_labs as (
 
     select
-          patient_id
+          person_id
         , observation_date
         {% if target.type == 'fabric' %}
             , try_cast(result as {{ dbt.type_float() }}) as bp_reading
@@ -391,7 +391,7 @@ with controlled_bp_codes as (
     union all
 
     select
-          patient_id
+          person_id
         , observation_date
         {% if target.type == 'fabric' %}
             , try_cast(result as {{ dbt.type_float() }}) as bp_reading
@@ -413,7 +413,7 @@ with controlled_bp_codes as (
 , systolic_bp as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , bp_reading
         , measure_id
@@ -421,7 +421,7 @@ with controlled_bp_codes as (
         , measure_version
         , performance_period_begin
         , performance_period_end
-        , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
+        , row_number() over(partition by person_id order by observation_date desc, bp_reading asc) as rn
     from obs_and_labs
     where lower(normalized_description) = 'systolic blood pressure'
     or
@@ -432,10 +432,10 @@ with controlled_bp_codes as (
 , diastolic_bp as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , bp_reading
-        , row_number() over(partition by patient_id order by observation_date desc, bp_reading asc) as rn
+        , row_number() over(partition by person_id order by observation_date desc, bp_reading asc) as rn
     from obs_and_labs
     where lower(normalized_description) = 'diastolic blood pressure'
     or
@@ -446,7 +446,7 @@ with controlled_bp_codes as (
 , least_recent_systolic_bp as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , bp_reading as systolic_bp
         , measure_id
@@ -462,7 +462,7 @@ with controlled_bp_codes as (
 , least_recent_diastolic_bp as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , bp_reading as diastolic_bp
     from diastolic_bp
@@ -473,7 +473,7 @@ with controlled_bp_codes as (
 , patients_with_bp_readings as (
 
     select
-          least_recent_systolic_bp.patient_id
+          least_recent_systolic_bp.person_id
         , least_recent_systolic_bp.systolic_bp
         , least_recent_diastolic_bp.diastolic_bp
         , least_recent_systolic_bp.observation_date
@@ -484,7 +484,7 @@ with controlled_bp_codes as (
         , least_recent_systolic_bp.performance_period_end
     from least_recent_systolic_bp
     inner join least_recent_diastolic_bp
-        on least_recent_systolic_bp.patient_id = least_recent_diastolic_bp.patient_id
+        on least_recent_systolic_bp.person_id = least_recent_diastolic_bp.person_id
             and least_recent_systolic_bp.observation_date = least_recent_diastolic_bp.observation_date
 
 )
@@ -492,7 +492,7 @@ with controlled_bp_codes as (
 , numerator as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , performance_period_begin
         , performance_period_end
@@ -509,7 +509,7 @@ with controlled_bp_codes as (
     union all
 
     select
-          patient_id
+          person_id
         , evidence_date as observation_date
         , performance_period_begin
         , performance_period_end
@@ -524,7 +524,7 @@ with controlled_bp_codes as (
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -537,7 +537,7 @@ with controlled_bp_codes as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

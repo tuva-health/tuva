@@ -1,4 +1,3 @@
-
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
    )
@@ -33,12 +32,13 @@ with all_encounters as (
     from {{ ref('encounters__orphaned_claims') }}
 )
 
-
 select
     {{  dbt.concat([
-    "med.claim_id",
-    "'-'",
-    "med.claim_line_number"
+        "med.claim_id",
+        "'-'",
+        "med.claim_line_number",
+        "'-'",
+        "med.data_source"
     ]) }} as medical_claim_id
     , cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
     , cast(med.claim_line_number as {{ dbt.type_int() }} ) as claim_line_number
@@ -46,7 +46,7 @@ select
     , cast(x.encounter_type as {{ dbt.type_string() }} ) as encounter_type
     , cast(x.encounter_group as {{ dbt.type_string() }} ) as encounter_group
     , cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
-    , cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
+    , cast(med.person_id as {{ dbt.type_string() }} ) as person_id
     , cast(med.member_id as {{ dbt.type_string() }} ) as member_id
     , cast(med.payer as {{ dbt.type_string() }} ) as payer
     , med.{{ quote_column('plan') }}
@@ -117,4 +117,3 @@ inner join all_encounters as x
 left join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} as enroll
   on med.claim_id = enroll.claim_id
   and med.claim_line_number = enroll.claim_line_number
-

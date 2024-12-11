@@ -6,7 +6,7 @@
 with patients_with_frailty as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
@@ -35,7 +35,7 @@ with patients_with_frailty as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , recorded_date
         , coalesce (
@@ -56,7 +56,7 @@ with patients_with_frailty as (
 , medical_claim as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , claim_start_date
         , claim_end_date
@@ -69,7 +69,7 @@ with patients_with_frailty as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -90,7 +90,7 @@ with patients_with_frailty as (
 , condition_exclusions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.claim_id
         , conditions.recorded_date
         , exclusion_codes.concept_name
@@ -105,7 +105,7 @@ with patients_with_frailty as (
 , med_claim_exclusions as (
 
     select
-          medical_claim.patient_id
+          medical_claim.person_id
         , medical_claim.claim_id
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
@@ -121,7 +121,7 @@ with patients_with_frailty as (
 , procedure_exclusions as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
         , exclusion_codes.concept_name
     from procedures
@@ -134,7 +134,7 @@ with patients_with_frailty as (
 , acute_inpatient as (
 
     select distinct
-          patients_with_frailty.patient_id
+          patients_with_frailty.person_id
         , coalesce(
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
@@ -151,7 +151,7 @@ with patients_with_frailty as (
         , cast(null as date) as procedure_date
     from patients_with_frailty
          inner join med_claim_exclusions
-            on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
+            on patients_with_frailty.person_id = med_claim_exclusions.person_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
     where lower(med_claim_exclusions.concept_name) = 'acute inpatient'
@@ -159,7 +159,7 @@ with patients_with_frailty as (
     union all
 
     select distinct
-          patients_with_frailty.patient_id
+          patients_with_frailty.person_id
         , procedure_exclusions.procedure_date as exclusion_date
         , {{ dbt.concat([
                  "patients_with_frailty.exclusion_reason",
@@ -173,9 +173,9 @@ with patients_with_frailty as (
         , procedure_exclusions.procedure_date
     from patients_with_frailty
          inner join procedure_exclusions
-         on patients_with_frailty.patient_id = procedure_exclusions.patient_id
+         on patients_with_frailty.person_id = procedure_exclusions.person_id
          inner join condition_exclusions
-         on procedure_exclusions.patient_id = condition_exclusions.patient_id
+         on procedure_exclusions.person_id = condition_exclusions.person_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
     where lower(procedure_exclusions.concept_name) = 'acute inpatient'
 
@@ -184,7 +184,7 @@ with patients_with_frailty as (
 , nonacute_outpatient as (
 
     select distinct
-          patients_with_frailty.patient_id
+          patients_with_frailty.person_id
         , coalesce(
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
@@ -201,7 +201,7 @@ with patients_with_frailty as (
         , cast(null as date) as procedure_date
     from patients_with_frailty
          inner join med_claim_exclusions
-            on patients_with_frailty.patient_id = med_claim_exclusions.patient_id
+            on patients_with_frailty.person_id = med_claim_exclusions.person_id
          inner join condition_exclusions
             on med_claim_exclusions.claim_id = condition_exclusions.claim_id
     where lower(med_claim_exclusions.concept_name) in (
@@ -215,7 +215,7 @@ with patients_with_frailty as (
     union all
 
     select distinct
-          patients_with_frailty.patient_id
+          patients_with_frailty.person_id
         , procedure_exclusions.procedure_date as exclusion_date
         , {{ dbt.concat([
                  "patients_with_frailty.exclusion_reason",
@@ -229,9 +229,9 @@ with patients_with_frailty as (
         , procedure_exclusions.procedure_date
     from patients_with_frailty
          inner join procedure_exclusions
-         on patients_with_frailty.patient_id = procedure_exclusions.patient_id
+         on patients_with_frailty.person_id = procedure_exclusions.person_id
          inner join condition_exclusions
-         on procedure_exclusions.patient_id = condition_exclusions.patient_id
+         on procedure_exclusions.person_id = condition_exclusions.person_id
          and procedure_exclusions.procedure_date = condition_exclusions.recorded_date
     where lower(procedure_exclusions.concept_name) in (
           'encounter inpatient'
@@ -246,7 +246,7 @@ with patients_with_frailty as (
 , exclusions_unioned as (
 
     select
-          acute_inpatient.patient_id
+          acute_inpatient.person_id
         , acute_inpatient.exclusion_date
         , acute_inpatient.exclusion_reason
         , acute_inpatient.claim_start_date
@@ -258,7 +258,7 @@ with patients_with_frailty as (
     union all
 
     select
-          nonacute_outpatient.patient_id
+          nonacute_outpatient.person_id
         , nonacute_outpatient.exclusion_date
         , nonacute_outpatient.exclusion_reason
         , nonacute_outpatient.claim_start_date
@@ -270,7 +270,7 @@ with patients_with_frailty as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , 'advanced_illness' as exclusion_type

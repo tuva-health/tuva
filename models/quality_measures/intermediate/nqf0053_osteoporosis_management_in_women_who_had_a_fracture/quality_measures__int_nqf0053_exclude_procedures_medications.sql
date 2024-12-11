@@ -7,7 +7,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
     from {{ ref('quality_measures__int_nqf0053_denominator')}}
 
@@ -26,7 +26,7 @@ with denominator as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -47,7 +47,7 @@ with denominator as (
 , pharmacy_claims as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
     from {{ ref('quality_measures__stg_pharmacy_claim') }}
@@ -57,7 +57,7 @@ with denominator as (
 , medications as (
 
     select
-        patient_id
+        person_id
       , encounter_id
       , prescribing_date
       , dispensing_date
@@ -115,7 +115,7 @@ with denominator as (
 , osteoporosis_pharmacy_claims as (
 
     select
-        pharmacy_claims.patient_id
+        pharmacy_claims.person_id
       , pharmacy_claims.dispensing_date
       , pharmacy_claims.ndc_code
       , osteoporosis_medication_codes.concept_name
@@ -129,7 +129,7 @@ with denominator as (
 , osteoporosis_medications as (
 
     select
-        medications.patient_id
+        medications.person_id
       , medications.encounter_id
       , medications.prescribing_date
       , medications.dispensing_date
@@ -146,12 +146,12 @@ with denominator as (
 , valid_osteoporosis_medications_procedures as (
 
     select
-          denominator.patient_id
+          denominator.person_id
         , osteoporosis_pharmacy_claims.concept_name as exclusion_reason
         , osteoporosis_pharmacy_claims.dispensing_date as exclusion_date
     from denominator
     inner join osteoporosis_pharmacy_claims
-        on denominator.patient_id = osteoporosis_pharmacy_claims.patient_id
+        on denominator.person_id = osteoporosis_pharmacy_claims.person_id
     where osteoporosis_pharmacy_claims.dispensing_date
         between
             {{ dbt.dateadd (
@@ -164,12 +164,12 @@ with denominator as (
     union all
 
     select
-          denominator.patient_id
+          denominator.person_id
         , osteoporosis_medications.concept_name as exclusion_reason
         , coalesce(osteoporosis_medications.prescribing_date, osteoporosis_medications.dispensing_date) as exclusion_date
     from denominator
     inner join osteoporosis_medications
-        on denominator.patient_id = osteoporosis_medications.patient_id
+        on denominator.person_id = osteoporosis_medications.person_id
             and coalesce(osteoporosis_medications.prescribing_date, osteoporosis_medications.dispensing_date)
             between
                 {{ dbt.dateadd (
@@ -184,12 +184,12 @@ with denominator as (
 , valid_tests_performed as (
 
     select
-          denominator.patient_id
+          denominator.person_id
         , bone_density_test_procedures.concept_name as exclusion_reason
         , procedure_date as exclusion_date
     from denominator
     inner join bone_density_test_procedures
-        on denominator.patient_id = bone_density_test_procedures.patient_id
+        on denominator.person_id = bone_density_test_procedures.person_id
     where bone_density_test_procedures.procedure_date
         between 
             {{ dbt.dateadd (
@@ -212,7 +212,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , 'measure specific exclusion for procedure medication' as exclusion_type

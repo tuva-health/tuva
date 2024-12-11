@@ -1,7 +1,7 @@
 
 
 select
-      patient_id
+      person_id
     , year_month
     , payer
     , plan

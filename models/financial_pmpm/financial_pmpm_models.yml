@@ -15,13 +15,13 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - patient_id
+            - person_id
             - year_month
             - "{{ quote_column('plan') }}"
     description: >
-      Computes all the paid and allowed statistics for every patient_id and year_month combination.
+      Computes all the paid and allowed statistics for every person_id and year_month combination.
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.

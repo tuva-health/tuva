@@ -13,7 +13,7 @@ date_int as (
 
 select 
     data_source
-  , patient_id
+  , person_id
   , first_day_of_month
   , d.yyyymm as year_month
 

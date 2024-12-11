@@ -374,6 +374,10 @@ Facility name.
 Facility NPI for the claim (typically represents the facility where services were performed).
 {% enddocs %}
 
+{% docs file_name %}
+The file name of the source file.
+{% enddocs %}
+
 {% docs facility_type %}
 The type of facility e.g. acute care hospital.
 {% enddocs %}
@@ -412,6 +416,10 @@ The CPT or HCPCS code representing the procedure or service provided. These code
 
 {% docs in_network_flag %}
 Flag indicating if the claim was in or out of network.
+{% enddocs %}
+
+{% docs ingest_datetime %}
+The date and time the source file was ingested into the data warehouse or landed in cloud storage.
 {% enddocs %}
 
 {% docs inferred_claim_end_column_used %}
@@ -647,7 +655,7 @@ Identifier for the source system from which patient data originated.
 {% enddocs %}
 
 {% docs patient_id %}
-Unique identifier for each patient in the dataset.
+Identifier that links a patient to a particular clinical source system.
 {% enddocs %}
 
 {% docs patient_row_num %}
@@ -676,6 +684,10 @@ Name of the line of business for the payer attributed provider (e.g. medicare, m
 
 {% docs payer_type %}
 Type of payer (e.g. commercial, medicare, medicaid, etc.).
+{% enddocs %}
+
+{% docs person_id %}
+Unique identifier for each person in the dataset.
 {% enddocs %}
 
 {% docs pharmacy_claim_id %}

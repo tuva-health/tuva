@@ -1,5 +1,5 @@
 select
-      patient_id
+      person_id
     , member_id
     , subscriber_id
     , gender

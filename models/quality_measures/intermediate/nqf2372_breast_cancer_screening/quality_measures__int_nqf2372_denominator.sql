@@ -19,7 +19,7 @@ with performance_period as (
 , patient as (
 
     select
-          patient_id
+          person_id
         , sex
         , birth_date
         , death_date
@@ -30,7 +30,7 @@ with performance_period as (
 , encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_type
         , encounter_start_date
     from {{ ref('quality_measures__stg_core__encounter') }}
@@ -40,7 +40,7 @@ with performance_period as (
 , medical_claim as (
 
     select
-          patient_id
+          person_id
         , claim_start_date
         , claim_end_date
         , hcpcs_code
@@ -51,7 +51,7 @@ with performance_period as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -90,7 +90,7 @@ with performance_period as (
 , patient_with_age as (
 
     select
-          patient.patient_id
+          patient.person_id
         , patient.sex
         , patient.birth_date
         , patient.death_date
@@ -113,7 +113,7 @@ with performance_period as (
 , patient_filtered as (
 
     select
-          patient_id
+          person_id
         , age
         , measure_id
         , measure_name
@@ -135,7 +135,7 @@ with performance_period as (
 , visit_claims as (
 
     select
-          medical_claim.patient_id
+          medical_claim.person_id
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
         , medical_claim.hcpcs_code
@@ -152,7 +152,7 @@ with performance_period as (
 , visit_encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_start_date
     from encounters
     where lower(encounter_type) in (
@@ -171,7 +171,7 @@ with performance_period as (
 , visit_procedures as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
     from procedures
          inner join visit_codes
@@ -187,7 +187,7 @@ with performance_period as (
 , eligible_population as (
 
     select
-          patient_filtered.patient_id
+          patient_filtered.person_id
         , patient_filtered.age
         , patient_filtered.measure_id
         , patient_filtered.measure_name
@@ -198,11 +198,11 @@ with performance_period as (
         , patient_filtered.denominator_flag
     from patient_filtered
          left join visit_claims
-            on patient_filtered.patient_id = visit_claims.patient_id
+            on patient_filtered.person_id = visit_claims.person_id
          left join visit_procedures
-            on patient_filtered.patient_id = visit_procedures.patient_id
+            on patient_filtered.person_id = visit_procedures.person_id
          left join visit_encounters
-            on patient_filtered.patient_id = visit_encounters.patient_id
+            on patient_filtered.person_id = visit_encounters.person_id
     where (
         visit_claims.claim_start_date
             between patient_filtered.performance_period_begin
@@ -223,7 +223,7 @@ with performance_period as (
 , add_data_types as (
 
     select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(age as integer) as age
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
@@ -237,7 +237,7 @@ with performance_period as (
 )
 
  select distinct
-      patient_id
+      person_id
     , age
     , performance_period_begin
     , performance_period_end

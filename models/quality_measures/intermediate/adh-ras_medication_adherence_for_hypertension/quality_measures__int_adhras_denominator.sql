@@ -29,7 +29,7 @@ with performance_period as (
 , pharmacy_claim  as (
 
     select 
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
@@ -40,7 +40,7 @@ with performance_period as (
 , patient_with_claim as (
 
     select
-          pharmacy_claim.patient_id
+          pharmacy_claim.person_id
         , dispensing_date
         , days_supply
         , ndc_code
@@ -53,7 +53,7 @@ with performance_period as (
 , patient_within_performance_period as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , days_supply
         , ndc_code
@@ -74,11 +74,11 @@ with performance_period as (
 , patient_with_rank as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , days_supply
         , ndc_code
-        , dense_rank() over (partition by patient_id order by dispensing_date) as dense_rank
+        , dense_rank() over (partition by person_id order by dispensing_date) as dense_rank
     from patient_within_performance_period
 
 )
@@ -86,7 +86,7 @@ with performance_period as (
 , patient_with_first_dispensing_date as (
 
     select
-          patient_id
+          person_id
         , dispensing_date as first_dispensing_date
     from patient_with_rank
     where dense_rank = 1
@@ -100,21 +100,21 @@ treatment period days is abbreviated as tpd
 , patient_with_tpd as (
 
     select
-          patients1.patient_id
+          patients1.person_id
         , patients1.dispensing_date
         , patients2.first_dispensing_date
         , patients1.days_supply
         , {{ datediff('first_dispensing_date', 'performance_period_end', 'day') }} as tpd
     from patient_within_performance_period as patients1
     inner join patient_with_first_dispensing_date as patients2
-        on patients1.patient_id = patients2.patient_id
+        on patients1.person_id = patients2.person_id
 
 )
 
 , first_check_patient as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , first_dispensing_date
         , days_supply
@@ -126,7 +126,7 @@ treatment period days is abbreviated as tpd
 , second_check_patient as (
 
     select
-          patient_id
+          person_id
         , ndc_code
     from patient_with_rank
     where dense_rank = 2
@@ -136,21 +136,21 @@ treatment period days is abbreviated as tpd
 , both_check_patient as (
 
     select
-          valid_patients1.patient_id
+          valid_patients1.person_id
         , valid_patients1.dispensing_date
         , valid_patients1.first_dispensing_date
         , valid_patients1.days_supply
         , valid_patients2.ndc_code
     from first_check_patient as valid_patients1
     inner join second_check_patient as valid_patients2
-        on valid_patients1.patient_id = valid_patients2.patient_id
+        on valid_patients1.person_id = valid_patients2.person_id
      
 )
 
 , patient_with_age as (
 
     select
-          valid_patients1.patient_id
+          valid_patients1.person_id
         , floor({{ datediff('birth_date', 'pp.performance_period_begin', 'hour') }} / 8760.0) as age
         , dispensing_date
         , first_dispensing_date
@@ -163,7 +163,7 @@ treatment period days is abbreviated as tpd
         , pp.measure_version
     from {{ ref('quality_measures__stg_core__patient') }} as patient
     inner join both_check_patient as valid_patients1
-        on patient.patient_id = valid_patients1.patient_id
+        on patient.person_id = valid_patients1.person_id
     cross join performance_period as pp
     where patient.death_date is null
 
@@ -172,7 +172,7 @@ treatment period days is abbreviated as tpd
 , qualifying_patients as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , first_dispensing_date
         , days_supply
@@ -191,7 +191,7 @@ treatment period days is abbreviated as tpd
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(dispensing_date as date) as dispensing_date
         , cast(first_dispensing_date as date) as first_dispensing_date
         , cast(days_supply as integer) as days_supply
@@ -207,7 +207,7 @@ treatment period days is abbreviated as tpd
 )
 
 select 
-      patient_id
+      person_id
     , dispensing_date
     , first_dispensing_date
     , days_supply

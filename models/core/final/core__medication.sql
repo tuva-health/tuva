@@ -9,6 +9,7 @@ with source_mapping as (
 {% if var('enable_normalize_engine',false) != true %}
     select
      meds.medication_id
+   , meds.person_id
    , meds.patient_id
    , meds.encounter_id
    , meds.dispensing_date
@@ -74,6 +75,7 @@ from {{ ref('core__stg_clinical_medication')}} meds
 
  select
      meds.medication_id
+   , meds.person_id
    , meds.patient_id
    , meds.encounter_id
    , meds.dispensing_date
@@ -188,7 +190,7 @@ from {{ ref('core__stg_clinical_medication')}} meds
 -- add auto rxnorm + atc
 select
      sm.medication_id
-   , sm.patient_id
+   , sm.person_id
    , sm.encounter_id
    , sm.dispensing_date
    , sm.prescribing_date

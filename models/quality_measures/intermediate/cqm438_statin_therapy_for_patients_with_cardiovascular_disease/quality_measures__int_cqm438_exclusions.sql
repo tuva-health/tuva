@@ -52,7 +52,7 @@ with exclusion_codes as (
 , valid_hospice_palliative as (
 
   select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_type
@@ -64,7 +64,7 @@ with exclusion_codes as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , recorded_date
         , coalesce (
@@ -86,7 +86,7 @@ with exclusion_codes as (
 , medical_claim as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , claim_start_date
         , claim_end_date
@@ -100,7 +100,7 @@ with exclusion_codes as (
 , observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , coalesce (
               normalized_code_type
@@ -122,7 +122,7 @@ with exclusion_codes as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -144,7 +144,7 @@ with exclusion_codes as (
 , medications as (
     
     select
-        patient_id
+        person_id
       , coalesce(prescribing_date, dispensing_date) as exclusion_date
       , source_code
       , source_code_type
@@ -155,7 +155,7 @@ with exclusion_codes as (
 , pharmacy_claims as (
 
     select
-        patient_id
+        person_id
       , dispensing_date
       , ndc_code
     from {{ ref('quality_measures__stg_pharmacy_claim') }} 
@@ -165,7 +165,7 @@ with exclusion_codes as (
 , condition_exclusions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.claim_id
         , conditions.recorded_date
         , exclusion_codes.concept_name as concept_name
@@ -179,7 +179,7 @@ with exclusion_codes as (
 , med_claim_exclusions as (
 
     select
-          medical_claim.patient_id
+          medical_claim.person_id
         , medical_claim.claim_id
         , medical_claim.claim_start_date
         , medical_claim.claim_end_date
@@ -195,7 +195,7 @@ with exclusion_codes as (
 , observation_exclusions as (
 
     select
-          observations.patient_id
+          observations.person_id
         , observations.observation_date
         , exclusion_codes.concept_name as concept_name
     from observations
@@ -208,7 +208,7 @@ with exclusion_codes as (
 , procedure_exclusions as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
         , exclusion_codes.concept_name as concept_name
     from procedures
@@ -221,7 +221,7 @@ with exclusion_codes as (
 , medication_exclusions as (
 
     select
-          medications.patient_id
+          medications.person_id
         , medications.exclusion_date
         , exclusion_codes.concept_name as concept_name
     from medications
@@ -234,7 +234,7 @@ with exclusion_codes as (
 , pharmacy_claims_exclusions as (
 
     select
-          pharmacy_claims.patient_id
+          pharmacy_claims.person_id
         , pharmacy_claims.dispensing_date
         , exclusion_codes.concept_name as concept_name
     from pharmacy_claims
@@ -247,7 +247,7 @@ with exclusion_codes as (
 , patients_with_exclusions as(
     
     select 
-          patient_id
+          person_id
         , recorded_date as exclusion_date
         , concept_name as exclusion_reason
     from condition_exclusions
@@ -255,7 +255,7 @@ with exclusion_codes as (
     union all
 
     select 
-          patient_id
+          person_id
         , coalesce(claim_end_date, claim_start_date) as exclusion_date
         , concept_name as exclusion_reason
     from med_claim_exclusions
@@ -263,7 +263,7 @@ with exclusion_codes as (
     union all
 
     select 
-          patient_id
+          person_id
         , observation_date as exclusion_date
         , concept_name as exclusion_reason
     from observation_exclusions
@@ -271,7 +271,7 @@ with exclusion_codes as (
     union all
 
     select 
-          patient_id
+          person_id
         , procedure_date as exclusion_date
         , concept_name as exclusion_reason
     from procedure_exclusions
@@ -279,7 +279,7 @@ with exclusion_codes as (
     union all
 
     select 
-          patient_id
+          person_id
         , exclusion_date
         , concept_name as exclusion_reason
     from medication_exclusions
@@ -287,7 +287,7 @@ with exclusion_codes as (
     union all
 
     select
-          patient_id
+          person_id
         , dispensing_date as exclusion_date
         , concept_name as exclusion_reason
     from pharmacy_claims_exclusions
@@ -295,7 +295,7 @@ with exclusion_codes as (
     union all
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from valid_hospice_palliative
@@ -305,12 +305,12 @@ with exclusion_codes as (
 , valid_exclusions as (
 
   select 
-        patients_with_exclusions.patient_id
+        patients_with_exclusions.person_id
       , patients_with_exclusions.exclusion_date
       , patients_with_exclusions.exclusion_reason  
   from patients_with_exclusions
   inner join {{ ref('quality_measures__int_cqm438_denominator') }} as denominator
-      on patients_with_exclusions.patient_id = denominator.patient_id
+      on patients_with_exclusions.person_id = denominator.person_id
 
 )
 
@@ -318,7 +318,7 @@ with exclusion_codes as (
 
     select
         distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , cast(1 as integer) as exclusion_flag
@@ -327,7 +327,7 @@ with exclusion_codes as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_flag

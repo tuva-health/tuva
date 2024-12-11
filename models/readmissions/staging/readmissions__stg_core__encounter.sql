@@ -5,7 +5,7 @@
 
 select
     encounter_id,
-    patient_id,
+    person_id,
     encounter_start_date,
     encounter_end_date,
     discharge_disposition_code,

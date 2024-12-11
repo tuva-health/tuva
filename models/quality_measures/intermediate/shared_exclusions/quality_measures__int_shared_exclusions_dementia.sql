@@ -7,7 +7,7 @@
 with patients_with_frailty as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from {{ ref('quality_measures__int_shared_exclusions_frailty') }}
@@ -30,7 +30,7 @@ with patients_with_frailty as (
 , medications as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , source_code_type
         , source_code
@@ -43,7 +43,7 @@ with patients_with_frailty as (
 , pharmacy_claim as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , paid_date
@@ -54,7 +54,7 @@ with patients_with_frailty as (
 , medication_exclusions as (
 
     select
-          medications.patient_id
+          medications.person_id
         , medications.dispensing_date
         , exclusion_codes.concept_name
     from medications
@@ -65,7 +65,7 @@ with patients_with_frailty as (
     union all
 
     select
-          medications.patient_id
+          medications.person_id
         , medications.dispensing_date
         , exclusion_codes.concept_name
     from medications
@@ -76,7 +76,7 @@ with patients_with_frailty as (
     union all
 
     select
-          medications.patient_id
+          medications.person_id
         , medications.dispensing_date
         , exclusion_codes.concept_name
     from medications
@@ -89,7 +89,7 @@ with patients_with_frailty as (
 , pharmacy_claim_exclusions as (
 
     select
-          pharmacy_claim.patient_id
+          pharmacy_claim.person_id
         , pharmacy_claim.dispensing_date
         , pharmacy_claim.ndc_code
         , pharmacy_claim.paid_date
@@ -104,7 +104,7 @@ with patients_with_frailty as (
 , frailty_with_dementia as (
 
     select
-          patients_with_frailty.patient_id
+          patients_with_frailty.person_id
         , patients_with_frailty.exclusion_date
         , {{ dbt.concat([
             "patients_with_frailty.exclusion_reason",
@@ -115,12 +115,12 @@ with patients_with_frailty as (
         , pharmacy_claim_exclusions.paid_date
     from patients_with_frailty
          inner join pharmacy_claim_exclusions
-            on patients_with_frailty.patient_id = pharmacy_claim_exclusions.patient_id
+            on patients_with_frailty.person_id = pharmacy_claim_exclusions.person_id
 
     union all
 
     select
-          patients_with_frailty.patient_id
+          patients_with_frailty.person_id
         , medication_exclusions.dispensing_date as exclusion_date
         , {{ dbt.concat([
             "patients_with_frailty.exclusion_reason",
@@ -131,12 +131,12 @@ with patients_with_frailty as (
         , null as paid_date
     from patients_with_frailty
          inner join medication_exclusions
-         on patients_with_frailty.patient_id = medication_exclusions.patient_id
+         on patients_with_frailty.person_id = medication_exclusions.person_id
 
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , 'dementia' as exclusion_type

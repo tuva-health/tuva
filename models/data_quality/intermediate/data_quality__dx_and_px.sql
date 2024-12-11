@@ -12,7 +12,7 @@ with unpivot_diagnosis as(
         value_name='diagnosis_code',
         remove=[   'claim_line_number'
                     , 'claim_type'
-                    , 'patient_id'
+                    , 'person_id'
                     , 'member_id'
                     , 'payer'
                     , 'plan'
@@ -141,7 +141,7 @@ with unpivot_diagnosis as(
         value_name='procedure_code',
         remove=[ 'claim_line_number'
                 , 'claim_type'
-                , 'patient_id'
+                , 'person_id'
                 , 'member_id'
                 , 'payer'
                 , 'plan'

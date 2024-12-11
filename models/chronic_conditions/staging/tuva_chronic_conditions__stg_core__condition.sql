@@ -4,7 +4,7 @@
 }}
 
 select 
-      patient_id
+      person_id
     , normalized_code
     , recorded_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run

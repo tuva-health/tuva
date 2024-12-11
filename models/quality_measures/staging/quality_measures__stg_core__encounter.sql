@@ -6,7 +6,7 @@
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , encounter_id
     , encounter_type
     , length_of_stay
@@ -18,7 +18,7 @@ from {{ ref('core__encounter') }}
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , encounter_id
     , encounter_type
     , length_of_stay
@@ -31,7 +31,7 @@ from {{ ref('core__encounter') }}
 
 {% if target.type == 'fabric' %}
     select top 0
-      cast(null as {{ dbt.type_string() }} ) as patient_id
+      cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
     , cast(null as {{dbt.type_numeric()}} ) as length_of_stay
@@ -40,7 +40,7 @@ from {{ ref('core__encounter') }}
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 {% else %}
     select
-      cast(null as {{ dbt.type_string() }} ) as patient_id
+      cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
     , cast(null as {{dbt.type_numeric()}} ) as length_of_stay

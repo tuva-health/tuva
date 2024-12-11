@@ -7,7 +7,7 @@
 with denominator as (
 
     select 
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -36,7 +36,7 @@ with denominator as (
 , procedure_vaccination as (
 
     select
-        patient_id
+        person_id
       , procedure_date
     from {{ ref('quality_measures__stg_core__procedure') }} as procedures
     inner join influenza_vaccination_code
@@ -48,7 +48,7 @@ with denominator as (
 , claims_vaccination as (
     
     select 
-          patient_id
+          person_id
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
@@ -60,7 +60,7 @@ with denominator as (
 , qualifying_procedures as (
 
     select
-          procedure_vaccination.patient_id
+          procedure_vaccination.person_id
         , procedure_vaccination.procedure_date as evidence_date
     from procedure_vaccination
     inner join {{ ref('quality_measures__int_nqf0041__performance_period') }} pp
@@ -73,7 +73,7 @@ with denominator as (
 , qualifying_claims as (
 
     select 
-          claims_vaccination.patient_id
+          claims_vaccination.person_id
         , claims_vaccination.max_date as evidence_date
     from claims_vaccination
     inner join {{ ref('quality_measures__int_nqf0041__performance_period') }} pp
@@ -86,14 +86,14 @@ with denominator as (
 , qualified_patients as (
 
     select
-          patient_id
+          person_id
         , evidence_date
     from qualifying_procedures
 
     union all
 
     select
-          patient_id
+          person_id
         , evidence_date
     from qualifying_claims
 
@@ -102,7 +102,7 @@ with denominator as (
 , combined_qualifying_patients as (
 
     select
-          qualified_patients.patient_id
+          qualified_patients.person_id
         , qualified_patients.evidence_date
         , denominator.measure_id
         , denominator.measure_name
@@ -112,14 +112,14 @@ with denominator as (
         , 1 as numerator_flag
     from qualified_patients
     inner join denominator
-        on qualified_patients.patient_id = denominator.patient_id
+        on qualified_patients.person_id = denominator.person_id
 
 )
 
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -133,7 +133,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

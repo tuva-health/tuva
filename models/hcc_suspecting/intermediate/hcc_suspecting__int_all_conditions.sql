@@ -6,7 +6,7 @@
 with conditions as (
 
     select
-          patient_id
+          person_id
         , recorded_date
         , condition_type
         , code_type
@@ -38,7 +38,7 @@ with conditions as (
 , joined as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code
@@ -57,7 +57,7 @@ with conditions as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
         , cast(code as {{ dbt.type_string() }}) as icd_10_cm_code
@@ -69,7 +69,7 @@ with conditions as (
 )
 
 select
-      patient_id
+      person_id
     , recorded_date
     , condition_type
     , icd_10_cm_code

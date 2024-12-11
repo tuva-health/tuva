@@ -4,7 +4,7 @@
 }}
 select
       claim_id
-    , patient_id
+    , person_id
     , recorded_date
     , condition_type
     , lower(normalized_code_type) as code_type

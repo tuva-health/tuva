@@ -6,7 +6,7 @@
 with medications as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , source_code
         , source_code_type
@@ -20,7 +20,7 @@ with medications as (
 , pharmacy_claims as (
 
     select
-          patient_id
+          person_id
         , coalesce(dispensing_date, paid_date) as dispensing_date
         , ndc_code as drug_code
         , 'ndc' as code_system
@@ -32,7 +32,7 @@ with medications as (
 , ndc_medications as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code as drug_code
         , 'ndc' as code_system
@@ -43,7 +43,7 @@ with medications as (
     union all
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , source_code as drug_code
         , 'ndc' as code_system
@@ -56,7 +56,7 @@ with medications as (
 , rxnorm_medications as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , rxnorm_code as drug_code
         , 'rxnorm' as code_system
@@ -67,7 +67,7 @@ with medications as (
     union all
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , source_code as drug_code
         , 'rxnorm' as code_system
@@ -90,7 +90,7 @@ with medications as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(dispensing_date as date) as dispensing_date
         , cast(drug_code as {{ dbt.type_string() }}) as drug_code
         , cast(code_system as {{ dbt.type_string() }}) as code_system
@@ -100,7 +100,7 @@ with medications as (
 )
 
 select
-      patient_id
+      person_id
     , dispensing_date
     , drug_code
     , code_system

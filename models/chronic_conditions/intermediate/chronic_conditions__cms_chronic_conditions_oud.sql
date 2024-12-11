@@ -28,7 +28,7 @@ with chronic_conditions as (
 , patient_conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , recorded_date as start_date
         , normalized_code_type as code_type
@@ -41,7 +41,7 @@ with chronic_conditions as (
 , patient_medications as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , paid_date as start_date
         , replace(ndc_code,'.','') as code
@@ -53,7 +53,7 @@ with chronic_conditions as (
 , patient_procedures as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , procedure_date as start_date
         , normalized_code_type as code_type
@@ -66,7 +66,7 @@ with chronic_conditions as (
 , inclusions_diagnosis as (
 
     select
-          patient_conditions.patient_id
+          patient_conditions.person_id
         , patient_conditions.claim_id
         , patient_conditions.start_date
         , patient_conditions.data_source
@@ -84,7 +84,7 @@ with chronic_conditions as (
 , inclusions_procedure as (
 
     select
-          patient_procedures.patient_id
+          patient_procedures.person_id
         , patient_procedures.claim_id
         , patient_procedures.start_date
         , patient_procedures.data_source
@@ -109,7 +109,7 @@ with chronic_conditions as (
 , inclusions_medication as (
 
     select
-          patient_medications.patient_id
+          patient_medications.person_id
         , patient_medications.claim_id
         , patient_medications.start_date
         , patient_medications.data_source
@@ -134,7 +134,7 @@ with chronic_conditions as (
 */
 , exclusions_other_chronic_conditions as (
 
-    select distinct patient_id
+    select distinct person_id
     from {{ ref('chronic_conditions__cms_chronic_conditions_all') }}
     where condition in (
           'Alcohol Use Disorders'
@@ -153,18 +153,18 @@ with chronic_conditions as (
 */
 , exclusions_medication as (
     select distinct
-          patient_medications.patient_id
+          patient_medications.person_id
     from patient_medications
          inner join chronic_conditions
              on patient_medications.code = chronic_conditions.code
          inner join exclusions_other_chronic_conditions
-             on patient_medications.patient_id = exclusions_other_chronic_conditions.patient_id
+             on patient_medications.person_id = exclusions_other_chronic_conditions.person_id
          left join inclusions_diagnosis
-             on patient_medications.patient_id = inclusions_diagnosis.patient_id
+             on patient_medications.person_id = inclusions_diagnosis.person_id
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'NDC'
     and chronic_conditions.code in {{ naltrexone_ndcs }}
-    and inclusions_diagnosis.patient_id is null
+    and inclusions_diagnosis.person_id is null
 
 )
 
@@ -191,7 +191,7 @@ with chronic_conditions as (
 {% endif %}
 
 select distinct
-      cast(inclusions_unioned.patient_id as {{ dbt.type_string() }}) as patient_id
+      cast(inclusions_unioned.person_id as {{ dbt.type_string() }}) as person_id
     , cast(inclusions_unioned.claim_id as {{ dbt.type_string() }}) as claim_id
     , cast(inclusions_unioned.start_date as date) as start_date
     , cast(inclusions_unioned.chronic_condition_type as {{ dbt.type_string() }}) as chronic_condition_type
@@ -201,5 +201,5 @@ select distinct
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from inclusions_unioned
      left join exclusions_medication
-         on inclusions_unioned.patient_id = exclusions_medication.patient_id
-where exclusions_medication.patient_id is null
+         on inclusions_unioned.person_id = exclusions_medication.person_id
+where exclusions_medication.person_id is null

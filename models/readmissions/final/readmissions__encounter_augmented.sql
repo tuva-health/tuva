@@ -8,7 +8,7 @@
 -- that are relevant for readmission measures
 select
     aa.encounter_id,
-    aa.patient_id,
+    aa.person_id,
     aa.admit_date,
     aa.discharge_date,
     aa.discharge_disposition_code,

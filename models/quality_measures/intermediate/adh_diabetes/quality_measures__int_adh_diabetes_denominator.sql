@@ -18,7 +18,7 @@ with diabetics_codes as (
 , rx_diabetes as (
 
     select
-        patient_id
+        person_id
       , dispensing_date
       , ndc_code
       , days_supply
@@ -32,7 +32,7 @@ with diabetics_codes as (
 , rx_diabetes_in_measurement_period as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
@@ -52,12 +52,12 @@ with diabetics_codes as (
 , rx_fill_order as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , performance_period_end
         , dense_rank() over (
             partition by 
-                  patient_id
+                  person_id
                 , performance_period_end
             order by dispensing_date
         ) as dr
@@ -68,7 +68,7 @@ with diabetics_codes as (
 , rx_first_fill as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , performance_period_end
     from rx_fill_order
@@ -79,7 +79,7 @@ with diabetics_codes as (
 , timely_fill_check as (
 
     select
-          patient_id
+          person_id
         , ( 1 + {{ dbt.datediff (
                                   datepart = 'day'
                                 , first_date = 'dispensing_date'
@@ -99,7 +99,7 @@ with diabetics_codes as (
 , first_check_passed_patients as (
 
     select
-          patient_id
+          person_id
         , days_in_treatment_period
     from timely_fill_check
     where days_in_treatment_period > 90
@@ -109,7 +109,7 @@ with diabetics_codes as (
 , second_check_passed_patients as (
 
     select
-          patient_id
+          person_id
     from rx_fill_order
     where dr = 2
 
@@ -118,18 +118,18 @@ with diabetics_codes as (
 , qualifying_patients as (
 
     select
-          first_check_passed_patients.patient_id
+          first_check_passed_patients.person_id
         , first_check_passed_patients.days_in_treatment_period
     from first_check_passed_patients
     inner join second_check_passed_patients
-        on first_check_passed_patients.patient_id = second_check_passed_patients.patient_id 
+        on first_check_passed_patients.person_id = second_check_passed_patients.person_id 
 
 )
 
 , qualifying_patients_with_age as (
     
     select
-          patients.patient_id
+          patients.person_id
         , floor({{ datediff('birth_date', 'pp.performance_period_begin', 'hour') }} / 8760.0) as age
         , days_in_treatment_period
         , performance_period_begin
@@ -139,7 +139,7 @@ with diabetics_codes as (
         , measure_version
     from {{ ref('quality_measures__stg_core__patient') }} patients
     inner join qualifying_patients
-        on patients.patient_id = qualifying_patients.patient_id
+        on patients.person_id = qualifying_patients.person_id
     cross join {{ ref('quality_measures__int_adh_diabetes__performance_period') }} pp
     where patients.death_date is null
 
@@ -152,7 +152,7 @@ with diabetics_codes as (
 , qualifying_patients_all_claim_info as (
 
     select
-          qualifying_patients_with_age.patient_id
+          qualifying_patients_with_age.person_id
         , qualifying_patients_with_age.age
         , rx_diabetes_in_measurement_period.dispensing_date
         , rx_diabetes_in_measurement_period.ndc_code
@@ -165,14 +165,14 @@ with diabetics_codes as (
         , qualifying_patients_with_age.measure_version
     from qualifying_patients_with_age
     inner join rx_diabetes_in_measurement_period
-        on qualifying_patients_with_age.patient_id = rx_diabetes_in_measurement_period.patient_id
+        on qualifying_patients_with_age.person_id = rx_diabetes_in_measurement_period.person_id
 
 )
 
 , denominator as (
 
     select
-          patient_id
+          person_id
         , age
         , dispensing_date
         , ndc_code
@@ -192,7 +192,7 @@ with diabetics_codes as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(age as integer) as age
         , cast(dispensing_date as date) as dispensing_date
         , cast(ndc_code as {{ dbt.type_string() }}) as ndc_code
@@ -209,7 +209,7 @@ with diabetics_codes as (
 )
 
 select
-      patient_id
+      person_id
     , age
     , dispensing_date
     , ndc_code

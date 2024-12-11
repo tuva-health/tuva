@@ -20,7 +20,7 @@ measurement period.
 with denominator as (
 
     select
-          patient_id
+          person_id
     from {{ ref('quality_measures__int_nqf0034_denominator') }}
 
 )
@@ -73,7 +73,7 @@ with denominator as (
 , medical_claim as (
 
     select
-          patient_id
+          person_id
         , claim_start_date
         , claim_end_date
         , hcpcs_code
@@ -84,7 +84,7 @@ with denominator as (
 , observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , coalesce (
               normalized_code_type
@@ -105,7 +105,7 @@ with denominator as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce(
               normalized_code_type
@@ -126,7 +126,7 @@ with denominator as (
 , labs as (
 
     select  
-      patient_id
+      person_id
     , result_date
     , collection_date
     , source_code_type
@@ -140,7 +140,7 @@ with denominator as (
 , qualifying_claims as (
 
     select
-          medical_claim.patient_id
+          medical_claim.person_id
         , coalesce( medical_claim.claim_start_date, medical_claim.claim_end_date) as claim_date
     , screening_codes.concept_name
     from medical_claim
@@ -156,7 +156,7 @@ with denominator as (
 , qualifying_observations as (
 
     select
-          observations.patient_id
+          observations.person_id
         , observations.observation_date
         , screening_codes.concept_name
     from observations
@@ -170,7 +170,7 @@ with denominator as (
 , qualifying_procedures as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
         , screening_codes.concept_name
     from procedures
@@ -184,7 +184,7 @@ with denominator as (
 
 , normalized_code_labs as (
   select
-      patient_id
+      person_id
     , coalesce(collection_date, result_date) as lab_date
     , screening_codes.concept_name
   from labs
@@ -199,7 +199,7 @@ with denominator as (
 , source_code_labs as (
 
   select
-      patient_id
+      person_id
     , coalesce(collection_date, result_date) as lab_date
     , screening_codes.concept_name
   from labs
@@ -215,7 +215,7 @@ with denominator as (
 , qualifying_labs_union as (
 
   select 
-        patient_id
+        person_id
       , lab_date
       , concept_name
   from normalized_code_labs
@@ -223,7 +223,7 @@ with denominator as (
   union all
 
   select 
-        patient_id
+        person_id
       , lab_date
       , concept_name
   from source_code_labs
@@ -233,7 +233,7 @@ with denominator as (
 , qualifying_labs as (
 
   select distinct
-        patient_id
+        person_id
       , lab_date
       , concept_name
   from qualifying_labs_union
@@ -243,7 +243,7 @@ with denominator as (
 , qualifying_events as (
 
     select
-          patient_id
+          person_id
         , claim_date as evidence_date
         , concept_name as evidence
     from qualifying_claims
@@ -251,7 +251,7 @@ with denominator as (
     union all
 
     select
-          patient_id
+          person_id
         , observation_date as evidence_date
         , concept_name as evidence
     from qualifying_observations
@@ -259,7 +259,7 @@ with denominator as (
     union all
 
     select
-          patient_id
+          person_id
         , procedure_date as evidence_date
         , concept_name as evidence
     from qualifying_procedures
@@ -267,7 +267,7 @@ with denominator as (
     union all
 
     select
-          patient_id
+          person_id
         , lab_date as evidence_date
         , concept_name as evidence
     from qualifying_labs
@@ -275,9 +275,9 @@ with denominator as (
 )
 
 select
-      cast( qualifying_events.patient_id as {{ dbt.type_string() }}) as patient_id
+      cast( qualifying_events.person_id as {{ dbt.type_string() }}) as person_id
     , cast( evidence_date as date) as evidence_date
     , cast( evidence as {{ dbt.type_string() }}) as evidence
 from qualifying_events
 inner join denominator
-    on qualifying_events.patient_id = denominator.patient_id
+    on qualifying_events.person_id = denominator.person_id

@@ -32,7 +32,7 @@ with pharmacy as (
 
 , eligibility as (
   select
-      patient_id
+      person_id
     , enrollment_start_date
     , enrollment_end_date
     , {{ quote_column('plan') }}
@@ -40,7 +40,7 @@ with pharmacy as (
     , count(*) as result_count
   from {{ ref('eligibility') }} p
   group by
-      patient_id
+      person_id
     , enrollment_start_date
     , enrollment_end_date
     , {{ quote_column('plan') }}

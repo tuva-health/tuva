@@ -3,8 +3,6 @@
    )
 }}
 
-
-
 with month_start_and_end_dates as (
   select
     {{ dbt.concat(["year",
@@ -18,7 +16,8 @@ with month_start_and_end_dates as (
 
 final_before_attribution_fields as (
 select distinct
-    a.patient_id
+    a.person_id
+  , a.member_id
   , year_month
   , a.payer
   , a.{{ quote_column('plan') }}
@@ -33,7 +32,8 @@ inner join month_start_and_end_dates b
 
 add_attribution_fields as (
 select
-    a.patient_id
+    a.person_id
+  , a.member_id
   , a.year_month
   , a.payer
   , a.{{ quote_column('plan') }}
@@ -51,13 +51,11 @@ select
 
 from final_before_attribution_fields a
 left join {{ ref('financial_pmpm__stg_provider_attribution') }} b
-on a.patient_id = b.patient_id
+on a.person_id = b.person_id
 and a.year_month = b.year_month
 and a.payer = b.payer
 and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
 and a.data_source = b.data_source
 )
 
-
-select *
-from add_attribution_fields
+select * from add_attribution_fields

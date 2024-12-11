@@ -24,7 +24,7 @@
 with denominator as (
   
     select
-        patient_id
+        person_id
     from {{ ref('quality_measures__int_nqf0420_denominator') }}
 
 )
@@ -45,7 +45,7 @@ with denominator as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -67,7 +67,7 @@ with denominator as (
 , medical_claim as (
 
     select
-          patient_id
+          person_id
         , claim_start_date
         , claim_end_date
         , hcpcs_code
@@ -79,7 +79,7 @@ with denominator as (
 , procedure_exclusions as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date
         , exclusion_codes.concept_name as concept_name
     from procedures
@@ -92,7 +92,7 @@ with denominator as (
 , med_claim_exclusions as (
 
     select
-          medical_claim.patient_id
+          medical_claim.person_id
         , coalesce(medical_claim.claim_end_date, medical_claim.claim_start_date) as exclusion_date
         , medical_claim.hcpcs_code
         , exclusion_codes.concept_name as concept_name
@@ -106,7 +106,7 @@ with denominator as (
 , patients_with_exclusions as(
     
     select
-        patient_id
+        person_id
       , exclusion_date
       , concept_name as exclusion_reason
     from med_claim_exclusions
@@ -114,7 +114,7 @@ with denominator as (
     union all
 
     select 
-          patient_id
+          person_id
         , procedure_date as exclusion_date
         , concept_name as exclusion_reason
     from procedure_exclusions
@@ -124,12 +124,12 @@ with denominator as (
 , valid_exclusions as (
 
   select 
-        patients_with_exclusions.patient_id
+        patients_with_exclusions.person_id
       , patients_with_exclusions.exclusion_date
       , patients_with_exclusions.exclusion_reason  
   from patients_with_exclusions
   inner join denominator
-      on patients_with_exclusions.patient_id = denominator.patient_id
+      on patients_with_exclusions.person_id = denominator.person_id
 
 )
 
@@ -137,7 +137,7 @@ with denominator as (
 
     select
         distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(exclusion_date as date) as exclusion_date
         , cast(exclusion_reason as {{ dbt.type_string() }}) as exclusion_reason
         , cast(1 as integer) as exclusion_flag
@@ -146,7 +146,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , exclusion_date
     , exclusion_reason
     , exclusion_flag

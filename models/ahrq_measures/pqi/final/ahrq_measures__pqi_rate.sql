@@ -20,7 +20,7 @@ with num as (
         data_source
       , year_number
       , pqi_number
-      , count(patient_id) as denom_count
+      , count(person_id) as denom_count
     from {{ ref('ahrq_measures__pqi_denom_long') }} as d
     group by
         data_source

@@ -6,7 +6,7 @@
 
 SELECT *,
     {{  dbt.concat([
-        'patient_id',
+        'person_id',
         "'|'",
         'data_source']) }} as patient_data_source_key
 FROM {{ ref('core__patient')}}

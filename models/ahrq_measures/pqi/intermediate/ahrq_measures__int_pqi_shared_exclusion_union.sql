@@ -10,7 +10,7 @@ select
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }} as denom
 inner join {{ ref('ahrq_measures__int_pqi_shared_exclusion_missing_age') }} as age
-  on denom.patient_id = age.patient_id
+  on denom.person_id = age.person_id
   and denom.data_source = age.data_source
 
 union all
@@ -23,7 +23,7 @@ select
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }} as denom
 inner join {{ ref('ahrq_measures__int_pqi_shared_exclusion_missing_gender') }} as gender
-  on denom.patient_id = gender.patient_id
+  on denom.person_id = gender.person_id
   and denom.data_source = gender.data_source
 
 union all

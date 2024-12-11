@@ -8,13 +8,13 @@
 WITH cte AS (
     SELECT 
         payment_year,
-        patient_id,
+        person_id,
         model_version,
         patient_risk_sk,
         SUM(coefficient) AS risk_score
     FROM {{ ref('mart_review__patient_risk_factors') }}
     GROUP BY payment_year,
-             patient_id,
+             person_id,
              model_version,
              patient_risk_sk
 )
@@ -35,7 +35,7 @@ SELECT
         ELSE null 
         END AS risk_score_bucket,
         payment_year,
-        patient_id,
+        person_id,
         model_version,
         patient_risk_sk,
         risk_score

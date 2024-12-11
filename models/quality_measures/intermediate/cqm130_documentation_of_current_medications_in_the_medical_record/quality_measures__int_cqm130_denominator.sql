@@ -19,7 +19,7 @@ with visit_codes as (
 , visits_encounters as (
 
     select 
-          patient_id
+          person_id
         , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as procedure_encounter_date -- alias only to enable union later
         , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as claims_encounter_date -- alias only to enable union later
     from {{ ref('quality_measures__stg_core__encounter') }} encounter
@@ -39,7 +39,7 @@ with visit_codes as (
 , procedure_encounters as (
 
     select 
-          patient_id
+          person_id
         , procedure_date as procedure_encounter_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claims_encounter_date
     from {{ ref('quality_measures__stg_core__procedure') }} procs
@@ -53,7 +53,7 @@ with visit_codes as (
 , claims_encounters as (
     
     select 
-          patient_id
+          person_id
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as procedure_encounter_date
         , coalesce(claim_end_date,claim_start_date) as claims_encounter_date
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
@@ -85,7 +85,7 @@ with visit_codes as (
 , multiple_encounters_by_patient as (
 
     select
-          patient_id
+          person_id
         , procedure_encounter_date
         , claims_encounter_date
         , case when procedure_encounter_date >= claims_encounter_date
@@ -98,43 +98,43 @@ with visit_codes as (
             , "coalesce(min(claim_enc), '')"
         ]) }} as qualifying_types
     from all_encounters
-    group by patient_id, procedure_encounter_date, claims_encounter_date
+    group by person_id, procedure_encounter_date, claims_encounter_date
 
 )
 
 , max_encounter_dates_by_patient as (
 
 	select
-		  patient_id
+		  person_id
 		, max(max_encounter_date) as max_encounter_date
 	from multiple_encounters_by_patient
-	group by patient_id
+	group by person_id
 
 )
 
 , latest_patient_encounters as (
 	
 	select
-		  max_encounter_dates_by_patient.patient_id
+		  max_encounter_dates_by_patient.person_id
 		, max_encounter_dates_by_patient.max_encounter_date
 		, procedure_encounter_date
 		, claims_encounter_date
 	from max_encounter_dates_by_patient
 	inner join multiple_encounters_by_patient
-		on max_encounter_dates_by_patient.patient_id = multiple_encounters_by_patient.patient_id
+		on max_encounter_dates_by_patient.person_id = multiple_encounters_by_patient.person_id
 
 )
 
 , patients_with_age as (
 
     select
-          p.patient_id
+          p.person_id
         , procedure_encounter_date
         , claims_encounter_date
         , floor({{ datediff('birth_date', 'e.max_encounter_date', 'hour') }} / 8760.0) as max_age
     from {{ ref('quality_measures__stg_core__patient') }} p
     inner join latest_patient_encounters e
-        on p.patient_id = e.patient_id
+        on p.person_id = e.person_id
     where p.death_date is null
 
 )
@@ -143,7 +143,7 @@ with visit_codes as (
 
     select
         distinct
-          patients_with_age.patient_id
+          patients_with_age.person_id
         , patients_with_age.max_age as age
         , patients_with_age.procedure_encounter_date
         , patients_with_age.claims_encounter_date
@@ -162,7 +162,7 @@ with visit_codes as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(age as integer) as age
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
@@ -177,7 +177,7 @@ with visit_codes as (
 )
 
 select 
-      patient_id
+      person_id
     , age
     , procedure_encounter_date
     , claims_encounter_date

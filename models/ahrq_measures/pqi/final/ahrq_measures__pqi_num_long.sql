@@ -4,7 +4,7 @@
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '01' as pqi_number
@@ -15,7 +15,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '03' as pqi_number
@@ -26,7 +26,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '05' as pqi_number
@@ -37,7 +37,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '07' as pqi_number
@@ -48,7 +48,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '08' as pqi_number
@@ -59,7 +59,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '11' as pqi_number
@@ -70,7 +70,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '12' as pqi_number
@@ -81,7 +81,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '14' as pqi_number
@@ -92,7 +92,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '15' as pqi_number
@@ -103,7 +103,7 @@ union all
 
 select
     n.data_source
-  , n.patient_id
+  , n.person_id
   , n.year_number
   , n.encounter_id
   , '16' as pqi_number

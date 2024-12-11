@@ -25,7 +25,7 @@ with visit_codes as (
 , visits_encounters as (
 
     select 
-           patient_id
+           person_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ref('quality_measures__stg_core__encounter')}} encounter
@@ -46,7 +46,7 @@ with visit_codes as (
 , procedure_encounters as (
 
     select 
-          patient_id
+          person_id
         , procedure_date as min_date
         , procedure_date as max_date
         from {{ref('quality_measures__stg_core__procedure')}} procs
@@ -60,7 +60,7 @@ with visit_codes as (
 , claims_encounters as (
 
     select 
-          patient_id
+          person_id
         , coalesce(claim_start_date,claim_end_date) as min_date
         , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
@@ -88,7 +88,7 @@ with visit_codes as (
 , encounters_by_patient as (
 
     select
-          patient_id
+          person_id
         , min(min_date) min_date
         , max(max_date) max_date
         , concat(concat(
@@ -97,7 +97,7 @@ with visit_codes as (
             ,coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
-    group by patient_id
+    group by person_id
 
 )
 
@@ -116,7 +116,7 @@ with visit_codes as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , encounter_id
         , recorded_date
@@ -131,7 +131,7 @@ with visit_codes as (
 , hypertension_conditions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.claim_id
         , conditions.encounter_id
         , conditions.recorded_date
@@ -147,7 +147,7 @@ with visit_codes as (
 , patients_with_age as (
     
     select
-          p.patient_id
+          p.person_id
         , min_date
         , floor({{ datediff('birth_date', 'e.min_date', 'hour') }} / 8760.0)  as min_age
         , max_date
@@ -155,7 +155,7 @@ with visit_codes as (
         , qualifying_types
     from {{ref('quality_measures__stg_core__patient')}} p
     inner join encounters_by_patient e
-        on p.patient_id = e.patient_id
+        on p.person_id = e.person_id
     where p.death_date is null
 
 )
@@ -165,7 +165,7 @@ with visit_codes as (
 
     select
         distinct
-          hypertension_conditions.patient_id
+          hypertension_conditions.person_id
         , hypertension_conditions.recorded_date
         , patients_with_age.max_age as age
         , pp.performance_period_begin
@@ -176,7 +176,7 @@ with visit_codes as (
         , 1 as denominator_flag
     from hypertension_conditions
     left join patients_with_age
-        on hypertension_conditions.patient_id = patients_with_age.patient_id
+        on hypertension_conditions.person_id = patients_with_age.person_id
     cross join {{ref('quality_measures__int_cqm236__performance_period')}} pp
     where max_age >= 18 and min_age <=  85
         and hypertension_conditions.recorded_date between
@@ -198,7 +198,7 @@ with visit_codes as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(age as integer) as age
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
@@ -211,7 +211,7 @@ with visit_codes as (
 )
 
 select 
-      patient_id
+      person_id
     , age
     , performance_period_begin
     , performance_period_end

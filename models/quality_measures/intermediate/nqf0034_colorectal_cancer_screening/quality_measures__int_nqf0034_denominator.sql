@@ -40,7 +40,7 @@ with visit_codes as (
 , visits_encounters as (
 
     select 
-          patient_id
+          person_id
         , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
         , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ ref('quality_measures__stg_core__encounter') }} encounter
@@ -60,7 +60,7 @@ with visit_codes as (
 , procedure_encounters as (
 
     select 
-          patient_id
+          person_id
         , procedure_date as min_date
         , procedure_date as max_date
         from {{ ref('quality_measures__stg_core__procedure') }} procs
@@ -73,7 +73,7 @@ with visit_codes as (
 
 , claims_encounters as (
 
-    select patient_id
+    select person_id
     , coalesce(claim_start_date,claim_end_date) as min_date
     , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ref('quality_measures__stg_medical_claim')}} medical_claim
@@ -100,21 +100,21 @@ with visit_codes as (
 
 , encounters_by_patient as (
 
-    select patient_id, min(min_date) min_date, max(max_date) max_date,
+    select person_id, min(min_date) min_date, max(max_date) max_date,
         concat(concat(
             coalesce(min(visit_enc),'')
             ,coalesce(min(proc_enc),''))
             ,coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
-    group by patient_id
+    group by person_id
 
 )
 
 , patients_with_age as (
 
     select
-          p.patient_id
+          p.person_id
         , min_date
         , floor({{ datediff('birth_date', 'e.min_date', 'hour') }} / 8766.0)  as min_age
         , max_date
@@ -122,13 +122,13 @@ with visit_codes as (
         , qualifying_types
     from {{ref('quality_measures__stg_core__patient')}} p
     inner join encounters_by_patient e
-        on p.patient_id = e.patient_id
+        on p.person_id = e.person_id
     where p.death_date is null -- ensures deceased patients are not included
 
 )
 
 select 
-      patient_id
+      person_id
     , min_age
     , max_age
     , qualifying_types

@@ -6,7 +6,7 @@
 with list as (
 
     select
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -15,7 +15,7 @@ with list as (
         , suspect_date
         , row_number() over (
             partition by
-                  patient_id
+                  person_id
                 , hcc_code
             order by suspect_date desc
           ) as row_num
@@ -26,7 +26,7 @@ with list as (
 , list_dedupe as (
 
     select
-          patient_id
+          person_id
         , hcc_code
         , hcc_description
         , reason
@@ -40,7 +40,7 @@ with list as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(reason as {{ dbt.type_string() }}) as reason
@@ -51,7 +51,7 @@ with list as (
 )
 
 select
-      patient_id
+      person_id
     , hcc_code
     , hcc_description
     , reason

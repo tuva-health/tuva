@@ -5,13 +5,13 @@
 with condition_counts as (
     select
         condition
-        , count(distinct patient_id) as patients
+        , count(distinct person_id) as patients
     from {{ ref('chronic_conditions__tuva_chronic_conditions_long') }}
     group by condition
 )
 , total_patients as (
     select 
-        count(distinct patient_id) as total_distinct_patients
+        count(distinct person_id) as total_distinct_patients
     from {{ ref('core__eligibility') }}
 )
 

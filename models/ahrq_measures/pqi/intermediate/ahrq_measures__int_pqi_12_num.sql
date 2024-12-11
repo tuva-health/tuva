@@ -4,7 +4,7 @@
 
 select
     e.data_source
-  , e.patient_id
+  , e.person_id
   , e.year_number
   , e.encounter_id
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -14,7 +14,7 @@ inner join {{ ref('pqi__value_sets') }} as hyp
   and hyp.value_set_name = 'urinary_tract_infection_diagnosis_codes'
   and hyp.pqi_number = '12'
 inner join {{ ref('ahrq_measures__int_pqi_12_denom') }} as denom
-  on e.patient_id = denom.patient_id
+  on e.person_id = denom.person_id
   and e.data_source = denom.data_source
   and e.year_number = denom.year_number
 left join {{ ref('ahrq_measures__int_pqi_12_exclusions') }} as shared

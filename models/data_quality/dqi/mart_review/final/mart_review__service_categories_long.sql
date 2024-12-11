@@ -5,7 +5,7 @@
 with encounters as (
     select
         cast(c.year_month_int as {{ dbt.type_string() }}) as year_month
-      , mc.patient_id
+      , mc.person_id
       , service_category_1
       , service_category_2
       , count(distinct mc.encounter_id) as visits
@@ -15,7 +15,7 @@ with encounters as (
       on mc.encounter_id = e.encounter_id
     group by
         cast(c.year_month_int as {{ dbt.type_string() }})
-      , mc.patient_id
+      , mc.person_id
       , service_category_1
       , service_category_2
 )
@@ -31,7 +31,7 @@ with encounters as (
     from {{ref('financial_pmpm__patient_spend_with_service_categories')}} as pmpm
     left join encounters
       on pmpm.year_month = encounters.year_month
-      and pmpm.patient_id = encounters.patient_id
+      and pmpm.person_id = encounters.person_id
       and pmpm.service_category_1 = encounters.service_category_1
       and pmpm.service_category_2 = encounters.service_category_2
     group by

@@ -3,7 +3,7 @@
    )
 }}
 select
-      patient_id
+      person_id
     , claim_id
     , encounter_id
     , recorded_date

@@ -4,7 +4,9 @@
 }}
 
 select
-    cast(procedure_id as {{ dbt.type_string() }} ) as procedure_id 
+    cast(procedure_id as {{ dbt.type_string() }} ) as procedure_id
+    , cast(person_id as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
     , cast(encounter_id as {{ dbt.type_string() }} ) as encounter_id
     , cast(claim_id as {{ dbt.type_string() }} ) as claim_id

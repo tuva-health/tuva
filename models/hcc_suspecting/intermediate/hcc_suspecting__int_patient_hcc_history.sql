@@ -6,7 +6,7 @@
 with all_conditions as (
 
     select
-          patient_id
+          person_id
         , data_source
         , recorded_date
         , condition_type
@@ -21,7 +21,7 @@ with all_conditions as (
 , hcc_grouped as (
 
     select
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -30,7 +30,7 @@ with all_conditions as (
     from all_conditions
     where hcc_code is not null
     group by
-          patient_id
+          person_id
         , hcc_code
         , hcc_description
         , data_source
@@ -40,7 +40,7 @@ with all_conditions as (
 , hcc_billed as (
 
     select
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , hcc_description
@@ -49,7 +49,7 @@ with all_conditions as (
     where hcc_code is not null
     and lower(condition_type) <> 'problem'
     group by
-          patient_id
+          person_id
         , hcc_code
         , hcc_description
         , data_source
@@ -59,7 +59,7 @@ with all_conditions as (
 , add_flag as (
 
     select
-          hcc_grouped.patient_id
+          hcc_grouped.person_id
         , hcc_grouped.data_source
         , hcc_grouped.hcc_code
         , hcc_grouped.hcc_description
@@ -74,7 +74,7 @@ with all_conditions as (
 
     from hcc_grouped
          left join hcc_billed
-         on hcc_grouped.patient_id = hcc_billed.patient_id
+         on hcc_grouped.person_id = hcc_billed.person_id
          and hcc_grouped.hcc_code = hcc_billed.hcc_code
          and hcc_grouped.data_source = hcc_billed.data_source
 
@@ -83,7 +83,7 @@ with all_conditions as (
 , all_conditions_with_flag as (
 
     select distinct
-          all_conditions.patient_id
+          all_conditions.person_id
         , all_conditions.data_source
         , all_conditions.recorded_date
         , all_conditions.condition_type
@@ -108,7 +108,7 @@ with all_conditions as (
         , coalesce(last_billed, last_recorded) as condition_date
     from all_conditions
          left join add_flag
-            on all_conditions.patient_id = add_flag.patient_id
+            on all_conditions.person_id = add_flag.person_id
             and all_conditions.hcc_code = add_flag.hcc_code
             and all_conditions.data_source = add_flag.data_source
 
@@ -117,7 +117,7 @@ with all_conditions as (
 , add_standard_fields as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , recorded_date
         , condition_type
@@ -147,7 +147,7 @@ with all_conditions as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
@@ -170,7 +170,7 @@ with all_conditions as (
 )
 
 select
-      patient_id
+      person_id
     , data_source
     , recorded_date
     , condition_type

@@ -9,7 +9,7 @@ seeds:
       enabled: |
         {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
-        patient_id: |
+        person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         member_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -60,7 +60,6 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
-        
 
   - name: lab_result_seed
     config:
@@ -71,6 +70,8 @@ seeds:
         {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         lab_result_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         patient_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -127,7 +128,6 @@ seeds:
         tuva_last_run: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
-
   - name: medical_claim_seed
     config:
       schema: |
@@ -141,7 +141,7 @@ seeds:
         claim_line_number: integer
         claim_type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        patient_id: |
+        person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         member_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -385,7 +385,6 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
 
-
   - name: observation_seed
     config:
       schema: |
@@ -395,6 +394,8 @@ seeds:
         {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         observation_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         patient_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -438,8 +439,6 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
 
-
-
   - name: pharmacy_claim_seed
     config:
       schema: |
@@ -451,7 +450,7 @@ seeds:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         claim_line_number: integer
-        patient_id: |
+        person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         member_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -481,7 +480,6 @@ seeds:
         ingest_datetime: |
           {%- if target.type in ("fabric") -%} datetime2(0) {%- else -%} datetime {%- endif -%} 
 
-
   - name: provider_attribution_seed
     config:
       schema: |
@@ -490,6 +488,8 @@ seeds:
       enabled: |
         {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
+        person_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         patient_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         year_month: |
@@ -516,4 +516,3 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         custom_attributed_provider_lob: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-

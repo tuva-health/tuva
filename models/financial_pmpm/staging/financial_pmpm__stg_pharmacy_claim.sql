@@ -5,7 +5,7 @@
 
 
 SELECT
-    patient_id
+    person_id
     , dispensing_date
     , paid_date
     , paid_amount

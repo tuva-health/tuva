@@ -13,7 +13,7 @@ with cte as (
 , final as (
     select
         e.*
-      , {{ dbt.concat(['e.patient_id', "'|'", 'e.data_source']) }} as patient_source_key
+      , {{ dbt.concat(['e.person_id', "'|'", 'e.data_source']) }} as patient_source_key
       , {{ dbt.concat(['e.encounter_id', "'|'", 'e.data_source']) }} as encounter_source_key
       , {{ dbt.concat(['e.ms_drg_code', "'|'", 'e.ms_drg_description']) }} as drgwithdescription
       , {{ dbt.concat(['e.primary_diagnosis_code', "'|'", 'e.primary_diagnosis_description']) }} as primary_diagnosis_and_description
