@@ -876,15 +876,15 @@ models:
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
-  - name: core__patient_crosswalk
+  - name: core__person_id_crosswalk
     description: >
-      The patient crosswalk table contains all source patient identifiers from 
+      The person id crosswalk table contains all source patient identifiers from 
       the input layer eligibility (claims) and patient (clinical).
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
-      alias: patient_crosswalk
+      alias: person_id_crosswalk
       tags: core
       materialized: table
     tests:
