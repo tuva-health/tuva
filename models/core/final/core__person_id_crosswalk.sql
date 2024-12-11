@@ -33,7 +33,7 @@ select distinct
     , cast(null as {{ dbt.type_string() }}) as payer
     , cast(null as {{ dbt.type_string() }}) as {{ quote_column('plan') }}
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-from {{ ref('patient') }}from {{ ref('patient') }}
+from {{ ref('patient') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
