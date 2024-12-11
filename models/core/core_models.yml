@@ -894,7 +894,7 @@ models:
             - patient_id
             - member_id
             - payer
-            - plan
+            - '{{ quote_column("plan") }}'
             - data_source
     columns:
       - name: person_id
