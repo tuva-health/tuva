@@ -6,7 +6,7 @@ select * from {{ ref('observation_seed') }}
 
 {%- else -%}
 
-    select
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
     cast(null as {{ dbt.type_string() }} ) as observation_id
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
@@ -29,6 +29,6 @@ select * from {{ ref('observation_seed') }}
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_high
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
-    {{ limit_zero() }}
+    {% if target.type == 'fabric' %} {% else %} limit 0 {% endif %}
 
 {%- endif %}

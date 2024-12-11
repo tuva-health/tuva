@@ -1,4 +1,4 @@
-select
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 cast(null as {{ dbt.type_string() }} ) as person_id
 , cast(null as {{ dbt.type_string() }} ) as patient_id
 , cast(null as {{ dbt.type_string() }} ) as first_name
@@ -19,4 +19,4 @@ cast(null as {{ dbt.type_string() }} ) as person_id
 , cast(null as {{ dbt.type_string() }}) as phone
 , cast(null as {{ dbt.type_string() }} ) as data_source
 , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
-{{ limit_zero() }}
+{% if target.type == 'fabric' %} {% else %} limit 0 {% endif %}

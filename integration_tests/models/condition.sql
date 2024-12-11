@@ -4,11 +4,9 @@
    )
 }}
 
-
-
 {% if var('use_synthetic_data') == true -%}
 
-select
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
  cast(null as {{ dbt.type_string() }} ) as condition_id
 , cast(null as {{ dbt.type_string() }} ) as person_id
 , cast(null as {{ dbt.type_string() }} ) as patient_id
@@ -34,9 +32,7 @@ select
 , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 {{ limit_zero()}}
 
-
 {%- else -%}
-
 
 select * from {{ source('source_input', 'condition') }}
 
