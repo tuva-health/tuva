@@ -54,7 +54,7 @@ select
       end as usable_rendering_npi
 
     , sum(paid_amount) as paid_amount
-
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }}
 group by
       claim_id

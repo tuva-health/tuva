@@ -79,5 +79,17 @@ with claim_comparisons_within_same_encounter as (
 
 )
 
-select *
+select
+      claim_id_a
+    , claim_id_b
+    , merge_start_date_a
+    , merge_end_date_a
+    , merge_start_date_b
+    , merge_end_date_b
+    , ddc_a
+    , ddc_b
+    , facility_npi_a
+    , facility_npi_b
+    , merge_flag
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from claim_merges_within_same_encounter

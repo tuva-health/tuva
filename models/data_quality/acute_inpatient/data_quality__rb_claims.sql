@@ -24,5 +24,14 @@ with group_by_claim_id as (
 
 )
 
-select *
+select
+      claim_id
+    , distinct_rev_code_count
+    , has_a_valid_rev_code
+    , has_an_invalid_rev_code
+    , basic
+    , hospice
+    , loa
+    , behavioral
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from group_by_claim_id

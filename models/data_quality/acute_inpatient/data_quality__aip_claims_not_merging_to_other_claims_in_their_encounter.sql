@@ -4,6 +4,7 @@
 
 select distinct 
       claim_id
+      , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__aip_multiple_claim_encounters') }}
 where claim_id not in (
     

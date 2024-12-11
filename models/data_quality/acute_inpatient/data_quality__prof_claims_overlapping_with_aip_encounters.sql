@@ -12,6 +12,7 @@ select
     , aa.usable_merge_dates
     , aa.usable_prof_claim
     , bb.encounter_id
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__all_prof_aip_claims') }} aa
 left join {{ ref('data_quality__aip_encounters_institutional_definition') }} bb
     on aa.patient_id = bb.patient_id

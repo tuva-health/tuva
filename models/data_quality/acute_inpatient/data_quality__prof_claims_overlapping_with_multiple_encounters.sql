@@ -34,6 +34,7 @@ select
     , bb.merge_end_date
     , bb.usable_merge_dates
     , bb.encounter_id
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from prof_claims_that_overlap_with_multiple_encounters aa
 inner join {{ ref('data_quality__prof_claims_overlapping_with_aip_encounters') }} bb
     on aa.claim_id = bb.claim_id

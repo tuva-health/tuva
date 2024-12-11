@@ -28,4 +28,5 @@ select
     , calculated_claim_type
     , place_of_service_code
     , valid_place_of_service_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_distinct_place_of_service_codes_for_each_claim

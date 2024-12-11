@@ -153,4 +153,5 @@ select
     , undeterminable_admit_source_code
     , usable_admit_source_code
     , assigned_admit_source_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from admit_source_code_summary

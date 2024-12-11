@@ -100,5 +100,16 @@ with claims_with_missing_diagnosis_code_1 as (
       on aa.claim_id = dd.claim_id
 )
 
-select *
+select
+      claim_id
+    , missing_diagnosis_code_1
+    , always_invalid_diagnosis_code_1
+    , valid_and_invalid_diagnosis_code_1
+    , always_valid_diagnosis_code_1
+    , unique_diagnosis_code_1
+    , determinable_diagnosis_code_1
+    , undeterminable_diagnosis_code_1
+    , usable_diagnosis_code_1
+    , assigned_diagnosis_code_1
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from diagnosis_code_1_summary

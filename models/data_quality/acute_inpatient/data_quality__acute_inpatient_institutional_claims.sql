@@ -114,4 +114,5 @@ select
     , usable_discharge_disposition_code
     , usable_facility_npi
     , usable_rendering_npi
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_dq_problem_and_dq_insight_flags

@@ -68,7 +68,7 @@ with rb as (
 , summary_cte as (
 
     select
-          1 as index
+          1 as {{ quote_column('index') }}
         , 'rb' as venn_section
         , (select * from rb) as claims
         , round(
@@ -84,7 +84,7 @@ with rb as (
     union all
 
     select
-          2 as index
+          2 as {{ quote_column('index') }}
         , 'drg' as venn_section
         , (select * from drg) as claims
         , round(
@@ -100,7 +100,7 @@ with rb as (
     union all
 
     select
-          3 as index
+          3 as {{ quote_column('index') }}
         , 'bill' as venn_section
         , (select * from bill) as claims
         , round(
@@ -116,7 +116,7 @@ with rb as (
     union all
 
     select
-          4 as index
+          4 as {{ quote_column('index') }}
         , 'rb_drg' as venn_section
         , (select * from rb_drg) as claims
         , round(
@@ -132,7 +132,7 @@ with rb as (
     union all
 
     select
-          5 as index
+          5 as {{ quote_column('index') }}
         , 'rb_bill' as venn_section
         , (select * from rb_bill) as claims
         , round(
@@ -148,7 +148,7 @@ with rb as (
     union all
 
     select
-          6 as index
+          6 as {{ quote_column('index') }}
         , 'drg_bill' as venn_section
         , (select * from drg_bill) as claims
         , round(
@@ -164,7 +164,7 @@ with rb as (
     union all
 
     select
-          7 as index
+          7 as {{ quote_column('index') }}
         , 'rb_drg_bill' as venn_section
         , (select * from rb_drg_bill) as claims
         , round(
@@ -180,7 +180,11 @@ with rb as (
 )
 
 select 
-    * 
+      {{ quote_column('index') }}
+    , venn_section
+    , claims
+    , percent_of_institutional_claims
+    , '{{ var('tuva_last_run')}}' as tuva_last_run 
 from summary_cte
 
 

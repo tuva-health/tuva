@@ -48,5 +48,13 @@ with all_room_and_board_rev_codes as (
 
 )
 
-select * 
+select
+    claim_id
+  , revenue_center_code
+  , valid_revenue_center_code
+  , basic
+  , hospice
+  , loa
+  , behavioral
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_room_and_board_rev_codes

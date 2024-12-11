@@ -98,5 +98,19 @@ with usable_aip_inst_claims as (
 
 )
 
-select *
+select   
+      patient_id
+    , claim_id_a
+    , claim_id_b
+    , merge_start_a
+    , merge_end_a
+    , merge_start_b
+    , merge_end_b
+    , facility_npi_a
+    , facility_npi_b
+    , different_facility_npi
+    , encounter_id_a
+    , encounter_id_b
+    , different_encounter_id
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_encounter_ids

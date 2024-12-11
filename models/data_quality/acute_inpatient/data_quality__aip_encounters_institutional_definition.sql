@@ -84,6 +84,7 @@ select
     , usable_rendering_npi
     , single_claim_encounter
     , multi_claim_encounter
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from single_claim_encounters
 
 union all
@@ -111,4 +112,5 @@ select
     , usable_rendering_npi
     , single_claim_encounter
     , multi_claim_encounter
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from multi_claim_encounters

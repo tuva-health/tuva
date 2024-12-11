@@ -238,6 +238,7 @@ SELECT
         WHEN icd25.icd_10_cm IS NOT NULL THEN 1
         ELSE 0
     END AS valid_diagnosis_code_25
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('medical_claim') }} mc
 
 left join {{ ref('terminology__bill_type') }} bill_type

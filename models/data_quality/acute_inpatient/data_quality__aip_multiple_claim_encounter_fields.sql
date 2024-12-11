@@ -283,6 +283,7 @@ select
     , dates_and_flags.usable_discharge_disposition_code
     , dates_and_flags.usable_facility_npi
     , dates_and_flags.usable_rendering_npi
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_encounters enc
 left join encounter_ms_drg_code ms_drg_code
     on enc.patient_id = ms_drg_code.patient_id

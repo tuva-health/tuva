@@ -75,6 +75,7 @@ select
     , dx1.undeterminable_diagnosis_code_1
     , dx1.usable_diagnosis_code_1
     , dx1.assigned_diagnosis_code_1
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 
 from {{ ref('data_quality__claim_type') }} claim_type
 

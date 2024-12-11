@@ -60,4 +60,5 @@ select
     , occurrences_1
     , admit_source_code_2
     , occurrences_2
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from determinable

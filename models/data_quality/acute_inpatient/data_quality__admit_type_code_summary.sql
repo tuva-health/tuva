@@ -151,4 +151,5 @@ select
     , undeterminable_admit_type_code
     , usable_admit_type_code
     , assigned_admit_type_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from admit_type_code_summary

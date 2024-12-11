@@ -18,6 +18,7 @@ select
     , has_valid_institutional_fields
     , has_professional_fields
     , has_valid_professional_fields
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__claim_type') }}
 cross join total_claims_count
 group by 

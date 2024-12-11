@@ -30,4 +30,5 @@ with claims_per_encounter as (
 select 
       number_of_claims_in_encounter
     , number_of_times_this_happens
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from summary

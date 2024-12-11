@@ -69,5 +69,5 @@ select
           when valid_place_of_service_code = 1 then 1
           else 0
       end as has_valid_professional_fields
-
+      , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__valid_values') }}

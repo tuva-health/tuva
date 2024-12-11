@@ -12,6 +12,7 @@ select
           where calculated_claim_type = 'professional'
         )
         as percent_of_professional_claims
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__pos_all') }}
 where valid_place_of_service_code = 0
 group by place_of_service_code

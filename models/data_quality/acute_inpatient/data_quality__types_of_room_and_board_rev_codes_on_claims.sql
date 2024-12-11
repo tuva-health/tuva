@@ -26,4 +26,5 @@ select
     , behavioral
     , claim_count
     , claim_percent
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from group_by_types_of_rb_claims

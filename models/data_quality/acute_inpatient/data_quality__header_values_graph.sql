@@ -866,184 +866,190 @@ from {{ ref('data_quality__header_values') }}
 where usable_diagnosis_code_1 = 1
 )
 
+, final as (
 
+  select * from missing_bill_type_code
+  union all
+  select * from populated_bill_type_code
+  union all
+  select * from always_valid_bill_type_code
+  union all
+  select * from valid_and_invalid_bill_type_code
+  union all
+  select * from always_invalid_bill_type_code
+  union all
+  select * from undeterminable_bill_type_code
+  union all
+  select * from determinable_bill_type_code
+  union all
+  select * from unique_bill_type_code
+  union all
+  select * from usable_bill_type_code
 
+  union all
 
+  select * from missing_ms_drg_code
+  union all
+  select * from populated_ms_drg_code
+  union all
+  select * from always_valid_ms_drg_code
+  union all
+  select * from valid_and_invalid_ms_drg_code
+  union all
+  select * from always_invalid_ms_drg_code
+  union all
+  select * from undeterminable_ms_drg_code
+  union all
+  select * from determinable_ms_drg_code
+  union all
+  select * from unique_ms_drg_code
+  union all
+  select * from usable_ms_drg_code
 
-select * from missing_bill_type_code
-union all
-select * from populated_bill_type_code
-union all
-select * from always_valid_bill_type_code
-union all
-select * from valid_and_invalid_bill_type_code
-union all
-select * from always_invalid_bill_type_code
-union all
-select * from undeterminable_bill_type_code
-union all
-select * from determinable_bill_type_code
-union all
-select * from unique_bill_type_code
-union all
-select * from usable_bill_type_code
+  union all
 
-union all
+  select * from missing_apr_drg_code
+  union all
+  select * from populated_apr_drg_code
+  union all
+  select * from always_valid_apr_drg_code
+  union all
+  select * from valid_and_invalid_apr_drg_code
+  union all
+  select * from always_invalid_apr_drg_code
+  union all
+  select * from undeterminable_apr_drg_code
+  union all
+  select * from determinable_apr_drg_code
+  union all
+  select * from unique_apr_drg_code
+  union all
+  select * from usable_apr_drg_code
 
-select * from missing_ms_drg_code
-union all
-select * from populated_ms_drg_code
-union all
-select * from always_valid_ms_drg_code
-union all
-select * from valid_and_invalid_ms_drg_code
-union all
-select * from always_invalid_ms_drg_code
-union all
-select * from undeterminable_ms_drg_code
-union all
-select * from determinable_ms_drg_code
-union all
-select * from unique_ms_drg_code
-union all
-select * from usable_ms_drg_code
+  union all
 
-union all
+  select * from missing_admit_type_code
+  union all
+  select * from populated_admit_type_code
+  union all
+  select * from always_valid_admit_type_code
+  union all
+  select * from valid_and_invalid_admit_type_code
+  union all
+  select * from always_invalid_admit_type_code
+  union all
+  select * from undeterminable_admit_type_code
+  union all
+  select * from determinable_admit_type_code
+  union all
+  select * from unique_admit_type_code
+  union all
+  select * from usable_admit_type_code
 
-select * from missing_apr_drg_code
-union all
-select * from populated_apr_drg_code
-union all
-select * from always_valid_apr_drg_code
-union all
-select * from valid_and_invalid_apr_drg_code
-union all
-select * from always_invalid_apr_drg_code
-union all
-select * from undeterminable_apr_drg_code
-union all
-select * from determinable_apr_drg_code
-union all
-select * from unique_apr_drg_code
-union all
-select * from usable_apr_drg_code
+  union all
 
-union all
+  select * from missing_admit_source_code
+  union all
+  select * from populated_admit_source_code
+  union all
+  select * from always_valid_admit_source_code
+  union all
+  select * from valid_and_invalid_admit_source_code
+  union all
+  select * from always_invalid_admit_source_code
+  union all
+  select * from undeterminable_admit_source_code
+  union all
+  select * from determinable_admit_source_code
+  union all
+  select * from unique_admit_source_code
+  union all
+  select * from usable_admit_source_code
 
-select * from missing_admit_type_code
-union all
-select * from populated_admit_type_code
-union all
-select * from always_valid_admit_type_code
-union all
-select * from valid_and_invalid_admit_type_code
-union all
-select * from always_invalid_admit_type_code
-union all
-select * from undeterminable_admit_type_code
-union all
-select * from determinable_admit_type_code
-union all
-select * from unique_admit_type_code
-union all
-select * from usable_admit_type_code
+  union all
 
-union all
+  select * from missing_discharge_disposition_code
+  union all
+  select * from populated_discharge_disposition_code
+  union all
+  select * from always_valid_discharge_disposition_code
+  union all
+  select * from valid_and_invalid_discharge_disposition_code
+  union all
+  select * from always_invalid_discharge_disposition_code
+  union all
+  select * from undeterminable_discharge_disposition_code
+  union all
+  select * from determinable_discharge_disposition_code
+  union all
+  select * from unique_discharge_disposition_code
+  union all
+  select * from usable_discharge_disposition_code
 
-select * from missing_admit_source_code
-union all
-select * from populated_admit_source_code
-union all
-select * from always_valid_admit_source_code
-union all
-select * from valid_and_invalid_admit_source_code
-union all
-select * from always_invalid_admit_source_code
-union all
-select * from undeterminable_admit_source_code
-union all
-select * from determinable_admit_source_code
-union all
-select * from unique_admit_source_code
-union all
-select * from usable_admit_source_code
+  union all
 
-union all
+  select * from missing_diagnosis_code_1_inst
+  union all
+  select * from populated_diagnosis_code_1_inst
+  union all
+  select * from always_valid_diagnosis_code_1_inst
+  union all
+  select * from valid_and_invalid_diagnosis_code_1_inst
+  union all
+  select * from always_invalid_diagnosis_code_1_inst
+  union all
+  select * from undeterminable_diagnosis_code_1_inst
+  union all
+  select * from determinable_diagnosis_code_1_inst
+  union all
+  select * from unique_diagnosis_code_1_inst
+  union all
+  select * from usable_diagnosis_code_1_inst
 
-select * from missing_discharge_disposition_code
-union all
-select * from populated_discharge_disposition_code
-union all
-select * from always_valid_discharge_disposition_code
-union all
-select * from valid_and_invalid_discharge_disposition_code
-union all
-select * from always_invalid_discharge_disposition_code
-union all
-select * from undeterminable_discharge_disposition_code
-union all
-select * from determinable_discharge_disposition_code
-union all
-select * from unique_discharge_disposition_code
-union all
-select * from usable_discharge_disposition_code
+  union all
 
-union all
+  select * from missing_diagnosis_code_1_prof
+  union all
+  select * from populated_diagnosis_code_1_prof
+  union all
+  select * from always_valid_diagnosis_code_1_prof
+  union all
+  select * from valid_and_invalid_diagnosis_code_1_prof
+  union all
+  select * from always_invalid_diagnosis_code_1_prof
+  union all
+  select * from undeterminable_diagnosis_code_1_prof
+  union all
+  select * from determinable_diagnosis_code_1_prof
+  union all
+  select * from unique_diagnosis_code_1_prof
+  union all
+  select * from usable_diagnosis_code_1_prof
 
-select * from missing_diagnosis_code_1_inst
-union all
-select * from populated_diagnosis_code_1_inst
-union all
-select * from always_valid_diagnosis_code_1_inst
-union all
-select * from valid_and_invalid_diagnosis_code_1_inst
-union all
-select * from always_invalid_diagnosis_code_1_inst
-union all
-select * from undeterminable_diagnosis_code_1_inst
-union all
-select * from determinable_diagnosis_code_1_inst
-union all
-select * from unique_diagnosis_code_1_inst
-union all
-select * from usable_diagnosis_code_1_inst
+  union all
 
-union all
+  select * from missing_diagnosis_code_1_all
+  union all
+  select * from populated_diagnosis_code_1_all
+  union all
+  select * from always_valid_diagnosis_code_1_all
+  union all
+  select * from valid_and_invalid_diagnosis_code_1_all
+  union all
+  select * from always_invalid_diagnosis_code_1_all
+  union all
+  select * from undeterminable_diagnosis_code_1_all
+  union all
+  select * from determinable_diagnosis_code_1_all
+  union all
+  select * from unique_diagnosis_code_1_all
+  union all
+  select * from usable_diagnosis_code_1_all
 
-select * from missing_diagnosis_code_1_prof
-union all
-select * from populated_diagnosis_code_1_prof
-union all
-select * from always_valid_diagnosis_code_1_prof
-union all
-select * from valid_and_invalid_diagnosis_code_1_prof
-union all
-select * from always_invalid_diagnosis_code_1_prof
-union all
-select * from undeterminable_diagnosis_code_1_prof
-union all
-select * from determinable_diagnosis_code_1_prof
-union all
-select * from unique_diagnosis_code_1_prof
-union all
-select * from usable_diagnosis_code_1_prof
+)
 
-union all
-
-select * from missing_diagnosis_code_1_all
-union all
-select * from populated_diagnosis_code_1_all
-union all
-select * from always_valid_diagnosis_code_1_all
-union all
-select * from valid_and_invalid_diagnosis_code_1_all
-union all
-select * from always_invalid_diagnosis_code_1_all
-union all
-select * from undeterminable_diagnosis_code_1_all
-union all
-select * from determinable_diagnosis_code_1_all
-union all
-select * from unique_diagnosis_code_1_all
-union all
-select * from usable_diagnosis_code_1_all
+select
+      field
+    , field_value
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from final

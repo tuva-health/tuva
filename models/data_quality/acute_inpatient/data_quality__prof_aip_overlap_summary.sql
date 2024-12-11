@@ -50,27 +50,38 @@ with number_of_encounters_each_prof_claim_overlaps_with as (
 
 )
 
+, final as (
+
+    select
+        'Prof claims overlapping with one encounter' as field
+        , claims_overlapping_with_one_encounter.total as number_of_claims
+        , round(claims_overlapping_with_one_encounter.total * 100.0 / total_usable_aip_professional_claims.total, 1) as percent_of_usable_aip_prof_claims
+    from claims_overlapping_with_one_encounter
+    cross join total_usable_aip_professional_claims
+
+    union all
+
+    select
+        'Prof claims overlapping with multiple encounters' as field
+        , claims_overlapping_with_multiple_encounters.total as number_of_claims
+        , round(claims_overlapping_with_multiple_encounters.total * 100.0 / total_usable_aip_professional_claims.total, 1) as percent_of_usable_aip_prof_claims
+    from claims_overlapping_with_multiple_encounters
+    cross join total_usable_aip_professional_claims
+
+    union all
+
+    select
+        'Prof claims overlapping with no encounters' as field
+        , claims_overlapping_with_no_encounters.total as number_of_claims
+        , round(claims_overlapping_with_no_encounters.total * 100.0 / total_usable_aip_professional_claims.total, 1) as percent_of_usable_aip_prof_claims
+    from claims_overlapping_with_no_encounters
+    cross join total_usable_aip_professional_claims
+
+)
+
 select
-      'Prof claims overlapping with one encounter' as field
-    , claims_overlapping_with_one_encounter.total as number_of_claims
-    , round(claims_overlapping_with_one_encounter.total * 100.0 / total_usable_aip_professional_claims.total, 1) as percent_of_usable_aip_prof_claims
-from claims_overlapping_with_one_encounter
-cross join total_usable_aip_professional_claims
-
-union all
-
-select
-      'Prof claims overlapping with multiple encounters' as field
-    , claims_overlapping_with_multiple_encounters.total as number_of_claims
-    , round(claims_overlapping_with_multiple_encounters.total * 100.0 / total_usable_aip_professional_claims.total, 1) as percent_of_usable_aip_prof_claims
-from claims_overlapping_with_multiple_encounters
-cross join total_usable_aip_professional_claims
-
-union all
-
-select
-      'Prof claims overlapping with no encounters' as field
-    , claims_overlapping_with_no_encounters.total as number_of_claims
-    , round(claims_overlapping_with_no_encounters.total * 100.0 / total_usable_aip_professional_claims.total, 1) as percent_of_usable_aip_prof_claims
-from claims_overlapping_with_no_encounters
-cross join total_usable_aip_professional_claims
+      field
+    , number_of_claims
+    , percent_of_usable_aip_prof_claims
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from final

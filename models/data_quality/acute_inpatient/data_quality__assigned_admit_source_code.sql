@@ -62,5 +62,6 @@ select
       claim_id
     , admit_source_code
     , assignment_method
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from union_of_codes
 

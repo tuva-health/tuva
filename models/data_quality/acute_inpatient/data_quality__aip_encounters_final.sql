@@ -43,6 +43,7 @@ select
       end as has_professional_claims
     , bb.paid_amount as professional_paid_amount
     , (aa.paid_amount + bb.paid_amount) as total_paid_amount
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__aip_encounters_institutional_definition') }} aa
 left join professional_paid_amounts bb
     on aa.encounter_id = bb.encounter_id

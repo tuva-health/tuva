@@ -89,6 +89,17 @@ with add_flags_for_each_relevant_field as (
 
 )
 
-select 
-      *
+select
+      patient_id
+    , encounter_id
+    , dq_problem
+    , multiple_ms_drg_code
+    , multiple_apr_drg_code
+    , multiple_diagnosis_code_1
+    , multiple_admit_type_code
+    , multiple_admit_source_code
+    , multiple_discharge_disposition_code
+    , multiple_facility_npi
+    , multiple_rendering_npi
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_dq_problem_flag

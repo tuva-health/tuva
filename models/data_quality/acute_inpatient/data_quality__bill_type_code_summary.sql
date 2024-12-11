@@ -133,4 +133,5 @@ select
     , undeterminable_bill_type_code
     , usable_bill_type_code
     , assigned_bill_type_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from bill_type_code_summary

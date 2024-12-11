@@ -72,4 +72,5 @@ select
     , merge_end_date
     , usable_merge_dates
     , usable_prof_claim
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_usable_flag

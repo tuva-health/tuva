@@ -54,4 +54,5 @@ select
       claim_id
     , diagnosis_code_1
     , assignment_method
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from union_of_codes

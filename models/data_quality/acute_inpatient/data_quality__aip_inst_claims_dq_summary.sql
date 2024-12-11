@@ -117,90 +117,100 @@ with total_institutional_claims as (
 
 )
 
-select
+, final as (
+    
+    select
       'total # of claims' as field
     , (select * from total_claims) as field_value
 
-union all
+    union all
+
+    select
+        '# inst claims' as field
+        , (select * from total_institutional_claims) as field_value
+
+    union all
+
+    select
+        '# AIP inst claims' as field
+        , (select * from total_aip_inst_claims) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims) / (# inst claims) * 100' as field
+        , round((select * from total_aip_inst_claims) * 100.0 / (select * from total_institutional_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims) / (total # of claims) * 100' as field
+        , round((select * from total_aip_inst_claims) * 100.0 / (select * from total_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# usable AIP inst claims) / (# AIP inst claims) * 100' as field
+        , round((select * from usable_aip_inst_claims) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with DQ problems) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_dq_problem) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable patient_id) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_patient_id) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable merge dates) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_merge_dates) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable diagnosis_code_1) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_diagnosis_code_1) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable ATC) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_atc) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable ASC) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_asc) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable DDC) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_ddc) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable facility_npi) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_facility_npi) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+    union all
+
+    select
+        '(# AIP inst claims with unusable rendering_npi) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_rendering_npi) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+
+)
 
 select
-      '# inst claims' as field
-    , (select * from total_institutional_claims) as field_value
-
-union all
-
-select
-      '# AIP inst claims' as field
-    , (select * from total_aip_inst_claims) as field_value
-
-union all
-
-select
-      '(# AIP inst claims) / (# inst claims) * 100' as field
-    , round((select * from total_aip_inst_claims) * 100.0 / (select * from total_institutional_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims) / (total # of claims) * 100' as field
-    , round((select * from total_aip_inst_claims) * 100.0 / (select * from total_claims), 1) as field_value
-
-union all
-
-select
-      '(# usable AIP inst claims) / (# AIP inst claims) * 100' as field
-    , round((select * from usable_aip_inst_claims) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with DQ problems) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_dq_problem) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable patient_id) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_patient_id) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable merge dates) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_merge_dates) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable diagnosis_code_1) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_diagnosis_code_1) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable ATC) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_atc) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable ASC) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_asc) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable DDC) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_ddc) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable facility_npi) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_facility_npi) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-
-union all
-
-select
-      '(# AIP inst claims with unusable rendering_npi) / (# AIP inst claims) * 100' as field
-    , round((select * from aip_inst_claims_with_unusable_rendering_npi) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+      field
+    , field_value
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from final

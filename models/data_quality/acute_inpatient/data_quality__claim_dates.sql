@@ -146,4 +146,5 @@ SELECT
     , merge_start_date_after_merge_end_date
     , usable_merge_dates
     , dx_date
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 FROM final_dates_table

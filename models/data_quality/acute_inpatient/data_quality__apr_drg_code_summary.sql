@@ -149,4 +149,5 @@ select
     , undeterminable_apr_drg_code
     , usable_apr_drg_code
     , assigned_apr_drg_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from apr_drg_code_summary

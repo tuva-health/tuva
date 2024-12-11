@@ -63,4 +63,5 @@ select
     , occurrences_1
     , ms_drg_code_2
     , occurrences_2
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from determinable

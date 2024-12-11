@@ -107,7 +107,7 @@ select
     , case when rb_bill.claim_id is not null then 1 else 0 end as rb_bill
     , case when drg_bill.claim_id is not null then 1 else 0 end as drg_bill
     , case when rb_drg_bill.claim_id is not null then 1 else 0 end as rb_drg_bill
-
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_distinct_claims aa
 left join rb on aa.claim_id = rb.claim_id
 left join drg on aa.claim_id = drg.claim_id

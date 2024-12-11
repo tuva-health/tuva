@@ -183,4 +183,5 @@ select
       patient_id
     , claim_id
     , encounter_id
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_encounter_id

@@ -54,5 +54,10 @@ with list_of_claims as (
 )
 
 select
-      *
+      claim_id
+    , bill_type_code_1
+    , occurrences_1
+    , bill_type_code_2
+    , occurrences_2
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from determinable

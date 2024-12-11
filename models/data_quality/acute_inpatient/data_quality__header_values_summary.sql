@@ -5,6 +5,7 @@
 select
       field
     , field_value
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__header_values_graph') }}
 where field in (
       'inst claims with usable bill type / total inst claims * 100',

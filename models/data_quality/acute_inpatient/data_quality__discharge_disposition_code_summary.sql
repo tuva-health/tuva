@@ -151,4 +151,5 @@ select
     , undeterminable_discharge_disposition_code
     , usable_discharge_disposition_code
     , assigned_discharge_disposition_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from discharge_disposition_code_summary

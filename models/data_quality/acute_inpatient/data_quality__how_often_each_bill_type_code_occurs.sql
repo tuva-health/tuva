@@ -35,4 +35,5 @@ select
     , bill_type_code
     , occurrences
     , ranking
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_ranking_from_high_to_low_occurrences

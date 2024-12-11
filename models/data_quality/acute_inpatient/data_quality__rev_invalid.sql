@@ -12,6 +12,7 @@ select
           where calculated_claim_type = 'institutional'
         )
         as percent_of_institutional_claims
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__rev_all') }}
 where valid_revenue_center_code = 0
 group by revenue_center_code

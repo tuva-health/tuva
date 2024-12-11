@@ -89,100 +89,111 @@ ten_or_more_pos_codes as (
       where usable_pos_count >= 10
 )
 
+, final as (
+
+      select
+            'Claims with >=1 usable pos code' as field
+      , (select number_of_claims from one_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from one_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=2 usable pos code' as field
+      , (select number_of_claims from two_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from two_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=3 usable pos code' as field
+      , (select number_of_claims from three_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from three_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=4 usable pos code' as field
+      , (select number_of_claims from four_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from four_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=5 usable pos code' as field
+      , (select number_of_claims from five_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from five_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=6 usable pos code' as field
+      , (select number_of_claims from six_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from six_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=7 usable pos code' as field
+      , (select number_of_claims from seven_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from seven_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=8 usable pos code' as field
+      , (select number_of_claims from eight_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from eight_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=9 usable pos code' as field
+      , (select number_of_claims from nine_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from nine_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+      union all
+
+      select
+            'Claims with >=10 usable pos code' as field
+      , (select number_of_claims from ten_or_more_pos_codes) as number_of_claims
+      , round(
+            (select number_of_claims from ten_or_more_pos_codes) * 100.0 /
+            (select total_claims from total_professional_claims), 1
+            ) as percent_of_professional_claims
+
+)
+
 select
-      'Claims with >=1 usable pos code' as field
-    , (select number_of_claims from one_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from one_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=2 usable pos code' as field
-    , (select number_of_claims from two_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from two_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=3 usable pos code' as field
-    , (select number_of_claims from three_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from three_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=4 usable pos code' as field
-    , (select number_of_claims from four_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from four_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=5 usable pos code' as field
-    , (select number_of_claims from five_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from five_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=6 usable pos code' as field
-    , (select number_of_claims from six_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from six_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=7 usable pos code' as field
-    , (select number_of_claims from seven_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from seven_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=8 usable pos code' as field
-    , (select number_of_claims from eight_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from eight_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=9 usable pos code' as field
-    , (select number_of_claims from nine_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from nine_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
-
-union all
-
-select
-      'Claims with >=10 usable pos code' as field
-    , (select number_of_claims from ten_or_more_pos_codes) as number_of_claims
-    , round(
-          (select number_of_claims from ten_or_more_pos_codes) * 100.0 /
-          (select total_claims from total_professional_claims), 1
-      ) as percent_of_professional_claims
+        field
+      , number_of_claims
+      , percent_of_professional_claims
+      , '{{ var('tuva_last_run')}}' as tuva_last_run
+from final

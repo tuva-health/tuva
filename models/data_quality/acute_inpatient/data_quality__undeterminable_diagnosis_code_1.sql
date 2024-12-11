@@ -49,4 +49,5 @@ select
     , occurrences_1
     , diagnosis_code_1_2
     , occurrences_2
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from determinable

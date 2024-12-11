@@ -150,4 +150,5 @@ select
     , undeterminable_ms_drg_code
     , usable_ms_drg_code
     , assigned_ms_drg_code
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from ms_drg_code_summary

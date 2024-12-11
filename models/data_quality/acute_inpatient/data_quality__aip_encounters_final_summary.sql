@@ -135,109 +135,119 @@ with aip_encounters as (
 
 )
 
+, final as (
+
+    select
+        'aip_encounters' as field,
+        (select * from aip_encounters) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_dq_prob) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_dq_problems) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_dx1) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_unusable_dx1) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_atc) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_unusable_atc) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_asc) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_unusable_asc) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_ddc) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_unusable_ddc) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_facility_npi) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_unusable_facility_npi) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_rendering_npi) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_unusable_rendering_npi) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(single_inst_claim_aip_encounters) / (aip_encounters) * 100' as field,
+        round((select * from single_inst_claim_aip_encounters) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(multiple_inst_claim_aip_encounters) / (aip_encounters) * 100' as field,
+        round((select * from multiple_inst_claim_aip_encounters) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_prof_claims) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_prof_claims) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_without_prof_claims) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_without_prof_claims) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        '(spend_from_prof_claims) / (total_spend_on_aip_encounters_with_prof_claims) * 100' as field,
+        round((select * from spend_from_prof_claims) * 1.0 /
+        (select * from total_spend_on_aip_encounters_with_prof_claims), 1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_death) / (aip_encounters) * 100' as field,
+        round((select * from aip_encounters_with_death) * 100.0 /
+        (select * from aip_encounters), 1) as field_value
+
+    union all
+
+    select
+        'average_los' as field,
+        (select * from average_los) as field_value
+
+    union all
+
+    select
+        'average_total_paid_amount' as field,
+        (select * from average_total_paid_amount) as field_value
+
+)
+
 select
-    'aip_encounters' as field,
-    (select * from aip_encounters) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_dq_prob) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_dq_problems) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_unusable_dx1) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_unusable_dx1) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_unusable_atc) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_unusable_atc) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_unusable_asc) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_unusable_asc) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_unusable_ddc) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_unusable_ddc) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_unusable_facility_npi) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_unusable_facility_npi) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_unusable_rendering_npi) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_unusable_rendering_npi) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(single_inst_claim_aip_encounters) / (aip_encounters) * 100' as field,
-    round((select * from single_inst_claim_aip_encounters) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(multiple_inst_claim_aip_encounters) / (aip_encounters) * 100' as field,
-    round((select * from multiple_inst_claim_aip_encounters) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_prof_claims) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_prof_claims) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_without_prof_claims) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_without_prof_claims) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    '(spend_from_prof_claims) / (total_spend_on_aip_encounters_with_prof_claims) * 100' as field,
-    round((select * from spend_from_prof_claims) * 1.0 /
-    (select * from total_spend_on_aip_encounters_with_prof_claims), 1) as field_value
-
-union all
-
-select
-    '(aip_encounters_with_death) / (aip_encounters) * 100' as field,
-    round((select * from aip_encounters_with_death) * 100.0 /
-    (select * from aip_encounters), 1) as field_value
-
-union all
-
-select
-    'average_los' as field,
-    (select * from average_los) as field_value
-
-union all
-
-select
-    'average_total_paid_amount' as field,
-    (select * from average_total_paid_amount) as field_value
+      field
+    , field_value
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from final

@@ -3,7 +3,8 @@
 ) }}
 
 select distinct 
-    claim_id 
+      claim_id 
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__header_values') }}
 where 
     usable_bill_type_code = 1 
