@@ -7,7 +7,7 @@
 with numeric_hcpcs as (
     select *
     from {{ ref('service_category__stg_medical_claim') }} as med
-    {% if target.type == 'duckdb' %}
+    {% if target.type in ('duckdb', 'databricks')  %}
         where try_cast('hcpcs_code' as integer) is not null
     {% else %}
         where {{ safe_cast('hcpcs_code', 'int')}} is not null
