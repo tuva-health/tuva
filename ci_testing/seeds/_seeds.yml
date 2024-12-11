@@ -456,13 +456,14 @@ seeds:
         allowed_amount: float
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-          
 
   - name: provider_attribution_seed
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
+      enabled: |
+        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
