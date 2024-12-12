@@ -17,6 +17,8 @@ with conditions as (
           person_id
         , condition_code
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_eligible_conditions') }}
 
 )
@@ -41,6 +43,8 @@ with conditions as (
           conditions.person_id
         , conditions.condition_code
         , conditions.payment_year
+        , conditions.collection_start_date
+        , conditions.collection_end_date
         , 'CMS-HCC-V24' as model_version
         , cast(seed_hcc_mapping.cms_hcc_v24 as {{ dbt.type_string() }}) as hcc_code
     from conditions
@@ -57,6 +61,8 @@ with conditions as (
           conditions.person_id
         , conditions.condition_code
         , conditions.payment_year
+        , conditions.collection_start_date
+        , conditions.collection_end_date
         , 'CMS-HCC-V28' as model_version
         , cast(seed_hcc_mapping.cms_hcc_v28 as {{ dbt.type_string() }}) as hcc_code
     from conditions
@@ -83,6 +89,8 @@ with conditions as (
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from unioned
 
 )
@@ -93,5 +101,7 @@ select
     , hcc_code
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

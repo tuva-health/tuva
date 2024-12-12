@@ -14,6 +14,8 @@ with demographics as (
         , institutional_status
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_demographic_factors') }}
 
 )
@@ -41,6 +43,9 @@ with demographics as (
           person_id
         , hcc_code
         , model_version
+        , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
 
 )
@@ -56,11 +61,15 @@ with demographics as (
         , demographics.institutional_status
         , demographics.model_version
         , demographics.payment_year
+        , demographics.collection_start_date
+        , demographics.collection_end_date
         , count(hcc_hierarchy.hcc_code) as hcc_count
     from demographics
         inner join hcc_hierarchy
             on demographics.person_id = hcc_hierarchy.person_id
             and demographics.model_version = hcc_hierarchy.model_version
+            and demographics.payment_year = hcc_hierarchy.payment_year
+            and demographics.collection_end_date = hcc_hierarchy.collection_end_date
     group by
           demographics.person_id
         , demographics.enrollment_status
@@ -70,6 +79,8 @@ with demographics as (
         , demographics.institutional_status
         , demographics.model_version
         , demographics.payment_year
+        , demographics.collection_start_date
+        , demographics.collection_end_date
 
 )
 
@@ -84,6 +95,8 @@ with demographics as (
         , institutional_status
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
         , case
             when hcc_count >= 10 then '>=10'
             else cast(hcc_count as {{ dbt.type_string() }})
@@ -98,6 +111,8 @@ with demographics as (
           hcc_counts_normalized.person_id
         , hcc_counts_normalized.model_version
         , hcc_counts_normalized.payment_year
+        , hcc_counts_normalized.collection_start_date
+        , hcc_counts_normalized.collection_end_date
         , seed_payment_hcc_count_factors.factor_type
         , seed_payment_hcc_count_factors.description
         , seed_payment_hcc_count_factors.coefficient
@@ -122,6 +137,8 @@ with demographics as (
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from hcc_counts
 
 )
@@ -133,5 +150,7 @@ select
     , factor_type
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

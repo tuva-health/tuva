@@ -16,6 +16,8 @@ with demographics as (
         , institutional_status
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_demographic_factors') }}
 
 )
@@ -26,6 +28,9 @@ with demographics as (
           person_id
         , hcc_code
         , model_version
+        , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_hcc_hierarchy') }}
 
 )
@@ -60,11 +65,15 @@ with demographics as (
         , demographics.institutional_status
         , demographics.model_version
         , demographics.payment_year
+        , demographics.collection_start_date
+        , demographics.collection_end_date
         , hcc_hierarchy.hcc_code
     from demographics
         inner join hcc_hierarchy
             on demographics.person_id = hcc_hierarchy.person_id
             and demographics.model_version = hcc_hierarchy.model_version
+            and demographics.payment_year = hcc_hierarchy.payment_year
+            and demographics.collection_end_date = hcc_hierarchy.collection_end_date
 
 )
 
@@ -74,6 +83,8 @@ with demographics as (
           demographics_with_hccs.person_id
         , demographics_with_hccs.model_version
         , demographics_with_hccs.payment_year
+        , demographics_with_hccs.collection_start_date
+        , demographics_with_hccs.collection_end_date
         , interactions_code_1.factor_type
         , interactions_code_1.description
         , interactions_code_1.hcc_code_1
@@ -102,11 +113,15 @@ with demographics as (
         , demographics_with_interactions.coefficient
         , demographics_with_interactions.model_version
         , demographics_with_interactions.payment_year
+        , demographics_with_interactions.collection_start_date
+        , demographics_with_interactions.collection_end_date
     from demographics_with_interactions
         inner join demographics_with_hccs as interactions_code_2
             on demographics_with_interactions.person_id = interactions_code_2.person_id
             and demographics_with_interactions.hcc_code_2 = interactions_code_2.hcc_code
             and demographics_with_interactions.model_version = interactions_code_2.model_version
+            and demographics_with_interactions.payment_year = interactions_code_2.payment_year
+            and demographics_with_interactions.collection_end_date = interactions_code_2.collection_end_date
 )
 
 , add_data_types as (
@@ -120,6 +135,8 @@ with demographics as (
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from disease_interactions
 
 )
@@ -133,5 +150,7 @@ select
     , factor_type
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types
