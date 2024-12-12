@@ -371,6 +371,46 @@ models:
     tags:
       - data_quality_aip
     materialized: table
+  description: >
+    The purpose of this table is to list all relevant dates for medical claims: 
+    claim_start_date, claim_end_date, admission_date, discharge_date, claim_line_start_date, and claim_line_end_date. 
+    The table is at the claim line grain, so there is one row in this table for each line in the input layer medical claim table. 
+    Dates that are not valid (i.e. not from the calendar table) are replaced by null values in this table.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: claim_line_number
+      description: The claim_line_number given in the input layer.
+    - name: claim_start_date
+      description: The claim_start_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_end_date
+      description: The claim_end_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: admission_date
+      description: The admission_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: discharge_date
+      description: The discharge_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_line_start_date
+      description: The claim_line_start_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_line_end_date
+      description: The claim_line_end_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: merge_start_date
+      description: >
+        The merge_start_date for this claim, calculated as the earliest valid date among
+        admission_date, claim_start_date, or claim_line_start_date. It is either valid or null.
+    - name: merge_end_date
+      description: >
+        The merge_end_date for this claim, calculated as the latest valid date among
+        discharge_date, claim_end_date, or claim_line_end_date. It is either valid or null.
+    - name: merge_start_date_after_merge_end_date
+      description: 0 or 1 flag. Has value of 1 if the merge_start_date is greater than the merge_end_date.
+    - name: usable_merge_dates
+      description: 0 or 1 flag. Has value of 1 if both merge_start_date and merge_end_date are valid and merge_start_date <= merge_end_date.
+    - name: dx_date
+      description: >
+        The date assigned to diagnosis codes for this claim, calculated as the latest valid date among
+        claim_end_date, claim_start_date, discharge_date, admission_date, claim_line_end_date, or claim_line_start_date.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
 
 - name: data_quality__claim_grain_calculated_dates
   config:
@@ -381,6 +421,30 @@ models:
     tags:
       - data_quality_aip
     materialized: table
+  description: >
+    This model lists useful calculated dates at the claim grain. The table contains one row per claim_id 
+      and includes calculated start and end dates for potential claim merging and diagnosis date assignment.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: merge_start_date
+      description: >
+        The merge_start_date for this claim, calculated as the earliest valid date among 
+        admission_date, claim_start_date, or claim_line_start_date. It is either valid or null.
+    - name: merge_end_date
+      description: >
+        The merge_end_date for this claim, calculated as the latest valid date among 
+        discharge_date, claim_end_date, or claim_line_end_date. It is either valid or null.
+    - name: merge_start_date_after_merge_end_date
+      description: 0 or 1 flag. Has value of 1 if the merge_start_date is greater than the merge_end_date.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: dx_date
+      description: The date we assign to diagnosis codes present on this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
 
 - name: data_quality__claim_type
   config:
@@ -981,3 +1045,171 @@ models:
     tags:
       - data_quality_aip
     materialized: table
+  description: >
+    The purpose of this table is to determine if several of the fields in the input layer medical claim table have valid values, 
+    i.e. values from terminology. This table is at the claim line grain (there is one row for every row in the input layer 
+    medical_claim table). For each row in the medical_claim table we list fields for which we want to check if there is a 
+    valid value from terminology, together with a flag that checks if the field is valid.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: claim_line_number
+      description: The claim_line_number given in the input layer.
+    - name: bill_type_code
+      description: The value of bill_type_code that is populated for this claim line.
+    - name: valid_bill_type_code
+      description: 0 or 1 flag. Has value of 1 if the value of bill_type_code for this claim line is from terminology.
+    - name: ms_drg_code
+      description: The value of ms_drg_code that is populated for this claim line.
+    - name: valid_ms_drg_code
+      description: 0 or 1 flag. Has value of 1 if the value of ms_drg_code for this claim line is from terminology.
+    - name: apr_drg_code
+      description: The value of apr_drg_code that is populated for this claim line.
+    - name: valid_apr_drg_code
+      description: 0 or 1 flag. Has value of 1 if the value of apr_drg_code for this claim line is from terminology.
+    - name: admit_type_code
+      description: The value of admit_type_code that is populated for this claim line.
+    - name: valid_admit_type_code
+      description: 0 or 1 flag. Has value of 1 if the value of admit_type_code for this claim line is from terminology.
+    - name: admit_source_code
+      description: The value of admit_source_code that is populated for this claim line.
+    - name: valid_admit_source_code
+      description: 0 or 1 flag. Has value of 1 if the value of admit_source_code for this claim line is from terminology.
+    - name: discharge_disposition_code
+      description: The value of discharge_disposition_code that is populated for this claim line.
+    - name: valid_discharge_disposition_code
+      description: 0 or 1 flag. Has value of 1 if the value of discharge_disposition_code for this claim line is from terminology.
+    - name: revenue_center_code
+      description: The value of revenue_center_code that is populated for this claim line.
+    - name: valid_revenue_center_code
+      description: 0 or 1 flag. Has value of 1 if the value of revenue_center_code for this claim line is from terminology.
+    - name: place_of_service_code
+      description: The value of place_of_service_code that is populated for this claim line.
+    - name: valid_place_of_service_code
+      description: 0 or 1 flag. Has value of 1 if the value of place_of_service_code for this claim line is from terminology.
+    - name: admission_date
+      description: The value of admission_date that is populated for this claim line.
+    - name: valid_admission_date
+      description: 0 or 1 flag. Has value of 1 if the value of admission_date for this claim line is from the calendar table.
+    - name: discharge_date
+      description: The value of discharge_date that is populated for this claim line.
+    - name: valid_discharge_date
+      description: 0 or 1 flag. Has value of 1 if the value of discharge_date for this claim line is from the calendar table.
+    - name: claim_start_date
+      description: The value of claim_start_date that is populated for this claim line.
+    - name: valid_claim_start_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_start_date for this claim line is from the calendar table.
+    - name: claim_end_date
+      description: The value of claim_end_date that is populated for this claim line.
+    - name: valid_claim_end_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_end_date for this claim line is from the calendar table.
+    - name: claim_line_start_date
+      description: The value of claim_line_start_date that is populated for this claim line.
+    - name: valid_claim_line_start_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_line_start_date for this claim line is from the calendar table.
+    - name: claim_line_end_date
+      description: The value of claim_line_end_date that is populated for this claim line.
+    - name: valid_claim_line_end_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_line_end_date for this claim line is from the calendar table.
+    - name: diagnosis_code_1
+      description: The value of diagnosis_code_1 that is populated for this claim line.
+    - name: valid_diagnosis_code_1
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_1 for this claim line is from terminology.
+    - name: diagnosis_code_2
+      description: The value of diagnosis_code_2 that is populated for this claim line.
+    - name: valid_diagnosis_code_2
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_2 for this claim line is from terminology.
+    - name: diagnosis_code_3
+      description: The value of diagnosis_code_3 that is populated for this claim line.
+    - name: valid_diagnosis_code_3
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_3 for this claim line is from terminology.
+    - name: diagnosis_code_4
+      description: The value of diagnosis_code_4 that is populated for this claim line.
+    - name: valid_diagnosis_code_4
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_4 for this claim line is from terminology.
+    - name: diagnosis_code_5
+      description: The value of diagnosis_code_5 that is populated for this claim line.
+    - name: valid_diagnosis_code_5
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_5 for this claim line is from terminology.
+    - name: diagnosis_code_6
+      description: The value of diagnosis_code_6 that is populated for this claim line.
+    - name: valid_diagnosis_code_6
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_6 for this claim line is from terminology.
+    - name: diagnosis_code_7
+      description: The value of diagnosis_code_7 that is populated for this claim line.
+    - name: valid_diagnosis_code_7
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_7 for this claim line is from terminology.
+    - name: diagnosis_code_8
+      description: The value of diagnosis_code_8 that is populated for this claim line.
+    - name: valid_diagnosis_code_8
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_8 for this claim line is from terminology.
+    - name: diagnosis_code_9
+      description: The value of diagnosis_code_9 that is populated for this claim line.
+    - name: valid_diagnosis_code_9
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_9 for this claim line is from terminology.
+    - name: diagnosis_code_10
+      description: The value of diagnosis_code_10 that is populated for this claim line.
+    - name: valid_diagnosis_code_10
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_10 for this claim line is from terminology.
+    - name: diagnosis_code_11
+      description: The value of diagnosis_code_11 that is populated for this claim line.
+    - name: valid_diagnosis_code_11
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_11 for this claim line is from terminology.
+    - name: diagnosis_code_12
+      description: The value of diagnosis_code_12 that is populated for this claim line.
+    - name: valid_diagnosis_code_12
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_12 for this claim line is from terminology.
+    - name: diagnosis_code_13
+      description: The value of diagnosis_code_13 that is populated for this claim line.
+    - name: valid_diagnosis_code_13
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_13 for this claim line is from terminology.
+    - name: diagnosis_code_14
+      description: The value of diagnosis_code_14 that is populated for this claim line.
+    - name: valid_diagnosis_code_14
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_14 for this claim line is from terminology.
+    - name: diagnosis_code_15
+      description: The value of diagnosis_code_15 that is populated for this claim line.
+    - name: valid_diagnosis_code_15
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_15 for this claim line is from terminology.
+    - name: diagnosis_code_16
+      description: The value of diagnosis_code_16 that is populated for this claim line.
+    - name: valid_diagnosis_code_16
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_16 for this claim line is from terminology.
+    - name: diagnosis_code_17
+      description: The value of diagnosis_code_17 that is populated for this claim line.
+    - name: valid_diagnosis_code_17
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_17 for this claim line is from terminology.
+    - name: diagnosis_code_18
+      description: The value of diagnosis_code_18 that is populated for this claim line.
+    - name: valid_diagnosis_code_18
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_18 for this claim line is from terminology.
+    - name: diagnosis_code_19
+      description: The value of diagnosis_code_19 that is populated for this claim line.
+    - name: valid_diagnosis_code_19
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_19 for this claim line is from terminology.
+    - name: diagnosis_code_20
+      description: The value of diagnosis_code_20 that is populated for this claim line.
+    - name: valid_diagnosis_code_20
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_20 for this claim line is from terminology.
+    - name: diagnosis_code_21
+      description: The value of diagnosis_code_21 that is populated for this claim line.
+    - name: valid_diagnosis_code_21
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_21 for this claim line is from terminology.
+    - name: diagnosis_code_22
+      description: The value of diagnosis_code_22 that is populated for this claim line.
+    - name: valid_diagnosis_code_22
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_22 for this claim line is from terminology.
+    - name: diagnosis_code_23
+      description: The value of diagnosis_code_23 that is populated for this claim line.
+    - name: valid_diagnosis_code_23
+      description: 0 or 1 flag. Has value o````````````````````````````````````````````````````````````````````````````````````````````````````````f 1 if the value of diagnosis_code_23 for this claim line is from terminology.
+    - name: diagnosis_code_24
+      description: The value of diagnosis_code_24 that is populated for this claim line.
+    - name: valid_diagnosis_code_24
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_24 for this claim line is from terminology.
+    - name: diagnosis_code_25
+      description: The value of diagnosis_code_25 that is populated for this claim line.
+    - name: valid_diagnosis_code_25
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_25 for this claim line is from terminology.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
