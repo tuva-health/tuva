@@ -9,17 +9,7 @@ with union_measures as (
     {{ dbt_utils.union_relations(
 
         relations=[
-              ref('quality_measures__int_nqf2372_long')
-            , ref('quality_measures__int_nqf0034_long')
-            , ref('quality_measures__int_nqf0059_long')
-            , ref('quality_measures__int_cqm236_long')
-            , ref('quality_measures__int_nqf0053_long')
-            , ref('quality_measures__int_cbe0055_long')
-            , ref('quality_measures__int_nqf0097_long')
-            , ref('quality_measures__int_cqm438_long')
-            , ref('quality_measures__int_nqf0041_long')
-            , ref('quality_measures__int_cbe0101_long')
-            , ref('quality_measures__int_cqm48_long')
+              ref('quality_measures__int_cqm438_long')
             , ref('quality_measures__int_cqm130_long')
             , ref('quality_measures__int_nqf0420_long')
             , ref('quality_measures__int_adh_diabetes_long')
