@@ -28,7 +28,7 @@ with medical_claims as (
           claim_id
         , claim_line_number
         , claim_type
-        , patient_id
+        , person_id
         , claim_start_date
         , claim_end_date
         , bill_type_code
@@ -41,7 +41,7 @@ with medical_claims as (
 
     select
           claim_id
-        , patient_id
+        , person_id
         , code
     from {{ ref('cms_hcc__stg_core__condition') }}
     where code_type = 'icd-10-cm'
@@ -60,10 +60,10 @@ with medical_claims as (
 , professional_claims as (
 
     select
-        medical_claims.claim_id
+          medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
-        , medical_claims.patient_id
+        , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
@@ -84,10 +84,10 @@ with medical_claims as (
 , inpatient_claims as (
 
     select
-        medical_claims.claim_id
+          medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
-        , medical_claims.patient_id
+        , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
@@ -106,10 +106,10 @@ with medical_claims as (
 , outpatient_claims as (
 
     select
-        medical_claims.claim_id
+          medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
-        , medical_claims.patient_id
+        , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
@@ -142,7 +142,7 @@ with medical_claims as (
 
     select distinct
           eligible_claims.claim_id
-        , eligible_claims.patient_id
+        , eligible_claims.person_id
         , eligible_claims.payment_year
         , eligible_claims.collection_start_date
         , eligible_claims.collection_end_date
@@ -150,14 +150,14 @@ with medical_claims as (
     from eligible_claims
         inner join conditions
             on eligible_claims.claim_id = conditions.claim_id
-            and eligible_claims.patient_id = conditions.patient_id
+            and eligible_claims.person_id = conditions.person_id
 
 )
 
 , add_data_types as (
 
     select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
@@ -167,7 +167,7 @@ with medical_claims as (
 )
 
 select
-      patient_id
+      person_id
     , condition_code
     , payment_year
     , collection_start_date

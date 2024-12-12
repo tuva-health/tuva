@@ -10,7 +10,6 @@ select * from {{ ref('lab_result_seed') }}
 
 {%- else -%}
 
-
 select * from {{ source('source_input', 'lab_result') }}
 
 {%- endif %}

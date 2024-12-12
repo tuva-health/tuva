@@ -7,7 +7,7 @@
 select
     encounter_id
     , encounter_type
-    , patient_id
+    , person_id
     , encounter_end_date
     , facility_id
     , primary_diagnosis_code_type

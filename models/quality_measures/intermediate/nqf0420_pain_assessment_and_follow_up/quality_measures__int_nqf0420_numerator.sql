@@ -6,7 +6,7 @@
 with denominator as (
 
     select 
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -32,7 +32,7 @@ with denominator as (
 , procedures as (
 
     select
-        patient_id
+        person_id
       , procedure_date
       , coalesce (
               normalized_code_type
@@ -53,7 +53,7 @@ with denominator as (
 , pain_assessment_procedures as (
 
     select 
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date as evidence_date
     from procedures
     inner join pain_assessment_code
@@ -65,7 +65,7 @@ with denominator as (
 , pain_assessment_claims as (
 
     select
-          patient_id
+          person_id
         , coalesce(claim_end_date, claim_start_date) as evidence_date
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
     inner join pain_assessment_code
@@ -77,14 +77,14 @@ with denominator as (
 , time_unbounded_qualifying_patients as (
 
     select
-          patient_id
+          person_id
         , evidence_date
     from pain_assessment_procedures
     
     union all
 
     select
-          patient_id
+          person_id
         , evidence_date
     from pain_assessment_claims
 
@@ -93,7 +93,7 @@ with denominator as (
 , qualifying_patients_with_denominator as (
 
     select 
-          time_unbounded_qualifying_patients.patient_id
+          time_unbounded_qualifying_patients.person_id
         , time_unbounded_qualifying_patients.evidence_date
         , denominator.performance_period_begin
         , denominator.performance_period_end
@@ -103,7 +103,7 @@ with denominator as (
         , 1 as numerator_flag
     from time_unbounded_qualifying_patients
     inner join denominator
-        on time_unbounded_qualifying_patients.patient_id = denominator.patient_id
+        on time_unbounded_qualifying_patients.person_id = denominator.person_id
             and time_unbounded_qualifying_patients.evidence_date between
                 denominator.performance_period_begin and denominator.performance_period_end
 
@@ -112,7 +112,7 @@ with denominator as (
 , add_data_types as (
 
      select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -126,7 +126,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

@@ -6,7 +6,7 @@
 
 {% if var('use_synthetic_data') == true -%}
 
-select
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 cast(null as {{ dbt.type_string() }} ) as location_id
 , cast(null as {{ dbt.type_string() }} ) as npi
 , cast(null as {{ dbt.type_string() }} ) as name

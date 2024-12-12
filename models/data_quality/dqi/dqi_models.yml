@@ -350,12 +350,12 @@ models:
     materialized: table
 
 
-- name: data_quality__eligibility_patient_id
+- name: data_quality__eligibility_person_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: eligibility_patient_id
+    alias: eligibility_person_id
     tags:
       - data_quality
     materialized: table
@@ -629,12 +629,12 @@ models:
     materialized: table
 
 
-- name: data_quality__claim_patient_id
+- name: data_quality__claim_person_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: claim_patient_id
+    alias: claim_person_id
     tags:
       - data_quality
     materialized: table
@@ -1229,12 +1229,12 @@ models:
     materialized: table
 
 
-- name: data_quality__pharmacy_patient_id
+- name: data_quality__pharmacy_person_id
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: pharmacy_patient_id
+    alias: pharmacy_person_id
     tags:
       - data_quality
     materialized: table

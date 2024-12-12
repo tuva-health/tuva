@@ -18,7 +18,7 @@ with eligibility_spans as(
             "'-'",
             quote_column('plan'),
         ]) }} as eligibility_span_id
-        , patient_id
+        , person_id
         , birth_date
         , gender
     from {{ ref('eligibility') }}
@@ -66,12 +66,12 @@ with eligibility_spans as(
 , multiple_birth_date as(
     select
     'Patient has multiple birthdays' as data_quality_check
-    , count(distinct patient_id) as result_count
+    , count(distinct person_id) as result_count
     from(
         select
-            patient_id
+            person_id
             , birth_date
-            , rank() over (partition by patient_id, birth_date order by birth_date) as rank_birth_date
+            , rank() over (partition by person_id, birth_date order by birth_date) as rank_birth_date
         from eligibility_spans e
         where birth_date is not null
     )x

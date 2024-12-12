@@ -6,7 +6,7 @@
 with lab_result as (
 
     select
-          patient_id
+          person_id
         , data_source
         , code_type
         , code
@@ -31,7 +31,7 @@ with lab_result as (
 , egfr_labs as (
 
     select distinct
-          lab_result.patient_id
+          lab_result.person_id
         , lab_result.data_source
         , lab_result.code_type
         , lab_result.code
@@ -49,7 +49,7 @@ with lab_result as (
 , numeric_egfr_labs as (
 
     select
-          patient_id
+          person_id
         , data_source
         , code_type
         , code
@@ -68,7 +68,7 @@ with lab_result as (
 , clean_non_numeric_egfr_labs as (
 
     select
-          patient_id
+          person_id
         , data_source
         , code_type
         , code
@@ -95,7 +95,7 @@ with lab_result as (
 , unioned_labs as (
 
     select
-          patient_id
+          person_id
         , data_source
         , code_type
         , code
@@ -106,7 +106,7 @@ with lab_result as (
     union all
 
     select
-          patient_id
+          person_id
         , data_source
         , code_type
         , code
@@ -120,7 +120,7 @@ with lab_result as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(code_type as {{ dbt.type_string() }}) as code_type
         , cast(code as {{ dbt.type_string() }}) as code
@@ -131,7 +131,7 @@ with lab_result as (
 )
 
 select
-      patient_id
+      person_id
     , data_source
     , code_type
     , code

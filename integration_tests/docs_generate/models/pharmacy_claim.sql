@@ -1,7 +1,7 @@
 select
       claim_id
     , claim_line_number
-    , patient_id
+    , person_id
     , member_id
     , payer
     , plan

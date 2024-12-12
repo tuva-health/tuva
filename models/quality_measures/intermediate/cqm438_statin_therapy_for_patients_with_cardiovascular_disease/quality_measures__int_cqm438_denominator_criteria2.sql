@@ -20,7 +20,7 @@ with cholesterol_codes as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , encounter_id
         , recorded_date
@@ -35,7 +35,7 @@ with cholesterol_codes as (
 , cholesterol_conditions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date as evidence_date
     from conditions
     inner join cholesterol_codes
@@ -47,7 +47,7 @@ with cholesterol_codes as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -68,7 +68,7 @@ with cholesterol_codes as (
 , cholesterol_procedures as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date as evidence_date
     from procedures
          inner join cholesterol_codes
@@ -80,7 +80,7 @@ with cholesterol_codes as (
 , labs as (
 
     select
-          patient_id
+          person_id
         , result
         , result_date
         , collection_date
@@ -95,11 +95,11 @@ with cholesterol_codes as (
 , cholesterol_tests_with_result as (
 
     select
-      labs.patient_id
+      labs.person_id
     , labs.result as evidence_value
     , coalesce(collection_date, result_date) as evidence_date
     , cholesterol_codes.concept_name
-    , row_number() over(partition by labs.patient_id order by
+    , row_number() over(partition by labs.person_id order by
                           labs.result desc
                         , result_date desc) as rn
     from labs
@@ -118,7 +118,7 @@ with cholesterol_codes as (
 , cholesterol_labs as (
 
     select
-          patient_id
+          person_id
         , evidence_date
     from cholesterol_tests_with_result
     where rn= 1
@@ -129,21 +129,21 @@ with cholesterol_codes as (
 , all_patients_with_cholesterol as (
 
     select
-          cholesterol_conditions.patient_id
+          cholesterol_conditions.person_id
         , cholesterol_conditions.evidence_date
     from cholesterol_conditions
 
     union all
 
     select
-          cholesterol_procedures.patient_id
+          cholesterol_procedures.person_id
         , cholesterol_procedures.evidence_date
     from cholesterol_procedures
 
     union all
 
     select
-          cholesterol_labs.patient_id
+          cholesterol_labs.person_id
         , cholesterol_labs.evidence_date
     from cholesterol_labs
 
@@ -153,7 +153,7 @@ with cholesterol_codes as (
 
     select
         distinct
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -168,7 +168,7 @@ with cholesterol_codes as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -179,7 +179,7 @@ with cholesterol_codes as (
 )
 
 select
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

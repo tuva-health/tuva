@@ -7,7 +7,7 @@ with cte as (
         'input_layer' as source
       , 'eligibility' as table_name
       , count(*) as row_count
-      , count(distinct patient_id) as unique_check
+      , count(distinct person_id) as unique_check
       , 'Unique Patient Count' as unique_check_desc
       , 2 as table_order
     from {{ ref('eligibility') }}

@@ -4,7 +4,7 @@
 }}
 
 select
-      patient_id
+      person_id
     , v24_risk_score
     , v28_risk_score
     , blended_risk_score

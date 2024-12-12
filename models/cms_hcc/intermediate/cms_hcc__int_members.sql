@@ -18,7 +18,7 @@ Jinja is used to set payment year variable.
 with stg_eligibility as (
 
     select
-          elig.patient_id
+          elig.person_id
         , elig.enrollment_start_date
         , elig.enrollment_end_date
         , elig.original_reason_entitlement_code
@@ -30,7 +30,7 @@ with stg_eligibility as (
         , dates.collection_end_date
         , {{ dbt.concat(['dates.payment_year', "'-12-31'"]) }} as payment_year_end_date
         , row_number() over(
-            partition by elig.patient_id, dates.collection_end_date
+            partition by elig.person_id, dates.collection_end_date
             order by elig.enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
     from {{ ref('cms_hcc__stg_core__eligibility') }} as elig
@@ -53,7 +53,7 @@ with stg_eligibility as (
 , stg_patient as (
 
     select
-          patient.patient_id
+          patient.person_id
         , patient.sex
         , patient.birth_date
         , dates.payment_year
@@ -68,7 +68,7 @@ with stg_eligibility as (
 , cap_collection_start_end_dates as (
 
     select
-          patient_id
+          person_id
         , enrollment_start_date
         , enrollment_end_date
         , payment_year
@@ -85,18 +85,18 @@ with stg_eligibility as (
             else enrollment_end_date
           end as proxy_enrollment_end_date
     from stg_eligibility
-    
+
 )
 
 , calculate_prior_coverage as (
 
-    select patient_id
+    select person_id
         , payment_year
         , collection_end_date
         , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
         , min({{ datediff('collection_start_date', 'collection_end_date', 'month') }} + 1) as collection_months
     from cap_collection_start_end_dates
-    group by patient_id
+    group by person_id
         , payment_year
         , collection_end_date
 
@@ -109,7 +109,7 @@ with stg_eligibility as (
 , add_enrollment as (
 
     select
-          patient_id
+          person_id
         , payment_year
         , collection_end_date
         , case
@@ -123,7 +123,7 @@ with stg_eligibility as (
 , latest_eligibility as (
 
     select
-          stg_eligibility.patient_id
+          stg_eligibility.person_id
         , stg_eligibility.payment_year
         , stg_eligibility.collection_start_date
         , stg_eligibility.collection_end_date
@@ -150,11 +150,11 @@ with stg_eligibility as (
         {% endif %}
     from stg_eligibility
         left join add_enrollment
-            on stg_eligibility.patient_id = add_enrollment.patient_id
+            on stg_eligibility.person_id = add_enrollment.person_id
             and stg_eligibility.payment_year = add_enrollment.payment_year
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left join stg_patient
-            on stg_eligibility.patient_id = stg_patient.patient_id
+            on stg_eligibility.person_id = stg_patient.person_id
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
 
@@ -163,7 +163,7 @@ with stg_eligibility as (
 , add_age_group as (
 
     select
-          patient_id
+          person_id
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -211,7 +211,7 @@ with stg_eligibility as (
 , add_status_logic as (
 
     select
-          patient_id
+          person_id
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -282,7 +282,7 @@ with stg_eligibility as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(gender as {{ dbt.type_string() }}) as gender
         , cast(age_group as {{ dbt.type_string() }}) as age_group
@@ -309,7 +309,7 @@ with stg_eligibility as (
 )
 
 select
-      patient_id
+      person_id
     , enrollment_status
     , gender
     , age_group

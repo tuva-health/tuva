@@ -9,7 +9,7 @@ select
 	cast(med.claim_id as {{ dbt.type_string() }} ) as claim_id
 	, cast(med.claim_line_number as int ) as claim_line_number
 	, cast(med.claim_type as {{ dbt.type_string() }} ) as claim_type
-	, cast(med.patient_id as {{ dbt.type_string() }} ) as patient_id
+	, cast(med.person_id as {{ dbt.type_string() }} ) as person_id
 	, cast(med.member_id as {{ dbt.type_string() }} ) as member_id
 	, cast(med.payer as {{ dbt.type_string() }} ) as payer
     , cast(med.{{ quote_column('plan') }} as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}

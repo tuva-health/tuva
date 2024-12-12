@@ -6,7 +6,7 @@
 with demographics as (
 
     select
-          patient_id
+          person_id
         , enrollment_status
         , gender
         , age_group
@@ -25,7 +25,7 @@ with demographics as (
 , hcc_hierarchy as (
 
     select
-          patient_id
+          person_id
         , hcc_code
         , model_version
         , payment_year
@@ -55,7 +55,7 @@ with demographics as (
 , demographics_with_hccs as (
 
     select
-          demographics.patient_id
+          demographics.person_id
         , demographics.enrollment_status
         , demographics.gender
         , demographics.age_group
@@ -70,7 +70,7 @@ with demographics as (
         , hcc_hierarchy.hcc_code
     from demographics
         inner join hcc_hierarchy
-            on demographics.patient_id = hcc_hierarchy.patient_id
+            on demographics.person_id = hcc_hierarchy.person_id
             and demographics.model_version = hcc_hierarchy.model_version
             and demographics.payment_year = hcc_hierarchy.payment_year
             and demographics.collection_end_date = hcc_hierarchy.collection_end_date
@@ -80,7 +80,7 @@ with demographics as (
 , disease_factors as (
 
     select
-          demographics_with_hccs.patient_id
+          demographics_with_hccs.person_id
         , demographics_with_hccs.hcc_code
         , demographics_with_hccs.model_version
         , demographics_with_hccs.payment_year
@@ -104,7 +104,7 @@ with demographics as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(description as {{ dbt.type_string() }}) as hcc_description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
@@ -118,7 +118,7 @@ with demographics as (
 )
 
 select
-      patient_id
+      person_id
     , hcc_code
     , hcc_description
     , coefficient

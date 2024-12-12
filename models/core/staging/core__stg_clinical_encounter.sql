@@ -5,7 +5,7 @@
 
 select
     cast(encounter_id as {{ dbt.type_string() }}) as encounter_id
-  , cast(patient_id as {{ dbt.type_string() }}) as patient_id
+  , cast(person_id as {{ dbt.type_string() }} ) as person_id
   , cast(encounter_type as {{ dbt.type_string() }}) as encounter_type
   , cast('clinical' as {{ dbt.type_string() }}) as encounter_group
   , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date

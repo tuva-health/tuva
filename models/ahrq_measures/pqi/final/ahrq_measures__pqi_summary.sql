@@ -7,7 +7,7 @@ select p.pqi_number
  , e.year_number
  , e.encounter_id
  , e.data_source
- , e.patient_id
+ , e.person_id
  , e.facility_id
  , e.ms_drg_code
  , e.ms_drg_description

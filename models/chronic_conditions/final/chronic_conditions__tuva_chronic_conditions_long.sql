@@ -5,7 +5,7 @@
 
 with all_conditions as (
 select 
-  patient_id,
+  person_id,
   normalized_code,
   recorded_date
     from {{ ref('tuva_chronic_conditions__stg_core__condition') }}
@@ -14,18 +14,18 @@ select
 
 conditions_with_first_and_last_diagnosis_date as (
 select 
-  patient_id,
+  person_id,
   normalized_code as icd_10_cm,
   min(recorded_date) as first_diagnosis_date,
   max(recorded_date) as last_diagnosis_date
 from all_conditions
-group by patient_id, normalized_code
+group by person_id, normalized_code
 
 )
 
 
 select
-  aa.patient_id,
+  aa.person_id,
   bb.concept_name as condition,
   min(first_diagnosis_date) as first_diagnosis_date,
   max(last_diagnosis_date) as last_diagnosis_date,
@@ -33,4 +33,4 @@ select
 from conditions_with_first_and_last_diagnosis_date aa
 inner join {{ ref('clinical_concept_library__value_set_member_relevant_fields') }} bb
 on aa.icd_10_cm = bb.code
-group by aa.patient_id, bb.concept_name
+group by aa.person_id, bb.concept_name

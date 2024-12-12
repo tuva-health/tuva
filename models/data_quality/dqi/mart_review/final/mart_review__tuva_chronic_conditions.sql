@@ -6,41 +6,41 @@
 
 with cte as (
     select distinct
-        patient_id
+        person_id
     from {{ ref('chronic_conditions__tuva_chronic_conditions_long')}}
 )
 
 , patientxwalk as (
     select distinct
-        patient_id
+        person_id
       , data_source
     from {{ ref('core__patient')}}
 )
 
 , result as (
     select
-        l.patient_id
+        l.person_id
       , p.data_source
       , l.condition
     from {{ ref('chronic_conditions__tuva_chronic_conditions_long')}} as l
     inner join patientxwalk as p
-      on l.patient_id = p.patient_id
+      on l.person_id = p.person_id
 
     union all
 
     select
-        p.patient_id
+        p.person_id
       , p.data_source
       , 'No Chronic Conditions' as condition
     from {{ ref('core__patient')}} as p
     left join cte
-      on p.patient_id = cte.patient_id
-    where cte.patient_id is null
+      on p.person_id = cte.person_id
+    where cte.person_id is null
 )
 
 select *
    , {{ dbt.concat([
-        'patient_id',
+        'person_id',
         "'|'",
         'data_source']) }} as patient_source_key
     , '{{ var('tuva_last_run')}}' as tuva_last_run

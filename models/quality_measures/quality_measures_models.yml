@@ -60,8 +60,8 @@ models:
       Each row represents the results a measure per patient. A null for the 
       denominator indicates that the patient was not eligible for that measure.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -125,8 +125,8 @@ models:
       with flags for each measure. The false flags can be treated as care gaps
       as exclusions have been included in the pivot logic.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: cqm_438
         description: >
           Performance flag for CQM438, Statin Therapy for the Prevention and 
@@ -233,8 +233,8 @@ models:
     description: >
       Subset of denominator logic for submission of criteria 1 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -258,8 +258,8 @@ models:
     description: >
       Subset of denominator logic for submission of criteria 2 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -283,8 +283,8 @@ models:
     description: >
       Subset of denominator logic for submission of criteria 3 of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -308,8 +308,8 @@ models:
     description: >
       Denominator logic for submission of the reporting version of Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: age
         description: Patient's age as of performance_period_begin date.
       - name: performance_period_begin
@@ -339,8 +339,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -366,8 +366,8 @@ models:
     description: >
       Final preparation of the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -418,8 +418,8 @@ models:
     description: >
       Numerator logic for the reporting version of CQM 438, Statin Therapy for the Prevention and Treatment of Cardiovascular Disease
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -465,8 +465,8 @@ models:
     description: >
       Denominator logic for the reporting version of Documentation of Current Medications in the Medical Record.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: age
         description: Patient's age during latest encounter in the performance period.
       - name: procedure_encounter_date
@@ -500,8 +500,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of CQM 130, Documentation of Current Medications in the Medical Record.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -527,8 +527,8 @@ models:
     description: >
       Final preparation of the reporting version of CQM 130, Documentation of Current Medications in the Medical Record before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -579,8 +579,8 @@ models:
     description: >
       Numerator logic for the reporting version of CQM 130, Documentation of Current Medications in the Medical Record.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -626,8 +626,8 @@ models:
     description: >
       Denominator logic for the reporting version of NQF 0420, Pain Assessment and Follow-Up.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: age
         description: Patient's age during latest encounter in the performance period.
       - name: performance_period_begin
@@ -657,8 +657,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of NQF 0420, Pain Assessment and Follow-Up.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -684,8 +684,8 @@ models:
     description: >
       Final preparation of the reporting version of NQF 0420, Pain Assessment and Follow-Up before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -736,8 +736,8 @@ models:
     description: >
       Numerator logic for the reporting version of NQF 0420, Pain Assessment and Follow-Up.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: performance_period_begin
         description: Beginning date of the performance or measurement period.
       - name: performance_period_end
@@ -783,8 +783,8 @@ models:
     description: >
       Denominator logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: age
         description: Patient's age during latest encounter in the performance period.
       - name: dispensing_date
@@ -822,8 +822,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -849,8 +849,8 @@ models:
     description: >
       Final preparation of the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -901,8 +901,8 @@ models:
     description: >
       Numerator logic for the reporting version of ADH-Diabetes, Medication Adherence for Diabetes Medications.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -941,8 +941,8 @@ models:
     description: >
       Denominator logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: dispensing_date
         description: Date the prescription was filled.
       - name: first_dispensing_date
@@ -978,8 +978,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -1005,8 +1005,8 @@ models:
     description: >
       Final preparation of the reporting version of ADH-RAS, Medication Adherence for Hypertension before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -1057,8 +1057,8 @@ models:
     description: >
       Numerator logic for the reporting version of ADH-RAS, Medication Adherence for Hypertension
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1097,8 +1097,8 @@ models:
     description: >
       Denominator logic for the reporting version of SUPD, Statin Use in Persons with Diabetes
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: age
         description: Patient's age as of the performance_period_begin date.
       - name: performance_period_begin
@@ -1128,8 +1128,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of SUPD, Statin Use in Persons with Diabetes
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -1155,8 +1155,8 @@ models:
     description: >
       Final preparation of the reporting version of SUPD, Statin Use in Persons with Diabetes before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -1207,8 +1207,8 @@ models:
     description: >
       Numerator logic for the reporting version of SUPD, Statin Use in Persons with Diabetes
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1244,8 +1244,8 @@ models:
     description: >
       Denominator logic for the reporting version of ADH-Statins, Medication Adherence for Cholesterol
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: dispensing_date
         description: Date the prescription was filled.
       - name: first_dispensing_date
@@ -1281,8 +1281,8 @@ models:
     description: >
       Combined exclusion logic for the reporting version of ADH-Statins, Medication Adherence for Cholesterol
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: exclusion_date
         description: >
           Date of event or service that excludes patient from the measure.
@@ -1308,8 +1308,8 @@ models:
     description: >
       Final preparation of the reporting version of ADH-Statins, Medication Adherence for Cholesterol before combining with other measures.
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: denominator_flag
         description: >
           The denominator is associated with a given patient population that 
@@ -1360,8 +1360,8 @@ models:
     description: >
       Numerator logic for the reporting version of ADH-Statins, Medication Adherence for Cholesterol
     columns:
-      - name: patient_id
-        description: Unique patient_id for each person.
+      - name: person_id
+        description: Unique person_id for each person.
       - name: evidence_date
         description: >
           Date of event or service that places patient in the numerator.
@@ -1389,7 +1389,7 @@ models:
       materialized: ephemeral
     description: Staging conditions from core.
     columns:
-      - name: patient_id
+      - name: person_id
         tests:
           - not_null:
               severity: warn
@@ -1410,7 +1410,7 @@ models:
     description: >
       Staging encounters from core. Creates an empty table if using claims only.
     columns:
-      - name: patient_id
+      - name: person_id
         tests:
           - not_null:
               severity: warn
@@ -1429,7 +1429,7 @@ models:
     description: >
       Staging medications from core. Creates an empty table if using claims only.
     columns:
-      - name: patient_id
+      - name: person_id
         tests:
           - not_null:
               severity: warn
@@ -1450,7 +1450,7 @@ models:
     description: >
       Staging medications from core. Creates an empty table if using claims only.
     columns:
-      - name: patient_id
+      - name: person_id
         tests:
           - not_null:
               severity: warn
@@ -1470,7 +1470,7 @@ models:
       materialized: ephemeral
     description: Staging eligibility from the input layer.
     columns:
-      - name: patient_id
+      - name: person_id
         tests:
           - not_null:
               severity: warn
@@ -1497,7 +1497,7 @@ models:
       materialized: ephemeral
     description: Staging procedures from core.
     columns:
-      - name: patient_id
+      - name: person_id
         tests:
           - not_null:
               severity: warn
@@ -1524,7 +1524,7 @@ models:
       Staging medical claims from the input layer. Creates an empty table if 
       using clinical only.
     columns:
-      - name: patient_id
+      - name: person_id
       - name: claim_start_date
       - name: claim_end_date
       - name: place_of_service
@@ -1547,7 +1547,7 @@ models:
       Staging pharmacy claims from the input layer. Creates an empty table if 
       using clinical only.
     columns:
-      - name: patient_id
+      - name: person_id
       - name: dispensing_date
       - name: ndc_code
       - name: days_supply
@@ -1566,7 +1566,7 @@ models:
       Staging lab results from the input layer. Creates an empty table if 
       using claims only.
     columns:
-      - name: patient_id
+      - name: person_id
       - name: result_date
       - name: collection_date
       - name: source_code_type

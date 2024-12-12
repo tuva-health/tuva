@@ -45,7 +45,7 @@ SELECT
         "e.discharge_disposition_description"
     ]) }} as discharge_code_and_description,
     {{ dbt.concat([
-        "e.patient_id",
+        "e.person_id",
         "'|'",
         "e.data_source"
     ]) }} as patient_source_key,

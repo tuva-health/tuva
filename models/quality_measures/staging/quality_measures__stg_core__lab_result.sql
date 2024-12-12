@@ -6,7 +6,7 @@
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , result
     , result_date
     , collection_date
@@ -20,7 +20,7 @@ from {{ ref('core__lab_result') }}
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , result
     , result_date
     , collection_date
@@ -35,7 +35,7 @@ from {{ ref('core__lab_result') }}
 
 {% if target.type == 'fabric' %}
     select top 0
-      cast(null as {{ dbt.type_string() }} ) as patient_id
+      cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as result
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
     ,  {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date
@@ -46,7 +46,7 @@ from {{ ref('core__lab_result') }}
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 {% else %}
     select
-      cast(null as {{ dbt.type_string() }} ) as patient_id
+      cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as result
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
     ,  {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date

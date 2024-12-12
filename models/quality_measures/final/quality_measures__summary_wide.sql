@@ -10,7 +10,7 @@
 with measures_long as (
 
         select
-          patient_id
+          person_id
         , denominator_flag
         , numerator_flag
         , exclusion_flag
@@ -23,7 +23,7 @@ with measures_long as (
 , cqm_438 as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'CQM438'
@@ -33,7 +33,7 @@ with measures_long as (
 , cqm_130 as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'CQM130'
@@ -43,7 +43,7 @@ with measures_long as (
 , nqf_0420 as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'NQF0420'
@@ -53,7 +53,7 @@ with measures_long as (
 , adh_diabetes as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'ADH-Diabetes'
@@ -63,7 +63,7 @@ with measures_long as (
 , adh_ras as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'ADH-RAS'
@@ -73,7 +73,7 @@ with measures_long as (
 , supd as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'SUPD'
@@ -83,7 +83,7 @@ with measures_long as (
 , adh_statins as (
 
     select
-          patient_id
+          person_id
         , performance_flag
     from measures_long
     where measure_id = 'ADH-Statins'
@@ -93,7 +93,7 @@ with measures_long as (
 , joined as (
 
     select
-          measures_long.patient_id
+          measures_long.person_id
         , max(cqm_438.performance_flag) as cqm_438
         , max(cqm_130.performance_flag) as cqm_130
         , max(nqf_0420.performance_flag) as nqf_0420
@@ -103,27 +103,27 @@ with measures_long as (
         , max(adh_statins.performance_flag) as adh_statins
     from measures_long
         left join cqm_438
-            on measures_long.patient_id = cqm_438.patient_id
+            on measures_long.person_id = cqm_438.person_id
         left join cqm_130
-            on measures_long.patient_id = cqm_130.patient_id
+            on measures_long.person_id = cqm_130.person_id
         left join nqf_0420
-            on measures_long.patient_id = nqf_0420.patient_id
+            on measures_long.person_id = nqf_0420.person_id
         left join adh_diabetes
-            on measures_long.patient_id = adh_diabetes.patient_id
+            on measures_long.person_id = adh_diabetes.person_id
         left join adh_ras
-            on measures_long.patient_id = adh_ras.patient_id
+            on measures_long.person_id = adh_ras.person_id
         left join supd
-            on measures_long.patient_id = supd.patient_id
+            on measures_long.person_id = supd.person_id
         left join adh_statins
-            on measures_long.patient_id = adh_statins.patient_id
-    group by measures_long.patient_id
+            on measures_long.person_id = adh_statins.person_id
+    group by measures_long.person_id
 
 )
 
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(cqm_438 as integer) as cqm_438
         , cast(cqm_130 as integer) as cqm_130
         , cast(nqf_0420 as integer) as nqf_0420
@@ -136,7 +136,7 @@ with measures_long as (
 )
 
 select
-      patient_id
+      person_id
     , adh_diabetes
     , adh_ras
     , adh_statins
