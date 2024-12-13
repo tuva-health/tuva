@@ -92,6 +92,16 @@ models:
       - data_quality_aip
     materialized: table
 
+- name: data_quality__aip_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
 - name: data_quality__aip_encounter_id
   config:
     schema: |
@@ -158,6 +168,16 @@ models:
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
         {% else %}data_quality{%- endif -%}
     alias: aip_multiple_claim_encounter_fields
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_multiple_claim_encounters_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounters_dq_summary
     tags:
       - data_quality_aip
     materialized: table
