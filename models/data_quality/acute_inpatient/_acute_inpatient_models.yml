@@ -696,6 +696,26 @@ models:
       - data_quality_aip
     materialized: table
 
+- name: data_quality__pk_at_input_layer_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_at_input_layer_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__pk_at_input_layer
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_at_input_layer
+    tags:
+      - data_quality_aip
+    materialized: table
+
 - name: data_quality__pos_all
   config:
     schema: |

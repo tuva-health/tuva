@@ -7,7 +7,7 @@ with all_aip_inst_claims as (
     select
           claim_id
     from {{ ref('data_quality__aip_venn_diagram') }}
-    where rb_drg_bill = 1
+    where (drg = 1 or bill = 1)
 
 )
 
