@@ -300,8 +300,8 @@ with final_cte as (
           35 as rank_id
         , '(valid rev codes) / (all rev codes) * 100' as field
         , round(
-            (select count(*) from {{ ref('data_quality__rev_all') }} where valid_revenue_center_code = 1) * 100.0 /
-            (select count(*) from {{ ref('data_quality__rev_all') }}),
+            (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__rev_all') }} where valid_revenue_center_code = 1) * 100.0 /
+            (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__rev_all') }}),
             1
           ) as field_value
 
@@ -757,14 +757,14 @@ with final_cte as (
     select
           87 as rank_id
         , 'Total AIP inst claims' as field
-        , (select count(*) from {{ ref('data_quality__acute_inpatient_institutional_claims') }}) as field_value
+        , (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__acute_inpatient_institutional_claims') }}) as field_value
 
     union all
 
     select
           88 as rank_id
         , 'Usable AIP inst claims' as field
-        , (select count(*) from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
+        , (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
           where usable_for_aip_encounter = 1) as field_value
 
     union all
@@ -772,21 +772,21 @@ with final_cte as (
     select
           89 as rank_id
         , 'AIP inst claims that make up single-claim encounters' as field
-        , (select count(*) from {{ ref('data_quality__aip_single_claim_encounters') }}) as field_value
+        , (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__aip_single_claim_encounters') }}) as field_value
 
     union all
 
     select
           90 as rank_id
         , 'AIP inst claims that make up multi-claim encounters' as field
-        , (select count(*) from {{ ref('data_quality__aip_multiple_claim_encounters') }}) as field_value
+        , (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__aip_multiple_claim_encounters') }}) as field_value
 
     union all
 
     select
           91 as rank_id
         , 'AIP encounters made up of multiple inst claims' as field
-        , (select count(*) from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}) as field_value
+        , (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}) as field_value
 
     union all
 
@@ -822,10 +822,10 @@ with final_cte as (
           96 as rank_id
         , '(valid pos codes) / (all pos codes) * 100' as field
         , round(
-            (select count(*) from {{ ref('data_quality__pos_all') }}
+            (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__pos_all') }}
             where calculated_claim_type = 'professional' 
             and valid_place_of_service_code = 1) * 100.0 /
-            (select count(*) from {{ ref('data_quality__pos_all') }}
+            (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__pos_all') }}
             where calculated_claim_type = 'professional'),
             1) as field_value
 
