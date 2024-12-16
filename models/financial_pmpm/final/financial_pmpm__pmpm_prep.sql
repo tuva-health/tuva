@@ -5,11 +5,19 @@
 
 with combine as (
   select
-      a.patient_id
+      a.person_id
     , a.year_month
     , a.payer
     , a.{{ quote_column('plan') }}
     , a.data_source
+    , a.payer_attributed_provider
+    , a.payer_attributed_provider_practice
+    , a.payer_attributed_provider_organization
+    , a.payer_attributed_provider_lob
+    , a.custom_attributed_provider
+    , a.custom_attributed_provider_practice
+    , a.custom_attributed_provider_organization
+    , a.custom_attributed_provider_lob
 
     -- service cat 1 paid
     , coalesce(b.inpatient_paid, 0) as inpatient_paid
@@ -91,22 +99,22 @@ with combine as (
 
   from {{ ref('core__member_months') }} as a
   left join {{ ref('financial_pmpm__service_category_1_paid_pivot') }} as b
-    on a.patient_id = b.patient_id
+    on a.person_id = b.person_id
     and a.year_month = b.year_month
     and a.payer = b.payer
     and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
   left join {{ ref('financial_pmpm__service_category_2_paid_pivot') }} as c
-    on a.patient_id = c.patient_id
+    on a.person_id = c.person_id
     and a.year_month = c.year_month
     and a.payer = c.payer
     and a.{{ quote_column('plan') }} = c.{{ quote_column('plan') }}
   left join {{ ref('financial_pmpm__service_category_1_allowed_pivot') }} as d
-    on a.patient_id = d.patient_id
+    on a.person_id = d.person_id
     and a.year_month = d.year_month
     and a.payer = d.payer
     and a.{{ quote_column('plan') }} = d.{{ quote_column('plan') }}
   left join {{ ref('financial_pmpm__service_category_2_allowed_pivot') }} as e
-    on a.patient_id = e.patient_id
+    on a.person_id = e.person_id
     and a.year_month = e.year_month
     and a.payer = e.payer
     and a.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}

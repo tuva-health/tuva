@@ -9,7 +9,7 @@
 
 select
     cast(encounter_id as {{ dbt.type_string() }}) as encounter_id,
-    cast(patient_id as {{ dbt.type_string() }}) as patient_id,
+    cast(person_id as {{ dbt.type_string() }}) as person_id,
     cast(encounter_start_date as date) as admit_date,
     cast(encounter_end_date as date) as discharge_date,
     cast(discharge_disposition_code as {{ dbt.type_string() }}) as discharge_disposition_code,

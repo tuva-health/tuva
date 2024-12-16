@@ -5,7 +5,7 @@
 
 
 SELECT
-    patient_id
+    person_id
     , claim_id
     , claim_line_number
     , claim_start_date

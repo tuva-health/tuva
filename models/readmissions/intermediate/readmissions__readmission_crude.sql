@@ -12,7 +12,7 @@
 with encounter_info as (
 select
     enc.encounter_id,
-    enc.patient_id,
+    enc.person_id,
     enc.admit_date,
     enc.discharge_date
 from {{ ref('readmissions__encounter') }} enc
@@ -33,11 +33,11 @@ and over_a.encounter_id_A is null and over_b.encounter_id_B is null
 encounter_sequence as (
 select
     encounter_id,
-    patient_id,
+    person_id,
     admit_date,
     discharge_date,
     row_number() over(
-        partition by patient_id order by admit_date, discharge_date
+        partition by person_id order by admit_date, discharge_date
     ) as encounter_seq
 from encounter_info
 ),
@@ -46,7 +46,7 @@ from encounter_info
 readmission_calc as (
 select
     aa.encounter_id,
-    aa.patient_id,
+    aa.person_id,
     aa.admit_date,
     aa.discharge_date,
     case
@@ -59,7 +59,7 @@ select
 	else 0
     end as readmit_30_flag
 from encounter_sequence aa left join encounter_sequence bb
-     on aa.patient_id = bb.patient_id
+     on aa.person_id = bb.person_id
      and aa.encounter_seq + 1 = bb.encounter_seq
 )
 

@@ -5,7 +5,7 @@
 
 with claims_with_service_categories as (
   select
-      patient_id
+      person_id
     , payer
     , {{ quote_column('plan') }}
     , service_category_1
@@ -19,7 +19,7 @@ with claims_with_service_categories as (
 
 , medical_claims_year_month as (
   select
-      patient_id
+      person_id
     , payer
     , {{ quote_column('plan') }}
     , service_category_1
@@ -36,7 +36,7 @@ with claims_with_service_categories as (
 
 , rx_claims as (
   select
-      patient_id
+      person_id
     , payer
     , {{ quote_column('plan') }}
     , 'pharmacy' as service_category_1
@@ -50,7 +50,7 @@ with claims_with_service_categories as (
 
 , rx_claims_year_month as (
   select
-      patient_id
+      person_id
     , payer
     , {{ quote_column('plan') }}
     , service_category_1
@@ -76,7 +76,7 @@ from rx_claims_year_month
 )
 
 select
-    patient_id
+    person_id
   , year_month
   , payer
   , {{ quote_column('plan') }}
@@ -88,7 +88,7 @@ select
   , '{{ var('tuva_last_run')}}' as tuva_last_run
   from combine_medical_and_rx
 group by
-    patient_id
+    person_id
   , year_month
   , payer
   , {{ quote_column('plan') }}

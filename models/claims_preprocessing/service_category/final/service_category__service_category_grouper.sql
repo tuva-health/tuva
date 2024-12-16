@@ -100,10 +100,10 @@ with service_category_1_mapping as(
         , service_category_1
         , service_category_2
         , service_category_3
-        ,original_service_cat_2
-        ,original_service_cat_3
+        , original_service_cat_2
+        , original_service_cat_3
         , source_model_name
-        , row_number() over (partition by claim_id, claim_line_number order by priority) as duplicate_row_number
+        , row_number() over (partition by claim_id, claim_line_number order by coalesce(priority,99999)) as duplicate_row_number
     from service_category_1_mapping
 )
 

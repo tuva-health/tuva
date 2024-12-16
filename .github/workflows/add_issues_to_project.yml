@@ -1,0 +1,19 @@
+name: add_issues_to_project
+
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request:
+    types: [opened, reopened]
+    branches: [main]
+
+jobs:
+  add-to-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          # setting the project url so this workflow can be used in other repos
+          project-url: https://github.com/orgs/tuva-health/projects/3
+          github-token: ${{ secrets.PROJECT_TOKEN }}

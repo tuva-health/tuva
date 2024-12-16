@@ -3,13 +3,9 @@
    )
 }}
 
--- *************************************************
--- This dbt model creates the patient table in core.
--- *************************************************
-
 with patient_stage as(
     select
-        patient_id
+        person_id
         ,first_name
         ,last_name
         ,gender
@@ -25,7 +21,7 @@ with patient_stage as(
         ,phone
         ,data_source
         ,row_number() over (
-	        partition by patient_id
+	        partition by person_id
 	        order by case when enrollment_end_date is null
                 then cast ('2050-01-01' as date)
                 else enrollment_end_date end DESC)
@@ -36,7 +32,7 @@ with patient_stage as(
 )
 
 select
-    cast(patient_id as {{ dbt.type_string() }}) as patient_id
+    cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(first_name as {{ dbt.type_string() }}) as first_name
     , cast(last_name as {{ dbt.type_string() }}) as last_name
     , cast(gender as {{ dbt.type_string() }}) as sex
@@ -52,6 +48,7 @@ select
     , cast(null as {{ dbt.type_string() }}) as county
     , cast(null as {{ dbt.type_float() }}) as latitude 
     , cast(null as {{ dbt.type_float() }}) as longitude
+    , cast(phone as {{ dbt.type_string() }}) as phone
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }} ) as age
     , cast(

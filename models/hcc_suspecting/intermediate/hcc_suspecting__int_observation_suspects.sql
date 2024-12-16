@@ -6,7 +6,7 @@
 with conditions as (
 
     select
-          patient_id
+          person_id
         , recorded_date
         , condition_type
         , code_type
@@ -19,7 +19,7 @@ with conditions as (
 , observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , result
         , code_type
@@ -32,9 +32,9 @@ with conditions as (
 , numeric_observations as (
 
     select
-          patient_id
+          person_id
         , observation_date
-        {% if target.type == 'fabric' %}
+        {% if target.type == 'fabric' or target.type == 'duckdb' %}
          , TRY_CAST(result AS {{ dbt.type_numeric() }}) AS result
         {% else %}
         , CAST(result AS {{ dbt.type_numeric() }}) AS result
@@ -74,7 +74,7 @@ with conditions as (
 , billed_hccs as (
 
     select distinct
-          patient_id
+          person_id
         , data_source
         , hcc_code
         , current_year_billed
@@ -85,7 +85,7 @@ with conditions as (
 , depression_assessment as (
 
     select
-          numeric_observations.patient_id
+          numeric_observations.person_id
         , numeric_observations.observation_date
         , numeric_observations.result
         , numeric_observations.code_type
@@ -103,7 +103,7 @@ with conditions as (
 , diabetes as (
 
      select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -121,7 +121,7 @@ with conditions as (
 , hypertension as (
 
      select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -139,7 +139,7 @@ with conditions as (
 , obstructive_sleep_apnea as (
 
      select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code_type
@@ -158,7 +158,7 @@ with conditions as (
 , bmi_over_30_with_osa as (
 
     select
-          numeric_observations.patient_id
+          numeric_observations.person_id
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -172,7 +172,7 @@ with conditions as (
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
         inner join obstructive_sleep_apnea
-            on numeric_observations.patient_id = obstructive_sleep_apnea.patient_id
+            on numeric_observations.person_id = obstructive_sleep_apnea.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'obstructive_sleep_apnea.recorded_date') }}
         inner join seed_hcc_descriptions
@@ -185,7 +185,7 @@ with conditions as (
 , bmi_over_35_with_diabetes as (
 
     select
-          numeric_observations.patient_id
+          numeric_observations.person_id
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -199,7 +199,7 @@ with conditions as (
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
         inner join diabetes
-            on numeric_observations.patient_id = diabetes.patient_id
+            on numeric_observations.person_id = diabetes.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'diabetes.recorded_date') }}
         inner join seed_hcc_descriptions
@@ -212,7 +212,7 @@ with conditions as (
 , bmi_over_35_with_hypertension as (
 
     select
-          numeric_observations.patient_id
+          numeric_observations.person_id
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -226,7 +226,7 @@ with conditions as (
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
         inner join hypertension
-            on numeric_observations.patient_id = hypertension.patient_id
+            on numeric_observations.person_id = hypertension.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'hypertension.recorded_date') }}
         inner join seed_hcc_descriptions
@@ -239,7 +239,7 @@ with conditions as (
 , bmi_over_40 as (
 
     select
-          numeric_observations.patient_id
+          numeric_observations.person_id
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
@@ -274,7 +274,7 @@ with conditions as (
 , hcc_48_suspect as (
 
     select
-          patient_id
+          person_id
         , data_source
         , observation_date
         , observation_result
@@ -311,7 +311,7 @@ with conditions as (
 , eligible_depression_assessments as (
 
     select
-          depression_assessment.patient_id
+          depression_assessment.person_id
         , depression_assessment.observation_date
         , depression_assessment.result
         , depression_assessment.code_type
@@ -320,7 +320,7 @@ with conditions as (
         , depression_assessment.concept_name
         , row_number() over (
             partition by
-                  depression_assessment.patient_id
+                  depression_assessment.person_id
                 , depression_assessment.data_source
             order by
                 case when depression_assessment.observation_date is null then 1 else 0 end,
@@ -333,7 +333,7 @@ with conditions as (
 , depression_assessments_ordered as (
 
     select
-          patient_id
+          person_id
         , observation_date
         , code_type
         , code
@@ -342,7 +342,7 @@ with conditions as (
         , result
         , row_number() over (
             partition by
-                  patient_id
+                  person_id
                 , data_source
             --order by result desc nulls last
             order by
@@ -357,7 +357,7 @@ with conditions as (
 , hcc_155_suspect as (
 
     select
-          depression_assessments_ordered.patient_id
+          depression_assessments_ordered.person_id
         , depression_assessments_ordered.data_source
         , depression_assessments_ordered.observation_date
         , depression_assessments_ordered.result as observation_result
@@ -392,7 +392,7 @@ with conditions as (
 , add_billed_flag as (
 
     select
-          unioned.patient_id
+          unioned.person_id
         , unioned.data_source
         , unioned.observation_date
         , unioned.observation_result
@@ -405,7 +405,7 @@ with conditions as (
         , billed_hccs.current_year_billed
     from unioned
         left join billed_hccs
-            on unioned.patient_id = billed_hccs.patient_id
+            on unioned.person_id = billed_hccs.person_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
 
@@ -414,7 +414,7 @@ with conditions as (
 , add_standard_fields as (
 
     select
-          patient_id
+          person_id
         , data_source
         , observation_date
         , observation_result
@@ -434,7 +434,7 @@ with conditions as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(observation_date as date) as observation_date
         , cast(observation_result as {{ dbt.type_string() }}) as observation_result
@@ -456,7 +456,7 @@ with conditions as (
 )
 
 select
-      patient_id
+      person_id
     , data_source
     , observation_date
     , observation_result

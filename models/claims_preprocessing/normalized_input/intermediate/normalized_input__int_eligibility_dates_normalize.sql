@@ -6,15 +6,15 @@
 
 
 select distinct
-    elig.patient_id
+    elig.person_id
   , {{ dbt.concat([
-        "elig.patient_id",
+        "elig.person_id",
         "coalesce(elig.data_source,'')",
         "coalesce(elig.payer,'')",
         "coalesce(elig." ~ quote_column('plan') ~ ",'')",
         "coalesce(cast(elig.enrollment_start_date as " ~ dbt.type_string() ~ "),'')",
         "coalesce(cast(elig.enrollment_end_date as " ~ dbt.type_string() ~ "),'')"
-    ]) }} as patient_id_key
+    ]) }} as person_id_key
   , cal_dob.full_date as normalized_birth_date
   , cal_death.full_date as normalized_death_date
   , cal_enroll_start.full_date as normalized_enrollment_start_date

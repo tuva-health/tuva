@@ -6,27 +6,24 @@
 
 
 with all_conditions as (
-   {% if var('clinical_enabled'
-   , var('tuva_marts_enabled'
-   , False)) == true and var('claims_enabled'
-   , var('tuva_marts_enabled'
-   , False)) == true -%}
+{% if var('clinical_enabled', var('tuva_marts_enabled', False)) == true
+    and var('claims_enabled', var('tuva_marts_enabled', False)) == true -%}
 
-select *
-from {{ ref('core__stg_claims_condition') }}
-union all
-select *
-from {{ ref('core__stg_clinical_condition') }}
+    select *
+    from {{ ref('core__stg_claims_condition') }}
+    union all
+    select *
+    from {{ ref('core__stg_clinical_condition') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select *
-from {{ ref('core__stg_clinical_condition') }}
+    select *
+    from {{ ref('core__stg_clinical_condition') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select *
-from {{ ref('core__stg_claims_condition') }}
+    select *
+    from {{ ref('core__stg_claims_condition') }}
 
 {%- endif %}
 )
@@ -36,6 +33,8 @@ from {{ ref('core__stg_claims_condition') }}
 {% if var('enable_normalize_engine',false) != true %}
 select
     all_conditions.condition_id
+  , all_conditions.person_id
+  , all_conditions.member_id
   , all_conditions.patient_id
   , all_conditions.encounter_id
   , all_conditions.claim_id
@@ -90,6 +89,8 @@ left join {{ ref('terminology__snomed_ct') }} snomed_ct
 {% else %}
 select
     all_conditions.condition_id
+  , all_conditions.person_id
+  , all_conditions.member_id
   , all_conditions.patient_id
   , all_conditions.encounter_id
   , all_conditions.claim_id

@@ -4,7 +4,7 @@
 }}
 
 select
-    patient_id
+    person_id
     , enrollment_start_date
     , enrollment_end_date
     , payer

@@ -4,7 +4,7 @@
 }}
 
 select
-      e.patient_id
+      e.person_id
     , e.birth_date
     , e.gender
     , e.race
@@ -12,6 +12,6 @@ select
     , row_number() over (partition by d.patient_data_source_id order by e.enrollment_start_date desc) patient_row_num
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__eligibility') }} e
-inner join {{ ref('encounters__patient_data_source_id') }} d on e.patient_id = d.patient_id
+inner join {{ ref('encounters__patient_data_source_id') }} d on e.person_id = d.person_id
 and
 e.data_source = d.data_source

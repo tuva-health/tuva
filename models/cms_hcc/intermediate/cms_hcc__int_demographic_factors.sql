@@ -6,7 +6,7 @@
 with members as (
 
     select
-          patient_id
+          person_id
         , enrollment_status
         , gender
         , age_group
@@ -19,6 +19,8 @@ with members as (
         , orec_default
         , institutional_status_default
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_members') }}
 
 )
@@ -44,7 +46,7 @@ with members as (
 , v24_new_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -57,6 +59,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -75,7 +79,7 @@ with members as (
 , v24_continuining_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -88,6 +92,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -108,7 +114,7 @@ with members as (
 , v28_new_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -121,6 +127,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -139,7 +147,7 @@ with members as (
 , v28_continuining_enrollees as (
 
     select
-          members.patient_id
+          members.person_id
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -152,6 +160,8 @@ with members as (
         , members.orec_default
         , members.institutional_status_default
         , members.payment_year
+        , members.collection_start_date
+        , members.collection_end_date
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
@@ -184,7 +194,7 @@ with members as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(gender as {{ dbt.type_string() }}) as gender
         , cast(age_group as {{ dbt.type_string() }}) as age_group
@@ -207,12 +217,14 @@ with members as (
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from unioned
 
 )
 
 select
-      patient_id
+      person_id
     , enrollment_status
     , gender
     , age_group
@@ -228,5 +240,7 @@ select
     , factor_type
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

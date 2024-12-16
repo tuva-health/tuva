@@ -18,7 +18,7 @@ with procedures as (
 select distinct
       procedures.encounter_id
     , procedures.claim_id
-    , procedures.patient_id
+    , procedures.person_id
     , procedures.normalized_code
     , ccsr__procedure_category_map.code_description
     , ccsr__procedure_category_map.ccsr_parent_category

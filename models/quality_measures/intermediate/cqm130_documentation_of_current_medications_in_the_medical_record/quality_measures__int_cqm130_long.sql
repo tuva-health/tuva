@@ -6,7 +6,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -20,7 +20,7 @@ with denominator as (
 , numerator as (
 
     select
-          patient_id
+          person_id
         , evidence_date
         , evidence_value
     from {{ ref('quality_measures__int_cqm130_numerator') }}
@@ -30,7 +30,7 @@ with denominator as (
 , exclusions as (
 
     select
-          patient_id
+          person_id
         , exclusion_date
         , exclusion_reason
     from {{ ref('quality_measures__int_cqm130_exclusions') }}
@@ -40,23 +40,23 @@ with denominator as (
 , measure_flags as (
 
     select
-          denominator.patient_id
+          denominator.person_id
         , case
-            when denominator.patient_id is not null
+            when denominator.person_id is not null
             then 1
             else null
           end as denominator_flag
         , case
-            when numerator.patient_id is not null and denominator.patient_id is not null
+            when numerator.person_id is not null and denominator.person_id is not null
             then 1
-            when denominator.patient_id is not null
+            when denominator.person_id is not null
             then 0
             else null
           end as numerator_flag
         , case
-            when exclusions.patient_id is not null and denominator.patient_id is not null
+            when exclusions.person_id is not null and denominator.person_id is not null
             then 1
-            when denominator.patient_id is not null
+            when denominator.person_id is not null
             then 0
             else null
           end as exclusion_flag
@@ -71,7 +71,7 @@ with denominator as (
         , denominator.measure_version
         , (row_number() over(
             partition by
-                  denominator.patient_id
+                  denominator.person_id
                 , denominator.performance_period_begin
                 , denominator.performance_period_end
                 , denominator.measure_id
@@ -84,9 +84,9 @@ with denominator as (
           )) as rn
     from denominator
         left join numerator
-            on denominator.patient_id = numerator.patient_id
+            on denominator.person_id = numerator.person_id
         left join exclusions
-            on denominator.patient_id = exclusions.patient_id
+            on denominator.person_id = exclusions.person_id
 
 )
 
@@ -96,7 +96,7 @@ with denominator as (
 , deduped as (
 
     select
-          patient_id
+          person_id
         , denominator_flag
         , numerator_flag
         , exclusion_flag
@@ -117,7 +117,7 @@ with denominator as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(denominator_flag as integer) as denominator_flag
         , cast(numerator_flag as integer) as numerator_flag
         , cast(exclusion_flag as integer) as exclusion_flag
@@ -135,7 +135,7 @@ with denominator as (
 )
 
 select
-      patient_id
+      person_id
     , denominator_flag
     , numerator_flag
     , exclusion_flag

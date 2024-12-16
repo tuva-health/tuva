@@ -9,7 +9,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       alias: acute_inpatient__encounter_grain
       tags: 
         - acute_inpatient
@@ -18,86 +18,129 @@ models:
       materialized: table
     columns:
       - name: encounter_id
-        description: Unique identifier for the acute inpatient encounter.
+        description: '{{ doc("encounter_id") }}'
       - name: encounter_start_date
-        description: Date when the patient was admitted.
+        description: '{{ doc("encounter_start_date") }}'
       - name: encounter_end_date
-        description: Date when the patient was discharged.
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
       - name: encounter_type
-        description: type of encounter
-      - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
       - name: admit_age
-        description: The age of the patient as of their admission date.
+        description: '{{ doc("admit_age") }}'
       - name: gender
-        description: The gender of the patient.
+        description: '{{ doc("gender") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: race
-        description: The race of the patient.
+        description: '{{ doc("race") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
       - name: facility_npi
-        description: The NPI for the facility where the encounter occurred.
+        description: '{{ doc("facility_npi") }}'
       - name: provider_first_name
-        description: The first name of the provider.
+        description: '{{ doc("provider_first_name") }}'
       - name: provider_last_name
-        description: The last name of the provider.
+        description: '{{ doc("provider_last_name") }}'
       - name: ms_drg_code
-        description: The MS-DRG code associted with the inpatient visit
+        description: '{{ doc("ms_drg_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: ms_drg_description
-        description: The MS-DRG description associted with the inpatient visit
+        description: '{{ doc("ms_drg_description") }}'
       - name: medical_surgical
-        description: Indicates whether the MS-DRG is medical or surgical in nature.
+        description: '{{ doc("medical_surgical") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: apr_drg_code
-        description: The APR-DRG code associted with the inpatient visit
+        description: '{{ doc("apr_drg_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: apr_drg_description
-        description: The APR-DRG description associted with the inpatient visit
+        description: '{{ doc("apr_drg_description") }}'
       - name: admit_source_code
-        description: Admission source code for the encounter.
+        description: '{{ doc("admit_source_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
       - name: admit_source_description
-        description: Admission source description for the encounter.
+        description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
-        description: Admission type code for the encounter.
+        description: '{{ doc("admit_type_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
       - name: admit_type_description
-        description: Admission type description for the encounter.
+        description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
-        description: Discharge disposition code for the encounter.
+        description: '{{ doc("discharge_disposition_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
       - name: discharge_disposition_description
-        description: Discharge disposition description for the encounter.
+        description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
-        description: The total paid amount across all claims for the encounter.
+        description: '{{ doc("total_paid_amount") }}'
       - name: total_allowed_amount
-        description: The total allowed amount across all claims for the encounter.
+        description: '{{ doc("total_allowed_amount") }}'
       - name: total_charge_amount
-        description: The total charge amount across all claims for the encounter.
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
       - name: length_of_stay
-        description: The length of stay for the encounter.
+        description: '{{ doc("length_of_stay") }}'
       - name: mortality_flag
-        description: 1 if a patient died during the encounter, 0 otherwise.
+        description: '{{ doc("mortality_flag") }}'
       - name: data_source
-        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: The time at with the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
+
 
   - name: emergency_department__encounter_grain
     description: This table pulls together all the data needed to perform acute inpatient analytics into a single table.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       alias: emergency_department__encounter_grain
       tags: 
         - emergency_department
@@ -106,89 +149,121 @@ models:
       materialized: table
     columns:
       - name: encounter_id
-        description: Unique identifier for the emergency_department encounter.
+        description: '{{ doc("encounter_id") }}'
       - name: encounter_start_date
-        description: Date when the patient was admitted.
+        description: '{{ doc("encounter_start_date") }}'
       - name: encounter_end_date
-        description: Date when the patient was discharged.
-      - name: patient_id
-        description: Unique identifier for each patient in the dataset.
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
       - name: encounter_type
-        description: type of encounter
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
       - name: admit_age
-        description: The age of the patient as of their admission date.
+        description: '{{ doc("admit_age") }}'
       - name: gender
-        description: The gender of the patient.
+        description: '{{ doc("gender") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__gender.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: race
-        description: The race of the patient.
+        description: '{{ doc("race") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__race.csv
-      - name: primary_diagnosis_code_type.
-        description: Code system used for the primary diagnosis
-        meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/reference_data/reference_data__code_type.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
-        description: Primary diagnosis on claim.
-        meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+        description: '{{ doc("primary_diagnosis_code") }}'
       - name: primary_diagnosis_description
-        description: Description of primary diagnosis code.
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
       - name: facility_npi
-        description: The NPI for the facility where the encounter occurred.
+        description: '{{ doc("facility_npi") }}'
       - name: provider_first_name
-        description: The first name of the provider.
+        description: '{{ doc("provider_first_name") }}'
       - name: provider_last_name
-        description: The last name of the provider.
+        description: '{{ doc("provider_last_name") }}'
       - name: ms_drg_code
-        description: The MS-DRG code associted with the inpatient visit
+        description: '{{ doc("ms_drg_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__ms_drg.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: ms_drg_description
-        description: The MS-DRG description associted with the inpatient visit
+        description: '{{ doc("ms_drg_description") }}'
       - name: medical_surgical
-        description: Indicates whether the MS-DRG is medical or surgical in nature.
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
       - name: apr_drg_code
-        description: The APR-DRG code associted with the inpatient visit
+        description: '{{ doc("apr_drg_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__apr_drg.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
       - name: apr_drg_description
-        description: The APR-DRG description associted with the inpatient visit
-        meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__apr_drg.csv
+        description: '{{ doc("apr_drg_description") }}'
       - name: admit_source_code
-        description: Admission source code for the encounter.
+        description: '{{ doc("admit_source_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__admit_source.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
       - name: admit_source_description
-        description: Admission source description for the encounter.
+        description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
-        description: Admission type code for the encounter.
+        description: '{{ doc("admit_type_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__admit_type.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
       - name: admit_type_description
-        description: Admission type description for the encounter.
+        description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
-        description: Discharge disposition code for the encounter.
+        description: '{{ doc("discharge_disposition_code") }}'
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
       - name: discharge_disposition_description
-        description: Discharge disposition description for the encounter.
+        description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
-        description: The total paid amount across all claims for the encounter.
+        description: '{{ doc("total_paid_amount") }}'
       - name: total_allowed_amount
-        description: The total allowed amount across all claims for the encounter.
+        description: '{{ doc("total_allowed_amount") }}'
       - name: total_charge_amount
-        description: The total charge amount across all claims for the encounter.
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
       - name: length_of_stay
-        description: The length of stay for the encoujnter.
+        description: '{{ doc("length_of_stay") }}'
       - name: mortality_flag
-        description: 1 if a patient died during the encounter, 0 otherwise.
+        description: '{{ doc("mortality_flag") }}'
       - name: data_source
-        description: User-configured field that indicates the data source (e.g. typically named after the payer and state "BCBS Tennessee").
+        description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: The time at with the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment.  Timezone is configurable via the `tuva_last_run` var.
+        description: '{{ doc("tuva_last_run") }}'
 
 
   - name: inpatient_psych__encounter_grain
@@ -197,7 +272,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {% else %}
+        {%- else -%}
           claims_preprocessing
         {%- endif -%}
       materialized: table
@@ -206,9 +281,121 @@ models:
         - encounters
     columns:
       - name: encounter_id
-        description: "The unique identifier for each encounter."
-        tests:
-          - unique
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: inpatient_rehab__encounter_grain
     description: "Encounters for inpatient rehab. One row per encounter."
@@ -216,7 +403,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {% else %}
+        {%- else -%}
           claims_preprocessing
         {%- endif -%}
       materialized: table
@@ -225,9 +412,121 @@ models:
         - encounters
     columns:
       - name: encounter_id
-        description: "The unique identifier for each encounter."
-        tests:
-          - unique
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: inpatient_snf__encounter_grain
     description: "Encounters for inpatient rehab. One row per encounter."
@@ -235,7 +534,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {% else %}
+        {%- else -%}
           claims_preprocessing
         {%- endif -%}
       materialized: table
@@ -244,9 +543,121 @@ models:
         - encounters
     columns:
       - name: encounter_id
-        description: "The unique identifier for each encounter."
-        tests:
-          - unique
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: inpatient_substance_use__encounter_grain
     description: "Encounters for inpatient rehab. One row per encounter."
@@ -254,7 +665,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {% else %}
+        {%- else -%}
           claims_preprocessing
         {%- endif -%}
       materialized: table
@@ -263,9 +674,121 @@ models:
         - encounters
     columns:
       - name: encounter_id
-        description: "The unique identifier for each encounter."
-        tests:
-          - unique
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: inpatient_hospice__encounter_grain
     description: "Encounters for inpatient rehab. One row per encounter."
@@ -273,7 +796,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
           {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {% else %}
+        {%- else -%}
           claims_preprocessing
         {%- endif -%}
       materialized: table
@@ -282,218 +805,2554 @@ models:
         - encounters
     columns:
       - name: encounter_id
-        description: "The unique identifier for each encounter."
-        tests:
-          - unique
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: encounters__combined_claim_line_crosswalk
     description: all claim lines that belong to an encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'    
 
   - name: urgent_care__encounter_grain
     description: one row per urgent care encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_psych__encounter_grain
     description: one row per outpatient psych encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_rehab__encounter_grain
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
   
   - name: outpatient_hospital_or_clinic__encounter_grain
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_surgery__encounter_grain
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: asc__encounter_grain
     description: one row per asc encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: dialysis__encounter_grain
     description: one row per dialysis encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_hospice__encounter_grain
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: home_health__encounter_grain
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_injections__encounter_grain
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_substance_use__encounter_grain
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_ptotst__encounter_grain
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: outpatient_radiology__encounter_grain
     description: one row per outpatient radiology encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: office_visit__encounter_grain
     description: one row per outpatient office visit surgery encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: lab__encounter_grain
     description: one row per lab encounter id summarizing encounter level metrics. labs will roll up to other encounters unless they appear on their own day with no other claims.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: dme__encounter_grain
     description: one row per dme encounter id summarizing encounter level metrics. dmes will roll up to other encounters unless they appear on their own day with no other claims.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: ambulance__encounter_grain
     description: one row per ambulance encounter id summarizing encounter level metrics. ambulances will roll up to other encounters unless they appear on their own day with no other claims.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+
 
   - name: orphaned_claim__encounter_grain
     description: orphaned claims (usually professional claims) that don't roll up to an anchor event, get assigned their own encounter id for completeness. 
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
         - encounters
+    columns:
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: encounter_start_date
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_date
+        description: '{{ doc("encounter_end_date") }}'
+      - name: patient_data_source_id
+        description: '{{ doc("patient_data_source_id") }}'
+      - name: encounter_type
+        description: '{{ doc("encounter_type") }}'
+      - name: encounter_group
+        description: '{{ doc("encounter_group") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: admit_age
+        description: '{{ doc("admit_age") }}'
+      - name: gender
+        description: '{{ doc("gender") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+      - name: race
+        description: '{{ doc("race") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+      - name: primary_diagnosis_code_type
+        description: '{{ doc("primary_diagnosis_code_type") }}'
+      - name: primary_diagnosis_code
+        description: '{{ doc("primary_diagnosis_code") }}'
+      - name: primary_diagnosis_description
+        description: '{{ doc("primary_diagnosis_description") }}'
+      - name: facility_id
+        description: '{{ doc("facility_id") }}'
+      - name: observation_flag
+        description: '{{ doc("observation_flag") }}'
+      - name: ed_flag
+        description: '{{ doc("ed_flag") }}'
+      - name: lab_flag
+        description: '{{ doc("lab_flag") }}'
+      - name: dme_flag
+        description: '{{ doc("dme_flag") }}'
+      - name: ambulance_flag
+        description: '{{ doc("ambulance_flag") }}'
+      - name: pharmacy_flag
+        description: '{{ doc("pharmacy_flag") }}'
+      - name: facility_name
+        description: '{{ doc("facility_name") }}'
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+      - name: delivery_flag
+        description: '{{ doc("delivery_flag") }}'
+      - name: delivery_type
+        description: '{{ doc("delivery_type") }}'
+      - name: newborn_flag
+        description: '{{ doc("newborn_flag") }}'
+      - name: nicu_flag
+        description: '{{ doc("nicu_flag") }}'
+      - name: facility_npi
+        description: '{{ doc("facility_npi") }}'
+      - name: provider_first_name
+        description: '{{ doc("provider_first_name") }}'
+      - name: provider_last_name
+        description: '{{ doc("provider_last_name") }}'
+      - name: ms_drg_code
+        description: '{{ doc("ms_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: ms_drg_description
+        description: '{{ doc("ms_drg_description") }}'
+      - name: medical_surgical
+        description: '{{ doc("medical_surgical") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+      - name: apr_drg_code
+        description: '{{ doc("apr_drg_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__apr_drg.csv
+      - name: apr_drg_description
+        description: '{{ doc("apr_drg_description") }}'
+      - name: admit_source_code
+        description: '{{ doc("admit_source_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
+      - name: admit_source_description
+        description: '{{ doc("admit_source_description") }}'
+      - name: admit_type_code
+        description: '{{ doc("admit_type_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
+      - name: admit_type_description
+        description: '{{ doc("admit_type_description") }}'
+      - name: discharge_disposition_code
+        description: '{{ doc("discharge_disposition_code") }}'
+        meta:
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+      - name: discharge_disposition_description
+        description: '{{ doc("discharge_disposition_description") }}'
+      - name: total_paid_amount
+        description: '{{ doc("total_paid_amount") }}'
+      - name: total_allowed_amount
+        description: '{{ doc("total_allowed_amount") }}'
+      - name: total_charge_amount
+        description: '{{ doc("total_charge_amount") }}'
+      - name: claim_count
+        description: '{{ doc("claim_count") }}'
+      - name: inst_claim_count
+        description: '{{ doc("inst_claim_count") }}'
+      - name: prof_claim_count
+        description: '{{ doc("prof_claim_count") }}'
+      - name: length_of_stay
+        description: '{{ doc("length_of_stay") }}'
+      - name: mortality_flag
+        description: '{{ doc("mortality_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
 
 
@@ -505,7 +3364,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -516,7 +3375,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -527,7 +3386,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -539,7 +3398,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -550,7 +3409,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -561,7 +3420,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -573,7 +3432,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -584,7 +3443,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -595,7 +3454,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -608,7 +3467,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -619,7 +3478,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -630,7 +3489,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -643,7 +3502,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -654,7 +3513,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -665,7 +3524,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -677,7 +3536,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -688,7 +3547,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -699,7 +3558,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -711,7 +3570,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -722,7 +3581,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -733,7 +3592,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -746,7 +3605,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -756,7 +3615,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -766,7 +3625,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -776,7 +3635,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -786,7 +3645,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -796,7 +3655,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -806,7 +3665,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -816,7 +3675,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -826,7 +3685,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -836,7 +3695,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -846,7 +3705,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -857,7 +3716,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -868,7 +3727,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -878,7 +3737,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -889,7 +3748,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -900,7 +3759,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -911,7 +3770,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -922,7 +3781,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -933,7 +3792,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -944,7 +3803,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -955,7 +3814,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -966,7 +3825,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -978,7 +3837,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -989,7 +3848,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1000,7 +3859,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1011,7 +3870,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1022,7 +3881,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1033,7 +3892,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1044,7 +3903,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1055,7 +3914,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1066,7 +3925,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1077,7 +3936,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1088,7 +3947,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1099,7 +3958,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1110,7 +3969,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1121,7 +3980,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1132,7 +3991,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1143,7 +4002,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1155,7 +4014,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1166,7 +4025,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1177,7 +4036,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1189,7 +4048,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1200,7 +4059,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1211,7 +4070,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1222,7 +4081,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1233,7 +4092,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1244,7 +4103,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1255,7 +4114,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1266,7 +4125,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1277,7 +4136,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1288,7 +4147,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1299,7 +4158,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1310,7 +4169,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1322,7 +4181,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1333,7 +4192,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1344,7 +4203,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1355,7 +4214,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1366,7 +4225,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1377,7 +4236,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1388,7 +4247,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -1401,7 +4260,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1411,7 +4270,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -1421,7 +4280,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -1431,7 +4290,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -1441,7 +4300,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -1451,7 +4310,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {% else %}claims_preprocessing{%- endif -%}
+        {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
