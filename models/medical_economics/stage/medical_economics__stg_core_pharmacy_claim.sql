@@ -9,6 +9,7 @@ select
       person_id
     , claim_id 
     , payer 
+    , claim_line_number
     , prescribing_provider_id
     , dispensing_date
     , ndc_code
@@ -27,6 +28,7 @@ select
       person_id
     , claim_id 
     , payer 
+    , claim_line_number
     , prescribing_provider_id
     , dispensing_date
     , ndc_code
@@ -46,6 +48,7 @@ from {{ ref('core__pharmacy_claim') }}
       cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as claim_id
     , cast(null as {{ dbt.type_string() }} ) as payer
+    , cast(null as {{ dbt.type_string() }} ) as claim_line_number
     , cast(null as {{ dbt.type_string() }} ) as prescribing_provider_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
     , cast(null as {{ dbt.type_string() }} ) as ndc_code
@@ -61,6 +64,7 @@ from {{ ref('core__pharmacy_claim') }}
       cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as claim_id
     , cast(null as {{ dbt.type_string() }} ) as payer
+    , cast(null as {{ dbt.type_string() }} ) as claim_line_number
     , cast(null as {{ dbt.type_string() }} ) as prescribing_provider_id
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
     , cast(null as {{ dbt.type_string() }} ) as ndc_code

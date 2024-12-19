@@ -19,9 +19,9 @@ select
     , bb.condition_grouper_3
     , cc.specialty_provider
 from {{ ref('medical_economics__stg_core_medical_claim') }} aa
-left join {{ ref('condition_grouper_medical_claim') }} bb
+left join {{ ref('medical_economics__condition_grouper_medical_claim') }} bb
     on aa.person_id = bb.person_id
     and aa.claim_id = bb.claim_id 
-left join {{ ref('specialty_medical_claim') }} cc
+left join {{ ref('medical_economics__specialty_medical_claim') }} cc
     on aa.person_id = cc.person_id
     and aa.claim_id = cc.claim_id 
