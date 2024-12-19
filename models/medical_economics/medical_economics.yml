@@ -1,0 +1,331 @@
+version: 2
+
+models:
+
+## Final 
+  - name: medical_economics__specialty_condition_grouper_pharmacy_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: specialty_condition_grouper_pharmacy_claim
+      tags: 
+        - pharmacy
+      materialized: table
+    description: >
+      Table that adds condition grouper and specialty grouper to every claim
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
+    columns:
+      - name: person_id
+        description: Unique identifier for the patient.
+      - name: claim_id
+        description: Unique identifier for the claim.
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: claim_line_number
+        description: Line number of the claim.
+      - name: prescribing_provider_id
+        description: Prescribing provider npi
+      - name: dispensing_date
+        description: Date of dispense
+      - name: ndc_code
+        description: National Drug Code.
+      - name: ndc_description
+        description: Description of the drug as per NDC.
+      - name: quantity
+        description: quantity of prescription
+      - name: days_supply
+        description: days of supply
+      - name: refills
+        description: Number of refills left
+      - name: paid_amount
+        description: Amount paid for the drug.
+      - name: allowed_amount
+        description: allowed amount for the drug
+      - name: condition_grouper_1
+        description: Prescribed condition associated with drug
+      - name: condition_grouper_2
+        description: Prescribed secondary condition associated with drug
+      - name: condition_grouper_3
+        description: Prescribed tertiary condition associated with drug
+      - name: specialty_provider
+        description: Specialty of provider prescribing drug, this comes from NPPES
+
+  - name: medical_economics__specialty_condition_grouper_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: specialty_condition_grouper_medical_claim
+      tags: 
+        - medical
+      materialized: table
+    description: >
+      Table that adds condition grouper and specialty grouper to every claim_line
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
+    columns:
+      - name: person_id
+        description: Unique identifier for the patient.
+      - name: claim_id
+        description: Unique identifier for the claim.
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: claim_start_date
+        description: claim start date
+      - name: claim_end_date
+        description: claim end date
+      - name: claim_line_number
+        description: Line number of the claim.
+      - name: service_category_1
+        description: Primary service category
+      - name: service_category_2
+        description: Secondary service category
+      - name: service_category_3
+        description: Tertiary service category
+      - name: ms_drg_code
+        description: MS DRG code
+      - name: apr_drg_code
+        description: APR DRG code
+      - name: hcpcs_code
+        description: All hcpcs codes
+      - name: rendering_id
+        description: Rendering npi on claim
+      - name: paid_amount
+        description: Amount paid for the drug.
+      - name: allowed_amount
+        description: allowed amount for the drug
+      - name: condition_grouper_1
+        description: Prescribed condition associated with drug
+      - name: condition_grouper_2
+        description: Prescribed secondary condition associated with drug
+      - name: condition_grouper_3
+        description: Prescribed tertiary condition associated with drug
+      - name: specialty_provider
+        description: Specialty of provider prescribing drug, this comes from NPPES
+
+  - name: medical_economics__risk_adjusted_member_months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: risk_adjusted_member_months
+      tags: 
+        - memeber_months
+      materialized: table
+    description: >
+      Member months table with risk adjustment added
+    columns:
+      - name: person_id
+        description: Unique identifier for each patient
+      - name: claim_id
+        description: Unique identifier for each pharmacy claim.
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: year_month
+        description: year month of YYYYMM format
+      - name: member_months
+        description: Number of unqiue person_id and payer
+      - name: payment_risk_score
+        description: >
+          The normalized risk score multiplied by the MA coding pattern 
+          adjustment factor for the corresponding HCC model version 
+          and payment year's rate announcement from CMS.
+      - name: risk_adjusted_member_months
+        description: >
+          Payment risk score multiplied by member_months.
+
+## Intermediate
+  - name: medical_economics__specialty_pharmacy_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: _specialty_pharmacy_claim
+      tags: 
+        - pharmacy
+      materialized: view
+    description: >
+      Intermediate view identifying all pharmacy claims with a specialty
+
+  - name: medical_economics__condition_grouper_pharmacy_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: _condition_grouper_pharmacy_claim
+      tags: 
+        - pharmacy
+      materialized: view
+    description: >
+      Intermediate view identifying all pharmacy claims with a condition
+
+  - name: medical_economics__specialty_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: _specialty_medical_claim
+      tags: 
+        - pharmacy
+      materialized: view
+    description: >
+      Intermediate view identifying all medical claims with a specialty
+
+  - name: medical_economics__condition_grouper_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: _condition_grouper_medical_claim
+      tags: 
+        - pharmacy
+      materialized: view
+    description: >
+      Intermediate view identifying all medical claims with a condition
+
+## Stage
+
+  - name: medical_economics__stg_core_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _stg_core_medical_claim
+      tags: medical_economics
+      materialized: ephemeral
+    description: >
+      Staging medical claims from the core layer. Creates an empty table if 
+      using clinical only.
+    columns:
+      - name: person_id
+      - name: claim_id
+      - name: payer
+      - name: claim_start_date
+      - name: claim_end_date
+      - name: service_category_1
+      - name: service_category_2
+      - name: service_category_3
+      - name: ms_drg_code
+      - name: apr_drg_code
+      - name: hcpcs_code
+      - name: rendering_id
+      - name: paid_amount
+      - name: allowed_amount
+
+  - name: medical_economics__stg_core_pharmacy_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _stg_core_pharmacy_claim
+      tags: medical_economics
+      materialized: ephemeral
+    description: >
+      Staging pharmacy claims from the core layer. Creates an empty table if 
+      using clinical only.
+    columns:
+      - name: person_id
+      - name: claim_id 
+      - name: payer 
+      - name: claim_line_number
+      - name: prescribing_provider_id
+      - name: dispensing_date
+      - name: ndc_code
+      - name: ndc_description
+      - name: quantity
+      - name: days_supply
+      - name: refills
+      - name: paid_amount
+      - name: allowed_amount
+
+  - name: medical_economics__stg_core_member_months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _stg_core_member_months
+      tags: medical_economics
+      materialized: ephemeral
+    description: >
+      Staging member months from the core layer
+    columns:
+      - name: person_id
+      - name: year_month 
+      - name: payer 
+      - name: member_month
+
+  - name: medical_economics__stg_ccsr_long_condition_category
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _stg_ccsr_long_condition_category
+      tags: medical_economics
+      materialized: ephemeral
+    description: >
+      Staging ccsr long condition category
+    columns:
+      - name: person_id
+      - name: claim_id 
+      - name: condition_grouper_1 
+      - name: condition_grouper_2
+      - name: condition_grouper_3
+
+  - name: medical_economics__stg_cms_hcc_patient_risk_scores
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _stg_cms_hcc_patient_risk_scores
+      tags: medical_economics
+      materialized: ephemeral
+    description: >
+      Staging cms hcc patient risk score category
+    columns:
+      - name: person_id
+      - name: payment_year  
+      - name: payment_risk_score 
+
+  - name: medical_economics__stg_terminology_provider
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _stg_terminology_provider
+      tags: medical_economics
+      materialized: ephemeral
+    description: >
+      Staging terminology provider, adding specialty from crosswalk created for mainstem
+    columns:
+      - name: npi 
+      - name: entity_type_description
+      - name: primary_taxonomy_code
+      - name: primary_specialty_description
+      - name: provider_first_name
+      - name: provider_last_name
+      - name: provider_organization_name
+      - name: parent_organization_name
+      - name: specialty
