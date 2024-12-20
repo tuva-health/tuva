@@ -1,6 +1,6 @@
 with pharmacy_claim as (
 
-    select 
+    select distinct
           aa.person_id
         , aa.claim_id 
         , bb.primary_specialty_description as specialty_provider

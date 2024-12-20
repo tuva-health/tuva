@@ -2,7 +2,7 @@
 
 with pharmacy_claim as (
 
-    select 
+    select distinct 
           person_id
         , claim_id 
         , null as condition_grouper_1 

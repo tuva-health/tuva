@@ -9,3 +9,7 @@ select
   , count(distinct person_id, payer) as member_month
 from 
     {{ ref('core__member_months') }} 
+group by 
+    person_id
+  , year_month
+  , payer 

@@ -1,6 +1,6 @@
 with medical_claim as (
 
-    select 
+    select distinct
           aa.person_id
         , aa.claim_id
         , bb.condition_grouper_1 

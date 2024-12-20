@@ -7,9 +7,9 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: specialty_condition_grouper_pharmacy_claim
       tags: 
@@ -62,13 +62,13 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: specialty_condition_grouper_medical_claim
       tags: 
-        - medical
+        - medical_economics
       materialized: table
     description: >
       Table that adds condition grouper and specialty grouper to every claim_line
@@ -121,13 +121,13 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: risk_adjusted_member_months
       tags: 
-        - memeber_months
+        - member_months
       materialized: table
     description: >
       Member months table with risk adjustment added
@@ -156,9 +156,9 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: _specialty_pharmacy_claim
       tags: 
@@ -171,9 +171,9 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: _condition_grouper_pharmacy_claim
       tags: 
@@ -186,9 +186,9 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: _specialty_medical_claim
       tags: 
@@ -201,9 +201,9 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
+          {{var('tuva_schema_prefix')}}_medical_economics
         {%- else -%}
-          pharmacy
+          medical_economics
         {%- endif -%}
       alias: _condition_grouper_medical_claim
       tags: 
@@ -217,7 +217,7 @@ models:
   - name: medical_economics__stg_core_medical_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_medical_economics{% else %}medical_economics{%- endif -%}
       alias: _stg_core_medical_claim
       tags: medical_economics
       materialized: ephemeral
@@ -243,7 +243,7 @@ models:
   - name: medical_economics__stg_core_pharmacy_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+                {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_medical_economics{% else %}medical_economics{%- endif -%}
       alias: _stg_core_pharmacy_claim
       tags: medical_economics
       materialized: ephemeral
@@ -268,7 +268,7 @@ models:
   - name: medical_economics__stg_core_member_months
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+                {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_medical_economics{% else %}medical_economics{%- endif -%}
       alias: _stg_core_member_months
       tags: medical_economics
       materialized: ephemeral
@@ -283,7 +283,7 @@ models:
   - name: medical_economics__stg_ccsr_long_condition_category
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+                {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_medical_economics{% else %}medical_economics{%- endif -%}
       alias: _stg_ccsr_long_condition_category
       tags: medical_economics
       materialized: ephemeral
@@ -299,7 +299,7 @@ models:
   - name: medical_economics__stg_cms_hcc_patient_risk_scores
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+                {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_medical_economics{% else %}medical_economics{%- endif -%}
       alias: _stg_cms_hcc_patient_risk_scores
       tags: medical_economics
       materialized: ephemeral
@@ -313,7 +313,7 @@ models:
   - name: medical_economics__stg_terminology_provider
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+                {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_medical_economics{% else %}medical_economics{%- endif -%}
       alias: _stg_terminology_provider
       tags: medical_economics
       materialized: ephemeral
