@@ -12,16 +12,16 @@ select
     , aa.rendering_id 
     , aa.paid_amount
     , aa.allowed_amount
-    , bb.condition_group_id
+    , bb.condition_grouper_id
     , dd.specialty_provider_id
 from {{ ref('medical_economics__specialty_condition_grouper_medical_claim') }} aa
 left join {{ ref('medical_economics__dim_condition_group') }} bb 
-    on aa.condition_group_1 = bb.condition_group_1
-    on aa.condition_group_2 = bb.condition_group_2
-    on aa.condition_group_3 = bb.condition_group_3
+    on aa.condition_grouper_1 = bb.condition_grouper_1
+    and aa.condition_grouper_2 = bb.condition_grouper_2
+    and aa.condition_grouper_3 = bb.condition_grouper_3
 left join {{ ref('medical_economics__dim_service_category') }} cc
     on aa.service_category_1 = cc.service_category_1
-    on aa.service_category_2 = cc.service_category_2
-    on aa.service_category_3 = cc.service_category_3
-left join {{ ref('medical_economics__dim_service_category') }} dd
+    and aa.service_category_2 = cc.service_category_2
+    and aa.service_category_3 = cc.service_category_3
+left join {{ ref('medical_economics__dim_specialty_provider') }} dd
     on aa.specialty_provider = dd.specialty_provider
