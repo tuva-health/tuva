@@ -2,6 +2,338 @@ version: 2
 
 models:
 
+## data_visualization
+  - name: medical_economics__dim_apr_drg
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_apr_drg
+      tags: 
+        - apr_drg
+      materialized: table
+    description: >
+      dim apr drg
+    columns:
+      - name: apr_drg_code
+        description: apr drg code
+      - name: apr_drg_description
+        description: apr drg description
+
+  - name: medical_economics__dim_calendar
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_calendar
+      tags: 
+        - calendar
+      materialized: table
+    description: >
+      dim calendar
+    columns:
+      - name: full_date
+        description: full date
+      - name: year
+        description: year
+      - name: month
+        description: month
+      - name: day
+        description: day
+      - name: month_name
+        description: month_name
+      - name: day_of_week_number
+        description: day_of_week_number
+      - name: day_of_week_name
+        description: day_of_week_name
+      - name: week_of_year
+        description: week_of_year
+      - name: day_of_year
+        description: day_of_year
+      - name: year_month
+        description: year_month
+      - name: first_day_of_month
+        description: first_day_of_month
+      - name: last_day_of_month
+        description: last_day_of_month
+      - name: year_month_int
+        description: year_month_int
+
+  - name: medical_economics__dim_condition_group
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_condition_group
+      tags: 
+        - condition_group
+      materialized: table
+    description: >
+      condition grouper reference table
+    columns:
+      - name: condition_group_1
+        description: primary condition group
+      - name: condition_group_2
+        description: secondary condition group
+      - name: condition_group_3
+        description: tertiary condition group
+      - name: condition_group_id
+        description: condition group id
+
+  - name: medical_economics__dim_hcpcs
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_hcpcs
+      tags: 
+        - hcpcs
+      materialized: table
+    description: >
+      hcpcs reference table
+    columns:
+      - name: hcpcs_code
+        description: hcpcs code
+      - name: hcpcs_description
+        description: hcpcs description
+
+  - name: medical_economics__dim_ms_drg
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_ms_drg
+      tags: 
+        - ms_drg
+      materialized: table
+    description: >
+      ms drg reference table
+    columns:
+      - name: ms_drg_code
+        description: ms drg code
+      - name: ms_drg_description
+        description: ms drg description
+
+  - name: medical_economics__dim_patient
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_patient
+      tags: 
+        - patient
+      materialized: table
+    description: >
+      patient reference table
+    columns:
+      - name: person_id
+        description: person id
+      - name: first_name
+        description: first name
+      - name: last_name
+        description: last name
+      - name: sex
+        description: sex
+      - name: race
+        description: race
+      - name: birth_date
+        description: birth date
+      - name: death_date
+        description: death date
+      - name: address
+        description: patient address
+      - name: city
+        description: patient city
+      - name: state
+        description: patient state
+      - name: zip_code
+        description: patient zip code
+      - name: county
+        description: patient county
+      - name: latitude
+        description: patient latitude
+      - name: longitude
+        description: patient longitude
+      - name: phone
+        description: patient phone
+      - name: age
+        description: age
+      - name: age_group
+        description: age group
+
+  - name: medical_economics__dim_provider
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_provider
+      tags: 
+        - provider
+      materialized: table
+    description: >
+      provider reference table
+    columns:
+      - name: npi
+        description: npi
+      - name: entity_type_description
+        description: individual or orgnaization
+      - name: primary_specialty_description
+        description: specialty description
+      - name: provider_first_name
+        description: first name
+      - name: provider_last_name
+        description: last name
+      - name: provider_organization_name
+        description: provider_organization_name
+      - name: parent_organization_name
+        description: parent_organization_name
+      - name: practice_address_line_1
+        description: practice_address_line_1
+      - name: practice_address_line_2
+        description: practice_address_line_2
+      - name: practice_city
+        description: practice_city
+      - name: practice_zip_code
+        description: practice_zip_code
+      - name: mailing_telephone_number
+        description: mailing_telephone_number
+      - name: location_telephone_number
+        description: location_telephone_number
+      - name: official_telephone_number
+        description: official_telephone_number
+      - name: last_updated
+        description: last updated in NPPES
+
+  - name: medical_economics__dim_service_category
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_service_category
+      tags: 
+        - service_category
+      materialized: table
+    description: >
+      service category reference table
+    columns:
+      - name: service_category_1
+        description: service_category_1
+      - name: service_category_2
+        description: service_category_2
+      - name: service_category_3
+        description: service_category_3
+      - name: service_category_id
+        description: service_category_id
+
+  - name: medical_economics__fact_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: fact_medical_claim
+      tags: 
+        - medical_economics
+      materialized: table
+    description: >
+      fact medical claim table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
+    columns:
+      - name: person_id
+        description: Unique identifier for the patient.
+      - name: claim_id
+        description: Unique identifier for the claim.
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: claim_start_date
+        description: claim start date
+      - name: claim_end_date
+        description: claim end date
+      - name: claim_line_number
+        description: Line number of the claim.
+      - name: service_category_id
+        description: service category id
+      - name: ms_drg_code
+        description: MS DRG code
+      - name: apr_drg_code
+        description: APR DRG code
+      - name: hcpcs_code
+        description: All hcpcs codes
+      - name: rendering_id
+        description: Rendering npi on claim
+      - name: paid_amount
+        description: Amount paid for the drug.
+      - name: allowed_amount
+        description: allowed amount for the drug
+      - name: condition_grouper_id
+        description: condition grouper id
+      - name: specialty_provider_id
+        description: specialty provider id
+
+  - name: medical_economics__fact_member_months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: fact_member_months
+      tags: 
+        - member_months
+      materialized: table
+    description: >
+      Member months table with risk adjustment added
+    columns:
+      - name: person_id
+        description: Unique identifier for each patient
+      - name: claim_id
+        description: Unique identifier for each pharmacy claim.
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: year_month
+        description: year month of YYYYMM format
+      - name: member_months
+        description: Number of unqiue person_id and payer
+      - name: payment_risk_score
+        description: >
+          The normalized risk score multiplied by the MA coding pattern 
+          adjustment factor for the corresponding HCC model version 
+          and payment year's rate announcement from CMS.
+      - name: risk_adjusted_member_months
+        description: >
+          Payment risk score multiplied by member_months.
+
 ## Final 
   - name: medical_economics__specialty_condition_grouper_pharmacy_claim
     config:
