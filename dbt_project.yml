@@ -3,7 +3,7 @@ version: '0.13.0'
 config-version: 2
 require-dbt-version: ">=1.5.0"
 
-profile: default
+profile: tuva_prod
 
 vars:
     ## CCSR data mart vars
@@ -38,6 +38,11 @@ vars:
     #tuva_seeds_s3_bucket: "tuva-public-resources"
     #tuva_seeds_s3_key_prefix: "tuva/seeds/example/prefix"
     custom_bucket_name: tuva-public-resources
+
+    # clinical_enabled: false
+    # claims_enabled: true
+
+    # dev_enabled: true
 
 on-run-end:
   - "{{ log_warning_for_seeds() }}"
