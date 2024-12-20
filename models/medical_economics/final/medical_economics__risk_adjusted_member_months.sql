@@ -2,7 +2,6 @@ with member_months as (
 
     select 
           aa.person_id
-        , aa.claim_id 
         , aa.payer 
         , aa.year_month 
         , aa.member_months
