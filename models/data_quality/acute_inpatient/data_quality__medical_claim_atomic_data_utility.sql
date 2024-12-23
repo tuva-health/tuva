@@ -1069,4 +1069,5 @@ select
     , invalid_perc
     , duplicated_count
     , duplicated_perc
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from final
