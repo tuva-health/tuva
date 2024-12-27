@@ -42,6 +42,8 @@ get_other_claim_data_elements as (
         , bb.paid_amount
         , bb.usable_for_aip_encounter
         , bb.dq_problem
+        , bb.usable_ms_drg_code
+        , bb.usable_apr_drg_code
         , bb.usable_patient_id
         , bb.usable_merge_dates
         , bb.usable_diagnosis_code_1
@@ -74,6 +76,8 @@ select
     , paid_amount
     , usable_for_aip_encounter
     , dq_problem
+    , usable_ms_drg_code
+    , usable_apr_drg_code
     , usable_patient_id
     , usable_merge_dates
     , usable_diagnosis_code_1

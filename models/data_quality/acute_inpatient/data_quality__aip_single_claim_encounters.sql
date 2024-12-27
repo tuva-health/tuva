@@ -49,6 +49,8 @@ with single_claim_encounters as (
         , bb.dq_problem
         , bb.usable_patient_id
         , bb.usable_merge_dates
+        , bb.usable_ms_drg_code
+        , bb.usable_apr_drg_code
         , bb.usable_diagnosis_code_1
         , bb.usable_admit_type_code
         , bb.usable_admit_source_code
@@ -82,6 +84,8 @@ select
     , dq_problem
     , usable_patient_id
     , usable_merge_dates
+    , usable_ms_drg_code
+    , usable_apr_drg_code
     , usable_diagnosis_code_1
     , usable_admit_type_code
     , usable_admit_source_code

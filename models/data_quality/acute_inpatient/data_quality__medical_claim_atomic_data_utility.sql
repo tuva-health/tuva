@@ -4,27 +4,27 @@
 
 with medical_claims as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
 )
 
 , professional_claims as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('data_quality__claim_type') }}
     where calculated_claim_type = 'professional'
 )
 
 , institutional_claims as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('data_quality__claim_type') }}
     where calculated_claim_type = 'institutional'
 )
 
 , missing_patient_id_count as (
     select
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where patient_id is null
 )
@@ -39,7 +39,7 @@ with medical_claims as (
 
 , dupe_patient_id_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id,
@@ -60,7 +60,7 @@ with medical_claims as (
 
 , missing_payer_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where payer is null
 )
@@ -75,7 +75,7 @@ with medical_claims as (
 
 , dupe_payer_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id,
@@ -96,7 +96,7 @@ with medical_claims as (
 
 , missing_plan_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where {{ quote_column('plan') }} is null
 )
@@ -111,7 +111,7 @@ with medical_claims as (
 
 , dupe_plan_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id,
@@ -132,7 +132,7 @@ with medical_claims as (
 
 , missing_claim_start_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where claim_start_date is null
 )
@@ -147,7 +147,7 @@ with medical_claims as (
 
 , invalid_claim_start_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_start_date = bb.full_date
@@ -164,7 +164,7 @@ with medical_claims as (
 
 , dupe_claim_start_date_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id,
@@ -185,7 +185,7 @@ with medical_claims as (
 
 , missing_claim_end_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where claim_end_date is null
 )
@@ -200,7 +200,7 @@ with medical_claims as (
 
 , invalid_claim_end_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_end_date = bb.full_date
@@ -217,7 +217,7 @@ with medical_claims as (
 
 , dupe_claim_end_date_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id,
@@ -238,7 +238,7 @@ with medical_claims as (
 
 , missing_claim_line_start_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where claim_line_start_date is null
 )
@@ -253,7 +253,7 @@ with medical_claims as (
 
 , invalid_claim_line_start_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_line_start_date = bb.full_date
@@ -270,7 +270,7 @@ with medical_claims as (
 
 , missing_claim_line_end_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where claim_line_end_date is null
 )
@@ -285,7 +285,7 @@ with medical_claims as (
 
 , invalid_claim_line_end_date_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_line_end_date = bb.full_date
@@ -323,7 +323,7 @@ with medical_claims as (
 
 , dupe_admission_date_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id,
@@ -368,7 +368,7 @@ with medical_claims as (
 
 , dupe_discharge_date_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id,
@@ -412,7 +412,7 @@ with medical_claims as (
 
 , dupe_ddc_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id,
@@ -436,7 +436,7 @@ with medical_claims as (
 
 , missing_pos_count as (
     select 
-        count(distinct claim_id) as claim_count
+        cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id as claim_id,
@@ -520,7 +520,7 @@ with medical_claims as (
 
 , dupe_bill_type_code_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id,
@@ -565,7 +565,7 @@ with medical_claims as (
 
 , dupe_ms_drg_code_count as (
     select 
-        count(*) as claim_count
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id,
@@ -609,7 +609,7 @@ with medical_claims as (
 )
 
 , dupe_apr_drg_code_count as (
-    select count(*)
+    select cast(count(*) as {{ dbt.type_numeric() }})
     from (
         select 
             aa.claim_id
@@ -632,7 +632,7 @@ with medical_claims as (
 )
 
 , missing_revenue_center_code_count as (
-    select count(distinct claim_id)
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
     from (
         select
             aa.claim_id
@@ -675,7 +675,7 @@ with medical_claims as (
 )
 
 , missing_hcpcs_code_count as (
-    select count(distinct claim_id)
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
     from (
         select
             aa.claim_id
@@ -698,7 +698,7 @@ with medical_claims as (
 )
 
 , missing_rendering_npi_count as (
-    select count(distinct claim_id)
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
     from {{ ref('medical_claim') }}
     where rendering_npi is null
 )
@@ -729,7 +729,7 @@ with medical_claims as (
 )
 
 , dupe_rendering_npi_count as (
-    select count(*)
+    select cast(count(*) as {{ dbt.type_numeric() }})
     from (
         select
             claim_id
@@ -749,7 +749,7 @@ with medical_claims as (
 )
 
 , missing_rendering_tin_count as (
-    select count(distinct claim_id)
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
     from {{ ref('medical_claim') }}
     where rendering_tin is null
 )
@@ -763,7 +763,7 @@ with medical_claims as (
 )
 
 , missing_billing_npi_count as (
-    select count(distinct claim_id)
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
     from {{ ref('medical_claim') }}
     where billing_npi is null
 )
@@ -794,7 +794,7 @@ with medical_claims as (
 )
 
 , dupe_billing_npi_count as (
-    select count(*)
+    select cast(count(*) as {{ dbt.type_numeric() }})
     from (
         select
             claim_id

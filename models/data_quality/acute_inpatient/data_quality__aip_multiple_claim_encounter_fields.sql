@@ -242,6 +242,8 @@ with add_row_number_to_claims as (
         , max(dq_problem) as dq_problem
         , max(usable_patient_id) as usable_patient_id
         , max(usable_merge_dates) as usable_merge_dates
+        , max(usable_ms_drg_code) as usable_ms_drg_code
+        , max(usable_apr_drg_code) as usable_apr_drg_code
         , max(usable_diagnosis_code_1) as usable_diagnosis_code_1
         , max(usable_admit_type_code) as usable_admit_type_code
         , max(usable_admit_source_code) as usable_admit_source_code
@@ -277,6 +279,8 @@ select
     , rendering_npi.rendering_npi
     , encounter_paid_amount.paid_amount
     , dates_and_flags.dq_problem
+    , dates_and_flags.usable_ms_drg_code
+    , dates_and_flags.usable_apr_drg_code
     , dates_and_flags.usable_diagnosis_code_1
     , dates_and_flags.usable_admit_type_code
     , dates_and_flags.usable_admit_source_code
