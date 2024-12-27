@@ -17,6 +17,21 @@ with aip_encounters as (
 
 )
 
+, aip_encounters_with_unusable_ms_drg_code as (
+
+    select count(*)
+    from {{ ref('data_quality__aip_encounters_final') }}
+    where usable_ms_drg_code = 0
+
+)
+
+, aip_encounters_with_unusable_apr_drg_code as (
+
+    select count(*)
+    from {{ ref('data_quality__aip_encounters_final')}}
+    where usable_apr_drg_code = 0
+)
+
 , aip_encounters_with_unusable_dx1 as (
 
     select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
@@ -138,8 +153,8 @@ with aip_encounters as (
 , final as (
 
     select
-        'aip_encounters' as field,
-        (select * from aip_encounters) as field_value
+        'aip_encounters' as field
+        ,(select * from aip_encounters) as field_value
 
     union all
 
@@ -147,6 +162,20 @@ with aip_encounters as (
         '(aip_encounters_with_dq_prob) / (aip_encounters) * 100' as field,
         round((select * from aip_encounters_with_dq_problems) * 100.0 /
         (select * from aip_encounters), 1) as field_value
+
+    union all
+    
+    select
+        '(aip_encounters_with_unusable_ms_drg_code) / (aip_encounters) * 100' as field,
+        round( (select * from aip_encounters_with_unusable_ms_drg_code) * 100.0 /
+        (select * from aip_encounters),1) as field_value
+
+    union all
+
+    select
+        '(aip_encounters_with_unusable_apr_drg_code) / (aip_encounters) * 100' as field,
+        round( (select * from aip_encounters_with_unusable_apr_drg_code) * 100.0 /
+        (select * from aip_encounters),1) as field_value
 
     union all
 

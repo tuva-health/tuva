@@ -7,6 +7,10 @@ with all_aip_inst_claims as (
     select
           claim_id
     from {{ ref('data_quality__aip_venn_diagram') }}
+    -- Here we define the logic for what constitutes
+    -- an acute inpatient institutional claim by pulling
+    -- all claim_ids from the aip_venn_diagram table
+    -- that meet this criteria:
     where (drg = 1 or bill = 1)
 
 )
@@ -29,6 +33,8 @@ with all_aip_inst_claims as (
         , other_header_values.paid_amount
         , other_header_values.usable_patient_id
         , merge_dates.usable_merge_dates
+        , header_values.usable_ms_drg_code
+        , header_values.usable_apr_drg_code
         , header_values.usable_diagnosis_code_1
         , header_values.usable_admit_type_code
         , header_values.usable_admit_source_code
@@ -67,19 +73,22 @@ with all_aip_inst_claims as (
           end as usable_for_aip_encounter
         , case
               when (
-                  usable_patient_id = 0 
-                  or usable_merge_dates = 0
-                  or usable_diagnosis_code_1 = 0
-                  or usable_admit_type_code = 0
-                  or usable_admit_source_code = 0
-                  or usable_discharge_disposition_code = 0
-                  or usable_rendering_npi = 0
-                  or usable_facility_npi = 0
+                     (usable_patient_id = 0) 
+                  or (usable_merge_dates = 0)
+                  or (usable_ms_drg_code = 0 and usable_apr_drg_code = 0)
+                  or (usable_diagnosis_code_1 = 0)
+                  or (usable_admit_type_code = 0)
+                  or (usable_admit_source_code = 0)
+                  or (usable_discharge_disposition_code = 0)
+                  or (usable_rendering_npi = 0)
+                  or (usable_facility_npi = 0)
               ) then 1
               else 0
           end as dq_problem
         , usable_patient_id
         , usable_merge_dates
+        , usable_ms_drg_code
+        , usable_apr_drg_code
         , usable_diagnosis_code_1
         , usable_admit_type_code
         , usable_admit_source_code
@@ -108,6 +117,8 @@ select
     , dq_problem
     , usable_patient_id
     , usable_merge_dates
+    , usable_ms_drg_code
+    , usable_apr_drg_code
     , usable_diagnosis_code_1
     , usable_admit_type_code
     , usable_admit_source_code

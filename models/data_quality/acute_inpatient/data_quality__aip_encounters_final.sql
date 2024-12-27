@@ -29,6 +29,8 @@ select
     , aa.rendering_npi
     , aa.paid_amount as institutional_paid_amount
     , aa.dq_problem
+    , aa.usable_ms_drg_code
+    , aa.usable_apr_drg_code
     , aa.usable_diagnosis_code_1
     , aa.usable_admit_type_code
     , aa.usable_admit_source_code
