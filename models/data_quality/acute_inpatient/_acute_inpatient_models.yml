@@ -1,0 +1,1265 @@
+version: 2
+models:
+
+# Data Quality - Acute Inpatient
+- name: data_quality__acute_inpatient_institutional_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: acute_inpatient_institutional_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__admit_source_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: admit_source_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__admit_type_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: admit_type_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_claims_adjacent_and_not_merging
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_adjacent_and_not_merging
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_claims_belonging_to_multiple_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_belonging_to_multiple_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_claims_not_merging_to_other_claims_in_their_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_not_merging_to_other_claims_in_their_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_claims_overlapping_and_not_merging
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_overlapping_and_not_merging
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_claims_per_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_per_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_claims_that_merge_to_a_different_claim_within_same_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_that_merge_to_a_different_claim_within_same_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_encounter_id
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounter_id
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_encounters_final_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounters_final_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+    
+- name: data_quality__aip_encounters_final
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounters_final
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_encounters_institutional_definition
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounters_institutional_definition
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_inst_claims_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_inst_claims_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_multiple_claim_encounter_dq_flags
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounter_dq_flags
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_multiple_claim_encounter_fields
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounter_fields
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_multiple_claim_encounters_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounters_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_multiple_claim_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_single_claim_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_single_claim_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_venn_diagram
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_venn_diagram
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_venn_diagram_key_areas
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_venn_diagram_key_areas
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__aip_venn_diagram_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_venn_diagram_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__all_line_level_room_and_board_rev_codes
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: all_line_level_room_and_board_rev_codes
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__all_prof_aip_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: all_prof_aip_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__all_prof_aip_claims_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: all_prof_aip_claims_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__apr_drg_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: apr_drg_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_apr_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_apr_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__assigned_ms_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_ms_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__bill
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: bill
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__bill_type_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: bill_type_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__calculated_claim_type_detailed_breakdown
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: calculated_claim_type_detailed_breakdown
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__calculated_claim_type_percentages
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: calculated_claim_type_percentages
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__claim_dates
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: claim_dates
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    The purpose of this table is to list all relevant dates for medical claims: 
+    claim_start_date, claim_end_date, admission_date, discharge_date, claim_line_start_date, and claim_line_end_date. 
+    The table is at the claim line grain, so there is one row in this table for each line in the input layer medical claim table. 
+    Dates that are not valid (i.e. not from the calendar table) are replaced by null values in this table.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: claim_line_number
+      description: The claim_line_number given in the input layer.
+    - name: claim_start_date
+      description: The claim_start_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_end_date
+      description: The claim_end_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: admission_date
+      description: The admission_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: discharge_date
+      description: The discharge_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_line_start_date
+      description: The claim_line_start_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_line_end_date
+      description: The claim_line_end_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: merge_start_date
+      description: >
+        The merge_start_date for this claim, calculated as the earliest valid date among
+        admission_date, claim_start_date, or claim_line_start_date. It is either valid or null.
+    - name: merge_end_date
+      description: >
+        The merge_end_date for this claim, calculated as the latest valid date among
+        discharge_date, claim_end_date, or claim_line_end_date. It is either valid or null.
+    - name: merge_start_date_after_merge_end_date
+      description: 0 or 1 flag. Has value of 1 if the merge_start_date is greater than the merge_end_date.
+    - name: usable_merge_dates
+      description: 0 or 1 flag. Has value of 1 if both merge_start_date and merge_end_date are valid and merge_start_date <= merge_end_date.
+    - name: dx_date
+      description: >
+        The date assigned to diagnosis codes for this claim, calculated as the latest valid date among
+        claim_end_date, claim_start_date, discharge_date, admission_date, claim_line_end_date, or claim_line_start_date.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__claim_grain_calculated_dates
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: claim_grain_calculated_dates
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This model lists useful calculated dates at the claim grain. The table contains one row per claim_id 
+      and includes calculated start and end dates for potential claim merging and diagnosis date assignment.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: merge_start_date
+      description: >
+        The merge_start_date for this claim, calculated as the earliest valid date among 
+        admission_date, claim_start_date, or claim_line_start_date. It is either valid or null.
+    - name: merge_end_date
+      description: >
+        The merge_end_date for this claim, calculated as the latest valid date among 
+        discharge_date, claim_end_date, or claim_line_end_date. It is either valid or null.
+    - name: merge_start_date_after_merge_end_date
+      description: 0 or 1 flag. Has value of 1 if the merge_start_date is greater than the merge_end_date.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: dx_date
+      description: The date we assign to diagnosis codes present on this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__claim_type
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: claim_type
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_apr_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_apr_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__determinable_ms_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_ms_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__diagnosis_code_1_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: diagnosis_code_1_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__discharge_disposition_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: discharge_disposition_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__distinct_room_and_board_rev_codes_per_claim
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: distinct_room_and_board_rev_codes_per_claim
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__drg
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: drg
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__header_values
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: header_values
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__header_values_graph
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: header_values_graph
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__header_values_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: header_values_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_admit_source_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_admit_source_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_admit_type_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_admit_type_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_apr_drg_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_apr_drg_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_bill_type_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_bill_type_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_diagnosis_code_1_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_diagnosis_code_1_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_discharge_disposition_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_discharge_disposition_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__how_often_each_ms_drg_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_ms_drg_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__line_grain
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: line_grain
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__medical_claim_atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: medical_claim_atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__ms_drg_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: ms_drg_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__other_header_values
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: other_header_values
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__pk_at_input_layer_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_at_input_layer_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__pk_at_input_layer
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_at_input_layer
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__pos_all
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pos_all
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__pos_invalid
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pos_invalid
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__prof_aip_overlap_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_aip_overlap_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__prof_claims_overlapping_with_aip_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_aip_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__prof_claims_overlapping_with_multiple_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_multiple_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__prof_claims_overlapping_with_no_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_no_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__prof_claims_overlapping_with_one_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_one_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__rb_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: rb_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__rev_all
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: rev_all
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__rev_invalid
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: rev_invalid
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__types_of_room_and_board_rev_codes_on_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: types_of_room_and_board_rev_codes_on_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_apr_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_apr_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__undeterminable_ms_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_ms_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_apr_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_apr_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__unique_ms_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_ms_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__usable_pos_code_histogram
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: usable_pos_code_histogram
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__usable_rev_code_histogram
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: usable_rev_code_histogram
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_admit_source_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_admit_source_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_admit_type_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_admit_type_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_apr_drg_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_apr_drg_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_bill_type_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_bill_type_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_diagnosis_code_1_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_diagnosis_code_1_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_discharge_disposition_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_discharge_disposition_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_ms_drg_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_ms_drg_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+
+- name: data_quality__valid_values
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_values
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    The purpose of this table is to determine if several of the fields in the input layer medical claim table have valid values, 
+    i.e. values from terminology. This table is at the claim line grain (there is one row for every row in the input layer 
+    medical_claim table). For each row in the medical_claim table we list fields for which we want to check if there is a 
+    valid value from terminology, together with a flag that checks if the field is valid.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: claim_line_number
+      description: The claim_line_number given in the input layer.
+    - name: bill_type_code
+      description: The value of bill_type_code that is populated for this claim line.
+    - name: valid_bill_type_code
+      description: 0 or 1 flag. Has value of 1 if the value of bill_type_code for this claim line is from terminology.
+    - name: ms_drg_code
+      description: The value of ms_drg_code that is populated for this claim line.
+    - name: valid_ms_drg_code
+      description: 0 or 1 flag. Has value of 1 if the value of ms_drg_code for this claim line is from terminology.
+    - name: apr_drg_code
+      description: The value of apr_drg_code that is populated for this claim line.
+    - name: valid_apr_drg_code
+      description: 0 or 1 flag. Has value of 1 if the value of apr_drg_code for this claim line is from terminology.
+    - name: admit_type_code
+      description: The value of admit_type_code that is populated for this claim line.
+    - name: valid_admit_type_code
+      description: 0 or 1 flag. Has value of 1 if the value of admit_type_code for this claim line is from terminology.
+    - name: admit_source_code
+      description: The value of admit_source_code that is populated for this claim line.
+    - name: valid_admit_source_code
+      description: 0 or 1 flag. Has value of 1 if the value of admit_source_code for this claim line is from terminology.
+    - name: discharge_disposition_code
+      description: The value of discharge_disposition_code that is populated for this claim line.
+    - name: valid_discharge_disposition_code
+      description: 0 or 1 flag. Has value of 1 if the value of discharge_disposition_code for this claim line is from terminology.
+    - name: revenue_center_code
+      description: The value of revenue_center_code that is populated for this claim line.
+    - name: valid_revenue_center_code
+      description: 0 or 1 flag. Has value of 1 if the value of revenue_center_code for this claim line is from terminology.
+    - name: place_of_service_code
+      description: The value of place_of_service_code that is populated for this claim line.
+    - name: valid_place_of_service_code
+      description: 0 or 1 flag. Has value of 1 if the value of place_of_service_code for this claim line is from terminology.
+    - name: admission_date
+      description: The value of admission_date that is populated for this claim line.
+    - name: valid_admission_date
+      description: 0 or 1 flag. Has value of 1 if the value of admission_date for this claim line is from the calendar table.
+    - name: discharge_date
+      description: The value of discharge_date that is populated for this claim line.
+    - name: valid_discharge_date
+      description: 0 or 1 flag. Has value of 1 if the value of discharge_date for this claim line is from the calendar table.
+    - name: claim_start_date
+      description: The value of claim_start_date that is populated for this claim line.
+    - name: valid_claim_start_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_start_date for this claim line is from the calendar table.
+    - name: claim_end_date
+      description: The value of claim_end_date that is populated for this claim line.
+    - name: valid_claim_end_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_end_date for this claim line is from the calendar table.
+    - name: claim_line_start_date
+      description: The value of claim_line_start_date that is populated for this claim line.
+    - name: valid_claim_line_start_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_line_start_date for this claim line is from the calendar table.
+    - name: claim_line_end_date
+      description: The value of claim_line_end_date that is populated for this claim line.
+    - name: valid_claim_line_end_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_line_end_date for this claim line is from the calendar table.
+    - name: diagnosis_code_1
+      description: The value of diagnosis_code_1 that is populated for this claim line.
+    - name: valid_diagnosis_code_1
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_1 for this claim line is from terminology.
+    - name: diagnosis_code_2
+      description: The value of diagnosis_code_2 that is populated for this claim line.
+    - name: valid_diagnosis_code_2
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_2 for this claim line is from terminology.
+    - name: diagnosis_code_3
+      description: The value of diagnosis_code_3 that is populated for this claim line.
+    - name: valid_diagnosis_code_3
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_3 for this claim line is from terminology.
+    - name: diagnosis_code_4
+      description: The value of diagnosis_code_4 that is populated for this claim line.
+    - name: valid_diagnosis_code_4
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_4 for this claim line is from terminology.
+    - name: diagnosis_code_5
+      description: The value of diagnosis_code_5 that is populated for this claim line.
+    - name: valid_diagnosis_code_5
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_5 for this claim line is from terminology.
+    - name: diagnosis_code_6
+      description: The value of diagnosis_code_6 that is populated for this claim line.
+    - name: valid_diagnosis_code_6
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_6 for this claim line is from terminology.
+    - name: diagnosis_code_7
+      description: The value of diagnosis_code_7 that is populated for this claim line.
+    - name: valid_diagnosis_code_7
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_7 for this claim line is from terminology.
+    - name: diagnosis_code_8
+      description: The value of diagnosis_code_8 that is populated for this claim line.
+    - name: valid_diagnosis_code_8
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_8 for this claim line is from terminology.
+    - name: diagnosis_code_9
+      description: The value of diagnosis_code_9 that is populated for this claim line.
+    - name: valid_diagnosis_code_9
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_9 for this claim line is from terminology.
+    - name: diagnosis_code_10
+      description: The value of diagnosis_code_10 that is populated for this claim line.
+    - name: valid_diagnosis_code_10
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_10 for this claim line is from terminology.
+    - name: diagnosis_code_11
+      description: The value of diagnosis_code_11 that is populated for this claim line.
+    - name: valid_diagnosis_code_11
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_11 for this claim line is from terminology.
+    - name: diagnosis_code_12
+      description: The value of diagnosis_code_12 that is populated for this claim line.
+    - name: valid_diagnosis_code_12
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_12 for this claim line is from terminology.
+    - name: diagnosis_code_13
+      description: The value of diagnosis_code_13 that is populated for this claim line.
+    - name: valid_diagnosis_code_13
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_13 for this claim line is from terminology.
+    - name: diagnosis_code_14
+      description: The value of diagnosis_code_14 that is populated for this claim line.
+    - name: valid_diagnosis_code_14
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_14 for this claim line is from terminology.
+    - name: diagnosis_code_15
+      description: The value of diagnosis_code_15 that is populated for this claim line.
+    - name: valid_diagnosis_code_15
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_15 for this claim line is from terminology.
+    - name: diagnosis_code_16
+      description: The value of diagnosis_code_16 that is populated for this claim line.
+    - name: valid_diagnosis_code_16
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_16 for this claim line is from terminology.
+    - name: diagnosis_code_17
+      description: The value of diagnosis_code_17 that is populated for this claim line.
+    - name: valid_diagnosis_code_17
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_17 for this claim line is from terminology.
+    - name: diagnosis_code_18
+      description: The value of diagnosis_code_18 that is populated for this claim line.
+    - name: valid_diagnosis_code_18
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_18 for this claim line is from terminology.
+    - name: diagnosis_code_19
+      description: The value of diagnosis_code_19 that is populated for this claim line.
+    - name: valid_diagnosis_code_19
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_19 for this claim line is from terminology.
+    - name: diagnosis_code_20
+      description: The value of diagnosis_code_20 that is populated for this claim line.
+    - name: valid_diagnosis_code_20
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_20 for this claim line is from terminology.
+    - name: diagnosis_code_21
+      description: The value of diagnosis_code_21 that is populated for this claim line.
+    - name: valid_diagnosis_code_21
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_21 for this claim line is from terminology.
+    - name: diagnosis_code_22
+      description: The value of diagnosis_code_22 that is populated for this claim line.
+    - name: valid_diagnosis_code_22
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_22 for this claim line is from terminology.
+    - name: diagnosis_code_23
+      description: The value of diagnosis_code_23 that is populated for this claim line.
+    - name: valid_diagnosis_code_23
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_23 for this claim line is from terminology.
+    - name: diagnosis_code_24
+      description: The value of diagnosis_code_24 that is populated for this claim line.
+    - name: valid_diagnosis_code_24
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_24 for this claim line is from terminology.
+    - name: diagnosis_code_25
+      description: The value of diagnosis_code_25 that is populated for this claim line.
+    - name: valid_diagnosis_code_25
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_25 for this claim line is from terminology.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
