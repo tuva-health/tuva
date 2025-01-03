@@ -14,8 +14,9 @@ select
   , claim_line_number as procedure_sequence_id
   , person_id
   , member_id
-  , coalesce(admission_date
+  , coalesce(claim_line_start_date
            , claim_start_date
+           , admission_date
            , discharge_date
            , claim_end_date
     ) as procedure_date
