@@ -28,11 +28,10 @@ with visit_codes as (
     inner join {{ ref('quality_measures__int_nqf0420__performance_period') }} as pp
         on coalesce(encounter.encounter_end_date, encounter.encounter_start_date) >= pp.performance_period_begin
             and coalesce(encounter.encounter_start_date, encounter.encounter_end_date) <= pp.performance_period_end
-    where lower(encounter_type) in (
-          'home health'
-        , 'office visit'
-        , 'outpatient'
-        , 'outpatient rehabilitation'
+    where lower(encounter_type) = 'home health'
+        or lower(encounter_group) in (
+              'office based'
+            , 'outpatient'
     )
 
 )
