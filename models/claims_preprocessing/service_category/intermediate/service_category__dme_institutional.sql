@@ -4,9 +4,9 @@
 }}
 
 select distinct
-    claim_id
-    , claim_line_number
-    , claim_line_id
+      med.claim_id
+    , med.claim_line_number
+    , med.claim_line_id
 , 'ancillary' as service_category_1
 , 'durable medical equipment' as service_category_2
 , 'durable medical equipment' as service_category_3
