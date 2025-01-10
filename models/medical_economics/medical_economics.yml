@@ -334,6 +334,61 @@ models:
         description: >
           Payment risk score multiplied by member_months.
 
+  - name: medical_economics__fact_agg_medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: fact_agg_medical_claim
+      tags: 
+        - medical_economics
+      materialized: table
+    description: >
+      Aggregated fact medical claim table
+    columns:
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: year_month
+        description: Year month in YYYY-MM-DD format
+      - name: service_category_id
+        description: service category id
+      - name: condition_grouper_id
+        description: condition grouper id
+      - name: specialty_provider_id
+        description: specialty provider id
+      - name: paid_amount
+        description: Amount paid for the drug.
+      - name: allowed_amount
+        description: allowed amount for the drug
+
+  - name: medical_economics__fact_agg_member_months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: fact_agg_member_months
+      tags: 
+        - member_months
+      materialized: table
+    description: >
+      Aggregated member months table with risk adjustment added for better Power BI optimization
+    columns:
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: year_month
+        description: year month of YYYYMM format
+      - name: member_months
+        description: Number of unqiue person_id and payer
+      - name: risk_adjusted_member_months
+        description: >
+          Payment risk score multiplied by member_months.
+
 ## Final 
   - name: medical_economics__specialty_condition_grouper_pharmacy_claim
     config:
