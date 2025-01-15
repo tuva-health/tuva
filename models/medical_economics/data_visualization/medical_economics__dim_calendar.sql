@@ -15,8 +15,9 @@ with calendar as (
         , last_day_of_month
         , year_month_int
     from {{ ref('reference_data__calendar') }}
+    where day = 1
 
 )
 
 select * 
-from calendar 
+from calendar
