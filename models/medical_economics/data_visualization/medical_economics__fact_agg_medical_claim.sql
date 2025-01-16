@@ -7,5 +7,6 @@ select
     , sum(paid_amount) as paid_amount
     , sum(allowed_amount) as allowed_amount
     , count(distinct claim_id) as distinct_claim_id
+    , count(distinct encounter_id) as distinct_encounter_id
 from {{ ref('medical_economics__fact_medical_claim') }} 
 group by 1,2,3,4,5

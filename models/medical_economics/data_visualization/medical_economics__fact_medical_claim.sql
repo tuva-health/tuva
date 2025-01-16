@@ -1,6 +1,7 @@
 select 
       aa.person_id 
     , aa.claim_id
+    , aa.encounter_id
     , aa.payer 
     , aa.claim_start_date
     , aa.claim_end_date 

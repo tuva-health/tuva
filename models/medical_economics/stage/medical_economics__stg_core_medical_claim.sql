@@ -8,6 +8,7 @@
 select
       person_id
     , claim_id
+    , encounter_id
     , payer 
     , claim_start_date
     , claim_end_date
@@ -29,6 +30,7 @@ from {{ ref('core__medical_claim') }}
 select
       person_id
     , claim_id
+    , encounter_id
     , payer 
     , claim_start_date
     , claim_end_date
@@ -51,6 +53,7 @@ from {{ ref('core__medical_claim') }}
     select top 0
          cast(null as {{ dbt.type_string() }} ) as person_id
         , cast(null as {{ dbt.type_string() }} ) as claim_id
+        , cast(null as {{ dbt.type_string() }} ) as encounter_id
         , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
@@ -69,6 +72,7 @@ from {{ ref('core__medical_claim') }}
 select
          cast(null as {{ dbt.type_string() }} ) as person_id
         , cast(null as {{ dbt.type_string() }} ) as claim_id
+        , cast(null as {{ dbt.type_string() }} ) as encounter_id
         , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date

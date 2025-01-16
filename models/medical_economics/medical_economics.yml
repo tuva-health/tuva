@@ -273,6 +273,8 @@ models:
         description: Unique identifier for the patient.
       - name: claim_id
         description: Unique identifier for the claim.
+      - name: encounter_id
+        description: Unique identifier for the encounter id
       - name: payer
         description: Unique identifier for the payer.
       - name: claim_start_date
@@ -365,6 +367,8 @@ models:
         description: allowed amount for the drug
       - name: distinct_claim_id
         description: Distinct claim id 
+      - name: distinct_encounter_id
+        description: Distinct encounter id
 
   - name: medical_economics__fact_agg_member_months
     config:
@@ -471,6 +475,8 @@ models:
         description: Unique identifier for the patient.
       - name: claim_id
         description: Unique identifier for the claim.
+      - name: encounter_id
+        description: Unique identifier for the encounter
       - name: payer
         description: Unique identifier for the payer.
       - name: claim_start_date
@@ -616,6 +622,7 @@ models:
     columns:
       - name: person_id
       - name: claim_id
+      - name: encounter_id
       - name: payer
       - name: claim_start_date
       - name: claim_end_date
