@@ -16,7 +16,7 @@ with claims_with_missing_bill_type_code as (
         from {{ ref('data_quality__valid_values') }}
         group by
               claim_id
-    )
+    ) as max_bill_type
     where max_bill_type_code is null
 
 )

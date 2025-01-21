@@ -5,7 +5,7 @@
 with rb as (
 
     select 
-        count(*)
+        count(*) as total
     from {{ ref('data_quality__aip_venn_diagram') }}
     where rb = 1
 
@@ -14,7 +14,7 @@ with rb as (
 , drg as (
 
     select 
-        count(*)
+        count(*) as total
     from {{ ref('data_quality__aip_venn_diagram') }}
     where drg = 1
 
@@ -23,7 +23,7 @@ with rb as (
 , bill as (
 
     select 
-        count(*)
+        count(*) as total
     from {{ ref('data_quality__aip_venn_diagram') }}
     where bill = 1
 
@@ -32,7 +32,7 @@ with rb as (
 , rb_drg_bill as (
 
     select 
-        count(*)
+        count(*) as total
     from {{ ref('data_quality__aip_venn_diagram') }}
     where rb = 1 
       and drg = 1 

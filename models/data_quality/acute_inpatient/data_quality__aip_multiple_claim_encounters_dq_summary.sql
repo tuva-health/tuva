@@ -23,7 +23,7 @@ with multiple_claim_encounters as (
 , count_of_multiple_claim_encounters as (
 
     select
-        count(*)
+        count(*) as total
     from multiple_claim_encounters
 
 )

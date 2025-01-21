@@ -12,4 +12,4 @@ group by
       patient_id
     , claim_id
 having
-    encounter_count > 1
+    count(distinct encounter_id) > 1

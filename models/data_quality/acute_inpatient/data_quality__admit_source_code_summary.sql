@@ -18,7 +18,7 @@ with claims_with_missing_admit_source_code as (
         from {{ ref('data_quality__valid_values') }}
         group by
               claim_id
-    )
+    ) as max_admit_source
     where max_admit_source_code is null
 
 )

@@ -10,7 +10,7 @@ with claims_with_missing_diagnosis_code_1 as (
             , max(diagnosis_code_1) as max_diagnosis_code_1
         from {{ ref('data_quality__valid_values') }}
         group by claim_id
-    )
+    ) as max_diag_code
     where max_diagnosis_code_1 is null
 )
 

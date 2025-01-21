@@ -4,7 +4,7 @@
 
 with medical_claim_rows as (
 
-    select count(*)
+    select count(*) as totalcount
     from {{ ref('medical_claim') }}
 
 )
@@ -12,15 +12,14 @@ with medical_claim_rows as (
 , medical_claim_distinct_pk as (
 
     select 
-    {# count(distinct claim_id, claim_line_number) #}
-    count(distinct {{ dbt.concat(["claim_id", "'|'", "cast(claim_line_number as " ~ dbt.type_string() ~ ")"]) }})
+        count(distinct {{ dbt.concat(["claim_id", "'|'", "cast(claim_line_number as " ~ dbt.type_string() ~ ")"]) }}) as countpk
     from {{ ref('medical_claim') }}
 
 )
 
 , pharmacy_claim_rows as (
 
-    select count(*)
+    select count(*) as totalcount
     from {{ ref('pharmacy_claim') }}
 
 )
@@ -28,14 +27,14 @@ with medical_claim_rows as (
 , pharmacy_claim_distinct_pk as (
 
     select
-    count(distinct {{ dbt.concat(["claim_id", "'|'", "cast(claim_line_number as " ~ dbt.type_string() ~ ")"]) }})
+        count(distinct {{ dbt.concat(["claim_id", "'|'", "cast(claim_line_number as " ~ dbt.type_string() ~ ")"]) }}) as countpk
     from {{ ref('pharmacy_claim') }}
 
 )
 
 , eligibility_rows as (
 
-    select count(*)
+    select count(*) as totalcount
     from {{ ref('eligibility') }}
 
 )
@@ -51,7 +50,7 @@ with medical_claim_rows as (
         "cast(enrollment_start_date as " ~ dbt.type_string() ~ ")", 
         "'|'", 
         "cast(enrollment_end_date as " ~ dbt.type_string() ~ ")"
-    ]) }})
+    ]) }}) as countpk
     from {{ ref('eligibility') }}
 
 )

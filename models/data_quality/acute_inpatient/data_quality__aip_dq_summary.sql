@@ -7,7 +7,7 @@ with final_cte as (
     select
           1 as rank_id
         , 'Bill Type Code atomic data quality:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -94,15 +94,15 @@ with final_cte as (
 
     select
           11 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           12 as rank_id
         , 'MS-DRG atomic data quality:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -189,15 +189,15 @@ with final_cte as (
 
     select
           22 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           23 as rank_id
         , 'APR-DRG atomic data quality:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -284,15 +284,15 @@ with final_cte as (
 
     select
           33 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           34 as rank_id
         , 'Revenue Center atomic data quality:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -399,15 +399,15 @@ with final_cte as (
 
     select
           46 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           47 as rank_id
         , 'Venn Diagram for aip claims:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -636,15 +636,15 @@ with final_cte as (
 
     select
           70 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           71 as rank_id
         , 'Acute inpatient institutional claims summary:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -809,15 +809,15 @@ with final_cte as (
 
     select
           89 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           90 as rank_id
         , 'Constructing AIP encounters' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -859,15 +859,15 @@ with final_cte as (
 
     select
           96 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all    
 
     select
         97 as rank_id
         , 'Data Quality issues specific to multiple-claim encounters' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -1125,29 +1125,29 @@ with final_cte as (
 
     select
         116 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
         117 as rank_id
         , 'Rolling up professional claims costs into AIP encounters' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           118 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           119 as rank_id
         , 'Place of Service Code atomic data quality:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -1256,15 +1256,15 @@ with final_cte as (
 
     select
           131 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           132 as rank_id
         , 'Professional aip claims summary:' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -1307,15 +1307,15 @@ with final_cte as (
 
     select
           137 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
     select
           138 as rank_id
         , 'Usable prof aip claims overlap summary' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 
@@ -1375,8 +1375,8 @@ with final_cte as (
 
     select
         145 as rank_id
-        , null as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     -- ************************************************************************************
     union all
@@ -1384,7 +1384,7 @@ with final_cte as (
     select
         146 as rank_id
         , 'Summary of AIP encounters' as field
-        , null as field_value
+        , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
 

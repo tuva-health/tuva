@@ -17,7 +17,7 @@ with claims_with_missing_discharge_disposition_code as (
         from {{ ref('data_quality__valid_values') }}
         group by
               claim_id
-    )
+    ) as max_discharge_disposition
     where max_discharge_disposition_code is null
 
 )

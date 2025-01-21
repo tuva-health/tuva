@@ -5,19 +5,19 @@
 
 
 with total_institutional_claims as (
-select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as totalinst
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
 ),
 
 total_professional_claims as (
-select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as totalprof
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'professional'
 ),
 
 total_claims as (
-select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) as total
 from {{ ref('data_quality__header_values') }}
 ),
 

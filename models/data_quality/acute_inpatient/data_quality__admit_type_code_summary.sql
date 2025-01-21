@@ -17,7 +17,7 @@ with claims_with_missing_admit_type_code as (
         from {{ ref('data_quality__valid_values') }}
         group by
               claim_id
-    )
+    ) as max_admit_type
     where max_admit_type_code is null
 
 )

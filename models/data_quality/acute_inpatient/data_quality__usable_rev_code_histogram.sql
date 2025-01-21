@@ -20,70 +20,70 @@ with usable_rev_counts as (
 
 , one_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 1
 )
 
 , two_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 2
 )
 
 , three_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 3
 )
 
 , four_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 4
 )
 
 , five_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 5
 )
 
 , six_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 6
 )
 
 , seven_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 7
 )
 
 , eight_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 8
 )
 
 , nine_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 9
 )
 
 , ten_or_more_rev_codes as (
     select
-        count(distinct claim_id)
+        count(distinct claim_id) as countdistinct
     from usable_rev_counts
     where usable_rev_count >= 10
 )

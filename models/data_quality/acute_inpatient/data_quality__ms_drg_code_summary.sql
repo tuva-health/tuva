@@ -17,7 +17,7 @@ with claims_with_missing_ms_drg_code as (
         from {{ ref('data_quality__valid_values') }}
         group by
               claim_id
-    )
+    ) as max_ms_drg
     where max_ms_drg_code is null
 
 )

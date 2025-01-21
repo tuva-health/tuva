@@ -14,7 +14,7 @@ with total_institutional_claims as (
 , total_claims as (
 
     select
-          sum(total_claims)
+          sum(total_claims) as totsum
     from {{ ref('data_quality__calculated_claim_type_percentages') }}
 
 )
@@ -22,7 +22,7 @@ with total_institutional_claims as (
 , total_aip_inst_claims as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
 
 )
@@ -30,7 +30,7 @@ with total_institutional_claims as (
 , usable_aip_inst_claims as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_for_aip_encounter = 1
 
@@ -39,7 +39,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_dq_problem as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where dq_problem = 1
 
@@ -48,7 +48,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_patient_id as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_patient_id = 0
 
@@ -57,7 +57,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_merge_dates as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_merge_dates = 0
 
@@ -66,7 +66,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_ms_drg_code as (
 
     select 
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_ms_drg_code = 0
 
@@ -75,7 +75,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_apr_drg_code as (
 
     select 
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_apr_drg_code = 0
 
@@ -84,7 +84,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_diagnosis_code_1 as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_diagnosis_code_1 = 0
 
@@ -93,7 +93,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_atc as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_admit_type_code = 0
 
@@ -102,7 +102,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_asc as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_admit_source_code = 0
 
@@ -111,7 +111,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_ddc as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_discharge_disposition_code = 0
 
@@ -120,7 +120,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_facility_npi as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_facility_npi = 0
 
@@ -129,7 +129,7 @@ with total_institutional_claims as (
 , aip_inst_claims_with_unusable_rendering_npi as (
 
     select
-          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+          cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
     where usable_rendering_npi = 0
 
