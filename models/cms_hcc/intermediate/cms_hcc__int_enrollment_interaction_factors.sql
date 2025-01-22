@@ -6,7 +6,7 @@
 with demographics as (
 
     select
-          patient_id
+          person_id
         , enrollment_status
         , gender
         , age_group
@@ -16,6 +16,8 @@ with demographics as (
         , institutional_status
         , model_version
         , payment_year
+        , collection_start_date
+        , collection_end_date
     from {{ ref('cms_hcc__int_demographic_factors') }}
 
 )
@@ -42,9 +44,11 @@ with demographics as (
 , non_institutional_interactions as (
 
     select
-          demographics.patient_id
+          demographics.person_id
         , demographics.model_version
         , demographics.payment_year
+        , demographics.collection_start_date
+        , demographics.collection_end_date
         , seed_interaction_factors.factor_type
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
@@ -76,9 +80,11 @@ with demographics as (
 , institutional_interactions as (
 
     select
-          demographics.patient_id
+          demographics.person_id
         , demographics.model_version
         , demographics.payment_year
+        , demographics.collection_start_date
+        , demographics.collection_end_date
         , seed_interaction_factors.factor_type
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
@@ -103,22 +109,26 @@ with demographics as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from unioned
 
 )
 
 select
-      patient_id
+      person_id
     , description
     , coefficient
     , factor_type
     , model_version
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

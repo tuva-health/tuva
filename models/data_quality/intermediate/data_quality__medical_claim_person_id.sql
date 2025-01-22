@@ -5,8 +5,8 @@
 with medical as (
   select
       claim_id
-    , count(distinct p.patient_id) as patient_id_count
-    , max(case when p.patient_id is null then 1 else 0 end) as missing_patient_id
+    , count(distinct p.person_id) as person_id_count
+    , max(case when p.person_id is null then 1 else 0 end) as missing_person_id
     , max(
         case 
           when startdts.month_start_date is null then 1
@@ -16,10 +16,10 @@ with medical as (
       ) as missing_eligibility
   from {{ ref('medical_claim') }} p
   left join {{ ref('data_quality__eligibility_dq_stage') }} startdts
-    on p.patient_id = startdts.patient_id
+    on p.person_id = startdts.person_id
     and p.claim_start_date between startdts.month_start_date and startdts.month_end_date
   left join {{ ref('data_quality__eligibility_dq_stage') }} enddts
-    on p.patient_id = enddts.patient_id
+    on p.person_id = enddts.person_id
     and p.claim_end_date between enddts.month_start_date and enddts.month_end_date
   group by
       claim_id
@@ -27,15 +27,15 @@ with medical as (
 
 , final as (
   select
-      'multiple medical_claim patient_ids' as data_quality_check
-    , sum(case when patient_id_count > 1 then 1 else 0 end) as result_count
+      'multiple medical_claim person_ids' as data_quality_check
+    , sum(case when person_id_count > 1 then 1 else 0 end) as result_count
   from medical
 
   union all
 
   select
-      'missing medical_claim patient_id' as data_quality_check
-    , sum(missing_patient_id) as result_count
+      'missing medical_claim person_id' as data_quality_check
+    , sum(missing_person_id) as result_count
   from medical
 
   union all

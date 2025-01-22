@@ -6,17 +6,17 @@
 
 WITH RankedMonths AS (
     SELECT
-        patient_id,
+        person_id,
         year_month,
         data_source,
-        lag(year_month_date, 1) over (partition by patient_id, data_source order by year_month_date) as prev_year_month,
-        lead(year_month_date, 1) over (partition by patient_id, data_source order by year_month_date) as next_year_month,
+        lag(year_month_date, 1) over (partition by person_id, data_source order by year_month_date) as prev_year_month,
+        lead(year_month_date, 1) over (partition by person_id, data_source order by year_month_date) as next_year_month,
         year_month_date
     FROM {{ ref('mart_review__stg_member_month') }}
 ),
 Changes AS (
  SELECT
-    patient_id,
+    person_id,
     data_source,
     year_month_date as change_month,
     case
@@ -27,7 +27,7 @@ Changes AS (
 FROM RankedMonths
 union all
 SELECT
-    patient_id,
+    person_id,
     data_source,
     {{ dateadd('month', 1, 'year_month_date') }} as change_month,
     case
@@ -40,9 +40,9 @@ FROM RankedMonths
 ),
 Final AS (
     SELECT
-       {{ dbt.concat(["patient_id", "'|'", "change_month"]) }} as membermonthkey,
+       {{ dbt.concat(["person_id", "'|'", "change_month"]) }} as membermonthkey,
         data_source,
-        patient_id,
+        person_id,
         change_month,
         change_type
     FROM Changes

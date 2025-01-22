@@ -5,7 +5,7 @@
 with base as (
     select *
     from {{ ref('medical_claim')}}
-    where claim_type = 'institutional'
+    where claim_type = 'professional'
 )
 , tuva_last_run as(
     select cast(substring('{{ var('tuva_last_run') }}',1,10) as date) as tuva_last_run

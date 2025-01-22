@@ -22,16 +22,13 @@ Jinja is used to set payment year variable.
  - The collection year is one year prior to the payment year.
 */
 
-{% set payment_year = var('cms_hcc_payment_year') | int() -%}
-{% set collection_year = payment_year - 1 -%}
-
 with medical_claims as (
 
     select
           claim_id
         , claim_line_number
         , claim_type
-        , patient_id
+        , person_id
         , claim_start_date
         , claim_end_date
         , bill_type_code
@@ -44,7 +41,7 @@ with medical_claims as (
 
     select
           claim_id
-        , patient_id
+        , person_id
         , code
     from {{ ref('cms_hcc__stg_core__condition') }}
     where code_type = 'icd-10-cm'
@@ -66,20 +63,23 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
-        , medical_claims.patient_id
+        , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
+        , dates.payment_year
+        , dates.collection_start_date
+        , dates.collection_end_date
     from medical_claims
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+            and cpt_hcpcs_list.payment_year = dates.payment_year
     where claim_type = 'professional'
-              and {{ date_part('year', 'claim_end_date') }} = {{ collection_year }}
-        and cpt_hcpcs_list.payment_year = {{ payment_year }}
 
 )
-
 
 , inpatient_claims as (
 
@@ -87,18 +87,18 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
-        , medical_claims.patient_id
+        , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
+        , dates.payment_year
+        , dates.collection_start_date
+        , dates.collection_end_date
     from medical_claims
+        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+            on claim_end_date between dates.collection_start_date and dates.collection_end_date
     where claim_type = 'institutional'
-        {% if target.type == 'fabric' %}
-            and YEAR(claim_end_date) = {{ collection_year }}
-        {% else %}
-            and extract(year from claim_end_date) = {{ collection_year }}
-        {% endif %}
         and substring(bill_type_code, 1, 2) in ('11','41')
 
 )
@@ -109,21 +109,21 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
-        , medical_claims.patient_id
+        , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
+        , dates.payment_year
+        , dates.collection_start_date
+        , dates.collection_end_date
     from medical_claims
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+            and cpt_hcpcs_list.payment_year = dates.payment_year
     where claim_type = 'institutional'
-        {% if target.type == 'fabric' %}
-            and YEAR(claim_end_date) = {{ collection_year }}
-        {% else %}
-            and extract(year from claim_end_date) = {{ collection_year }}
-        {% endif %}
-        and cpt_hcpcs_list.payment_year = {{ payment_year }}
         and substring(bill_type_code, 1, 2) in ('12','13','43','71','73','76','77','85')
 
 )
@@ -142,28 +142,35 @@ with medical_claims as (
 
     select distinct
           eligible_claims.claim_id
-        , eligible_claims.patient_id
+        , eligible_claims.person_id
+        , eligible_claims.payment_year
+        , eligible_claims.collection_start_date
+        , eligible_claims.collection_end_date
         , conditions.code
     from eligible_claims
         inner join conditions
             on eligible_claims.claim_id = conditions.claim_id
-            and eligible_claims.patient_id = conditions.patient_id
+            and eligible_claims.person_id = conditions.person_id
 
 )
 
 , add_data_types as (
 
     select distinct
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
-        , cast('{{ payment_year }}' as integer) as payment_year
+        , cast(payment_year as integer) as payment_year
+        , cast(collection_start_date as date) as collection_start_date
+        , cast(collection_end_date as date) as collection_end_date
     from eligible_conditions
 
 )
 
 select
-      patient_id
+      person_id
     , condition_code
     , payment_year
+    , collection_start_date
+    , collection_end_date
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from add_data_types

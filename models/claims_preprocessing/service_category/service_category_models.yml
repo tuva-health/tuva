@@ -730,6 +730,8 @@ models:
   - name: service_category__stg_medical_claim
     description: Staging med claims for sc grouper
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
         - service_category_grouper_base
@@ -737,6 +739,8 @@ models:
 
   - name: service_category__stg_inpatient_institutional
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
         - service_category_grouper
@@ -744,6 +748,8 @@ models:
 
   - name: service_category__stg_outpatient_institutional
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
         - service_category_grouper
@@ -751,6 +757,8 @@ models:
 
   - name: service_category__stg_professional
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
         - service_category_grouper
@@ -758,6 +766,8 @@ models:
 
   - name: service_category__stg_office_based
     config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
         - service_category_grouper

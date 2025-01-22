@@ -5,12 +5,12 @@
 with pharmacy as (
   select
       claim_id
-    , count(distinct p.patient_id) as patient_id_count
-    , max(case when p.patient_id is null then 1 else 0 end) as missing_patient_id
+    , count(distinct p.person_id) as person_id_count
+    , max(case when p.person_id is null then 1 else 0 end) as missing_person_id
     , max(case when e.month_start_date is null then 1 else 0 end) as missing_eligibility
   from {{ ref('pharmacy_claim') }} p
   left join {{ ref('data_quality__eligibility_dq_stage') }} e
-    on p.patient_id = e.patient_id
+    on p.person_id = e.person_id
     and coalesce(p.paid_date, p.dispensing_date) between e.month_start_date and e.month_end_date
   group by
       claim_id
@@ -18,15 +18,15 @@ with pharmacy as (
 
 , final as (
   select
-      'multiple pharmacy_claim patient_ids' as data_quality_check
-    , sum(case when patient_id_count > 1 then 1 else 0 end) as result_count
+      'multiple pharmacy_claim person_ids' as data_quality_check
+    , sum(case when person_id_count > 1 then 1 else 0 end) as result_count
   from pharmacy
 
   union all
 
   select
-      'missing pharmacy_claim patient_id' as data_quality_check
-    , sum(missing_patient_id) as result_count
+      'missing pharmacy_claim person_id' as data_quality_check
+    , sum(missing_person_id) as result_count
   from pharmacy
 
   union all

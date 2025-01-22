@@ -26,7 +26,7 @@ with ascvd_codes as (
 , conditions as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , encounter_id
         , recorded_date
@@ -41,7 +41,7 @@ with ascvd_codes as (
 , ascvd_conditions as (
 
     select
-          conditions.patient_id
+          conditions.person_id
         , conditions.recorded_date as evidence_date
     from conditions
     inner join ascvd_codes
@@ -53,7 +53,7 @@ with ascvd_codes as (
 , procedures as (
 
     select
-          patient_id
+          person_id
         , procedure_date
         , coalesce (
               normalized_code_type
@@ -74,7 +74,7 @@ with ascvd_codes as (
 , ascvd_procedures as (
 
     select
-          procedures.patient_id
+          procedures.person_id
         , procedures.procedure_date as evidence_date
     from procedures
          inner join ascvd_codes
@@ -86,14 +86,14 @@ with ascvd_codes as (
 , historical_ascvd as (
 
     select
-          ascvd_conditions.patient_id
+          ascvd_conditions.person_id
         , ascvd_conditions.evidence_date
     from ascvd_conditions
 
     union all
 
     select
-          ascvd_procedures.patient_id
+          ascvd_procedures.person_id
         , ascvd_procedures.evidence_date
     from ascvd_procedures
 
@@ -103,7 +103,7 @@ with ascvd_codes as (
 
     select
         distinct
-          historical_ascvd.patient_id
+          historical_ascvd.person_id
         , pp.performance_period_begin
         , pp.performance_period_end
         , pp.measure_id
@@ -118,7 +118,7 @@ with ascvd_codes as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
         , cast(measure_id as {{ dbt.type_string() }}) as measure_id
@@ -129,7 +129,7 @@ with ascvd_codes as (
 )
 
 select 
-      patient_id
+      person_id
     , performance_period_begin
     , performance_period_end
     , measure_id

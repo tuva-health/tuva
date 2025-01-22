@@ -3,7 +3,7 @@
    )
 }}
 select
-      patient_id
+      person_id
     , encounter_id
     , procedure_date
     , source_code_type

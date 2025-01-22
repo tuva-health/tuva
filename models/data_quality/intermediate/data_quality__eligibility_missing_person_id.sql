@@ -18,14 +18,14 @@ with eligibility_spans as(
             "'-'",
             quote_column('plan'),
         ]) }} as eligibility_span_id
-        , patient_id
+        , person_id
     from {{ ref('eligibility') }}
 )
 
 select
-    'Missing patient_id' as data_quality_check
+    'Missing person_id' as data_quality_check
     ,count(*) as result_count
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from eligibility_spans
 where
-    patient_id is null or patient_id = ''
+    person_id is null or person_id = ''

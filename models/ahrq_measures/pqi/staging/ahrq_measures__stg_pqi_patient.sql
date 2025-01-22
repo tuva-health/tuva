@@ -5,7 +5,7 @@
 select 
     data_source
   , birth_date
-  , patient_id
+  , person_id
   , sex
 from 
     {{ ref('core__patient') }}

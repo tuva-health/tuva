@@ -6,9 +6,10 @@
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , encounter_id
     , encounter_type
+    , encounter_group
     , length_of_stay
     , encounter_start_date
     , encounter_end_date
@@ -18,9 +19,10 @@ from {{ ref('core__encounter') }}
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
 select
-      patient_id
+      person_id
     , encounter_id
     , encounter_type
+    , encounter_group
     , length_of_stay
     , encounter_start_date
     , encounter_end_date
@@ -31,18 +33,20 @@ from {{ ref('core__encounter') }}
 
 {% if target.type == 'fabric' %}
     select top 0
-      cast(null as {{ dbt.type_string() }} ) as patient_id
+      cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
+    , cast(null as {{dbt.type_string()}} ) as encounter_group
     , cast(null as {{dbt.type_numeric()}} ) as length_of_stay
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_start_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_end_date
     , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 {% else %}
     select
-      cast(null as {{ dbt.type_string() }} ) as patient_id
+      cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
+    , cast(null as {{dbt.type_string()}} ) as encounter_group
     , cast(null as {{dbt.type_numeric()}} ) as length_of_stay
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_start_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_end_date

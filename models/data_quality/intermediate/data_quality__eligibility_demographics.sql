@@ -18,7 +18,7 @@ with eligibility_spans as(
             "'-'",
             quote_column('plan'),
         ]) }} as eligibility_span_id
-        , patient_id
+        , person_id
         , birth_date
         , gender
     from {{ ref('eligibility') }}
@@ -36,7 +36,7 @@ with eligibility_spans as(
     'Birthday is not a valid date' as data_quality_check
     , count(distinct eligibility_span_id) as result_count
     from eligibility_spans e
-    left join reference_data.calendar c
+    left join {{ ref('reference_data__calendar') }} c
         on e.birth_date = c.full_date
     where c.full_date is null
 )
@@ -66,12 +66,12 @@ with eligibility_spans as(
 , multiple_birth_date as(
     select
     'Patient has multiple birthdays' as data_quality_check
-    , count(distinct patient_id) as result_count
+    , count(distinct person_id) as result_count
     from(
         select
-            patient_id
+            person_id
             , birth_date
-            , rank() over (partition by patient_id, birth_date order by birth_date) as rank_birth_date
+            , rank() over (partition by person_id, birth_date order by birth_date) as rank_birth_date
         from eligibility_spans e
         where birth_date is not null
     )x

@@ -6,15 +6,15 @@
 
 
 select
-      patient_id
+      person_id
     , {{ dbt.concat([
-        "patient_id",
+        "person_id",
         "coalesce(data_source,'')",
         "coalesce(payer,'')",
         "coalesce(" ~ quote_column('plan') ~ ",'')",
         "coalesce(cast(enrollment_start_date as " ~ dbt.type_string() ~ "),'')",
         "coalesce(cast(enrollment_end_date as " ~ dbt.type_string() ~ "),'')"
-    ]) }} as patient_id_key
+    ]) }} as person_id_key
     , member_id
     , subscriber_id
     , gender

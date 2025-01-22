@@ -20,7 +20,7 @@ models:
       - name: claim_line_number
         description: >
           Indicates the line number for the particular line of the claim.
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: payer
         description: Name of the payer.
@@ -57,7 +57,7 @@ models:
         - normalized_input
         - claims_preprocessing
     columns:
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: >
@@ -166,7 +166,7 @@ models:
           (UB-04), dental, or vision.
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__claim_type.csv
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: >
@@ -769,7 +769,7 @@ models:
       - name: claim_line_number
         description: Indicates the line number for the particular line of the claim.
         data_type: integer
-      - name: patient_id
+      - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: member_id
         description: >

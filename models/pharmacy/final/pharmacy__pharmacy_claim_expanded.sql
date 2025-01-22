@@ -7,7 +7,7 @@ with all_drugs as (
       p.data_source
     , p.claim_id
     , p.claim_line_number
-    , p.patient_id
+    , p.person_id
     , p.member_id
     , p.prescribing_provider_id
     , p.dispensing_provider_id
@@ -63,8 +63,7 @@ select
     a.data_source
   , a.claim_id
   , a.claim_line_number
-  , a.patient_id
-  , a.member_id
+  , a.person_id
   , a.prescribing_provider_id
   , a.dispensing_provider_id
   , a.dispensing_date

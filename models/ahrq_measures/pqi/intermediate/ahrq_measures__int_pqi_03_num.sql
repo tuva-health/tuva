@@ -4,7 +4,7 @@
 
 select
     e.data_source
-  , e.patient_id
+  , e.person_id
   , e.year_number
   , e.encounter_id
   , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -14,7 +14,7 @@ inner join {{ ref('pqi__value_sets') }} as pqi
   and pqi.value_set_name = 'diabetes_with_long-term_complications_diagnosis_codes'
   and pqi.pqi_number = '03'
 inner join {{ ref('ahrq_measures__int_pqi_03_denom') }} as denom
-  on e.patient_id = denom.patient_id
+  on e.person_id = denom.person_id
   and e.data_source = denom.data_source
   and e.year_number = denom.year_number
 left join {{ ref('ahrq_measures__int_pqi_03_exclusions') }} as shared

@@ -6,7 +6,7 @@
 with patients_with_ascvd as (
 
     select 
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -20,7 +20,7 @@ with patients_with_ascvd as (
 , patients_with_cholesterol as (
 
     select 
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -34,7 +34,7 @@ with patients_with_ascvd as (
 , patients_with_diabetes as (
 
     select 
-          patient_id
+          person_id
         , performance_period_begin
         , performance_period_end
         , measure_id
@@ -65,7 +65,7 @@ with patients_with_ascvd as (
 
 , visits_encounters as (
 
-    select patient_id
+    select person_id
          , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as min_date
          , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as max_date
     from {{ ref('quality_measures__stg_core__encounter') }} encounter
@@ -74,10 +74,12 @@ with patients_with_ascvd as (
         and  coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
           'home health'
-        , 'office visit'
-        , 'outpatient'
-        , 'outpatient rehabilitation'
         , 'telehealth'
+    )
+    
+    or lower(encounter_group) in (
+          'office based'
+        , 'outpatient'
     )
 
 )
@@ -85,7 +87,7 @@ with patients_with_ascvd as (
 , procedure_encounters as (
 
     select 
-          patient_id
+          person_id
         , procedure_date as min_date
         , procedure_date as max_date
     from {{ ref('quality_measures__stg_core__procedure') }} procedures
@@ -98,7 +100,7 @@ with patients_with_ascvd as (
 
 , claims_encounters as (
     
-    select patient_id
+    select person_id
     , coalesce(claim_start_date,claim_end_date) as min_date
     , coalesce(claim_end_date,claim_start_date) as max_date
     from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
@@ -129,25 +131,25 @@ with patients_with_ascvd as (
 
 , encounters_by_patient as (
 
-    select patient_id,min(min_date) min_date, max(max_date) max_date,
+    select person_id,min(min_date) min_date, max(max_date) max_date,
         concat(concat(
             coalesce(min(visit_enc),'')
             ,coalesce(min(proc_enc),''))
             ,coalesce(min(claim_enc),'')
             ) as qualifying_types
     from all_encounters
-    group by patient_id
+    group by person_id
 
 )
 
 , patients_with_age as (
 
     select
-          p.patient_id
+          p.person_id
         , floor({{ datediff('birth_date', 'performance_period_begin', 'hour') }} / 8760.0)  as age
     from {{ ref('quality_measures__stg_core__patient') }} p
     inner join encounters_by_patient e
-        on p.patient_id = e.patient_id
+        on p.person_id = e.person_id
             and p.death_date is null
     cross join {{ ref('quality_measures__int_cqm438__performance_period') }}
 
@@ -157,7 +159,7 @@ with patients_with_ascvd as (
 
     select
         distinct
-          patients_with_ascvd.patient_id
+          patients_with_ascvd.person_id
         , patients_with_age.age as age
         , patients_with_ascvd.performance_period_begin
         , patients_with_ascvd.performance_period_end
@@ -167,7 +169,7 @@ with patients_with_ascvd as (
         , 1 as denominator_flag
     from patients_with_ascvd
     left join patients_with_age
-    on patients_with_ascvd.patient_id = patients_with_age.patient_id
+    on patients_with_ascvd.person_id = patients_with_age.person_id
     where age is not null
 
 )
@@ -176,7 +178,7 @@ with patients_with_ascvd as (
 
     select
         distinct
-          patients_with_cholesterol.patient_id
+          patients_with_cholesterol.person_id
         , patients_with_age.age as age
         , patients_with_cholesterol.performance_period_begin
         , patients_with_cholesterol.performance_period_end
@@ -186,7 +188,7 @@ with patients_with_ascvd as (
         , 1 as denominator_flag
     from patients_with_cholesterol
     left join patients_with_age
-    on patients_with_cholesterol.patient_id = patients_with_age.patient_id
+    on patients_with_cholesterol.person_id = patients_with_age.person_id
     where age between 20 and 75
 
 )
@@ -195,7 +197,7 @@ with patients_with_ascvd as (
 
     select
         distinct
-          patients_with_diabetes.patient_id
+          patients_with_diabetes.person_id
         , patients_with_age.age as age
         , patients_with_diabetes.performance_period_begin
         , patients_with_diabetes.performance_period_end
@@ -205,7 +207,7 @@ with patients_with_ascvd as (
         , 1 as denominator_flag
     from patients_with_diabetes
     left join patients_with_age
-    on patients_with_diabetes.patient_id = patients_with_age.patient_id
+    on patients_with_diabetes.person_id = patients_with_age.person_id
     where age between 40 and 75
 
 )
@@ -213,7 +215,7 @@ with patients_with_ascvd as (
 , final_denominator as (
     
     select
-          patient_id
+          person_id
         , age
         , performance_period_begin
         , performance_period_end
@@ -226,7 +228,7 @@ with patients_with_ascvd as (
     union all
 
     select
-          patient_id
+          person_id
         , age
         , performance_period_begin
         , performance_period_end
@@ -239,7 +241,7 @@ with patients_with_ascvd as (
     union all
 
     select
-          patient_id
+          person_id
         , age
         , performance_period_begin
         , performance_period_end
@@ -254,7 +256,7 @@ with patients_with_ascvd as (
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(age as integer) as age
         , cast(performance_period_begin as date) as performance_period_begin
         , cast(performance_period_end as date) as performance_period_end
@@ -267,7 +269,7 @@ with patients_with_ascvd as (
 )
 
 select 
-      patient_id
+      person_id
     , age
     , performance_period_begin
     , performance_period_end

@@ -6,7 +6,7 @@
 
 
 select
-    cast(elig.patient_id as {{ dbt.type_string() }} ) as patient_id
+    cast(elig.person_id as {{ dbt.type_string() }} ) as person_id
     , cast(elig.member_id as {{ dbt.type_string() }} ) as member_id
     , cast(elig.subscriber_id as {{ dbt.type_string() }} ) as subscriber_id
     , cast(elig.gender as {{ dbt.type_string() }} ) as gender
@@ -35,4 +35,4 @@ select
     , cast('{{ var('tuva_last_run')}}'  as {{ dbt.type_string() }} ) as tuva_last_run
 from {{ ref('normalized_input__stg_eligibility') }} elig
 left join {{ ref('normalized_input__int_eligibility_dates_normalize') }} date_norm
-    on elig.patient_id_key = date_norm.patient_id_key
+    on elig.person_id_key = date_norm.person_id_key

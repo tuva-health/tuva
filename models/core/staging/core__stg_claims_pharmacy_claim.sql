@@ -1,4 +1,3 @@
-
 {{ config(
      enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
    )
@@ -9,18 +8,17 @@
 -- table in core.
 -- *************************************************
 
-
-
-
 select
     {{ dbt.concat([
         "cast(claim_id as " ~ dbt.type_string() ~ ")",
         "'-'",
-        "cast(claim_line_number as " ~ dbt.type_string() ~ ")"
+        "cast(claim_line_number as " ~ dbt.type_string() ~ ")",
+        "'-'",
+        "cast(data_source as " ~ dbt.type_string() ~ ")"
          ]) }} as pharmacy_claim_id
        , cast(claim_id as {{ dbt.type_string() }} ) as claim_id
        , cast(claim_line_number as integer ) as claim_line_number
-       , cast(patient_id as {{ dbt.type_string() }} ) as patient_id
+       , cast(person_id as {{ dbt.type_string() }} ) as person_id
        , cast(member_id as {{ dbt.type_string() }} ) as member_id
        , cast(payer as {{ dbt.type_string() }} ) as payer
        , {{ quote_column('plan') }}

@@ -4,11 +4,11 @@
    )
 }}
 
-
 {% if var('use_synthetic_data') == true -%}
 
-select
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
 cast(null as {{ dbt.type_string() }} ) as encounter_id
+, cast(null as {{ dbt.type_string() }} ) as person_id
 , cast(null as {{ dbt.type_string() }} ) as patient_id
 , cast(null as {{ dbt.type_string() }} ) as encounter_type
 , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as encounter_start_date

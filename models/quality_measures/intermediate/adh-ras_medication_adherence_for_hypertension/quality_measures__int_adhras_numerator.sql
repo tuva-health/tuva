@@ -6,7 +6,7 @@
 with denominator as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , first_dispensing_date
         , days_supply
@@ -38,12 +38,12 @@ The below 3 cte identifies periods of continuous medication use for each patient
 , ranked_patient as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
-        , dense_rank() over (partition by patient_id order by dispensing_date) as dense_rank
-        , lag(ndc_code) over (partition by patient_id order by dispensing_date) as previous_ndc
+        , dense_rank() over (partition by person_id order by dispensing_date) as dense_rank
+        , lag(ndc_code) over (partition by person_id order by dispensing_date) as previous_ndc
     from denominator
 
 )
@@ -51,7 +51,7 @@ The below 3 cte identifies periods of continuous medication use for each patient
 , grouped_meds as (
 
     select
-          patient_id
+          person_id
         , dispensing_date
         , ndc_code
         , days_supply
@@ -67,12 +67,12 @@ The below 3 cte identifies periods of continuous medication use for each patient
 , final_groups as (
 
     select
-          patient_id
+          person_id
         , ndc_code
         , dispensing_date
         , days_supply
         , sum(med_change_flag) over (
-              partition by patient_id 
+              partition by person_id 
               order by dense_rank 
               rows between unbounded preceding and current row
           ) as group_id
@@ -89,7 +89,7 @@ on previous fills and the performance period.
 , theoretical_end_dates as (
 
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
@@ -115,14 +115,14 @@ or use the current rx_fill_date
 , previous_fill_end_dates as (
     
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
         , theoretical_end_date
         , lag(theoretical_end_date)
           over (partition by 
-                patient_id
+                person_id
               , group_id  
             order by
                 dispensing_date
@@ -134,7 +134,7 @@ or use the current rx_fill_date
 , adjusted_fill_dates as (
     
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
@@ -158,7 +158,7 @@ or use the current rx_fill_date
 , actual_end_dates as (
 
     select
-        patient_id
+        person_id
       , group_id
       , dispensing_date
       , days_supply
@@ -185,14 +185,14 @@ or use the current rx_fill_date
 , grouped_fill_ranges as (
 
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
         , adjusted_fill_date
         , actual_end_date
-        , min(adjusted_fill_date) over(partition by patient_id, group_id) as group_first
-        , max(adjusted_fill_date) over(partition by patient_id, group_id) as group_last
+        , min(adjusted_fill_date) over(partition by person_id, group_id) as group_first
+        , max(adjusted_fill_date) over(partition by person_id, group_id) as group_last
     from actual_end_dates
 
 )
@@ -200,7 +200,7 @@ or use the current rx_fill_date
 , final_fills as (
 
     select
-          patient_id
+          person_id
         , group_id
         , dispensing_date
         , days_supply
@@ -213,7 +213,7 @@ or use the current rx_fill_date
               when adjusted_fill_date = group_last
               then days_supply
               else 0
-            end) over (partition by patient_id, group_id) as group_last_days_supply
+            end) over (partition by person_id, group_id) as group_last_days_supply
     from grouped_fill_ranges
 
 )
@@ -227,7 +227,7 @@ or use the current rx_fill_date
 , covered_days_per_groups as (
     
     select
-          patient_id
+          person_id
         , group_id
         , group_first
         , group_last
@@ -240,7 +240,7 @@ or use the current rx_fill_date
             }} ) as covered_days_per_group
     from final_fills
     group by 
-          patient_id
+          person_id
         , group_id
         , group_first
         , group_last
@@ -251,13 +251,13 @@ or use the current rx_fill_date
 , with_lag as (
 
     select
-          patient_id
+          person_id
         , group_id
         , group_first
         , group_last
         , covered_days_per_group
-        , lag(group_last) over(partition by patient_id order by group_first) as lag_date
-        , lag(group_last_days_supply) over(partition by patient_id order by group_first) as lag_days_supply
+        , lag(group_last) over(partition by person_id order by group_first) as lag_date
+        , lag(group_last_days_supply) over(partition by person_id order by group_first) as lag_days_supply
     from covered_days_per_groups
 
 )
@@ -265,7 +265,7 @@ or use the current rx_fill_date
 , overlap_days as (
 
     select
-          patient_id
+          person_id
         , group_id
         , group_first
         , group_last
@@ -299,16 +299,16 @@ or use the current rx_fill_date
 , final_covered_days as (
 
     select 
-          patient_id
+          person_id
         , sum(covered_days_per_group) - sum(overlap) as actual_covered_days
     from overlap_days
-    group by patient_id
+    group by person_id
 
 )
 
 , patient_with_treatment_period_days as (
     select
-          patient_id
+          person_id
         , {{ datediff('first_dispensing_date', 'performance_period_end', 'day') }} as treatment_period_days
     from denominator
 
@@ -317,11 +317,11 @@ or use the current rx_fill_date
 , patient_with_pdc as (
 
     select
-          final_covered_days.patient_id
+          final_covered_days.person_id
         , round(cast(actual_covered_days * 100 / treatment_period_days as {{ dbt.type_numeric() }}), 4) as adherence
     from final_covered_days
     inner join patient_with_treatment_period_days 
-        on final_covered_days.patient_id = patient_with_treatment_period_days.patient_id
+        on final_covered_days.person_id = patient_with_treatment_period_days.person_id
 
 )
 
@@ -332,14 +332,14 @@ Selects only the patient whose pdc is greater than 80%.
 , valid_patients as (
 
     select 
-          patient_with_pdc.patient_id
+          patient_with_pdc.person_id
         , adherence
         , denominator.dispensing_date as evidence_date
         , denominator.days_supply as evidence_value
         , 1 as numerator_flag
     from patient_with_pdc 
     inner join denominator
-        on patient_with_pdc.patient_id = denominator.patient_id 
+        on patient_with_pdc.person_id = denominator.person_id 
     where patient_with_pdc.adherence >= 80.00 
 
 )
@@ -347,7 +347,7 @@ Selects only the patient whose pdc is greater than 80%.
 , add_data_types as (
 
     select
-          cast(patient_id as {{ dbt.type_string() }}) as patient_id
+          cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(evidence_date as date) as evidence_date
         , cast(evidence_value as {{ dbt.type_string() }}) as evidence_value
         , cast(adherence as {{ dbt.type_numeric() }}) as adherence
@@ -357,7 +357,7 @@ Selects only the patient whose pdc is greater than 80%.
 )
 
 select
-      patient_id
+      person_id
     , evidence_date
     , evidence_value
     , adherence

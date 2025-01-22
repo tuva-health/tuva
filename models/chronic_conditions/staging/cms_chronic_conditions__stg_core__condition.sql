@@ -5,7 +5,7 @@
 
 select
       claim_id
-    , patient_id
+    , person_id
     , recorded_date
     , normalized_code_type
     , normalized_code

@@ -3,7 +3,7 @@
    )
 }}
 select
-      patient_id
+      person_id
     , sex
     , birth_date
     , death_date
