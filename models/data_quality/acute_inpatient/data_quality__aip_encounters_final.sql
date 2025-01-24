@@ -14,7 +14,7 @@ with professional_paid_amounts as (
 )
 
 select
-      aa.patient_id
+      aa.person_id
     , aa.encounter_id
     , aa.encounter_start_date
     , aa.encounter_end_date

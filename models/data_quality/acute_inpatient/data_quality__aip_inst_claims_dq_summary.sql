@@ -180,7 +180,7 @@ with total_institutional_claims as (
     union all
 
     select
-        '(# AIP inst claims with unusable patient_id) / (# AIP inst claims) * 100' as field
+        '(# AIP inst claims with unusable person_id) / (# AIP inst claims) * 100' as field
         , round((select * from aip_inst_claims_with_unusable_patient_id) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
 
     union all

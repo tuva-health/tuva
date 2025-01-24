@@ -5,11 +5,11 @@
 with single_claim_encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_id
         , count(distinct claim_id) as claim_count
     from {{ ref('data_quality__aip_encounter_id') }}
-    group by patient_id, encounter_id
+    group by person_id, encounter_id
     having claim_count = 1
 
 )
@@ -17,7 +17,7 @@ with single_claim_encounters as (
 , claims_from_single_claim_encounters as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , encounter_id
     from {{ ref('data_quality__aip_encounter_id') }}
@@ -31,7 +31,7 @@ with single_claim_encounters as (
 , get_other_claim_data_elements as (
 
     select
-          aa.patient_id
+          aa.person_id
         , aa.claim_id
         , aa.encounter_id
         , bb.merge_start_date
@@ -60,13 +60,13 @@ with single_claim_encounters as (
         , 0 as part_of_multi_claim_encounter
     from claims_from_single_claim_encounters aa
     left join {{ ref('data_quality__acute_inpatient_institutional_claims') }} bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.claim_id = bb.claim_id
 
 )
 
 select
-      patient_id
+      person_id
     , claim_id
     , encounter_id
     , merge_start_date

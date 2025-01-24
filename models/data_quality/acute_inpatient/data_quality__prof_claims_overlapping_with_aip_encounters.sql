@@ -4,7 +4,7 @@
 
 select
       aa.claim_id
-    , aa.patient_id
+    , aa.person_id
     , aa.paid_amount
     , aa.usable_patient_id
     , aa.merge_start_date
@@ -15,7 +15,7 @@ select
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('data_quality__all_prof_aip_claims') }} aa
 left join {{ ref('data_quality__aip_encounters_institutional_definition') }} bb
-    on aa.patient_id = bb.patient_id
+    on aa.person_id = bb.person_id
     and (
            aa.merge_start_date between bb.encounter_start_date and bb.encounter_end_date
         or aa.merge_end_date between bb.encounter_start_date and bb.encounter_end_date

@@ -5,7 +5,7 @@
 with add_flags_for_each_relevant_field as (
 
     select
-          patient_id
+          person_id
         , encounter_id
         
         , case 
@@ -51,7 +51,7 @@ with add_flags_for_each_relevant_field as (
     from {{ ref('data_quality__aip_multiple_claim_encounters') }}
     where usable_for_aip_encounter = 1
     group by 
-          patient_id
+          person_id
         , encounter_id
 
 )
@@ -59,7 +59,7 @@ with add_flags_for_each_relevant_field as (
 , add_dq_problem_flag as (
 
     select
-          patient_id
+          person_id
         , encounter_id
 
         , case
@@ -90,7 +90,7 @@ with add_flags_for_each_relevant_field as (
 )
 
 select
-      patient_id
+      person_id
     , encounter_id
     , dq_problem
     , multiple_ms_drg_code

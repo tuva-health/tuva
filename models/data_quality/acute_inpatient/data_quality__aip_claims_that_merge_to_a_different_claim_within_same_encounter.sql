@@ -53,7 +53,7 @@ with claim_comparisons_within_same_encounter as (
 
     from {{ ref('data_quality__aip_multiple_claim_encounters') }} aa
     inner join {{ ref('data_quality__aip_multiple_claim_encounters') }} bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.encounter_id = bb.encounter_id
         and aa.claim_id <> bb.claim_id
 

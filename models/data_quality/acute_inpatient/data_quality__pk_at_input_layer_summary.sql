@@ -41,7 +41,7 @@ with medical_claim_rows as (
 
     select 
         count(distinct {{ dbt.concat([
-        "patient_id", 
+        "person_id", 
         "'|'", 
         quote_column("plan"),
         "'|'", 

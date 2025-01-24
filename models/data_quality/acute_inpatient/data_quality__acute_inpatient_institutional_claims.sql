@@ -19,7 +19,7 @@ with all_aip_inst_claims as (
 
     select
           aip.claim_id
-        , other_header_values.patient_id
+        , other_header_values.person_id
         , merge_dates.merge_start_date
         , merge_dates.merge_end_date
         , header_values.assigned_ms_drg_code as ms_drg_code
@@ -55,7 +55,7 @@ with all_aip_inst_claims as (
 
     select
           claim_id
-        , patient_id
+        , person_id
         , merge_start_date
         , merge_end_date
         , ms_drg_code
@@ -101,7 +101,7 @@ with all_aip_inst_claims as (
 
 select
       claim_id
-    , patient_id
+    , person_id
     , merge_start_date
     , merge_end_date
     , ms_drg_code

@@ -43,7 +43,7 @@ with medical_claim_rows as (
 
     select 
         count(distinct {{ dbt.concat([
-        "patient_id", 
+        "person_id", 
         "'|'", 
         quote_column("plan"),
         "'|'", 
@@ -88,7 +88,7 @@ with medical_claim_rows as (
     union all
 
     select
-        'select count(distinct patient_id, plan, enrollment_start_date, enrollment_end_date) from eligibility' as field,
+        'select count(distinct person_id, plan, enrollment_start_date, enrollment_end_date) from eligibility' as field,
         (select * from eligibility_distinct_pk) as field_value
 
 )

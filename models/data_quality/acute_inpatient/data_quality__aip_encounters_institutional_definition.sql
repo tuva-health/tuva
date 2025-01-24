@@ -5,7 +5,7 @@
 with single_claim_encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_id
         , merge_start_date as encounter_start_date
         , merge_end_date as encounter_end_date
@@ -37,7 +37,7 @@ with single_claim_encounters as (
 , multi_claim_encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_id
         , encounter_start_date
         , encounter_end_date
@@ -66,7 +66,7 @@ with single_claim_encounters as (
 )
 
 select
-      patient_id
+      person_id
     , encounter_id
     , encounter_start_date
     , encounter_end_date
@@ -96,7 +96,7 @@ from single_claim_encounters
 union all
 
 select
-      patient_id
+      person_id
     , encounter_id
     , encounter_start_date
     , encounter_end_date

@@ -6,7 +6,7 @@ with all_prof_aip_claim_lines as (
 
     select
           claim_id
-        , patient_id
+        , person_id
         , place_of_service_code
         , paid_amount
     from {{ ref('medical_claim') }}
@@ -18,7 +18,7 @@ with all_prof_aip_claim_lines as (
 
     select
           claim_id
-        , max(patient_id) as patient_id
+        , max(person_id) as person_id
         , sum(paid_amount) as paid_amount
     from all_prof_aip_claim_lines
     group by
@@ -30,7 +30,7 @@ with all_prof_aip_claim_lines as (
 
     select
           aa.claim_id
-        , aa.patient_id
+        , aa.person_id
         , aa.paid_amount
         , bb.usable_patient_id
         , cc.merge_start_date
@@ -39,7 +39,7 @@ with all_prof_aip_claim_lines as (
     from group_at_claim_grain aa
     left join {{ ref('data_quality__other_header_values') }} bb
       on aa.claim_id = bb.claim_id
-      and aa.patient_id = bb.patient_id
+      and aa.person_id = bb.person_id
     left join {{ ref('data_quality__claim_grain_calculated_dates') }} cc
       on aa.claim_id = cc.claim_id
 
@@ -49,7 +49,7 @@ with all_prof_aip_claim_lines as (
 
     select
           claim_id
-        , patient_id
+        , person_id
         , paid_amount
         , usable_patient_id
         , merge_start_date
@@ -65,7 +65,7 @@ with all_prof_aip_claim_lines as (
 
 select
       claim_id
-    , patient_id
+    , person_id
     , paid_amount
     , usable_patient_id
     , merge_start_date

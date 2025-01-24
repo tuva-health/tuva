@@ -5,14 +5,14 @@
 with add_row_num as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , merge_start_date
         , merge_end_date
         , discharge_disposition_code
         , facility_npi
         , row_number() over (
-              partition by patient_id
+              partition by person_id
               order by merge_end_date, merge_start_date, claim_id
           ) as row_num
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
@@ -23,7 +23,7 @@ with add_row_num as (
 , check_for_merges_with_larger_row_num as (
 
     select
-          aa.patient_id
+          aa.person_id
         , aa.claim_id as claim_id_a
         , bb.claim_id as claim_id_b
         , aa.row_num as row_num_a
@@ -55,7 +55,7 @@ with add_row_num as (
           end as merge_flag
     from add_row_num aa
     inner join add_row_num bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.row_num < bb.row_num
 
 )
@@ -63,7 +63,7 @@ with add_row_num as (
 , merges_with_larger_row_num as (
 
     select
-          patient_id
+          person_id
         , claim_id_a
         , claim_id_b
         , row_num_a
@@ -86,7 +86,7 @@ with add_row_num as (
     select distinct aa.claim_id as claim_id
     from add_row_num aa
     inner join merges_with_larger_row_num bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and bb.row_num_a < aa.row_num
         and bb.row_num_b > aa.row_num
 
@@ -95,7 +95,7 @@ with add_row_num as (
 , close_flags as (
 
     select
-          aa.patient_id
+          aa.person_id
         , aa.claim_id
         , aa.merge_start_date
         , aa.merge_end_date
@@ -117,13 +117,13 @@ with add_row_num as (
 , join_every_row_to_later_closes as (
 
     select
-          aa.patient_id as patient_id
+          aa.person_id as person_id
         , aa.claim_id as claim_id
         , aa.row_num as row_num
         , bb.row_num as row_num_b
     from close_flags aa
     inner join close_flags bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.row_num <= bb.row_num
     where bb.close_flag = 1
 
@@ -132,18 +132,18 @@ with add_row_num as (
 , find_min_closing_row_num_for_every_claim as (
 
     select
-          patient_id
+          person_id
         , claim_id
         , min(row_num_b) as min_closing_row
     from join_every_row_to_later_closes
-    group by patient_id, claim_id
+    group by person_id, claim_id
 
 )
 
 , add_min_closing_row_to_every_claim as (
 
     select
-          aa.patient_id as patient_id
+          aa.person_id as person_id
         , aa.claim_id as claim_id
         , aa.merge_start_date as merge_start_date
         , aa.merge_end_date as merge_end_date
@@ -154,7 +154,7 @@ with add_row_num as (
         , bb.min_closing_row as min_closing_row
     from close_flags aa
     left join find_min_closing_row_num_for_every_claim bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.claim_id = bb.claim_id
 
 )
@@ -162,7 +162,7 @@ with add_row_num as (
 , add_encounter_id as (
 
     select
-          aa.patient_id as patient_id
+          aa.person_id as person_id
         , aa.claim_id as claim_id
         , aa.merge_start_date as merge_start_date
         , aa.merge_end_date as merge_end_date
@@ -174,13 +174,13 @@ with add_row_num as (
         , bb.claim_id as encounter_id
     from add_min_closing_row_to_every_claim aa
     left join add_min_closing_row_to_every_claim bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.min_closing_row = bb.row_num
 
 )
 
 select
-      patient_id
+      person_id
     , claim_id
     , encounter_id
     , '{{ var('tuva_last_run')}}' as tuva_last_run

@@ -21,8 +21,8 @@ models:
   columns:
       - name: claim_id
         description: The claim_id given in the input layer.
-      - name: patient_id
-        description: The patient_id for this claim.
+      - name: person_id
+        description: The person_id for this claim.
       - name: merge_start_date
         description: The start date of the merge period for this claim.
       - name: merge_end_date
@@ -55,7 +55,7 @@ models:
           usable_admit_type_code, usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
       - name: usable_patient_id
         description: >
-          0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+          0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
       - name: usable_merge_dates
         description: >
           0 or 1 flag. Has value of 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
@@ -214,8 +214,8 @@ models:
       not merged into a common encounter indeed have different facility_npi values or the first claim has discharge disposition <> '30', and also that 
       they have different encounter_id values.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the claim.
+    - name: person_id
+      description: The person_id associated with the claim.
     - name: claim_id_a
       description: The first claim in the pair (smaller claim_id).
     - name: claim_id_b
@@ -264,8 +264,8 @@ models:
       This table lists all claims that are assigned to more than one encounter. There should be zero claims assigned to more 
       than one encounter if the encounter grouper works correctly, so this table should always be empty.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the claim.
+    - name: person_id
+      description: The person_id associated with the claim.
     - name: claim_id
       description: The claim_id given in the input layer.
     - name: encounter_count
@@ -311,8 +311,8 @@ models:
       is because they have different facility_npi. In this table we can easily check that pairs of claims overlapping in time and not merged into 
       a common encounter indeed have different facility_npi values and encounter_id values.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the claim.
+    - name: person_id
+      description: The person_id associated with the claim.
     - name: claim_id_a
       description: The first claim in the pair (smaller claim_id).
     - name: claim_id_b
@@ -429,8 +429,8 @@ models:
       acute_inpatient_institutional_claims table that has usable_for_aip_encounter = 1. N different claims that are 
       merged into a single encounter would be represented as N rows on this table with different claim_ids but the same encounter_id.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the claim.
+    - name: person_id
+      description: The person_id associated with the claim.
     - name: claim_id
       description: The claim_id given in the input layer.
     - name: encounter_id
@@ -466,8 +466,8 @@ models:
       This table shows all final usable acute inpatient encounters with rolled-up payments from professional claims. 
       The table is at the encounter grain, meaning count(*) = count(distinct encounter_id) on this table.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the encounter.
+    - name: person_id
+      description: The person_id associated with the encounter.
     - name: encounter_id
       description: The unique identifier for the encounter.
     - name: encounter_start_date
@@ -570,8 +570,8 @@ models:
       that we can get from institutional claims. This includes both single-claim encounters and multi-claim encounters.
       Here we select only claims from the aip_single_claim_encounter table that have usable_for_aip_encounter = 1.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the encounter.
+    - name: person_id
+      description: The person_id associated with the encounter.
     - name: encounter_id
       description: The unique identifier for the encounter.
     - name: encounter_start_date
@@ -672,8 +672,8 @@ models:
       forming the same encounter have inconsistent values for fields that should be consistent at the encounter level: ms_drg_code, apr_drg_code, 
       diagnosis_code_1, admit_type_code, admit_source_code, discharge_disposition_code, facility_npi, and rendering_npi.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the encounter.
+    - name: person_id
+      description: The person_id associated with the encounter.
     - name: encounter_id
       description: The unique identifier for the encounter.
     - name: dq_problem
@@ -728,8 +728,8 @@ models:
       (order by merge_end_date, merge_start_date, claim_id desc) and use the latest claim with a populated discharge_disposition_code 
       to pick the value of discharge_disposition_code for the encounter.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the encounter.
+    - name: person_id
+      description: The person_id associated with the encounter.
     - name: encounter_id
       description: The unique identifier for the encounter.
     - name: encounter_start_date
@@ -833,8 +833,8 @@ models:
       to be in the table aip_encounter_id) it must have usable_for_aip_encounter = 1. Therefore, all claims in this table 
       have usable_for_aip_encounter = 1.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the claim.
+    - name: person_id
+      description: The person_id associated with the claim.
     - name: claim_id
       description: The claim_id given in the input layer.
     - name: encounter_id
@@ -878,7 +878,7 @@ models:
         0 or 1 flag. Has value of 1 iff there is a usable value of apr_drg_code for the claim.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines. 
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines. 
         By construction, all claims in this table have usable_patient_id = 1.
     - name: usable_merge_dates
       description: >
@@ -929,8 +929,8 @@ models:
       to be in the table aip_encounter_id) it must have usable_for_aip_encounter = 1. Therefore, all claims in this table 
       have usable_for_aip_encounter = 1.
   columns:
-    - name: patient_id
-      description: The patient_id associated with the claim.
+    - name: person_id
+      description: The person_id associated with the claim.
     - name: claim_id
       description: The claim_id given in the input layer.
     - name: encounter_id
@@ -969,7 +969,7 @@ models:
         usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines. 
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines. 
         By construction, all claims in this table have usable_patient_id = 1.
     - name: usable_merge_dates
       description: >
@@ -1152,14 +1152,14 @@ models:
   columns:
     - name: claim_id
       description: The claim_id given in the input layer.
-    - name: patient_id
-      description: The patient_id for this claim.
+    - name: person_id
+      description: The person_id for this claim.
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
       description: The merge_start_date for this claim.
     - name: merge_end_date
@@ -2645,12 +2645,12 @@ models:
   columns:
     - name: claim_id
       description: The claim_id given in the input layer.
-    - name: patient_id
+    - name: person_id
       description: >
-        The patient_id for this claim. This field is null if the patient_id field is not usable (i.e., if usable_patient_id = 0).
+        The person_id for this claim. This field is null if the person_id field is not usable (i.e., if usable_patient_id = 0).
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: facility_npi
       description: >
         The facility_npi for this claim. This field is null if the facility_npi field is not usable (i.e., if usable_facility_npi = 0).
@@ -2768,14 +2768,14 @@ models:
   columns:
     - name: claim_id
       description: The claim_id given in the input layer.
-    - name: patient_id
-      description: The patient_id for this claim.
+    - name: person_id
+      description: The person_id for this claim.
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: usable_prof_claim
       description: >
         0 or 1 flag. Has value of 1 iff the claim is usable (i.e., if usable_patient_id = 1 and merge_start_date <= merge_end_date).
@@ -2809,14 +2809,14 @@ models:
   columns:
     - name: claim_id
       description: The claim_id given in the input layer.
-    - name: patient_id
-      description: The patient_id for this claim.
+    - name: person_id
+      description: The person_id for this claim.
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
       description: The merge_start_date for this claim.
     - name: merge_end_date
@@ -2847,14 +2847,14 @@ models:
   columns:
     - name: claim_id
       description: The claim_id given in the input layer.
-    - name: patient_id
-      description: The patient_id for this claim.
+    - name: person_id
+      description: The person_id for this claim.
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
       description: The merge_start_date for this claim.
     - name: merge_end_date
@@ -2885,14 +2885,14 @@ models:
   columns:
     - name: claim_id
       description: The claim_id given in the input layer.
-    - name: patient_id
-      description: The patient_id for this claim.
+    - name: person_id
+      description: The person_id for this claim.
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
     - name: usable_patient_id
       description: >
-        0 or 1 flag. Has value of 1 iff the patient_id is populated for at least one claim line and unique across claim lines.
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
       description: The merge_start_date for this claim.
     - name: merge_end_date

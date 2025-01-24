@@ -5,13 +5,13 @@
 with claims_per_encounter as (
 
     select
-          patient_id
+          person_id
         , encounter_id
         , count(distinct claim_id) as claims
     from {{ ref('data_quality__aip_multiple_claim_encounters') }}
     where usable_for_aip_encounter = 1
     group by 
-          patient_id
+          person_id
         , encounter_id
 
 )

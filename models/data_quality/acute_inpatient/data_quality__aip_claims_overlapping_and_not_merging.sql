@@ -6,7 +6,7 @@ with usable_aip_inst_claims as (
 
     select
           claim_id
-        , patient_id
+        , person_id
         , merge_start_date
         , merge_end_date
         , discharge_disposition_code
@@ -19,7 +19,7 @@ with usable_aip_inst_claims as (
 , check_all_overlapping_claims as (
 
     select
-          aa.patient_id
+          aa.person_id
         , aa.claim_id as claim_id_a
         , bb.claim_id as claim_id_b
         , aa.merge_start_date as merge_start_a
@@ -46,7 +46,7 @@ with usable_aip_inst_claims as (
           end as overlapping_flag
     from usable_aip_inst_claims aa
     inner join usable_aip_inst_claims bb
-        on aa.patient_id = bb.patient_id
+        on aa.person_id = bb.person_id
         and aa.claim_id < bb.claim_id
 
 )
@@ -54,7 +54,7 @@ with usable_aip_inst_claims as (
 , select_only_overlapping_claims as (
 
     select
-          patient_id
+          person_id
         , claim_id_a
         , claim_id_b
         , merge_start_a
@@ -72,7 +72,7 @@ with usable_aip_inst_claims as (
 , add_encounter_ids as (
 
     select
-          orig.patient_id
+          orig.person_id
         , orig.claim_id_a
         , orig.claim_id_b
         , orig.merge_start_a
@@ -90,16 +90,16 @@ with usable_aip_inst_claims as (
           end as different_encounter_id
     from select_only_overlapping_claims orig
     left join {{ ref('data_quality__aip_encounter_id') }} aa
-        on orig.patient_id = aa.patient_id
+        on orig.person_id = aa.person_id
         and orig.claim_id_a = aa.claim_id
     left join {{ ref('data_quality__aip_encounter_id') }} bb
-        on orig.patient_id = bb.patient_id
+        on orig.person_id = bb.person_id
         and orig.claim_id_b = bb.claim_id
 
 )
 
 select   
-      patient_id
+      person_id
     , claim_id_a
     , claim_id_b
     , merge_start_a

@@ -26,7 +26,7 @@ with medical_claims as (
     select
         cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
-    where patient_id is null
+    where person_id is null
 )
 
 , missing_patient_id_perc as (
@@ -43,7 +43,7 @@ with medical_claims as (
     from (
         select
             claim_id,
-            count(distinct patient_id) as count_of_patient_ids
+            count(distinct person_id) as count_of_patient_ids
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_patient_ids > 1
@@ -816,7 +816,7 @@ with medical_claims as (
 , final as (
     select
         1 as rank_id
-        , 'patient_id' as field
+        , 'person_id' as field
         , (select * from missing_patient_id_count) as missing_count
         , (select * from missing_patient_id_perc) as missing_perc
         , null as invalid_count

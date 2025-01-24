@@ -7,16 +7,16 @@ select
 
     , case
         when (
-               (max(patient_id) is not null) and 
-               (max(patient_id) = min(patient_id))
-             ) then max(patient_id)
+               (max(person_id) is not null) and 
+               (max(person_id) = min(person_id))
+             ) then max(person_id)
         else null
-      end as patient_id
+      end as person_id
 
     , case
         when (
-               (max(patient_id) is not null) and 
-               (max(patient_id) = min(patient_id))
+               (max(person_id) is not null) and 
+               (max(person_id) = min(person_id))
              ) then 1
         else 0
       end as usable_patient_id

@@ -5,7 +5,7 @@
 with multiple_claim_encounters as (
 
     select
-          patient_id
+          person_id
         , encounter_id
         , dq_problem
         , multiple_ms_drg_code

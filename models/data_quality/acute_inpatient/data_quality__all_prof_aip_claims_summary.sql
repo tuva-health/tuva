@@ -47,7 +47,7 @@ with total_aip_prof_claims as (
     union all
 
     select
-        '(aip prof claims with unusable patient_id) / (total aip prof claims) * 100' as field
+        '(aip prof claims with unusable person_id) / (total aip prof claims) * 100' as field
         , round(aip_prof_claims_with_unusable_patient_id.total * 100.0 / total_aip_prof_claims.total, 1) as field_value
     from aip_prof_claims_with_unusable_patient_id, total_aip_prof_claims
 
