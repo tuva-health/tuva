@@ -844,6 +844,45 @@ with final_cte as (
     union all
 
     select
+          94 as rank_id
+        , 'AIP inst claims that make up multi-claim encounters' as field
+        , (select cast(count(*) as {{ dbt.type_string() }}) from {{ ref('data_quality__aip_multiple_claim_encounters') }}) as field_value
+
+    union all
+
+    select
+          95 as rank_id
+        , 'AIP encounters made up of multiple inst claims' as field
+        , (select cast(count(*) as {{ dbt.type_string() }}) from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}) as field_value
+
+    union all
+
+    select
+          96 as rank_id
+        , cast(null as {{ dbt.type_string() }} ) as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
+
+    union all    
+
+    select
+          97 as rank_id
+        , 'Data Quality issues specific to multiple-claim encounters' as field
+        , cast(null as {{ dbt.type_string() }} ) as field_value
+
+    union all
+
+    select
+          98 as rank_id
+        , 'Encounters with a DQ problem' as field
+        , (
+            select cast(encounters as {{ dbt.type_string() }}) as encounters
+            from {{ ref('data_quality__aip_multiple_claim_encounters_dq_summary') }}
+            where field = 'Encounters with a DQ problem'
+        ) as field_value
+
+    union all
+
+    select
         99 as rank_id
         , 'Encounters with a multiple MS-DRG' as field
         , (
