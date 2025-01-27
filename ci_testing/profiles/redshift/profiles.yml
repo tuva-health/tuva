@@ -3,7 +3,7 @@ default:
     dev:
       connect_timeout: 999999
       dbname: dev_ci_testing
-      host: "{{ env_var('DBT_REDSHIFT_CI_HOST') }}"
+      host: "{{ env_var('DBT_REDSHIFT_CI_HOST_MIGRATION_TESTING') }}"
       keepalives_idle: 240
       password: "{{ env_var('DBT_REDSHIFT_CI_PASSWORD') }}"
       port: 5439
