@@ -395,6 +395,50 @@ models:
         description: >
           Payment risk score multiplied by member_months.
 
+  - name: medical_economics__fact_comparative_population
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: fact_comparative_population
+      tags: 
+        - dimension
+      materialized: table
+    description: >
+      Fact table containing the two populations of interest for comparison using 
+      core.patient as its base with person_id contained.
+    columns:
+      - name: person_id
+        description: Unique person id 
+      - name: comparative_population_id
+        description: Comparative population id
+      - name: comparative_population
+        description: Comparative population name
+
+  - name: medical_economics__dim_comparative_population
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: dim_comparative_population
+      tags: 
+        - dimension
+      materialized: table
+    description: >
+      Dimension table containing the two populations of interest for comparison using 
+      core.patient as its base
+    columns:
+      - name: comparative_population_id
+        description: Comparative population id
+      - name: comparative_population
+        description: Comparative population name
+
 ## Final 
   - name: medical_economics__specialty_condition_grouper_pharmacy_claim
     config:
