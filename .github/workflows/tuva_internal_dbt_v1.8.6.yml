@@ -137,6 +137,15 @@ jobs:
 #        run: echo "${{ steps.dbt-build.outputs.result }}"
 #        shell: bash
 
+  test-redshift-connection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Public IP of Runner
+        run: |
+          echo "Public IP Address:"
+          curl -s https://checkip.amazonaws.com
+
+
 #######  Redshift
   redshift_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
