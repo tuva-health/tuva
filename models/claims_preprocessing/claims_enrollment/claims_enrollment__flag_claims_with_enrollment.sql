@@ -74,6 +74,7 @@ select distinct
     , claim.member_id
     , claim.payer
     , claim.{{ quote_column('plan') }}
+    , mm.member_month_key
     , claim.inferred_claim_start_year_month
     , claim.inferred_claim_end_year_month
     , claim.inferred_claim_start_column_used

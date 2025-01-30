@@ -104,6 +104,7 @@ select
         when enroll.claim_id is not null then 1
             else 0
     end as int) as enrollment_flag
+    , enroll.member_month_key
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} as med
