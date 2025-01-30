@@ -47,7 +47,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_patient_ids > 1
-    )
+    ) as subquery
 )
 
 , dupe_patient_id_perc as (
@@ -83,7 +83,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_payers > 1
-    )
+    ) as subquery
 )
 
 , dupe_payer_perc as (
@@ -119,7 +119,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_plans > 1
-    )
+    ) as subquery
 )
 
 , dupe_plan_perc as (
@@ -172,7 +172,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_claim_start_dates > 1
-    )
+    ) as subquery
 )
 
 , dupe_claim_start_date_perc as (
@@ -225,7 +225,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_claim_end_dates > 1
-    )
+    ) as subquery
 )
 
 , dupe_claim_end_date_perc as (
@@ -334,7 +334,7 @@ with medical_claims as (
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
         having count_of_admission_dates > 1
-    )
+    ) as subquery
 )
 
 , dupe_admission_date_perc as (
@@ -379,7 +379,7 @@ with medical_claims as (
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
         having count_of_discharge_dates > 1
-    )
+    ) as subquery
 )
 
 , dupe_discharge_date_perc as (
@@ -424,7 +424,7 @@ with medical_claims as (
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
         having count_of_ddcs > 1
-    )
+    ) as subquery
 )
 
 , dupe_ddc_perc as (
@@ -447,7 +447,7 @@ with medical_claims as (
             on aa.claim_id = bb.claim_id
         where bb.calculated_claim_type = 'professional'
         group by aa.claim_id
-    )
+    ) as subquery
     where max_place_of_service_code is null
 )
 
@@ -532,7 +532,7 @@ with medical_claims as (
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
         having count_of_bill_type_codes > 1
-    )
+    ) as subquery
 )
 
 , dupe_bill_type_code_perc as (
@@ -577,7 +577,7 @@ with medical_claims as (
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
         having count_of_ms_drg_codes > 1
-    )
+    ) as subquery
 )
 
 , dupe_ms_drg_code_perc as (
@@ -610,7 +610,7 @@ with medical_claims as (
 )
 
 , dupe_apr_drg_code_count as (
-    select cast(count(*) as {{ dbt.type_numeric() }})
+    select cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select 
             aa.claim_id
@@ -621,7 +621,7 @@ with medical_claims as (
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
         having count_of_apr_drg_codes > 1
-    )
+    ) as subquery
 )
 
 , dupe_apr_drg_code_perc as (
@@ -629,11 +629,11 @@ with medical_claims as (
         (select * from dupe_apr_drg_code_count) * 100.0 /
         (select * from institutional_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , missing_revenue_center_code_count as (
-    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id
@@ -643,7 +643,7 @@ with medical_claims as (
             on aa.claim_id = bb.claim_id
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
-    )
+    ) as subquery
     where max_revenue_center_code is null
 )
 
@@ -652,11 +652,11 @@ with medical_claims as (
         (select * from missing_revenue_center_code_count) * 100.0 /
         (select * from institutional_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , invalid_revenue_center_code_count as (
-    select count(distinct aa.claim_id)
+    select count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__revenue_center') }} bb
         on aa.revenue_center_code = bb.revenue_center_code
@@ -672,11 +672,11 @@ with medical_claims as (
         (select * from invalid_pos_count) * 100.0 /
         (select * from institutional_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , missing_hcpcs_code_count as (
-    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id
@@ -686,7 +686,7 @@ with medical_claims as (
             on aa.claim_id = bb.claim_id
         where bb.calculated_claim_type = 'professional'
         group by aa.claim_id
-    )
+    ) as subquery
     where max_hcpcs_code is null
 )
 
@@ -695,11 +695,11 @@ with medical_claims as (
         (select * from missing_hcpcs_code_count) * 100.0 /
         (select * from professional_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , missing_rendering_npi_count as (
-    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where rendering_npi is null
 )
@@ -709,11 +709,11 @@ with medical_claims as (
         (select * from missing_rendering_npi_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , invalid_rendering_npi_count as (
-    select count(distinct aa.claim_id)
+    select count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__provider') }} bb
         on aa.rendering_npi = bb.npi
@@ -726,11 +726,11 @@ with medical_claims as (
         (select * from invalid_rendering_npi_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , dupe_rendering_npi_count as (
-    select cast(count(*) as {{ dbt.type_numeric() }})
+    select cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id
@@ -738,7 +738,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_rendering_npis > 1
-    )
+    ) as subquery
 )
 
 , dupe_rendering_npi_perc as (
@@ -746,11 +746,11 @@ with medical_claims as (
         (select * from dupe_rendering_npi_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , missing_rendering_tin_count as (
-    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where rendering_tin is null
 )
@@ -760,7 +760,7 @@ with medical_claims as (
         (select * from missing_rendering_tin_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , dupe_rendering_tin_count as (
@@ -773,7 +773,7 @@ with medical_claims as (
             from {{ ref('medical_claim') }}
             group by claim_id
             having count_of_rendering_tins > 1
-        )
+        ) as subquery
 )
 
 , dupe_rendering_tin_perc as (
@@ -785,7 +785,7 @@ with medical_claims as (
 )
 
 , missing_billing_npi_count as (
-    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }})
+    select cast(nullif(count(distinct claim_id), 0) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where billing_npi is null
 )
@@ -795,11 +795,11 @@ with medical_claims as (
         (select * from missing_billing_npi_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , invalid_billing_npi_count as (
-    select count(distinct aa.claim_id)
+    select count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__provider') }} bb
         on aa.billing_npi = bb.npi
@@ -812,11 +812,11 @@ with medical_claims as (
         (select * from invalid_billing_npi_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , dupe_billing_npi_count as (
-    select cast(count(*) as {{ dbt.type_numeric() }})
+    select cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id
@@ -824,7 +824,7 @@ with medical_claims as (
         from {{ ref('medical_claim') }}
         group by claim_id
         having count_of_billing_npis > 1
-    )
+    ) as subquery
 )
 
 , dupe_billing_npi_perc as (
@@ -832,12 +832,12 @@ with medical_claims as (
         (select * from dupe_billing_npi_count) * 100.0 /
         (select * from medical_claims)
         , 1
-    )
+    ) as percentage
 )
 
 , missing_billing_tin_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }}
     where billing_tin is null
 )
@@ -847,12 +847,12 @@ with medical_claims as (
         round(
         (select * from missing_billing_tin_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , dupe_billing_tin_count as (
     select 
-        count(*)
+        count(*) as claim_count
     from (
             select 
             claim_id
@@ -860,7 +860,7 @@ with medical_claims as (
             from {{ ref('medical_claim') }}
             group by claim_id
             having count_of_billing_tins > 1
-        )
+        ) as subquery
 )
 
 , dupe_billing_tin_perc as (
@@ -868,12 +868,12 @@ with medical_claims as (
         round(
         (select * from dupe_billing_tin_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , missing_facility_npi_count as (
     select 
-        count(distinct aa.claim_id)
+        count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('data_quality__claim_type') }} bb
         on aa.claim_id = bb.claim_id
@@ -886,12 +886,12 @@ with medical_claims as (
         round(
         (select * from missing_facility_npi_count) * 100.0 /
         (select * from institutional_claims), 1
-        )
+        ) as percentage
 )
 
 , invalid_facility_npi_count as (
     select 
-        count(distinct aa.claim_id)
+        count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__provider') }} bb
         on aa.rendering_npi = bb.npi
@@ -907,23 +907,23 @@ with medical_claims as (
         round(
         (select * from invalid_facility_npi_count) * 100.0 /
         (select * from institutional_claims), 1
-        )
+        ) as percentage
 )
 
 , dupe_facility_npi_count as (
     select 
-        count(*)
+        count(*) as claim_count
     from (
             select 
-            aa.claim_id
-        , count(distinct aa.facility_npi) as count_of_facility_npis
+              aa.claim_id
+            , count(distinct aa.facility_npi) as count_of_facility_npis
             from {{ ref('medical_claim') }} aa
             left join {{ ref('data_quality__claim_type') }} bb
             on aa.claim_id = bb.claim_id
             where bb.calculated_claim_type = 'institutional'
             group by aa.claim_id
             having count_of_facility_npis > 1
-        )
+        ) as subquery
 )
 
 , dupe_facility_npi_perc as (
@@ -931,12 +931,12 @@ with medical_claims as (
         round(
         (select * from dupe_facility_npi_count) * 100.0 /
         (select * from institutional_claims), 1
-        )
+        ) as percentage
 )
 
 , missing_paid_date_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }}
     where paid_date is null
 )
@@ -946,12 +946,12 @@ with medical_claims as (
         round(
         (select * from missing_paid_date_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , invalid_paid_date_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.paid_date = bb.full_date
@@ -964,19 +964,19 @@ with medical_claims as (
         round(
         (select * from invalid_paid_date_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , missing_paid_amount_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from (
             select 
-            claim_id
-        , max(paid_amount) as max_paid_amount
+              claim_id
+            , max(paid_amount) as max_paid_amount
             from {{ ref('medical_claim') }} 
             group by claim_id
-        )
+        ) as subquery
     where max_paid_amount is null
 )
 
@@ -985,19 +985,19 @@ with medical_claims as (
         round(
         (select * from missing_paid_amount_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , missing_allowed_amount_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from (
             select 
             claim_id
             , max(allowed_amount) as max_allowed_amount
             from {{ ref('medical_claim') }} 
             group by claim_id
-        )
+        ) as subquery
     where max_allowed_amount is null
 )
 
@@ -1006,12 +1006,12 @@ with medical_claims as (
         round(
         (select * from missing_allowed_amount_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , missing_diagnosis_code_type_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }}
     where diagnosis_code_type is null
 )
@@ -1021,12 +1021,12 @@ with medical_claims as (
         round(
         (select * from missing_diagnosis_code_type_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , invalid_diagnosis_code_type_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }}
     where (diagnosis_code_type is not null) 
         and diagnosis_code_type not in ('icd-9-cm', 'icd-10-cm')
@@ -1037,12 +1037,12 @@ with medical_claims as (
         round(
         (select * from invalid_diagnosis_code_type_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , dupe_diagnosis_code_type_count as (
     select 
-        count(*)
+        count(*) as claim_count
     from (
             select 
             claim_id
@@ -1050,7 +1050,7 @@ with medical_claims as (
             from {{ ref('medical_claim') }}
             group by claim_id
             having count_of_diagnosis_code_types > 1
-        )
+        ) as subquery
 )
 
 , dupe_diagnosis_code_type_perc as (
@@ -1058,12 +1058,12 @@ with medical_claims as (
         round(
         (select * from dupe_diagnosis_code_type_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , missing_diagnosis_code_1_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }}
     where diagnosis_code_1 is null
 )
@@ -1073,12 +1073,12 @@ with medical_claims as (
         round(
         (select * from missing_diagnosis_code_1_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , invalid_diagnosis_code_1_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__icd_10_cm') }} bb
         on aa.diagnosis_code_1 = bb.icd_10_cm
@@ -1091,12 +1091,12 @@ with medical_claims as (
         round(
         (select * from invalid_diagnosis_code_1_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , dupe_diagnosis_code_1_count as (
     select 
-        count(*)
+        count(*) as claim_count
     from (
             select 
             claim_id
@@ -1104,7 +1104,7 @@ with medical_claims as (
             from {{ ref('medical_claim') }}
             group by claim_id
             having count_of_diagnosis_code_1s > 1
-        )
+        ) as subquery
 )
 
 , dupe_diagnosis_code_1_perc as (
@@ -1112,12 +1112,12 @@ with medical_claims as (
         round(
         (select * from dupe_diagnosis_code_1_count) * 100.0 /
         (select * from medical_claims), 1
-        )
+        ) as percentage
 )
 
 , invalid_procedure_code_type_count as (
     select 
-        count(distinct aa.claim_id)
+        count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('data_quality__claim_type') }} bb
         on aa.claim_id = bb.claim_id
@@ -1130,12 +1130,12 @@ with medical_claims as (
         round(
         (select * from invalid_procedure_code_type_count) * 100.0 /
         (select * from institutional_claims), 1
-        )
+        ) as percentage
 )
 
 , invalid_procedure_code_1_count as (
     select 
-        count(distinct claim_id)
+        count(distinct claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__icd_10_pcs') }} bb
         on aa.procedure_code_1 = bb.icd_10_pcs
@@ -1148,7 +1148,7 @@ with medical_claims as (
         round(
         (select * from invalid_procedure_code_1_count) * 100.0 /
         (select * from institutional_claims), 1
-        )
+        ) as percentage
 )
 
 , final as (

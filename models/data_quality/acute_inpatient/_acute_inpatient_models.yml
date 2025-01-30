@@ -2574,6 +2574,11 @@ models:
     tags:
       - data_quality_aip
     materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer medical_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
 
 - name: data_quality__ms_drg_code_summary
   config:
@@ -2691,6 +2696,96 @@ models:
     materialized: table
   description: >
     This table shows us the number of rows and the number of unique PK rows in each input layer table.
+
+- name: data_quality__pk_eligibility_trending
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_eligibility_trending
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show for each historic data refresh (i.e., for each ingest_datetime), 
+      whether the eligibility table has a correct primary key (PK).
+  columns:
+    - name: ingest_datetime
+      description: >
+        The datetime when a batch of data was ingested.
+    - name: eligibility_row_count
+      description: >
+        The count of rows in the eligibility table that were ingested in that ingest_datetime.
+    - name: eligibility_pk_count
+      description: >
+        The count of distinct values of the primary key (patient_id, plan, enrollment_start_date, enrollment_end_date) 
+        in the eligibility table that were ingested in that ingest_datetime.
+    - name: correct_pk
+      description: |
+        This field is 'YES' when eligibility_row_count = eligibility_pk_count. 
+        This field is 'NO' when eligibility_row_count <> eligibility_pk_count.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pk_medical_claim_trending
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_medical_claim_trending
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show for each historic data refresh (i.e., for each ingest_datetime), 
+      whether the medical_claim table has a correct primary key (PK).
+  columns:
+    - name: ingest_datetime
+      description: >
+        The datetime when a batch of data was ingested.
+    - name: medical_claim_row_count
+      description: >
+        The count of rows in the medical_claim table that were ingested in that ingest_datetime.
+    - name: medical_claim_pk_count
+      description: >
+        The count of distinct values of the primary key (claim_id, claim_line_number) 
+        in the medical_claim table that were ingested in that ingest_datetime.
+    - name: correct_pk
+      description: |
+        This field is 'YES' when medical_claim_row_count = medical_claim_pk_count. 
+        This field is 'NO' when medical_claim_row_count <> medical_claim_pk_count.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pk_pharmacy_claim_trending
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pK_pharmacy_claim_trending
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show for each historic data refresh (i.e., for each ingest_datetime), 
+      whether the pharmacy_claim table has a correct primary key (PK).
+  columns:
+    - name: ingest_datetime
+      description: >
+        The datetime when a batch of data was ingested.
+    - name: pharmacy_claim_row_count
+      description: >
+        The count of rows in the pharmacy_claim table that were ingested in that ingest_datetime.
+    - name: pharmacy_claim_pk_count
+      description: >
+        The count of distinct values of the primary key (claim_id, claim_line_number) 
+        in the pharmacy_claim table that were ingested in that ingest_datetime.
+    - name: correct_pk
+      description: |
+        This field is 'YES' when pharmacy_claim_row_count = pharmacy_claim_pk_count. 
+        This field is 'NO' when pharmacy_claim_row_count <> pharmacy_claim_pk_count.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
 
 - name: data_quality__pos_all
   config:

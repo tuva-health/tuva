@@ -8,4 +8,4 @@ select distinct
 from {{ ref('data_quality__header_values') }}
 where 
     usable_bill_type_code = 1 
-    and substr(assigned_bill_type_code, 1, 2) in ('11', '12')
+    and substring(assigned_bill_type_code, 1, 2) in ('11', '12')
