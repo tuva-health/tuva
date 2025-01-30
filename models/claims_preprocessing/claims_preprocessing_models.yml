@@ -26,6 +26,8 @@ models:
         description: Name of the payer.
       - name: plan
         description: Name of the plan.
+      - name: member_month_key
+        description: '{{ doc("member_month_key") }}'
       - name: inferred_claim_start_year_month
         description: |
           The claim start date year and month.  If claim line start date is missing then the following column will be used, 
@@ -38,6 +40,33 @@ models:
         description: The name of the column used to populated inferred_claim_start_year_month.
       - name: inferred_claim_end_column_used
         description: The name of the column used to populated inferred_claim_start_column_used.
+
+  - name: claims_enrollment__flag_rx_claims_with_enrollment
+    description: This table contains pharmacy claims with matching enrollment
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: flag_rx_claims_with_enrollment
+      tags:
+        - claims_preprocessing
+      materialized: table
+    columns:
+      - name: claim_id
+        description: Unique identifier for each claim.
+      - name: claim_line_number
+        description: >
+          Indicates the line number for the particular line of the claim.
+      - name: person_id
+        description: Unique identifier for each patient in the dataset.
+      - name: payer
+        description: Name of the payer.
+      - name: plan
+        description: Name of the plan.
+      - name: member_month_key
+        description: '{{ doc("member_month_key") }}'
+      - name: paid_year_month
+        description: the year and month of the date the pharmacy claim was paid.
 
 
       

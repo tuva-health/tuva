@@ -118,3 +118,7 @@ inner join all_encounters as x
 left join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} as enroll
   on med.claim_id = enroll.claim_id
   and med.claim_line_number = enroll.claim_line_number
+  and med.person_id = enroll.person_id
+  and med.payer = enroll.payer
+  and med.{{ quote_column('plan') }} = enroll.{{ quote_column('plan') }}
+  and med.data_source = enroll.data_source

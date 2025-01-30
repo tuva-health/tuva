@@ -40,6 +40,19 @@ select
        , cast(copayment_amount as {{ dbt.type_numeric() }} ) as copayment_amount
        , cast(deductible_amount as {{ dbt.type_numeric() }} ) as deductible_amount
        , cast(in_network_flag as int ) as in_network_flag
+       , cast(
+       case
+           when enroll.claim_id is not null then 1
+              else 0
+       end as int) as enrollment_flag
+       , enroll.member_month_key
        , cast(data_source as {{ dbt.type_string() }} ) as data_source
        , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('normalized_input__pharmacy_claim') }}  pharm
+left join {{ ref('claims_enrollment__flag_rx_claims_with_enrollment') }} as enroll
+  on pharm.claim_id = enroll.claim_id
+  and pharm.claim_line_number = enroll.claim_line_number
+  and pharm.person_id = enroll.person_id
+  and pharm.payer = enroll.payer
+  and pharm.{{ quote_column('plan') }} = enroll.{{ quote_column('plan') }}
+  and pharm.data_source = enroll.data_source
