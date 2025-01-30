@@ -57,15 +57,16 @@ and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
 and a.data_source = b.data_source
 ),
 
-final_with_sk (
-  select 
-    {{ dbt_utils.generate_surrogate_key([
-        'person_id',
-        'year_month',
-        'payer',
-        quote_column('plan'),
-        'data_source'
-    ]) }} as member_month_key
+final_with_sk as (
+select 
+    dense_rank() over (
+      order by 
+        person_id
+      , year_month
+      , payer
+      , {{ quote_column('plan') }}
+      , data_source
+  ) as member_month_key
   , person_id
   , member_id
   , year_month

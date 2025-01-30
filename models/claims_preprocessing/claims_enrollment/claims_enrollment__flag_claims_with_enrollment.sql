@@ -13,6 +13,7 @@ with claim_dates as(
         , member_id
         , payer
         , {{ quote_column('plan') }}
+        , data_source
         , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date
         , coalesce(claim_line_end_date, claim_end_date, discharge_date) as inferred_claim_end_date
         , case
@@ -36,6 +37,7 @@ with claim_dates as(
         , member_id
         , payer
         , {{ quote_column('plan') }}
+        , data_source
         , inferred_claim_start_date
         , inferred_claim_end_date
         , inferred_claim_start_column_used
@@ -74,6 +76,7 @@ select distinct
     , claim.member_id
     , claim.payer
     , claim.{{ quote_column('plan') }}
+    , claim.data_source
     , mm.member_month_key
     , claim.inferred_claim_start_year_month
     , claim.inferred_claim_end_year_month
