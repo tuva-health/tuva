@@ -1005,3 +1005,7 @@ Unique year-month of in the dataset computed from eligibility.
 {% docs zip_code %}
 The zip code of the record (e.g., facility location, patient, etc).
 {% enddocs %}
+
+{% docs member_month_key %}
+The unique combination of person_id, year_month, payer, plan, and data source.
+{% enddocs %}
