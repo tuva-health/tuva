@@ -44,4 +44,5 @@ select
   , medical_claim_row_count
   , medical_claim_pk_count
   , correct_pk
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from join_both

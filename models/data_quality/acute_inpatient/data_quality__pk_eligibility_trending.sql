@@ -52,4 +52,5 @@ select
   , eligibility_row_count
   , eligibility_pk_count
   , correct_pk
+  , '{{ var('tuva_last_run')}}' as tuva_last_run
 from join_both
