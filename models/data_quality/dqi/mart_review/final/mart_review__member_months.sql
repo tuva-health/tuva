@@ -12,15 +12,10 @@ SELECT m.*,
         'm.person_id',
         "'|'",
         'm.data_source'
-    ]) }} AS patient_data_source_key,
-    {{ dbt.concat([
-        'm.person_id',
-        "'|'",
-        'm.data_source',
-        "'|'",
-        'm.year_month'
-    ]) }} AS member_month_key
+    ]) }} AS patient_data_source_key
 FROM {{ ref('core__member_months')}} m
 LEFT JOIN {{ ref('financial_pmpm__pmpm_prep') }} p ON m.person_id = p.person_id
     AND m.data_source = p.data_source
     AND m.year_month = p.year_month
+    AND m.payer = p.payer
+    AND m.plan = p.plan
