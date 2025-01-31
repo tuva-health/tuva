@@ -9,7 +9,7 @@ SELECT
     mc.data_source,
     mc.year_month,
     mc.payer,
-    mc.plan,
+    mc.{{ quote_column('plan') }},
     SUM(CASE WHEN mm.person_id IS NOT NULL THEN 1 ELSE 0 END) AS claims_with_enrollment,
     COUNT(*) AS claims
 FROM {{ ref('mart_review__stg_medical_claim') }} mc
@@ -18,14 +18,14 @@ LEFT JOIN {{ ref('core__member_months')}} mm
 GROUP BY mc.data_source
 , mc.year_month
 , mc.payer
-, mc.plan
+, mc.{{ quote_column('plan') }}
 )
 
 select
     data_source
     , year_month
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , claims_with_enrollment
     , claims
     , cast(claims_with_enrollment / claims as {{ dbt.type_numeric()}} ) AS percentage_claims_with_enrollment
