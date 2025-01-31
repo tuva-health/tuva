@@ -25,7 +25,7 @@ with encounters as (
         pmpm.year_month
       , pmpm.data_source
       , pmpm.payer
-      , pmpm.plan
+      , pmpm.{{ quote_column('plan') }}
       , pmpm.service_category_1
       , pmpm.service_category_2
       , sum(total_paid) as paid_amt
@@ -40,6 +40,6 @@ with encounters as (
         pmpm.year_month
       , pmpm.data_source
       , pmpm.payer
-      , pmpm.plan
+      , pmpm.{{ quote_column('plan') }}
       , pmpm.service_category_1
       , pmpm.service_category_2
