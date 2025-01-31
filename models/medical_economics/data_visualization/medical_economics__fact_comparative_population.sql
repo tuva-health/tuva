@@ -3,7 +3,7 @@ with population_1 as (
     select 
           person_id 
         , 1 as comparative_population_id
-        , 'population 1' as comparative_population
+        , 'California' as comparative_population
     from {{ ref('medical_economics__dim_patient') }}
     where state = 'California'
 
@@ -14,7 +14,7 @@ population_2 as (
     select 
           person_id 
         , 2 as comparative_population_id
-        , 'population 2' as comparative_population
+        , 'All other states' as comparative_population
     from {{ ref('medical_economics__dim_patient') }}
     where state <> 'California'
 

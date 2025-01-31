@@ -8,7 +8,7 @@ with member_months as (
     , aa.member_month
     , aa.risk_adjusted_member_months
   from {{ ref('medical_economics__risk_adjusted_member_months') }} aa 
-  left join {{ ref('medical_economics__dim_comparative_population') }} bb
+  left join {{ ref('medical_economics__fact_comparative_population') }} bb
     on aa.person_id = bb.person_id 
 
 )

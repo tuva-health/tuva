@@ -14,7 +14,7 @@ with fact_medical_claim as (
     , aa.paid_amount
     , aa.allowed_amount
   from {{ ref('medical_economics__fact_medical_claim') }} aa
-  left join {{ ref('medical_economics__dim_comparative_population') }} bb
+  left join {{ ref('medical_economics__fact_comparative_population') }} bb
       on aa.person_id = bb.person_id  
 
 )
