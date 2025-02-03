@@ -37,115 +37,106 @@ env:
 
 jobs:
 #######  BigQuery
-#  bigquery_clinical_and_claims_enabled:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install dbt-core and BigQuery adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-bigquery
-#
-#      - name: Create dbt profiles.yml for BigQuery
-#        run: |
-#          mkdir -p ./profiles/bigquery
-#          echo "default:
-#            outputs:
-#              dev:
-#                type: bigquery
-#                method: service-account
-#                project: dev-ci-testing
-#                keyfile: ./creds.json
-#                dataset: connector
-#                threads: 8
-#                timeout_seconds: 300
-#                priority: interactive
-#            target: dev" > ./profiles/bigquery/profiles.yml
-#        working-directory: ci_testing
-#
-#      - name: Create BigQuery credentials file
-#        run: |
-#          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 --decode > ./creds.json
-#        working-directory: ci_testing
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/bigquery
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/bigquery
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
-#
-#
-########  Fabric
-#  fabric_clinical_and_claims_enabled:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install ODBC Driver 18 for SQL Server
-#        run: |
-#          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-#          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
-#          sudo apt-get update
-#          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
-#
-#      - name: Install dbt-core and Fabric adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-fabric
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/fabric
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/fabric
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
-
-  test-redshift-connection:
+  bigquery_clinical_and_claims_enabled:
     runs-on: ubuntu-latest
-    steps:
-      - name: Get Public IP of Runner
-        run: |
-          echo "Public IP Address:"
-          curl -s https://checkip.amazonaws.com
 
+    steps:
+      - uses: actions/checkout@v2
+
+
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and BigQuery adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-bigquery
+
+      - name: Create dbt profiles.yml for BigQuery
+        run: |
+          mkdir -p ./profiles/bigquery
+          echo "default:
+            outputs:
+              dev:
+                type: bigquery
+                method: service-account
+                project: dev-ci-testing
+                keyfile: ./creds.json
+                dataset: connector
+                threads: 8
+                timeout_seconds: 300
+                priority: interactive
+            target: dev" > ./profiles/bigquery/profiles.yml
+        working-directory: ci_testing
+
+      - name: Create BigQuery credentials file
+        run: |
+          echo "${{ secrets.TUVA_BIGQUERY_TOKEN }}" | base64 --decode > ./creds.json
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/bigquery
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+
+#######  Fabric
+  fabric_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install ODBC Driver 18 for SQL Server
+        run: |
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+
+      - name: Install dbt-core and Fabric adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-fabric
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/fabric
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/fabric
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
 
 #######  Redshift
   redshift_clinical_and_claims_enabled:
@@ -183,176 +174,176 @@ jobs:
         shell: bash
 
 #######  Snowflake
-#  snowflake_clinical_and_claims_enabled:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install dbt-core and Snowflake adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-snowflake
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
-#
-#  snowflake_claims_enabled:
-#    runs-on: ubuntu-latest
-#    needs: snowflake_clinical_and_claims_enabled
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install dbt-core and Snowflake adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-snowflake
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
-#
-#  snowflake_claims_prov_attribution_enabled:
-#    runs-on: ubuntu-latest
-#    needs: snowflake_claims_enabled
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install dbt-core and Snowflake adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-snowflake
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
-#
-#  snowflake_clinical_enabled:
-#    runs-on: ubuntu-latest
-#    needs: snowflake_claims_prov_attribution_enabled
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install dbt-core and Snowflake adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-snowflake
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
-#
-#  snowflake_prov_attribution_enabled:
-#    runs-on: ubuntu-latest
-#    needs: snowflake_clinical_enabled
-#
-#    steps:
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Python
-#        uses: actions/setup-python@v4
-#        with:
-#          python-version: '3.9'
-#
-#      - name: Install dbt-core and Snowflake adapter
-#        run: |
-#          python -m pip install --upgrade pip
-#          pip install dbt-core==1.8.6 dbt-snowflake
-#
-#      - name: dbt-deps
-#        run: dbt deps --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-debug
-#        run: dbt debug --profiles-dir ./profiles/snowflake
-#        working-directory: ci_testing
-#
-#      - name: dbt-build
-#        run: |
-#          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
-#        working-directory: ci_testing
-#
-#      - name: Get the result
-#        if: ${{ always() }}
-#        run: echo "${{ steps.dbt-build.outputs.result }}"
-#        shell: bash
+  snowflake_clinical_and_claims_enabled:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_claims_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_clinical_and_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_claims_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_claims_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_clinical_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_claims_prov_attribution_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
+  snowflake_prov_attribution_enabled:
+    runs-on: ubuntu-latest
+    needs: snowflake_clinical_enabled
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dbt-core and Snowflake adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.8.6 dbt-snowflake
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/snowflake
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
