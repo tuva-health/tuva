@@ -35,7 +35,7 @@ select
     , cast(coalesce(apr.normalized_description, undetermined.apr_drg_description) as {{ dbt.type_string() }} ) as apr_drg_description
 	, cast(coalesce(rev.normalized_code, undetermined.revenue_center_code) as {{ dbt.type_string() }} ) as revenue_center_code
     , cast(coalesce(rev.normalized_description, undetermined.revenue_center_description) as {{ dbt.type_string() }} ) as revenue_center_description
-	, cast(med.service_unit_quantity as {{ dbt.type_string() }} ) as service_unit_quantity
+	, cast(med.service_unit_quantity as {{ dbt.type_numeric() }} ) as service_unit_quantity
 	, cast(med.hcpcs_code as {{ dbt.type_string() }} ) as hcpcs_code
 	, cast(med.hcpcs_modifier_1 as {{ dbt.type_string() }} ) as hcpcs_modifier_1
 	, cast(med.hcpcs_modifier_2 as {{ dbt.type_string() }} ) as hcpcs_modifier_2
