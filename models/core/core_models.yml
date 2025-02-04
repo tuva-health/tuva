@@ -611,6 +611,8 @@ models:
       description: '{{ doc("in_network_flag") }}'
     - name: enrollment_flag
       description: '{{ doc("enrollment_flag") }}'
+    - name: member_month_key
+      description: '{{ doc("member_month_key") }}'
     - name: data_source
       description: '{{ doc("data_source") }}'
     - name: tuva_last_run
@@ -711,6 +713,10 @@ models:
       - core
       materialized: table
     columns:
+    - name: member_month_key
+      description: '{{ doc("member_month_key") }}'
+      tests:
+        - not_null
     - name: person_id
       description: '{{ doc("person_id") }}'
       tests:
@@ -990,6 +996,10 @@ models:
         description: '{{ doc("deductible_amount") }}'
       - name: in_network_flag
         description: '{{ doc("in_network_flag") }}'
+      - name: enrollment_flag
+        description: '{{ doc("enrollment_flag") }}'
+      - name: member_month_key
+        description: '{{ doc("member_month_key") }}'
       - name: data_source
         description: '{{ doc("data_source") }}'
       - name: tuva_last_run

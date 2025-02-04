@@ -104,6 +104,7 @@ select
         when enroll.claim_id is not null then 1
             else 0
     end as int) as enrollment_flag
+    , enroll.member_month_key
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} as med
@@ -117,3 +118,7 @@ inner join all_encounters as x
 left join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} as enroll
   on med.claim_id = enroll.claim_id
   and med.claim_line_number = enroll.claim_line_number
+  and med.person_id = enroll.person_id
+  and med.payer = enroll.payer
+  and med.{{ quote_column('plan') }} = enroll.{{ quote_column('plan') }}
+  and med.data_source = enroll.data_source

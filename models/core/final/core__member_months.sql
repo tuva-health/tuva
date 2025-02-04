@@ -29,7 +29,6 @@ inner join month_start_and_end_dates b
   and a.enrollment_end_date >= b.month_start_date
 ),
 
-
 add_attribution_fields as (
 select
     a.person_id
@@ -56,6 +55,34 @@ and a.year_month = b.year_month
 and a.payer = b.payer
 and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
 and a.data_source = b.data_source
+),
+
+final_with_sk as (
+select 
+    dense_rank() over (
+      order by 
+        person_id
+      , year_month
+      , payer
+      , {{ quote_column('plan') }}
+      , data_source
+  ) as member_month_key
+  , person_id
+  , member_id
+  , year_month
+  , payer
+  , {{ quote_column('plan') }}
+  , data_source
+  , tuva_last_run
+  , payer_attributed_provider
+  , payer_attributed_provider_practice
+  , payer_attributed_provider_organization
+  , payer_attributed_provider_lob
+  , custom_attributed_provider
+  , custom_attributed_provider_practice
+  , custom_attributed_provider_organization
+  , custom_attributed_provider_lob
+from add_attribution_fields
 )
 
-select * from add_attribution_fields
+select * from final_with_sk
