@@ -301,7 +301,7 @@ with final_cte as (
         , '(valid rev codes) / (all rev codes) * 100' as field
         , cast(round(
             (select cast(count(*) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__rev_all') }} where valid_revenue_center_code = 1) * 100.0 /
-            (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__rev_all') }}),
+            (select cast(count(*) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__rev_all') }}),
             1
           ) as {{ dbt.type_string() }}) as field_value
 
@@ -622,13 +622,12 @@ with final_cte as (
                         , 'bill'
                     )
                 ) * 100.0 /
-                nullif (
+                
                   (
                     select total_claims
                     from {{ ref('data_quality__calculated_claim_type_percentages') }}
                     where calculated_claim_type = 'institutional'
-                  ), 0
-                )
+                  )
             , 1)
         ) as {{ dbt.type_string() }}) as field_value
 
@@ -980,7 +979,7 @@ with final_cte as (
                 where field = 'Encounters with a DQ problem'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
           ) as {{ dbt.type_string() }}) as field_value
@@ -997,7 +996,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple MS-DRG'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
           ) as {{ dbt.type_string() }}) as field_value
@@ -1014,7 +1013,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple APR-DRG'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
           ) as {{ dbt.type_string() }}) as field_value
@@ -1031,7 +1030,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple Dx1'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
         ) as {{ dbt.type_string() }}) as field_value
@@ -1048,7 +1047,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple ATC'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
         ) as {{ dbt.type_string() }}) as field_value
@@ -1065,7 +1064,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple ASC'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
         ) as {{ dbt.type_string() }}) as field_value
@@ -1082,7 +1081,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple DDC'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
         ) as {{ dbt.type_string() }}) as field_value
@@ -1099,7 +1098,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple facility NPI'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
         ) as {{ dbt.type_string() }}) as field_value
@@ -1116,7 +1115,7 @@ with final_cte as (
                 where field = 'Encounters with a multiple rendering NPI'
             ) * 100 /
             (
-                select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }})
+                select cast(count(*) as {{ dbt.type_numeric() }})
                 from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
             ), 1
         ) as {{ dbt.type_string() }}) as field_value
@@ -1158,7 +1157,7 @@ with final_cte as (
             (select cast(count(*) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__pos_all') }}
             where calculated_claim_type = 'professional' 
             and valid_place_of_service_code = 1) * 100.0 /
-            (select cast(nullif(count(*), 0) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__pos_all') }}
+            (select cast(count(*) as {{ dbt.type_numeric() }}) from {{ ref('data_quality__pos_all') }}
             where calculated_claim_type = 'professional'),
             1) as {{ dbt.type_string() }}) as field_value
 
