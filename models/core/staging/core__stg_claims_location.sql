@@ -6,7 +6,7 @@
 }}
 
 with all_providers_in_claims_dataset as (
-select distinct facility_id as npi, data_source
+select distinct facility_id as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -15,7 +15,7 @@ union
 union distinct
 {% endif %}
 
-select distinct rendering_id as npi, data_source
+select distinct rendering_id as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -24,7 +24,7 @@ union
 union distinct
 {% endif %}
 
-select distinct billing_id as npi, data_source
+select distinct billing_id as npi
 from {{ ref('core__stg_claims_medical_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -33,7 +33,7 @@ union
 union distinct
 {% endif %}
 
-select distinct prescribing_provider_id as npi, data_source
+select distinct prescribing_provider_id as npi
 from {{ ref('core__stg_claims_pharmacy_claim') }}
 
 {% if target.type == 'fabric' %}
@@ -42,13 +42,13 @@ union
 union distinct
 {% endif %}
 
-select distinct dispensing_provider_id as npi, data_source
+select distinct dispensing_provider_id as npi
 from {{ ref('core__stg_claims_pharmacy_claim') }}
 ),
 
 
 provider as (
-select aa.*, bb.data_source
+select aa.*
 from {{ ref('terminology__provider') }} aa
 inner join all_providers_in_claims_dataset bb
 on aa.npi = bb.npi
@@ -69,6 +69,6 @@ select
     , cast(practice_zip_code as {{ dbt.type_string() }} ) as zip_code
     , cast(null as {{ dbt.type_float() }} ) as latitude
     , cast(null as {{ dbt.type_float() }} ) as longitude
-    , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast( '{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
-from provider
+from provider 
