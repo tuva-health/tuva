@@ -22,6 +22,59 @@ with medical_claims as (
     where calculated_claim_type = 'institutional'
 )
 
+, missing_claim_type_count as (
+    select
+        cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as claim_count
+    from {{ ref('medical_claim') }}
+    where claim_type is null
+)
+
+, missing_claim_type_perc as (
+    select
+        round(
+            (select claim_count from missing_claim_type_count) * 100.0 /
+            (select claim_count from medical_claims), 1
+        ) as percentage
+)
+
+, invalid_claim_type_count as (
+    select
+        cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as claim_count
+    from {{ ref('medical_claim') }} aa
+    left join {{ ref('terminology__claim_type') }} bb
+        on aa.claim_type = bb.claim_type
+    where aa.claim_type is not null and bb.claim_type is null
+)
+
+, invalid_claim_type_perc as (
+    select
+        round(
+            (select claim_count from invalid_claim_type_count) * 100.0 /
+            (select claim_count from medical_claims), 1
+        ) as percentage
+)
+
+, dupe_claim_type_count as (
+    select
+        cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
+    from (
+        select
+            claim_id,
+            count(distinct claim_type) as count_of_claim_types
+        from {{ ref('medical_claim') }}
+        group by claim_id
+        having count_of_claim_types > 1
+    ) as subquery
+)
+
+, dupe_claim_type_perc as (
+    select
+        round(
+            (select claim_count from dupe_claim_type_count) * 100.0 /
+            (select claim_count from medical_claims), 1
+        ) as percentage
+)
+
 , missing_patient_id_count as (
     select
         cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as claim_count
@@ -1152,6 +1205,19 @@ with medical_claims as (
 )
 
 , final as (
+    select
+        0 as rank_id
+        , 'claim_type' as field
+        , (select * from missing_claim_type_count) as missing_count
+        , (select * from missing_claim_type_perc) as missing_perc
+        , (select * from invalid_claim_type_count) as invalid_count
+        , (select * from invalid_claim_type_perc) as invalid_perc
+        , (select * from dupe_claim_type_count) as duplicated_count
+        , (select * from dupe_claim_type_perc) as duplicated_perc
+        , 'all' as claim_type
+
+    union all
+
     select
         1 as rank_id
         , 'person_id' as field
