@@ -18,4 +18,4 @@ SELECT *,
             'data_source',
             "'|'",
             'year_month']) }} as data_source_month_key
-FROM {{ ref('financial_pmpm__pmpm_payer') }}
+FROM {{ ref('financial_pmpm__pmpm_payer_plan') }}

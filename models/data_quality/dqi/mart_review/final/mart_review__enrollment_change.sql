@@ -9,8 +9,9 @@ WITH RankedMonths AS (
         person_id,
         year_month,
         data_source,
-        lag(year_month_date, 1) over (partition by person_id, data_source order by year_month_date) as prev_year_month,
-        lead(year_month_date, 1) over (partition by person_id, data_source order by year_month_date) as next_year_month,
+        {{ quote_column('plan') }},
+        lag(year_month_date, 1) over (partition by person_id, data_source, {{ quote_column('plan') }} order by year_month_date) as prev_year_month,
+        lead(year_month_date, 1) over (partition by person_id, data_source, {{ quote_column('plan') }} order by year_month_date) as next_year_month,
         year_month_date
     FROM {{ ref('mart_review__stg_member_month') }}
 ),
@@ -18,6 +19,7 @@ Changes AS (
  SELECT
     person_id,
     data_source,
+    {{ quote_column('plan') }},
     year_month_date as change_month,
     case
         when prev_year_month is null
@@ -29,6 +31,7 @@ union all
 SELECT
     person_id,
     data_source,
+    {{ quote_column('plan') }},
     {{ dateadd('month', 1, 'year_month_date') }} as change_month,
     case
         when next_year_month is null
@@ -43,6 +46,7 @@ Final AS (
        {{ dbt.concat(["person_id", "'|'", "change_month"]) }} as membermonthkey,
         data_source,
         person_id,
+        {{ quote_column('plan') }},
         change_month,
         change_type
     FROM Changes
@@ -53,11 +57,13 @@ Result AS (
         data_source,
         change_month,
         change_type,
+        {{ quote_column('plan') }},
         count(*) as member_count
     FROM Final
     GROUP BY data_source
     , change_month
     , change_type
+    , {{ quote_column('plan') }}
 )
 
 

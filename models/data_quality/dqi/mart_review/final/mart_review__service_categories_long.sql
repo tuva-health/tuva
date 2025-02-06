@@ -6,6 +6,9 @@ with encounters as (
     select
         cast(c.year_month_int as {{ dbt.type_string() }}) as year_month
       , mc.person_id
+      , mc.data_source
+      , mc.payer
+      , mc.{{ quote_column('plan') }}
       , service_category_1
       , service_category_2
       , count(distinct mc.encounter_id) as visits
@@ -16,6 +19,9 @@ with encounters as (
     group by
         cast(c.year_month_int as {{ dbt.type_string() }})
       , mc.person_id
+      , mc.data_source
+      , mc.payer
+      , mc.{{ quote_column('plan') }}
       , service_category_1
       , service_category_2
 )
@@ -34,6 +40,8 @@ with encounters as (
     left join encounters
       on pmpm.year_month = encounters.year_month
       and pmpm.person_id = encounters.person_id
+      and pmpm.data_source = encounters.data_source
+      and pmpm.{{ quote_column('plan') }} = encounters.{{ quote_column('plan') }}
       and pmpm.service_category_1 = encounters.service_category_1
       and pmpm.service_category_2 = encounters.service_category_2
     group by
