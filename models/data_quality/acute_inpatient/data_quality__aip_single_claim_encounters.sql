@@ -10,7 +10,7 @@ with single_claim_encounters as (
         , count(distinct claim_id) as claim_count
     from {{ ref('data_quality__aip_encounter_id') }}
     group by person_id, encounter_id
-    having claim_count = 1
+    having count(distinct claim_id) = 1
 
 )
 

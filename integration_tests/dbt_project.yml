@@ -8,14 +8,14 @@ vars:
   error_empty_seeds: true
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
-  use_synthetic_data: false
+  use_synthetic_data: true
 
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
-  input_database: tuva
+  input_database: tuva_synthetic
   input_schema: input_layer
 
-  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("Asia/Kathmandu")) }}'
 
   ## The Tuva Project can support claims and clinical data.
   # By default, all models are disabled.
@@ -35,20 +35,20 @@ vars:
 
   ## Quality Measures period var
   # to run quality measueres for a period other than current year, add the below variable uncommented to your project
-#  quality_measures_period_end: "2018-12-31"
+  quality_measures_period_end: "2017-12-31"
 
   ## The vars directly below enable a single data mart.  See the Quickstart
   # guide for instructions.
 
-  # ccsr_enabled: false
-  # cms_chronic_conditions_enabled: false
-  # tuva_chronic_conditions_enabled: false
-  # claims_preprocessing_enabled: false
-  # cms_hcc_enabled: false
-  # ed_classification_enabled: false
-  # financial_pmpm_enabled: false
-  # insights_enabled: false
-  # quality_measures_enabled: false
+  # ccsr_enabled: true
+  # cms_chronic_conditions_enabled: true
+  # tuva_chronic_conditions_enabled: true
+  # claims_preprocessing_enabled: true
+  # cms_hcc_enabled: true
+  # ed_classification_enabled: true
+  # financial_pmpm_enabled: true
+  # insights_enabled: true
+  # quality_measures_enabled: true
   # readmissions_enabled: true
 
 

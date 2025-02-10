@@ -46,7 +46,11 @@ with add_row_num as (
               -- Claims that are adjacent (merge_start_date of the second one is the day after merge_end_date of the first one)
               -- should be merged if the first claim has discharge_disposition_code = '30' (still a patient) and they have the same facility_npi:
               when (
-                  (aa.merge_end_date + 1 = bb.merge_start_date)
+                  ( {{ dbt.dateadd (
+                        datepart = "day"
+                        , interval = 1
+                        , from_date_or_timestamp = "aa.merge_end_date" 
+                        ) }} = bb.merge_start_date)
                   and (aa.discharge_disposition_code = '30')
                   and (aa.facility_npi = bb.facility_npi)
               ) then 1

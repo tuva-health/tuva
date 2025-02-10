@@ -38,7 +38,11 @@ with usable_aip_inst_claims as (
               else 0
           end as ddc_not_30
         , case
-              when (aa.merge_end_date + 1 = bb.merge_start_date) then 1
+              when ( {{ dbt.dateadd (
+                        datepart = "day"
+                        , interval = 1
+                        , from_date_or_timestamp = "aa.merge_end_date" 
+                        ) }} = bb.merge_start_date) then 1
               else 0
           end as adjacent_flag
     from usable_aip_inst_claims aa

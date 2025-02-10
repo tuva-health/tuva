@@ -41,7 +41,11 @@ with claim_comparisons_within_same_encounter as (
             -- and they have the same facility_npi:
             when
             (
-                (aa.merge_end_date + 1 = bb.merge_start_date)
+                ({{ dbt.dateadd (
+                        datepart = "day"
+                        , interval = 1
+                        , from_date_or_timestamp = "aa.merge_end_date" 
+                        ) }} = bb.merge_start_date)
                 and
                 (aa.discharge_disposition_code = '30')
                 and
