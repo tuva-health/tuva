@@ -130,7 +130,7 @@ seeds:
       terminology__nitos:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.13.0','nitos.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_provider_data','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_provider_data/0.13.0','other_provider_taxonomy.csv',compression=true,null_marker=true) }}"
       terminology__payer_type:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.13.0','payer_type.csv',compression=true,null_marker=true) }}"
       terminology__place_of_service:
