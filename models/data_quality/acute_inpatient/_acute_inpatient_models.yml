@@ -2580,6 +2580,36 @@ models:
     - have invalid values
     - have duplicate values (i.e. more than one distinct value per claim)
 
+- name: data_quality__medical_claim_atomic_data_utility_stage_01
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: medical_claim_atomic_data_utility_stage_01
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer medical_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+
+- name: data_quality__medical_claim_atomic_data_utility_stage_02
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: medical_claim_atomic_data_utility_stage_02
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer medical_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+
 - name: data_quality__ms_drg_code_summary
   config:
     schema: |
@@ -2762,7 +2792,7 @@ models:
     schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
         {% else %}data_quality{%- endif -%}
-    alias: pK_pharmacy_claim_trending
+    alias: pk_pharmacy_claim_trending
     tags:
       - data_quality_aip
     materialized: table
