@@ -4,8 +4,7 @@
 
 with final as (
     select
-        rank_id
-        , field
+          field
         , missing_count
         , missing_perc
         , invalid_count
@@ -18,8 +17,7 @@ with final as (
     union all
 
     select
-          rank_id
-        , field
+          field
         , missing_count
         , missing_perc
         , invalid_count
@@ -34,12 +32,12 @@ with final as (
 select
       'medical_claim' as table_name
     , field
+    , claim_type
     , missing_count
     , missing_perc
     , invalid_count
     , invalid_perc
     , duplicated_count
     , duplicated_perc
-    , claim_type
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from final

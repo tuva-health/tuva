@@ -633,8 +633,7 @@ with medical_claims as (
 , final2 as (
 
     select 
-        13 as rank_id
-        , 'ms_drg_code' as field
+          'ms_drg_code' as field
         , null as missing_count
         , null as missing_perc
         , (select * from invalid_ms_drg_code_count) as invalid_count
@@ -646,8 +645,7 @@ with medical_claims as (
     union all
 
     select 
-        14 as rank_id
-        , 'apr_drg_code' as field
+          'apr_drg_code' as field
         , null as missing_count
         , null as missing_perc
         , (select * from invalid_apr_drg_code_count) as invalid_count
@@ -659,8 +657,7 @@ with medical_claims as (
     union all
 
     select 
-        15 as rank_id
-        , 'revenue_center_code' as field
+          'revenue_center_code' as field
         , (select * from missing_revenue_center_code_count) as missing_count
         , (select * from missing_revenue_center_code_perc) as missing_perc
         , (select * from invalid_revenue_center_code_count) as invalid_count
@@ -672,8 +669,7 @@ with medical_claims as (
     union all
 
     select 
-        16 as rank_id
-        , 'hcpcs_code' as field
+          'hcpcs_code' as field
         , (select * from missing_hcpcs_code_count) as missing_count
         , (select * from missing_hcpcs_code_perc) as missing_perc
         , null as invalid_count
@@ -685,8 +681,7 @@ with medical_claims as (
     union all
 
     select 
-        17 as rank_id
-        , 'rendering_npi' as field
+          'rendering_npi' as field
         , (select * from missing_rendering_npi_count) as missing_count
         , (select * from missing_rendering_npi_perc) as missing_perc
         , (select * from invalid_rendering_npi_count) as invalid_count
@@ -698,8 +693,7 @@ with medical_claims as (
     union all
 
     select 
-        18 as rank_id
-        , 'rendering_tin' as field
+          'rendering_tin' as field
         , (select * from missing_rendering_tin_count) as missing_count
         , (select * from missing_rendering_tin_perc) as missing_perc
         , null as invalid_count
@@ -711,8 +705,7 @@ with medical_claims as (
     union all
 
     select 
-        19 as rank_id
-        , 'billing_npi' as field
+          'billing_npi' as field
         , (select * from missing_billing_npi_count) as missing_count
         , (select * from missing_billing_npi_perc) as missing_perc
         , (select * from invalid_billing_npi_count) as invalid_count
@@ -724,7 +717,6 @@ with medical_claims as (
     union all
 
     select
-        20 as rank_id,
         'billing_tin' as field,
         (select * from missing_billing_tin_count) as missing_count,
         (select * from missing_billing_tin_perc) as missing_perc,
@@ -737,7 +729,6 @@ with medical_claims as (
     union all
 
     select
-        21 as rank_id,
         'facility_npi' as field,
         (select * from missing_facility_npi_count) as missing_count,
         (select * from missing_facility_npi_perc) as missing_perc,
@@ -750,7 +741,6 @@ with medical_claims as (
     union all
 
     select
-        22 as rank_id,
         'paid_date' as field,
         (select * from missing_paid_date_count) as missing_count,
         (select * from missing_paid_date_perc) as missing_perc,
@@ -763,7 +753,6 @@ with medical_claims as (
     union all
 
     select
-        23 as rank_id,
         'paid_amount' as field,
         (select * from missing_paid_amount_count) as missing_count,
         (select * from missing_paid_amount_perc) as missing_perc,
@@ -776,7 +765,6 @@ with medical_claims as (
     union all
 
     select
-        24 as rank_id,
         'allowed_amount' as field,
         (select * from missing_allowed_amount_count) as missing_count,
         (select * from missing_allowed_amount_perc) as missing_perc,
@@ -789,7 +777,6 @@ with medical_claims as (
     union all
 
     select
-        25 as rank_id,
         'diagnosis_code_type' as field,
         (select * from missing_diagnosis_code_type_count) as missing_count,
         (select * from missing_diagnosis_code_type_perc) as missing_perc,
@@ -802,7 +789,6 @@ with medical_claims as (
     union all
 
     select
-        26 as rank_id,
         'diagnosis_code_1' as field,
         (select * from missing_diagnosis_code_1_count) as missing_count,
         (select * from missing_diagnosis_code_1_perc) as missing_perc,
@@ -815,7 +801,6 @@ with medical_claims as (
     union all
 
     select
-        27 as rank_id,
         'procedure_code_type' as field,
         null as missing_count,
         null as missing_perc,
@@ -828,7 +813,6 @@ with medical_claims as (
     union all
 
     select
-        28 as rank_id,
         'procedure_code_1' as field,
         null as missing_count,
         null as missing_perc,
@@ -841,8 +825,7 @@ with medical_claims as (
 )
 
 select
-      rank_id
-    , field
+      field
     , claim_type
     , missing_count
     , missing_perc
