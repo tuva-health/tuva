@@ -23,8 +23,7 @@ select
     , discharge_disposition_code
     , place_of_service_code
     , bill_type_code
-    , ms_drg_code
-    , apr_drg_code
+    , drg_code
     , revenue_center_code
     , service_unit_quantity
     , hcpcs_code

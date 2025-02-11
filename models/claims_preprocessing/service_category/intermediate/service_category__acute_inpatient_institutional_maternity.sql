@@ -8,10 +8,10 @@ select distinct
   , 'inpatient' as service_category_1
   , 'acute inpatient' as service_category_2
   , case 
-      when s.ms_drg_code in ('768', '796', '797', '798', '805', '806', '807') then 'l/d - vaginal delivery'
-      when s.ms_drg_code in ('783', '784', '785', '786', '787', '788') then 'l/d - cesarean delivery'
-      when s.ms_drg_code = '795' then 'l/d - newborn'
-      when s.ms_drg_code in ('789', '790', '791', '792', '793', '794') then 'l/d - newborn nicu'
+      when s.drg_code in ('768', '796', '797', '798', '805', '806', '807') then 'l/d - vaginal delivery'
+      when s.drg_code in ('783', '784', '785', '786', '787', '788') then 'l/d - cesarean delivery'
+      when s.drg_code = '795' then 'l/d - newborn'
+      when s.drg_code in ('789', '790', '791', '792', '793', '794') then 'l/d - newborn nicu'
       when s.revenue_center_code in ('0173', '0174') then 'l/d - newborn nicu'
       else 'l/d - other'
     end as service_category_3
@@ -21,6 +21,6 @@ from {{ ref('service_category__stg_medical_claim') }} as s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
   on s.claim_id = a.claim_id
 inner join {{ ref('terminology__ms_drg') }} as m
-  on s.ms_drg_code = m.ms_drg_code
+  on s.drg_code = m.ms_drg_code
 where 
   m.mdc_code in ('MDC 14', 'MDC 15')

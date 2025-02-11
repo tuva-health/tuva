@@ -9,40 +9,40 @@ with normalize_cte as(
     select 
         med.claim_id
         , med.data_source
-        , ms.ms_drg_code
-        , ms.ms_drg_description
+        , ms.drg_code
+        , ms.drg_description
     from {{ ref('normalized_input__stg_medical_claim') }} med
     inner join {{ ref('terminology__ms_drg') }} ms
-        on med.ms_drg_code = ms.ms_drg_code
+        on med.drg_code = ms.ms_drg_code
     where claim_type = 'institutional'
 )
 , distinct_counts as(
     select 
         claim_id
         , data_source
-        , ms_drg_code
-        , ms_drg_description
+        , drg_code
+        , drg_description
         , count(*) as ms_drg_occurrence_count
     from normalize_cte
-    where ms_drg_code is not null
+    where drg_code is not null
     group by 
         claim_id
         , data_source
-        , ms_drg_code
-        , ms_drg_description
+        , drg_code
+        , drg_description
 )
 
 , occurence_comparison as(
     select
         claim_id
         , data_source
-        , 'ms_drg_code' as column_name
-        , ms_drg_code as normalized_code
-        , ms_drg_description as normalized_description
-        , ms_drg_occurrence_count as occurrence_count
-        , coalesce(lead(ms_drg_occurrence_count) 
-            over (partition by claim_id, data_source order by ms_drg_occurrence_count desc),0) as next_occurrence_count
-        , row_number() over (partition by claim_id, data_source order by ms_drg_occurrence_count desc) as occurrence_row_count
+        , 'drg_code' as column_name
+        , drg_code as normalized_code
+        , drg_description as normalized_description
+        , drg_occurrence_count as occurrence_count
+        , coalesce(lead(drg_occurrence_count) 
+            over (partition by claim_id, data_source order by drg_occurrence_count desc),0) as next_occurrence_count
+        , row_number() over (partition by claim_id, data_source order by drg_occurrence_count desc) as occurrence_row_count
     from distinct_counts dist
 )
 

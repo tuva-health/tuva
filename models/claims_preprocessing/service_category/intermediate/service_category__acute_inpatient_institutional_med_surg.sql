@@ -19,4 +19,4 @@ from {{ ref('service_category__stg_medical_claim') }} as s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
   on s.claim_id = a.claim_id
 inner join {{ ref('terminology__ms_drg') }} as m
-  on s.ms_drg_code = m.ms_drg_code
+  on s.drg_code = m.ms_drg_code

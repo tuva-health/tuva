@@ -31,10 +31,12 @@ with chronic_conditions as (
           person_id
         , claim_id
         , claim_start_date as start_date
-        , 'MS-DRG' as code_type
-        , ms_drg_code as code
+        , drg_code_type as code_type
+        , drg_code as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__medical_claim') }}
+    where
+        drg_code_type = 'MS-DRG'
 
 )
 

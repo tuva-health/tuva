@@ -42,8 +42,7 @@ where claim_type = 'institutional'
         , f.diagnosis_code_1
         , f.diagnosis_code_type
         , f.facility_id as facility_id
-        , f.ms_drg_code as ms_drg_code
-        , f.apr_drg_code as apr_drg_code
+        , f.drg_code as drg_code
         , f.admit_source_code as admit_source_code
         , f.admit_type_code as admit_type_code
         , l.discharge_disposition_code as discharge_disposition_code
@@ -127,11 +126,9 @@ select
 , sc.pharmacy_flag
 , sc.observation_flag
 , sc.ed_flag
-, c.ms_drg_code
-, j.ms_drg_description
+, c.drg_code
+, j.drg_description
 , j.medical_surgical
-, c.apr_drg_code
-, k.apr_drg_description
 , c.admit_source_code
 , h.admit_source_description
 , c.admit_type_code
@@ -168,9 +165,7 @@ left join {{ ref('terminology__admit_source') }} h
 left join {{ ref('terminology__admit_type') }} i
   on c.admit_type_code = i.admit_type_code
 left join {{ ref('terminology__ms_drg') }} j
-  on c.ms_drg_code = j.ms_drg_code
-left join {{ ref('terminology__apr_drg') }} k
-  on c.apr_drg_code = k.apr_drg_code
+  on c.drg_code = j.ms_drg_code
 left join {{ ref('terminology__icd_10_cm')}} icd10cm
   on c.diagnosis_code_1 = icd10cm.icd_10_cm
   and c.diagnosis_code_type = 'icd-10-cm'
