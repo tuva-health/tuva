@@ -17,6 +17,7 @@ with disqualified_unpivot as (
     'discharge_date',
     'discharge_disposition_code',
     'facility_id',
+    'drg_code_type',
     'drg_code',
     'paid_amount',
     'length_of_stay',

@@ -4,16 +4,20 @@
    )
 }}
 
-
 with normalize_cte as(
     select 
         med.claim_id
         , med.data_source
-        , ms.drg_code
-        , ms.drg_description
+        , med.drg_code_type
+        , coalesce(msdrg.ms_drg_code, aprdrg.apr_drg_code) as drg_code
+        , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
     from {{ ref('normalized_input__stg_medical_claim') }} med
-    inner join {{ ref('terminology__ms_drg') }} ms
-        on med.drg_code = ms.ms_drg_code
+    left join {{ ref('terminology__ms_drg') }} msdrg
+        on med.drg_code_type = 'ms-drg'
+        and med.drg_code = msdrg.ms_drg_code
+    left join {{ ref('terminology__apr_drg') }} aprdrg
+        on med.drg_code_type = 'apr-drg'
+        and med.drg_code = aprdrg.apr_drg_code
     where claim_type = 'institutional'
 )
 , distinct_counts as(
@@ -22,7 +26,7 @@ with normalize_cte as(
         , data_source
         , drg_code
         , drg_description
-        , count(*) as ms_drg_occurrence_count
+        , count(*) as drg_occurrence_count
     from normalize_cte
     where drg_code is not null
     group by 

@@ -7,7 +7,7 @@ with inst_header as (
       m.claim_id
     , max(case when m.claim_type = 'institutional' and btc.bill_type_code is null and m.bill_type_code is not null then 1 else 0 end) as invalid_bill_type_code
     , max(case when m.claim_type = 'institutional' and dd.discharge_disposition_code is null and m.discharge_disposition_code is not null then 1 else 0 end) as invalid_discharge_disposition_code
-    , max(case when d.claim_id is not null and ms.drg_code is null and m.drg_code is not null then 1 else 0 end) as invalid_drg_code
+    , max(case when d.claim_id is not null and (ms.ms_drg_code is null and apr.apr_drg_code is null) and m.drg_code is not null then 1 else 0 end) as invalid_drg_code
     , max(case when m.claim_type = 'institutional' and m.bill_type_code is null then 1 else 0 end) as missing_bill_type_code
     , max(case when m.claim_type = 'institutional' and m.discharge_disposition_code is null then 1 else 0 end) as missing_discharge_disposition_code
     , max(case when d.claim_id is not null and m.drg_code is null then 1 else 0 end) as missing_drg_code
@@ -21,6 +21,10 @@ with inst_header as (
     on m.bill_type_code = btc.bill_type_code
   left join {{ ref('terminology__ms_drg') }} as ms
     on m.drg_code = ms.ms_drg_code
+    and m.drg_code_type = 'ms-drg'
+  left join {{ ref('terminology__apr_drg') }} as apr
+    on m.drg_code = apr.apr_drg_code
+    and m.drg_code_type = 'apr-drg'
   left join {{ ref('terminology__discharge_disposition') }} as dd
     on m.discharge_disposition_code = dd.discharge_disposition_code
   group by m.claim_id

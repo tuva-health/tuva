@@ -49,6 +49,7 @@ where claim_type = 'institutional'
         , f.diagnosis_code_1
         , f.diagnosis_code_type
         , f.facility_id as facility_id
+        , f.drg_code_type as drg_code_type
         , f.drg_code as drg_code
         , f.admit_source_code as admit_source_code
         , f.admit_type_code as admit_type_code
@@ -133,9 +134,10 @@ select
 , sc.dme_flag
 , sc.ambulance_flag
 , sc.pharmacy_flag
+, c.drg_code_type
 , c.drg_code
-, j.drg_description
-, j.medical_surgical
+, coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
+, coalesce(msdrg.medical_surgical, aprdrg.medical_surgical) as medical_surgical
 , c.admit_source_code
 , h.admit_source_description
 , c.admit_type_code
@@ -172,8 +174,12 @@ left join {{ ref('terminology__admit_source') }} h
   on c.admit_source_code = h.admit_source_code
 left join {{ ref('terminology__admit_type') }} i
   on c.admit_type_code = i.admit_type_code
-left join {{ ref('terminology__ms_drg') }} j
-  on c.drg_code = j.ms_drg_code
+left join {{ ref('terminology__ms_drg') }} msdrg
+  on c.drg_code_type = 'ms-drg'
+  and c.drg_code = msdrg.ms_drg_code
+left join {{ ref('terminology__apr_drg') }} aprdrg
+  on c.drg_code_type = 'apr-drg'
+  and c.drg_code = aprdrg.apr_drg_code
 left join {{ ref('terminology__icd_10_cm')}} icd10cm
   on c.diagnosis_code_1 = icd10cm.icd_10_cm
   and c.diagnosis_code_type = 'icd-10-cm'

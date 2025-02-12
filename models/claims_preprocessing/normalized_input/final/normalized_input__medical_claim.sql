@@ -29,6 +29,7 @@ select
     , cast(coalesce(pos.normalized_description, undetermined.place_of_service_description) as {{ dbt.type_string() }} ) as place_of_service_description
 	, cast(coalesce(bill.normalized_code, undetermined.bill_type_code) as {{ dbt.type_string() }} ) as bill_type_code
     , cast(coalesce(bill.normalized_description, undetermined.bill_type_description) as {{ dbt.type_string() }} ) as bill_type_description
+	, cast(med.drg_code_type as {{ dbt.type_string() }} ) as drg_code_type
 	, cast(coalesce(drg.normalized_code, undetermined.drg_code) as {{ dbt.type_string() }} ) as drg_code
     , cast(coalesce(drg.normalized_description, undetermined.drg_description) as {{ dbt.type_string() }} ) as drg_description
 	, cast(coalesce(rev.normalized_code, undetermined.revenue_center_code) as {{ dbt.type_string() }} ) as revenue_center_code
@@ -186,8 +187,8 @@ left join {{ref('normalized_input__int_discharge_disposition_final') }} disch_di
     on med.claim_id = disch_disp.claim_id
     and med.data_source = disch_disp.data_source
 left join {{ref('normalized_input__int_drg_final') }} drg
-    on med.claim_id = ms.claim_id
-    and med.data_source = ms.data_source
+	on med.claim_id = drg.claim_id
+    and med.data_source = drg.data_source
 left join {{ref('normalized_input__int_place_of_service_normalize') }} pos
     on med.claim_id = pos.claim_id
     and med.claim_line_number = pos.claim_line_number

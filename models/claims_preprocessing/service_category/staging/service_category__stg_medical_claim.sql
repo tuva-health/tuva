@@ -20,8 +20,9 @@ select
   , m.hcpcs_code
   , c.ccs_category
   , c.ccs_category_description
+  , m.drg_code_type
   , m.drg_code
-  , drg.drg_description
+  , m.drg_description
   , m.place_of_service_code
   , pos.place_of_service_description
   , m.revenue_center_code
@@ -42,10 +43,7 @@ left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} dx on m.diagnosis_code_1
 left join {{ ref('terminology__provider') }} p on m.facility_id = p.npi
 left join {{ ref('terminology__ccs_services_procedures') }} c on m.hcpcs_code = c.hcpcs_code
 left join {{ ref('terminology__nitos') }} n on m.hcpcs_code = n.hcpcs_code
-left join {{ ref('terminology__ms_drg') }} drg on m.drg_code = drg.ms_drg_code
 left join {{ ref('terminology__revenue_center') }} r on m.revenue_center_code = r.revenue_center_code
 left join {{ ref('terminology__place_of_service') }} pos on m.place_of_service_code = pos.place_of_service_code
 left join {{ ref('terminology__bill_type') }} bt on m.bill_type_code = bt.bill_type_code
 left join {{ ref('terminology__provider')}} rend on m.rendering_id = rend.npi
-
-
