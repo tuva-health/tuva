@@ -31,7 +31,7 @@ with all_aip_inst_claims as (
         , other_header_values.facility_npi
         , other_header_values.rendering_npi
         , other_header_values.paid_amount
-        , other_header_values.usable_patient_id
+        , other_header_values.usable_person_id
         , merge_dates.usable_merge_dates
         , header_values.usable_ms_drg_code
         , header_values.usable_apr_drg_code
@@ -68,12 +68,12 @@ with all_aip_inst_claims as (
         , rendering_npi
         , paid_amount
         , case
-              when (usable_patient_id = 1 and usable_merge_dates = 1) then 1
+              when (usable_person_id = 1 and usable_merge_dates = 1) then 1
               else 0
           end as usable_for_aip_encounter
         , case
               when (
-                     (usable_patient_id = 0) 
+                     (usable_person_id = 0) 
                   or (usable_merge_dates = 0)
                   or (usable_ms_drg_code = 0 and usable_apr_drg_code = 0)
                   or (usable_diagnosis_code_1 = 0)
@@ -85,7 +85,7 @@ with all_aip_inst_claims as (
               ) then 1
               else 0
           end as dq_problem
-        , usable_patient_id
+        , usable_person_id
         , usable_merge_dates
         , usable_ms_drg_code
         , usable_apr_drg_code
@@ -115,7 +115,7 @@ select
     , paid_amount
     , usable_for_aip_encounter
     , dq_problem
-    , usable_patient_id
+    , usable_person_id
     , usable_merge_dates
     , usable_ms_drg_code
     , usable_apr_drg_code

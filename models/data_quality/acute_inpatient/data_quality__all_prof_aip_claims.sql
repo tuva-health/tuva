@@ -32,7 +32,7 @@ with all_prof_aip_claim_lines as (
           aa.claim_id
         , aa.person_id
         , aa.paid_amount
-        , bb.usable_patient_id
+        , bb.usable_person_id
         , cc.merge_start_date
         , cc.merge_end_date
         , cc.usable_merge_dates
@@ -51,12 +51,12 @@ with all_prof_aip_claim_lines as (
           claim_id
         , person_id
         , paid_amount
-        , usable_patient_id
+        , usable_person_id
         , merge_start_date
         , merge_end_date
         , usable_merge_dates
         , case
-            when (usable_patient_id = 1 and usable_merge_dates = 1) then 1
+            when (usable_person_id = 1 and usable_merge_dates = 1) then 1
             else 0
           end as usable_prof_claim
     from add_other_fields
@@ -67,7 +67,7 @@ select
       claim_id
     , person_id
     , paid_amount
-    , usable_patient_id
+    , usable_person_id
     , merge_start_date
     , merge_end_date
     , usable_merge_dates

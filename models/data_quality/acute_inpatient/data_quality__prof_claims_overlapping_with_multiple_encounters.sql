@@ -29,7 +29,7 @@ select
       bb.claim_id
     , bb.person_id
     , bb.paid_amount
-    , bb.usable_patient_id
+    , bb.usable_person_id
     , bb.merge_start_date
     , bb.merge_end_date
     , bb.usable_merge_dates

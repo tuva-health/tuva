@@ -47,7 +47,7 @@ with single_claim_encounters as (
         , bb.paid_amount
         , bb.usable_for_aip_encounter
         , bb.dq_problem
-        , bb.usable_patient_id
+        , bb.usable_person_id
         , bb.usable_merge_dates
         , bb.usable_ms_drg_code
         , bb.usable_apr_drg_code
@@ -82,7 +82,7 @@ select
     , paid_amount
     , usable_for_aip_encounter
     , dq_problem
-    , usable_patient_id
+    , usable_person_id
     , usable_merge_dates
     , usable_ms_drg_code
     , usable_apr_drg_code

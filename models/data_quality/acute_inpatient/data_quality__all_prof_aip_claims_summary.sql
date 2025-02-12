@@ -10,12 +10,12 @@ with total_aip_prof_claims as (
 
 )
 
-,  aip_prof_claims_with_unusable_patient_id as (
+,  aip_prof_claims_with_unusable_person_id as (
 
     select
           cast(count(*) as {{ dbt.type_numeric() }}) as total
     from {{ ref('data_quality__all_prof_aip_claims') }}
-    where usable_patient_id = 0
+    where usable_person_id = 0
 
 )
 
@@ -48,8 +48,8 @@ with total_aip_prof_claims as (
 
     select
         '(aip prof claims with unusable person_id) / (total aip prof claims) * 100' as field
-        , round(aip_prof_claims_with_unusable_patient_id.total * 100.0 / total_aip_prof_claims.total, 1) as field_value
-    from aip_prof_claims_with_unusable_patient_id, total_aip_prof_claims
+        , round(aip_prof_claims_with_unusable_person_id.total * 100.0 / total_aip_prof_claims.total, 1) as field_value
+    from aip_prof_claims_with_unusable_person_id, total_aip_prof_claims
 
     union all
 

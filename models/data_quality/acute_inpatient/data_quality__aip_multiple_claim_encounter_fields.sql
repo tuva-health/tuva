@@ -240,7 +240,7 @@ with add_row_number_to_claims as (
         , min(merge_start_date) as encounter_start_date
         , max(merge_end_date) as encounter_end_date
         , max(dq_problem) as dq_problem
-        , max(usable_patient_id) as usable_patient_id
+        , max(usable_person_id) as usable_person_id
         , max(usable_merge_dates) as usable_merge_dates
         , max(usable_ms_drg_code) as usable_ms_drg_code
         , max(usable_apr_drg_code) as usable_apr_drg_code

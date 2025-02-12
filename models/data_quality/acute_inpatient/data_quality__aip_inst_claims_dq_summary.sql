@@ -45,12 +45,12 @@ with total_institutional_claims as (
 
 )
 
-, aip_inst_claims_with_unusable_patient_id as (
+, aip_inst_claims_with_unusable_person_id as (
 
     select
           cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
-    where usable_patient_id = 0
+    where usable_person_id = 0
 
 )
 
@@ -181,7 +181,7 @@ with total_institutional_claims as (
 
     select
         '(# AIP inst claims with unusable person_id) / (# AIP inst claims) * 100' as field
-        , round((select * from aip_inst_claims_with_unusable_patient_id) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+        , round((select * from aip_inst_claims_with_unusable_person_id) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
 
     union all
 

@@ -6,7 +6,7 @@ select
       aa.claim_id
     , aa.person_id
     , aa.paid_amount
-    , aa.usable_patient_id
+    , aa.usable_person_id
     , aa.merge_start_date
     , aa.merge_end_date
     , aa.usable_merge_dates

@@ -47,13 +47,13 @@ models:
         description: The total paid amount for this claim.
       - name: usable_for_aip_encounter
         description: >
-          An acute IP claim is usable for defining encounters if it has a usable_patient_id = 1 and usable_merge_dates = 1.
+          An acute IP claim is usable for defining encounters if it has a usable_person_id = 1 and usable_merge_dates = 1.
       - name: dq_problem
         description: >
           0 or 1 flag. 1 iff any of the following data quality flags are 0:
-          usable_patient_id, usable_merge_dates, (usable_ms_drg_code and usable_apr_drg_code), usable_diagnosis_code_1, 
+          usable_person_id, usable_merge_dates, (usable_ms_drg_code and usable_apr_drg_code), usable_diagnosis_code_1, 
           usable_admit_type_code, usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
-      - name: usable_patient_id
+      - name: usable_person_id
         description: >
           0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
       - name: usable_merge_dates
@@ -509,7 +509,7 @@ models:
     - name: dq_problem
       description: >
         0 or 1 flag. It is = 1 iff any of the following data quality flags are 0:
-        usable_patient_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code,
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code,
         usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
     - name: usable_ms_drg_code
       description: >
@@ -610,7 +610,7 @@ models:
     - name: dq_problem
       description: >
         0 or 1 flag. Has value of 1 iff any of the following data quality flags are 0:
-        usable_patient_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
         usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
     - name: usable_ms_drg_code
       description: >
@@ -768,7 +768,7 @@ models:
     - name: dq_problem
       description: >
         0 or 1 flag. Has value of 1 iff any of the following data quality flags are 0:
-        usable_patient_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code,
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code,
         usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
     - name: usable_ms_drg_code
       description: >
@@ -864,11 +864,11 @@ models:
     
     - name: usable_for_aip_encounter
       description: >
-        An acute IP claim is usable for defining encounters if it has a usable_patient_id = 1 and usable_merge_dates = 1.
+        An acute IP claim is usable for defining encounters if it has a usable_person_id = 1 and usable_merge_dates = 1.
     - name: dq_problem
       description: >
         0 or 1 flag. 1 iff any of the following data quality flags are 0:
-        usable_patient_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
         usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
     - name: usable_ms_drg_code
       description: >
@@ -876,10 +876,10 @@ models:
     - name: usable_apr_drg_code
       description: >
         0 or 1 flag. Has value of 1 iff there is a usable value of apr_drg_code for the claim.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines. 
-        By construction, all claims in this table have usable_patient_id = 1.
+        By construction, all claims in this table have usable_person_id = 1.
     - name: usable_merge_dates
       description: >
         0 or 1 flag. Has value of 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
@@ -961,16 +961,16 @@ models:
 
     - name: usable_for_aip_encounter
       description: >
-        An acute IP claim is usable for defining encounters if it has a usable_patient_id = 1 and usable_merge_dates = 1.
+        An acute IP claim is usable for defining encounters if it has a usable_person_id = 1 and usable_merge_dates = 1.
     - name: dq_problem
       description: >
         0 or 1 flag. 1 iff any of the following data quality flags are 0:
-        usable_patient_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
         usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines. 
-        By construction, all claims in this table have usable_patient_id = 1.
+        By construction, all claims in this table have usable_person_id = 1.
     - name: usable_merge_dates
       description: >
         0 or 1 flag. Has value of 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
@@ -1157,7 +1157,7 @@ models:
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
@@ -1170,7 +1170,7 @@ models:
         and merge_start_date <= merge_end_date.
     - name: usable_prof_claim
       description: >
-        0 or 1 flag. Has value of 1 iff usable_patient_id = 1 and usable_merge_dates = 1.
+        0 or 1 flag. Has value of 1 iff usable_person_id = 1 and usable_merge_dates = 1.
     - name: tuva_last_run
       description: The date and timestamp of the dbt run.
 
@@ -1439,6 +1439,21 @@ models:
     - name: tuva_last_run
       description: The date and timestamp of the dbt run.
 
+- name: data_quality__atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer eligibility, medical_claim and pharmacy_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+
 - name: data_quality__bill
   config:
     schema: |
@@ -1687,6 +1702,25 @@ models:
       description: 0 or 1 flag. Has value of 1 if the claim has at least one valid professional-specific field.
     - name: tuva_last_run
       description: The date and timestamp of the dbt run.
+
+- name: data_quality__data_marts_populating
+  config: 
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: data_marts_populating
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table counts the number of rows in the data marts final tables that are populated by the data model.
+  columns:
+    - name: data_mart
+      description: The name of the data mart.
+    - name: table_name
+      description: The name of the table in the data mart.
+    - name: row_count
+      description: The number of rows in the table.
 
 - name: data_quality__determinable_admit_source_code
   config:
@@ -2579,6 +2613,7 @@ models:
     - are missing
     - have invalid values
     - have duplicate values (i.e. more than one distinct value per claim)
+    It is an intermediate table for building atomic_data_utility table.
 
 - name: data_quality__medical_claim_atomic_data_utility_stage_01
   config:
@@ -2589,11 +2624,8 @@ models:
     tags:
       - data_quality_aip
     materialized: table
-  description: |
-    The purpose of this table is to show how often key fields in the input layer medical_claim table:
-    - are missing
-    - have invalid values
-    - have duplicate values (i.e. more than one distinct value per claim)
+  description: >
+    Intermediate table for building medical_claim_atomic_data_utility table.
 
 - name: data_quality__medical_claim_atomic_data_utility_stage_02
   config:
@@ -2604,11 +2636,8 @@ models:
     tags:
       - data_quality_aip
     materialized: table
-  description: |
-    The purpose of this table is to show how often key fields in the input layer medical_claim table:
-    - are missing
-    - have invalid values
-    - have duplicate values (i.e. more than one distinct value per claim)
+  description: >
+    Intermediate table for building medical_claim_atomic_data_utility table.
 
 - name: data_quality__ms_drg_code_summary
   config:
@@ -2682,8 +2711,8 @@ models:
       description: The claim_id given in the input layer.
     - name: person_id
       description: >
-        The person_id for this claim. This field is null if the person_id field is not usable (i.e., if usable_patient_id = 0).
-    - name: usable_patient_id
+        The person_id for this claim. This field is null if the person_id field is not usable (i.e., if usable_person_id = 0).
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: facility_npi
@@ -2702,6 +2731,22 @@ models:
       description: The total paid amount for the claim.
     - name: tuva_last_run
       description: The date and timestamp of the dbt run.
+
+- name: data_quality__pharmacy_claim_atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pharmacy_claim_atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer medical_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+    It is an intermediate table for building atomic_data_utility table.
 
 - name: data_quality__pk_at_input_layer_summary
   config:
@@ -2748,7 +2793,7 @@ models:
         The count of rows in the eligibility table that were ingested in that ingest_datetime.
     - name: eligibility_pk_count
       description: >
-        The count of distinct values of the primary key (patient_id, plan, enrollment_start_date, enrollment_end_date) 
+        The count of distinct values of the primary key (person_id, plan, enrollment_start_date, enrollment_end_date) 
         in the eligibility table that were ingested in that ingest_datetime.
     - name: correct_pk
       description: |
@@ -2898,12 +2943,12 @@ models:
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: usable_prof_claim
       description: >
-        0 or 1 flag. Has value of 1 iff the claim is usable (i.e., if usable_patient_id = 1 and merge_start_date <= merge_end_date).
+        0 or 1 flag. Has value of 1 iff the claim is usable (i.e., if usable_person_id = 1 and merge_start_date <= merge_end_date).
     - name: merge_start_date
       description: The merge_start_date for this claim.
     - name: merge_end_date
@@ -2939,7 +2984,7 @@ models:
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
@@ -2977,7 +3022,7 @@ models:
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date
@@ -3015,7 +3060,7 @@ models:
     - name: paid_amount
       description: >
         The total paid amount for lines on the claim with place_of_service = '21'.
-    - name: usable_patient_id
+    - name: usable_person_id
       description: >
         0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
     - name: merge_start_date

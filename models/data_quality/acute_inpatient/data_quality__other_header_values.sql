@@ -19,7 +19,7 @@ select
                (max(person_id) = min(person_id))
              ) then 1
         else 0
-      end as usable_patient_id
+      end as usable_person_id
 
     , case
         when (
