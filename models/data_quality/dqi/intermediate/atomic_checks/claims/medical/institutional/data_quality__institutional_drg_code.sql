@@ -9,10 +9,11 @@ from {{ ref('data_quality__stg_institutional_inpatient') }}
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["base.ms_drg_code", "'|'", "coalesce(term.ms_drg_description, '')"]) }} as field
+        , {{ dbt.concat(["base.drg_code", "'|'", "coalesce(ms.ms_drg_description, apr.apr_drg_description, '')"]) }} as field
         , data_source
     from base
-    left join {{ ref('terminology__ms_drg')}} as term on base.ms_drg_code = term.ms_drg_code
+    left join {{ ref('terminology__ms_drg')}} as ms on base.drg_code = ms.ms_drg_code and base.drg_code_type = 'ms-drg'
+    left join {{ ref('terminology__apr_drg')}} as apr on base.drg_code = apr.apr_drg_code and base.drg_code_type = 'apr-drg'
 ),
 
 claim_grain as (
@@ -44,21 +45,22 @@ select distinct -- to bring to claim_id grain
     , 'Claim ID' AS drill_down_key
     , coalesce(m.claim_id, 'NULL') AS drill_down_value
     , 'institutional' AS claim_type
-    , 'MS_DRG_CODE' AS field_name
+    , 'DRG_CODE' AS field_name
     , case when cg.frequency > 1                then 'multiple'
-          when term.ms_drg_code is not null then 'valid'
-          when m.ms_drg_code is not null    then 'invalid'
+          when coalesce(ms.ms_drg_code, apr.apr_drg_code) is not null then 'valid'
+          when m.drg_code is not null    then 'invalid'
                                                else 'null' end as bucket_name
     , case
         when cg.frequency = 1
-            and m.ms_drg_code is not null
-            and term.ms_drg_code is null
-            then 'MS DRG does not join to Terminology MS DRG table'
+            and m.drg_code is not null
+            and coalesce(ms.ms_drg_code, apr.apr_drg_code) is null
+            then 'DRG code does not join to Terminology DRG table'
         else null
     end as invalid_reason
     , cast({{ substring('agg.field_aggregated', 1, 255) }} as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from base m
 left join claim_grain cg on m.claim_id = cg.claim_id and m.data_source = cg.data_source
-left join {{ ref('terminology__ms_drg')}} as term on m.ms_drg_code = term.ms_drg_code
+left join {{ ref('terminology__ms_drg')}} as ms on m.drg_code = ms.ms_drg_code and m.drg_code_type = 'ms-drg'
+left join {{ ref('terminology__ms_drg')}} as apr on m.drg_code = apr.apr_drg_code and m.apr_code_type = 'apr-drg'
 left join claim_agg agg on m.claim_id = agg.claim_id and m.data_source = agg.data_source

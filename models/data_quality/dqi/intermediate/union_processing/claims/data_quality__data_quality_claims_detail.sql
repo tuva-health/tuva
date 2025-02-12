@@ -1500,6 +1500,21 @@ SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
 	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
 	FROM {{ ref('data_quality__professional_diagnosis_code_3') }}
 
+union all
+
+SELECT     cast(data_source as {{ dbt.type_string() }}) as data_source
+	, cast(source_date as {{ dbt.type_string() }}) as source_date
+	, cast(table_name as {{ dbt.type_string() }}) as table_name
+	, cast(drill_down_key as {{ dbt.type_string() }}) as drill_down_key
+	, cast(drill_down_value as {{ dbt.type_string() }}) as drill_down_value
+	, cast(claim_type as {{ dbt.type_string() }}) as claim_type
+	, cast(field_name as {{ dbt.type_string() }}) as field_name
+	, cast(bucket_name as {{ dbt.type_string() }}) as bucket_name
+	, cast(invalid_reason as {{ dbt.type_string() }}) as invalid_reason
+	, cast(field_value as {{ dbt.type_string() }}) as field_value
+	, cast(tuva_last_run as {{ dbt.type_string() }}) as tuva_last_run
+	FROM {{ ref('data_quality__claim_drg_code_type') }}
+
 )
 
 
