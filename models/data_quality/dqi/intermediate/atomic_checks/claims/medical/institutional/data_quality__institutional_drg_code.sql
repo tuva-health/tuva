@@ -62,5 +62,5 @@ select distinct -- to bring to claim_id grain
 from base m
 left join claim_grain cg on m.claim_id = cg.claim_id and m.data_source = cg.data_source
 left join {{ ref('terminology__ms_drg')}} as ms on m.drg_code = ms.ms_drg_code and m.drg_code_type = 'ms-drg'
-left join {{ ref('terminology__ms_drg')}} as apr on m.drg_code = apr.apr_drg_code and m.apr_code_type = 'apr-drg'
+left join {{ ref('terminology__apr_drg')}} as apr on m.drg_code = apr.apr_drg_code and m.drg_code_type = 'apr-drg'
 left join claim_agg agg on m.claim_id = agg.claim_id and m.data_source = agg.data_source
