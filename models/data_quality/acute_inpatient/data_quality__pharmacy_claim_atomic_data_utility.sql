@@ -166,7 +166,8 @@ with pharmacy_claims as (
     from {{ ref('pharmacy_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.dispensing_date = bb.full_date
-    where aa.dispensing_date is not null and bb.full_date is null
+    where (aa.dispensing_date is not null and bb.full_date is null)
+        or aa.dispensing_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date)
 )
 
 , invalid_dispensing_date_perc as (
@@ -342,8 +343,8 @@ with pharmacy_claims as (
     from {{ ref('pharmacy_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.paid_date = bb.full_date
-    where (aa.paid_date is not null) 
-        and (bb.full_date is null)
+    where (aa.paid_date is not null and bb.full_date is null)
+        or (aa.paid_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date))
 )
 
 , invalid_paid_date_perc as (

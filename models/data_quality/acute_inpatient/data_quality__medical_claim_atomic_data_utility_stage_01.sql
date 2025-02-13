@@ -204,7 +204,8 @@ with medical_claims as (
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_start_date = bb.full_date
-    where aa.claim_start_date is not null and bb.full_date is null
+    where (aa.claim_start_date is not null and bb.full_date is null)
+        or (aa.claim_start_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date))
 )
 
 , invalid_claim_start_date_perc as (
@@ -257,7 +258,9 @@ with medical_claims as (
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_end_date = bb.full_date
-    where aa.claim_end_date is not null and bb.full_date is null
+    where (aa.claim_end_date is not null and bb.full_date is null)
+        or (aa.claim_end_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date))
+         or (aa.claim_end_date < aa.claim_start_date)
 )
 
 , invalid_claim_end_date_perc as (
@@ -310,7 +313,8 @@ with medical_claims as (
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_line_start_date = bb.full_date
-    where aa.claim_line_start_date is not null and bb.full_date is null
+    where (aa.claim_line_start_date is not null and bb.full_date is null)
+        or (aa.claim_line_start_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date))
 )
 
 , invalid_claim_line_start_date_perc as (
@@ -342,7 +346,8 @@ with medical_claims as (
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.claim_line_end_date = bb.full_date
-    where aa.claim_line_end_date is not null and bb.full_date is null
+    where (aa.claim_line_end_date is not null and bb.full_date is null)
+        or (aa.claim_line_end_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date))
 )
 
 , invalid_claim_line_end_date_perc as (
@@ -361,8 +366,9 @@ with medical_claims as (
         on aa.admission_date = bb.full_date
     left join {{ ref('data_quality__claim_type') }} cc
         on aa.claim_id = cc.claim_id
-    where aa.admission_date is not null 
-        and bb.full_date is null
+    where ((aa.admission_date is not null 
+        and bb.full_date is null)
+        or (aa.admission_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date)))
         and cc.calculated_claim_type = 'institutional'
 )
 
@@ -406,8 +412,8 @@ with medical_claims as (
         on aa.discharge_date = bb.full_date
     left join {{ ref('data_quality__claim_type') }} cc
         on aa.claim_id = cc.claim_id
-    where aa.discharge_date is not null 
-        and bb.full_date is null
+    where ((aa.discharge_date is not null and bb.full_date is null)
+            or aa.discharge_date > aa.admission_date)
         and cc.calculated_claim_type = 'institutional'
 )
 
