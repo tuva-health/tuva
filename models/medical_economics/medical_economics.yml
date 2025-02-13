@@ -592,6 +592,39 @@ models:
         description: >
           Payment risk score multiplied by member_months.
 
+  - name: medical_economics__high_cost_claimant
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: high_cost_claimant
+      tags: 
+        - member_months
+      materialized: table
+    description: >
+      Identifies all patients who have had over 150k in spend over the past 12 months. If a patient 
+      has less than 12 months of paid claims but still in total has more than 150k in spend over that
+      period the flag will start once they have hit over 150k spend.
+    columns:
+      - name: person_id
+        description: Unique identifier for each patient
+      - name: payer
+        description: Unique identifier for the payer.
+      - name: year_month
+        description: year month of YYYYMM format
+      - name: total_paid
+        description: Total paid_amount for the particular year_month and payer
+      - name: rolling_12_paid_amount
+        description: >
+          Sums all paid amounts for the past 12 months 
+      - name: high_cost_claimant_flag
+        description: >
+          Flag representing all patient with over 150k paid in claims over the past 
+          12 months
+
 ## Intermediate
   - name: medical_economics__specialty_pharmacy_claim
     config:
