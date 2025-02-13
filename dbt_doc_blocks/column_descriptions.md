@@ -306,7 +306,7 @@ The DRG system used for the claim.
 The DRG code on the claim.
 {% enddocs %}
 
-{% docs drg_code_description %}
+{% docs drg_description %}
 The description for the DRG code used on the claim.
 {% enddocs %}
 
