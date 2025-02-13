@@ -374,6 +374,10 @@ Facility name.
 Facility NPI for the claim (typically represents the facility where services were performed).
 {% enddocs %}
 
+{% docs file_date %}
+The date associated with the claims file, typically reflecting the reporting period of the claims data.
+{% enddocs %}
+
 {% docs file_name %}
 The file name of the source file.
 {% enddocs %}
@@ -388,6 +392,14 @@ The first name of the patient.
 
 {% docs gender %}
 The gender of the patient.
+{% enddocs %}
+
+{% docs group_id %}
+The group id which multiple members are enrolled for health coverage.
+{% enddocs %}
+
+{% docs group_name %}
+The group name under which multiple members are enrolled for health coverage.
 {% enddocs %}
 
 {% docs hcpcs_code %}

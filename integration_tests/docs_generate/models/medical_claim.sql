@@ -145,5 +145,6 @@ select
     , in_network_flag
     , data_source
     , file_name
+    , file_date
     , ingest_datetime
 from {{ ref('medical_claim_seed') }}
