@@ -108,6 +108,7 @@ copy  {{ this }}
         {% set full_path = bucket  ~ pattern %}
         {% set table_name = this.schema ~ '.' ~  this.name %}
         {% set tmp_table = this.schema ~ '.' ~  this.name ~ "__dbt_tmp_external" %}
+        {% set header_line_count %}{% if headers -%}1{%- else -%}0{%- endif -%}{% endset %}
 
 
         {% set drop_tmp_table %}
@@ -118,7 +119,7 @@ copy  {{ this }}
             ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
             STORED AS TEXTFILE
             LOCATION '{{ bucket }}'
-            TBLPROPERTIES ('skip.header.line.count'='0', 'compressionType'='GZIP');
+            TBLPROPERTIES ('skip.header.line.count'='{{ header_line_count }}', 'compressionType'='GZIP');
         {% endset %}
 
         {% set drop_seed_table %}
