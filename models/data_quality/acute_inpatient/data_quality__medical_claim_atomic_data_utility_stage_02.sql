@@ -434,8 +434,9 @@ with medical_claims as (
     from {{ ref('medical_claim') }} aa
     left join {{ ref('reference_data__calendar') }} bb
         on aa.paid_date = bb.full_date
-    where (aa.paid_date is not null) 
-        and (bb.full_date is null)
+    where (aa.paid_date is not null and bb.full_date is null)
+        or (aa.paid_date < aa.claim_start_date)
+            or (aa.paid_date > cast(substring('{{ var('tuva_last_run') }}',1,10) as date))
 )
 
 , invalid_paid_date_perc as (
