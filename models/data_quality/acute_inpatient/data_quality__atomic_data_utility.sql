@@ -2,7 +2,6 @@
     enabled = var('claims_enabled', False)
 ) }}
 
-/*yet to add eligibility_atomic_data_utility*/
 with medical_claim_atomic_data_utility as (
     
     select
@@ -35,6 +34,22 @@ with medical_claim_atomic_data_utility as (
 
 )
 
+, eligibility_atomic_data_utility as (
+
+    select
+          table_name
+        , field
+        , claim_type
+        , missing_count
+        , missing_perc
+        , invalid_count
+        , invalid_perc
+        , duplicated_count
+        , duplicated_perc
+    from {{ ref('data_quality__eligibility_atomic_data_utility') }}
+
+)
+
 , final as (
 
     select * from medical_claim_atomic_data_utility
@@ -42,6 +57,10 @@ with medical_claim_atomic_data_utility as (
     union all
 
     select * from pharmacy_claim_atomic_data_utility
+
+    union all
+
+    select * from eligibility_atomic_data_utility
 
 )
 

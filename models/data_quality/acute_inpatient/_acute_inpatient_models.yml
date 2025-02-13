@@ -2077,6 +2077,46 @@ models:
     - name: tuva_last_run
       description: The date and timestamp of the dbt run.
 
+- name: data_quality__eligibility_atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: eligibility_atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer eligibility table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+    It is an intermediate table for building atomic_data_utility table.
+
+- name: data_quality__eligibility_atomic_data_utility_stage_01
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: eligibility_atomic_data_utility_stage_01
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    Intermediate table for building eligibility_atomic_data_utility table.
+
+- name: data_quality__eligibility_atomic_data_utility_stage_02
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: eligibility_atomic_data_utility_stage_02
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    Intermediate table for building eligibility_atomic_data_utility table.
+
 - name: data_quality__header_values
   config:
     schema: |
@@ -2742,7 +2782,7 @@ models:
       - data_quality_aip
     materialized: table
   description: |
-    The purpose of this table is to show how often key fields in the input layer medical_claim table:
+    The purpose of this table is to show how often key fields in the input layer pharmacy_claim table:
     - are missing
     - have invalid values
     - have duplicate values (i.e. more than one distinct value per claim)
