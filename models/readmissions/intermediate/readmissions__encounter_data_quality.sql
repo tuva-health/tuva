@@ -64,19 +64,23 @@ select
 	else 0
     end as overlaps_with_another_encounter_flag,
     case
-        when aa.ms_drg_code is null then 1
+        when aa.drg_code is null then 1
 	else 0
-    end as missing_ms_drg_flag,
+    end as missing_drg_flag,
     case
-        when cc.ms_drg_code is null then 1
+        when coalesce(cc.ms_drg_code,dd.apr_drg_code) is null then 1
 	else 0
-    end as invalid_ms_drg_flag
+    end as invalid_drg_flag
 
 from {{ ref('readmissions__encounter_with_ccs') }} aa
      left join {{ ref('terminology__discharge_disposition') }} bb
      on aa.discharge_disposition_code = bb.discharge_disposition_code
      left join {{ ref('terminology__ms_drg') }} cc
-     on aa.ms_drg_code = cc.ms_drg_code
+     on aa.drg_code = cc.ms_drg_code
+     and aa.drg_code_type = 'ms-drg'
+     left join {{ ref('terminology__apr_drg') }} dd
+     on aa.drg_code = dd.apr_drg_code
+     and aa.drg_code_type = 'apr-drg'
 ),
 
 
@@ -108,9 +112,9 @@ select
 	    or
 	    (overlaps_with_another_encounter_flag = 1)
 	    or
-	    (missing_ms_drg_flag = 1)
+	    (missing_drg_flag = 1)
 	    or
-	    (invalid_ms_drg_flag = 1)
+	    (invalid_drg_flag = 1)
 	    then 1
 	else 0
     end as disqualified_encounter_flag,
@@ -123,8 +127,8 @@ select
     invalid_primary_diagnosis_code_flag,
     no_diagnosis_ccs_flag,
     overlaps_with_another_encounter_flag,
-    missing_ms_drg_flag,
-    invalid_ms_drg_flag
+    missing_drg_flag,
+    invalid_drg_flag
 from encounter_data_quality_issues
 )    
 

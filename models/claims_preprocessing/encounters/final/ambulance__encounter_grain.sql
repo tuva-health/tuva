@@ -13,7 +13,7 @@ with encounter_date as (
     select stg.*
     ,cli.encounter_id
     ,cli.old_encounter_id
-      ,cli.encounter_type
+    ,cli.encounter_type
     ,cli.encounter_group
     ,d.encounter_start_date 
     , row_number() over (partition by cli.encounter_id order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional

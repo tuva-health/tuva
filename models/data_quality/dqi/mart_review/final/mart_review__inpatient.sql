@@ -15,7 +15,7 @@ with cte as (
         e.*
       , {{ dbt.concat(['e.person_id', "'|'", 'e.data_source']) }} as patient_source_key
       , {{ dbt.concat(['e.encounter_id', "'|'", 'e.data_source']) }} as encounter_source_key
-      , {{ dbt.concat(['e.ms_drg_code', "'|'", 'e.ms_drg_description']) }} as drgwithdescription
+      , {{ dbt.concat(['e.drg_code', "'|'", 'e.drg_description']) }} as drgwithdescription
       , {{ dbt.concat(['e.primary_diagnosis_code', "'|'", 'e.primary_diagnosis_description']) }} as primary_diagnosis_and_description
       , {{ dbt.concat(['e.admit_source_code', "'|'", 'e.admit_source_description']) }} as admit_source_code_and_description
       , {{ dbt.concat(['e.admit_type_code', "'|'", 'e.admit_type_description']) }} as admit_type_code_and_description
@@ -44,7 +44,7 @@ with cte as (
     left join {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} as b
       on p.ccsr_parent_category = b.ccsr_parent_category
     left join {{ ref('terminology__ms_drg_weights_los')}} as weights
-      on e.ms_drg_code = weights.ms_drg
+      on e.drg_code = weights.ms_drg
     where e.encounter_type = 'acute inpatient'
 )
 

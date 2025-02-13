@@ -8,16 +8,16 @@ with drg_requirement as (
       mc.claim_id
   from {{ ref('service_category__stg_medical_claim') }} as mc
   left join {{ ref('terminology__ms_drg') }} as msdrg
-    on mc.ms_drg_code = msdrg.ms_drg_code
+    on mc.drg_code_type = 'ms-drg'
+    and mc.drg_code = msdrg.ms_drg_code
   left join {{ ref('terminology__apr_drg') }} as aprdrg
-    on mc.apr_drg_code = aprdrg.apr_drg_code
+    on mc.drg_code_type = 'apr-drg'
+    and mc.drg_code = aprdrg.apr_drg_code
   where mc.claim_type = 'institutional'
-    and (
-      msdrg.ms_drg_code is not null
-      or aprdrg.apr_drg_code is not null
+    and (msdrg.ms_drg_code is not null
+      OR aprdrg.apr_drg_code is not null
     )
 )
-
 , bill_type_requirement as (
   select distinct
       claim_id

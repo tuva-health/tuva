@@ -9,4 +9,4 @@ select
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }}
 where 
-  ms_drg_code = '999'
+  drg_code = '999'

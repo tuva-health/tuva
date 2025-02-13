@@ -29,10 +29,9 @@ select
     , pos.place_of_service_description
     , tob.bill_type_code
     , tob.bill_type_description
-    , msdrg.ms_drg_code
-    , msdrg.ms_drg_description
-    , aprdrg.apr_drg_code
-    , aprdrg.apr_drg_description
+    , med.drg_code_type
+    , coalesce(msdrg.ms_drg_code, aprdrg.apr_drg_code) as drg_code
+    , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
     , rev.revenue_center_code
     , rev.revenue_center_description
     , service_unit_quantity
@@ -172,9 +171,11 @@ left join {{ ref('terminology__place_of_service')}} pos
 left join {{ ref('terminology__bill_type')}} tob
     on med.bill_type_code = tob.bill_type_code
 left join {{ ref('terminology__ms_drg')}} msdrg
-    on med.ms_drg_code = msdrg.ms_drg_code
+    on med.drg_code_type = 'ms-drg'
+    and med.drg_code = msdrg.ms_drg_code
 left join {{ ref('terminology__apr_drg')}} aprdrg
-    on med.apr_drg_code = aprdrg.apr_drg_code
+    on med.drg_code_type = 'apr-drg'
+    and med.drg_code = aprdrg.apr_drg_code
 left join {{ ref('terminology__revenue_center')}} rev
     on med.revenue_center_code = rev.revenue_center_code
 left join {{ ref('terminology__provider')}} rendnpi

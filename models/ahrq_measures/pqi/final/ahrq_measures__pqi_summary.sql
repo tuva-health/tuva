@@ -9,8 +9,8 @@ select p.pqi_number
  , e.data_source
  , e.person_id
  , e.facility_id
- , e.ms_drg_code
- , e.ms_drg_description
+ , e.drg_code
+ , e.drg_description
  , e.encounter_start_date
  , e.encounter_end_date
  , e.length_of_stay

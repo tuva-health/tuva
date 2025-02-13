@@ -10,7 +10,8 @@ select
     encounter_end_date,
     discharge_disposition_code,
     facility_id,
-    ms_drg_code,
+    drg_code_type,
+    drg_code,
     paid_amount,
     primary_diagnosis_code,
     '{{ var('tuva_last_run')}}' as tuva_last_run

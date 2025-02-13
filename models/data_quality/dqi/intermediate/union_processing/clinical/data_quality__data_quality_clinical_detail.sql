@@ -100,14 +100,6 @@ SELECT * FROM {{ ref('data_quality__encounter_allowed_amount') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__encounter_apr_drg_code') }}
-
-union all
-
-SELECT * FROM {{ ref('data_quality__encounter_apr_drg_description') }}
-
-union all
-
 SELECT * FROM {{ ref('data_quality__encounter_attending_provider_id') }}
 
 union all
@@ -152,11 +144,11 @@ SELECT * FROM {{ ref('data_quality__encounter_length_of_stay') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__encounter_ms_drg_code') }}
+SELECT * FROM {{ ref('data_quality__encounter_drg_code') }}
 
 union all
 
-SELECT * FROM {{ ref('data_quality__encounter_ms_drg_description') }}
+SELECT * FROM {{ ref('data_quality__encounter_drg_description') }}
 
 union all
 
