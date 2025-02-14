@@ -75,38 +75,38 @@ with medical_claims as (
         ) as percentage
 )
 
-, missing_patient_id_count as (
+, missing_person_id_count as (
     select
         cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as claim_count
     from {{ ref('medical_claim') }}
     where person_id is null
 )
 
-, missing_patient_id_perc as (
+, missing_person_id_perc as (
     select
         round(
-            (select claim_count from missing_patient_id_count) * 100.0 /
+            (select claim_count from missing_person_id_count) * 100.0 /
             (select claim_count from medical_claims), 1
         ) as percentage
 )
 
-, dupe_patient_id_count as (
+, dupe_person_id_count as (
     select 
         cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             claim_id,
-            count(distinct person_id) as count_of_patient_ids
+            count(distinct person_id) as count_of_person_ids
         from {{ ref('medical_claim') }}
         group by claim_id
         having count(distinct person_id) > 1
     ) as subquery
 )
 
-, dupe_patient_id_perc as (
+, dupe_person_id_perc as (
     select 
         round(
-            (select claim_count from dupe_patient_id_count) * 100.0 /
+            (select claim_count from dupe_person_id_count) * 100.0 /
             (select claim_count from medical_claims), 1
         ) as percentage
 )
@@ -618,12 +618,12 @@ with medical_claims as (
 
     select
           'person_id' as field
-        , (select * from missing_patient_id_count) as missing_count
-        , (select * from missing_patient_id_perc) as missing_perc
+        , (select * from missing_person_id_count) as missing_count
+        , (select * from missing_person_id_perc) as missing_perc
         , null as invalid_count
         , null as invalid_perc
-        , (select * from dupe_patient_id_count) as duplicated_count
-        , (select * from dupe_patient_id_perc) as duplicated_perc
+        , (select * from dupe_person_id_count) as duplicated_count
+        , (select * from dupe_person_id_perc) as duplicated_perc
         , 'all' as claim_type
 
     union all
