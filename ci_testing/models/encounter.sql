@@ -21,7 +21,7 @@ cast(null as {{ dbt.type_string() }} ) as encounter_id
 , cast(null as {{ dbt.type_string() }} ) as primary_diagnosis_description
 , cast(null as {{ dbt.type_string() }} ) as drg_code_type
 , cast(null as {{ dbt.type_string() }} ) as drg_code
-, cast(null as {{ dbt.type_string() }} ) as drg_code_description
+, cast(null as {{ dbt.type_string() }} ) as drg_description
 , cast(null as {{ dbt.type_float() }} ) as paid_amount
 , cast(null as {{ dbt.type_float() }} ) as allowed_amount
 , cast(null as {{ dbt.type_float() }} ) as charge_amount
