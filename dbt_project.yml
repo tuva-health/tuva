@@ -58,7 +58,7 @@ seeds:
   the_tuva_project:
     clinical_concept_library:
       clinical_concept_library__clinical_concepts:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.13.2','input_layer_concepts.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.13.2','tuva_concepts.csv',compression=true,null_marker=true) }}"
       clinical_concept_library__coding_systems:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.13.2','tuva_coding_systems.csv',compression=true,null_marker=true) }}"
       clinical_concept_library__value_set_members:
