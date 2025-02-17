@@ -69,10 +69,9 @@ select
     , cast(med.place_of_service_description as {{ dbt.type_string() }} ) as place_of_service_description
     , cast(med.bill_type_code as {{ dbt.type_string() }} ) as bill_type_code
     , cast(med.bill_type_description as {{ dbt.type_string() }} ) as bill_type_description
-    , cast(med.ms_drg_code as {{ dbt.type_string() }} ) as ms_drg_code
-    , cast(med.ms_drg_description as {{ dbt.type_string() }} ) as ms_drg_description
-    , cast(med.apr_drg_code as {{ dbt.type_string() }} ) as apr_drg_code
-    , cast(med.apr_drg_description as {{ dbt.type_string() }} ) as apr_drg_description
+    , cast(med.drg_code_type as {{ dbt.type_string() }} ) as drg_code_type
+    , cast(med.drg_code as {{ dbt.type_string() }} ) as drg_code
+    , cast(med.drg_description as {{ dbt.type_string() }} ) as drg_description
     , cast(med.revenue_center_code as {{ dbt.type_string() }} ) as revenue_center_code
     , cast(med.revenue_center_description as {{ dbt.type_string() }} ) as revenue_center_description
     , cast(med.service_unit_quantity as {{ dbt.type_numeric() }} ) as service_unit_quantity
