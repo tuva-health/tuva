@@ -13,7 +13,8 @@ select
     aa.discharge_date,
     aa.discharge_disposition_code,
     aa.facility_id,
-    aa.ms_drg_code,
+    aa.drg_code_type,
+    aa.drg_code,
     aa.paid_amount,
     {{ dbt.datediff("aa.admit_date", "aa.discharge_date","day") }} as length_of_stay,
     case
@@ -40,8 +41,8 @@ select
     ee.invalid_primary_diagnosis_code_flag,
     ee.no_diagnosis_ccs_flag,
     ee.overlaps_with_another_encounter_flag,
-    ee.missing_ms_drg_flag,
-    ee.invalid_ms_drg_flag,
+    ee.missing_drg_flag,
+    ee.invalid_drg_flag,
     '{{ var('tuva_last_run')}}' as tuva_last_run
 from
     {{ ref('readmissions__encounter') }} aa

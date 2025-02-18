@@ -5,8 +5,8 @@
 select 
     encounter_id
   , data_source
-  , ms_drg_code
-  , ms_drg_description
+  , drg_code
+  , drg_description
   , admit_source_code
   , encounter_start_date
   , encounter_end_date

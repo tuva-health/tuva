@@ -17,8 +17,8 @@ select
     , discharge_disposition_code
     , place_of_service_code
     , bill_type_code
-    , ms_drg_code
-    , apr_drg_code
+    , drg_code_type
+    . drg_code
     , revenue_center_code
     , service_unit_quantity
     , hcpcs_code
@@ -145,5 +145,6 @@ select
     , in_network_flag
     , data_source
     , file_name
+    , file_date
     , ingest_datetime
 from {{ ref('medical_claim_seed') }}
