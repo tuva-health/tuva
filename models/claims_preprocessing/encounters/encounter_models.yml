@@ -3248,6 +3248,17 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: emergency_department__generate_encounter_id_pre_sort
+    description: generate encounter id and stitch inpatient psych claims together
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
   - name: emergency_department__start_end_dates
     description: calculate start and end date of encounter 
     config:
@@ -3490,7 +3501,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: view
+      materialized: table
       tags:
       - claims_preprocessing
       - encounters
@@ -3510,7 +3521,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: view
+      materialized: table
       tags:
       - claims_preprocessing
       - encounters
@@ -3520,7 +3531,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: view
+      materialized: table
       tags:
       - claims_preprocessing
       - encounters
