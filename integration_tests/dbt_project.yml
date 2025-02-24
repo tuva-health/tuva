@@ -2,7 +2,7 @@ name: 'integration_tests'
 version: '1.0.0'
 config-version: 2
 
-profile: tuva_bigquery
+profile: default
 
 vars:
   error_empty_seeds: true
@@ -13,7 +13,7 @@ vars:
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
   input_database: dev_ci_testing
-  input_schema:  input_layer
+  input_schema: input_layer
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
