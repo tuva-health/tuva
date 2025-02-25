@@ -8,8 +8,7 @@ with multiple_claim_encounters as (
           person_id
         , encounter_id
         , dq_problem
-        , multiple_ms_drg_code
-        , multiple_apr_drg_code
+        , multiple_drg_code
         , multiple_diagnosis_code_1
         , multiple_admit_type_code
         , multiple_admit_source_code
@@ -50,33 +49,14 @@ with multiple_claim_encounters as (
     union all
 
     select
-        'Encounters with a multiple MS-DRG' as field
+        'Encounters with a multiple DRG' as field
         , (select count(*)
         from multiple_claim_encounters
-        where multiple_ms_drg_code = 1) as encounters
+        where multiple_drg_code = 1) as encounters
         , round(
             (select count(*)
             from multiple_claim_encounters
-            where multiple_ms_drg_code = 1) * 100.0 /
-            (select
-                case
-                    when (select * from count_of_multiple_claim_encounters) = 0 then 1
-                    else (select * from count_of_multiple_claim_encounters)
-                end
-            ), 1
-        ) as percent_of_encounters
-
-    union all
-
-    select
-        'Encounters with a multiple APR-DRG' as field
-        , (select count(*)
-        from multiple_claim_encounters
-        where multiple_apr_drg_code = 1) as encounters
-        , round(
-            (select count(*)
-            from multiple_claim_encounters
-            where multiple_apr_drg_code = 1) * 100.0 /
+            where multiple_drg_code = 1) * 100.0 /
             (select
                 case
                     when (select * from count_of_multiple_claim_encounters) = 0 then 1

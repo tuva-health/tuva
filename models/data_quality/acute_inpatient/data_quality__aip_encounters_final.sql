@@ -19,8 +19,7 @@ select
     , aa.encounter_start_date
     , aa.encounter_end_date
     , {{ datediff('aa.encounter_start_date', 'aa.encounter_end_date', 'day') }} as los
-    , aa.ms_drg_code
-    , aa.apr_drg_code
+    , aa.drg_code
     , aa.diagnosis_code_1
     , aa.admit_type_code
     , aa.admit_source_code
@@ -29,8 +28,7 @@ select
     , aa.rendering_npi
     , aa.paid_amount as institutional_paid_amount
     , aa.dq_problem
-    , aa.usable_ms_drg_code
-    , aa.usable_apr_drg_code
+    , aa.usable_drg_code
     , aa.usable_diagnosis_code_1
     , aa.usable_admit_type_code
     , aa.usable_admit_source_code

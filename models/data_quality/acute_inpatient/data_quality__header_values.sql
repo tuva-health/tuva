@@ -16,25 +16,15 @@ select
     , bill.usable_bill_type_code
     , bill.assigned_bill_type_code
 
-    , ms.missing_ms_drg_code
-    , ms.always_invalid_ms_drg_code
-    , ms.valid_and_invalid_ms_drg_code
-    , ms.always_valid_ms_drg_code
-    , ms.unique_ms_drg_code
-    , ms.determinable_ms_drg_code
-    , ms.undeterminable_ms_drg_code
-    , ms.usable_ms_drg_code
-    , ms.assigned_ms_drg_code
-
-    , apr.missing_apr_drg_code
-    , apr.always_invalid_apr_drg_code
-    , apr.valid_and_invalid_apr_drg_code
-    , apr.always_valid_apr_drg_code
-    , apr.unique_apr_drg_code
-    , apr.determinable_apr_drg_code
-    , apr.undeterminable_apr_drg_code
-    , apr.usable_apr_drg_code
-    , apr.assigned_apr_drg_code
+    , drg.missing_drg_code
+    , drg.always_invalid_drg_code
+    , drg.valid_and_invalid_drg_code
+    , drg.always_valid_drg_code
+    , drg.unique_drg_code
+    , drg.determinable_drg_code
+    , drg.undeterminable_drg_code
+    , drg.usable_drg_code
+    , drg.assigned_drg_code
 
     , atco.missing_admit_type_code
     , atco.always_invalid_admit_type_code
@@ -82,11 +72,8 @@ from {{ ref('data_quality__claim_type') }} claim_type
 left join {{ ref('data_quality__bill_type_code_summary') }} bill
     on claim_type.claim_id = bill.claim_id
 
-left join {{ ref('data_quality__ms_drg_code_summary') }} ms
-    on bill.claim_id = ms.claim_id
-
-left join {{ ref('data_quality__apr_drg_code_summary') }} apr
-    on bill.claim_id = apr.claim_id
+left join {{ ref('data_quality__drg_code_summary') }} drg
+    on bill.claim_id = drg.claim_id
 
 left join {{ ref('data_quality__admit_type_code_summary') }} atco
     on bill.claim_id = atco.claim_id
