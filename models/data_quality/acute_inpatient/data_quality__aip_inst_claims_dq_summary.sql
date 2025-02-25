@@ -63,21 +63,12 @@ with total_institutional_claims as (
 
 )
 
-, aip_inst_claims_with_unusable_ms_drg_code as (
+, aip_inst_claims_with_unusable_drg_code as (
 
     select 
           cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as tot
     from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
-    where usable_ms_drg_code = 0
-
-)
-
-, aip_inst_claims_with_unusable_apr_drg_code as (
-
-    select 
-          cast(count(distinct claim_id) as {{ dbt.type_numeric() }}) as tot
-    from {{ ref('data_quality__acute_inpatient_institutional_claims') }}
-    where usable_apr_drg_code = 0
+    where usable_drg_code = 0
 
 )
 
@@ -192,14 +183,8 @@ with total_institutional_claims as (
     union all
 
     select
-        '(# AIP inst claims with unusable ms_drg_code) / (# AIP inst claims) * 100' as field
-        , round((select * from aip_inst_claims_with_unusable_ms_drg_code) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
-    
-    union all
-    
-    select
-        '(# AIP inst claims with unusable apr_drg_code) / (# AIP inst claims) * 100' as field
-        , round((select * from aip_inst_claims_with_unusable_apr_drg_code) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
+        '(# AIP inst claims with unusable drg_code) / (# AIP inst claims) * 100' as field
+        , round((select * from aip_inst_claims_with_unusable_drg_code) * 100.0 / (select * from total_aip_inst_claims), 1) as field_value
     
     union all
 

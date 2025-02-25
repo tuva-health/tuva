@@ -9,8 +9,7 @@ select
 from {{ ref('data_quality__header_values_graph') }}
 where field in (
       '(inst claims with usable bill type) / (total inst claims) * 100',
-      '(inst claims with usable ms-drg) / (total inst claims) * 100',
-      '(inst claims with usable apr-drg) / (total inst claims) * 100',
+      '(inst claims with usable drg) / (total inst claims) * 100',
       '(inst claims with usable admit type) / (total inst claims) * 100',
       '(inst claims with usable admit source) / (total inst claims) * 100',
       '(inst claims with usable discharge disp) / (total inst claims) * 100',

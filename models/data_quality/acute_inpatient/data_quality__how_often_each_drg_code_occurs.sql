@@ -6,13 +6,13 @@ with add_count_of_occurrences as (
 
     select
           claim_id
-        , ms_drg_code
+        , drg_code
         , count(*) as occurrences
     from {{ ref('data_quality__valid_values') }}
-    where valid_ms_drg_code = 1
+    where valid_drg_code = 1
     group by
           claim_id
-        , ms_drg_code
+        , drg_code
 
 )
 
@@ -20,7 +20,7 @@ with add_count_of_occurrences as (
 
     select
           claim_id
-        , ms_drg_code
+        , drg_code
         , occurrences
         , row_number() over (
             partition by claim_id
@@ -32,7 +32,7 @@ with add_count_of_occurrences as (
 
 select
       claim_id
-    , ms_drg_code
+    , drg_code
     , occurrences
     , ranking
     , '{{ var('tuva_last_run')}}' as tuva_last_run
