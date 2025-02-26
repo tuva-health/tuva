@@ -30,7 +30,7 @@ SELECT
         when m.paid_date < m.claim_start_date then 'paid date before claim start date'
         else null
     end as invalid_reason
-    , cast(claim_line_start_date as {{ dbt.type_string() }}) as field_value
+    , cast(paid_date as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('medical_claim')}} m
-cross join tuva_last_run cte
+from {{ ref('medical_claim')}} AS m
+cross join tuva_last_run AS cte

@@ -14,4 +14,4 @@ SELECT DISTINCT -- to bring to claim_ID grain
     ,cast(null as {{ dbt.type_string() }}) as invalid_reason
     ,cast(person_id as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('medical_claim')}} m
+from {{ ref('medical_claim')}} AS m
