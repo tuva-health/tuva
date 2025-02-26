@@ -105,7 +105,7 @@ with members as (
             and members.medicaid_status = seed_demographic_factors.medicaid_status
             and members.dual_status = seed_demographic_factors.dual_status
                 /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-            and CASE WHEN members.orec IN ('65-69','70-74','75-79','80-84','85-89','90-94','>=95') THEN 'Aged' ELSE members.orec END = seed_demographic_factors.orec
+            and CASE WHEN members.age_group IN ('65-69','70-74','75-79','80-84','85-89','90-94','>=95') THEN 'Aged' ELSE members.orec END = seed_demographic_factors.orec
             and members.institutional_status = seed_demographic_factors.institutional_status
     where members.enrollment_status = 'Continuing'
         and seed_demographic_factors.model_version = 'CMS-HCC-V24'
@@ -174,7 +174,7 @@ with members as (
             and members.medicaid_status = seed_demographic_factors.medicaid_status
             and members.dual_status = seed_demographic_factors.dual_status
                 /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-            and CASE WHEN members.orec IN ('65-69','70-74','75-79','80-84','85-89','90-94','>=95') THEN 'Aged' ELSE members.orec END = seed_demographic_factors.orec
+            and CASE WHEN members.age_group IN ('65-69','70-74','75-79','80-84','85-89','90-94','>=95') THEN 'Aged' ELSE members.orec END = seed_demographic_factors.orec
             and members.institutional_status = seed_demographic_factors.institutional_status
     where members.enrollment_status = 'Continuing'
         and seed_demographic_factors.model_version = 'CMS-HCC-V28'
