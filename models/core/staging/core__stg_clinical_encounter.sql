@@ -35,10 +35,9 @@ select
   , cast(primary_diagnosis_code_type as {{ dbt.type_string() }}) as primary_diagnosis_code_type
   , cast(primary_diagnosis_code as {{ dbt.type_string() }}) as primary_diagnosis_code
   , cast(primary_diagnosis_description as {{ dbt.type_string() }}) as primary_diagnosis_description
-  , cast(ms_drg_code as {{ dbt.type_string() }}) as ms_drg_code
-  , cast(ms_drg_description as {{ dbt.type_string() }}) as ms_drg_description
-  , cast(apr_drg_code as {{ dbt.type_string() }}) as apr_drg_code
-  , cast(apr_drg_description as {{ dbt.type_string() }}) as apr_drg_description
+  , cast(drg_code_type as {{ dbt.type_string() }}) as drg_code_type
+  , cast(drg_code as {{ dbt.type_string() }}) as drg_code
+  , cast(drg_description as {{ dbt.type_string() }}) as drg_description
   , cast(paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
   , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
   , cast(charge_amount as {{ dbt.type_numeric() }} ) as charge_amount

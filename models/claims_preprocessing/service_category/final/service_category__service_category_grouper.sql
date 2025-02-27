@@ -119,8 +119,8 @@ select
     , duplicate_row_number
     , s.ccs_category
     , s.ccs_category_description
-    , s.ms_drg_code
-    , s.ms_drg_description
+    , s.drg_code
+    , s.drg_description
     , s.place_of_service_code
     , s.place_of_service_description
     , s.revenue_center_code
@@ -141,5 +141,3 @@ from service_category_2_deduplication d
 inner join {{ ref('service_category__stg_medical_claim') }} s on d.claim_id = s.claim_id
 and
 d.claim_line_number = s.claim_line_number
---where duplicate_row_number = 1
-

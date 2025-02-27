@@ -11,10 +11,10 @@ where encounter_type = 'acute inpatient'
 ,cte as (
 select 
     {{ dbt.concat([
-        'ms_drg_code',
+        'drg_code',
         "' - '",
-        'ms_drg_description'
-    ]) }} as ms_drg_code_and_description
+        'drg_description'
+    ]) }} as drg_code_and_description
     ,cast('acute inpatient drg distribution' as {{ dbt.type_string() }} ) as analytics_concept
     ,cast(count(*) as {{ dbt.type_numeric() }} )/total_encounters as encounter_percent
     ,total_encounters
@@ -23,19 +23,19 @@ from {{ ref('core__encounter') }}
 cross join total_cte 
 where encounter_type = 'acute inpatient'
 and
-ms_drg_code is not null
+drg_code is not null
 group by 
     {{ dbt.concat([
-        'ms_drg_code',
+        'drg_code',
         "' - '",
-        'ms_drg_description'
+        'drg_description'
     ]) }},
     total_encounters
 )
 
 select 
     cte.analytics_concept
-    ,ms_drg_code_and_description as analytics_measure
+    ,drg_code_and_description as analytics_measure
     ,encounter_percent as data_source_value
     ,m.analytics_value
     ,rank_nbr as value_rank

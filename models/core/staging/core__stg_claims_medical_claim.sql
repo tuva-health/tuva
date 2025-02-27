@@ -69,10 +69,9 @@ select
     , cast(med.place_of_service_description as {{ dbt.type_string() }} ) as place_of_service_description
     , cast(med.bill_type_code as {{ dbt.type_string() }} ) as bill_type_code
     , cast(med.bill_type_description as {{ dbt.type_string() }} ) as bill_type_description
-    , cast(med.ms_drg_code as {{ dbt.type_string() }} ) as ms_drg_code
-    , cast(med.ms_drg_description as {{ dbt.type_string() }} ) as ms_drg_description
-    , cast(med.apr_drg_code as {{ dbt.type_string() }} ) as apr_drg_code
-    , cast(med.apr_drg_description as {{ dbt.type_string() }} ) as apr_drg_description
+    , cast(med.drg_code_type as {{ dbt.type_string() }} ) as drg_code_type
+    , cast(med.drg_code as {{ dbt.type_string() }} ) as drg_code
+    , cast(med.drg_description as {{ dbt.type_string() }} ) as drg_description
     , cast(med.revenue_center_code as {{ dbt.type_string() }} ) as revenue_center_code
     , cast(med.revenue_center_description as {{ dbt.type_string() }} ) as revenue_center_description
     , cast(med.service_unit_quantity as {{ dbt.type_numeric() }} ) as service_unit_quantity
@@ -104,6 +103,7 @@ select
         when enroll.claim_id is not null then 1
             else 0
     end as int) as enrollment_flag
+    , enroll.member_month_key
     , cast(med.data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} as med
@@ -117,3 +117,7 @@ inner join all_encounters as x
 left join {{ ref('claims_enrollment__flag_claims_with_enrollment') }} as enroll
   on med.claim_id = enroll.claim_id
   and med.claim_line_number = enroll.claim_line_number
+  and med.person_id = enroll.person_id
+  and med.payer = enroll.payer
+  and med.{{ quote_column('plan') }} = enroll.{{ quote_column('plan') }}
+  and med.data_source = enroll.data_source
