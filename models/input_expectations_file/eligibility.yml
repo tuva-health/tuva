@@ -1,0 +1,128 @@
+version: 2
+seeds:
+- name: eligibility
+  config:
+    schema: input_layer
+    tags: "tuva_demo, input_layer"
+    column_types:
+      person_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      member_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      subscriber_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      gender: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      race: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      birth_date: date
+      death_date: date
+      death_flag: integer
+      enrollment_start_date: date
+      enrollment_end_date: date
+      payer: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      plan: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      original_reason_entitlement_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      dual_status_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      medicare_status_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      group_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      group_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      first_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      last_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      social_security_number: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      subscriber_relation: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      address: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      city: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      state: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      zip_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      phone: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      data_source: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_date: date
+      ingest_datetime: |
+        {%- if target.type in ("postgres", "databricks") -%} timestamp 
+        {%- elif target.type == "fabric" -%} datetime2(6)
+        {%- else -%} datetime {%- endif -%}
+  columns:
+  - name: PERSON_ID
+    description: ''
+  - name: MEMBER_ID
+    description: ''
+  - name: SUBSCRIBER_ID
+    description: ''
+  - name: GENDER
+    description: ''
+  - name: RACE
+    description: ''
+  - name: BIRTH_DATE
+    description: ''
+  - name: DEATH_DATE
+    description: ''
+  - name: DEATH_FLAG
+    description: ''
+  - name: ENROLLMENT_START_DATE
+    description: ''
+  - name: ENROLLMENT_END_DATE
+    description: ''
+  - name: PAYER
+    description: ''
+  - name: PAYER_TYPE
+    description: ''
+  - name: PLAN
+    description: ''
+  - name: ORIGINAL_REASON_ENTITLEMENT_CODE
+    description: ''
+  - name: DUAL_STATUS_CODE
+    description: ''
+  - name: MEDICARE_STATUS_CODE
+    description: ''
+  - name: GROUP_ID
+    description: ''
+  - name: GROUP_NAME
+    description: ''
+  - name: FIRST_NAME
+    description: ''
+  - name: LAST_NAME
+    description: ''
+  - name: SOCIAL_SECURITY_NUMBER
+    description: ''
+  - name: SUBSCRIBER_RELATION
+    description: ''
+  - name: ADDRESS
+    description: ''
+  - name: CITY
+    description: ''
+  - name: STATE
+    description: ''
+  - name: ZIP_CODE
+    description: ''
+  - name: PHONE
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: FILE_NAME
+    description: ''
+  - name: FILE_DATE
+    description: ''
+  - name: INGEST_DATETIME
+    description: ''

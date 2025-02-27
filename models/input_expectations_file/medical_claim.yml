@@ -1,0 +1,559 @@
+version: 2
+seeds:
+- name: medical_claim
+  config:
+    schema: input_layer
+    tags: "tuva_demo, input_layer"
+    column_types:
+      claim_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      claim_line_number: integer
+      claim_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      person_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      member_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      plan: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      claim_start_date: date
+      claim_end_date: date
+      claim_line_start_date: date
+      claim_line_end_date: date
+      admission_date: date
+      discharge_date: date
+      admit_source_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      admit_type_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      discharge_disposition_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      place_of_service_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      bill_type_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      drg_code_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      drg_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      revenue_center_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      service_unit_quantity: integer
+      hcpcs_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      hcpcs_modifier_1: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      hcpcs_modifier_2: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      hcpcs_modifier_3: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      hcpcs_modifier_4: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      hcpcs_modifier_5: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      rendering_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      rendering_tin: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      billing_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      billing_tin: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      facility_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      paid_date: date
+      paid_amount: float
+      allowed_amount: float
+      charge_amount: float
+      coinsurance_amount: float
+      copayment_amount: float
+      deductible_amount: float
+      total_cost_amount: float
+      diagnosis_code_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_1: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_2: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_3: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_4: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_5: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_6: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_7: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_8: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_9: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_10: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_11: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_12: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_13: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_14: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_15: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_16: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_17: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_18: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_19: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_20: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_21: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_22: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_23: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_24: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_code_25: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_1: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_2: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_3: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_4: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_5: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_6: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_7: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_8: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_9: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_10: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_11: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_12: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_13: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_14: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_15: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_16: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_17: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_18: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_19: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_20: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_21: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_22: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_23: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_24: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      diagnosis_poa_25: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_type: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_1: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_2: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_3: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_4: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_5: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_6: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_7: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_8: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_9: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_10: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_11: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_12: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_13: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_14: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_15: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_16: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_17: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_18: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_19: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_20: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_21: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_22: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_23: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_24: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_code_25: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      procedure_date_1: date
+      procedure_date_2: date
+      procedure_date_3: date
+      procedure_date_4: date
+      procedure_date_5: date
+      procedure_date_6: date
+      procedure_date_7: date
+      procedure_date_8: date
+      procedure_date_9: date
+      procedure_date_10: date
+      procedure_date_11: date
+      procedure_date_12: date
+      procedure_date_13: date
+      procedure_date_14: date
+      procedure_date_15: date
+      procedure_date_16: date
+      procedure_date_17: date
+      procedure_date_18: date
+      procedure_date_19: date
+      procedure_date_20: date
+      procedure_date_21: date
+      procedure_date_22: date
+      procedure_date_23: date
+      procedure_date_24: date
+      procedure_date_25: date
+      in_network_flag: integer
+      data_source: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_date: date
+      ingest_datetime: |
+        {%- if target.type in ("postgres", "databricks") -%} timestamp 
+        {%- elif target.type == "fabric" -%} datetime2(6)
+        {%- else -%} datetime {%- endif -%}
+  columns:
+  - name: CLAIM_ID
+    description: ''
+  - name: CLAIM_LINE_NUMBER
+    description: ''
+  - name: CLAIM_TYPE
+    description: ''
+  - name: PERSON_ID
+    description: ''
+  - name: MEMBER_ID
+    description: ''
+  - name: PAYER
+    description: ''
+  - name: PLAN
+    description: ''
+  - name: CLAIM_START_DATE
+    description: ''
+  - name: CLAIM_END_DATE
+    description: ''
+  - name: CLAIM_LINE_START_DATE
+    description: ''
+  - name: CLAIM_LINE_END_DATE
+    description: ''
+  - name: ADMISSION_DATE
+    description: ''
+  - name: DISCHARGE_DATE
+    description: ''
+  - name: ADMIT_SOURCE_CODE
+    description: ''
+  - name: ADMIT_TYPE_CODE
+    description: ''
+  - name: DISCHARGE_DISPOSITION_CODE
+    description: ''
+  - name: PLACE_OF_SERVICE_CODE
+    description: ''
+  - name: BILL_TYPE_CODE
+    description: ''
+  - name: DRG_CODE_TYPE
+    description: ''
+  - name: DRG_CODE
+    description: ''
+  - name: REVENUE_CENTER_CODE
+    description: ''
+  - name: SERVICE_UNIT_QUANTITY
+    description: ''
+  - name: HCPCS_CODE
+    description: ''
+  - name: HCPCS_MODIFIER_1
+    description: ''
+  - name: HCPCS_MODIFIER_2
+    description: ''
+  - name: HCPCS_MODIFIER_3
+    description: ''
+  - name: HCPCS_MODIFIER_4
+    description: ''
+  - name: HCPCS_MODIFIER_5
+    description: ''
+  - name: RENDERING_NPI
+    description: ''
+  - name: RENDERING_TIN
+    description: ''
+  - name: BILLING_NPI
+    description: ''
+  - name: BILLING_TIN
+    description: ''
+  - name: FACILITY_NPI
+    description: ''
+  - name: PAID_DATE
+    description: ''
+  - name: PAID_AMOUNT
+    description: ''
+  - name: ALLOWED_AMOUNT
+    description: ''
+  - name: CHARGE_AMOUNT
+    description: ''
+  - name: COINSURANCE_AMOUNT
+    description: ''
+  - name: COPAYMENT_AMOUNT
+    description: ''
+  - name: DEDUCTIBLE_AMOUNT
+    description: ''
+  - name: TOTAL_COST_AMOUNT
+    description: ''
+  - name: DIAGNOSIS_CODE_TYPE
+    description: ''
+  - name: DIAGNOSIS_CODE_1
+    description: ''
+  - name: DIAGNOSIS_CODE_2
+    description: ''
+  - name: DIAGNOSIS_CODE_3
+    description: ''
+  - name: DIAGNOSIS_CODE_4
+    description: ''
+  - name: DIAGNOSIS_CODE_5
+    description: ''
+  - name: DIAGNOSIS_CODE_6
+    description: ''
+  - name: DIAGNOSIS_CODE_7
+    description: ''
+  - name: DIAGNOSIS_CODE_8
+    description: ''
+  - name: DIAGNOSIS_CODE_9
+    description: ''
+  - name: DIAGNOSIS_CODE_10
+    description: ''
+  - name: DIAGNOSIS_CODE_11
+    description: ''
+  - name: DIAGNOSIS_CODE_12
+    description: ''
+  - name: DIAGNOSIS_CODE_13
+    description: ''
+  - name: DIAGNOSIS_CODE_14
+    description: ''
+  - name: DIAGNOSIS_CODE_15
+    description: ''
+  - name: DIAGNOSIS_CODE_16
+    description: ''
+  - name: DIAGNOSIS_CODE_17
+    description: ''
+  - name: DIAGNOSIS_CODE_18
+    description: ''
+  - name: DIAGNOSIS_CODE_19
+    description: ''
+  - name: DIAGNOSIS_CODE_20
+    description: ''
+  - name: DIAGNOSIS_CODE_21
+    description: ''
+  - name: DIAGNOSIS_CODE_22
+    description: ''
+  - name: DIAGNOSIS_CODE_23
+    description: ''
+  - name: DIAGNOSIS_CODE_24
+    description: ''
+  - name: DIAGNOSIS_CODE_25
+    description: ''
+  - name: DIAGNOSIS_POA_1
+    description: ''
+  - name: DIAGNOSIS_POA_2
+    description: ''
+  - name: DIAGNOSIS_POA_3
+    description: ''
+  - name: DIAGNOSIS_POA_4
+    description: ''
+  - name: DIAGNOSIS_POA_5
+    description: ''
+  - name: DIAGNOSIS_POA_6
+    description: ''
+  - name: DIAGNOSIS_POA_7
+    description: ''
+  - name: DIAGNOSIS_POA_8
+    description: ''
+  - name: DIAGNOSIS_POA_9
+    description: ''
+  - name: DIAGNOSIS_POA_10
+    description: ''
+  - name: DIAGNOSIS_POA_11
+    description: ''
+  - name: DIAGNOSIS_POA_12
+    description: ''
+  - name: DIAGNOSIS_POA_13
+    description: ''
+  - name: DIAGNOSIS_POA_14
+    description: ''
+  - name: DIAGNOSIS_POA_15
+    description: ''
+  - name: DIAGNOSIS_POA_16
+    description: ''
+  - name: DIAGNOSIS_POA_17
+    description: ''
+  - name: DIAGNOSIS_POA_18
+    description: ''
+  - name: DIAGNOSIS_POA_19
+    description: ''
+  - name: DIAGNOSIS_POA_20
+    description: ''
+  - name: DIAGNOSIS_POA_21
+    description: ''
+  - name: DIAGNOSIS_POA_22
+    description: ''
+  - name: DIAGNOSIS_POA_23
+    description: ''
+  - name: DIAGNOSIS_POA_24
+    description: ''
+  - name: DIAGNOSIS_POA_25
+    description: ''
+  - name: PROCEDURE_CODE_TYPE
+    description: ''
+  - name: PROCEDURE_CODE_1
+    description: ''
+  - name: PROCEDURE_CODE_2
+    description: ''
+  - name: PROCEDURE_CODE_3
+    description: ''
+  - name: PROCEDURE_CODE_4
+    description: ''
+  - name: PROCEDURE_CODE_5
+    description: ''
+  - name: PROCEDURE_CODE_6
+    description: ''
+  - name: PROCEDURE_CODE_7
+    description: ''
+  - name: PROCEDURE_CODE_8
+    description: ''
+  - name: PROCEDURE_CODE_9
+    description: ''
+  - name: PROCEDURE_CODE_10
+    description: ''
+  - name: PROCEDURE_CODE_11
+    description: ''
+  - name: PROCEDURE_CODE_12
+    description: ''
+  - name: PROCEDURE_CODE_13
+    description: ''
+  - name: PROCEDURE_CODE_14
+    description: ''
+  - name: PROCEDURE_CODE_15
+    description: ''
+  - name: PROCEDURE_CODE_16
+    description: ''
+  - name: PROCEDURE_CODE_17
+    description: ''
+  - name: PROCEDURE_CODE_18
+    description: ''
+  - name: PROCEDURE_CODE_19
+    description: ''
+  - name: PROCEDURE_CODE_20
+    description: ''
+  - name: PROCEDURE_CODE_21
+    description: ''
+  - name: PROCEDURE_CODE_22
+    description: ''
+  - name: PROCEDURE_CODE_23
+    description: ''
+  - name: PROCEDURE_CODE_24
+    description: ''
+  - name: PROCEDURE_CODE_25
+    description: ''
+  - name: PROCEDURE_DATE_1
+    description: ''
+  - name: PROCEDURE_DATE_2
+    description: ''
+  - name: PROCEDURE_DATE_3
+    description: ''
+  - name: PROCEDURE_DATE_4
+    description: ''
+  - name: PROCEDURE_DATE_5
+    description: ''
+  - name: PROCEDURE_DATE_6
+    description: ''
+  - name: PROCEDURE_DATE_7
+    description: ''
+  - name: PROCEDURE_DATE_8
+    description: ''
+  - name: PROCEDURE_DATE_9
+    description: ''
+  - name: PROCEDURE_DATE_10
+    description: ''
+  - name: PROCEDURE_DATE_11
+    description: ''
+  - name: PROCEDURE_DATE_12
+    description: ''
+  - name: PROCEDURE_DATE_13
+    description: ''
+  - name: PROCEDURE_DATE_14
+    description: ''
+  - name: PROCEDURE_DATE_15
+    description: ''
+  - name: PROCEDURE_DATE_16
+    description: ''
+  - name: PROCEDURE_DATE_17
+    description: ''
+  - name: PROCEDURE_DATE_18
+    description: ''
+  - name: PROCEDURE_DATE_19
+    description: ''
+  - name: PROCEDURE_DATE_20
+    description: ''
+  - name: PROCEDURE_DATE_21
+    description: ''
+  - name: PROCEDURE_DATE_22
+    description: ''
+  - name: PROCEDURE_DATE_23
+    description: ''
+  - name: PROCEDURE_DATE_24
+    description: ''
+  - name: PROCEDURE_DATE_25
+    description: ''
+  - name: IN_NETWORK_FLAG
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: FILE_NAME
+    description: ''
+  - name: FILE_DATE
+    description: ''
+  - name: INGEST_DATETIME
+    description: ''

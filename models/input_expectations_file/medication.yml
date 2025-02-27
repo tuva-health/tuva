@@ -1,0 +1,108 @@
+version: 2
+models:
+- name: medication
+  config:
+    schema: input_layer
+    tags: "tuva_demo, input_layer"
+  columns:
+  - name: MEDICATION_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PERSON_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PATIENT_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ENCOUNTER_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+
+  - name: DISPENSING_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRESCRIBING_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: SOURCE_CODE_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: SOURCE_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: SOURCE_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NDC_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NDC_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: RXNORM_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: RXNORM_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ATC_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ATC_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ROUTE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: STRENGTH
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: QUANTITY
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: QUANTITY_UNIT
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DAYS_SUPPLY
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRACTITIONER_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DATA_SOURCE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: FILE_NAME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: INGEST_DATETIME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: TUVA_LAST_RUN
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist

@@ -1,0 +1,64 @@
+version: 2
+seeds:
+- name: provider_attribution
+  config:
+    schema: input_layer
+    tags: "tuva_demo, input_layer"
+    column_types:
+      person_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      patient_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      year_month: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      plan: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      data_source: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer_attributed_provider: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer_attributed_provider_practice: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer_attributed_provider_organization: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer_attributed_provider_lob: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      custom_attributed_provider: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      custom_attributed_provider_practice: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      custom_attributed_provider_organization: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      custom_attributed_provider_lob: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+  columns:
+  - name: PERSON_ID
+    description: ''
+  - name: PATIENT_ID
+    description: ''
+  - name: YEAR_MONTH
+    description: ''
+  - name: PAYER
+    description: ''
+  - name: PLAN
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: PAYER_ATTRIBUTED_PROVIDER
+    description: ''
+  - name: PAYER_ATTRIBUTED_PROVIDER_PRACTICE
+    description: ''
+  - name: PAYER_ATTRIBUTED_PROVIDER_ORGANIZATION
+    description: ''
+  - name: PAYER_ATTRIBUTED_PROVIDER_LOB
+    description: ''
+  - name: CUSTOM_ATTRIBUTED_PROVIDER
+    description: ''
+  - name: CUSTOM_ATTRIBUTED_PROVIDER_PRACTICE
+    description: ''
+  - name: CUSTOM_ATTRIBUTED_PROVIDER_ORGANIZATION
+    description: ''
+  - name: CUSTOM_ATTRIBUTED_PROVIDER_LOB
+    description: ''

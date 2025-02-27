@@ -1,0 +1,96 @@
+version: 2
+seeds:
+- name: pharmacy_claim
+  config:
+    schema: input_layer
+    tags: "tuva_demo, input_layer"
+    column_types:
+      claim_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      claim_line_number: integer
+      person_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      member_id: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      payer: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      plan: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      prescribing_provider_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      dispensing_provider_npi: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      dispensing_date: date
+      ndc_code: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      quantity: integer
+      days_supply: integer
+      refills: integer
+      paid_date: date
+      paid_amount: float
+      allowed_amount: float
+      charge_amount: float
+      coinsurance_amount: float
+      copayment_amount: float
+      deductible_amount: float
+      in_network_flag: integer
+      data_source: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_name: |
+        {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+      file_date: date
+      ingest_datetime: |
+        {%- if target.type in ("postgres", "databricks") -%} timestamp 
+        {%- elif target.type == "fabric" -%} datetime2(6)
+        {%- else -%} datetime {%- endif -%}
+  columns:
+  - name: CLAIM_ID
+    description: ''
+  - name: CLAIM_LINE_NUMBER
+    description: ''
+  - name: PERSON_ID
+    description: ''
+  - name: MEMBER_ID
+    description: ''
+  - name: PAYER
+    description: ''
+  - name: PLAN
+    description: ''
+  - name: PRESCRIBING_PROVIDER_NPI
+    description: ''
+  - name: DISPENSING_PROVIDER_NPI
+    description: ''
+  - name: DISPENSING_DATE
+    description: ''
+  - name: NDC_CODE
+    description: ''
+  - name: QUANTITY
+    description: ''
+  - name: DAYS_SUPPLY
+    description: ''
+  - name: REFILLS
+    description: ''
+  - name: PAID_DATE
+    description: ''
+  - name: PAID_AMOUNT
+    description: ''
+  - name: ALLOWED_AMOUNT
+    description: ''
+  - name: CHARGE_AMOUNT
+    description: ''
+  - name: COINSURANCE_AMOUNT
+    description: ''
+  - name: COPAYMENT_AMOUNT
+    description: ''
+  - name: DEDUCTIBLE_AMOUNT
+    description: ''
+  - name: IN_NETWORK_FLAG
+    description: ''
+  - name: DATA_SOURCE
+    description: ''
+  - name: FILE_NAME
+    description: ''
+  - name: FILE_DATE
+    description: ''
+  - name: INGEST_DATETIME
+    description: ''
