@@ -8,95 +8,97 @@ models:
     tags: input_layer
     materialized: view
   columns:
-  - name: OBSERVATION_ID
+  - name: observation_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PERSON_ID
+      - unique
+      - not_null
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PATIENT_ID
+  - name: patient_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENCOUNTER_ID
+  - name: encounter_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PANEL_ID
+  - name: panel_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: OBSERVATION_DATE
+  - name: observation_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: OBSERVATION_TYPE
+  - name: observation_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_CODE_TYPE
+  - name: source_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_CODE
+  - name: source_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_DESCRIPTION
+  - name: source_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_CODE_TYPE
+  - name: normalized_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_CODE
+  - name: normalized_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_DESCRIPTION
+  - name: normalized_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: RESULT
+  - name: result
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_UNITS
+  - name: source_units
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_UNITS
+  - name: normalized_units
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_REFERENCE_RANGE_LOW
+  - name: source_reference_range_low
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_REFERENCE_RANGE_HIGH
+  - name: source_reference_range_high
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_REFERENCE_RANGE_LOW
+  - name: normalized_reference_range_low
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_REFERENCE_RANGE_HIGH
+  - name: normalized_reference_range_high
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

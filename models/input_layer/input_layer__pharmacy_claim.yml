@@ -2,109 +2,116 @@ version: 2
 models:
 - name: input_layer__pharmacy_claim
   description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - claim_id
+          - claim_line_number
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
     tags: input_layer
     materialized: view
   columns:
-  - name: CLAIM_ID
+  - name: claim_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_LINE_NUMBER
+      - not_null
+  - name: claim_line_number
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PERSON_ID
+      - not_null
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MEMBER_ID
+  - name: member_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAYER
+  - name: payer
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PLAN
+  - name: plan
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRESCRIBING_PROVIDER_NPI
+  - name: prescribing_provider_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISPENSING_PROVIDER_NPI
+  - name: dispensing_provider_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISPENSING_DATE
+  - name: dispensing_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NDC_CODE
+  - name: ndc_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: QUANTITY
+  - name: quantity
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DAYS_SUPPLY
+  - name: days_supply
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: REFILLS
+  - name: refills
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAID_DATE
+  - name: paid_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAID_AMOUNT
+  - name: paid_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ALLOWED_AMOUNT
+  - name: allowed_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CHARGE_AMOUNT
+  - name: charge_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: COINSURANCE_AMOUNT
+  - name: coinsurance_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: COPAYMENT_AMOUNT
+  - name: copayment_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DEDUCTIBLE_AMOUNT
+  - name: deductible_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: IN_NETWORK_FLAG
+  - name: in_network_flag
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_DATE
+  - name: file_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

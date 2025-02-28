@@ -8,35 +8,37 @@ models:
     tags: input_layer
     materialized: view
   columns:
-  - name: PRACTITIONER_ID
+  - name: practitioner_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NPI
+      - unique
+      - not_null
+  - name: npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FIRST_NAME
+  - name: first_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: LAST_NAME
+  - name: last_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRACTICE_AFFILIATION
+  - name: practice_affiliation
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SPECIALTY
+  - name: specialty
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SUB_SPECIALTY
+  - name: sub_specialty
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

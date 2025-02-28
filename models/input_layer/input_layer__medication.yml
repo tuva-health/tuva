@@ -8,99 +8,101 @@ models:
     tags: input_layer
     materialized: view
   columns:
-  - name: MEDICATION_ID
+  - name: medication_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PERSON_ID
+      - unique
+      - not_null
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PATIENT_ID
+  - name: patient_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENCOUNTER_ID
+  - name: encounter_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISPENSING_DATE
+  - name: dispensing_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRESCRIBING_DATE
+  - name: prescribing_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_CODE_TYPE
+  - name: source_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_CODE
+  - name: source_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_DESCRIPTION
+  - name: source_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NDC_CODE
+  - name: ndc_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NDC_DESCRIPTION
+  - name: ndc_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: RXNORM_CODE
+  - name: rxnorm_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: RXNORM_DESCRIPTION
+  - name: rxnorm_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ATC_CODE
+  - name: atc_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ATC_DESCRIPTION
+  - name: atc_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ROUTE
+  - name: route
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: STRENGTH
+  - name: strength
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: QUANTITY
+  - name: quantity
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: QUANTITY_UNIT
+  - name: quantity_unit
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DAYS_SUPPLY
+  - name: days_supply
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRACTITIONER_ID
+  - name: practitioner_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

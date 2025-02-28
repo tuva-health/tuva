@@ -2,133 +2,140 @@ version: 2
 models:
 - name: input_layer__eligibility
   description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - person_id
+          - enrollment_start_date
+          - enrollment_end_date
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
     tags: input_layer
     materialized: view
   columns:
-  - name: PERSON_ID
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MEMBER_ID
+      - not_null
+  - name: member_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SUBSCRIBER_ID
+  - name: subscriber_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: GENDER
+  - name: gender
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: RACE
+  - name: race
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: BIRTH_DATE
+  - name: birth_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DEATH_DATE
+  - name: death_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DEATH_FLAG
+  - name: death_flag
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENROLLMENT_START_DATE
+  - name: enrollment_start_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENROLLMENT_END_DATE
+  - name: enrollment_end_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAYER
+  - name: payer
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAYER_TYPE
+  - name: payer_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PLAN
+  - name: plan
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ORIGINAL_REASON_ENTITLEMENT_CODE
+  - name: original_reason_entitlement_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DUAL_STATUS_CODE
+  - name: dual_status_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MEDICARE_STATUS_CODE
+  - name: medicare_status_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: GROUP_ID
+  - name: group_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: GROUP_NAME
+  - name: group_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FIRST_NAME
+  - name: first_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: LAST_NAME
+  - name: last_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOCIAL_SECURITY_NUMBER
+  - name: social_security_number
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SUBSCRIBER_RELATION
+  - name: subscriber_relation
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADDRESS
+  - name: address
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CITY
+  - name: city
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: STATE
+  - name: state
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ZIP_CODE
+  - name: zip_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PHONE
+  - name: phone
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_DATE
+  - name: file_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

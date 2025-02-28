@@ -8,119 +8,121 @@ models:
     tags: input_layer
     materialized: view
   columns:
-  - name: ENCOUNTER_ID
+  - name: encounter_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PERSON_ID
+      - unique
+      - not_null
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PATIENT_ID
+  - name: patient_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENCOUNTER_TYPE
+  - name: encounter_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENCOUNTER_START_DATE
+  - name: encounter_start_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENCOUNTER_END_DATE
+  - name: encounter_end_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: LENGTH_OF_STAY
+  - name: length_of_stay
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMIT_SOURCE_CODE
+  - name: admit_source_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMIT_SOURCE_DESCRIPTION
+  - name: admit_source_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMIT_TYPE_CODE
+  - name: admit_type_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMIT_TYPE_DESCRIPTION
+  - name: admit_type_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISCHARGE_DISPOSITION_CODE
+  - name: discharge_disposition_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISCHARGE_DISPOSITION_DESCRIPTION
+  - name: discharge_disposition_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ATTENDING_PROVIDER_ID
+  - name: attending_provider_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ATTENDING_PROVIDER_NAME
+  - name: attending_provider_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FACILITY_ID
+  - name: facility_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FACILITY_NAME
+  - name: facility_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRIMARY_DIAGNOSIS_CODE_TYPE
+  - name: primary_diagnosis_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRIMARY_DIAGNOSIS_CODE
+  - name: primary_diagnosis_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRIMARY_DIAGNOSIS_DESCRIPTION
+  - name: primary_diagnosis_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DRG_CODE_TYPE
+  - name: drg_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DRG_CODE
+  - name: drg_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DRG_DESCRIPTION
+  - name: drg_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAID_AMOUNT
+  - name: paid_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ALLOWED_AMOUNT
+  - name: allowed_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CHARGE_AMOUNT
+  - name: charge_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

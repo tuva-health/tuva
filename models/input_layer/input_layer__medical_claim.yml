@@ -2,601 +2,632 @@ version: 2
 models:
 - name: input_layer__medical_claim
   description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - claim_id
+          - claim_line_number
+#     A claim cannot be both professional and institutional within the same claim id.
+    - dbt_expectations.expect_select_column_values_to_be_unique_within_record:
+        column_list: ['claim_id', 'claim_type']
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
     tags: input_layer
     materialized: view
   columns:
-  - name: CLAIM_ID
+  - name: claim_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_LINE_NUMBER
+      - not_null
+  - name: claim_line_number
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_TYPE
+      - not_null
+  - name: claim_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PERSON_ID
+      - not_null
+      - accepted_values:
+          values: ['professional', 'institutional', 'undetermined']
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MEMBER_ID
+  - name: member_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAYER
+  - name: payer
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PLAN
+  - name: plan
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_START_DATE
+  - name: claim_start_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_END_DATE
+  - name: claim_end_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_LINE_START_DATE
+  - name: claim_line_start_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_LINE_END_DATE
+  - name: claim_line_end_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMISSION_DATE
+  - name: admission_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISCHARGE_DATE
+  - name: discharge_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMIT_SOURCE_CODE
+  - name: admit_source_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADMIT_TYPE_CODE
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          value: 1
+  - name: admit_type_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DISCHARGE_DISPOSITION_CODE
+  - name: discharge_disposition_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PLACE_OF_SERVICE_CODE
+  - name: place_of_service_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: BILL_TYPE_CODE
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          value: 2
+  - name: bill_type_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DRG_CODE_TYPE
+      - dbt_expectations.expect_column_value_lengths_to_be_between:
+        - min_value: 3
+        - max_value: 4
+  - name: drg_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DRG_CODE
+      - accepted_values:
+          values: ['ms-drg', 'apr-drg']
+  - name: drg_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: REVENUE_CENTER_CODE
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          value: 3
+  - name: revenue_center_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SERVICE_UNIT_QUANTITY
+      - dbt_expectations.expect_column_value_lengths_to_be_between:
+        - min_value: 3
+        - max_value: 4
+  - name: service_unit_quantity
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: HCPCS_CODE
+  - name: hcpcs_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: HCPCS_MODIFIER_1
+  - name: hcpcs_modifier_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: HCPCS_MODIFIER_2
+  - name: hcpcs_modifier_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: HCPCS_MODIFIER_3
+  - name: hcpcs_modifier_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: HCPCS_MODIFIER_4
+  - name: hcpcs_modifier_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: HCPCS_MODIFIER_5
+  - name: hcpcs_modifier_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: RENDERING_NPI
+  - name: rendering_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: RENDERING_TIN
+  - name: rendering_tin
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: BILLING_NPI
+  - name: billing_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: BILLING_TIN
+  - name: billing_tin
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FACILITY_NPI
+  - name: facility_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAID_DATE
+  - name: paid_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PAID_AMOUNT
+  - name: paid_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ALLOWED_AMOUNT
+  - name: allowed_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CHARGE_AMOUNT
+  - name: charge_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: COINSURANCE_AMOUNT
+  - name: coinsurance_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: COPAYMENT_AMOUNT
+  - name: copayment_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DEDUCTIBLE_AMOUNT
+  - name: deductible_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: TOTAL_COST_AMOUNT
+  - name: total_cost_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_TYPE
+  - name: diagnosis_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_1
+      - accepted_values:
+          values: ['icd-10-cm', 'icd-9-cm']
+  - name: diagnosis_code_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_2
+  - name: diagnosis_code_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_3
+  - name: diagnosis_code_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_4
+  - name: diagnosis_code_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_5
+  - name: diagnosis_code_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_6
+  - name: diagnosis_code_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_7
+  - name: diagnosis_code_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_8
+  - name: diagnosis_code_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_9
+  - name: diagnosis_code_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_10
+  - name: diagnosis_code_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_11
+  - name: diagnosis_code_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_12
+  - name: diagnosis_code_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_13
+  - name: diagnosis_code_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_14
+  - name: diagnosis_code_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_15
+  - name: diagnosis_code_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_16
+  - name: diagnosis_code_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_17
+  - name: diagnosis_code_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_18
+  - name: diagnosis_code_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_19
+  - name: diagnosis_code_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_20
+  - name: diagnosis_code_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_21
+  - name: diagnosis_code_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_22
+  - name: diagnosis_code_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_23
+  - name: diagnosis_code_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_24
+  - name: diagnosis_code_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_CODE_25
+  - name: diagnosis_code_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_1
+  - name: diagnosis_poa_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_2
+  - name: diagnosis_poa_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_3
+  - name: diagnosis_poa_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_4
+  - name: diagnosis_poa_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_5
+  - name: diagnosis_poa_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_6
+  - name: diagnosis_poa_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_7
+  - name: diagnosis_poa_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_8
+  - name: diagnosis_poa_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_9
+  - name: diagnosis_poa_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_10
+  - name: diagnosis_poa_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_11
+  - name: diagnosis_poa_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_12
+  - name: diagnosis_poa_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_13
+  - name: diagnosis_poa_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_14
+  - name: diagnosis_poa_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_15
+  - name: diagnosis_poa_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_16
+  - name: diagnosis_poa_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_17
+  - name: diagnosis_poa_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_18
+  - name: diagnosis_poa_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_19
+  - name: diagnosis_poa_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_20
+  - name: diagnosis_poa_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_21
+  - name: diagnosis_poa_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_22
+  - name: diagnosis_poa_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_23
+  - name: diagnosis_poa_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_24
+  - name: diagnosis_poa_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DIAGNOSIS_POA_25
+  - name: diagnosis_poa_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_TYPE
+  - name: procedure_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_1
+      - accepted_values:
+          values: ['icd-10-pcs', 'icd-9-pcs']
+  - name: procedure_code_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_2
+  - name: procedure_code_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_3
+  - name: procedure_code_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_4
+  - name: procedure_code_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_5
+  - name: procedure_code_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_6
+  - name: procedure_code_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_7
+  - name: procedure_code_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_8
+  - name: procedure_code_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_9
+  - name: procedure_code_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_10
+  - name: procedure_code_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_11
+  - name: procedure_code_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_12
+  - name: procedure_code_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_13
+  - name: procedure_code_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_14
+  - name: procedure_code_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_15
+  - name: procedure_code_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_16
+  - name: procedure_code_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_17
+  - name: procedure_code_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_18
+  - name: procedure_code_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_19
+  - name: procedure_code_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_20
+  - name: procedure_code_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_21
+  - name: procedure_code_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_22
+  - name: procedure_code_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_23
+  - name: procedure_code_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_24
+  - name: procedure_code_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_CODE_25
+  - name: procedure_code_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_1
+  - name: procedure_date_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_2
+  - name: procedure_date_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_3
+  - name: procedure_date_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_4
+  - name: procedure_date_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_5
+  - name: procedure_date_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_6
+  - name: procedure_date_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_7
+  - name: procedure_date_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_8
+  - name: procedure_date_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_9
+  - name: procedure_date_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_10
+  - name: procedure_date_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_11
+  - name: procedure_date_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_12
+  - name: procedure_date_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_13
+  - name: procedure_date_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_14
+  - name: procedure_date_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_15
+  - name: procedure_date_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_16
+  - name: procedure_date_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_17
+  - name: procedure_date_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_18
+  - name: procedure_date_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_19
+  - name: procedure_date_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_20
+  - name: procedure_date_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_21
+  - name: procedure_date_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_22
+  - name: procedure_date_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_23
+  - name: procedure_date_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_24
+  - name: procedure_date_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE_25
+  - name: procedure_date_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: IN_NETWORK_FLAG
+  - name: in_network_flag
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_DATE
+  - name: file_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

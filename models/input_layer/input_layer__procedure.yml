@@ -8,87 +8,89 @@ models:
     tags: input_layer
     materialized: view
   columns:
-  - name: PROCEDURE_ID
+  - name: procedure_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PERSON_ID
+      - unique
+      - not_null
+  - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PATIENT_ID
+  - name: patient_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ENCOUNTER_ID
+  - name: encounter_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CLAIM_ID
+  - name: claim_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PROCEDURE_DATE
+  - name: procedure_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_CODE_TYPE
+  - name: source_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_CODE
+  - name: source_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: SOURCE_DESCRIPTION
+  - name: source_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_CODE_TYPE
+  - name: normalized_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_CODE
+  - name: normalized_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NORMALIZED_DESCRIPTION
+  - name: normalized_description
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MODIFIER_1
+  - name: modifier_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MODIFIER_2
+  - name: modifier_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MODIFIER_3
+  - name: modifier_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MODIFIER_4
+  - name: modifier_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: MODIFIER_5
+  - name: modifier_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PRACTITIONER_ID
+  - name: practitioner_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FILE_NAME
+  - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: INGEST_DATETIME
+  - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist

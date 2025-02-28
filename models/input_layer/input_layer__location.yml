@@ -8,51 +8,53 @@ models:
     tags: input_layer
     materialized: view
   columns:
-  - name: LOCATION_ID
+  - name: location_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NPI
+      - unique
+      - not_null
+  - name: npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: NAME
+  - name: name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: FACILITY_TYPE
+  - name: facility_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: PARENT_ORGANIZATION
+  - name: parent_organization
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ADDRESS
+  - name: address
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: CITY
+  - name: city
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: STATE
+  - name: state
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: ZIP_CODE
+  - name: zip_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: LATITUDE
+  - name: latitude
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: LONGITUDE
+  - name: longitude
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
-  - name: DATA_SOURCE
+  - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist
