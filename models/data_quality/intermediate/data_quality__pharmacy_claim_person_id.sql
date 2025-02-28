@@ -8,7 +8,7 @@ with pharmacy as (
     , count(distinct p.person_id) as person_id_count
     , max(case when p.person_id is null then 1 else 0 end) as missing_person_id
     , max(case when e.month_start_date is null then 1 else 0 end) as missing_eligibility
-  from {{ ref('pharmacy_claim') }} p
+  from {{ ref('input_layer__pharmacy_claim') }} p
   left join {{ ref('data_quality__eligibility_dq_stage') }} e
     on p.person_id = e.person_id
     and coalesce(p.paid_date, p.dispensing_date) between e.month_start_date and e.month_end_date

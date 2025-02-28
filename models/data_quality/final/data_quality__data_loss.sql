@@ -10,7 +10,7 @@ with input_medical as (
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
     , sum(allowed_amount) as allowed_amount
-  from {{ ref('medical_claim') }}
+  from {{ ref('input_layer__medical_claim') }}
 )
 
 , input_pharmacy as (
@@ -21,7 +21,7 @@ with input_medical as (
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
     , sum(allowed_amount) as allowed_amount
-  from {{ ref('pharmacy_claim') }}
+  from {{ ref('input_layer__pharmacy_claim') }}
 )
 
 ,input_eligibility as (
@@ -39,7 +39,7 @@ select
       , "'-'"
       , quote_column('plan')
     ]) }}) as span_count
-from {{ ref('eligibility') }}
+from {{ ref('input_layer__eligibility') }}
 )
 
   , input_member_months as (

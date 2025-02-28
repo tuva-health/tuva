@@ -19,7 +19,7 @@ with eligibility_spans as(
         ]) }} as eligibility_span_id
         , payer
         , payer_type
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 )
 
 , missing_payer_type as(
