@@ -52,7 +52,6 @@ models:
           values: ['professional', 'institutional', 'undetermined']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: person_id
     description: ''
     tests:
@@ -185,7 +184,6 @@ models:
           values: ['ms-drg', 'apr-drg']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: drg_code
     description: ''
     tests:
@@ -362,7 +360,6 @@ models:
           values: ['icd-10-cm', 'icd-9-cm']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_1
     description: ''
     tests:
@@ -724,7 +721,6 @@ models:
           values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_1
     description: ''
     tests:
