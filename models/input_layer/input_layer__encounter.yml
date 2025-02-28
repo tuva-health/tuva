@@ -1,0 +1,126 @@
+version: 2
+models:
+- name: input_layer__encounter
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: ENCOUNTER_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PERSON_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PATIENT_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ENCOUNTER_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ENCOUNTER_START_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ENCOUNTER_END_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: LENGTH_OF_STAY
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ADMIT_SOURCE_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ADMIT_SOURCE_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ADMIT_TYPE_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ADMIT_TYPE_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DISCHARGE_DISPOSITION_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DISCHARGE_DISPOSITION_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ATTENDING_PROVIDER_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ATTENDING_PROVIDER_NAME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: FACILITY_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: FACILITY_NAME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRIMARY_DIAGNOSIS_CODE_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRIMARY_DIAGNOSIS_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRIMARY_DIAGNOSIS_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DRG_CODE_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DRG_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DRG_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PAID_AMOUNT
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ALLOWED_AMOUNT
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CHARGE_AMOUNT
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DATA_SOURCE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: FILE_NAME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: INGEST_DATETIME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist

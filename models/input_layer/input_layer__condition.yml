@@ -1,0 +1,94 @@
+version: 2
+models:
+- name: input_layer__condition
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: CONDITION_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PATIENT_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ENCOUNTER_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CLAIM_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: RECORDED_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ONSET_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: RESOLVED_DATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: STATUS
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CONDITION_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: SOURCE_CODE_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: SOURCE_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: SOURCE_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NORMALIZED_CODE_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NORMALIZED_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NORMALIZED_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CONDITION_RANK
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRESENT_ON_ADMIT_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PRESENT_ON_ADMIT_DESCRIPTION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DATA_SOURCE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: FILE_NAME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: INGEST_DATETIME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist

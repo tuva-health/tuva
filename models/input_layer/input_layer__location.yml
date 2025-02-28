@@ -1,0 +1,58 @@
+version: 2
+models:
+- name: input_layer__location
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: LOCATION_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NPI
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: NAME
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: FACILITY_TYPE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PARENT_ORGANIZATION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ADDRESS
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CITY
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: STATE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: ZIP_CODE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: LATITUDE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: LONGITUDE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DATA_SOURCE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist

@@ -1,0 +1,66 @@
+version: 2
+models:
+- name: input_layer__provider_attribution
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: PERSON_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PATIENT_ID
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: YEAR_MONTH
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PAYER
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PLAN
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: DATA_SOURCE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PAYER_ATTRIBUTED_PROVIDER
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PAYER_ATTRIBUTED_PROVIDER_PRACTICE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PAYER_ATTRIBUTED_PROVIDER_ORGANIZATION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: PAYER_ATTRIBUTED_PROVIDER_LOB
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CUSTOM_ATTRIBUTED_PROVIDER
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CUSTOM_ATTRIBUTED_PROVIDER_PRACTICE
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CUSTOM_ATTRIBUTED_PROVIDER_ORGANIZATION
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
+  - name: CUSTOM_ATTRIBUTED_PROVIDER_LOB
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist
