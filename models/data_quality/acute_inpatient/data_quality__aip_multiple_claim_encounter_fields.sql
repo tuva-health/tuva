@@ -260,7 +260,7 @@ select
     , dates_and_flags.usable_rendering_npi
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_encounters enc
-left join encounter_drg_code
+left join encounter_drg_code drg_code
     on enc.person_id = drg_code.person_id
     and enc.encounter_id = drg_code.encounter_id
 left join encounter_diagnosis_code_1 diagnosis_code_1

@@ -813,26 +813,6 @@ where usable_diagnosis_code_1 = 1
 
   union all
 
-  select * from missing_apr_drg_code
-  union all
-  select * from populated_apr_drg_code
-  union all
-  select * from always_valid_apr_drg_code
-  union all
-  select * from valid_and_invalid_apr_drg_code
-  union all
-  select * from always_invalid_apr_drg_code
-  union all
-  select * from undeterminable_apr_drg_code
-  union all
-  select * from determinable_apr_drg_code
-  union all
-  select * from unique_apr_drg_code
-  union all
-  select * from usable_apr_drg_code
-
-  union all
-
   select * from missing_admit_type_code
   union all
   select * from populated_admit_type_code
