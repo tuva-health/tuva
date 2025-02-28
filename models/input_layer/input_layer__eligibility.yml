@@ -10,10 +10,10 @@ models:
           - enrollment_end_date
           - member_id
           - payer
-          - plan
           - data_source
         config:
           severity: warn
+          enabled: "{{ (target.type != 'fabric') | as_bool }}"
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
