@@ -119,191 +119,96 @@ and usable_bill_type_code = 1
 
 
 -- **************************************************
--- ms_drg_code fields:
+-- drg_code fields:
 -- **************************************************
 
-missing_ms_drg_code as (
+missing_drg_code as (
 select
-  '(inst claims with missing ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with missing drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and missing_ms_drg_code = 1
+and missing_drg_code = 1
 ),
 
 
-populated_ms_drg_code as (
+populated_drg_code as (
 select
-  '(inst claims with populated ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with populated drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and missing_ms_drg_code = 0
+and missing_drg_code = 0
 ),
 
 
-always_valid_ms_drg_code as (
+always_valid_drg_code as (
 select
-  '(inst claims with always valid ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with always valid drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and always_valid_ms_drg_code = 1
+and always_valid_drg_code = 1
 ),
 
 
-valid_and_invalid_ms_drg_code as (
+valid_and_invalid_drg_code as (
 select
-  '(inst claims with valid and invalid ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with valid and invalid drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and valid_and_invalid_ms_drg_code = 1
+and valid_and_invalid_drg_code = 1
 ),
 
 
-always_invalid_ms_drg_code as (
+always_invalid_drg_code as (
 select
-  '(inst claims with always invalid ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with always invalid drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and always_invalid_ms_drg_code = 1
+and always_invalid_drg_code = 1
 ),
 
 
-undeterminable_ms_drg_code as (
+undeterminable_drg_code as (
 select
-  '(inst claims with undeterminable ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with undeterminable drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and undeterminable_ms_drg_code = 1
+and undeterminable_drg_code = 1
 ),
 
 
-determinable_ms_drg_code as (
+determinable_drg_code as (
 select
-  '(inst claims with determinable ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with determinable drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and determinable_ms_drg_code = 1
+and determinable_drg_code = 1
 ),
 
 
-unique_ms_drg_code as (
+unique_drg_code as (
 select
-  '(inst claims with unique ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with unique drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and unique_ms_drg_code = 1
+and unique_drg_code = 1
 ),
 
 
-usable_ms_drg_code as (
+usable_drg_code as (
 select
-  '(inst claims with usable ms-drg) / (total inst claims) * 100' as field,
+  '(inst claims with usable drg) / (total inst claims) * 100' as field,
   cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
 from {{ ref('data_quality__header_values') }}
 where calculated_claim_type = 'institutional'
-and usable_ms_drg_code = 1
-),
-
-
-
--- **************************************************
--- apr_drg_code fields:
--- **************************************************
-
-missing_apr_drg_code as (
-select
-  '(inst claims with missing apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and missing_apr_drg_code = 1
-),
-
-
-populated_apr_drg_code as (
-select
-  '(inst claims with populated apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and missing_apr_drg_code = 0
-),
-
-
-always_valid_apr_drg_code as (
-select
-  '(inst claims with always valid apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and always_valid_apr_drg_code = 1
-),
-
-
-valid_and_invalid_apr_drg_code as (
-select
-  '(inst claims with valid and invalid apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and valid_and_invalid_apr_drg_code = 1
-),
-
-
-always_invalid_apr_drg_code as (
-select
-  '(inst claims with always invalid apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and always_invalid_apr_drg_code = 1
-),
-
-
-undeterminable_apr_drg_code as (
-select
-  '(inst claims with undeterminable apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and undeterminable_apr_drg_code = 1
-),
-
-
-determinable_apr_drg_code as (
-select
-  '(inst claims with determinable apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and determinable_apr_drg_code = 1
-),
-
-
-unique_apr_drg_code as (
-select
-  '(inst claims with unique apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and unique_apr_drg_code = 1
-),
-
-
-usable_apr_drg_code as (
-select
-  '(inst claims with usable apr-drg) / (total inst claims) * 100' as field,
-  cast(count(*) as {{ dbt.type_numeric() }}) / (select * from total_institutional_claims) * 100 as field_value
-from {{ ref('data_quality__header_values') }}
-where calculated_claim_type = 'institutional'
-and usable_apr_drg_code = 1
+and usable_drg_code = 1
 ),
 
 
@@ -888,43 +793,23 @@ where usable_diagnosis_code_1 = 1
 
   union all
 
-  select * from missing_ms_drg_code
+  select * from missing_drg_code
   union all
-  select * from populated_ms_drg_code
+  select * from populated_drg_code
   union all
-  select * from always_valid_ms_drg_code
+  select * from always_valid_drg_code
   union all
-  select * from valid_and_invalid_ms_drg_code
+  select * from valid_and_invalid_drg_code
   union all
-  select * from always_invalid_ms_drg_code
+  select * from always_invalid_drg_code
   union all
-  select * from undeterminable_ms_drg_code
+  select * from undeterminable_drg_code
   union all
-  select * from determinable_ms_drg_code
+  select * from determinable_drg_code
   union all
-  select * from unique_ms_drg_code
+  select * from unique_drg_code
   union all
-  select * from usable_ms_drg_code
-
-  union all
-
-  select * from missing_apr_drg_code
-  union all
-  select * from populated_apr_drg_code
-  union all
-  select * from always_valid_apr_drg_code
-  union all
-  select * from valid_and_invalid_apr_drg_code
-  union all
-  select * from always_invalid_apr_drg_code
-  union all
-  select * from undeterminable_apr_drg_code
-  union all
-  select * from determinable_apr_drg_code
-  union all
-  select * from unique_apr_drg_code
-  union all
-  select * from usable_apr_drg_code
+  select * from usable_drg_code
 
   union all
 

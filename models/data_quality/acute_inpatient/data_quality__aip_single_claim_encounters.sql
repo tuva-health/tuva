@@ -36,8 +36,7 @@ with single_claim_encounters as (
         , aa.encounter_id
         , bb.merge_start_date
         , bb.merge_end_date
-        , bb.ms_drg_code
-        , bb.apr_drg_code
+        , bb.drg_code
         , bb.diagnosis_code_1
         , bb.admit_type_code
         , bb.admit_source_code
@@ -49,8 +48,7 @@ with single_claim_encounters as (
         , bb.dq_problem
         , bb.usable_person_id
         , bb.usable_merge_dates
-        , bb.usable_ms_drg_code
-        , bb.usable_apr_drg_code
+        , bb.usable_drg_code
         , bb.usable_diagnosis_code_1
         , bb.usable_admit_type_code
         , bb.usable_admit_source_code
@@ -71,8 +69,7 @@ select
     , encounter_id
     , merge_start_date
     , merge_end_date
-    , ms_drg_code
-    , apr_drg_code
+    , drg_code
     , diagnosis_code_1
     , admit_type_code
     , admit_source_code
@@ -84,8 +81,7 @@ select
     , dq_problem
     , usable_person_id
     , usable_merge_dates
-    , usable_ms_drg_code
-    , usable_apr_drg_code
+    , usable_drg_code
     , usable_diagnosis_code_1
     , usable_admit_type_code
     , usable_admit_source_code

@@ -22,93 +22,53 @@ with medical_claims as (
     where calculated_claim_type = 'institutional'
 )
 
-,invalid_ms_drg_code_count as (
+, invalid_drg_code_count as (
     select 
         count(distinct aa.claim_id) as claim_count
     from {{ ref('medical_claim') }} aa
     left join {{ ref('terminology__ms_drg') }} bb
-        on aa.ms_drg_code = bb.ms_drg_code
+        on aa.drg_code_type = 'ms-drg'
+        and aa.drg_code = bb.ms_drg_code
+    left join {{ ref('terminology__apr_drg') }} dd
+        on aa.drg_code_type = 'apr-drg'
+        and aa.drg_code = dd.apr_drg_code
     left join {{ ref('data_quality__claim_type') }} cc
         on aa.claim_id = cc.claim_id
-    where aa.ms_drg_code is not null 
-        and bb.ms_drg_code is null 
+    where aa.drg_code is not null
+        and coalesce(bb.ms_drg_code, dd.apr_drg_code) is null 
         and cc.calculated_claim_type = 'institutional'
 )
 
-, invalid_ms_drg_code_perc as (
+, invalid_drg_code_perc as (
     select 
         round(
-            (select claim_count from invalid_ms_drg_code_count) * 100.0 /
+            (select claim_count from invalid_drg_code_count) * 100.0 /
             (select claim_count from institutional_claims), 1
         ) as percentage
 )
 
-, dupe_ms_drg_code_count as (
+, dupe_drg_code_count as (
     select 
         cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
     from (
         select
             aa.claim_id,
-            count(distinct aa.ms_drg_code) as count_of_ms_drg_codes
+            count(distinct aa.drg_code) as count_of_drg_codes
         from {{ ref('medical_claim') }} aa
         left join {{ ref('data_quality__claim_type') }} bb
             on aa.claim_id = bb.claim_id
         where bb.calculated_claim_type = 'institutional'
         group by aa.claim_id
-        having count(distinct aa.ms_drg_code) > 1
+        having count(distinct aa.drg_code) > 1
     ) as subquery
 )
 
-, dupe_ms_drg_code_perc as (
+, dupe_drg_code_perc as (
     select 
         round(
-            (select claim_count from dupe_ms_drg_code_count) * 100.0 /
+            (select claim_count from dupe_drg_code_count) * 100.0 /
             (select claim_count from institutional_claims), 1
         ) as percentage
-)
-
-, invalid_apr_drg_code_count as (
-    select 
-        count(distinct aa.claim_id) as claim_count
-    from {{ ref('medical_claim') }} aa
-    left join {{ ref('terminology__apr_drg') }} bb
-        on aa.apr_drg_code = bb.apr_drg_code
-    left join {{ ref('data_quality__claim_type') }} cc
-        on aa.claim_id = cc.claim_id
-    where (aa.apr_drg_code is not null) 
-        and (bb.apr_drg_code is null) 
-        and cc.calculated_claim_type = 'institutional'
-)
-
-, invalid_apr_drg_code_perc as (
-    select round(
-        (select * from invalid_apr_drg_code_count) * 100.0 /
-        (select * from institutional_claims)
-        , 1
-    ) as percentage
-)
-
-, dupe_apr_drg_code_count as (
-    select cast(count(*) as {{ dbt.type_numeric() }}) as claim_count
-    from (
-        select 
-            aa.claim_id
-            , count(distinct apr_drg_code) as count_of_apr_drg_codes
-        from {{ ref('medical_claim') }} aa
-        left join {{ ref('data_quality__claim_type') }} bb
-            on aa.claim_id = bb.claim_id
-        where bb.calculated_claim_type = 'institutional'
-        group by aa.claim_id
-        having count(distinct apr_drg_code) > 1
-    ) as subquery
-)
-
-, dupe_apr_drg_code_perc as (
-    select round(
-        (select * from dupe_apr_drg_code_count) * 100.0 /
-        (select * from institutional_claims)
-        , 1
-    ) as percentage
 )
 
 , missing_revenue_center_code_count as (
@@ -634,25 +594,13 @@ with medical_claims as (
 , final2 as (
 
     select 
-          'ms_drg_code' as field
+          'drg_code' as field
         , null as missing_count
         , null as missing_perc
-        , (select * from invalid_ms_drg_code_count) as invalid_count
-        , (select * from invalid_ms_drg_code_perc) as invalid_perc
-        , (select * from dupe_ms_drg_code_count) as duplicated_count
-        , (select * from dupe_ms_drg_code_perc) as duplicated_perc
-        , 'institutional' as claim_type
-
-    union all
-
-    select 
-          'apr_drg_code' as field
-        , null as missing_count
-        , null as missing_perc
-        , (select * from invalid_apr_drg_code_count) as invalid_count
-        , (select * from invalid_apr_drg_code_perc) as invalid_perc
-        , (select * from dupe_apr_drg_code_count) as duplicated_count
-        , (select * from dupe_apr_drg_code_perc) as duplicated_perc
+        , (select * from invalid_drg_code_count) as invalid_count
+        , (select * from invalid_drg_code_perc) as invalid_perc
+        , (select * from dupe_drg_code_count) as duplicated_count
+        , (select * from dupe_drg_code_perc) as duplicated_perc
         , 'institutional' as claim_type
 
     union all

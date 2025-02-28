@@ -24,55 +24,29 @@ with add_row_number_to_claims as (
 
 )
 
-, encounter_ms_drg_code_row as (
+, encounter_drg_code_row as (
 
     select
           person_id
         , encounter_id
-        , min(row_num_first) as ms_drg_code_row
+        , min(row_num_first) as drg_code_row
     from add_row_number_to_claims
-    where ms_drg_code is not null
+    where drg_code is not null
     group by person_id, encounter_id
 
 )
 
-, encounter_ms_drg_code as (
+, encounter_drg_code as (
 
     select
           aa.person_id
         , aa.encounter_id
-        , aa.ms_drg_code
+        , aa.drg_code
     from add_row_number_to_claims aa
-    inner join encounter_ms_drg_code_row bb
+    inner join encounter_drg_code_row bb
         on aa.person_id = bb.person_id
         and aa.encounter_id = bb.encounter_id
-        and aa.row_num_first = bb.ms_drg_code_row
-
-)
-
-, encounter_apr_drg_code_row as (
-
-    select
-          person_id
-        , encounter_id
-        , min(row_num_first) as apr_drg_code_row
-    from add_row_number_to_claims
-    where apr_drg_code is not null
-    group by person_id, encounter_id
-
-)
-
-, encounter_apr_drg_code as (
-
-    select
-          aa.person_id
-        , aa.encounter_id
-        , aa.apr_drg_code
-    from add_row_number_to_claims aa
-    inner join encounter_apr_drg_code_row bb
-        on aa.person_id = bb.person_id
-        and aa.encounter_id = bb.encounter_id
-        and aa.row_num_first = bb.apr_drg_code_row
+        and aa.row_num_first = bb.drg_code_row
 
 )
 
@@ -242,8 +216,7 @@ with add_row_number_to_claims as (
         , max(dq_problem) as dq_problem
         , max(usable_person_id) as usable_person_id
         , max(usable_merge_dates) as usable_merge_dates
-        , max(usable_ms_drg_code) as usable_ms_drg_code
-        , max(usable_apr_drg_code) as usable_apr_drg_code
+        , max(usable_drg_code) as usable_drg_code
         , max(usable_diagnosis_code_1) as usable_diagnosis_code_1
         , max(usable_admit_type_code) as usable_admit_type_code
         , max(usable_admit_source_code) as usable_admit_source_code
@@ -269,8 +242,7 @@ select
     , enc.encounter_id
     , dates_and_flags.encounter_start_date
     , dates_and_flags.encounter_end_date
-    , ms_drg_code.ms_drg_code
-    , apr_drg_code.apr_drg_code
+    , drg_code.drg_code
     , diagnosis_code_1.diagnosis_code_1
     , admit_type_code.admit_type_code
     , admit_source_code.admit_source_code
@@ -279,8 +251,7 @@ select
     , rendering_npi.rendering_npi
     , encounter_paid_amount.paid_amount
     , dates_and_flags.dq_problem
-    , dates_and_flags.usable_ms_drg_code
-    , dates_and_flags.usable_apr_drg_code
+    , dates_and_flags.usable_drg_code
     , dates_and_flags.usable_diagnosis_code_1
     , dates_and_flags.usable_admit_type_code
     , dates_and_flags.usable_admit_source_code
@@ -289,12 +260,9 @@ select
     , dates_and_flags.usable_rendering_npi
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from all_encounters enc
-left join encounter_ms_drg_code ms_drg_code
-    on enc.person_id = ms_drg_code.person_id
-    and enc.encounter_id = ms_drg_code.encounter_id
-left join encounter_apr_drg_code apr_drg_code
-    on enc.person_id = apr_drg_code.person_id
-    and enc.encounter_id = apr_drg_code.encounter_id
+left join encounter_drg_code drg_code
+    on enc.person_id = drg_code.person_id
+    and enc.encounter_id = drg_code.encounter_id
 left join encounter_diagnosis_code_1 diagnosis_code_1
     on enc.person_id = diagnosis_code_1.person_id
     and enc.encounter_id = diagnosis_code_1.encounter_id

@@ -3,7 +3,7 @@
 ) }}
 
 SELECT
-    mc.claim_id
+      mc.claim_id
     , mc.claim_line_number
     , mc.bill_type_code
     , CASE
@@ -11,17 +11,11 @@ SELECT
         ELSE 0
     END AS valid_bill_type_code
 
-    , mc.ms_drg_code
+    , mc.drg_code
     , CASE
-        WHEN ms_drg.ms_drg_code IS NOT NULL THEN 1
+        WHEN coalesce(ms_drg.ms_drg_code, apr_drg.apr_drg_code) IS NOT NULL THEN 1
         ELSE 0
-    END AS valid_ms_drg_code
-
-    , mc.apr_drg_code
-    , CASE
-        WHEN apr_drg.apr_drg_code IS NOT NULL THEN 1
-        ELSE 0
-    END AS valid_apr_drg_code
+    END AS valid_drg_code
 
     , mc.admit_type_code
     , CASE
@@ -245,10 +239,12 @@ left join {{ ref('terminology__bill_type') }} bill_type
     on mc.bill_type_code = bill_type.bill_type_code
 
 left join {{ ref('terminology__ms_drg') }} ms_drg
-    on mc.ms_drg_code = ms_drg.ms_drg_code
+    on mc.drg_code_type = 'ms-drg'
+    and mc.drg_code = ms_drg.ms_drg_code
 
 left join {{ ref('terminology__apr_drg') }} apr_drg
-    on mc.apr_drg_code = apr_drg.apr_drg_code
+    on mc.drg_code_type = 'apr-drg'
+    and mc.drg_code = apr_drg.apr_drg_code
 
 left join {{ ref('terminology__admit_type') }} admit_type
     on mc.admit_type_code = admit_type.admit_type_code

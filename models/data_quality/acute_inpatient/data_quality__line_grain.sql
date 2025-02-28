@@ -12,8 +12,7 @@ select
     -- we should label that claim as an institutional claim.
     -- 'Institutional' fields are the following:
     --      - bill_type_code
-    --      - ms_drg_code
-    --      - apr_drg_code
+    --      - drg_code
     --      - admit_type_code
     --      - admit_source_code
     --      - discharge_disposition_code
@@ -26,8 +25,7 @@ select
     -- admission_date and discharge_date in our list of 'institutional' fields.
     , case
           when (bill_type_code is not null 
-                or ms_drg_code is not null 
-                or apr_drg_code is not null 
+                or drg_code is not null
                 or admit_type_code is not null 
                 or admit_source_code is not null 
                 or discharge_disposition_code is not null 
@@ -40,8 +38,7 @@ select
 
     , case
           when (valid_bill_type_code = 1 
-                or valid_ms_drg_code = 1 
-                or valid_apr_drg_code = 1 
+                or valid_drg_code = 1
                 or valid_admit_type_code = 1 
                 or valid_admit_source_code = 1 
                 or valid_discharge_disposition_code = 1 

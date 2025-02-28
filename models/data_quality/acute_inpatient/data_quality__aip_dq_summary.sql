@@ -101,7 +101,7 @@ with final_cte as (
 
     select
           12 as rank_id
-        , 'MS-DRG atomic data quality:' as field
+        , 'DRG atomic data quality:' as field
         , cast(null as {{ dbt.type_string() }} ) as field_value
 
     union all
@@ -111,7 +111,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with missing ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with missing drg) / (total inst claims) * 100'
 
     union all
 
@@ -120,7 +120,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with populated ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with populated drg) / (total inst claims) * 100'
 
     union all
 
@@ -129,7 +129,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with always valid ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with always valid drg) / (total inst claims) * 100'
 
     union all
 
@@ -138,7 +138,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with valid and invalid ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with valid and invalid drg) / (total inst claims) * 100'
 
     union all
 
@@ -147,7 +147,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with always invalid ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with always invalid drg) / (total inst claims) * 100'
 
     union all
 
@@ -156,7 +156,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with undeterminable ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with undeterminable drg) / (total inst claims) * 100'
 
     union all
 
@@ -165,7 +165,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with determinable ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with determinable drg) / (total inst claims) * 100'
 
     union all
 
@@ -174,7 +174,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with unique ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with unique drg) / (total inst claims) * 100'
 
     union all
 
@@ -183,7 +183,7 @@ with final_cte as (
         , field
         , cast(field_value as {{ dbt.type_string() }} ) as field_value
     from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with usable ms-drg) / (total inst claims) * 100'
+    where field = '(inst claims with usable drg) / (total inst claims) * 100'
 
     union all
 
@@ -191,94 +191,6 @@ with final_cte as (
           22 as rank_id
         , cast(null as {{ dbt.type_string() }} ) as field
         , cast(null as {{ dbt.type_string() }} ) as field_value
-
-    union all
-
-    select
-          23 as rank_id
-        , 'APR-DRG atomic data quality:' as field
-        , cast(null as {{ dbt.type_string() }} ) as field_value
-
-    union all
-
-    select
-          24 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with missing apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          25 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with populated apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          26 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with always valid apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          27 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with valid and invalid apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          28 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with always invalid apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          29 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with undeterminable apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          30 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with determinable apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          31 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with unique apr-drg) / (total inst claims) * 100'
-
-    union all
-
-    select
-          32 as rank_id
-        , field
-        , cast(field_value as {{ dbt.type_string() }} ) as field_value
-    from {{ ref('data_quality__header_values_graph') }}
-    where field = '(inst claims with usable apr-drg) / (total inst claims) * 100'
 
     union all
 
@@ -730,23 +642,12 @@ with final_cte as (
 
     select
         81 as rank_id
-        , '(# AIP inst claims with unusable ms_drg_code) / (# AIP inst claims) * 100' as field
+        , '(# AIP inst claims with unusable drg_code) / (# AIP inst claims) * 100' as field
         , cast((
             select field_value
             from {{ ref('data_quality__aip_inst_claims_dq_summary') }}
-            where field = '(# AIP inst claims with unusable ms_drg_code) / (# AIP inst claims) * 100'
+            where field = '(# AIP inst claims with unusable drg_code) / (# AIP inst claims) * 100'
         ) as {{ dbt.type_string() }} ) as field_value
-
-    union all
-
-    select
-        82 as rank_id
-        , '(# AIP inst claims with unusable apr_drg_code) / (# AIP inst claims) * 100' as field
-        , cast((
-            select field_value
-            from {{ ref('data_quality__aip_inst_claims_dq_summary') }}
-            where field = '(# AIP inst claims with unusable apr_drg_code) / (# AIP inst claims) * 100'
-        ) as {{ dbt.type_string() }} )as field_value
 
     union all
 
@@ -883,22 +784,11 @@ with final_cte as (
 
     select
         99 as rank_id
-        , 'Encounters with a multiple MS-DRG' as field
+        , 'Encounters with a multiple DRG' as field
         , (
             select cast(encounters as {{ dbt.type_string() }}) as encounters
             from {{ ref('data_quality__aip_multiple_claim_encounters_dq_summary') }}
-            where field = 'Encounters with a multiple MS-DRG'
-        ) as field_value
-
-    union all
-
-    select
-        100 as rank_id
-        , 'Encounters with a multiple APR-DRG' as field
-        , (
-            select cast(encounters as {{ dbt.type_string() }}) as encounters
-            from {{ ref('data_quality__aip_multiple_claim_encounters_dq_summary') }}
-            where field = 'Encounters with a multiple APR-DRG'
+            where field = 'Encounters with a multiple DRG'
         ) as field_value
 
     union all
@@ -988,29 +878,12 @@ with final_cte as (
 
     select
         108 as rank_id
-        , '(Encounters with a multiple MS-DRG) / (multi-claim enc) * 100' as field
+        , '(Encounters with a multiple DRG) / (multi-claim enc) * 100' as field
         , cast(round(
             (
                 select encounters
                 from {{ ref('data_quality__aip_multiple_claim_encounters_dq_summary') }}
-                where field = 'Encounters with a multiple MS-DRG'
-            ) * 100 /
-            (
-                select cast(count(*) as {{ dbt.type_numeric() }})
-                from {{ ref('data_quality__aip_multiple_claim_encounter_fields') }}
-            ), 1
-          ) as {{ dbt.type_string() }}) as field_value
-
-    union all
-
-    select
-        109 as rank_id
-        , '(Encounters with a multiple APR-DRG) / (multi-claim enc) * 100' as field
-        , cast(round(
-            (
-                select encounters
-                from {{ ref('data_quality__aip_multiple_claim_encounters_dq_summary') }}
-                where field = 'Encounters with a multiple APR-DRG'
+                where field = 'Encounters with a multiple DRG'
             ) * 100 /
             (
                 select cast(count(*) as {{ dbt.type_numeric() }})
@@ -1407,22 +1280,11 @@ with final_cte as (
 
     select
         149 as rank_id
-        , '(aip_encounters_with_unusable_ms_drg_code) / (aip_encounters) * 100' as field
+        , '(aip_encounters_with_unusable_drg_code) / (aip_encounters) * 100' as field
         , cast((
             select field_value
             from {{ ref('data_quality__aip_encounters_final_summary') }}
-            where field = '(aip_encounters_with_unusable_ms_drg_code) / (aip_encounters) * 100'
-          ) as {{ dbt.type_string() }}) as field_value
-
-    union all
-
-    select
-        150 as rank_id
-        , '(aip_encounters_with_unusable_apr_drg_code) / (aip_encounters) * 100' as field
-        , cast((
-            select field_value
-            from {{ ref('data_quality__aip_encounters_final_summary') }}
-            where field = '(aip_encounters_with_unusable_apr_drg_code) / (aip_encounters) * 100'
+            where field = '(aip_encounters_with_unusable_drg_code) / (aip_encounters) * 100'
           ) as {{ dbt.type_string() }}) as field_value
 
     union all

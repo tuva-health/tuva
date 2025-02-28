@@ -9,8 +9,7 @@ with single_claim_encounters as (
         , encounter_id
         , merge_start_date as encounter_start_date
         , merge_end_date as encounter_end_date
-        , ms_drg_code
-        , apr_drg_code
+        , drg_code
         , diagnosis_code_1
         , admit_type_code
         , admit_source_code
@@ -19,8 +18,7 @@ with single_claim_encounters as (
         , rendering_npi
         , paid_amount
         , dq_problem
-        , usable_ms_drg_code
-        , usable_apr_drg_code
+        , usable_drg_code
         , usable_diagnosis_code_1
         , usable_admit_type_code
         , usable_admit_source_code
@@ -41,8 +39,7 @@ with single_claim_encounters as (
         , encounter_id
         , encounter_start_date
         , encounter_end_date
-        , ms_drg_code
-        , apr_drg_code
+        , drg_code
         , diagnosis_code_1
         , admit_type_code
         , admit_source_code
@@ -51,8 +48,7 @@ with single_claim_encounters as (
         , rendering_npi
         , paid_amount
         , dq_problem
-        , usable_ms_drg_code
-        , usable_apr_drg_code
+        , usable_drg_code
         , usable_diagnosis_code_1
         , usable_admit_type_code
         , usable_admit_source_code
@@ -70,8 +66,7 @@ select
     , encounter_id
     , encounter_start_date
     , encounter_end_date
-    , ms_drg_code
-    , apr_drg_code
+    , drg_code
     , diagnosis_code_1
     , admit_type_code
     , admit_source_code
@@ -80,8 +75,7 @@ select
     , rendering_npi
     , paid_amount
     , dq_problem
-    , usable_ms_drg_code
-    , usable_apr_drg_code
+    , usable_drg_code
     , usable_diagnosis_code_1
     , usable_admit_type_code
     , usable_admit_source_code
@@ -100,8 +94,7 @@ select
     , encounter_id
     , encounter_start_date
     , encounter_end_date
-    , ms_drg_code
-    , apr_drg_code
+    , drg_code
     , diagnosis_code_1
     , admit_type_code
     , admit_source_code
@@ -110,8 +103,7 @@ select
     , rendering_npi
     , paid_amount
     , dq_problem
-    , usable_ms_drg_code
-    , usable_apr_drg_code
+    , usable_drg_code
     , usable_diagnosis_code_1
     , usable_admit_type_code
     , usable_admit_source_code

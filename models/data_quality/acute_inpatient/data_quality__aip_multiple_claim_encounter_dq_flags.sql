@@ -9,14 +9,9 @@ with add_flags_for_each_relevant_field as (
         , encounter_id
         
         , case 
-            when (count(distinct ms_drg_code) > 1) then 1
+            when (count(distinct drg_code) > 1) then 1
             else 0
-          end as multiple_ms_drg_code
-
-        , case 
-            when (count(distinct apr_drg_code) > 1) then 1
-            else 0
-          end as multiple_apr_drg_code
+          end as multiple_drg_code
 
         , case 
             when (count(distinct diagnosis_code_1) > 1) then 1
@@ -64,8 +59,7 @@ with add_flags_for_each_relevant_field as (
 
         , case
             when (
-                 multiple_ms_drg_code = 1 
-                 or multiple_apr_drg_code = 1 
+                 multiple_drg_code = 1 
                  or multiple_diagnosis_code_1 = 1 
                  or multiple_admit_type_code = 1 
                  or multiple_admit_source_code = 1 
@@ -76,8 +70,7 @@ with add_flags_for_each_relevant_field as (
             else 0
           end as dq_problem
 
-        , multiple_ms_drg_code
-        , multiple_apr_drg_code
+        , multiple_drg_code
         , multiple_diagnosis_code_1
         , multiple_admit_type_code
         , multiple_admit_source_code
@@ -93,8 +86,7 @@ select
       person_id
     , encounter_id
     , dq_problem
-    , multiple_ms_drg_code
-    , multiple_apr_drg_code
+    , multiple_drg_code
     , multiple_diagnosis_code_1
     , multiple_admit_type_code
     , multiple_admit_source_code
