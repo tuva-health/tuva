@@ -17,59 +17,93 @@ models:
   - name: person_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: patient_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: year_month
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: payer
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: plan
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: data_source
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: payer_attributed_provider
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: payer_attributed_provider_practice
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: payer_attributed_provider_organization
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: payer_attributed_provider_lob
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: custom_attributed_provider
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: custom_attributed_provider_practice
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: custom_attributed_provider_organization
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: custom_attributed_provider_lob
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn

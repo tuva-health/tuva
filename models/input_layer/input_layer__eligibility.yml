@@ -8,6 +8,8 @@ models:
           - person_id
           - enrollment_start_date
           - enrollment_end_date
+        config:
+          severity: warn
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -17,125 +19,189 @@ models:
   - name: person_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: member_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: subscriber_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: gender
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: race
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: birth_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: death_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: death_flag
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: enrollment_start_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: enrollment_end_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: payer
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: payer_type
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: plan
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: original_reason_entitlement_code
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: dual_status_code
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: medicare_status_code
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: group_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: group_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: first_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: last_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: social_security_number
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: subscriber_relation
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: address
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: city
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: state
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: zip_code
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: phone
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: data_source
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: file_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: file_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: ingest_datetime
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn

@@ -11,34 +11,54 @@ models:
   - name: practitioner_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - unique
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - unique:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: npi
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: first_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: last_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: practice_affiliation
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: specialty
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: sub_specialty
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: data_source
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn

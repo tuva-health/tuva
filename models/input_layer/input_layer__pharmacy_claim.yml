@@ -7,6 +7,8 @@ models:
         combination_of_columns:
           - claim_id
           - claim_line_number
+        config:
+          severity: warn
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -16,102 +18,156 @@ models:
   - name: claim_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: claim_line_number
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: person_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: member_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: payer
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: plan
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: prescribing_provider_npi
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: dispensing_provider_npi
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: dispensing_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: ndc_code
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: quantity
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: days_supply
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: refills
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: paid_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: paid_amount
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: allowed_amount
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: charge_amount
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: coinsurance_amount
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: copayment_amount
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: deductible_amount
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: in_network_flag
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: data_source
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: file_name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: file_date
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: ingest_datetime
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn

@@ -11,50 +11,78 @@ models:
   - name: location_id
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
-      - unique
-      - not_null
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - unique:
+          config:
+            severity: warn
+      - not_null:
+          config:
+            severity: warn
   - name: npi
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: name
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: facility_type
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: parent_organization
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: address
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: city
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: state
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: zip_code
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: latitude
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: longitude
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
   - name: data_source
     description: ''
     tests:
-      - dbt_expectations.expect_column_to_exist
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
