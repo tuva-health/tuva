@@ -2,6 +2,13 @@ version: 2
 models:
 - name: input_layer__patient
   description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - person_id
+          - patient_id
+        config:
+          severity: warn
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -14,9 +21,6 @@ models:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-      - unique:
-          config:
-            severity: warn
       - not_null:
           config:
             severity: warn
@@ -24,6 +28,9 @@ models:
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+      - not_null:
           config:
             severity: warn
   - name: first_name
