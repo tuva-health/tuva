@@ -48,4 +48,4 @@ select
   , cast(null as {{ dbt.type_string() }}) as source_model
   , cast(data_source as {{ dbt.type_string() }}) as data_source
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
-from {{ ref('encounter') }}
+from {{ ref('input_layer__encounter') }}

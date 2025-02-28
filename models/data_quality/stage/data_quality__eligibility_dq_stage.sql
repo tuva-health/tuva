@@ -21,7 +21,7 @@ select distinct
   , a.{{ quote_column('plan') }}
   , data_source
   , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('eligibility') }} a
+from {{ ref('input_layer__eligibility') }} a
 inner join month_start_and_end_dates b
   on a.enrollment_start_date <= b.month_end_date
   and a.enrollment_end_date >= b.month_start_date

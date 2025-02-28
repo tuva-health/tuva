@@ -8,7 +8,7 @@ with pharmacy as (
     , claim_line_number
     , data_source
     , count(*) as result_count
-  from {{ ref('pharmacy_claim') }} p
+  from {{ ref('input_layer__pharmacy_claim') }} p
   group by
       claim_id
     , claim_line_number
@@ -22,7 +22,7 @@ with pharmacy as (
     , claim_line_number
     , data_source
     , count(*) as result_count
-  from {{ ref('medical_claim') }} p
+  from {{ ref('input_layer__medical_claim') }} p
   group by
       claim_id
     , claim_line_number
@@ -38,7 +38,7 @@ with pharmacy as (
     , {{ quote_column('plan') }}
     , data_source
     , count(*) as result_count
-  from {{ ref('eligibility') }} p
+  from {{ ref('input_layer__eligibility') }} p
   group by
       person_id
     , enrollment_start_date

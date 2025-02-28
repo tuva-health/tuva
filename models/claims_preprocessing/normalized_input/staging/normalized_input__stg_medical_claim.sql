@@ -150,4 +150,4 @@ select
     , procedure_date_25
     , in_network_flag
     , data_source
-from {{ ref('medical_claim') }}
+from {{ ref('input_layer__medical_claim') }}

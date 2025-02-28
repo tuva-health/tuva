@@ -11,7 +11,7 @@ with medical_claim as (
     , max(case when m.hcpcs_code is null then 1 else 0 end) as missing_hcpcs_code
     , max(case when m.claim_type = 'professional' and m.place_of_service_code is null then 1 else 0 end) as missing_place_of_service_code
     , max(case when m.claim_type = 'institutional' and m.revenue_center_code is null then 1 else 0 end) as missing_revenue_center_code
-  from {{ ref('medical_claim') }} as m
+  from {{ ref('input_layer__medical_claim') }} as m
   left join {{ ref('terminology__hcpcs_level_2') }} as hcpc
     on m.hcpcs_code = hcpc.hcpcs
   left join {{ ref('terminology__place_of_service') }} as pos

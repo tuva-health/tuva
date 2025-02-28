@@ -42,4 +42,4 @@ select
     , data_source
     , file_name
     , ingest_datetime
-from {{ ref('eligibility') }}
+from {{ ref('input_layer__eligibility') }}

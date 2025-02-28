@@ -6,6 +6,6 @@
 
 
     SELECT *
-    FROM {{ ref('medical_claim') }}
+    FROM {{ ref('input_layer__medical_claim') }}
     WHERE claim_type = 'institutional'
     AND {{ substring('bill_type_code', 1, 2) }} = '11'
