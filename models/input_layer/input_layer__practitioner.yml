@@ -14,6 +14,7 @@ models:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - unique:
           config:
             severity: warn
@@ -26,39 +27,46 @@ models:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: first_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: last_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: practice_affiliation
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: specialty
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: sub_specialty
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
