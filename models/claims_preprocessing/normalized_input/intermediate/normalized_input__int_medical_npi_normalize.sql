@@ -34,7 +34,6 @@ select distinct
 from {{ ref('normalized_input__stg_medical_claim') }} as med
 left join {{ ref('terminology__provider') }} as rend_prov
   on med.rendering_npi = rend_prov.npi
-  and rend_prov.entity_type_description = 'Individual'
 left join {{ ref('terminology__provider') }} as bill_prov
   on med.billing_npi = bill_prov.npi
 left join {{ ref('terminology__provider') }} as fac_prov

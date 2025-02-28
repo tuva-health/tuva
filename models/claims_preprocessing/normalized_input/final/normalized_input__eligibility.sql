@@ -22,6 +22,8 @@ select
     , cast(elig.original_reason_entitlement_code as {{ dbt.type_string() }} ) as original_reason_entitlement_code
     , cast(elig.dual_status_code as {{ dbt.type_string() }} ) as dual_status_code
     , cast(elig.medicare_status_code as {{ dbt.type_string() }} ) as medicare_status_code
+    , cast(elig.group_id as {{ dbt.type_string() }} ) as group_id
+    , cast(elig.group_name as {{ dbt.type_string() }} ) as group_name
     , cast(elig.first_name as {{ dbt.type_string() }} ) as first_name
     , cast(elig.last_name as {{ dbt.type_string() }} ) as last_name
     , cast(elig.social_security_number as {{ dbt.type_string() }} ) as social_security_number

@@ -676,12 +676,12 @@ models:
 ### Institutional Claims
 
 
-- name: data_quality__institutional_ms_drg_code
+- name: data_quality__institutional_drg_code
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: institutional_ms_drg_code
+    alias: institutional_drg_code
     tags:
       - data_quality
     materialized: table
@@ -715,17 +715,6 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
     alias: institutional_admit_type_code
-    tags:
-      - data_quality
-    materialized: table
-
-
-- name: data_quality__institutional_apr_drg_code
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: institutional_apr_drg_code
     tags:
       - data_quality
     materialized: table
@@ -1560,28 +1549,6 @@ models:
     materialized: table
 
 
-- name: data_quality__encounter_apr_drg_code
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: encounter_apr_drg_code
-    tags:
-      - data_quality
-    materialized: table
-
-
-- name: data_quality__encounter_apr_drg_description
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: encounter_apr_drg_description
-    tags:
-      - data_quality
-    materialized: table
-
-
 - name: data_quality__encounter_attending_provider_id
   config:
     schema: |
@@ -1703,23 +1670,23 @@ models:
     materialized: table
 
 
-- name: data_quality__encounter_ms_drg_code
+- name: data_quality__encounter_drg_code
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: encounter_ms_drg_code
+    alias: encounter_drg_code
     tags:
       - data_quality
     materialized: table
 
 
-- name: data_quality__encounter_ms_drg_description
+- name: data_quality__encounter_drg_description
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: encounter_ms_drg_description
+    alias: encounter_drg_description
     tags:
       - data_quality
     materialized: table
