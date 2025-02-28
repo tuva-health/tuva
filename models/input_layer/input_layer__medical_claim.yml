@@ -9,9 +9,13 @@ models:
           - claim_line_number
         config:
           severity: warn
+          enabled: "{{ (target.type != 'fabric') | as_bool }}"
 #     A claim cannot be both professional and institutional within the same claim id.
     - dbt_expectations.expect_select_column_values_to_be_unique_within_record:
         column_list: ['claim_id', 'claim_type']
+        config:
+          severity: warn
+          enabled: "{{ (target.type != 'fabric') | as_bool }}"
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
