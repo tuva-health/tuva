@@ -607,5 +607,6 @@ with core__medical_claim as (
 select
     data_mart
     , table_name
-    , row_count
+    , cast(row_count as {{ dbt.type_int() }}) as row_count
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
 from final

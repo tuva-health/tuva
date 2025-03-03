@@ -68,11 +68,11 @@ select
       table_name
     , field
     , claim_type
-    , missing_count
+    , cast(missing_count as {{ dbt.type_int() }}) as missing_count
     , missing_perc
-    , invalid_count
+    , cast(invalid_count as {{ dbt.type_int() }}) as invalid_count
     , invalid_perc
-    , duplicated_count
+    , cast(duplicated_count as {{ dbt.type_int() }}) as duplicated_count
     , duplicated_perc
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from final
