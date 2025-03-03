@@ -6,4 +6,4 @@
 
 
 select *
-from {{ ref('medical_claim') }}
+from {{ ref('input_layer__medical_claim') }}

@@ -153,4 +153,4 @@ select
     , file_name
     , file_date
     , ingest_datetime
-from {{ ref('medical_claim') }}
+from {{ ref('input_layer__medical_claim') }}

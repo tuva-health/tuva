@@ -1,0 +1,123 @@
+version: 2
+models:
+- name: input_layer__provider_attribution
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - person_id
+          - year_month
+          - data_source
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: person_id
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - not_null:
+          config:
+            severity: warn
+  - name: patient_id
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: year_month
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - not_null:
+          config:
+            severity: warn
+  - name: payer
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: plan
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: data_source
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - not_null:
+          config:
+            severity: warn
+  - name: payer_attributed_provider
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: payer_attributed_provider_practice
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: payer_attributed_provider_organization
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: payer_attributed_provider_lob
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: custom_attributed_provider
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: custom_attributed_provider_practice
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: custom_attributed_provider_organization
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: custom_attributed_provider_lob
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"

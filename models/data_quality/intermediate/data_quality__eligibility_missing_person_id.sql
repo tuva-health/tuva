@@ -19,7 +19,7 @@ with eligibility_spans as(
             quote_column('plan'),
         ]) }} as eligibility_span_id
         , person_id
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 )
 
 select

@@ -19,7 +19,7 @@ with pharmacy_claim as (
         when refills is null then 1
         else 0
       end) as missing_refills
-  from {{ ref('pharmacy_claim') }} m
+  from {{ ref('input_layer__pharmacy_claim') }} m
   group by
       claim_id
 )

@@ -14,7 +14,7 @@ with inst_header as (
     , count(distinct case when m.claim_type = 'institutional' then m.bill_type_code else null end) as bill_type_code_count
     , count(distinct case when m.claim_type = 'institutional' then m.discharge_disposition_code else null end) as discharge_disposition_code_count
     , count(distinct case when d.claim_id is not null then m.drg_code else null end) as drg_code_count
-  from {{ ref('medical_claim') }} as m
+  from {{ ref('input_layer__medical_claim') }} as m
   left join {{ ref('data_quality__inpatient_dq_stage') }} as d
     on m.claim_id = d.claim_id
   left join {{ ref('terminology__bill_type') }} as btc

@@ -43,5 +43,5 @@ SELECT
         END as {{ dbt.type_string() }}
     ) AS age_group
     , tuva_last_run_datetime as tuva_last_run
-FROM {{ ref('patient') }}
+FROM {{ ref('input_layer__patient') }}
 cross join tuva_last_run

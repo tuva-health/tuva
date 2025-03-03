@@ -12,7 +12,7 @@ with pharmacy_claim as (
       , max(case when term2.npi is null and m.dispensing_provider_npi is not null then 1 else 0 end) as invalid_dispensing_npi
       , max(case when m.dispensing_provider_npi is null then 1 else 0 end) as missing_dispensing_npi
       , max(case when term2.entity_type_code = '1' then 1 else 0 end) as wrong_entity_type_dispensing_npi
-    from {{ ref('pharmacy_claim') }} as m
+    from {{ ref('input_layer__pharmacy_claim') }} as m
     left join {{ ref('terminology__provider') }} as term
       on m.prescribing_provider_npi = term.npi
     left join {{ ref('terminology__provider') }} as term2

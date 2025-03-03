@@ -1,0 +1,198 @@
+version: 2
+models:
+- name: input_layer__pharmacy_claim
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - claim_id
+          - claim_line_number
+        config:
+          severity: warn
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: claim_id
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - not_null:
+          config:
+            severity: warn
+  - name: claim_line_number
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - not_null:
+          config:
+            severity: warn
+  - name: person_id
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: member_id
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: payer
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: plan
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: prescribing_provider_npi
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: dispensing_provider_npi
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: dispensing_date
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: ndc_code
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: quantity
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: days_supply
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: refills
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: paid_date
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: paid_amount
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: allowed_amount
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: charge_amount
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: coinsurance_amount
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: copayment_amount
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: deductible_amount
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: in_network_flag
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: data_source
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: file_name
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: file_date
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+  - name: ingest_datetime
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
