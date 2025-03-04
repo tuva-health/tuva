@@ -31,6 +31,7 @@ models:
     description: '{{ doc("npi") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -38,6 +39,7 @@ models:
     description: '{{ doc("name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -45,6 +47,7 @@ models:
     description: '{{ doc("facility_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -52,6 +55,7 @@ models:
     description: '{{ doc("parent_organization") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -59,6 +63,7 @@ models:
     description: '{{ doc("address") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -66,6 +71,7 @@ models:
     description: '{{ doc("city") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -73,6 +79,7 @@ models:
     description: '{{ doc("state") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -80,6 +87,7 @@ models:
     description: '{{ doc("zip_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -87,6 +95,7 @@ models:
     description: '{{ doc("latitude") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -94,6 +103,7 @@ models:
     description: '{{ doc("longitude") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -101,6 +111,7 @@ models:
     description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"

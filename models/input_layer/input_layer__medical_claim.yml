@@ -59,20 +59,24 @@ models:
     description: '{{ doc("claim_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - not_null:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
       - accepted_values:
           values: ['professional', 'institutional', 'undetermined']
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
   - name: person_id
     description: '{{ doc("person_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -80,6 +84,7 @@ models:
     description: '{{ doc("member_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -87,6 +92,7 @@ models:
     description: '{{ doc("payer") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -94,6 +100,7 @@ models:
     description: '{{ doc("plan") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -101,6 +108,7 @@ models:
     description: '{{ doc("claim_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -108,6 +116,7 @@ models:
     description: '{{ doc("claim_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -115,6 +124,7 @@ models:
     description: '{{ doc("claim_line_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -122,6 +132,7 @@ models:
     description: '{{ doc("claim_line_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -129,6 +140,7 @@ models:
     description: '{{ doc("admission_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -136,6 +148,7 @@ models:
     description: '{{ doc("discharge_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -143,11 +156,13 @@ models:
     description: '{{ doc("admit_source_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 1
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -155,6 +170,7 @@ models:
     description: '{{ doc("admit_type_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -162,6 +178,7 @@ models:
     description: '{{ doc("discharge_disposition_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -169,11 +186,13 @@ models:
     description: '{{ doc("place_of_service_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 2
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -181,12 +200,14 @@ models:
     description: '{{ doc("bill_type_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -194,22 +215,26 @@ models:
     description: '{{ doc("drg_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - accepted_values:
           values: ['ms-drg', 'apr-drg']
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
   - name: drg_code
     description: '{{ doc("drg_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 3
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -217,12 +242,14 @@ models:
     description: '{{ doc("revenue_center_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -230,6 +257,7 @@ models:
     description: '{{ doc("service_unit_quantity") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -237,6 +265,7 @@ models:
     description: '{{ doc("hcpcs_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -244,6 +273,7 @@ models:
     description: '{{ doc("hcpcs_modifier_1") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -251,6 +281,7 @@ models:
     description: '{{ doc("hcpcs_modifier_2") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -258,6 +289,7 @@ models:
     description: '{{ doc("hcpcs_modifier_3") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -265,6 +297,7 @@ models:
     description: '{{ doc("hcpcs_modifier_4") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -272,6 +305,7 @@ models:
     description: '{{ doc("hcpcs_modifier_5") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -281,6 +315,7 @@ models:
           entity providing services).
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -288,6 +323,7 @@ models:
     description: '{{ doc("rendering_tin") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -297,6 +333,7 @@ models:
           the claim).
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -304,6 +341,7 @@ models:
     description: '{{ doc("billing_tin") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -313,6 +351,7 @@ models:
           services were performed).
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -320,6 +359,7 @@ models:
     description: '{{ doc("paid_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -327,6 +367,7 @@ models:
     description: '{{ doc("paid_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -334,6 +375,7 @@ models:
     description: '{{ doc("allowed_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -341,6 +383,7 @@ models:
     description: '{{ doc("charge_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -348,6 +391,7 @@ models:
     description: '{{ doc("coinsurance_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -355,6 +399,7 @@ models:
     description: '{{ doc("copayment_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -362,6 +407,7 @@ models:
     description: '{{ doc("deductible_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -369,6 +415,7 @@ models:
     description: '{{ doc("total_cost_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -376,17 +423,20 @@ models:
     description: '{{ doc("diagnosis_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - accepted_values:
           values: ['icd-10-cm', 'icd-9-cm']
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
   - name: diagnosis_code_1
     description: 1st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -394,6 +444,7 @@ models:
     description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -401,6 +452,7 @@ models:
     description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -408,6 +460,7 @@ models:
     description: 4th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -415,6 +468,7 @@ models:
     description: 5th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -422,6 +476,7 @@ models:
     description: 6th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -429,6 +484,7 @@ models:
     description: 7th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -436,6 +492,7 @@ models:
     description: 8th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -443,6 +500,7 @@ models:
     description: 9th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -450,6 +508,7 @@ models:
     description: 10th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -457,6 +516,7 @@ models:
     description: 11th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -464,6 +524,7 @@ models:
     description: 12th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -471,6 +532,7 @@ models:
     description: 13th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -478,6 +540,7 @@ models:
     description: 14th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -485,6 +548,7 @@ models:
     description: 15th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -492,6 +556,7 @@ models:
     description: 16th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -499,6 +564,7 @@ models:
     description: 17th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -506,6 +572,7 @@ models:
     description: 18th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -513,6 +580,7 @@ models:
     description: 19th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -520,6 +588,7 @@ models:
     description: 20th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -527,6 +596,7 @@ models:
     description: 21st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -534,6 +604,7 @@ models:
     description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -541,6 +612,7 @@ models:
     description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -548,6 +620,7 @@ models:
     description: 24th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -555,6 +628,7 @@ models:
     description: 25th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -563,6 +637,7 @@ models:
           Present on admission code for the 1st diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -571,6 +646,7 @@ models:
           Present on admission code for the 2nd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -579,6 +655,7 @@ models:
           Present on admission code for the 3rd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -587,6 +664,7 @@ models:
           Present on admission code for the 4th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -595,6 +673,7 @@ models:
           Present on admission code for the 5th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -603,6 +682,7 @@ models:
           Present on admission code for the 6th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -611,6 +691,7 @@ models:
           Present on admission code for the 7th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -619,6 +700,7 @@ models:
           Present on admission code for the 8th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -627,6 +709,7 @@ models:
           Present on admission code for the 9th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -635,6 +718,7 @@ models:
           Present on admission code for the 10th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -643,6 +727,7 @@ models:
           Present on admission code for the 11th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -651,6 +736,7 @@ models:
           Present on admission code for the 12th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -659,6 +745,7 @@ models:
           Present on admission code for the 13th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -667,6 +754,7 @@ models:
           Present on admission code for the 14th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -675,6 +763,7 @@ models:
           Present on admission code for the 15th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -683,6 +772,7 @@ models:
           Present on admission code for the 16th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -691,6 +781,7 @@ models:
           Present on admission code for the 17th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -699,6 +790,7 @@ models:
           Present on admission code for the 18th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -707,6 +799,7 @@ models:
           Present on admission code for the 19th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -715,6 +808,7 @@ models:
           Present on admission code for the 20th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -723,6 +817,7 @@ models:
           Present on admission code for the 21st diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -731,6 +826,7 @@ models:
           Present on admission code for the 22nd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -739,6 +835,7 @@ models:
           Present on admission code for the 23rd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -747,6 +844,7 @@ models:
           Present on admission code for the 24th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -755,6 +853,7 @@ models:
           Present on admission code for the 25th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -762,17 +861,20 @@ models:
     description: Indicates the type of procedure code (e.g. ICD-10-PCS).
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - accepted_values:
           values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
   - name: procedure_code_1
     description: 1st ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -780,6 +882,7 @@ models:
     description: 2nd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -787,6 +890,7 @@ models:
     description: 3rd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -794,6 +898,7 @@ models:
     description: 4th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -801,6 +906,7 @@ models:
     description: 5th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -808,6 +914,7 @@ models:
     description: 6th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -815,6 +922,7 @@ models:
     description: 7th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -822,6 +930,7 @@ models:
     description: 8th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -829,6 +938,7 @@ models:
     description: 9th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -836,6 +946,7 @@ models:
     description: 10th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -843,6 +954,7 @@ models:
     description: 11th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -850,6 +962,7 @@ models:
     description: 12th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -857,6 +970,7 @@ models:
     description: 13th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -864,6 +978,7 @@ models:
     description: 14th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -871,6 +986,7 @@ models:
     description: 15th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -878,6 +994,7 @@ models:
     description: 16th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -885,6 +1002,7 @@ models:
     description: 17th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -892,6 +1010,7 @@ models:
     description: 18th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -899,6 +1018,7 @@ models:
     description: 19th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -906,6 +1026,7 @@ models:
     description: 20th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -913,6 +1034,7 @@ models:
     description: 21st ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -920,6 +1042,7 @@ models:
     description: 22nd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -927,6 +1050,7 @@ models:
     description: 23rd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -934,6 +1058,7 @@ models:
     description: 24th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -941,6 +1066,7 @@ models:
     description: 25th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -948,6 +1074,7 @@ models:
     description: Date of the 1st procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -955,6 +1082,7 @@ models:
     description: Date of the 2nd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -962,6 +1090,7 @@ models:
     description: Date of the 3rd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -969,6 +1098,7 @@ models:
     description: Date of the 4th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -976,6 +1106,7 @@ models:
     description: Date of the 5th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -983,6 +1114,7 @@ models:
     description: Date of the 6th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -990,6 +1122,7 @@ models:
     description: Date of the 7th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -997,6 +1130,7 @@ models:
     description: Date of the 8th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1004,6 +1138,7 @@ models:
     description: Date of the 9th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1011,6 +1146,7 @@ models:
     description: Date of the 10th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1018,6 +1154,7 @@ models:
     description: Date of the 11th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1025,6 +1162,7 @@ models:
     description: Date of the 12th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1032,6 +1170,7 @@ models:
     description: Date of the 13th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1039,6 +1178,7 @@ models:
     description: Date of the 14th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1046,6 +1186,7 @@ models:
     description: Date of the 15th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1053,6 +1194,7 @@ models:
     description: Date of the 16th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1060,6 +1202,7 @@ models:
     description: Date of the 17th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1067,6 +1210,7 @@ models:
     description: Date of the 18th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1074,6 +1218,7 @@ models:
     description: Date of the 19th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1081,6 +1226,7 @@ models:
     description: Date of the 20th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1088,6 +1234,7 @@ models:
     description: Date of the 21st procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1095,6 +1242,7 @@ models:
     description: Date of the 22nd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1102,6 +1250,7 @@ models:
     description: Date of the 23rd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1109,6 +1258,7 @@ models:
     description: Date of the 24th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1116,6 +1266,7 @@ models:
     description: Date of the 25th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1123,6 +1274,7 @@ models:
     description: '{{ doc("in_network_flag") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1130,6 +1282,7 @@ models:
     description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1137,6 +1290,7 @@ models:
     description: '{{ doc("file_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1144,6 +1298,7 @@ models:
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -1151,6 +1306,7 @@ models:
     description: '{{ doc("ingest_datetime") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"

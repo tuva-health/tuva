@@ -31,6 +31,7 @@ models:
     description: '{{ doc("npi") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -38,6 +39,7 @@ models:
     description: '{{ doc("provider_first_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -45,6 +47,7 @@ models:
     description: '{{ doc("provider_last_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -52,6 +55,7 @@ models:
     description: '{{ doc("practice_affiliation") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -59,6 +63,7 @@ models:
     description: '{{ doc("specialty") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -66,6 +71,7 @@ models:
     description: '{{ doc("sub_specialty") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -73,6 +79,7 @@ models:
     description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
