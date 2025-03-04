@@ -13,14 +13,17 @@ models:
         combination_of_columns:
           - claim_id
           - claim_line_number
+        tags: ['tuva_dqi_sev_1', 'dqi']
         config:
-          severity: warn
+          severity: error
           enabled: "{{ (target.type != 'fabric') | as_bool }}"
 #     A claim cannot be both professional and institutional within the same claim id.
     - dbt_expectations.expect_select_column_values_to_be_unique_within_record:
+        description: 'A claim cannot be both professional and institutional within the same claim id.'
         column_list: ['claim_id', 'claim_type']
+        tags: ['tuva_dqi_sev_1', 'dqi']
         config:
-          severity: warn
+          severity: error
           enabled: "{{ (target.type != 'fabric') | as_bool }}"
   config:
     schema: |
@@ -32,22 +35,26 @@ models:
     description: '{{ doc("claim_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - not_null:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
   - name: claim_line_number
     description: '{{ doc("claim_line_number") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - not_null:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
   - name: claim_type
     description: '{{ doc("claim_type") }}'
     tests:

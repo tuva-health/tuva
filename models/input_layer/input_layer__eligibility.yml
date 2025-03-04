@@ -17,8 +17,9 @@ models:
           - member_id
           - payer
           - data_source
+        tags: ['tuva_dqi_sev_1', 'dqi']
         config:
-          severity: warn
+          severity: error
           enabled: "{{ (target.type != 'fabric') | as_bool }}"
   config:
     schema: |
@@ -30,12 +31,14 @@ models:
     description: '{{ doc("person_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - not_null:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
   - name: member_id
     description: '{{ doc("member_id") }}'
     tests:

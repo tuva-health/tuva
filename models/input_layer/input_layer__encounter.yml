@@ -16,15 +16,18 @@ models:
     description: '{{ doc("encounter_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - unique:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
       - not_null:
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
-            severity: warn
+            severity: error
   - name: person_id
     description: '{{ doc("person_id") }}'
     tests:
