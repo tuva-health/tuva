@@ -511,11 +511,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_3
     description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -527,11 +557,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_5
     description: 5th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -543,11 +603,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_7
     description: 7th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -559,11 +649,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_9
     description: 9th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -575,11 +695,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_11
     description: 11th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -591,11 +741,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_13
     description: 13th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -607,11 +787,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_15
     description: 15th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -623,11 +833,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_17
     description: 17th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -639,11 +879,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_19
     description: 19th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -655,11 +925,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_21
     description: 21st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -671,11 +971,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_23
     description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -687,11 +1017,41 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_25
     description: 25th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex_list:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          regex_list: [
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
+            "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
+            "^[0-9]{3,5}$",                           # ICD-9 numeric without period
+            "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
+            "^[VE][0-9]{2,4}$"                        # ICD-9 V/E codes without period
+          ]
+          match_on: any
+          row_condition: "diagnosis_code_1 is not null"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
