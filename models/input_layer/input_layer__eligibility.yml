@@ -84,7 +84,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
@@ -98,7 +98,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
@@ -125,7 +125,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
@@ -139,7 +139,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
@@ -305,7 +305,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_in_type_list:
           column_type_list: [date, datetime]
           tags: ['tuva_dqi_sev_2', 'dqi']
@@ -319,7 +319,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_in_type_list:
           column_type_list: [date, datetime]
           tags: ['tuva_dqi_sev_2', 'dqi']
