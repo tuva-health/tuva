@@ -1,22 +1,38 @@
-with population_1 as (
+with random_1 as (
+
+    select distinct person_id
+    from {{ ref('medical_economics__medical_claim_random_ten_percent') }}
+
+),
+
+random_2 as (
+
+    select distinct person_id
+    from {{ ref('medical_economics__medical_claim_random_twenty_percent') }}
+
+),
+
+population_1 as (
 
     select 
-          person_id 
+          aa.person_id 
         , 1 as comparative_population_id
-        , 'California' as comparative_population
-    from {{ ref('medical_economics__dim_patient') }}
-    where state = 'California'
+        , 'Random 10%' as comparative_population
+    from {{ ref('medical_economics__dim_patient') }} aa
+    inner join random_1 bb 
+        on aa.person_id = bb.person_id
 
 ),
 
 population_2 as (
 
     select 
-          person_id 
+          aa.person_id 
         , 2 as comparative_population_id
-        , 'All other states' as comparative_population
-    from {{ ref('medical_economics__dim_patient') }}
-    where state <> 'California'
+        , 'Random 10%' as comparative_population
+    from {{ ref('medical_economics__dim_patient') }} aa
+    inner join random_2 bb 
+        on aa.person_id = bb.person_id
 
 ),
 

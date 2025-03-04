@@ -4,11 +4,11 @@ with medical_claim as (
           aa.person_id
         , aa.claim_id
         , bb.primary_specialty_description as specialty_provider
-    from {{ ref('medical_economics__stg_core_medical_claim') }} aa
+    from {{ ref('medical_economics__medical_claim_intermediate') }} aa
     left join {{ ref('medical_economics__stg_terminology_provider') }} bb
         on aa.rendering_id = bb.npi 
 
-)
+) 
 
 select *
 from medical_claim 

@@ -686,6 +686,127 @@ models:
     description: >
       Intermediate view identifying all medical claims with a condition
 
+  - name: medical_economics__medical_claim_random_ten_percent
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _medical_claim_random_ten_percent
+      tags: 
+        - medical_claim
+      materialized: view
+    description: >
+      Ten percent sample of the medical_claims data set 
+
+  - name: medical_economics__medical_claim_random_twenty_percent
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _medical_claim_random_twenty_percent
+      tags: 
+        - medical_claim
+      materialized: view
+    description: >
+      Twenty percent sample of the medical_claims data set 
+
+  - name: medical_economics__member_months_intermediate
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _member_months_intermediate
+      tags: 
+        - member_months
+      materialized: view
+    description: >
+      Intermediate member months table
+
+  - name: medical_economics__patient_random_group
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _patient_random_group
+      tags: 
+        - member_months
+      materialized: view
+    description: >
+      Core patient table base filtered to random population. If you want to remove the random population
+      remove the inner join in this table.
+
+  - name: medical_economics__medical_claim_intermediate
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _medical_claim_intermediate
+      tags: 
+        - member_months
+      materialized: view
+    description: >
+      Intermediate medical claim table
+
+  - name: medical_economics__pharmacy_claim_intermediate
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _pharmacy_claim_intermediate
+      tags: 
+        - member_months
+      materialized: view
+    description: >
+      Intermediate medical claim table
+
+  - name: medical_economics__member_months_random_ten_percent
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _member_months_random_ten_percent
+      tags: 
+        - member_months
+      materialized: view
+    description: >
+      Random 10% sample of all members 
+
+  - name: medical_economics__member_months_random_twenty_percent
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_medical_economics
+        {%- else -%}
+          medical_economics
+        {%- endif -%}
+      alias: _member_months_random_twenty_percent
+      tags: 
+        - member_months
+      materialized: view
+    description: >
+      Random 20% sample of all members 
+
 ## Stage
 
   - name: medical_economics__stg_core_medical_claim

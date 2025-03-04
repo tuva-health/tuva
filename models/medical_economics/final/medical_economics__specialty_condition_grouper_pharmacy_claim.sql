@@ -16,7 +16,7 @@ select
     , bb.condition_grouper_2
     , bb.condition_grouper_3
     , cc.specialty_provider
-from {{ ref('medical_economics__stg_core_pharmacy_claim') }} aa
+from {{ ref('medical_economics__pharmacy_claim_intermediate') }} aa
 left join {{ ref('medical_economics__condition_grouper_pharmacy_claim') }} bb
     on aa.person_id = bb.person_id
     and aa.claim_id = bb.claim_id 

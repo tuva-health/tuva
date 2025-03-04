@@ -7,7 +7,7 @@ with member_months as (
         , aa.member_month
         , bb.payment_risk_score
         , aa.member_month * bb.payment_risk_score as risk_adjusted_member_months
-    from {{ ref('medical_economics__stg_core_member_months') }} aa
+    from {{ ref('medical_economics__member_months_intermediate') }} aa
     left join {{ ref('medical_economics__stg_cms_hcc_patient_risk_scores') }} bb
         on aa.person_id = bb.person_id 
         and left(aa.year_month,4) = bb.payment_year

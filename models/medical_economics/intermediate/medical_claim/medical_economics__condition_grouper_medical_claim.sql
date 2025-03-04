@@ -6,9 +6,9 @@ with medical_claim as (
         , bb.condition_grouper_1 
         , bb.condition_grouper_2
         , bb.condition_grouper_3
-    from {{ ref('medical_economics__stg_core_medical_claim') }} aa
+    from {{ ref('medical_economics__medical_claim_intermediate') }} aa
     left join {{ ref('medical_economics__stg_ccsr_long_condition_category') }} bb
-        on aa.person_id = bb.person_id
+        on aa.person_id = bb.person_id 
         and aa.claim_id = bb.claim_id 
 
 )

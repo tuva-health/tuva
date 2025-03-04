@@ -8,7 +8,7 @@ with pharmacy_claim as (
         , null as condition_grouper_1 
         , null as condition_grouper_2
         , null as condition_grouper_3
-    from {{ ref('medical_economics__stg_core_medical_claim') }} 
+    from {{ ref('medical_economics__pharmacy_claim_intermediate') }} 
 
 )
 
