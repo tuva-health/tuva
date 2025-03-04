@@ -251,7 +251,7 @@ models:
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
           description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
-          regex: "^\\d{2}$"
+          regex: "^[0-9]{2}$"
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -273,7 +273,7 @@ models:
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
           description: "3 digits, 2 numbers followed by letter. If 4, leading 0."
-          regex: "^(\\d{2}[\\dA-Za-z]|0\\d{2}[\\dA-Za-z])$"
+          regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -322,7 +322,7 @@ models:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
-          regex: "^(\\d{3}|0\\d{3})$"
+          regex: "^(\\\\d{3}|0\\\\d{3})$"
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -400,7 +400,7 @@ models:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
-          regex: "^\\d{10}$"
+          regex: "^[0-9]{10}$"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -429,7 +429,7 @@ models:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
-          regex: "^\\d{10}$"
+          regex: "^[0-9]{10}$"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -458,7 +458,7 @@ models:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
-          regex: "^\\d{10}$"
+          regex: "^[0-9]{10}$"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
