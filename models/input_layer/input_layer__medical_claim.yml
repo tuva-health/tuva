@@ -214,6 +214,19 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          value: 1
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
+          regex: "^[0-59]$"
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: discharge_disposition_code
     description: '{{ doc("discharge_disposition_code") }}'
     tests:
@@ -236,6 +249,13 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
+          regex: "^\\d{2}$"
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: bill_type_code
     description: '{{ doc("bill_type_code") }}'
     tests:
@@ -247,6 +267,13 @@ models:
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          description: "3 digits, 2 numbers followed by letter. If 4, leading 0."
+          regex: "^(\\d{2}[\\dA-Za-z]|0\\d{2}[\\dA-Za-z])$"
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -290,6 +317,12 @@ models:
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          regex: "^(\\d{3}|0\\d{3})$"
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -360,6 +393,17 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          value: 10
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          regex: "^\\d{10}$"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: rendering_tin
     description: '{{ doc("rendering_tin") }}'
     tests:
@@ -378,6 +422,17 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          value: 10
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          regex: "^\\d{10}$"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: billing_tin
     description: '{{ doc("billing_tin") }}'
     tests:
@@ -393,6 +448,17 @@ models:
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          value: 10
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_match_regex:
+          regex: "^\\d{10}$"
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

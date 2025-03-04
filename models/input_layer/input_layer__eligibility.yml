@@ -162,6 +162,13 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - relationships:
+          to: ref('terminology__payer_type')
+          field: payer_type
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: plan
     description: '{{ doc("plan") }}'
     tests:
@@ -178,6 +185,18 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_value_lengths_to_equal:
+          value: 1
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - accepted_values:
+          description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
+          values: ['0', '1', '2', '3']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: dual_status_code
     description: '{{ doc("dual_status_code") }}'
     tests:
@@ -186,11 +205,23 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - accepted_values:
+          description: "https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january"
+          values: ['00', '01', '02', '03', '04', '05', '06', '08', '09', '10']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: medicare_status_code
     description: '{{ doc("medicare_status_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - accepted_values:
+          description: "https://resdac.org/cms-data/variables/medicare-status-code-january"
+          values: ['00','10','11','20','21','31','40']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
