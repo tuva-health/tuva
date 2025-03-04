@@ -18,6 +18,7 @@ models:
         tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
         config:
           severity: error
+          enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -31,11 +32,12 @@ models:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: patient_id
     description: '{{ doc("patient_id") }}'
     tests:
@@ -43,7 +45,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: year_month
     description: '{{ doc("year_month") }}'
     tests:
@@ -51,11 +53,12 @@ models:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: payer
     description: '{{ doc("payer") }}'
     tests:
@@ -63,7 +66,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: plan
     description: '{{ doc("plan") }}'
     tests:
@@ -71,7 +74,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: data_source
     description: '{{ doc("data_source") }}'
     tests:
@@ -79,11 +82,12 @@ models:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: payer_attributed_provider
     description: '{{ doc("payer_attributed_provider") }}'
     tests:
@@ -91,7 +95,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: payer_attributed_provider_practice
     description: '{{ doc("payer_attributed_provider_practice") }}'
     tests:
@@ -99,7 +103,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: payer_attributed_provider_organization
     description: '{{ doc("payer_attributed_provider_organization") }}'
     tests:
@@ -107,7 +111,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: payer_attributed_provider_lob
     description: '{{ doc("payer_attributed_provider_lob") }}'
     tests:
@@ -115,7 +119,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: custom_attributed_provider
     description: '{{ doc("custom_attributed_provider") }}'
     tests:
@@ -123,7 +127,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: custom_attributed_provider_practice
     description: '{{ doc("custom_attributed_provider_practice") }}'
     tests:
@@ -131,7 +135,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: custom_attributed_provider_organization
     description: '{{ doc("custom_attributed_provider_organization") }}'
     tests:
@@ -139,7 +143,7 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: custom_attributed_provider_lob
     description: '{{ doc("custom_attributed_provider_lob") }}'
     tests:
@@ -147,4 +151,4 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
