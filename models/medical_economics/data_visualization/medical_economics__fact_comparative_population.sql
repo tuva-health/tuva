@@ -1,14 +1,14 @@
 with random_1 as (
 
     select distinct person_id
-    from {{ ref('medical_economics__medical_claim_random_ten_percent') }}
+    from {{ ref('medical_economics__member_months_random_ten_percent') }}
 
 ),
 
 random_2 as (
 
     select distinct person_id
-    from {{ ref('medical_economics__medical_claim_random_twenty_percent') }}
+    from {{ ref('medical_economics__member_months_random_twenty_percent') }}
 
 ),
 
@@ -29,7 +29,7 @@ population_2 as (
     select 
           aa.person_id 
         , 2 as comparative_population_id
-        , 'Random 10%' as comparative_population
+        , 'Random 20%' as comparative_population
     from {{ ref('medical_economics__dim_patient') }} aa
     inner join random_2 bb 
         on aa.person_id = bb.person_id
