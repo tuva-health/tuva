@@ -9,13 +9,13 @@ models:
           - claim_line_number
         config:
           severity: warn
-          enabled: "{{ (target.type != 'fabric') | as_bool }}"
+          enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
 #     A claim cannot be both professional and institutional within the same claim id.
     - dbt_expectations.expect_select_column_values_to_be_unique_within_record:
         column_list: ['claim_id', 'claim_type']
         config:
           severity: warn
-          enabled: "{{ (target.type != 'fabric') | as_bool }}"
+          enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -28,1085 +28,1092 @@ models:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: claim_line_number
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: claim_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - accepted_values:
           values: ['professional', 'institutional', 'undetermined']
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: person_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: member_id
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: payer
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: plan
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: claim_start_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: claim_end_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: claim_line_start_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: claim_line_end_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: admission_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: discharge_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: admit_source_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 1
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: admit_type_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: discharge_disposition_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: place_of_service_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 2
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: bill_type_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: drg_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - accepted_values:
           values: ['ms-drg', 'apr-drg']
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: drg_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 3
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: revenue_center_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: service_unit_quantity
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: hcpcs_code
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: hcpcs_modifier_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: hcpcs_modifier_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: hcpcs_modifier_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: hcpcs_modifier_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: hcpcs_modifier_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: rendering_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: rendering_tin
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: billing_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: billing_tin
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: facility_npi
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: paid_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: paid_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: allowed_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: charge_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: coinsurance_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: copayment_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: deductible_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: total_cost_amount
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - accepted_values:
           values: ['icd-10-cm', 'icd-9-cm']
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: diagnosis_code_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_poa_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_type
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - accepted_values:
           values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
           config:
             severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: procedure_code_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_code_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_1
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_2
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_3
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_4
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_5
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_6
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_7
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_8
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_9
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_10
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_11
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_12
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_13
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_14
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_15
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_16
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_17
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_18
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_19
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_20
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_21
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_22
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_23
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_24
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: procedure_date_25
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: in_network_flag
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: data_source
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: file_name
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: file_date
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: ingest_datetime
     description: ''
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
-            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
