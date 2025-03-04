@@ -1,7 +1,13 @@
 version: 2
 models:
 - name: input_layer__medical_claim
-  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  description: > 
+      Mapping check to make sure all columns are mapped appropriately into the input layer.
+      The medical_claim table contains information on healthcare services and 
+      supplies provided to patients, billed by providers, and paid for by health 
+      insurers. It includes information on the provider who rendered the 
+      service, the amount paid for the service by the health insurer, and the 
+      underlying reason for the service (i.e. diagnosis).
   tests:
     - dbt_utils.unique_combination_of_columns:
         combination_of_columns:
@@ -23,7 +29,7 @@ models:
     materialized: view
   columns:
   - name: claim_id
-    description: ''
+    description: '{{ doc("claim_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -33,7 +39,7 @@ models:
           config:
             severity: warn
   - name: claim_line_number
-    description: ''
+    description: '{{ doc("claim_line_number") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -43,7 +49,7 @@ models:
           config:
             severity: warn
   - name: claim_type
-    description: ''
+    description: '{{ doc("claim_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -57,77 +63,77 @@ models:
           config:
             severity: warn
   - name: person_id
-    description: ''
+    description: '{{ doc("person_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: member_id
-    description: ''
+    description: '{{ doc("member_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: payer
-    description: ''
+    description: '{{ doc("payer") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: plan
-    description: ''
+    description: '{{ doc("plan") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: claim_start_date
-    description: ''
+    description: '{{ doc("claim_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: claim_end_date
-    description: ''
+    description: '{{ doc("claim_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: claim_line_start_date
-    description: ''
+    description: '{{ doc("claim_line_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: claim_line_end_date
-    description: ''
+    description: '{{ doc("claim_line_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: admission_date
-    description: ''
+    description: '{{ doc("admission_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: discharge_date
-    description: ''
+    description: '{{ doc("discharge_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: admit_source_code
-    description: ''
+    description: '{{ doc("admit_source_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -139,21 +145,21 @@ models:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: admit_type_code
-    description: ''
+    description: '{{ doc("admit_type_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: discharge_disposition_code
-    description: ''
+    description: '{{ doc("discharge_disposition_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: place_of_service_code
-    description: ''
+    description: '{{ doc("place_of_service_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -165,7 +171,7 @@ models:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: bill_type_code
-    description: ''
+    description: '{{ doc("bill_type_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -178,7 +184,7 @@ models:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: drg_code_type
-    description: ''
+    description: '{{ doc("drg_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -189,7 +195,7 @@ models:
           config:
             severity: warn
   - name: drg_code
-    description: ''
+    description: '{{ doc("drg_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -201,7 +207,7 @@ models:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: revenue_center_code
-    description: ''
+    description: '{{ doc("revenue_center_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -214,147 +220,153 @@ models:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: service_unit_quantity
-    description: ''
+    description: '{{ doc("service_unit_quantity") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: hcpcs_code
-    description: ''
+    description: '{{ doc("hcpcs_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: hcpcs_modifier_1
-    description: ''
+    description: '{{ doc("hcpcs_modifier_1") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: hcpcs_modifier_2
-    description: ''
+    description: '{{ doc("hcpcs_modifier_2") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: hcpcs_modifier_3
-    description: ''
+    description: '{{ doc("hcpcs_modifier_3") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: hcpcs_modifier_4
-    description: ''
+    description: '{{ doc("hcpcs_modifier_4") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: hcpcs_modifier_5
-    description: ''
+    description: '{{ doc("hcpcs_modifier_5") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: rendering_npi
-    description: ''
+    description: >
+          Rendering NPI for the claim (typically represents the physician or 
+          entity providing services).
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: rendering_tin
-    description: ''
+    description: '{{ doc("rendering_tin") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: billing_npi
-    description: ''
+    description: >
+          Billing NPI for the claim (typically represents organization billing 
+          the claim).
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: billing_tin
-    description: ''
+    description: '{{ doc("billing_tin") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: facility_npi
-    description: ''
+    description: >
+          Facility NPI for the claim (typically represents the facility where 
+          services were performed).
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: paid_date
-    description: ''
+    description: '{{ doc("paid_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: paid_amount
-    description: ''
+    description: '{{ doc("paid_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: allowed_amount
-    description: ''
+    description: '{{ doc("allowed_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: charge_amount
-    description: ''
+    description: '{{ doc("charge_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: coinsurance_amount
-    description: ''
+    description: '{{ doc("coinsurance_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: copayment_amount
-    description: ''
+    description: '{{ doc("copayment_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: deductible_amount
-    description: ''
+    description: '{{ doc("deductible_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: total_cost_amount
-    description: ''
+    description: '{{ doc("total_cost_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_type
-    description: ''
+    description: '{{ doc("diagnosis_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -365,357 +377,382 @@ models:
           config:
             severity: warn
   - name: diagnosis_code_1
-    description: ''
+    description: 1st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_2
-    description: ''
+    description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_3
-    description: ''
+    description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_4
-    description: ''
+    description: 4th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_5
-    description: ''
+    description: 5th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_6
-    description: ''
+    description: 6th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_7
-    description: ''
+    description: 7th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_8
-    description: ''
+    description: 8th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_9
-    description: ''
+    description: 9th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_10
-    description: ''
+    description: 10th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_11
-    description: ''
+    description: 11th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_12
-    description: ''
+    description: 12th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_13
-    description: ''
+    description: 13th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_14
-    description: ''
+    description: 14th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_15
-    description: ''
+    description: 15th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_16
-    description: ''
+    description: 16th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_17
-    description: ''
+    description: 17th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_18
-    description: ''
+    description: 18th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_19
-    description: ''
+    description: 19th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_20
-    description: ''
+    description: 20th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_21
-    description: ''
+    description: 21st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_22
-    description: ''
+    description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_23
-    description: ''
+    description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_24
-    description: ''
+    description: 24th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_code_25
-    description: ''
+    description: 25th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_1
-    description: ''
+    description: >
+          Present on admission code for the 1st diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_2
-    description: ''
+    description: >
+          Present on admission code for the 2nd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_3
-    description: ''
+    description: >
+          Present on admission code for the 3rd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_4
-    description: ''
+    description: >
+          Present on admission code for the 4th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_5
-    description: ''
+    description: >
+          Present on admission code for the 5th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_6
-    description: ''
+    description: >
+          Present on admission code for the 6th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_7
-    description: ''
+    description: >
+          Present on admission code for the 7th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_8
-    description: ''
+    description: >
+          Present on admission code for the 8th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_9
-    description: ''
+    description: >
+          Present on admission code for the 9th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_10
-    description: ''
+    description: >
+          Present on admission code for the 10th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_11
-    description: ''
+    description: >
+          Present on admission code for the 11th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_12
-    description: ''
+    description: >
+          Present on admission code for the 12th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_13
-    description: ''
+    description: >
+          Present on admission code for the 13th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_14
-    description: ''
+    description: >
+          Present on admission code for the 14th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_15
-    description: ''
+    description: >
+          Present on admission code for the 15th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_16
-    description: ''
+    description: >
+          Present on admission code for the 16th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_17
-    description: ''
+    description: >
+          Present on admission code for the 17th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_18
-    description: ''
+    description: >
+          Present on admission code for the 18th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_19
-    description: ''
+    description: >
+          Present on admission code for the 19th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_20
-    description: ''
+    description: >
+          Present on admission code for the 20th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_21
-    description: ''
+    description: >
+          Present on admission code for the 21st diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_22
-    description: ''
+    description: >
+          Present on admission code for the 22nd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_23
-    description: ''
+    description: >
+          Present on admission code for the 23rd diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_24
-    description: ''
+    description: >
+          Present on admission code for the 24th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: diagnosis_poa_25
-    description: ''
+    description: >
+          Present on admission code for the 25th diagnosis on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_type
-    description: ''
+    description: Indicates the type of procedure code (e.g. ICD-10-PCS).
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -726,371 +763,371 @@ models:
           config:
             severity: warn
   - name: procedure_code_1
-    description: ''
+    description: 1st ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_2
-    description: ''
+    description: 2nd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_3
-    description: ''
+    description: 3rd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_4
-    description: ''
+    description: 4th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_5
-    description: ''
+    description: 5th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_6
-    description: ''
+    description: 6th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_7
-    description: ''
+    description: 7th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_8
-    description: ''
+    description: 8th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_9
-    description: ''
+    description: 9th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_10
-    description: ''
+    description: 10th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_11
-    description: ''
+    description: 11th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_12
-    description: ''
+    description: 12th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_13
-    description: ''
+    description: 13th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_14
-    description: ''
+    description: 14th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_15
-    description: ''
+    description: 15th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_16
-    description: ''
+    description: 16th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_17
-    description: ''
+    description: 17th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_18
-    description: ''
+    description: 18th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_19
-    description: ''
+    description: 19th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_20
-    description: ''
+    description: 20th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_21
-    description: ''
+    description: 21st ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_22
-    description: ''
+    description: 22nd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_23
-    description: ''
+    description: 23rd ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_24
-    description: ''
+    description: 24th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_code_25
-    description: ''
+    description: 25th ICD (9 or 10) procedure code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_1
-    description: ''
+    description: Date of the 1st procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_2
-    description: ''
+    description: Date of the 2nd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_3
-    description: ''
+    description: Date of the 3rd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_4
-    description: ''
+    description: Date of the 4th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_5
-    description: ''
+    description: Date of the 5th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_6
-    description: ''
+    description: Date of the 6th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_7
-    description: ''
+    description: Date of the 7th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_8
-    description: ''
+    description: Date of the 8th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_9
-    description: ''
+    description: Date of the 9th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_10
-    description: ''
+    description: Date of the 10th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_11
-    description: ''
+    description: Date of the 11th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_12
-    description: ''
+    description: Date of the 12th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_13
-    description: ''
+    description: Date of the 13th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_14
-    description: ''
+    description: Date of the 14th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_15
-    description: ''
+    description: Date of the 15th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_16
-    description: ''
+    description: Date of the 16th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_17
-    description: ''
+    description: Date of the 17th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_18
-    description: ''
+    description: Date of the 18th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_19
-    description: ''
+    description: Date of the 19th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_20
-    description: ''
+    description: Date of the 20th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_21
-    description: ''
+    description: Date of the 21st procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_22
-    description: ''
+    description: Date of the 22nd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_23
-    description: ''
+    description: Date of the 23rd procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_24
-    description: ''
+    description: Date of the 24th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: procedure_date_25
-    description: ''
+    description: Date of the 25th procedure on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: in_network_flag
-    description: ''
+    description: '{{ doc("in_network_flag") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: data_source
-    description: ''
+    description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: file_name
-    description: ''
+    description: '{{ doc("file_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -1104,7 +1141,7 @@ models:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: ingest_datetime
-    description: ''
+    description: '{{ doc("ingest_datetime") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:

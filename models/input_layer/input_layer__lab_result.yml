@@ -1,7 +1,11 @@
 version: 2
 models:
 - name: input_layer__lab_result
-  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  description: |
+    Mapping check to make sure all columns are mapped appropriately into the input layer.
+    The lab result table contains information about lab test results, 
+    including the LOINC code and description, units, reference range, and 
+    result.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -9,7 +13,7 @@ models:
     materialized: view
   columns:
   - name: lab_result_id
-    description: ''
+    description: '{{ doc("lab_result_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -22,203 +26,203 @@ models:
           config:
             severity: warn
   - name: person_id
-    description: ''
+    description: '{{ doc("person_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: patient_id
-    description: ''
+    description: '{{ doc("patient_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: encounter_id
-    description: ''
+    description: '{{ doc("encounter_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: accession_number
-    description: ''
+    description: '{{ doc("accession_number") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_code_type
-    description: ''
+    description: '{{ doc("source_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_code
-    description: ''
+    description: '{{ doc("source_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_description
-    description: ''
+    description: '{{ doc("source_description") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_component
-    description: ''
+    description: '{{ doc("source_component") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_code_type
-    description: ''
+    description: '{{ doc("normalized_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_code
-    description: ''
+    description: '{{ doc("normalized_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_description
-    description: ''
+    description: '{{ doc("normalized_description") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_component
-    description: ''
+    description: '{{ doc("normalized_component") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: status
-    description: ''
+    description: '{{ doc("status") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: result
-    description: ''
+    description: '{{ doc("result") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: result_date
-    description: ''
+    description: '{{ doc("result_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: collection_date
-    description: ''
+    description: '{{ doc("collection_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_units
-    description: ''
+    description: '{{ doc("source_units") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_units
-    description: ''
+    description: '{{ doc("normalized_units") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_reference_range_low
-    description: ''
+    description: '{{ doc("source_reference_range_low") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_reference_range_high
-    description: ''
+    description: '{{ doc("source_reference_range_high") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_reference_range_low
-    description: ''
+    description: '{{ doc("normalized_reference_range_low") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_reference_range_high
-    description: ''
+    description: '{{ doc("normalized_reference_range_high") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: source_abnormal_flag
-    description: ''
+    description: '{{ doc("source_abnormal_flag") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: normalized_abnormal_flag
-    description: ''
+    description: '{{ doc("normalized_abnormal_flag") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: specimen
-    description: ''
+    description: '{{ doc("specimen") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: ordering_practitioner_id
-    description: ''
+    description: '{{ doc("ordering_practitioner_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: data_source
-    description: ''
+    description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: file_name
-    description: ''
+    description: '{{ doc("file_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: ingest_datetime
-    description: ''
+    description: '{{ doc("ingest_datetime") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:

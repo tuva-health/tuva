@@ -1,7 +1,10 @@
 version: 2
 models:
 - name: input_layer__practitioner
-  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  description: >
+      Mapping check to make sure all columns are mapped appropriately into the input layer.
+      The practitioner table contains information on the providers in the 
+      dataset e.g. physicians, physicians assistants, etc.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -9,7 +12,7 @@ models:
     materialized: view
   columns:
   - name: practitioner_id
-    description: ''
+    description: '{{ doc("practitioner_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
@@ -22,49 +25,49 @@ models:
           config:
             severity: warn
   - name: npi
-    description: ''
+    description: '{{ doc("npi") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: first_name
-    description: ''
+    description: '{{ doc("provider_first_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: last_name
-    description: ''
+    description: '{{ doc("provider_last_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: practice_affiliation
-    description: ''
+    description: '{{ doc("practice_affiliation") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: specialty
-    description: ''
+    description: '{{ doc("specialty") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: sub_specialty
-    description: ''
+    description: '{{ doc("sub_specialty") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: data_source
-    description: ''
+    description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
           config:
