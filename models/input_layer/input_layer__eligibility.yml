@@ -63,6 +63,11 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - accepted_values:
+          values: ['male', 'female', 'unknown']
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
   - name: race
     description: '{{ doc("race") }}'
     tests:
@@ -107,6 +112,11 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - accepted_values:
+          values: ['0', '1']
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
   - name: enrollment_start_date
     description: '{{ doc("enrollment_start_date") }}'
     tests:
