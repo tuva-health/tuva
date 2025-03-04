@@ -13,7 +13,7 @@ models:
         combination_of_columns:
           - claim_id
           - claim_line_number
-        tags: ['tuva_dqi_sev_1', 'dqi']
+        tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
         config:
           severity: error
           enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -21,7 +21,7 @@ models:
     - dbt_expectations.expect_select_column_values_to_be_unique_within_record:
         description: 'A claim cannot be both professional and institutional within the same claim id.'
         column_list: ['claim_id', 'claim_type']
-        tags: ['tuva_dqi_sev_1', 'dqi']
+        tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
         config:
           severity: error
           enabled: "{{ (target.type != 'fabric') | as_bool }}"
@@ -35,24 +35,24 @@ models:
     description: '{{ doc("claim_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_1', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - not_null:
-          tags: ['tuva_dqi_sev_1', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
   - name: claim_line_number
     description: '{{ doc("claim_line_number") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_1', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
       - not_null:
-          tags: ['tuva_dqi_sev_1', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: error
   - name: claim_type
