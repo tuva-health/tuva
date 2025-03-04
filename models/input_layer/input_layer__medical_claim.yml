@@ -491,8 +491,8 @@ models:
       - dbt_expectations.expect_column_values_to_match_regex_list:
           tags: ['tuva_dqi_sev_2', 'dqi']
           regex_list: [
-            "^[A-TV-Z][0-9]{2}(\\.[0-9A-Z]{1,7})?$",  # ICD-10 with period
-            "^[A-TV-Z][0-9]{2}[0-9A-Z]{0,7}$",        # ICD-10 without period
+            "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
+            "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
             "^[0-9]{3}(\\.[0-9]{1,2})?$",             # ICD-9 numeric with period
             "^[0-9]{3,5}$",                           # ICD-9 numeric without period
             "^[VE][0-9]{3}(\\.[0-9]{1})?$",           # ICD-9 V/E codes with period
