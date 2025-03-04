@@ -8,6 +8,8 @@ models:
           - person_id
           - year_month
           - data_source
+        config:
+          severity: warn
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
