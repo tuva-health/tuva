@@ -103,6 +103,12 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: ndc_code
     description: '{{ doc("ndc_code") }}'
     tests:
@@ -139,6 +145,12 @@ models:
     description: '{{ doc("paid_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn

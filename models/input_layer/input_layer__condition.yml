@@ -60,6 +60,12 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: onset_date
     description: '{{ doc("onset_date") }}'
     tests:
@@ -68,10 +74,22 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: resolved_date
     description: '{{ doc("resolved_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn

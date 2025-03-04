@@ -79,10 +79,22 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: death_date
     description: '{{ doc("death_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -103,10 +115,22 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: enrollment_end_date
     description: '{{ doc("enrollment_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_of_type:
+          column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -271,10 +295,22 @@ models:
           config:
             severity: warn
             enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [date, datetime]
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
   - name: ingest_datetime
     description: '{{ doc("ingest_datetime") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ (target.type != 'fabric') | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [date, datetime]
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
