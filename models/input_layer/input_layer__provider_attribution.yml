@@ -42,7 +42,7 @@ models:
     description: '{{ doc("patient_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -63,7 +63,7 @@ models:
     description: '{{ doc("payer") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -71,7 +71,7 @@ models:
     description: '{{ doc("plan") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -92,7 +92,7 @@ models:
     description: '{{ doc("payer_attributed_provider") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -100,7 +100,7 @@ models:
     description: '{{ doc("payer_attributed_provider_practice") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -108,7 +108,7 @@ models:
     description: '{{ doc("payer_attributed_provider_organization") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -116,7 +116,7 @@ models:
     description: '{{ doc("payer_attributed_provider_lob") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -124,7 +124,7 @@ models:
     description: '{{ doc("custom_attributed_provider") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -132,7 +132,7 @@ models:
     description: '{{ doc("custom_attributed_provider_practice") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -140,7 +140,7 @@ models:
     description: '{{ doc("custom_attributed_provider_organization") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -148,7 +148,7 @@ models:
     description: '{{ doc("custom_attributed_provider_lob") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

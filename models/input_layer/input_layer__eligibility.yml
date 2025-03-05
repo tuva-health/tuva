@@ -44,7 +44,7 @@ models:
     description: '{{ doc("member_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -52,7 +52,7 @@ models:
     description: '{{ doc("subscriber_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -60,7 +60,7 @@ models:
     description: '{{ doc("sex") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -73,7 +73,7 @@ models:
     description: '{{ doc("race") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -81,7 +81,7 @@ models:
     description: '{{ doc("birth_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -95,7 +95,7 @@ models:
     description: '{{ doc("death_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -109,7 +109,7 @@ models:
     description: '{{ doc("death_flag") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -122,7 +122,7 @@ models:
     description: '{{ doc("enrollment_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -136,7 +136,7 @@ models:
     description: '{{ doc("enrollment_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -150,7 +150,7 @@ models:
     description: '{{ doc("payer") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -158,7 +158,7 @@ models:
     description: '{{ doc("payer_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -173,7 +173,7 @@ models:
     description: '{{ doc("plan") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -181,7 +181,7 @@ models:
     description: '{{ doc("original_reason_entitlement_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -202,7 +202,7 @@ models:
     description: '{{ doc("dual_status_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -217,7 +217,7 @@ models:
     description: '{{ doc("medicare_status_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -232,7 +232,7 @@ models:
     description: '{{ doc("first_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -240,7 +240,7 @@ models:
     description: '{{ doc("first_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -248,7 +248,7 @@ models:
     description: '{{ doc("first_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -256,7 +256,7 @@ models:
     description: '{{ doc("last_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -264,7 +264,7 @@ models:
     description: '{{ doc("social_security_number") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -272,7 +272,7 @@ models:
     description: '{{ doc("subscriber_relation") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -280,7 +280,7 @@ models:
     description: '{{ doc("address") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -288,7 +288,7 @@ models:
     description: '{{ doc("city") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -296,7 +296,7 @@ models:
     description: '{{ doc("state") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -304,7 +304,7 @@ models:
     description: '{{ doc("zip_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -312,7 +312,7 @@ models:
     description: '{{ doc("phone") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -320,7 +320,7 @@ models:
     description: '{{ doc("data_source") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -328,7 +328,7 @@ models:
     description: '{{ doc("file_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -336,7 +336,7 @@ models:
     description: '{{ doc("file_name") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -350,7 +350,7 @@ models:
     description: '{{ doc("ingest_datetime") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_1', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
