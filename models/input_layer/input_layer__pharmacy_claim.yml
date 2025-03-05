@@ -366,3 +366,24 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+        date,
+        datetime,
+        time,
+        timestamp,
+        timestamp_ntz,
+        timestampntz,
+        timestamp_ltz,
+        timestampltz,
+        timestamp_tz,
+        timestamptz,
+        timestamp with time zone,
+        timestamp without time zone,
+        datetime2,
+        datetimeoffset
+          ]
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
