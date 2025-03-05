@@ -165,7 +165,7 @@ models:
       - relationships:
           to: ref('terminology__payer_type')
           field: payer_type
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_3', 'dqi']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -208,7 +208,7 @@ models:
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - accepted_values:
           description: "https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january"
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
           values: ['00', '01', '02', '03', '04', '05', '06', '08', '09', '10']
           config:
             severity: warn

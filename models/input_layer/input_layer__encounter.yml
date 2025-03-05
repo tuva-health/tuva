@@ -62,7 +62,7 @@ models:
       - relationships:
           to: ref('terminology__encounter_type')
           field: encounter_type
-          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
