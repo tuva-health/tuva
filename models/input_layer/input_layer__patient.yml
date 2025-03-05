@@ -66,10 +66,15 @@ models:
     description: '{{ doc("sex") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - accepted_values:
+          values: ['male', 'female', 'unknown']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
+          config:
+            severity: warn
   - name: race
     description: '{{ doc("race") }}'
     tests:
@@ -82,13 +87,13 @@ models:
     description: '{{ doc("birth_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -96,13 +101,13 @@ models:
     description: '{{ doc("death_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

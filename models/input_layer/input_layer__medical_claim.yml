@@ -61,18 +61,18 @@ models:
     description: '{{ doc("claim_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - not_null:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - accepted_values:
           values: ['professional', 'institutional', 'undetermined']
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
@@ -80,10 +80,15 @@ models:
     description: '{{ doc("person_id") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_cms_chronic_conditions','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_cms_chronic_conditions','dqi_readmission']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: member_id
     description: '{{ doc("member_id") }}'
     tests:
@@ -96,7 +101,7 @@ models:
     description: '{{ doc("payer") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -104,7 +109,7 @@ models:
     description: '{{ doc("plan") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -112,13 +117,13 @@ models:
     description: '{{ doc("claim_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -126,13 +131,13 @@ models:
     description: '{{ doc("claim_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -140,13 +145,13 @@ models:
     description: '{{ doc("claim_line_start_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -154,13 +159,13 @@ models:
     description: '{{ doc("claim_line_end_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -168,13 +173,13 @@ models:
     description: '{{ doc("admission_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -182,13 +187,13 @@ models:
     description: '{{ doc("discharge_date") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -231,28 +236,35 @@ models:
     description: '{{ doc("discharge_disposition_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - relationships:
+          to: ref('terminology__discharge_disposition')
+          field: discharge_disposition_code
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_readmission']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: place_of_service_code
     description: '{{ doc("place_of_service_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 2
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
           description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
           regex: "^[0-9]{2}$"
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -260,21 +272,21 @@ models:
     description: '{{ doc("bill_type_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
           description: "3 digits, 2 numbers followed by letter. If 4, leading 0."
           regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -282,13 +294,13 @@ models:
     description: '{{ doc("drg_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_financial_pmpm','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - accepted_values:
           values: ['ms-drg', 'apr-drg']
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_financial_pmpm','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
@@ -296,13 +308,13 @@ models:
     description: '{{ doc("drg_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_financial_pmpm','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
           value: 3
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_financial_pmpm','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -310,20 +322,20 @@ models:
     description: '{{ doc("revenue_center_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_be_between:
           min_value: 3
           max_value: 4
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex:
           regex: "^(\\\\d{3}|0\\\\d{3})$"
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -339,7 +351,7 @@ models:
     description: '{{ doc("hcpcs_code") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_financial_pmpm','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -347,7 +359,7 @@ models:
     description: '{{ doc("hcpcs_modifier_1") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -355,7 +367,7 @@ models:
     description: '{{ doc("hcpcs_modifier_2") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -363,7 +375,7 @@ models:
     description: '{{ doc("hcpcs_modifier_3") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -371,7 +383,7 @@ models:
     description: '{{ doc("hcpcs_modifier_4") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -379,7 +391,7 @@ models:
     description: '{{ doc("hcpcs_modifier_5") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_quality_measures']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -447,12 +459,12 @@ models:
           services were performed).
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_value_lengths_to_equal:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_readmission']
           value: 10
           config:
             severity: warn
@@ -480,7 +492,27 @@ models:
     description: '{{ doc("paid_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_ed_classification','dqi_financial_pmpm']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_ed_classification','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -488,7 +520,27 @@ models:
     description: '{{ doc("allowed_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_ed_classification','dqi_financial_pmpm']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_ed_classification','dqi_financial_pmpm']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -496,7 +548,27 @@ models:
     description: '{{ doc("charge_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_ed_classification']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_ed_classification']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -504,6 +576,26 @@ models:
     description: '{{ doc("coinsurance_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -516,10 +608,50 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: deductible_amount
     description: '{{ doc("deductible_amount") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
           tags: ['tuva_dqi_sev_2', 'dqi']
           config:
             severity: warn
@@ -532,17 +664,37 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_in_type_list:
+          column_type_list: [
+            date,
+            datetime,
+            number,
+            decimal,
+            numeric,
+            float,
+            float4,
+            float8,
+            double,
+            double precision,
+            real,
+            float64,
+            bignumeric
+          ]
+          tags: ['tuva_dqi_sev_2', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: diagnosis_code_type
     description: '{{ doc("diagnosis_code_type") }}'
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - accepted_values:
           values: ['icd-10-cm', 'icd-9-cm']
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
@@ -550,12 +702,12 @@ models:
     description: 1st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_readmission']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_readmission']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -573,12 +725,12 @@ models:
     description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -596,12 +748,12 @@ models:
     description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -619,12 +771,12 @@ models:
     description: 4th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -642,12 +794,12 @@ models:
     description: 5th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -665,12 +817,12 @@ models:
     description: 6th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -688,12 +840,12 @@ models:
     description: 7th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -711,12 +863,12 @@ models:
     description: 8th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -734,12 +886,12 @@ models:
     description: 9th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -757,12 +909,12 @@ models:
     description: 10th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -780,12 +932,12 @@ models:
     description: 11th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -803,12 +955,12 @@ models:
     description: 12th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -826,12 +978,12 @@ models:
     description: 13th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -849,12 +1001,12 @@ models:
     description: 14th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -872,12 +1024,12 @@ models:
     description: 15th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -895,12 +1047,12 @@ models:
     description: 16th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -918,12 +1070,12 @@ models:
     description: 17th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -941,12 +1093,12 @@ models:
     description: 18th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -964,12 +1116,12 @@ models:
     description: 19th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -987,12 +1139,12 @@ models:
     description: 20th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -1010,12 +1162,12 @@ models:
     description: 21st ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -1033,12 +1185,12 @@ models:
     description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -1056,12 +1208,12 @@ models:
     description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -1079,12 +1231,12 @@ models:
     description: 24th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
@@ -1102,12 +1254,12 @@ models:
     description: 25th ICD (9 or 10) CM diagnosis code on the claim.
     tests:
       - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_match_regex_list:
-          tags: ['tuva_dqi_sev_2', 'dqi']
+          tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr','dqi_tuva_chronic_conditions','dqi_cms_hccs']
           regex_list: [
             "^[A-TV-Z][0-9A-Z]{2,7}$",                # ICD-10 without period
             "^[A-TV-Z][0-9]{1,2}\\.[0-9A-Z]{1,7}$",   # ICD-10 with period
