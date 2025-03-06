@@ -250,6 +250,13 @@ models:
   - name: place_of_service_code
     description: '{{ doc("place_of_service_code") }}'
     tests:
+      - not_null:
+          description: "If a claim is professional, it should have a place of service code via CMS-1500. "
+          tags: ['tuva_dqi_sev_4', 'dqi','dqi_quality_measures']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+            where: claim_type = 'professional'
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_quality_measures']
           config:
