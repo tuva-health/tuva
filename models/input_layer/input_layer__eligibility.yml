@@ -21,6 +21,14 @@ models:
         config:
           severity: error
           enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+    - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+      tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
+      column_A: enrollment_end_date
+      column_B: enrollment_start_date
+      or_equal: True
+      config:
+          severity: warn
+          enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -69,6 +77,11 @@ models:
           tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_hccs']
           config:
             severity: warn
+      - not_null:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: race
     description: '{{ doc("race") }}'
     tests:
@@ -80,8 +93,27 @@ models:
   - name: birth_date
     description: '{{ doc("birth_date") }}'
     tests:
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: 'A person should not have multiple birthdays.'
+          min_value: 1
+          max_value: 1
+          tags: [ 'tuva_dqi_sev_3', 'dqi','dqi_cms_hccs' ]
+          group_by: [ person_id ]
+          strictly: false
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -91,9 +123,23 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: death_date
     description: '{{ doc("death_date") }}'
     tests:
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
@@ -121,6 +167,15 @@ models:
   - name: enrollment_start_date
     description: '{{ doc("enrollment_start_date") }}'
     tests:
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
           config:
@@ -135,6 +190,15 @@ models:
   - name: enrollment_end_date
     description: '{{ doc("enrollment_end_date") }}'
     tests:
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
           config:

@@ -17,13 +17,13 @@ models:
         config:
           severity: error
           enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-#     A claim cannot be both professional and institutional within the same claim id.
-    - dbt_expectations.expect_select_column_values_to_be_unique_within_record:
-        description: 'A claim cannot be both professional and institutional within the same claim id.'
-        column_list: ['claim_id', 'claim_type']
-        tags: ['tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
-        config:
-          severity: error
+    - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+      tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+      column_A: claim_end_date
+      column_B: claim_start_date
+      or_equal: True
+      config:
+          severity: warn
           enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   config:
     schema: |
@@ -60,6 +60,16 @@ models:
   - name: claim_type
     description: '{{ doc("claim_type") }}'
     tests:
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: 'A claim cannot be both professional and institutional within the same claim id.'
+          min_value: 1
+          max_value: 1
+          tags: [ 'tuva_dqi_sev_1', 'dqi','dqi_service_categories','dqi_ccsr','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission' ]
+          group_by: [ claim_id ]
+          strictly: false
+          config:
+            severity: error
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_hccs']
           config:
@@ -79,6 +89,16 @@ models:
   - name: person_id
     description: '{{ doc("person_id") }}'
     tests:
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: 'A claim should not belong to two different people.'
+          min_value: 1
+          max_value: 1
+          tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_ccsr','dqi_cms_chronic_conditions','dqi_readmission']
+          group_by: [ claim_id ]
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_ccsr','dqi_cms_chronic_conditions','dqi_readmission']
           config:
@@ -116,8 +136,27 @@ models:
   - name: claim_start_date
     description: '{{ doc("claim_start_date") }}'
     tests:
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: 'A claim should not have multiple start dates within the same claim id.'
+          min_value: 1
+          max_value: 1
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          group_by: [ claim_id ]
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -127,11 +166,40 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: claim_end_date
     description: '{{ doc("claim_end_date") }}'
     tests:
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: 'A claim should not have multiple end dates within the same claim id.'
+          min_value: 1
+          max_value: 1
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          group_by: [ claim_id ]
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -146,6 +214,15 @@ models:
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -177,6 +254,15 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_tuva_chronic_conditions']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_values_to_be_of_type:
           column_type: date
           tags: ['tuva_dqi_sev_2', 'dqi','dqi_tuva_chronic_conditions']
@@ -188,6 +274,15 @@ models:
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_tuva_chronic_conditions']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "This is a test on all dates to see if they are within a reasonable range. "
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_tuva_chronic_conditions']
+          min_value: "1900-01-02"
+          max_value: "2050-01-02"
+          strictly: false
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -278,6 +373,16 @@ models:
   - name: bill_type_code
     description: '{{ doc("bill_type_code") }}'
     tests:
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: 'A claim should not have multiple bill type codes within the same claim id.'
+          min_value: 1
+          max_value: 1
+          tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_chronic_conditions']
+          group_by: [ claim_id ]
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_cms_chronic_conditions']
           config:
@@ -328,6 +433,24 @@ models:
   - name: revenue_center_code
     description: '{{ doc("revenue_center_code") }}'
     tests:
+      - not_null:
+          description: "Missing revenue codes for institutional claims. Severity 5 as triggers if at least on revenue code is missing. "
+          tags: ['tuva_dqi_sev_5', 'dqi','dqi_quality_measures']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+            where: claim_type = 'institutional'
+      - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          description: "For institutional claims, should be some distinct count of different revenue codes"
+          tags: ['tuva_dqi_sev_4', 'dqi','dqi_financial_pmpm']
+          min_value: 5
+          max_value: 1000
+          group_by: [ data_source ]
+          row_condition: "claim_type = 'institutional'"
+          strictly: false
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi','dqi_financial_pmpm']
           config:
@@ -362,6 +485,13 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          description: "Procedure code should not be null on profressional claims. "
+          tags: ['tuva_dqi_sev_2', 'dqi','dqi_cms_chronic_conditions','dqi_financial_pmpm','dqi_quality_measures']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+            where: claim_type = 'professional'
   - name: hcpcs_modifier_1
     description: '{{ doc("hcpcs_modifier_1") }}'
     tests:
