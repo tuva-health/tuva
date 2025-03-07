@@ -5,6 +5,20 @@ require-dbt-version: ">=1.5.0"
 
 profile: default
 
+models:
+  ## see docs: https://docs.elementary-data.com/
+  elementary:
+    ## elementary models will be created in the schema '<your_schema>_elementary'
+    +schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_elementary{% else %}elementary{%- endif -%}
+    ## To disable elementary for dev, uncomment this:
+    # enabled: "{{ target.name in ['prod','analytics'] }}"
+    enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+
+flags:
+  require_explicit_package_overrides_for_builtin_materializations: false
+
+
 vars:
     ## CCSR data mart vars
     # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
@@ -38,6 +52,9 @@ vars:
     #tuva_seeds_s3_bucket: "tuva-public-resources"
     #tuva_seeds_s3_key_prefix: "tuva/seeds/example/prefix"
     custom_bucket_name: tuva-public-resources
+
+    ## DQI data testing on input layer
+    enable_input_layer_testing: true
 
 on-run-end:
   - "{{ log_warning_for_seeds() }}"
