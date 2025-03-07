@@ -18,13 +18,13 @@ models:
           severity: error
           enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
     - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
-      tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
-      column_A: claim_end_date
-      column_B: claim_start_date
-      or_equal: True
-      config:
-          severity: warn
-          enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+        tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_chronic_conditions','dqi_tuva_chronic_conditions','dqi_cms_hccs','dqi_ed_classification','dqi_financial_pmpm','dqi_quality_measures','dqi_readmission']
+        column_A: claim_end_date
+        column_B: claim_start_date
+        or_equal: True
+        config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
