@@ -212,16 +212,7 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: drg_code_type
-    description: '{{ doc("drg_code_type") }}'
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_1', 'dqi']
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: drg_code
-    description: '{{ doc("drg_code") }}'
+  - name: ms_drg_code
     tests:
       - dbt_expectations.expect_column_to_exist:
           tags: ['tuva_dqi_sev_1', 'dqi']
