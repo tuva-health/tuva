@@ -2383,14 +2383,6 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: file_date
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          tags: ['tuva_dqi_sev_1', 'dqi']
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
   - name: ingest_datetime
     description: '{{ doc("ingest_datetime") }}'
     tests:
