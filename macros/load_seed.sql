@@ -91,10 +91,58 @@ copy  {{ this }}
 
 {% endmacro %}
 
+
 {% macro athena__load_seed(uri, pattern, compression, headers, null_marker) %}
   {% if execute %}
-    {% do adapter.load_tuva_seed(this, uri, pattern, compression, headers, null_marker) %}
+
+    {%- set columns = adapter.get_columns_in_relation(this) -%}
+    {%- set ddl_collist = [] -%}
+    {%- set null_char = 'N' if null_marker else '' -%}
+    {% for col in columns %}
+        {% do ddl_collist.append(col.name ~ " string" ) %}
+    {% endfor %}
+    {%- set ddl_cols = ddl_collist|join(',') -%}
+    {% set bucket = 's3://' ~ uri ~ '/' %}
+    {% set full_path = bucket  ~ pattern %}
+    {% set table_name = this.schema ~ '.' ~  this.name %}
+    {% set tmp_table = this.schema ~ '.' ~  this.name ~ "__dbt_tmp_external" %}
+    {% set header_line_count %}{% if headers -%}1{%- else -%}0{%- endif -%}{% endset %}
+
+    {% set drop_tmp_table %}
+      DROP TABLE IF EXISTS `{{ tmp_table }}`;
+    {% endset %}
+
+    {% set create_tmp_table %}
+      CREATE EXTERNAL TABLE `{{ tmp_table }}` ( {{ ddl_cols }} )
+      ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+      STORED AS TEXTFILE
+      LOCATION '{{ bucket }}'
+      TBLPROPERTIES ('skip.header.line.count'='{{ header_line_count }}', 'compressionType'='GZIP');
+    {% endset %}
+
+    {% set drop_seed_table %}
+      DROP TABLE IF EXISTS `{{ table_name }}`;
+    {% endset %}
+
+    {% set create_seed_table %}
+      CREATE TABLE {{ table_name }} AS
+      SELECT {% for col in columns %}
+        cast(nullif({{ col.name }},'{{ null_char }}') as {{ dml_data_type(col.dtype) }}) as {{ col.name }} {%-if not loop.last -%},{%- endif %}{% endfor %}
+      FROM {{ tmp_table }}
+      WHERE "$path" like '{{ full_path }}%';
+    {% endset %}
+
+    {% for query in [drop_tmp_table, create_tmp_table, drop_seed_table, create_seed_table, drop_tmp_table] %}
+      {{ log(query, True) }}
+      {% call statement('athenasql', fetch_result=true) %}
+        {{ query }}
+      {% endcall %}
+    {% endfor %}
+
+    {{ log("Loaded seed data from external resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*",True) }}
+
   {% endif %}
+
 {% endmacro %}
 
 
