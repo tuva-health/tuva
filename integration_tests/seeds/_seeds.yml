@@ -196,13 +196,20 @@ seeds:
         facility_npi: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         paid_date: date
-        paid_amount: float
-        allowed_amount: float
-        charge_amount: float
-        coinsurance_amount: float
-        copayment_amount: float
-        deductible_amount: float
-        total_cost_amount: float
+        paid_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        allowed_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        charge_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        coinsurance_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        copayment_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        deductible_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        total_cost_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
         diagnosis_code_type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         diagnosis_code_1: |
