@@ -157,7 +157,6 @@ seeds:
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
       alias: ethnicity
       tags: terminology
-      table_type: iceberg
       column_types:
         code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -237,7 +236,7 @@ seeds:
         rbcs_subcat_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         rbcs_famnumb: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type == 'athena' -%} int {%- else -%} numeric {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
         rbcs_family_desc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         rbcs_major_ind: |
@@ -249,7 +248,7 @@ seeds:
         rbcs_assignment_eff_dt: |
           {%- if target.type in ("bigquery", "databricks") -%} date {%- else -%} date {%- endif -%}
         current_flag: |
-          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type == 'athena' -%} int {%- else -%} numeric {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} numeric {%- elif target.type in ("athena") -%} int {%- else -%} numeric {%- endif -%}
     columns:
       - name: hcpcs_cd
         description: HCPCS or CPT code.
@@ -617,13 +616,13 @@ seeds:
         ms_drg_title: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         drg_weight_raw: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type == 'athena' -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
         drg_weight: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type == 'athena' -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
         geometric_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type == 'athena' -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
         arithmetic_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type == 'athena' -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
     columns:
       - name: ms_drg
         description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
@@ -1183,4 +1182,3 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         focus_area: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-
