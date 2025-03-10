@@ -15,6 +15,6 @@ SELECT
     , case
         when m.claim_id is null then 'null' else 'valid' end as bucket_name
     , cast(null as {{ dbt.type_string() }}) as invalid_reason
-    , cast(member_id as {{ dbt.type_string() }}) as field_value
+    , cast(m.claim_id as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('pharmacy_claim')}} m
+from {{ ref('pharmacy_claim')}} AS m

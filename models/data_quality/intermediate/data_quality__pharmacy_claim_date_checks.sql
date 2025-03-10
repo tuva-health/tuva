@@ -7,7 +7,7 @@ with pharmacy_claim as (
       claim_id
     , max(case when paid_date is null then 1 else 0 end) as missing_paid_date
     , max(case when dispensing_date is null then 1 else 0 end) as missing_dispensing_date
-  from {{ ref('pharmacy_claim') }}
+  from {{ ref('input_layer__pharmacy_claim') }}
   group by
       claim_id
 )

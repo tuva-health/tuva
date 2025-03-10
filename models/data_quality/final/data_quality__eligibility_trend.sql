@@ -19,7 +19,7 @@ with eligibility_spans as(
         ]) }} as eligibility_span_id
         , enrollment_start_date
         , enrollment_end_date
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 )
 , month_start_and_end_dates as (
   select

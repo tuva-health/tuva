@@ -21,7 +21,7 @@ with eligibility_spans as(
         , person_id
         , birth_date
         , gender
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 )
 
 , missing_birth_date as(

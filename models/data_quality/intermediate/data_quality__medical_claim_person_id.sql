@@ -14,7 +14,7 @@ with medical as (
           else 0
         end
       ) as missing_eligibility
-  from {{ ref('medical_claim') }} p
+  from {{ ref('input_layer__medical_claim') }} p
   left join {{ ref('data_quality__eligibility_dq_stage') }} startdts
     on p.person_id = startdts.person_id
     and p.claim_start_date between startdts.month_start_date and startdts.month_end_date

@@ -1,0 +1,74 @@
+version: 2
+models:
+- name: input_layer__practitioner
+  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+    tags: input_layer
+    materialized: view
+  columns:
+  - name: practitioner_id
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - unique:
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - not_null:
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+  - name: npi
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: first_name
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: last_name
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: practice_affiliation
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: specialty
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: sub_specialty
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: data_source
+    description: ''
+    tests:
+      - dbt_expectations.expect_column_to_exist:
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

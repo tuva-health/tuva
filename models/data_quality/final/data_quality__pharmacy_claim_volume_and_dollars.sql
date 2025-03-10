@@ -7,7 +7,7 @@ select
   , count(distinct p.claim_id) as claim_volume
   , sum(p.paid_amount) as paid_amount
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('pharmacy_claim') }} p
+from {{ ref('input_layer__pharmacy_claim') }} p
 left join {{ ref('reference_data__calendar') }} c
   on coalesce(p.paid_date, p.dispensing_date) = c.full_date
 group by

@@ -1125,6 +1125,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         product_tty: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        prescribable_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         brand_vs_generic: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         brand_name: |
@@ -1139,6 +1141,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
         dose_form_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3000) {%- endif -%}
+        active: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
+        prescribable: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(10) {%- endif -%}
 
   - name: terminology__ccs_services_procedures
     config:

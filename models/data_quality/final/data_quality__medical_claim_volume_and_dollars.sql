@@ -10,7 +10,7 @@ with range_cte as (
     {% else %}
       , current_date as last_date
     {% endif %}
-  from {{ ref('medical_claim') }} p
+  from {{ ref('input_layer__medical_claim') }} p
 )
 
 , date_cte as (
@@ -26,7 +26,7 @@ with range_cte as (
       c.year_month_int
     , count(distinct p.claim_id) as claim_volume
     , sum(p.paid_amount) as paid_amount
-  from {{ ref('medical_claim') }} p
+  from {{ ref('input_layer__medical_claim') }} p
   left join {{ ref('reference_data__calendar') }} c
     on p.claim_start_date = c.full_date
   group by

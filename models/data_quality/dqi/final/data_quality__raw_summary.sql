@@ -10,7 +10,7 @@ with cte as (
       , count(distinct person_id) as unique_check
       , 'Unique Patient Count' as unique_check_desc
       , 2 as table_order
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 
     union all
 
@@ -21,7 +21,7 @@ with cte as (
       , null as unique_check
       , 'Unique Patient Count' as unique_check_desc
       , 1 as table_order
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 
     union all
 
@@ -32,7 +32,7 @@ with cte as (
       , count(distinct claim_id) as unique_check
       , 'Unique Claim Count' as unique_check_desc
       , 4 as table_order
-    from {{ ref('medical_claim') }}
+    from {{ ref('input_layer__medical_claim') }}
 
     union all
 
@@ -43,7 +43,7 @@ with cte as (
       , null as unique_check
       , 'Unique Claim Count' as unique_check_desc
       , 3 as table_order
-    from {{ ref('medical_claim') }}
+    from {{ ref('input_layer__medical_claim') }}
 
     union all
 
@@ -54,7 +54,7 @@ with cte as (
       , count(distinct claim_id) as unique_check
       , 'Unique Claim Count' as unique_check_desc
       , 6 as table_order
-    from {{ ref('pharmacy_claim') }}
+    from {{ ref('input_layer__pharmacy_claim') }}
 
     union all
 
@@ -65,7 +65,7 @@ with cte as (
       , null as unique_check
       , 'Unique Claim Count' as unique_check_desc
       , 5 as table_order
-    from {{ ref('pharmacy_claim') }}
+    from {{ ref('input_layer__pharmacy_claim') }}
 )
 
 select

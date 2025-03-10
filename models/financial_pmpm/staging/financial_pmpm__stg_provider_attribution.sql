@@ -20,7 +20,7 @@ select
     , cast(custom_attributed_provider_organization as {{ dbt.type_string() }} ) as custom_attributed_provider_organization
     , cast(custom_attributed_provider_lob as {{ dbt.type_string() }} ) as custom_attributed_provider_lob
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('provider_attribution') }}
+from {{ ref('input_layer__provider_attribution') }}
 
 {% elif var('provider_attribution_enabled',False) ==  false -%}
 

@@ -298,6 +298,18 @@ Indicates whether durable medical equipment (DME) was used during the encounter 
 A flag or description indicating a data quality issue.
 {% enddocs %}
 
+{% docs drg_code_type %}
+The DRG system used for the claim.
+{% enddocs %}
+
+{% docs drg_code %}
+The DRG code on the claim.
+{% enddocs %}
+
+{% docs drg_description %}
+The description for the DRG code used on the claim.
+{% enddocs %}
+
 {% docs dual_status_code %}
 Indicates whether the patient is dually eligible for Medicare and Medicaid.
 {% enddocs %}
@@ -374,6 +386,10 @@ Facility name.
 Facility NPI for the claim (typically represents the facility where services were performed).
 {% enddocs %}
 
+{% docs file_date %}
+The date associated with the claims file, typically reflecting the reporting period of the claims data.
+{% enddocs %}
+
 {% docs file_name %}
 The file name of the source file.
 {% enddocs %}
@@ -388,6 +404,14 @@ The first name of the patient.
 
 {% docs gender %}
 The gender of the patient.
+{% enddocs %}
+
+{% docs group_id %}
+The group id which multiple members are enrolled for health coverage.
+{% enddocs %}
+
+{% docs group_name %}
+The group name under which multiple members are enrolled for health coverage.
 {% enddocs %}
 
 {% docs hcpcs_code %}
@@ -492,6 +516,10 @@ Unique identifier for each medication in the table.
 
 {% docs member_id %}
 Identifier that links a patient to a particular insurance product or health plan. A patient can have more than one member_id because they can have more than one insurance product/plan.
+{% enddocs %}
+
+{% docs member_month_key %}
+The unique combination of person_id, year_month, payer, plan, and data source.
 {% enddocs %}
 
 {% docs min_closing_row %}
@@ -1004,8 +1032,4 @@ Unique year-month of in the dataset computed from eligibility.
 
 {% docs zip_code %}
 The zip code of the record (e.g., facility location, patient, etc).
-{% enddocs %}
-
-{% docs member_month_key %}
-The unique combination of person_id, year_month, payer, plan, and data source.
 {% enddocs %}

@@ -11,10 +11,10 @@ SELECT
                     "'|'",
                     "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'null')"]) }} as drill_down_value
     , 'PHARMACY' AS claim_type
-    , 'PAID_DATE' AS field_name
+    , 'QUANTITY' AS field_name
     , case
         when m.quantity is null then 'null' else 'valid' end as bucket_name
     , cast(null as {{ dbt.type_string() }}) as invalid_reason
     , cast(quantity as {{ dbt.type_string() }}) as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('pharmacy_claim')}} m
+from {{ ref('pharmacy_claim')}} AS m

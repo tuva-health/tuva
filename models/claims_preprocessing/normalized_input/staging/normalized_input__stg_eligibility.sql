@@ -31,6 +31,8 @@ select
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code
+    , group_id
+    , group_name
     , first_name
     , last_name
     , social_security_number
@@ -41,5 +43,6 @@ select
     , phone
     , data_source
     , file_name
+    , file_date
     , ingest_datetime
-from {{ ref('eligibility') }}
+from {{ ref('input_layer__eligibility') }}

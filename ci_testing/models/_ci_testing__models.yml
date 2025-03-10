@@ -6,8 +6,8 @@ models:
     description: Created from seed or source data depending on test_data_override variable.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
-        {% else %}_tuva_claims{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       tags: claims
       materialized: table
 
@@ -15,8 +15,8 @@ models:
     description: Created from seed or source data depending on test_data_override variable.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
-        {% else %}_tuva_claims{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       tags: claims
       materialized: table
 
@@ -24,8 +24,8 @@ models:
     description: Created from seed or source data depending on test_data_override variable.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_claims
-        {% else %}_tuva_claims{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       tags: claims
       materialized: table
 
@@ -44,70 +44,70 @@ models:
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: encounter
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: lab_result
     description: Created from seed or source data depending on test_data_override variable.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: location
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: medication
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: observation
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: patient
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: practitioner
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view
 
   - name: procedure
     description: Created using empty table logic.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_clinical
-        {% else %}_tuva_clinical{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_input_layer
+        {% else %}_input_layer{%- endif -%}
       materialized: view

@@ -57,7 +57,7 @@ with stg_eligibility as (
         , patient.sex
         , patient.birth_date
         , dates.payment_year
-        , floor({{ datediff('birth_date', 'payment_year_age_date', 'hour') }} / 8766.0) as payment_year_age
+        , floor({{ datediff('birth_date', 'payment_year_age_date', 'year') }} ) as payment_year_age
         , patient.death_date
     from {{ ref('cms_hcc__stg_core__patient') }} as patient
     cross join payment_year_age_dates as dates
