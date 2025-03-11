@@ -35,7 +35,26 @@ limited_test_result_rows AS (
 aggregated_result_rows AS (
     SELECT
         elementary_test_results_id,
-        listagg(result_row, ', ') AS aggregated_result_rows
+        {% if target.type == 'snowflake' %}
+            listagg(result_row, ', ') AS aggregated_result_rows
+        {% elif target.type == 'bigquery' %}
+            string_agg(result_row, ', ') AS aggregated_result_rows
+        {% elif target.type == 'redshift' %}
+            listagg(result_row, ', ') AS aggregated_result_rows
+        {% elif target.type == 'fabric' %}
+            string_agg(result_row, ', ') AS aggregated_result_rows
+        {% elif target.type == 'databricks' %}
+            concat_ws(', ', collect_list(result_row)) AS aggregated_result_rows
+        {% elif target.type == 'postgres' %}
+            string_agg(result_row, ', ') AS aggregated_result_rows
+        {% elif target.type == 'athena' %}
+            array_join(array_agg(result_row), ', ') AS aggregated_result_rows
+        {% elif target.type == 'duckdb' %}
+            string_agg(result_row, ', ') AS aggregated_result_rows
+        {% else %}
+            -- Default fallback
+            string_agg(result_row, ', ') AS aggregated_result_rows
+        {% endif %}
     FROM limited_test_result_rows
     GROUP BY elementary_test_results_id
 )
@@ -70,6 +89,26 @@ SELECT
     etr.failures,
     etr.failed_row_count,
     arr.aggregated_result_rows AS result_rows,
+
+    -- Map test names to categories
+    CASE
+        -- Completeness tests
+        WHEN dt.short_name = 'expect_column_to_exist' THEN 'completeness'
+        WHEN dt.short_name = 'not_null' THEN 'completeness'
+
+        -- Validity tests
+        WHEN dt.short_name = 'expect_column_values_to_be_of_type' THEN 'validity'
+        WHEN dt.short_name = 'relationships' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_values_to_match_regex_list' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_values_to_be_in_type_list' THEN 'validity'
+        WHEN dt.short_name = 'accepted_values' THEN 'validity'
+
+        -- Consistency tests
+        WHEN dt.short_name = 'unique' THEN 'consistency'
+
+        -- Default for unmapped tests
+        ELSE 'other'
+    END AS test_category,
 
      -- Extract severity level from tags
     CASE
