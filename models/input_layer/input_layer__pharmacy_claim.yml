@@ -125,6 +125,11 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_quality_measures']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: quantity
     description: '{{ doc("quantity") }}'
     tests:
@@ -141,6 +146,11 @@ models:
           config:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - not_null:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_quality_measures']
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
   - name: refills
     description: '{{ doc("refills") }}'
     tests:
