@@ -82,9 +82,9 @@ nonsensical_dates as (
         'Nonsensical dates' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
-    where enrollment_start_date < '1900-01-01'
-    or enrollment_end_date < '1900-01-01'
-    or enrollment_start_date > '2100-01-01'
+    where enrollment_start_date < {{ dbt.cast("'1900-01-01'", api.Column.translate_type('date')) }}
+    or enrollment_end_date < {{ dbt.cast("'1900-01-01'", api.Column.translate_type('date')) }}
+    or enrollment_start_date > {{ dbt.cast("'2100-01-01'", api.Column.translate_type('date')) }}
 )
 
 select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_start_date

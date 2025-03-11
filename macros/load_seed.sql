@@ -95,14 +95,14 @@ copy  {{ this }}
 {% macro athena__load_seed(uri, pattern, compression, headers, null_marker) %}
   {% if execute %}
         {%- set columns = adapter.get_columns_in_relation(this) -%}
-        {%- set ddl_collist = [] -%}
+        {%- set column_definitions = [] -%}
         {%- set null_char = 'N' if null_marker else '' -%}
 
         {% for col in columns %}
-            {% do ddl_collist.append(col.name ~ " string" ) %}
+            {% do column_definitions.append(col.name ~ " string" ) %}
         {% endfor %}
 
-        {%- set ddl_cols = ddl_collist|join(',') -%}
+        {%- set col_ddl = column_definitions|join(',') -%}
 
         {% set bucket = 's3://' ~ uri ~ '/' %}
         {% set full_path = bucket  ~ pattern %}
@@ -115,7 +115,7 @@ copy  {{ this }}
             DROP TABLE IF EXISTS `{{ tmp_table }}`;
         {% endset %}
         {% set create_tmp_table %}
-            CREATE EXTERNAL TABLE `{{ tmp_table }}` ( {{ ddl_cols }} )
+            CREATE EXTERNAL TABLE `{{ tmp_table }}` ( {{ col_ddl }} )
             ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
             STORED AS TEXTFILE
             LOCATION '{{ bucket }}'
