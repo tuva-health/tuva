@@ -9,7 +9,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: data_quality_for_pbi
+    alias: testing_summary
     tags:
       - data_quality
 
@@ -3226,7 +3226,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: claim_type_summary
+    alias: claim_drg_code_type
     tags:
       - data_quality
     materialized: table
