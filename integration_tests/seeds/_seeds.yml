@@ -482,9 +482,12 @@ seeds:
         days_supply: integer
         refills: integer
         paid_date: date
-        paid_amount: float
-        allowed_amount: float
-        charge_amount: float
+        paid_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        allowed_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        charge_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
         in_network_flag: integer
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
