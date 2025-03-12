@@ -20,6 +20,14 @@ models:
     alias: testing_summary
     tags:
       - data_quality
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        combination_of_columns:
+          - DATA_QUALITY_CATEGORY
+          - GRAPH_NAME
+          - LEVEL_OF_DETAIL
+          - Y_AXIS
+          - X_AXIS
 
 - name: data_quality__data_quality_detail
   config:
