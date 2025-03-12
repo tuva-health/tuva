@@ -12,6 +12,14 @@ models:
     alias: testing_summary
     tags:
       - data_quality
+- name: data_quality__exploratory_charts
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: testing_summary
+    tags:
+      - data_quality
 
 - name: data_quality__data_quality_detail
   config:
