@@ -11,17 +11,17 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-      tests:
-        - dbt_expectations.expect_table_row_count_to_be_between:
-            tags: ['tuva_dqi_sev_3', 'dqi','dqi_service_categories', 'dqi_usability']
-            description: "This is a check in one of the final downstream marts to see if 
-                         service_category__service_category_grouper is populated. If this is flagging, 
-                         please check other areas further upstream on the input layer."
-            min_value: 1
-            strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
-            config:
-              severity: warn
-              enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+          tags: ['tuva_dqi_sev_3', 'dqi','dqi_service_categories', 'dqi_usability']
+          description: "This is a check in one of the final downstream marts to see if 
+                       service_category__service_category_grouper is populated. If this is flagging, 
+                       please check other areas further upstream on the input layer."
+          min_value: 1
+          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
