@@ -8,10 +8,6 @@
     {%- if custom_schema_name is not none -%}
         {{ custom_schema_name | trim }}
     {%- else -%}
-        {%- if default.startswith('_') and target.type == 'athena' -%}
-            {{ default_schema[1:] | trim }}
-        {%- else -%}
             {{ default_schema }}
-        {%- endif -%}
     {%- endif -%}
 {%- endmacro %}
