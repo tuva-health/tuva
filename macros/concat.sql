@@ -1,8 +1,7 @@
 {#
-    Override default concat to first cast all fields to varchar
+    Override athena__concat to cast all fields to varchar before concatenating
 #}
 {% macro concat(fields) -%}
-
     {{ return(adapter.dispatch('concat')(fields)) }}
 {%- endmacro %}
 
