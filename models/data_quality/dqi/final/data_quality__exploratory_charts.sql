@@ -7,7 +7,7 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
          , 'month'                                  AS level_of_detail
          , 'claim_end_date'                         AS y_axis_description
          , 'paid_date'                              AS x_axis_description
-         , 'year'                                   AS filter_description
+         , 'paid_year'                                   AS filter_description
          , 'total_paid_amount'                      AS sum_description
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilmc.claim_end_date, MONTH)   AS y_axis
@@ -72,7 +72,7 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
          , 'month'                                  AS level_of_detail
          , 'claim_end_date'                         AS y_axis_description
          , 'paid_date'                              AS x_axis_description
-         , 'year'                                   AS filter_description
+         , 'paid_year'                                   AS filter_description
          , 'unique_number_of_claims'                AS sum_description
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilmc.claim_end_date, MONTH)   AS y_axis
@@ -136,7 +136,7 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
          , 'month'                                  AS level_of_detail
          , 'N/A'                                    AS y_axis_description
          , 'claim_end_date'                         AS x_axis_description
-         , 'N/A'                                    AS filter_description
+         , 'paid_year'                                    AS filter_description
          , 'total_paid_amount'                      AS sum_description
          {% if target.type == 'bigquery' %}
          , CAST(NULL AS DATE)                       AS y_axis
@@ -236,7 +236,7 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
          , 'month'                                  AS level_of_detail
          , 'N/A'                                    AS y_axis_description
          , 'claim_end_date'                         AS x_axis_description
-         , 'N/A'                                    AS filter_description
+         , 'paid_year'                              AS filter_description
          , 'count_distinct_claim_id'                AS sum_description
          , CAST(NULL AS DATE)                       AS y_axis
          {% if target.type == 'bigquery' %}
@@ -413,7 +413,7 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
          , 'month'                                          AS level_of_detail
          , 'dispensing_date'                                AS y_axis_description
          , 'paid_date'                                      AS x_axis_description
-         , 'year'                                           AS filter_description
+         , 'paid_year'                                      AS filter_description
          , 'unique_number_of_claims'                        AS sum_description
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilpc.dispensing_date, MONTH)          AS y_axis
@@ -475,10 +475,10 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
     SELECT 'reasonableness'                          AS data_quality_category
          , 'pharmacy_claim_paid_over_time_monthly'   AS graph_name
          , 'month'                                   AS level_of_detail
-         , 'total_paid'                              AS y_axis_description
+         , 'N/A'                                     AS y_axis_description
          , 'dispensing_date'                         AS x_axis_description
-         , 'N/A'                                     AS filter_description
-         , 'n/a'                                     AS sum_description
+         , 'paid_year'                               AS filter_description
+         , 'paid_amount'                             AS sum_description
          , CAST(NULL AS DATE)                        AS y_axis
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilpc.dispensing_date, MONTH)   AS x_axis
@@ -572,7 +572,7 @@ WITH medical_paid_amount_vs_end_date_matrix AS (
          , 'month'                                   AS level_of_detail
          , 'N/A'                                     AS y_axis_description
          , 'dispensing_date'                         AS x_axis_description
-         , 'N/A'                                     AS filter_description
+         , 'paid_year'                               AS filter_description
          , 'count_distinct_claim_id'                 AS sum_description
          , CAST(NULL AS DATE)                        AS y_axis
          {% if target.type == 'bigquery' %}
