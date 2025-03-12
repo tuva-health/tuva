@@ -105,9 +105,17 @@ SELECT
         WHEN dt.short_name = 'expect_column_values_to_match_regex_list' THEN 'validity'
         WHEN dt.short_name = 'expect_column_values_to_be_in_type_list' THEN 'validity'
         WHEN dt.short_name = 'accepted_values' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_values_to_match_regex' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_value_lengths_to_be_between' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_unique_value_count_to_be_between' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_value_lengths_to_equal' THEN 'validity'
+        WHEN dt.short_name = 'expect_column_values_to_be_between' THEN 'validity'
 
         -- Consistency tests
         WHEN dt.short_name = 'unique' THEN 'consistency'
+        WHEN dt.short_name = 'expect_column_pair_values_A_to_be_greater_than_B' THEN 'consistency'
+        WHEN dt.short_name = 'expect_table_row_count_to_be_between' THEN 'consistency'
+        WHEN dt.short_name = 'unique_combination_of_columns' THEN 'consistency'
 
         -- Default for unmapped tests
         ELSE 'other'
