@@ -92,6 +92,9 @@ SELECT
 
     -- Map test names to categories
     CASE
+
+        WHEN dt.tags LIKE '%"dqi_usability"%' THEN 'usability'
+
         -- Completeness tests
         WHEN dt.short_name = 'expect_column_to_exist' THEN 'completeness'
         WHEN dt.short_name = 'not_null' THEN 'completeness'
