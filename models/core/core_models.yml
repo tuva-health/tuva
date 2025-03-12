@@ -159,6 +159,27 @@ models:
       - core
       - encounters
       materialized: table
+      tests:
+        - dbt_expectations.expect_table_row_count_to_be_between:
+            tags: ['tuva_dqi_sev_3', 'dqi','dqi_service_categories', 'dqi_usability']
+            description: "This is a check in one of the final downstream marts to see if Acute IP visits are populated.
+                        If this is flagging, please check other areas further upstream on the input layer."
+            min_value: 1
+            row_condition: "encounter_type = 'acute inpatient'" # (Optional)
+            strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+            config:
+              severity: warn
+              enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+        - dbt_expectations.expect_table_row_count_to_be_between:
+            tags: ['tuva_dqi_sev_3', 'dqi','dqi_service_categories', 'dqi_usability']
+            description: "This is a check in one of the final downstream marts to see if ED visits are populated.
+                        If this is flagging, please check other areas further upstream on the input layer."
+            min_value: 1
+            row_condition: "encounter_type = 'emergency department'" # (Optional)
+            strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+            config:
+              severity: warn
+              enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
     columns:
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
