@@ -12,7 +12,7 @@ select distinct
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} m
 inner join {{ ref('service_category__stg_outpatient_institutional') }} i on m.claim_id = i.claim_id
-where substring(m.bill_type_code, 1, 2) in ('52')
+where m.revenue_center_code in ('0513', '0905')
 
 union all
 
@@ -35,5 +35,3 @@ select distinct claim_id
 ,source_model_name
 ,tuva_last_run
 from multiple_sources
-
-  
