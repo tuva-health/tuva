@@ -94,7 +94,7 @@ models:
     description: '{{ doc("birth_date") }}'
     tests:
       - dbt_expectations.expect_column_values_to_be_between:
-          description: "This is a test on all dates to see if they are within a reasonable range. "
+#          description: "This is a test on all dates to see if they are within a reasonable range. "
           tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
           min_value: "'1900-01-02'"
           max_value: "'2050-01-02'"
@@ -132,7 +132,7 @@ models:
     description: '{{ doc("death_date") }}'
     tests:
       - dbt_expectations.expect_column_values_to_be_between:
-          description: "This is a test on all dates to see if they are within a reasonable range. "
+#          description: "This is a test on all dates to see if they are within a reasonable range. "
           tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs']
           min_value: "'1900-01-02'"
           max_value: "'2050-01-02'"
@@ -168,7 +168,7 @@ models:
     description: '{{ doc("enrollment_start_date") }}'
     tests:
       - dbt_expectations.expect_column_values_to_be_between:
-          description: "This is a test on all dates to see if they are within a reasonable range. "
+#          description: "This is a test on all dates to see if they are within a reasonable range. "
           tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
           min_value: "'1900-01-02'"
           max_value: "'2050-01-02'"
@@ -191,7 +191,7 @@ models:
     description: '{{ doc("enrollment_end_date") }}'
     tests:
       - dbt_expectations.expect_column_values_to_be_between:
-          description: "This is a test on all dates to see if they are within a reasonable range. "
+#          description: "This is a test on all dates to see if they are within a reasonable range. "
           tags: ['tuva_dqi_sev_3', 'dqi','dqi_cms_hccs','dqi_financial_pmpm']
           min_value: "'1900-01-02'"
           max_value: "'2050-01-02'"
