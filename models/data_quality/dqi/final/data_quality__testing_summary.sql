@@ -14,49 +14,6 @@ WITH latest_test_invocation AS (
         WHERE command = 'test'
     ) ranked_invocations
     WHERE row_num = 1
-),
-
--- Get the test result rows limited to 3 per test result
-limited_test_result_rows AS (
-    SELECT
-        elementary_test_results_id,
-        result_row
-    FROM (
-        SELECT
-            elementary_test_results_id,
-            result_row,
-            ROW_NUMBER() OVER (PARTITION BY elementary_test_results_id ORDER BY result_row) AS row_num
-        FROM {{ ref('test_result_rows') }}
-    ) ranked_rows
-    WHERE row_num <= 3
-),
-
--- Aggregate the limited rows into a string per test result
-aggregated_result_rows AS (
-    SELECT
-        elementary_test_results_id,
-        {% if target.type == 'snowflake' %}
-            listagg(result_row, ', ') AS aggregated_result_rows
-        {% elif target.type == 'bigquery' %}
-            string_agg(result_row, ', ') AS aggregated_result_rows
-        {% elif target.type == 'redshift' %}
-            listagg(result_row, ', ') AS aggregated_result_rows
-        {% elif target.type == 'fabric' %}
-            string_agg(result_row, ', ') AS aggregated_result_rows
-        {% elif target.type == 'databricks' %}
-            concat_ws(', ', collect_list(result_row)) AS aggregated_result_rows
-        {% elif target.type == 'postgres' %}
-            string_agg(result_row, ', ') AS aggregated_result_rows
-        {% elif target.type == 'athena' %}
-            array_join(array_agg(result_row), ', ') AS aggregated_result_rows
-        {% elif target.type == 'duckdb' %}
-            string_agg(result_row, ', ') AS aggregated_result_rows
-        {% else %}
-            -- Default fallback
-            string_agg(result_row, ', ') AS aggregated_result_rows
-        {% endif %}
-    FROM limited_test_result_rows
-    GROUP BY elementary_test_results_id
 )
 
 SELECT
@@ -88,7 +45,6 @@ SELECT
     etr.status,
     etr.failures,
     etr.failed_row_count,
-    arr.aggregated_result_rows AS result_rows,
 
     -- Map test names to categories
     CASE
@@ -145,7 +101,5 @@ SELECT
 FROM {{ ref('dbt_tests') }} AS dt
 LEFT JOIN {{ ref('elementary_test_results') }} AS etr
     ON dt.unique_id = etr.test_unique_id
-INNER JOIN latest_test_invocation lti
+INNER JOIN latest_test_invocation AS lti
     ON etr.invocation_id = lti.invocation_id
-LEFT JOIN aggregated_result_rows arr
-    ON arr.elementary_test_results_id = etr.id
