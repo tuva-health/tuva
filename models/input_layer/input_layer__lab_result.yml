@@ -22,8 +22,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - unique:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
@@ -47,8 +46,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
@@ -61,8 +59,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: encounter_id
         description: '{{ doc("encounter_id") }}'
         tests:
@@ -70,8 +67,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: accession_number
         description: '{{ doc("accession_number") }}'
         tests:
@@ -79,8 +75,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_code_type
         description: '{{ doc("source_code_type") }}'
         tests:
@@ -88,8 +83,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
               values: ['loinc', 'snomed-ct', 'dqi_quality_measures']
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
@@ -102,8 +96,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_description
         description: '{{ doc("source_description") }}'
         tests:
@@ -111,8 +104,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_component
         description: '{{ doc("source_component") }}'
         tests:
@@ -120,8 +112,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_code_type
         description: '{{ doc("normalized_code_type") }}'
         tests:
@@ -129,8 +120,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_code
         description: '{{ doc("normalized_code") }}'
         tests:
@@ -138,8 +128,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_description
         description: '{{ doc("normalized_description") }}'
         tests:
@@ -147,8 +136,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_component
         description: '{{ doc("normalized_component") }}'
         tests:
@@ -156,8 +144,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: status
         description: '{{ doc("status") }}'
         tests:
@@ -165,8 +152,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: result
         description: '{{ doc("result") }}'
         tests:
@@ -174,8 +160,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: result_date
         description: '{{ doc("result_date") }}'
         tests:
@@ -183,15 +168,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: collection_date
         description: '{{ doc("collection_date") }}'
         tests:
@@ -199,15 +182,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_units
         description: '{{ doc("source_units") }}'
         tests:
@@ -215,8 +196,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_units
         description: '{{ doc("normalized_units") }}'
         tests:
@@ -224,8 +204,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_reference_range_low
         description: '{{ doc("source_reference_range_low") }}'
         tests:
@@ -233,8 +212,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_reference_range_high
         description: '{{ doc("source_reference_range_high") }}'
         tests:
@@ -242,8 +220,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_reference_range_low
         description: '{{ doc("normalized_reference_range_low") }}'
         tests:
@@ -251,8 +228,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_reference_range_high
         description: '{{ doc("normalized_reference_range_high") }}'
         tests:
@@ -260,8 +236,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: source_abnormal_flag
         description: '{{ doc("source_abnormal_flag") }}'
         tests:
@@ -269,8 +244,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: normalized_abnormal_flag
         description: '{{ doc("normalized_abnormal_flag") }}'
         tests:
@@ -278,8 +252,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: specimen
         description: '{{ doc("specimen") }}'
         tests:
@@ -287,8 +260,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: ordering_practitioner_id
         description: '{{ doc("ordering_practitioner_id") }}'
         tests:
@@ -296,8 +268,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
@@ -305,8 +276,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:
@@ -314,8 +284,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: ingest_datetime
         description: '{{ doc("ingest_datetime") }}'
         tests:
@@ -323,8 +292,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, time, timestamp, timestamp_ntz, timestampntz,
                 timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
@@ -332,5 +300,4 @@ models:
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

@@ -48,8 +48,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
@@ -68,8 +67,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
@@ -93,8 +91,7 @@ models:
               strictly: false
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: 'A claim cannot be both professional and institutional
                     within the same claim id.'
@@ -102,8 +99,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               config:
@@ -128,8 +124,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: 'A claim should not belong to two different
                     people.'
@@ -138,8 +133,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
                 'dqi_readmission']
@@ -153,8 +147,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer
         description: '{{ doc("payer") }}'
         tests:
@@ -162,8 +155,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: plan
         description: '{{ doc("plan") }}'
         tests:
@@ -171,8 +163,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: claim_start_date
         description: '{{ doc("claim_start_date") }}'
         tests:
@@ -187,8 +178,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: 'A claim should not have multiple start dates
                     within the same claim id.'
@@ -198,8 +188,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
 # description: This is a test on all dates to see if they are within a reasonable range. 
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
@@ -210,8 +199,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
@@ -222,8 +210,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
@@ -245,8 +232,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: 'A claim should not have multiple end dates
                     within the same claim id.'
@@ -263,8 +249,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
 # description: This is a test on all dates to see if they are within a reasonable range. 
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
@@ -275,8 +260,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
@@ -287,8 +271,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: claim_line_start_date
         description: '{{ doc("claim_line_start_date") }}'
         tests:
@@ -296,8 +279,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
 # description: This is a test on all dates to see if they are within a reasonable range. 
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
@@ -306,8 +288,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
@@ -316,8 +297,7 @@ models:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: claim_line_end_date
         description: '{{ doc("claim_line_end_date") }}'
         tests:
@@ -325,15 +305,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: admission_date
         description: '{{ doc("admission_date") }}'
         tests:
@@ -341,8 +319,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_tuva_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
 # description: This is a test on all dates to see if they are within a reasonable range. 
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_tuva_chronic_conditions']
@@ -351,8 +328,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
@@ -361,8 +337,7 @@ models:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_tuva_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: discharge_date
         description: '{{ doc("discharge_date") }}'
         tests:
@@ -370,8 +345,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_tuva_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
 # description: This is a test on all dates to see if they are within a reasonable range. 
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_tuva_chronic_conditions']
@@ -380,8 +354,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
@@ -390,8 +363,7 @@ models:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_tuva_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
         tests:
@@ -399,15 +371,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               value: 1
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
         tests:
@@ -415,23 +385,20 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               value: 1
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
 # description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               regex: "^[0-59]$"
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
       - name: discharge_disposition_code
@@ -441,8 +408,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__discharge_disposition')
               field: discharge_disposition_code
@@ -467,23 +433,20 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               value: 2
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
 # description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               regex: "^[0-9]{2}$"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs"
       - name: bill_type_code
@@ -498,8 +461,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: 'A claim should not have multiple bill type
                     codes within the same claim id.'
@@ -507,24 +469,21 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_be_between:
               min_value: 3
               max_value: 4
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
 # description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
               regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "3 digits, 2 numbers followed by letter. If
                     4, leading 0."
@@ -536,8 +495,7 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
               values: ['ms-drg', 'apr-drg']
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_financial_pmpm',
@@ -553,16 +511,14 @@ models:
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               value: 3
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_financial_pmpm',
                 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: revenue_center_code
         description: '{{ doc("revenue_center_code") }}'
         tests:
@@ -586,8 +542,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "For institutional claims, should be some
                     distinct count of different revenue codes"
@@ -595,23 +550,20 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_be_between:
               min_value: 3
               max_value: 4
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: "^(\\\\d{3}|0\\\\d{3})$"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: service_unit_quantity
         description: '{{ doc("service_unit_quantity") }}'
         tests:
@@ -619,8 +571,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: hcpcs_code
         description: '{{ doc("hcpcs_code") }}'
         tests:
@@ -629,10 +580,9 @@ models:
                 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-# description: Procedure code should not be null on profressional claims. 
+# description: Procedure code should not be null on professional claims.
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_financial_pmpm',
                 'dqi_quality_measures']
               config:
@@ -640,7 +590,7 @@ models:
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
                 where: claim_type = 'professional'
                 meta:
-                  dqi_test_description: "Procedure code should not be null on profressional
+                  dqi_test_description: "Procedure code should not be null on professional
                     claims. "
       - name: hcpcs_modifier_1
         description: '{{ doc("hcpcs_modifier_1") }}'
@@ -649,8 +599,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: hcpcs_modifier_2
         description: '{{ doc("hcpcs_modifier_2") }}'
         tests:
@@ -658,8 +607,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: hcpcs_modifier_3
         description: '{{ doc("hcpcs_modifier_3") }}'
         tests:
@@ -667,8 +615,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: hcpcs_modifier_4
         description: '{{ doc("hcpcs_modifier_4") }}'
         tests:
@@ -676,8 +623,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: hcpcs_modifier_5
         description: '{{ doc("hcpcs_modifier_5") }}'
         tests:
@@ -685,8 +631,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: rendering_npi
         description: >
           Rendering NPI for the claim (typically represents the physician or  entity
@@ -696,21 +641,18 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               tags: ['tuva_dqi_sev_2', 'dqi']
               value: 10
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: "^[0-9]{10}$"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: rendering_tin
         description: '{{ doc("rendering_tin") }}'
         tests:
@@ -718,8 +660,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: billing_npi
         description: >
           Billing NPI for the claim (typically represents organization billing  the
@@ -729,21 +670,18 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               tags: ['tuva_dqi_sev_2', 'dqi']
               value: 10
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: "^[0-9]{10}$"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: billing_tin
         description: '{{ doc("billing_tin") }}'
         tests:
@@ -751,8 +689,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: facility_npi
         description: >
           Facility NPI for the claim (typically represents the facility where  services
@@ -762,21 +699,18 @@ models:
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_value_lengths_to_equal:
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_readmission']
               value: 10
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: "^[0-9]{10}$"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: paid_date
         description: '{{ doc("paid_date") }}'
         tests:
@@ -784,15 +718,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: paid_amount
         description: '{{ doc("paid_amount") }}'
         tests:
@@ -800,16 +732,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_ed_classification', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ed_classification', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: allowed_amount
         description: '{{ doc("allowed_amount") }}'
         tests:
@@ -817,16 +747,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_ed_classification', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ed_classification', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: charge_amount
         description: '{{ doc("charge_amount") }}'
         tests:
@@ -834,16 +762,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_ed_classification']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ed_classification']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: coinsurance_amount
         description: '{{ doc("coinsurance_amount") }}'
         tests:
@@ -851,16 +777,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: copayment_amount
         description: '{{ doc("copayment_amount") }}'
         tests:
@@ -868,16 +792,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: deductible_amount
         description: '{{ doc("deductible_amount") }}'
         tests:
@@ -885,16 +807,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: total_cost_amount
         description: '{{ doc("total_cost_amount") }}'
         tests:
@@ -902,16 +822,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_type
         description: '{{ doc("diagnosis_code_type") }}'
         tests:
@@ -920,8 +838,7 @@ models:
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
               values: ['icd-10-cm', 'icd-9-cm']
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
@@ -937,8 +854,7 @@ models:
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_readmission']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_readmission']
@@ -950,8 +866,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_2
         description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -960,8 +875,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -973,8 +887,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_3
         description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -983,8 +896,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -996,8 +908,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_4
         description: 4th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1006,8 +917,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1019,8 +929,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_5
         description: 5th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1029,8 +938,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1042,8 +950,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_6
         description: 6th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1052,8 +959,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1065,8 +971,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_7
         description: 7th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1075,8 +980,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1088,8 +992,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_8
         description: 8th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1098,8 +1001,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1111,8 +1013,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_9
         description: 9th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1121,8 +1022,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1134,8 +1034,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_10
         description: 10th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1144,8 +1043,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1157,8 +1055,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_11
         description: 11th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1167,8 +1064,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1180,8 +1076,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_12
         description: 12th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1190,8 +1085,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1203,8 +1097,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_13
         description: 13th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1213,8 +1106,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1226,8 +1118,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_14
         description: 14th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1236,8 +1127,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1249,8 +1139,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_15
         description: 15th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1259,8 +1148,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1272,8 +1160,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_16
         description: 16th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1282,8 +1169,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1295,8 +1181,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_17
         description: 17th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1305,8 +1190,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1318,8 +1202,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_18
         description: 18th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1328,8 +1211,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1341,8 +1223,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_19
         description: 19th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1351,8 +1232,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1364,8 +1244,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_20
         description: 20th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1374,8 +1253,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1387,8 +1265,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_21
         description: 21st ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1397,8 +1274,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1410,8 +1286,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_22
         description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1420,8 +1295,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1433,8 +1307,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_23
         description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1443,8 +1316,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1456,8 +1328,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_24
         description: 24th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1466,8 +1337,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1479,8 +1349,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_code_25
         description: 25th ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -1489,8 +1358,7 @@ models:
                 'dqi_cms_hccs']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
@@ -1502,8 +1370,7 @@ models:
               row_condition: "diagnosis_code_1 is not null"
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_1
         description: >
           Present on admission code for the 1st diagnosis on the claim.
@@ -1512,16 +1379,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_2
         description: >
           Present on admission code for the 2nd diagnosis on the claim.
@@ -1530,16 +1395,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_3
         description: >
           Present on admission code for the 3rd diagnosis on the claim.
@@ -1548,16 +1411,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_4
         description: >
           Present on admission code for the 4th diagnosis on the claim.
@@ -1566,16 +1427,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_5
         description: >
           Present on admission code for the 5th diagnosis on the claim.
@@ -1584,16 +1443,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_6
         description: >
           Present on admission code for the 6th diagnosis on the claim.
@@ -1602,16 +1459,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_7
         description: >
           Present on admission code for the 7th diagnosis on the claim.
@@ -1620,16 +1475,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_8
         description: >
           Present on admission code for the 8th diagnosis on the claim.
@@ -1638,16 +1491,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_9
         description: >
           Present on admission code for the 9th diagnosis on the claim.
@@ -1656,16 +1507,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_10
         description: >
           Present on admission code for the 10th diagnosis on the claim.
@@ -1674,16 +1523,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_11
         description: >
           Present on admission code for the 11th diagnosis on the claim.
@@ -1692,16 +1539,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_12
         description: >
           Present on admission code for the 12th diagnosis on the claim.
@@ -1710,16 +1555,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_13
         description: >
           Present on admission code for the 13th diagnosis on the claim.
@@ -1728,16 +1571,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_14
         description: >
           Present on admission code for the 14th diagnosis on the claim.
@@ -1746,16 +1587,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_15
         description: >
           Present on admission code for the 15th diagnosis on the claim.
@@ -1764,16 +1603,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_16
         description: >
           Present on admission code for the 16th diagnosis on the claim.
@@ -1782,16 +1619,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_17
         description: >
           Present on admission code for the 17th diagnosis on the claim.
@@ -1800,16 +1635,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_18
         description: >
           Present on admission code for the 18th diagnosis on the claim.
@@ -1818,16 +1651,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_19
         description: >
           Present on admission code for the 19th diagnosis on the claim.
@@ -1836,16 +1667,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_20
         description: >
           Present on admission code for the 20th diagnosis on the claim.
@@ -1854,16 +1683,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_21
         description: >
           Present on admission code for the 21st diagnosis on the claim.
@@ -1872,16 +1699,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_22
         description: >
           Present on admission code for the 22nd diagnosis on the claim.
@@ -1890,16 +1715,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_23
         description: >
           Present on admission code for the 23rd diagnosis on the claim.
@@ -1908,16 +1731,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_24
         description: >
           Present on admission code for the 24th diagnosis on the claim.
@@ -1926,16 +1747,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: diagnosis_poa_25
         description: >
           Present on admission code for the 25th diagnosis on the claim.
@@ -1944,16 +1763,14 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - relationships:
               to: ref('terminology__present_on_admission')
               field: present_on_admit_code
               tags: ['tuva_dqi_sev_3', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_type
         description: Indicates the type of procedure code (e.g. ICD-10-PCS).
         tests:
@@ -1961,8 +1778,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
               values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
               tags: ['tuva_dqi_sev_2', 'dqi']
@@ -1976,8 +1792,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_2
         description: 2nd ICD (9 or 10) procedure code on the claim.
         tests:
@@ -1985,8 +1800,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_3
         description: 3rd ICD (9 or 10) procedure code on the claim.
         tests:
@@ -1994,8 +1808,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_4
         description: 4th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2003,8 +1816,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_5
         description: 5th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2012,8 +1824,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_6
         description: 6th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2021,8 +1832,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_7
         description: 7th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2030,8 +1840,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_8
         description: 8th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2039,8 +1848,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_9
         description: 9th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2048,8 +1856,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_10
         description: 10th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2057,8 +1864,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_11
         description: 11th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2066,8 +1872,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_12
         description: 12th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2075,8 +1880,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_13
         description: 13th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2084,8 +1888,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_14
         description: 14th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2093,8 +1896,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_15
         description: 15th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2102,8 +1904,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_16
         description: 16th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2111,8 +1912,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_17
         description: 17th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2120,8 +1920,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_18
         description: 18th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2129,8 +1928,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_19
         description: 19th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2138,8 +1936,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_20
         description: 20th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2147,8 +1944,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_21
         description: 21st ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2156,8 +1952,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_22
         description: 22nd ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2165,8 +1960,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_23
         description: 23rd ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2174,8 +1968,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_24
         description: 24th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2183,8 +1976,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_code_25
         description: 25th ICD (9 or 10) procedure code on the claim.
         tests:
@@ -2192,8 +1984,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_1
         description: Date of the 1st procedure on the claim.
         tests:
@@ -2201,15 +1992,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_2
         description: Date of the 2nd procedure on the claim.
         tests:
@@ -2217,15 +2006,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_3
         description: Date of the 3rd procedure on the claim.
         tests:
@@ -2233,15 +2020,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_4
         description: Date of the 4th procedure on the claim.
         tests:
@@ -2249,15 +2034,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_5
         description: Date of the 5th procedure on the claim.
         tests:
@@ -2265,15 +2048,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_6
         description: Date of the 6th procedure on the claim.
         tests:
@@ -2281,15 +2062,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_7
         description: Date of the 7th procedure on the claim.
         tests:
@@ -2297,15 +2076,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_8
         description: Date of the 8th procedure on the claim.
         tests:
@@ -2313,15 +2090,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_9
         description: Date of the 9th procedure on the claim.
         tests:
@@ -2329,15 +2104,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_10
         description: Date of the 10th procedure on the claim.
         tests:
@@ -2345,15 +2118,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_11
         description: Date of the 11th procedure on the claim.
         tests:
@@ -2361,15 +2132,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_12
         description: Date of the 12th procedure on the claim.
         tests:
@@ -2377,15 +2146,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_13
         description: Date of the 13th procedure on the claim.
         tests:
@@ -2393,15 +2160,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_14
         description: Date of the 14th procedure on the claim.
         tests:
@@ -2409,15 +2174,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_15
         description: Date of the 15th procedure on the claim.
         tests:
@@ -2425,15 +2188,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_16
         description: Date of the 16th procedure on the claim.
         tests:
@@ -2441,15 +2202,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_17
         description: Date of the 17th procedure on the claim.
         tests:
@@ -2457,15 +2216,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_18
         description: Date of the 18th procedure on the claim.
         tests:
@@ -2473,15 +2230,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_19
         description: Date of the 19th procedure on the claim.
         tests:
@@ -2489,15 +2244,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_20
         description: Date of the 20th procedure on the claim.
         tests:
@@ -2505,15 +2258,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_21
         description: Date of the 21st procedure on the claim.
         tests:
@@ -2521,15 +2272,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_22
         description: Date of the 22nd procedure on the claim.
         tests:
@@ -2537,15 +2286,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_23
         description: Date of the 23rd procedure on the claim.
         tests:
@@ -2553,15 +2300,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_24
         description: Date of the 24th procedure on the claim.
         tests:
@@ -2569,15 +2314,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date_25
         description: Date of the 25th procedure on the claim.
         tests:
@@ -2585,15 +2328,13 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: in_network_flag
         description: '{{ doc("in_network_flag") }}'
         tests:
@@ -2601,8 +2342,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
@@ -2610,8 +2350,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:
@@ -2619,8 +2358,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: file_date
         description: ''
         tests:
@@ -2628,8 +2366,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: ingest_datetime
         description: '{{ doc("ingest_datetime") }}'
         tests:
@@ -2637,8 +2374,7 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, time, timestamp, timestamp_ntz, timestampntz,
                 timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
@@ -2646,5 +2382,4 @@ models:
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
-                  true)) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

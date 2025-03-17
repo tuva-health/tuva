@@ -1,4 +1,13 @@
-{{ config(materialized='table', enabled = var('enable_input_layer_testing', true) ) }}
+{{ config(
+    materialized='table',
+    enabled = (
+        var('enable_input_layer_testing', true) | as_bool
+    )
+    and
+    (
+        var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool
+    )
+) }}
 
 WITH medical_paid_amount_vs_end_date_matrix AS (
 

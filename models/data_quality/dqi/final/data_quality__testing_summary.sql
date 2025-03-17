@@ -1,5 +1,5 @@
 /* TO POPULATE RECORDS IN THIS TABLE, MAKE SURE TO RUN "dbt test" command after a full run and seed is completed*/
-{{ config(materialized='view', enabled = var('enable_input_layer_testing', true) ) }}
+{{ config(materialized='view', enabled = ((target.type != 'fabric') and var('enable_input_layer_testing', true)) ) }}
 
 WITH latest_test_invocation AS (
     SELECT
