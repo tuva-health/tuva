@@ -14,6 +14,7 @@ WITH combined_professional_services AS (
       ref('service_category__inpatient_hospice_professional'),
       ref('service_category__inpatient_psychiatric_professional'),
       ref('service_category__inpatient_rehab_professional'),
+      ref('service_category__inpatient_substance_use_professional'),
       ref('service_category__lab_professional'),
       ref('service_category__office_based_other_professional'),
       ref('service_category__office_based_physical_therapy_professional'),
