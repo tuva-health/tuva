@@ -19,7 +19,8 @@ models:
             - year_month
             - "{{ quote_column('plan') }}"
     description: >
-      Computes all the paid and allowed statistics for every person_id and year_month combination.
+      Computes all the paid and allowed statistics for every person_id and year_month
+      combination.
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
@@ -31,8 +32,8 @@ models:
         description: Name of the plan (i.e. sub contract) providing coverage.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g. typically  named
+          after the payer and state "BCBS Tennessee").
       - name: payer_attributed_provider
         description: >
           Unique identifier for the provider assigned to this patient-year_month
@@ -59,7 +60,8 @@ models:
           Name of the organization for the attributed provider assigned by the user.
       - name: custom_attributed_provider_lob
         description: >
-          Name of the line of business for the attributed provider assigned by the user
+          Name of the line of business for the attributed provider assigned by the
+          user
           (e.g. medicare, medicaid, commercial).
       - name: inpatient_paid
         description: Total inpatient paid amount per member per month (PMPM).
@@ -82,7 +84,8 @@ models:
       - name: dialysis_paid
         description: Total dialysis paid amount per member per month (PMPM).
       - name: durable_medical_equipment_paid
-        description: Total durable medical equipment paid amount per member per month (PMPM).
+        description: Total durable medical equipment paid amount per member per month
+          (PMPM).
       - name: emergency_department_paid
         description: Total emergency department paid amount per member per month (PMPM).
       - name: home_health_paid
@@ -90,19 +93,24 @@ models:
       - name: hospice_paid
         description: Total hospice paid amount per member per month (PMPM).
       - name: inpatient_psychiatric_paid
-        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+        description: Total inpatient psychiatric paid amount per member per month
+          (PMPM).
       - name: inpatient_rehabilitation_paid
-        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+        description: Total inpatient rehabilitation paid amount per member per month
+          (PMPM).
       - name: lab_paid
         description: Total lab paid amount per member per month (PMPM).
       - name: office_visit_paid_2
         description: Total office visit paid amount per member per month (PMPM).
       - name: outpatient_hospital_or_clinic_paid
-        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+        description: Total outpatient hospital or clinic paid amount per member per
+          month (PMPM).
       - name: outpatient_psychiatric_paid
-        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+        description: Total outpatient psychiatric paid amount per member per month
+          (PMPM).
       - name: outpatient_rehabilitation_paid
-        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+        description: Total outpatient rehabilitation paid amount per member per month
+          (PMPM).
       - name: skilled_nursing_paid
         description: Total skilled nursing paid amount per member per month (PMPM).
       - name: urgent_care_paid
@@ -124,31 +132,39 @@ models:
       - name: ambulance_allowed
         description: Total ambulance allowed amount per member per month (PMPM).
       - name: ambulatory_surgery_allowed
-        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+        description: Total ambulatory surgery allowed amount per member per month
+          (PMPM).
       - name: dialysis_allowed
         description: Total dialysis allowed amount per member per month (PMPM).
       - name: durable_medical_equipment_allowed
-        description: Total durable medical equipment allowed amount per member per month (PMPM).
+        description: Total durable medical equipment allowed amount per member per
+          month (PMPM).
       - name: emergency_department_allowed
-        description: Total emergency department allowed amount per member per month (PMPM).
+        description: Total emergency department allowed amount per member per month
+          (PMPM).
       - name: home_health_allowed
         description: Total home health allowed amount per member per month (PMPM).
       - name: hospice_allowed
         description: Total hospice allowed amount per member per month (PMPM).
       - name: inpatient_psychiatric_allowed
-        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+        description: Total inpatient psychiatric allowed amount per member per month
+          (PMPM).
       - name: inpatient_rehabilitation_allowed
-        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Total inpatient rehabilitation allowed amount per member per
+          month (PMPM).
       - name: lab_allowed
         description: Total lab allowed amount per member per month (PMPM).
       - name: office_visit_allowed_2
         description: Total office visit allowed amount per member per month (PMPM).
       - name: outpatient_hospital_or_clinic_allowed
-        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+        description: Total outpatient hospital or clinic allowed amount per member
+          per month (PMPM).
       - name: outpatient_psychiatric_allowed
-        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+        description: Total outpatient psychiatric allowed amount per member per month
+          (PMPM).
       - name: outpatient_rehabilitation_allowed
-        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Total outpatient rehabilitation allowed amount per member per
+          month (PMPM).
       - name: skilled_nursing_allowed
         description: Total skilled nursing allowed amount per member per month (PMPM).
       - name: urgent_care_allowed
@@ -163,9 +179,9 @@ models:
         description: Total medical allowed amount per member per month (PMPM).
       - name: tuva_last_run
         description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+          The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time`
+          as the local time of the `dbt run`  environment.  Timezone is configurable
+          via the `tuva_last_run` var.
 
   - name: financial_pmpm__pmpm_payer_plan
     config:
@@ -177,7 +193,8 @@ models:
         - financial_pmpm
       materialized: table
     description: >
-      Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
+      Computes per member per month statistics for every service category by aggregating
+      across patients from pmpm_prep.
       This version of the table computes at the payer and plan grain.
     columns:
       - name: year_month
@@ -188,8 +205,8 @@ models:
         description: Name of the plan (i.e. sub contract) providing coverage.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g. typically  named
+          after the payer and state "BCBS Tennessee").
       - name: member_months
         description: The sum of member months.
       - name: total_paid
@@ -217,7 +234,8 @@ models:
       - name: dialysis_paid
         description: Total dialysis paid amount per member per month (PMPM).
       - name: durable_medical_equipment_paid
-        description: Total durable medical equipment paid amount per member per month (PMPM).
+        description: Total durable medical equipment paid amount per member per month
+          (PMPM).
       - name: emergency_department_paid
         description: Total emergency department paid amount per member per month (PMPM).
       - name: home_health_paid
@@ -225,19 +243,24 @@ models:
       - name: hospice_paid
         description: Total hospice paid amount per member per month (PMPM).
       - name: inpatient_psychiatric_paid
-        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+        description: Total inpatient psychiatric paid amount per member per month
+          (PMPM).
       - name: inpatient_rehabilitation_paid
-        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+        description: Total inpatient rehabilitation paid amount per member per month
+          (PMPM).
       - name: lab_paid
         description: Total lab paid amount per member per month (PMPM).
       - name: office_visit_paid_2
         description: Total office visit paid amount per member per month (PMPM).
       - name: outpatient_hospital_or_clinic_paid
-        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+        description: Total outpatient hospital or clinic paid amount per member per
+          month (PMPM).
       - name: outpatient_psychiatric_paid
-        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+        description: Total outpatient psychiatric paid amount per member per month
+          (PMPM).
       - name: outpatient_rehabilitation_paid
-        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+        description: Total outpatient rehabilitation paid amount per member per month
+          (PMPM).
       - name: skilled_nursing_paid
         description: Total skilled nursing paid amount per member per month (PMPM).
       - name: urgent_care_paid
@@ -263,40 +286,48 @@ models:
       - name: ambulance_allowed
         description: Total ambulance allowed amount per member per month (PMPM).
       - name: ambulatory_surgery_allowed
-        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+        description: Total ambulatory surgery allowed amount per member per month
+          (PMPM).
       - name: dialysis_allowed
         description: Total dialysis allowed amount per member per month (PMPM).
       - name: durable_medical_equipment_allowed
-        description: Total durable medical equipment allowed amount per member per month (PMPM).
+        description: Total durable medical equipment allowed amount per member per
+          month (PMPM).
       - name: emergency_department_allowed
-        description: Total emergency department allowed amount per member per month (PMPM).
+        description: Total emergency department allowed amount per member per month
+          (PMPM).
       - name: home_health_allowed
         description: Total home health allowed amount per member per month (PMPM).
       - name: hospice_allowed
         description: Total hospice allowed amount per member per month (PMPM).
       - name: inpatient_psychiatric_allowed
-        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+        description: Total inpatient psychiatric allowed amount per member per month
+          (PMPM).
       - name: inpatient_rehabilitation_allowed
-        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Total inpatient rehabilitation allowed amount per member per
+          month (PMPM).
       - name: lab_allowed
         description: Total lab allowed amount per member per month (PMPM).
       - name: office_visit_allowed_2
         description: Total office visit allowed amount per member per month (PMPM).
       - name: outpatient_hospital_or_clinic_allowed
-        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+        description: Total outpatient hospital or clinic allowed amount per member
+          per month (PMPM).
       - name: outpatient_psychiatric_allowed
-        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+        description: Total outpatient psychiatric allowed amount per member per month
+          (PMPM).
       - name: outpatient_rehabilitation_allowed
-        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Total outpatient rehabilitation allowed amount per member per
+          month (PMPM).
       - name: skilled_nursing_allowed
         description: Total skilled nursing allowed amount per member per month (PMPM).
       - name: urgent_care_allowed
         description: Total urgent care allowed amount per member per month (PMPM).
       - name: tuva_last_run
         description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+          The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time`
+          as the local time of the `dbt run`  environment.  Timezone is configurable
+          via the `tuva_last_run` var.
 
   - name: financial_pmpm__pmpm_payer
     config:
@@ -308,19 +339,23 @@ models:
         - financial_pmpm
       materialized: table
     description: >
-      Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
+      Computes per member per month statistics for every service category by aggregating
+      across patients from pmpm_prep.
       This version of the table computes at the payer grain.
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
-          tags: [ 'tuva_dqi_sev_3', 'dqi','dqi_financial_pmpm', 'dqi_usability' ]
-          description: "This is a check in one of the final downstream marts to see if 
-                       financial_pmpm__pmpm_payer is populated. If this is flagging, 
-                       please check other areas further upstream on the input layer."
+# description: This is a check in one of the final downstream marts to see if financial_pmpm__pmpm_payer is populated. If this is flagging, please check other areas further upstream on the input layer.
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_financial_pmpm', 'dqi_usability']
           min_value: 1
           strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
+            meta:
+              dqi_test_description: "This is a check in one of the final downstream
+                marts to see if financial_pmpm__pmpm_payer is populated. If this is
+                flagging, please check other areas further upstream on the input layer."
     columns:
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.
@@ -328,8 +363,8 @@ models:
         description: Name of the payer (i.e. health insurer) providing coverage.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically 
-          named after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g. typically  named
+          after the payer and state "BCBS Tennessee").
       - name: member_months
         description: The sum of member months.
       - name: total_paid
@@ -357,7 +392,8 @@ models:
       - name: dialysis_paid
         description: Total dialysis paid amount per member per month (PMPM).
       - name: durable_medical_equipment_paid
-        description: Total durable medical equipment paid amount per member per month (PMPM).
+        description: Total durable medical equipment paid amount per member per month
+          (PMPM).
       - name: emergency_department_paid
         description: Total emergency department paid amount per member per month (PMPM).
       - name: home_health_paid
@@ -365,19 +401,24 @@ models:
       - name: hospice_paid
         description: Total hospice paid amount per member per month (PMPM).
       - name: inpatient_psychiatric_paid
-        description: Total inpatient psychiatric paid amount per member per month (PMPM).
+        description: Total inpatient psychiatric paid amount per member per month
+          (PMPM).
       - name: inpatient_rehabilitation_paid
-        description: Total inpatient rehabilitation paid amount per member per month (PMPM).
+        description: Total inpatient rehabilitation paid amount per member per month
+          (PMPM).
       - name: lab_paid
         description: Total lab paid amount per member per month (PMPM).
       - name: office_visit_paid_2
         description: Total office visit paid amount per member per month (PMPM).
       - name: outpatient_hospital_or_clinic_paid
-        description: Total outpatient hospital or clinic paid amount per member per month (PMPM).
+        description: Total outpatient hospital or clinic paid amount per member per
+          month (PMPM).
       - name: outpatient_psychiatric_paid
-        description: Total outpatient psychiatric paid amount per member per month (PMPM).
+        description: Total outpatient psychiatric paid amount per member per month
+          (PMPM).
       - name: outpatient_rehabilitation_paid
-        description: Total outpatient rehabilitation paid amount per member per month (PMPM).
+        description: Total outpatient rehabilitation paid amount per member per month
+          (PMPM).
       - name: skilled_nursing_paid
         description: Total skilled nursing paid amount per member per month (PMPM).
       - name: urgent_care_paid
@@ -403,40 +444,48 @@ models:
       - name: ambulance_allowed
         description: Total ambulance allowed amount per member per month (PMPM).
       - name: ambulatory_surgery_allowed
-        description: Total ambulatory surgery allowed amount per member per month (PMPM).
+        description: Total ambulatory surgery allowed amount per member per month
+          (PMPM).
       - name: dialysis_allowed
         description: Total dialysis allowed amount per member per month (PMPM).
       - name: durable_medical_equipment_allowed
-        description: Total durable medical equipment allowed amount per member per month (PMPM).
+        description: Total durable medical equipment allowed amount per member per
+          month (PMPM).
       - name: emergency_department_allowed
-        description: Total emergency department allowed amount per member per month (PMPM).
+        description: Total emergency department allowed amount per member per month
+          (PMPM).
       - name: home_health_allowed
         description: Total home health allowed amount per member per month (PMPM).
       - name: hospice_allowed
         description: Total hospice allowed amount per member per month (PMPM).
       - name: inpatient_psychiatric_allowed
-        description: Total inpatient psychiatric allowed amount per member per month (PMPM).
+        description: Total inpatient psychiatric allowed amount per member per month
+          (PMPM).
       - name: inpatient_rehabilitation_allowed
-        description: Total inpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Total inpatient rehabilitation allowed amount per member per
+          month (PMPM).
       - name: lab_allowed
         description: Total lab allowed amount per member per month (PMPM).
       - name: office_visit_allowed_2
         description: Total office visit allowed amount per member per month (PMPM).
       - name: outpatient_hospital_or_clinic_allowed
-        description: Total outpatient hospital or clinic allowed amount per member per month (PMPM).
+        description: Total outpatient hospital or clinic allowed amount per member
+          per month (PMPM).
       - name: outpatient_psychiatric_allowed
-        description: Total outpatient psychiatric allowed amount per member per month (PMPM).
+        description: Total outpatient psychiatric allowed amount per member per month
+          (PMPM).
       - name: outpatient_rehabilitation_allowed
-        description: Total outpatient rehabilitation allowed amount per member per month (PMPM).
+        description: Total outpatient rehabilitation allowed amount per member per
+          month (PMPM).
       - name: skilled_nursing_allowed
         description: Total skilled nursing allowed amount per member per month (PMPM).
       - name: urgent_care_allowed
         description: Total urgent care allowed amount per member per month (PMPM).
       - name: tuva_last_run
         description: >
-          The last time the data was refreshed.  Generated by 
-          `dbt_utils.pretty_time` as the local time of the `dbt run` 
-          environment.  Timezone is configurable via the `tuva_last_run` var.
+          The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time`
+          as the local time of the `dbt run`  environment.  Timezone is configurable
+          via the `tuva_last_run` var.
 
 #### Intermediate
 
@@ -450,7 +499,8 @@ models:
         - financial_pmpm
       materialized: table
     description: >
-      Adds service categories to claims and sums paid and allowed amounts to the year-month level.
+      Adds service categories to claims and sums paid and allowed amounts to the year-month
+      level.
 
   - name: financial_pmpm__service_category_1_allowed_pivot
     config:

@@ -13,15 +13,19 @@ models:
         - claims_preprocessing
     tests:
       - dbt_expectations.expect_table_row_count_to_be_between:
-          tags: ['tuva_dqi_sev_3', 'dqi','dqi_service_categories', 'dqi_usability']
-          description: "This is a check in one of the final downstream marts to see if 
-                       service_category__service_category_grouper is populated. If this is flagging, 
-                       please check other areas further upstream on the input layer."
+# description: This is a check in one of the final downstream marts to see if service_category__service_category_grouper is populated. If this is flagging, please check other areas further upstream on the input layer.
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_service_categories', 'dqi_usability']
           min_value: 1
           strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
+            meta:
+              dqi_test_description: "This is a check in one of the final downstream
+                marts to see if service_category__service_category_grouper is populated.
+                If this is flagging, please check other areas further upstream on
+                the input layer."
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -36,39 +40,52 @@ models:
       - name: service_category_3
         description: The third, even more specific service category of the claim line.
       - name: original_service_cat_2
-        description: Original categorization of service category 2 before any transformation or normalization.
+        description: Original categorization of service category 2 before any transformation
+          or normalization.
       - name: original_service_cat_3
-        description: Original categorization of service category 3 before any transformation or normalization.
+        description: Original categorization of service category 3 before any transformation
+          or normalization.
       - name: claim_line_id
-        description: Concatenated field of claim_id and claim_line_number, providing a unique identifier for each line within a claim.
+        description: Concatenated field of claim_id and claim_line_number, providing
+          a unique identifier for each line within a claim.
       - name: duplicate_row_number
-        description: Row number used to identify duplicate entries within the data set.
+        description: Row number used to identify duplicate entries within the data
+          set.
       - name: ccs_category
-        description: Clinical Classifications Software category associated with the service provided.
+        description: Clinical Classifications Software category associated with the
+          service provided.
       - name: ccs_category_description
         description: Description of the Clinical Classifications Software category.
       - name: drg_code
-        description: Medicare Severity Diagnosis Related Group code related to the claim.
+        description: Medicare Severity Diagnosis Related Group code related to the
+          claim.
       - name: drg_description
-        description: Description of the Medicare Severity Diagnosis Related Group code.
+        description: Description of the Medicare Severity Diagnosis Related Group
+          code.
       - name: place_of_service_code
         description: Code that identifies the place where service was provided.
       - name: place_of_service_description
         description: Description of the place where service was provided.
       - name: revenue_center_code
-        description: Revenue center code associated with the financial aspects of the care provided.
+        description: Revenue center code associated with the financial aspects of
+          the care provided.
       - name: revenue_center_description
         description: Description of the revenue center code.
       - name: hcpcs_code
-        description: Healthcare Common Procedure Coding System code that identifies specific services provided.
+        description: Healthcare Common Procedure Coding System code that identifies
+          specific services provided.
       - name: default_ccsr_category_ip
-        description: Default Clinical Classifications Software for Services and Procedures category for inpatient services.
+        description: Default Clinical Classifications Software for Services and Procedures
+          category for inpatient services.
       - name: default_ccsr_category_op
-        description: Default Clinical Classifications Software for Services and Procedures category for outpatient services.
+        description: Default Clinical Classifications Software for Services and Procedures
+          category for outpatient services.
       - name: default_ccsr_category_description_ip
-        description: Description of the default CCS for Services and Procedures category for inpatient.
+        description: Description of the default CCS for Services and Procedures category
+          for inpatient.
       - name: default_ccsr_category_description_op
-        description: Description of the default CCS for Services and Procedures category for outpatient.
+        description: Description of the default CCS for Services and Procedures category
+          for outpatient.
       - name: primary_taxonomy_code
         description: Taxonomy code that classifies the providers type or specialization.
       - name: primary_specialty_description
@@ -148,7 +165,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__ambulance_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -268,7 +285,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__outpatient_hospice_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -340,7 +357,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__inpatient_rehab_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -518,7 +535,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__acute_inpatient_institutional_other
     config:
       schema: |
@@ -551,7 +568,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__observation_professional
     config:
       schema: |
@@ -574,7 +591,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
   - name: service_category__office_based_other_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -584,7 +601,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__office_based_physical_therapy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -595,7 +612,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
   - name: service_category__office_based_radiology
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -605,7 +622,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
   - name: service_category__office_based_surgery_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -615,7 +632,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__pharmacy_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -626,7 +643,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__pharmacy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -637,8 +654,8 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
-  
+
+
   - name: service_category__outpatient_physical_therapy_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -648,7 +665,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_physical_therapy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -659,7 +676,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_radiology_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -670,7 +687,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_radiology_professional
     description: service categories flagged by corresponding codes and value sets
@@ -681,7 +698,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_substance_use_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -692,7 +709,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_substance_use_professional
     description: service categories flagged by corresponding codes and value sets
@@ -703,7 +720,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_surgery_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -714,8 +731,8 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
-  
+
+
   - name: service_category__outpatient_surgery_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -725,7 +742,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_rehab_institutional
     description: flagging outpatient claims for outpatient rehab service categories
@@ -736,7 +753,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-  
+
 #staging:
   - name: service_category__stg_medical_claim
     description: Staging med claims for sc grouper

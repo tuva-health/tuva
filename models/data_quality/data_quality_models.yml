@@ -3,627 +3,645 @@ models:
 
 #### Data Quality
 ## Final
-- name: data_quality__chronic_conditions_prevalence
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: chronic_conditions_prevalence
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__chronic_conditions_prevalence
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: chronic_conditions_prevalence
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__chronic_conditions_none
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: chronic_conditions_none
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__chronic_conditions_none
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: chronic_conditions_none
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__encounters_cost_and_utilization_trend
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: encounters_cost_and_utilization_trend
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__encounters_cost_and_utilization_trend
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: encounters_cost_and_utilization_trend
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__service_category_pmpm_trend
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: service_category_pmpm_trend
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__service_category_pmpm_trend
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: service_category_pmpm_trend
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__dx_and_px
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: dx_and_px
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-    - name: result_count
-      description: The number of rows in the input layer that match the data quality check criteria
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__dx_and_px
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: dx_and_px
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+      - name: result_count
+        description: The number of rows in the input layer that match the data quality
+          check criteria
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__eligibility_date_checks
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: eligibility_date_checks
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-    - name: result_count
-      description: The number of eligibility spans in the input layer that match the data quality check criteria
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
-
-
-- name: data_quality__eligibility_demographics
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: eligibility_demographics
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-    - name: result_count
-      description: |
-        The number of eligibility spans in the input layer that match the data quality check criteria (multiple birth dates
-        count unique members)
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__eligibility_date_checks
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_date_checks
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+      - name: result_count
+        description: The number of eligibility spans in the input layer that match
+          the data quality check criteria
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
 
-- name: data_quality__eligibility_missing_person_id
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: eligibility_missing_person_id
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-    - name: result_count
-      description: The number of eligibility spans in the input layer that match the data quality check criteria
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__eligibility_demographics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_demographics
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+      - name: result_count
+        description: |
+          The number of eligibility spans in the input layer that match the data quality check criteria (multiple birth dates
+          count unique members)
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
 
-- name: data_quality__eligibility_missing_payer
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: eligibility_missing_payer
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-    - name: result_count
-      description: The number of eligibility spans in the input layer that match the data quality check criteria
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
-
-- name: data_quality__encounters_cost_and_utilization
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: encounters_cost_and_utilization
-    tags:
-      - data_quality_audit
-    materialized: table
-
-- name: data_quality__encounters_missing_groups_union
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: encounters_missing_groups_union
-    tags:
-      - data_quality_audit
-    materialized: table
-
-- name: data_quality__encounters_missing_groups
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: encounters_missing_groups
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__eligibility_missing_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_missing_person_id
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+      - name: result_count
+        description: The number of eligibility spans in the input layer that match
+          the data quality check criteria
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
 
-- name: data_quality__eligibility_trend
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: eligibility_trend
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: year_month
-      description: The year and month
-    - name: member_months
-      description: The count of distinct members with eligibility in the corresponding year and month
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__eligibility_missing_payer
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_missing_payer
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+      - name: result_count
+        description: The number of eligibility spans in the input layer that match
+          the data quality check criteria
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__claim_date_trends
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: claim_date_trends
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: year_month
-      description: The name of the data quality check
-    - name: claim_start_date
-      description: The count of distinct claims with a claim start date in the corresponding year and month.
-    - name: claim_end_date
-      description: The count of distinct claims with a claim end date in the corresponding year and month.
-    - name: admission_date
-      description: The count of distinct claims with a admission date in the corresponding year and month.
-    - name: discharge_date
-      description: The count of distinct claims with a discharge date in the corresponding year and month.
-    - name: medical_paid_date
-      description: The count of distinct claims with a medical paid date in the corresponding year and month.
-    - name: dispensing_date
-      description: The count of distinct claims with a dispensing date in the corresponding year and month.
-    - name: pharmacy_paid_date
-      description: The count of distinct claims with a pharmacy paid date in the corresponding year and month.
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__encounters_cost_and_utilization
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: encounters_cost_and_utilization
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__data_quality_test_summary
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_test_summary
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-      tests: 
-        - unique
-        - not_null
-    - name: result_count 
-      description: the count of records that match the result of the data quality check
-    - name: tuva_last_run  
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__encounters_missing_groups_union
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: encounters_missing_groups_union
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__analytics_reference_summary
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: analytics_reference_summary
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__encounters_missing_groups
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: encounters_missing_groups
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__analytics_checks_summary
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: analytics_checks_summary
-    tags:
-      - data_quality_audit
-    materialized: table
 
-  columns:
-    - name: data_quality_check
-      description: The name of the data quality check
-      tests: 
-        - unique
-        - not_null
-    - name: result_count 
-      description: the count of records that match the result of the data quality check
-    - name: tuva_last_run  
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__eligibility_trend
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_trend
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: year_month
+        description: The year and month
+      - name: member_months
+        description: The count of distinct members with eligibility in the corresponding
+          year and month
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__pharmacy_claim_person_id
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_person_id
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__claim_date_trends
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: claim_date_trends
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: year_month
+        description: The name of the data quality check
+      - name: claim_start_date
+        description: The count of distinct claims with a claim start date in the corresponding
+          year and month.
+      - name: claim_end_date
+        description: The count of distinct claims with a claim end date in the corresponding
+          year and month.
+      - name: admission_date
+        description: The count of distinct claims with a admission date in the corresponding
+          year and month.
+      - name: discharge_date
+        description: The count of distinct claims with a discharge date in the corresponding
+          year and month.
+      - name: medical_paid_date
+        description: The count of distinct claims with a medical paid date in the
+          corresponding year and month.
+      - name: dispensing_date
+        description: The count of distinct claims with a dispensing date in the corresponding
+          year and month.
+      - name: pharmacy_paid_date
+        description: The count of distinct claims with a pharmacy paid date in the
+          corresponding year and month.
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__pharmacy_claim_date_checks
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_date_checks
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__data_quality_test_summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_test_summary
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+        tests:
+          - unique
+          - not_null
+      - name: result_count
+        description: the count of records that match the result of the data quality
+          check
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__pharmacy_claim_ndc
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_ndc      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__analytics_reference_summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytics_reference_summary
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__pharmacy_claim_prescription_details
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_prescription_details      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__analytics_checks_summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytics_checks_summary
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__pharmacy_claim_npi
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_npi      
-    tags:
-      - data_quality_audit
-    materialized: table
+    columns:
+      - name: data_quality_check
+        description: The name of the data quality check
+        tests:
+          - unique
+          - not_null
+      - name: result_count
+        description: the count of records that match the result of the data quality
+          check
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__pharmacy_claim_volume_and_dollars
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: pharmacy_claim_volume_and_dollars      
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns: 
-    - name: year_month
-      description: the year and month in format yyyymm
-    - name: claim_volume
-      description: the unique count of claims
-    - name: paid_amount
-      description: '{{ doc("paid_amount") }}'
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
-  
+  - name: data_quality__pharmacy_claim_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_person_id
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__primary_key_check
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: primary_key_check
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__pharmacy_claim_date_checks
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_date_checks
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__medical_claim_person_id
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: medical_claim_person_id      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__pharmacy_claim_ndc
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_ndc
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__medical_claim_date_checks
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: medical_claim_date_checks      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__pharmacy_claim_prescription_details
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_prescription_details
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__medical_claim_inst_header_fields
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: medical_claim_inst_header_fields      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__pharmacy_claim_npi
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_npi
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__medical_claim_claim_line_fields
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: medical_claim_claim_line_fields      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__pharmacy_claim_volume_and_dollars
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: pharmacy_claim_volume_and_dollars
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: year_month
+        description: the year and month in format yyyymm
+      - name: claim_volume
+        description: the unique count of claims
+      - name: paid_amount
+        description: '{{ doc("paid_amount") }}'
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
 
-- name: data_quality__medical_claim_provider_npi
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: medical_claim_provider_npi      
-    tags:
-      - data_quality_audit
-    materialized: table
 
-- name: data_quality__medical_claim_volume_and_dollars
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: medical_claim_volume_and_dollars      
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns: 
-    - name: year_month
-      description: the year and month in format yyyymm
-    - name: claim_volume
-      description: the unique count of claims
-    - name: paid_amount
-      description: '{{ doc("paid_amount") }}'
-    - name: tuva_last_ran
-      description: '{{ doc("tuva_last_run") }}'
-  
+  - name: data_quality__primary_key_check
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: primary_key_check
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__data_loss
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_loss      
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: table_name
-      description: the name of the table's records being counted
-    - name: metric
-      description: the name of the metric being analyzed
-    - name: input_layer_value
-      description: the count of the metric found in the input layer schema of the table
-    - name: core_value
-      description: the count of the metric found in the core layer schema of the table
-    - name: tuva_last_run
-      description: '{{ doc("tuva_last_run") }}'
+  - name: data_quality__medical_claim_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_person_id
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__medical_claim_date_checks
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_date_checks
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__medical_claim_inst_header_fields
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_inst_header_fields
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__medical_claim_claim_line_fields
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_claim_line_fields
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__medical_claim_provider_npi
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_provider_npi
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__medical_claim_volume_and_dollars
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: medical_claim_volume_and_dollars
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: year_month
+        description: the year and month in format yyyymm
+      - name: claim_volume
+        description: the unique count of claims
+      - name: paid_amount
+        description: '{{ doc("paid_amount") }}'
+      - name: tuva_last_ran
+        description: '{{ doc("tuva_last_run") }}'
+
+
+  - name: data_quality__data_loss
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_loss
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: table_name
+        description: the name of the table's records being counted
+      - name: metric
+        description: the name of the metric being analyzed
+      - name: input_layer_value
+        description: the count of the metric found in the input layer schema of the
+          table
+      - name: core_value
+        description: the count of the metric found in the core layer schema of the
+          table
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
       
 
 
-- name: data_quality__core_populated
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: core_populated      
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: table_name
-      description: the name of the table's records being counted
-    - name: record_count
-      description: the total number of records belonging to the specific data quality check
-      
-
-- name: data_quality__analytics_populated
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: analytics_populated      
-    tags:
-      - data_quality_audit
-    materialized: table
-  columns:
-    - name: table_name
-      description: the name of the table's records being counted
-    - name: record_count
-      description: the total number of records belonging to the specific data quality check
-
-- name: data_quality__readmissions
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_readmissions      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__core_populated
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: core_populated
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: table_name
+        description: the name of the table's records being counted
+      - name: record_count
+        description: the total number of records belonging to the specific data quality
+          check
 
 
-- name: data_quality__readmissions_reference
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_readmissions_reference      
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__analytics_populated
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: analytics_populated
+      tags:
+        - data_quality_audit
+      materialized: table
+    columns:
+      - name: table_name
+        description: the name of the table's records being counted
+      - name: record_count
+        description: the total number of records belonging to the specific data quality
+          check
 
-- name: data_quality__service_categories_pmpm
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: service_categories_pmpm
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__readmissions
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_readmissions
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__cms_hcc
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_cms_hcc
-    tags:
-      - data_quality_audit
-    materialized: table
 
-- name: data_quality__cms_hcc_reference
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_cms_hcc_reference
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__readmissions_reference
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_readmissions_reference
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__quality_measures_reference
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_quality_measures_reference
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__service_categories_pmpm
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: service_categories_pmpm
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__quality_measures
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_quality_measures
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__cms_hcc
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_cms_hcc
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__acute_inpatient_reference
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_acute_inpatient_reference
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__cms_hcc_reference
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_cms_hcc_reference
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__acute_inpatient
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_acute_inpatient
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__quality_measures_reference
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_quality_measures_reference
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__acute_inpatient_prevalence
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_acute_inpatient_prevalence
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__quality_measures
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_quality_measures
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__ed_classification
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_ed_classification
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__acute_inpatient_reference
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_acute_inpatient_reference
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__ed_classification_reference
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_ed_classification_reference
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__acute_inpatient
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_acute_inpatient
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__financial_pmpm
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_financial_pmpm
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__acute_inpatient_prevalence
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_acute_inpatient_prevalence
+      tags:
+        - data_quality_audit
+      materialized: table
 
-- name: data_quality__claim_percent
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: data_quality_claim_percent
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__ed_classification
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_ed_classification
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__ed_classification_reference
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_ed_classification_reference
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__financial_pmpm
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_financial_pmpm
+      tags:
+        - data_quality_audit
+      materialized: table
+
+  - name: data_quality__claim_percent
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: data_quality_claim_percent
+      tags:
+        - data_quality_audit
+      materialized: table
 
 
 
 #### stage
-- name: data_quality__eligibility_dq_stage
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    tags:
-      - data_quality_audit
-    materialized: view
+  - name: data_quality__eligibility_dq_stage
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      tags:
+        - data_quality_audit
+      materialized: view
 
-- name: data_quality__inpatient_dq_stage
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    tags:
-      - data_quality_audit
-    materialized: table
+  - name: data_quality__inpatient_dq_stage
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      tags:
+        - data_quality_audit
+      materialized: table
