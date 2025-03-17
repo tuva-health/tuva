@@ -108,7 +108,7 @@ models:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - dbt_expectations.expect_column_unique_value_count_to_be_between:
-#          description: 'A person should not have multiple birthdays.'
+          description: 'A person should not have multiple birthdays.'
           min_value: 1
           max_value: 1
           tags: [ 'tuva_dqi_sev_3', 'dqi','dqi_cms_hccs' ]
