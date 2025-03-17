@@ -19,4 +19,4 @@ where
     med.hcpcs_code in ('Q5001', 'Q5002', 'Q5003', 'Q5009')
     and NOT EXISTS (SELECT 1 FROM {{ ref('service_category__home_health_institutional') }} AS hhi WHERE med.claim_id = hhi.claim_id2)
   )
-  or med.revenue_center_code in ('0651', '0652')
+  or med.revenue_center_code in ('0650', '0651', '0652', '0657', '0659')
