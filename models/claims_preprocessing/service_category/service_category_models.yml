@@ -790,3 +790,11 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
+  - name: service_category__dme_institutional
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
