@@ -18,8 +18,8 @@ with base_data as (
     select
         bd.*
       , max(end_date) over (
-            partition by patient_data_source_id 
-            order by start_date, claim_id 
+            partition by patient_data_source_id
+            order by start_date, claim_id
             rows between unbounded preceding and 1 preceding
         ) as previous_max_end_date
     from base_data as bd
@@ -29,9 +29,9 @@ with base_data as (
 , flagged_data as (
     select
         gd.*
-      , case 
-            when start_date > coalesce(previous_max_end_date, '1900-01-01') then 1 
-            else 0 
+      , case
+            when start_date > coalesce(previous_max_end_date, {{ dbt.cast("'1900-01-01'", api.Column.translate_type('date')) }} ) then 1
+            else 0
         end as new_group_flag
     from grouped_data as gd
 )
@@ -41,8 +41,8 @@ with base_data as (
     select
         fd.*
       , sum(new_group_flag) over (
-            partition by patient_data_source_id 
-            order by start_date, claim_id 
+            partition by patient_data_source_id
+            order by start_date, claim_id
             rows unbounded preceding
         ) as encounter_group
     from flagged_data as fd
