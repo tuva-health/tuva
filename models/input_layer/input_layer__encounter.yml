@@ -74,7 +74,8 @@ models:
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                # Disabled for bigquery as relationships dbt test does not work when the alias and the field are the same name
+                enabled: "{{ ((target.type != 'fabric') and (target.type != 'bigquery') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: encounter_start_date
         description: '{{ doc("encounter_start_date") }}'
         tests:
