@@ -13,7 +13,7 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_elementary{% else %}elementary{%- endif -%}
     ## To disable elementary for dev, uncomment this:
     # enabled: "{{ target.name in ['prod','analytics'] }}"
-    enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+    +enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
 
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false
