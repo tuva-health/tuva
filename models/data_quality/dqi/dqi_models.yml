@@ -28,6 +28,9 @@ models:
             - LEVEL_OF_DETAIL
             - Y_AXIS
             - X_AXIS
+          config:
+            severity: error
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
 
   - name: data_quality__data_quality_detail
     config:
