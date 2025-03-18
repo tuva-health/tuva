@@ -1,0 +1,194 @@
+version: 2
+
+models:
+## Final
+- name: power_bi__dim_member
+  description: >
+    Member dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_member
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: patient_source_key
+    description: Unique key of patient id and data source
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__dim_date
+  description: >
+    Date dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_date
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: full_date
+    description: full date
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__dim_service_category
+  description: >
+    Unique service categories dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_service_category
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: service_category_sk
+    description: SK for unique combination of service categories
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__dim_encounter_type
+  description: >
+    Unique encounter type dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_encounter_type
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: encounter_type_sk
+    description: SK for unique combination of encounter groups and types
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__fact_member_months
+  description: >
+    Member months fact for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_member_months
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: patient_month_key
+    description: Unique combination of patient id and year month
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__fact_encounters
+  description: >
+    Encounter level fact for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_encounters
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: encounter_id
+    description: Unique encounter id
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__fact_claims
+  description: >
+    Claim line level fact for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_claims
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: medical_claim_id
+    description: Unique claim line id
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__fact_encounter_service_bridge
+  description: >
+    Bridge table for encounters and service categories for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_encounter_service_bridge
+    tags: power_bi
+    materialized: table
+
+- name: power_bi__dim_condition
+  description: >
+    Condition dimension table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_condition
+    tags: power_bi
+    materialized: table
+
+- name: power_bi__fact_member_condition_bridge
+  description: >
+    Member to condition bridge table table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_member_condition_bridge
+    tags: power_bi
+    materialized: table
+
+- name: power_bi__dim_data_source
+  description: >
+    Data source dimension table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_data_source
+    tags: power_bi
+    materialized: table
+
+- name: power_bi__fact_claims_summary
+  description: >
+    Claims summary fact table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_claims_summary
+    tags: power_bi
+    materialized: table
+
+  # - name: core__stg_claims_procedure
+  #   description: Staging core claims procedures
+  #   config:
+  #     schema: |
+  #       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+  #       {% else %}core{%- endif -%}
+  #     alias: _stg_claims_procedure
+  #     tags: core_stage_claims
+  #     materialized: table
