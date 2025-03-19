@@ -13,4 +13,4 @@ s.claim_id
 from {{ ref('service_category__stg_medical_claim') }} s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} a on s.claim_id = a.claim_id
 where substring(s.bill_type_code, 1, 2) in ('82')
-  
+or s.revenue_center_code in ('0655', '0656', '0658', '0115', '0125', '0135', '0145', '0155', '0235')
