@@ -13,18 +13,12 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_elementary{% else %}elementary{%- endif -%}
     ## To disable elementary for dev, uncomment this:
     # enabled: "{{ target.name in ['prod','analytics'] }}"
-    +enabled: "{{ var('enable_elementary') }}"
 
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false
 
 
 vars:
-    disable_run_results: "{{ target.type == 'fabric' }}"
-    disable_tests_results: "{{ target.type == 'fabric' }}"
-    disable_dbt_artifacts_autoupload: "{{ target.type == 'fabric' }}"
-    disable_dbt_invocation_autoupload: "{{ target.type == 'fabric' }}"
-    enable_elementary: "{{ target.type != 'fabric' }}"
     ## CCSR data mart vars
     # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
     record_type: "ip"
