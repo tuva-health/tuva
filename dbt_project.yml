@@ -6,15 +6,6 @@ require-dbt-version: ">=1.5.0"
 profile: default
 
 models:
-  the_tuva_project:
-    data_quality:
-      ## Legacy data quality models
-      final:
-        +enabled: "{{ var('enable_legacy_data_quality', false) }}"
-      intermediate:
-        +enabled: "{{ var('enable_legacy_data_quality', false) }}"
-      stage:
-        +enabled: "{{ var('enable_legacy_data_quality', false) }}"
   ## see docs: https://docs.elementary-data.com/
   elementary:
     ## elementary models will be created in the schema '<your_schema>_elementary'
