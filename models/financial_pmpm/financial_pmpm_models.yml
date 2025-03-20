@@ -310,6 +310,20 @@ models:
     description: >
       Computes per member per month statistics for every service category by aggregating across patients from pmpm_prep.
       This version of the table computes at the payer grain.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+# description: This is a check in one of the final downstream marts to see if financial_pmpm__pmpm_payer is populated. If this is flagging, please check other areas further upstream on the input layer.
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_financial_pmpm', 'dqi_usability']
+          min_value: 1
+          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
+            meta:
+              dqi_test_description: "This is a check in one of the final downstream
+                marts to see if financial_pmpm__pmpm_payer is populated. If this is
+                flagging, please check other areas further upstream on the input layer."
     columns:
       - name: year_month
         description: Unique year-month of in the dataset computed from eligibility.

@@ -106,6 +106,21 @@ models:
       tags: readmissions
       materialized: table
     description: "This model includes all rows from the encounter_augmented model where disqualified_encounter_flag = 0 (all rows for encounters that are not disqualified for data quality issues). For each of these encounters we add fields to indicate whether it had a readmission and, when a readmission was present, to show relevant fields for the readmission."
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+# description: This is a check in one of the final downstream marts to see if readmissions__readmission_summary is populated. If this is flagging, please check other areas further upstream on the input layer.
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_readmission', 'dqi_usability']
+          min_value: 1
+          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
+            meta:
+              dqi_test_description: "This is a check in one of the final downstream
+                marts to see if readmissions__readmission_summary is populated. If
+                this is flagging, please check other areas further upstream on the
+                input layer."
     columns:
       - name: encounter_id
         description: "The unique identifier for the encounter"
@@ -258,7 +273,7 @@ models:
         description: "Unique identifier for one of the overlapping encounters"
       - name: encounter_id_B
         description: "Unique identifier for the other overlapping encounter"
-  
+
   - name: readmissions__encounter_specialty_cohort
     config:
       schema: |
