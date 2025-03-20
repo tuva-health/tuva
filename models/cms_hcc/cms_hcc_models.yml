@@ -44,7 +44,8 @@ models:
         description: Description of the risk factor.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -64,8 +65,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      This final model displays the contributing demographic and disease risk  factors,
-      interactions, and HCCs for each enrollee in the payment year
+      This final model displays the contributing demographic and disease risk 
+      factors, interactions, and HCCs for each enrollee in the payment year
       and collection period.
     columns:
       - name: person_id
@@ -86,7 +87,8 @@ models:
         description: Description of the risk factor.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -97,12 +99,10 @@ models:
           The payment year the HCC and risk scores are being calculated for.
       - name: collection_start_date
         description: >
-          The start date for the collection period the HCC and risk scores are being
-          calculated for.
+          The start date for the collection period the HCC and risk scores are being calculated for.
       - name: collection_end_date
         description: >
-          The end date for the collection period the HCC and risk scores are being
-          calculated for.
+          The end date for the collection period the HCC and risk scores are being calculated for.
       - name: tuva_last_run
         description: The date the model was run.
 
@@ -115,8 +115,8 @@ models:
       materialized: table
     description: >
       This final model calculates the CMS HCC raw risk score, blended risk score,
-      normalized risk score, and payment risk score for each enrollee in the  payment
-      year.
+      normalized risk score, and payment risk score for each enrollee in the 
+      payment year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -124,33 +124,33 @@ models:
           - unique
       - name: v24_risk_score
         description: >
-          The sum of all patient risk factors from model version CMS-HCC-V24.  If
-          payment year >= 2024 then the score may be weighted following  CMS's transition
-          plan.
+          The sum of all patient risk factors from model version CMS-HCC-V24. 
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
       - name: v28_risk_score
         description: >
           The sum of all patient risk factors from model version CMS-HCC-V28.
-          If payment year >= 2024 then the score may be weighted following  CMS's
-          transition plan.
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
       - name: blended_risk_score
         description: The of sum v24_risk_score and v28_risk_score.
       - name: normalized_risk_score
         description: >
-          The blended risk score divided by the normalization adjustment factor  for
-          the corresponding HCC model version and payment year's rate  announcement
-          from CMS.
+          The blended risk score divided by the normalization adjustment factor 
+          for the corresponding HCC model version and payment year's rate 
+          announcement from CMS.
       - name: payment_risk_score
         description: >
-          The normalized risk score multiplied by the MA coding pattern  adjustment
-          factor for the corresponding HCC model version  and payment year's rate
-          announcement from CMS.
+          The normalized risk score multiplied by the MA coding pattern 
+          adjustment factor for the corresponding HCC model version 
+          and payment year's rate announcement from CMS.
       - name: payment_risk_score_weighted_by_months
         description: >
           Payment risk score multiplied by member_months.
       - name: member_months
         description: >
-          Member months derived from the finanicial_pmpm mart utilizing  payment year
-          eligibility.
+          Member months derived from the finanicial_pmpm mart utilizing 
+          payment year eligibility.
       - name: payment_year
         description: >
           The payment year the HCC and risk scores are being calculated for.
@@ -166,8 +166,8 @@ models:
       materialized: table
     description: >
       This final model calculates the CMS HCC raw risk score, blended risk score,
-      normalized risk score, and payment risk score for each enrollee in the  payment
-      year and collection period.
+      normalized risk score, and payment risk score for each enrollee in the 
+      payment year and collection period.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -179,44 +179,42 @@ models:
         description: Unique ID for the patient.
       - name: v24_risk_score
         description: >
-          The sum of all patient risk factors from model version CMS-HCC-V24.  If
-          payment year >= 2024 then the score may be weighted following  CMS's transition
-          plan.
+          The sum of all patient risk factors from model version CMS-HCC-V24. 
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
       - name: v28_risk_score
         description: >
           The sum of all patient risk factors from model version CMS-HCC-V28.
-          If payment year >= 2024 then the score may be weighted following  CMS's
-          transition plan.
+          If payment year >= 2024 then the score may be weighted following 
+          CMS's transition plan.
       - name: blended_risk_score
         description: The of sum v24_risk_score and v28_risk_score.
       - name: normalized_risk_score
         description: >
-          The blended risk score divided by the normalization adjustment factor  for
-          the corresponding HCC model version and payment year's rate  announcement
-          from CMS.
+          The blended risk score divided by the normalization adjustment factor 
+          for the corresponding HCC model version and payment year's rate 
+          announcement from CMS.
       - name: payment_risk_score
         description: >
-          The normalized risk score multiplied by the MA coding pattern  adjustment
-          factor for the corresponding HCC model version  and payment year's rate
-          announcement from CMS.
+          The normalized risk score multiplied by the MA coding pattern 
+          adjustment factor for the corresponding HCC model version 
+          and payment year's rate announcement from CMS.
       - name: payment_risk_score_weighted_by_months
         description: >
           Payment risk score multiplied by member_months.
       - name: member_months
         description: >
-          Member months derived from the finanicial_pmpm mart utilizing  payment year
-          eligibility.
+          Member months derived from the finanicial_pmpm mart utilizing 
+          payment year eligibility.
       - name: payment_year
         description: >
           The payment year the HCC and risk scores are being calculated for.
       - name: collection_start_date
         description: >
-          The start date for the collection period the HCC and risk scores are being
-          calculated for.
+          The start date for the collection period the HCC and risk scores are being calculated for.
       - name: collection_end_date
         description: >
-          The end date for the collection period the HCC and risk scores are being
-          calculated for.
+          The end date for the collection period the HCC and risk scores are being calculated for.
       - name: tuva_last_run
         description: The date the model was run.
 
@@ -229,8 +227,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Demographic and enrollment risk relative factor values for the  corresponding
-      HCC model version and payment year.
+      Demographic and enrollment risk relative factor values for the 
+      corresponding HCC model version and payment year.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -247,21 +245,22 @@ models:
         description: Indicates whether the patient is "Female" or "Male".
       - name: age_group
         description: >
-          Indicates what age group the patient is in. (e.g. "60-64").  CMS guidance:
-          Age is calculated as of Feb 1 of the payment year.
+          Indicates what age group the patient is in. (e.g. "60-64"). 
+          CMS guidance: Age is calculated as of Feb 1 of the payment year.
       - name: medicaid_status
         description: Indicates whether the patient is enrolled in Medicaid.
       - name: dual_status
         description: >
-          Indicates whether the patient has "Full", "Partial", or "Non"  dual status.
+          Indicates whether the patient has "Full", "Partial", or "Non" 
+          dual status.
       - name: orec
         description: >
-          Indicates the Original Reason for Entitlement Code (OREC)  "Aged", "Disabled",
-          or "ESRD".
+          Indicates the Original Reason for Entitlement Code (OREC) 
+          "Aged", "Disabled", or "ESRD".
       - name: institutional_status
         description: >
-          Indicates whether the patient resided in an institution for at  least 90
-          days.
+          Indicates whether the patient resided in an institution for at 
+          least 90 days.
       - name: enrollment_status_default
         description: >
           Indicates the input data was missing and a default status was used.
@@ -276,7 +275,8 @@ models:
           Indicates the input data was missing and a default status was used.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -296,8 +296,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Disabled and disease interaction factor values for the corresponding  HCC model
-      version and payment year.
+      Disabled and disease interaction factor values for the corresponding 
+      HCC model version and payment year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -305,7 +305,8 @@ models:
         description: Description of the disabled and disease interaction.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -326,8 +327,8 @@ models:
       materialized: table
     description: >
       Disease factor values for every enrollee's final payment-eligible HCC
-      after the hierarchy has been applied and necessary HCCs dropped for the  corresponding
-      HCC model version and payment year.
+      after the hierarchy has been applied and necessary HCCs dropped for the 
+      corresponding HCC model version and payment year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -337,7 +338,8 @@ models:
         description: HCC description.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -357,9 +359,9 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Disease interaction factor values for final payment-eligible HCC  after the
-      hierarchy has been applied and necessary HCCs dropped for the  corresponding
-      HCC model version and payment year.
+      Disease interaction factor values for final payment-eligible HCC 
+      after the hierarchy has been applied and necessary HCCs dropped for the 
+      corresponding HCC model version and payment year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -371,7 +373,8 @@ models:
         description: Description of the disease interaction.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -391,8 +394,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Conditions from eligible risk-adjustable claims per claim type for the  collection
-      year.
+      Conditions from eligible risk-adjustable claims per claim type for the 
+      collection year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -416,8 +419,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Enrollment interaction factor values for the corresponding HCC model  version
-      and payment year.
+      Enrollment interaction factor values for the corresponding HCC model 
+      version and payment year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -425,7 +428,8 @@ models:
         description: Description of the enrollment interaction.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -445,8 +449,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Final payment-eligible HCC count factor values for the corresponding  HCC model
-      version and payment year.
+      Final payment-eligible HCC count factor values for the corresponding 
+      HCC model version and payment year.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -454,7 +458,8 @@ models:
         description: HCC counts.
       - name: coefficient
         description: >
-          Relative factor value that correspond to the CMS HCC model's  risk indicators.
+          Relative factor value that correspond to the CMS HCC model's 
+          risk indicators.
       - name: factor_type
         description: >
           Type of risk factor, e.g. Demographic, Disease, etc.
@@ -497,8 +502,8 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      Eligible conditions mapped to HCC codes for the corresponding HCC model  version
-      and payment year
+      Eligible conditions mapped to HCC codes for the corresponding HCC model 
+      version and payment year
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -527,8 +532,8 @@ models:
             - person_id
             - collection_end_date
     description: >
-      Transformed eligibility data into the demographic risk segments required  for
-      the CMS HCC and risk calculations.
+      Transformed eligibility data into the demographic risk segments required 
+      for the CMS HCC and risk calculations.
     columns:
       - name: person_id
         description: Unique ID for the patient.
@@ -547,15 +552,17 @@ models:
         description: Indicates whether the patient is enrolled in Medicaid.
       - name: dual_status
         description: >
-          Indicates whether the patient has "Full", "Partial", or "Non"  dual status.
+          Indicates whether the patient has "Full", "Partial", or "Non" 
+          dual status.
       - name: orec
         description: >
-          Indicates the Original Reason for Entitlement Code (OREC)  "Aged", "Disabled",
-          or "ESRD". If available, current Medicare Status  is used when OREC is missing.
+          Indicates the Original Reason for Entitlement Code (OREC) 
+          "Aged", "Disabled", or "ESRD". If available, current Medicare Status 
+          is used when OREC is missing.
       - name: institutional_status
         description: >
-          Indicates whether the patient resided in an institution for at  least 90
-          days.
+          Indicates whether the patient resided in an institution for at 
+          least 90 days.
       - name: enrollment_status_default
         description: >
           Indicates the input data was missing and a default status was used.
@@ -638,7 +645,8 @@ models:
         description: Date the patient's insurance eligibility ended.
       - name: dual_status_code
         description: >
-          Indicates whether the patient is dually eligible for Medicare  and Medicaid.
+          Indicates whether the patient is dually eligible for Medicare 
+          and Medicaid.
       - name: medicare_status_code
         description: Indicates how the patient became eligible for Medicare.
 
@@ -658,8 +666,8 @@ models:
           Indicates the line number for the particular line of the claim.
       - name: claim_type
         description: >
-          Indicates whether the claim is professional (CMS-1500),  institutional (UB-04),
-          dental, or vision.
+          Indicates whether the claim is professional (CMS-1500), 
+          institutional (UB-04), dental, or vision.
       - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: claim_start_date
@@ -707,10 +715,10 @@ models:
         description: Name of the plan (i.e. sub contract) providing coverage.
       - name: data_source
         description: >
-          User-configured field that indicates the data source (e.g. typically  named
-          after the payer and state "BCBS Tennessee").
+          User-configured field that indicates the data source (e.g. typically 
+          named after the payer and state "BCBS Tennessee").
       - name: tuva_last_run
         description: >
-          The last time the data was refreshed.  Generated by  `dbt_utils.pretty_time`
-          as the local time of the `dbt run`  environment.  Timezone is configurable
-          via the `tuva_last_run` var.
+          The last time the data was refreshed.  Generated by 
+          `dbt_utils.pretty_time` as the local time of the `dbt run` 
+          environment.  Timezone is configurable via the `tuva_last_run` var.

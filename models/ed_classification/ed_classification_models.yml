@@ -20,13 +20,11 @@ models:
       - name: ed_classification_description
         description: ED classification category.
         meta:
-          terminology: 
-            https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/ed_classification/ed_classification__categories.csv
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/ed_classification/ed_classification__categories.csv
       - name: ed_classification_order
         description: The order of the classification.
         meta:
-          terminology: 
-            https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/ed_classification/ed_classification__categories.csv
+          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/ed_classification/ed_classification__categories.csv
       - name: person_id
         description: Unique identifier for each patient in the dataset.
       - name: encounter_end_date
@@ -35,14 +33,11 @@ models:
         description: Year and month of the encounter end date.
       - name: primary_diagnosis_code
         description: >
-          Primary diagnosis code for the encounter. If from claims the primary  diagnosis
-          code comes from the institutional claim.
+          Primary diagnosis code for the encounter. If from claims the primary 
+          diagnosis code comes from the institutional claim.
         meta:
-          terminology: 
-            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded
-            as a seed and is instead loaded from public cloud storage for supported
-            adapters."
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__icd_10_cm.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: primary_diagnosis_description
         description: Description of the primary diagnosis code.
       - name: paid_amount
@@ -54,11 +49,8 @@ models:
       - name: facility_id
         description: The ID for the facility where the encounter occurred.
         meta:
-          terminology: 
-            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
-          terminology_note: "**Note: this terminology set is too large to be loaded
-            as a seed and is instead loaded from public cloud storage for supported
-            adapters."
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: facility_name
         description: The name of the facility.
       - name: facility_state
@@ -74,8 +66,7 @@ models:
       - name: patient_sex
         description: The sex of the patient.
         meta:
-          terminology: 
-            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
       - name: patient_age
         description: The age of the patient at the time of the encounter.
       - name: patient_zip_code
@@ -87,8 +78,7 @@ models:
       - name: patient_race
         description: The race of the patient.
         meta:
-          terminology: 
-            https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
+          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
 
 
 # Intermediate
