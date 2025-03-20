@@ -47,7 +47,7 @@ select
     , etr.failed_row_count
 
     -- Map test names to categories
-    case
+    , case
 
         when dt.tags like '%"dqi_usability"%' then 'usability'
 
