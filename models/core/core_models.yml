@@ -2,6 +2,125 @@ version: 2
 
 models:
 ## Final
+  - name: core__appointment
+    description: >
+      The appointment table contains information about scheduled patient visits,
+      including the provider, location, reason, and status.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{ var('tuva_schema_prefix') }}_core
+        {% else %}core{%- endif -%}
+      alias: appointment
+      tags:
+        - core
+        - appointments
+      materialized: table
+    columns:
+      - name: appointment_id
+        description: '{{ doc("appointment_id") }}'
+        tests:
+          - unique:
+              config:
+                severity: warn
+          - not_null:
+              config:
+                severity: error
+
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
+        tests:
+          - not_null
+
+      - name: provider_id
+        description: '{{ doc("provider_id") }}'
+
+      - name: status
+        description: '{{ doc("appt_status") }}'
+        meta:
+          terminology: https://www.hl7.org/fhir/appointment.html
+        tests:
+          - accepted_values:
+              values:
+                - 'proposed'
+                - 'pending'
+                - 'booked'
+                - 'arrived'
+                - 'fulfilled'
+                - 'cancelled'
+                - 'noshow'
+                - 'entered-in-error'
+                - 'checked-in'
+                - 'waitlist'
+
+      - name: appointment_type_code
+        description: '{{ doc("appointment_type_code") }}'
+
+      - name: reason_code
+        description: '{{ doc("reason_code") }}'
+
+      - name: reason_description
+        description: '{{ doc("reason_description") }}'
+
+      - name: appointment_start_time
+        description: '{{ doc("appointment_start_time") }}'
+
+      - name: appointment_end_time
+        description: '{{ doc("appointment_end_time") }}'
+
+      - name: cancellation_reason
+        description: '{{ doc("cancellation_reason") }}'
+
+      - name: location_id
+        description: '{{ doc("location_id") }}'
+
+      - name: virtual_service
+        description: '{{ doc("virtual_service") }}'
+
+      - name: telehealth_flag
+        description: '{{ doc("telehealth_flag") }}'
+        data_type: integer
+
+      - name: emergency_flag
+        description: '{{ doc("emergency_flag") }}'
+        data_type: integer
+
+      - name: home_visit_flag
+        description: '{{ doc("home_visit_flag") }}'
+        data_type: integer
+
+      - name: specialist_referral_flag
+        description: '{{ doc("specialist_referral_flag") }}'
+        data_type: integer
+
+      - name: primary_care_flag
+        description: '{{ doc("primary_care_flag") }}'
+        data_type: integer
+
+      - name: preventive_care_flag
+        description: '{{ doc("preventive_care_flag") }}'
+        data_type: integer
+
+      - name: recurrence_id
+        description: '{{ doc("recurrence_id") }}'
+
+      - name: recurrence_type
+        description: '{{ doc("recurrence_type") }}'
+
+      - name: recurring_appointment_flag
+        description: '{{ doc("recurring_appointment_flag") }}'
+        data_type: integer
+
+      - name: created_at
+        description: '{{ doc("created_at") }}'
+
+      - name: updated_at
+        description: '{{ doc("updated_at") }}'
+
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
   - name: core__condition
     description: >
       The core condition table contains information related to medical  conditions
