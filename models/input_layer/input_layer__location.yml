@@ -1,102 +1,128 @@
 version: 2
 models:
-- name: input_layer__location
-  description: 'Mapping check to make sure all columns are mapped appropriately into the input layer. '
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
-    tags: input_layer
-    materialized: view
-  columns:
-  - name: location_id
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - unique:
-          config:
-            severity: warn
-            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
-      - not_null:
-          config:
-            severity: warn
-            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
-  - name: npi
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: name
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: facility_type
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: parent_organization
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: address
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: city
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: state
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: zip_code
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: latitude
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: longitude
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-  - name: data_source
-    description: ''
-    tests:
-      - dbt_expectations.expect_column_to_exist:
-          config:
-            severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+  - name: input_layer__location
+    description: |
+      Mapping check to make sure all columns are mapped appropriately into the input layer.
+      The location table contains information on practice and facility locations 
+      where patients receive medical care.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+      tags: input_layer
+      materialized: view
+    columns:
+      - name: location_id
+        description: '{{ doc("location_id") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
+              config:
+                severity: error
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - unique:
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
+              config:
+                severity: error
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - not_null:
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
+                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
+                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
+                'dqi_readmission']
+              config:
+                severity: error
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: npi
+        description: '{{ doc("npi") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: name
+        description: '{{ doc("name") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: facility_type
+        description: '{{ doc("facility_type") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: parent_organization
+        description: '{{ doc("parent_organization") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: address
+        description: '{{ doc("address") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: city
+        description: '{{ doc("city") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: state
+        description: '{{ doc("state") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: zip_code
+        description: '{{ doc("zip_code") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: latitude
+        description: '{{ doc("latitude") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: longitude
+        description: '{{ doc("longitude") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
