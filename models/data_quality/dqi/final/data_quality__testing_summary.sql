@@ -8,8 +8,8 @@ with latest_test_invocation as (
     from (
         select
             invocation_id
-    ,        generated_at
-    ,        ROW_NUMBER() OVER (PARTITION BY command ORDER BY generated_at DESC) as row_num
+            , generated_at
+            , ROW_NUMBER() OVER (partition by command order by generated_at desc) as row_num
         from {{ ref('dbt_invocations') }}
         where command = 'test'
     ) ranked_invocations
@@ -20,7 +20,7 @@ select
     dt.unique_id
     , dt.database_name
     , dt.schema_name
-    , etr.table_name°
+    , etr.table_name
     , dt.name as test_name
     , dt.short_name as test_short_name
     , dt.test_column_name

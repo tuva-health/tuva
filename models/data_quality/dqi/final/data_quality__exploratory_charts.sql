@@ -43,7 +43,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('MONTH', ilmc.paid_date)      as x_axis
          , DATE_TRUNC('YEAR', ilmc.claim_end_date)  as chart_filter
          {% endif %}
-         , SUM(ilmc.paid_amount)                    as value
+         , sum(ilmc.paid_amount)                    as value
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
@@ -108,7 +108,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('MONTH', ilmc.paid_date)      as x_axis
          , DATE_TRUNC('YEAR', ilmc.claim_end_date)  as chart_filter
          {% endif %}
-         , COUNT(DISTINCT ilmc.claim_id)            as value
+         , count(distinct ilmc.claim_id)            as value
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
@@ -172,7 +172,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as x_axis
          , DATE_TRUNC('YEAR', ilmc.claim_end_date)  as chart_filter
          {% endif %}
-         , SUM(ilmc.paid_amount)                    as value
+         , sum(ilmc.paid_amount)                    as value
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
@@ -220,7 +220,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('YEAR', ilmc.claim_end_date) as x_axis
          {% endif %}
          , cast(NULL as DATE)                      as chart_filter
-         , SUM(ilmc.paid_amount)                   as value
+         , sum(ilmc.paid_amount)                   as value
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
@@ -251,27 +251,27 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilmc.claim_end_date, MONTH)   as x_axis
          , DATE_TRUNC(ilmc.claim_end_date, YEAR)    as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
          , DATE_TRUNC('month', ilmc.claim_end_date) as x_axis
          , DATE_TRUNC('year', ilmc.claim_end_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
          , DATETRUNC(month, ilmc.claim_end_date)    as x_axis
          , DATETRUNC(year, ilmc.claim_end_date)     as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as x_axis
          , DATE_TRUNC('YEAR', ilmc.claim_end_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as DOUBLE) as value
+         , cast(count(distinct ilmc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as x_axis
          , DATE_TRUNC('YEAR', ilmc.claim_end_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as DECIMAL) as value
+         , cast(count(distinct ilmc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as x_axis
          , DATE_TRUNC('YEAR', ilmc.claim_end_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% endif %}
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
@@ -309,27 +309,27 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilmc.claim_end_date, YEAR)   as x_axis
          , cast(NULL as DATE)                      as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
          , DATE_TRUNC('year', ilmc.claim_end_date) as x_axis
          , cast(NULL as DATE)                      as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
          , DATETRUNC(year, ilmc.claim_end_date)    as x_axis
          , cast(NULL as DATE)                      as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('YEAR', ilmc.claim_end_date) as x_axis
          , cast(NULL as DATE)                      as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as DOUBLE) as value
+         , cast(count(distinct ilmc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
          , DATE_TRUNC('YEAR', ilmc.claim_end_date) as x_axis
          , cast(NULL as DATE)                      as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as DECIMAL) as value
+         , cast(count(distinct ilmc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , DATE_TRUNC('YEAR', ilmc.claim_end_date) as x_axis
          , cast(NULL as DATE)                      as chart_filter
-         , cast(COUNT(DISTINCT ilmc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% endif %}
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
@@ -384,7 +384,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('MONTH', ilpc.paid_date)              as x_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)         as chart_filter
          {% endif %}
-         , SUM(ilpc.paid_amount)                            as value
+         , sum(ilpc.paid_amount)                            as value
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
@@ -449,7 +449,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('MONTH', ilpc.paid_date)              as x_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)         as chart_filter
          {% endif %}
-         , COUNT(DISTINCT ilpc.claim_id)                    as value
+         , count(distinct ilpc.claim_id)                    as value
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
@@ -508,7 +508,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)  as chart_filter
          {% endif %}
-         , SUM(ilpc.paid_amount)                     as value
+         , sum(ilpc.paid_amount)                     as value
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
@@ -556,7 +556,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('YEAR', ilpc.dispensing_date) as x_axis
          {% endif %}
          , cast(NULL as DATE)                       as chart_filter
-         , SUM(ilpc.paid_amount)                    as value
+         , sum(ilpc.paid_amount)                    as value
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
@@ -587,27 +587,27 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilpc.dispensing_date, MONTH)   as x_axis
          , DATE_TRUNC(ilpc.dispensing_date, YEAR)    as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
          , DATE_TRUNC('month', ilpc.dispensing_date) as x_axis
          , DATE_TRUNC('year', ilpc.dispensing_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
          , DATETRUNC(month, ilpc.dispensing_date)    as x_axis
          , DATETRUNC(year, ilpc.dispensing_date)     as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as DOUBLE) as value
+         , cast(count(distinct ilpc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
          , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as DECIMAL) as value
+         , cast(count(distinct ilpc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)  as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% endif %}
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
@@ -645,27 +645,27 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          {% if target.type == 'bigquery' %}
          , DATE_TRUNC(ilpc.dispensing_date, YEAR)   as x_axis
          , cast(NULL as DATE)                       as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
          , DATE_TRUNC('year', ilpc.dispensing_date) as x_axis
          , cast(NULL as DATE)                       as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
          , DATETRUNC(year, ilpc.dispensing_date)    as x_axis
          , cast(NULL as DATE)                       as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('YEAR', ilpc.dispensing_date) as x_axis
          , cast(NULL as DATE)                       as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as DOUBLE) as value
+         , cast(count(distinct ilpc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
          , DATE_TRUNC('YEAR', ilpc.dispensing_date) as x_axis
          , cast(NULL as DATE)                       as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as DECIMAL) as value
+         , cast(count(distinct ilpc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , DATE_TRUNC('YEAR', ilpc.dispensing_date) as x_axis
          , cast(NULL as DATE)                       as chart_filter
-         , cast(COUNT(DISTINCT ilpc.claim_id) as NUMERIC) as value
+         , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% endif %}
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
