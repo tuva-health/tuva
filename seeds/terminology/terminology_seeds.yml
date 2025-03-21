@@ -1182,3 +1182,50 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         focus_area: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
+
+
+  - name: terminology__icd10_pcs_code_cms_ontology
+    description: |
+      A table containing the broken out elements of the ontology associated with ICD-10-PCS codes.
+      CMS posts these files in XML format, and this file was tabularized using Python.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+      alias: icd10_pcs_ontology
+      tags:
+        - terminology
+      enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        icd10_pcs_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        section: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        body_system: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        operation: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        body_part: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        approach: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        device: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        qualifier: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: icd_10_pcs_code
+        description: ICD-10-PCS code
+      - name: section
+        description: The "section" is associated with the first character of the ICD-10-PCS code.
+      - name: body_system
+        description: Body system associated with the ICD-10-PCS code; corresponds to the second character of the code.
+      - name: operation
+        description: Root operation associated with the ICD-10-PCS code; corresponds to the third character of the code
+      - name: body_part
+        description: Body part associated with the ICD-10-PCS code; corresponds to the fourth character of the code
+      - name: approach
+        description: Approach associated with the ICD-10-PCS code; corresponds to the fifth character of the code
+      - name: device
+        description: Device associated with the ICD-10-PCS code; corresponds to the sixth character of the code
+      - name: qualifier
+        description: Qualifier associated with the ICD-10-PCS code; corresponds to the seventh character of the code
