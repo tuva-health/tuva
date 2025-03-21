@@ -95,13 +95,13 @@ with all_conditions as (
         , add_flag.last_billed
         , add_flag.current_year_billed
         , cast('Prior coding history' as {{ dbt.type_string() }}) as reason
-        , {{ dbt.concat([
+        , {{ dbt_utils.concat([
             "icd_10_cm_code",
             "case"
             " when last_billed is not null then " ~
-            dbt.concat(["' last billed on '", "last_billed"]) ~
+            dbt_utils.concat(["' last billed on '", "last_billed"]) ~
             " when last_billed is null and last_recorded is not null then " ~
-            dbt.concat(["' last recorded on '", "last_recorded"]) ~
+            dbt_utils.concat(["' last recorded on '", "last_recorded"]) ~
             " else ' (missing recorded and billing dates) '"
             " end"
         ]) }} as contributing_factor
@@ -129,13 +129,13 @@ with all_conditions as (
         , last_billed
         , current_year_billed
         , 'Prior coding history' as reason
-        , {{ dbt.concat([
+        , {{ dbt_utils.concat([
             "icd_10_cm_code",
             "case"
             " when last_billed is not null then " ~
-            dbt.concat(["' last billed on '", "last_billed"]) ~
+            dbt_utils.concat(["' last billed on '", "last_billed"]) ~
             " when last_billed is null and last_recorded is not null then " ~
-            dbt.concat(["' last recorded on '", "last_recorded"]) ~
+            dbt_utils.concat(["' last recorded on '", "last_recorded"]) ~
             " else ' (missing recorded and billing dates) '"
             " end"
         ]) }} as contributing_factor

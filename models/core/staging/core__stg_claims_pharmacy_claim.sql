@@ -9,7 +9,7 @@
 -- *************************************************
 
 select
-    {{ dbt.concat([
+    {{ dbt_utils.concat([
         "cast(pharm.claim_id as " ~ dbt.type_string() ~ ")",
         "'-'",
         "cast(pharm.claim_line_number as " ~ dbt.type_string() ~ ")",

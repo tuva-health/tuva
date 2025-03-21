@@ -28,7 +28,7 @@ with input_medical as (
 select
     cast('eligibility' as {{ dbt.type_string() }}) as table_name
   , count(distinct person_id) as patient_count
-  , count(distinct {{ dbt.concat([
+  , count(distinct {{ dbt_utils.concat([
         'member_id'
       , "'-'"
       , 'enrollment_start_date'

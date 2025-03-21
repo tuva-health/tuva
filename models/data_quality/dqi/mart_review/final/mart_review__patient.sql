@@ -5,7 +5,7 @@
 }}
 
 SELECT *,
-    {{  dbt.concat([
+    {{  dbt_utils.concat([
         'person_id',
         "'|'",
         'data_source']) }} as patient_data_source_key

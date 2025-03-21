@@ -7,7 +7,7 @@
 
 select distinct
     elig.person_id
-  , {{ dbt.concat([
+  , {{ dbt_utils.concat([
         "elig.person_id",
         "coalesce(elig.data_source,'')",
         "coalesce(elig.payer,'')",

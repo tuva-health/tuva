@@ -4,7 +4,7 @@
 
 with eligibility_spans as(
     select distinct
-        {{ dbt.concat([
+        {{ dbt_utils.concat([
             "member_id",
             "'-'",
             "enrollment_start_date",
@@ -21,8 +21,8 @@ with eligibility_spans as(
 )
 , month_start_and_end_dates as (
   select
-    {{ dbt.concat(["year",
-                  dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+    {{ dbt_utils.concat(["year",
+                  dbt.right(dbt_utils.concat(["'0'", "month"]), 2)]) }} as year_month
     , min(full_date) as month_start_date
     , max(full_date) as month_end_date
   from {{ ref('reference_data__calendar')}}

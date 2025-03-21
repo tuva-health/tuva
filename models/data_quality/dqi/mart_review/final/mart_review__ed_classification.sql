@@ -20,7 +20,7 @@ SELECT
     e.paid_amount,
     e.primary_diagnosis_code,
     e.primary_diagnosis_description,
-    {{ dbt.concat([
+    {{ dbt_utils.concat([
         'e.primary_diagnosis_code',
         "'|'",
         'e.primary_diagnosis_description'
@@ -28,7 +28,7 @@ SELECT
     p.ccsr_parent_category,
     p.ccsr_category,
     p.ccsr_category_description,
-    {{ dbt.concat([
+    {{ dbt_utils.concat([
         'p.ccsr_category',
         "'|'",
         'p.ccsr_category_description'
@@ -39,12 +39,12 @@ SELECT
     e.charge_amount,
     e.data_source,
     e.length_of_stay,
-    {{ dbt.concat([
+    {{ dbt_utils.concat([
         "e.discharge_disposition_code",
         "'|'",
         "e.discharge_disposition_description"
     ]) }} as discharge_code_and_description,
-    {{ dbt.concat([
+    {{ dbt_utils.concat([
         "e.person_id",
         "'|'",
         "e.data_source"

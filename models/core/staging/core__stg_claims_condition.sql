@@ -536,7 +536,7 @@ where diagnosis_code_25 is not null
 
 select distinct
 {{ dbt.safe_cast(
-    dbt.concat([
+    dbt_utils.concat([
         "CAST(unpivot_cte.data_source AS " ~ dbt.type_string() ~ ")",
         "'_'",
         "CAST(unpivot_cte.claim_id AS " ~ dbt.type_string() ~ ")",

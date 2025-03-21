@@ -40,7 +40,7 @@ FROM RankedMonths
 ),
 Final AS (
     SELECT
-       {{ dbt.concat(["person_id", "'|'", "change_month"]) }} as membermonthkey,
+       {{ dbt_utils.concat(["person_id", "'|'", "change_month"]) }} as membermonthkey,
         data_source,
         person_id,
         change_month,

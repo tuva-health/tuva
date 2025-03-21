@@ -39,7 +39,7 @@ with cte as (
 )
 
 select *
-   , {{ dbt.concat([
+   , {{ dbt_utils.concat([
         'person_id',
         "'|'",
         'data_source']) }} as patient_source_key
