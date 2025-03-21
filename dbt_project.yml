@@ -55,6 +55,9 @@ vars:
     ## DQI data testing on input layer
     enable_input_layer_testing: true
 
+    ## Set this variable to true if you want legacy data quality models to build
+    enable_legacy_data_quality: false
+
 on-run-end:
   - "{{ log_warning_for_seeds() }}"
 
