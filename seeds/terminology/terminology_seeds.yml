@@ -1190,7 +1190,7 @@ seeds:
       CMS posts these files in XML format, and this file was tabularized using Python.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
       alias: icd10_pcs_ontology
       tags:
         - terminology
