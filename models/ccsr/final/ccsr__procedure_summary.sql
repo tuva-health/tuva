@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('ccsr_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
+   )
+}}
+
 with procedure_base as (
     select 
         encounter_id
