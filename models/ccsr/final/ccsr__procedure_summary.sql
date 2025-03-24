@@ -6,12 +6,12 @@ with procedure_base as (
         , code_description
         , ccsr_parent_category
         , ccsr_category
-        , ccsr_category_description,
+        , ccsr_category_description
         , clinical_domain
         , operation
         , approach
-        , '{{ var('tuva_last_run')}}' as tuva_last_run
     from {{ ref('ccsr__long_procedure_category') }} c
+    -- include only records that map to a CCSR procedure category
     where ccsr_category is not null
 ),
 
@@ -21,14 +21,19 @@ procedures_aggregated as (
         , ccsr_category_description
         , operation
         , approach
-        , count(distinct claim_id) as n_occurrences
-        , count(distinct person_id) as n_individuals
+        , count(claim_id) as n_occurrences_with_approach
+        , n_total_occurrences
+        , n_occurrences_with_approach / n_total_occurrences*100 as approach_rate
     from procedure_base
     group by 
         ccsr_category
         , ccsr_category_description
         , operation
         , approach
+        , n_total_occurrences
 )
 
-select * from procedures_aggregated
+select 
+    *
+    , '{{ var('tuva_last_run')}}' as tuva_last_run
+from procedures_aggregated
