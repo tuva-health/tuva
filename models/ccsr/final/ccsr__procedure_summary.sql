@@ -15,6 +15,8 @@ with procedure_base as (
         , clinical_domain
         , operation
         , approach
+        , count(claim_id) over 
+            (partition by ccsr_category, operation) as n_total_occurrences
     from {{ ref('ccsr__long_procedure_category') }}
     -- include only records that map to a CCSR procedure category
     where ccsr_category is not null
