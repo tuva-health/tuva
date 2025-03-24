@@ -17,5 +17,5 @@ select
     , ont.qualifier
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('ccsr__prccsr_v2023_1_cleaned_map')}} as ccsr_map
-left join {{ ref('terminology__cms_icd_10_pcs_code_ontology') }} as ont
+left join {{ ref('terminology__icd10_pcs_cms_ontology') }} as ont
     on ccsr_map.icd_10_pcs = ont.icd10pcs_code

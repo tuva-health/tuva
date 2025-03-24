@@ -1184,14 +1184,15 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
 
 
-  - name: test_icd10_pcs_code_seed
+  - name: terminology__icd10_pcs_cms_ontology
     description: |
-      A table containing the broken out elements of the ontology associated with ICD-10-PCS codes.
-      CMS posts these files in XML format, and this file was tabularized using Python.
+      A table containing the broken out elements of the ontology associated with ICD-10-PCS codes. These codes are a positional ontology, 
+      where each character in the code contains information about the procedure, depending on its position. CMS posts files containing these codes in XML format,
+      which can be tabularized using Python.
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: icd10_pcs_ontology
+      alias: icd10_pcs_cms_ontology
       tags:
         - terminology
       enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
