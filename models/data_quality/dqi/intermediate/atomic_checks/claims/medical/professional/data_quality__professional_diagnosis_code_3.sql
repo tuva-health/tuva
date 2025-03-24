@@ -13,7 +13,7 @@ select
     , coalesce(cast(m.claim_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     , 'MEDICAL_CLAIM' AS table_name
     , 'Claim ID | Claim Line Number' AS drill_down_key
-    , {{ dbt.concat(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
+    , {{ concat_custom(["coalesce(cast(m.claim_id as " ~ dbt.type_string() ~ "), 'null')",
                     "'|'",
                     "coalesce(cast(m.claim_line_number as " ~ dbt.type_string() ~ "), 'null')"]) }} as drill_down_value
     , 'professional' AS claim_type
@@ -27,7 +27,7 @@ select
             then 'Diagnosis Code does not join to Terminology ICD_10_CM table'
         else null
     end as invalid_reason
-    , {{ dbt.concat(["m.diagnosis_code_3", "'|'", "coalesce(term.short_description, '')"]) }} as field_value
+    , {{ concat_custom(["m.diagnosis_code_3", "'|'", "coalesce(term.short_description, '')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from base m
 left join {{ ref('terminology__icd_10_cm')}} as term on m.diagnosis_code_3 = term.icd_10_cm

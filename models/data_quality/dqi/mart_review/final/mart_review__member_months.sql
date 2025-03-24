@@ -8,7 +8,7 @@ SELECT m.*,
     COALESCE(p.total_paid, 0) AS total_paid,
     COALESCE(p.medical_paid, 0) AS medical_paid,
     COALESCE(p.pharmacy_paid, 0) AS pharmacy_paid,
-    {{ dbt.concat([
+    {{ concat_custom([
         'm.person_id',
         "'|'",
         'm.data_source'

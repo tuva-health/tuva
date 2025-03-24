@@ -9,7 +9,7 @@ select
   , d.patient_data_source_id
   , m.claim_id
   , m.claim_line_number
-  , {{ dbt.concat(["m.claim_id","'|'","cast(m.claim_line_number as " ~ dbt.type_string() ~ ")"]) }} as claim_line_id
+  , {{ concat_custom(["m.claim_id","'|'","cast(m.claim_line_number as " ~ dbt.type_string() ~ ")"]) }} as claim_line_id
   , m.claim_type
   , coalesce(m.admission_date,m.claim_line_start_date,m.claim_start_date) as start_date
   , coalesce(m.discharge_date,m.claim_line_end_date,m.claim_end_date) as end_date

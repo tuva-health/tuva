@@ -10,7 +10,7 @@ where encounter_type = 'acute inpatient'
 
 ,cte as (
 select 
-    {{ dbt.concat([
+    {{ concat_custom([
         'drg_code',
         "' - '",
         'drg_description'
@@ -25,7 +25,7 @@ where encounter_type = 'acute inpatient'
 and
 drg_code is not null
 group by 
-    {{ dbt.concat([
+    {{ concat_custom([
         'drg_code',
         "' - '",
         'drg_description'
