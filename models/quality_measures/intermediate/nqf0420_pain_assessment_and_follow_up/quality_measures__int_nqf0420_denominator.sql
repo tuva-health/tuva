@@ -132,7 +132,7 @@ with visit_codes as (
     select 
           person_id
         , max(max_date) max_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
               "coalesce(min(visit_enc), '')"
             , "coalesce(min(proc_enc), '')"
             , "coalesce(min(claim_enc), '')"

@@ -10,9 +10,9 @@ select
     , cat.classification_order as ed_classification_order
     , class.person_id
     , class.encounter_end_date
-    , {{  dbt.concat([date_part('year', 'class.encounter_end_date'),
+    , {{  concat_custom([date_part('year', 'class.encounter_end_date'),
                       dbt.right(
-                      dbt.concat(["'00'", date_part('month', 'class.encounter_end_date')])
+                      concat_custom(["'00'", date_part('month', 'class.encounter_end_date')])
                       , 2)]) }} as year_month
     , class.primary_diagnosis_code
     , class.primary_diagnosis_description

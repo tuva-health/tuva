@@ -9,7 +9,7 @@ from {{ ref('data_quality__stg_institutional_inpatient') }}
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["procedure_code_3", "'|'", "coalesce(term.description, '')"]) }} as field
+        , {{ concat_custom(["procedure_code_3", "'|'", "coalesce(term.description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__icd_10_pcs')}} as term on base.procedure_code_3 = term.icd_10_pcs

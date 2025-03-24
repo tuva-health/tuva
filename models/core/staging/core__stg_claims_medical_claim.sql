@@ -33,7 +33,7 @@ with all_encounters as (
 )
 
 select
-    {{  dbt.concat([
+    {{  concat_custom([
         "med.claim_id",
         "'-'",
         "med.claim_line_number",

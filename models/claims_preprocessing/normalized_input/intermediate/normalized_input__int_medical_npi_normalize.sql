@@ -12,21 +12,21 @@ select distinct
   , rend_prov.npi as normalized_rendering_npi
   , case 
       when rend_prov.entity_type_code = '1' then 
-        cast({{ dbt.concat(["rend_prov.provider_last_name", "', '", "rend_prov.provider_first_name"]) }} as {{ dbt.type_string() }})
+        cast({{ concat_custom(["rend_prov.provider_last_name", "', '", "rend_prov.provider_first_name"]) }} as {{ dbt.type_string() }})
       else 
         cast(rend_prov.provider_organization_name as {{ dbt.type_string() }})
     end as normalized_rendering_name
   , bill_prov.npi as normalized_billing_npi
   , case 
       when bill_prov.entity_type_code = '1' then
-        cast({{ dbt.concat(["bill_prov.provider_last_name", "', '", "bill_prov.provider_first_name"]) }} as {{ dbt.type_string() }})
+        cast({{ concat_custom(["bill_prov.provider_last_name", "', '", "bill_prov.provider_first_name"]) }} as {{ dbt.type_string() }})
       else 
         cast(bill_prov.provider_organization_name as {{ dbt.type_string() }})
     end as normalized_billing_name
   , fac_prov.npi as normalized_facility_npi
   , case 
       when fac_prov.entity_type_code = '1' then
-        cast({{ dbt.concat(["fac_prov.provider_last_name", "', '", "fac_prov.provider_first_name"]) }} as {{ dbt.type_string() }})
+        cast({{ concat_custom(["fac_prov.provider_last_name", "', '", "fac_prov.provider_first_name"]) }} as {{ dbt.type_string() }})
       else 
         cast(fac_prov.provider_organization_name as {{ dbt.type_string() }})
     end as normalized_facility_name

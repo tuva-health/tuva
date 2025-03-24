@@ -192,7 +192,7 @@ select   d.encounter_id
 , hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
 , phy.billing_id
-, {{ dbt.concat(["b2.provider_first_name", "' '", "b2.provider_last_name"]) }} as provider_name
+, {{ concat_custom(["b2.provider_first_name", "' '", "b2.provider_last_name"]) }} as provider_name
 , b2.primary_specialty_description as provider_specialty
 , sc.lab_flag
 , sc.dme_flag

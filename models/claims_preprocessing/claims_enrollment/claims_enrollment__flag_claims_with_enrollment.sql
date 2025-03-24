@@ -34,16 +34,16 @@ with claim_dates as(
         , data_source
         , inferred_claim_start_date
         , inferred_claim_start_column_used
-        , {{ dbt.concat([
-                date_part('year', 'inferred_claim_start_date'),
-                dbt.right(
-                    dbt.concat([
-                        "'0'",
-                        date_part('month', 'inferred_claim_start_date'),
-                    ]),
-                    2
-                )
-            ]) }} as inferred_claim_start_year_month
+        , {{ concat_custom([
+            date_part('year', 'inferred_claim_start_date'),
+            dbt.right(
+                concat_custom([
+                    "'0'",
+                    date_part('month', 'inferred_claim_start_date'),
+                ]),
+                2
+            )
+        ]) }} as inferred_claim_start_year_month
 from claim_dates
 
 )
