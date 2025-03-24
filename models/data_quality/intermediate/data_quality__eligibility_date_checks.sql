@@ -4,7 +4,7 @@
 
 with eligibility_spans as(
     select distinct
-        {{ dbt.concat([
+        {{ concat_custom([
             "member_id",
             "'-'",
             "enrollment_start_date",

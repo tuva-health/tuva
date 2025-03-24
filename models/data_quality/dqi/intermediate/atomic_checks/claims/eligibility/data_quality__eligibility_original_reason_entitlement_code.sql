@@ -17,7 +17,7 @@ SELECT DISTINCT
         when m.original_reason_entitlement_code is not null and term.original_reason_entitlement_code is null then 'Original Reason Entitlement Code does not join to Terminology Original Reason Entitlement Code table'
         else null
     end as invalid_reason
-    , {{ dbt.concat(["m.original_reason_entitlement_code", "'|'", "coalesce(term.original_reason_entitlement_description,'')"]) }} as field_value
+    , {{ concat_custom(["m.original_reason_entitlement_code", "'|'", "coalesce(term.original_reason_entitlement_description,'')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility')}} m
 left join {{ ref('terminology__medicare_orec')}} term on m.original_reason_entitlement_code = term.original_reason_entitlement_code

@@ -65,7 +65,7 @@ with demographic_factors as (
 
     select
           person_id
-        , {{ dbt.concat(["hcc_description", "' (HCC '", "hcc_code", "')'"]) }} as description
+        , {{ concat_custom(["hcc_description", "' (HCC '", "hcc_code", "')'"]) }} as description
         , coefficient
         , factor_type
         , model_version

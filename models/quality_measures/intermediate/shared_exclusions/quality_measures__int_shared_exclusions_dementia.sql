@@ -106,7 +106,7 @@ with patients_with_frailty as (
     select
           patients_with_frailty.person_id
         , patients_with_frailty.exclusion_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "patients_with_frailty.exclusion_reason",
             "' with '",
             "pharmacy_claim_exclusions.concept_name"
@@ -122,7 +122,7 @@ with patients_with_frailty as (
     select
           patients_with_frailty.person_id
         , medication_exclusions.dispensing_date as exclusion_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "patients_with_frailty.exclusion_reason",
             "' with '",
             "medication_exclusions.concept_name"

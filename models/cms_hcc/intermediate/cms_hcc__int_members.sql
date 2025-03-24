@@ -28,7 +28,7 @@ with stg_eligibility as (
         , dates.payment_year
         , dates.collection_start_date
         , dates.collection_end_date
-        , {{ dbt.concat(['dates.payment_year', "'-12-31'"]) }} as payment_year_end_date
+        , {{ concat_custom(['dates.payment_year', "'-12-31'"]) }} as payment_year_end_date
         , row_number() over(
             partition by elig.person_id, dates.collection_end_date
             order by elig.enrollment_end_date desc
@@ -36,7 +36,7 @@ with stg_eligibility as (
     from {{ ref('cms_hcc__stg_core__eligibility') }} as elig
     inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
         /* filter to members with eligibility in collection or payment year */
-        on elig.enrollment_start_date <= cast({{ dbt.concat(['dates.payment_year', "'-12-31'"]) }} as date)
+        on elig.enrollment_start_date <= cast({{ concat_custom(['dates.payment_year', "'-12-31'"]) }} as date)
         and elig.enrollment_end_date >= dates.collection_start_date
 
 )
@@ -45,7 +45,7 @@ with stg_eligibility as (
 
     select distinct
           payment_year
-        , cast({{ dbt.concat(['payment_year',"'-02-01'"]) }} as date) as payment_year_age_date
+        , cast({{ concat_custom(['payment_year',"'-02-01'"]) }} as date) as payment_year_age_date
     from {{ ref('cms_hcc__int_monthly_collection_dates') }}
 
 )
