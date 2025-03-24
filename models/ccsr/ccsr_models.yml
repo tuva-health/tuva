@@ -95,13 +95,20 @@ models:
     description: >
       This table stores information on procedure volume patterns across CCSR categories.
     columns:
-      - ccsr_category: The CCSR category mapped to the ICD-10-PCS code associated with the procedure
-      - ccsr_category_description: A description of the clinical domain.
-      - operation: The objective of the procedure performed
-      - approach: The way the surgical site was reached
-      - n_occurrences_with_approach: within a CCSR category, the number of times a specific approach occurred for a given operation.
-      - n_total_occurrences: for a given CCSR category, the number of times specific operation occurred
-      - approach_rate: Of all occurrences of an operation within a CCSR category, the rate at whiich a specific approach occurred.
+      - name: ccsr_category
+        description: The CCSR category mapped to the ICD-10-PCS code associated with the procedure
+      - name: ccsr_category_description
+        description: A description of the clinical domain.
+      - name: operation
+        description: The objective of the procedure performed
+      - name: approach
+        description: The way the surgical site was reached
+      - name: n_occurrences_with_approach
+        description: within a CCSR category, the number of times a specific approach occurred for a given operation.
+      - name: n_total_occurrences
+        description: for a given CCSR category, the number of times specific operation occurred
+      - name: approach_rate
+        description: Of all occurrences of an operation within a CCSR category, the rate at whiich a specific approach occurred.
 
   - name: ccsr__singular_condition_category
     config:

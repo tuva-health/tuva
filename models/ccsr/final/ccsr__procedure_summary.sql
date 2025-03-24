@@ -15,7 +15,7 @@ with procedure_base as (
         , clinical_domain
         , operation
         , approach
-    from {{ ref('ccsr__long_procedure_category') }} c
+    from {{ ref('ccsr__long_procedure_category') }}
     -- include only records that map to a CCSR procedure category
     where ccsr_category is not null
 ),
