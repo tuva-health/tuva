@@ -1182,8 +1182,6 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
         focus_area: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}
-
-
   - name: terminology__icd10_pcs_cms_ontology
     description: |
       A table containing the broken out elements of the ontology associated with ICD-10-PCS codes. These codes are a positional ontology, 
@@ -1196,7 +1194,7 @@ seeds:
       tags:
         - terminology
       column_types:
-        icd10_pcs_code: |
+        icd10pcs_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         section: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
