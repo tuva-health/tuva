@@ -6,7 +6,7 @@ with fact_medical_claim as (
     , aa.encounter_id
     , aa.payer
     , aa.claim_start_date
-    , replace(left(aa.claim_start_date,7),'-','') as year_month
+    , left(aa.claim_start_date,7) || '-01' as year_month
     , aa.service_category_id
     , aa.condition_grouper_id
     , aa.specialty_provider_id

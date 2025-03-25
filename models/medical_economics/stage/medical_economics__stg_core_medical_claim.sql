@@ -16,6 +16,12 @@ select
     , service_category_1
     , service_category_2
     , service_category_3
+    , revenue_center_code
+    , revenue_center_description
+    , rendering_id
+    , rendering_tin
+    , facility_id 
+    , facility_name
     , ms_drg_code
     , apr_drg_code
     , hcpcs_code
@@ -38,10 +44,15 @@ select
     , service_category_1
     , service_category_2
     , service_category_3
+    , revenue_center_code
+    , revenue_center_description
+    , rendering_id
+    , rendering_tin
+    , facility_id 
+    , facility_name
     , ms_drg_code
     , apr_drg_code
     , hcpcs_code
-    , rendering_id
     , paid_amount
     , allowed_amount
     , '{{ var('tuva_last_run')}}' as tuva_last_run
@@ -61,6 +72,8 @@ from {{ ref('core__medical_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as service_category_1
         , cast(null as {{ dbt.type_string() }} ) as service_category_2
         , cast(null as {{ dbt.type_string() }} ) as service_category_3
+        , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
+        , cast(null as {{ dbt.type_string() }} ) as revenue_center_description
         , cast(null as {{ dbt.type_string() }} ) as ms_drg_code
         , cast(null as {{ dbt.type_string() }} ) as apr_drg_code
         , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
@@ -80,6 +93,8 @@ select
         , cast(null as {{ dbt.type_string() }} ) as service_category_1
         , cast(null as {{ dbt.type_string() }} ) as service_category_2
         , cast(null as {{ dbt.type_string() }} ) as service_category_3
+        , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
+        , cast(null as {{ dbt.type_string() }} ) as revenue_center_description
         , cast(null as {{ dbt.type_string() }} ) as ms_drg_code
         , cast(null as {{ dbt.type_string() }} ) as apr_drg_code
         , cast(null as {{ dbt.type_string() }} ) as hcpcs_code

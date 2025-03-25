@@ -3,7 +3,7 @@ with member_months as (
   select 
       aa.person_id
     , aa.payer
-    , aa.year_month
+    , to_date(aa.year_month || '01','YYYYMMDD') as year_month
     , bb.comparative_population_id
     , aa.member_month
     , aa.risk_adjusted_member_months

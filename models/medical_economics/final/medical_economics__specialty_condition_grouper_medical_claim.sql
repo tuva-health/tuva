@@ -9,10 +9,15 @@ select
     , aa.service_category_1
     , aa.service_category_2
     , aa.service_category_3
+    , aa.revenue_center_code
+    , aa.revenue_center_description
+    , aa.rendering_id
+    , aa.rendering_tin
+    , aa.facility_id 
+    , aa.facility_name
     , aa.ms_drg_code
     , aa.apr_drg_code
     , aa.hcpcs_code
-    , aa.rendering_id
     , aa.paid_amount
     , aa.allowed_amount
     , bb.condition_grouper_1 
