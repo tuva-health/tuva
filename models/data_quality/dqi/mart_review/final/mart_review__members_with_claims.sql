@@ -4,49 +4,49 @@
    )
 }}
 
-WITH medical_claim AS (
-    SELECT
-        data_source,
-        person_id,
-        year_month,
-        SUM(paid_amount) AS paid_amount
-    FROM {{ ref('mart_review__stg_medical_claim') }}
-    GROUP BY data_source
+with medical_claim as (
+    select
+        data_source
+        , person_id
+        , year_month
+        , SUM(paid_amount) as paid_amount
+    from {{ ref('mart_review__stg_medical_claim') }}
+    group by data_source
     , person_id
     , year_month
 )
 
-,pharmacy_claim AS (
-    SELECT
-        data_source,
-        person_id,
-        year_month,
-        SUM(paid_amount) AS paid_amount
-    FROM {{ ref('mart_review__stg_pharmacy_claim') }}
-    GROUP BY data_source
+,pharmacy_claim as (
+    select
+        data_source
+        , person_id
+        , year_month
+        , SUM(paid_amount) as paid_amount
+    from {{ ref('mart_review__stg_pharmacy_claim') }}
+    group by data_source
     , person_id
     , year_month
 )
 , final as(
-SELECT
-    mm.data_source,
-    mm.year_month,
-    SUM(CASE WHEN mc.person_id IS NOT NULL THEN 1 ELSE 0 END) AS members_with_medical_claims,
-    SUM(CASE WHEN pc.person_id IS NOT NULL THEN 1 ELSE 0 END) AS members_with_pharmacy_claims,
-    SUM(CASE WHEN pc.person_id IS NOT NULL THEN 1
-             WHEN mc.person_id is not null THEN 1 ELSE 0 END) AS members_with_claims,
-    COUNT(*) AS total_member_months
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM {{ ref('core__member_months')}} mm
-LEFT JOIN medical_claim mc
-    ON mm.person_id = mc.person_id
-    AND mm.data_source = mc.data_source
-    AND mm.year_month = mc.year_month
-LEFT JOIN pharmacy_claim pc
-    ON mm.person_id = pc.person_id
-    AND mm.data_source = pc.data_source
-    AND mm.year_month = pc.year_month
-GROUP BY mm.data_source, mm.year_month
+select
+    mm.data_source
+    , mm.year_month
+    , SUM(case when mc.person_id is not null then 1 else 0 end) as members_with_medical_claims
+    , SUM(case when pc.person_id is not null then 1 else 0 end) as members_with_pharmacy_claims
+    , SUM(case when pc.person_id is not null then 1
+             when mc.person_id is not null then 1 else 0 end) as members_with_claims
+    , COUNT(*) as total_member_months
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('core__member_months') }} as mm
+left outer join medical_claim as mc
+    on mm.person_id = mc.person_id
+    and mm.data_source = mc.data_source
+    and mm.year_month = mc.year_month
+left outer join pharmacy_claim as pc
+    on mm.person_id = pc.person_id
+    and mm.data_source = pc.data_source
+    and mm.year_month = pc.year_month
+group by mm.data_source, mm.year_month
 )
 
 select
@@ -56,8 +56,7 @@ select
     , members_with_pharmacy_claims
     , members_with_claims
     , total_member_months
-    , cast(members_with_claims/ total_member_months as {{ dbt.type_numeric()}}) as percent_members_with_claims
-    , cast(members_with_medical_claims/ total_member_months  as {{ dbt.type_numeric()}}) as percent_members_with_medical_claims
-    , cast(members_with_pharmacy_claims/ total_member_months as {{ dbt.type_numeric()}})  as  percent_members_with_pharmacy_claims
+    , CAST(members_with_claims/ total_member_months as {{ dbt.type_numeric() }}) as percent_members_with_claims
+    , CAST(members_with_medical_claims/ total_member_months  as {{ dbt.type_numeric() }}) as percent_members_with_medical_claims
+    , CAST(members_with_pharmacy_claims/ total_member_months as {{ dbt.type_numeric() }})  as  percent_members_with_pharmacy_claims
 from final
-

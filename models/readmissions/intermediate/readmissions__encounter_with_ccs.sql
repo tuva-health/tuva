@@ -10,29 +10,29 @@
 
 
 select
-    aa.encounter_id,
-    aa.person_id,
-    aa.admit_date,
-    aa.discharge_date,
-    aa.discharge_disposition_code,
-    aa.facility_id,
-    aa.drg_code_type,
-    aa.drg_code,
-    aa.paid_amount,
-    aa.primary_diagnosis_code,
+    aa.encounter_id
+    , aa.person_id
+    , aa.admit_date
+    , aa.discharge_date
+    , aa.discharge_disposition_code
+    , aa.facility_id
+    , aa.drg_code_type
+    , aa.drg_code
+    , aa.paid_amount
+    , aa.primary_diagnosis_code
 
-    case
+    , case
       when bb.icd_10_cm is not null then 1
       else 0
-    end as valid_primary_diagnosis_code_flag,
+    end as valid_primary_diagnosis_code_flag
 
-    cc.ccs_diagnosis_category,
+    , cc.ccs_diagnosis_category
 
-    '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 
 from
-    {{ ref('readmissions__encounter') }} aa
-    left join {{ ref('terminology__icd_10_cm') }} bb
+    {{ ref('readmissions__encounter') }} as aa
+    left outer join {{ ref('terminology__icd_10_cm') }} as bb
     on aa.primary_diagnosis_code = bb.icd_10_cm
-    left join {{ ref('readmissions__icd_10_cm_to_ccs') }} cc
+    left outer join {{ ref('readmissions__icd_10_cm_to_ccs') }} as cc
     on aa.primary_diagnosis_code = cc.icd_10_cm

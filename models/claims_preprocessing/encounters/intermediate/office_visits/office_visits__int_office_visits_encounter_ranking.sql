@@ -5,19 +5,20 @@
 
 with rank_cte as (
 select *
-from  {{ ref('office_visits__int_office_visits_union')}}
+from {{ ref('office_visits__int_office_visits_union') }}
 )
 
-,dist_encounter as (
+, dist_encounter as (
 select distinct old_encounter_id
-,encounter_type
-,priority_number
+, encounter_type
+, priority_number
 from rank_cte
 )
 
-select 
+select
 old_encounter_id
-,encounter_type
-,priority_number
-,row_number() over (partition by old_encounter_id order by priority_number) as relative_rank
+, encounter_type
+, priority_number
+, row_number() over (partition by old_encounter_id
+order by priority_number) as relative_rank
 from dist_encounter

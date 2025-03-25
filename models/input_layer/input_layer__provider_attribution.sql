@@ -5,8 +5,8 @@
 
 {% if var('provider_attribution_enabled',False) == true -%}
 
-SELECT *
-FROM {{ ref('provider_attribution') }}
+select *
+from {{ ref('provider_attribution') }}
 
 
 {% elif var('provider_attribution_enabled',False) ==  false -%}

@@ -24,7 +24,7 @@
 {%- endset -%}
 
 with denominator as (
-    
+
     select
         person_id
     from {{ ref('quality_measures__int_adh_diabetes_denominator') }}
@@ -77,14 +77,14 @@ with denominator as (
           person_id
         , recorded_date
         , claim_id
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'snomed' then 'snomed-ct'
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -174,5 +174,5 @@ select
     , exclusion_date
     , exclusion_reason
     , exclusion_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

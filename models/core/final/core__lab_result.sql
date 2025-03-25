@@ -31,9 +31,9 @@ select
         labs.normalized_description
         , loinc.long_common_name
         , snomed_ct.description
-        ) normalized_description
+        ) as normalized_description
     , case when coalesce(labs.normalized_code, labs.normalized_description) is not null then 'manual'
-         when coalesce(loinc.loinc,snomed_ct.snomed_ct) is not null then 'automatic'
+         when coalesce(loinc.loinc, snomed_ct.snomed_ct) is not null then 'automatic'
          end as mapping_method
     , labs.normalized_component
     , labs.status
@@ -52,11 +52,11 @@ select
     , labs.ordering_practitioner_id
     , labs.data_source
     , labs.tuva_last_run
-From {{ ref('core__stg_clinical_lab_result')}} as labs
-left join {{ ref('terminology__loinc') }} loinc
+from {{ ref('core__stg_clinical_lab_result') }} as labs
+left outer join {{ ref('terminology__loinc') }} as loinc
     on labs.source_code_type = 'loinc'
         and labs.source_code = loinc.loinc
-left join {{ref('terminology__snomed_ct')}} snomed_ct
+left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on labs.source_code_type = 'snomed-ct'
         and labs.source_code = snomed_ct.snomed_ct
 
@@ -111,11 +111,11 @@ select
     , labs.ordering_practitioner_id
     , labs.data_source
     , labs.tuva_last_run
-From  {{ ref('core__stg_clinical_lab_result')}} as labs
+From  {{ ref('core__stg_clinical_lab_result') }} as labs
 left join {{ ref('terminology__loinc') }} loinc
     on labs.source_code_type = 'loinc'
         and labs.source_code = loinc.loinc
-left join {{ref('terminology__snomed_ct')}} snomed_ct
+left join {{ ref('terminology__snomed_ct') }} snomed_ct
     on labs.source_code_type = 'snomed-ct'
         and labs.source_code = snomed_ct.snomed_ct
 left join {{ ref('custom_mapped') }} custom_mapped

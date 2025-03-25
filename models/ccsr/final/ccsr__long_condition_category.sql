@@ -4,13 +4,13 @@
 }}
 
 with ccsr__dx_vertical_pivot as (
-    
-    select * from {{ ref('ccsr__dx_vertical_pivot') }} 
+
+    select * from {{ ref('ccsr__dx_vertical_pivot') }}
 
 )
 
 , condition as (
-    
+
     select * from {{ ref('ccsr__stg_core__condition') }}
 
 )
@@ -21,7 +21,7 @@ with ccsr__dx_vertical_pivot as (
 
 )
 
-select 
+select
       condition.encounter_id
     , condition.claim_id
     , condition.person_id
@@ -37,8 +37,8 @@ select
     , ccsr__dx_vertical_pivot.is_ip_default_category
     , ccsr__dx_vertical_pivot.is_op_default_category
     , {{ var('dxccsr_version') }} as dxccsr_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from condition
-left join ccsr__dx_vertical_pivot
+left outer join ccsr__dx_vertical_pivot
     on condition.normalized_code = ccsr__dx_vertical_pivot.code
-left join dxccsr_body_systems on ccsr__dx_vertical_pivot.ccsr_parent_category = dxccsr_body_systems.ccsr_parent_category
+left outer join dxccsr_body_systems on ccsr__dx_vertical_pivot.ccsr_parent_category = dxccsr_body_systems.ccsr_parent_category

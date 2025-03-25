@@ -33,14 +33,14 @@ with patients as (
     select
           person_id
         , recorded_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'snomed' then 'snomed-ct'
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -65,7 +65,7 @@ with patients as (
     select
           person_id
         , observation_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -73,7 +73,7 @@ with patients as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -86,7 +86,7 @@ with patients as (
     select
           person_id
         , procedure_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -94,7 +94,7 @@ with patients as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -205,5 +205,5 @@ select
       person_id
     , exclusion_date
     , exclusion_reason
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from patients_with_frailty

@@ -25,10 +25,10 @@ select
   , 1 as diagnosis_rank
   , diagnosis_poa_1 as present_on_admit_code
   , data_source
-from {{ ref('normalized_input__medical_claim') }} 
+from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_1 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -49,7 +49,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_2 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -70,7 +70,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_3 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -91,7 +91,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_4 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -112,7 +112,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_5 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -133,7 +133,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_6 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -154,7 +154,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_7 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -175,7 +175,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_8 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -196,7 +196,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_9 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -217,7 +217,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_10 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -238,7 +238,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_11 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -259,7 +259,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_12 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -280,7 +280,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_13 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -301,7 +301,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_14 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -322,7 +322,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_15 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -343,7 +343,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_16 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -364,7 +364,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_17 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -385,7 +385,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_18 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -406,7 +406,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_19 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -427,7 +427,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_20 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -448,7 +448,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_21 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -469,7 +469,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_22 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -490,7 +490,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_23 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -511,7 +511,7 @@ select
 from {{ ref('normalized_input__medical_claim') }}
 where diagnosis_code_24 is not null
 
-union all 
+union all
 
 select
     claim_id
@@ -546,38 +546,38 @@ select distinct
         "CAST(unpivot_cte.source_code AS " ~ dbt.type_string() ~ ")",
     ]), api.Column.translate_type("string"))
  }} as condition_id
-    , cast(unpivot_cte.person_id as {{ dbt.type_string() }} ) as person_id
-    , cast(unpivot_cte.member_id as {{ dbt.type_string() }} ) as member_id
-    , cast(null as {{ dbt.type_string() }} ) as patient_id
-    , cast(null as {{ dbt.type_string() }} ) as encounter_id --one claim can be on multiple encounters, so nulling out for now
-    , cast(unpivot_cte.claim_id as {{ dbt.type_string() }} ) as claim_id
+    , cast(unpivot_cte.person_id as {{ dbt.type_string() }}) as person_id
+    , cast(unpivot_cte.member_id as {{ dbt.type_string() }}) as member_id
+    , cast(null as {{ dbt.type_string() }}) as patient_id
+    , cast(null as {{ dbt.type_string() }}) as encounter_id --one claim can be on multiple encounters, so nulling out for now
+    , cast(unpivot_cte.claim_id as {{ dbt.type_string() }}) as claim_id
     , {{ try_to_cast_date('unpivot_cte.recorded_date', 'YYYY-MM-DD') }} as recorded_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as onset_date
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as resolved_date
-    , cast('active' as {{ dbt.type_string() }} ) as status
-    , cast(unpivot_cte.condition_type as {{ dbt.type_string() }} ) as condition_type
-    , cast(unpivot_cte.source_code_type as {{ dbt.type_string() }} ) as source_code_type
-    , cast(unpivot_cte.source_code as {{ dbt.type_string() }} ) as source_code
-    , cast(null as {{ dbt.type_string() }} ) as source_description
+    , cast('active' as {{ dbt.type_string() }}) as status
+    , cast(unpivot_cte.condition_type as {{ dbt.type_string() }}) as condition_type
+    , cast(unpivot_cte.source_code_type as {{ dbt.type_string() }}) as source_code_type
+    , cast(unpivot_cte.source_code as {{ dbt.type_string() }}) as source_code
+    , cast(null as {{ dbt.type_string() }}) as source_description
     , cast(
         case
         when icd.icd_10_cm is not null then 'icd-10-cm'
         end as {{ dbt.type_string() }}
       ) as normalized_code_type
-    , cast(icd.icd_10_cm as {{ dbt.type_string() }} ) as normalized_code
-    , cast(icd.long_description as {{ dbt.type_string() }} ) as normalized_description
-    , cast(unpivot_cte.diagnosis_rank as {{ dbt.type_int() }} ) as condition_rank
-    , cast(unpivot_cte.present_on_admit_code as {{ dbt.type_string() }} ) as present_on_admit_code
-    , cast(poa.present_on_admit_description as {{ dbt.type_string() }} ) as present_on_admit_description
-    , cast(unpivot_cte.data_source as {{ dbt.type_string() }} ) as data_source
-    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
+    , cast(icd.icd_10_cm as {{ dbt.type_string() }}) as normalized_code
+    , cast(icd.long_description as {{ dbt.type_string() }}) as normalized_description
+    , cast(unpivot_cte.diagnosis_rank as {{ dbt.type_int() }}) as condition_rank
+    , cast(unpivot_cte.present_on_admit_code as {{ dbt.type_string() }}) as present_on_admit_code
+    , cast(poa.present_on_admit_description as {{ dbt.type_string() }}) as present_on_admit_description
+    , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from unpivot_cte
 --inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
 --and
 --unpivot_cte.claim_line_number = x.claim_line_number
 --and
 --x.claim_line_attribution_number = 1
-left join {{ ref('terminology__icd_10_cm') }} icd
+left outer join {{ ref('terminology__icd_10_cm') }} as icd
     on unpivot_cte.source_code = icd.icd_10_cm
-left join {{ ref('terminology__present_on_admission') }} as poa
+left outer join {{ ref('terminology__present_on_admission') }} as poa
     on unpivot_cte.present_on_admit_code = poa.present_on_admit_code

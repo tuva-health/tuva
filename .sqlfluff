@@ -1,0 +1,54 @@
+[sqlfluff]
+dialect = ansi
+templater = dbt
+rules = AL01, AL02, AL03, AL04, AM01, AM02, AM05, AM06, AM07, CP01, CP02, CP03, CP04, CP05, CV01, L019, L022, LT01, LT04, LT12, LT14, JJ01
+large_file_skip_byte_limit = 100000
+
+[sqlfluff:templater:dbt]
+project_dir = .
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+
+[sqlfluff:core]
+fix_even_unparsable = True
+
+[sqlfluff:indentation]
+indented_joins = True
+indented_using_on = True
+template_blocks_indent = False
+tab_space_size = 2
+indent_unit = space
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.identifiers]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.types]
+capitalisation_policy = lower
+
+[sqlfluff:layout:type:comma]
+line_position = leading
+
+[sqlfluff:rules:layout.select_targets]
+wildcard_policy = single
+
+[sqlfluff:rules:layout.long_lines]
+max_line_length = 120
+
+[sqlfluff:aliasing]
+aliasing = explicit
+
+[sqlfluff:rules:ambiguous.column_references]
+group_by_and_order_by_style = explicit
+
+[sqlfluff:rules:ambiguous.join]
+fully_qualify_join_types = both

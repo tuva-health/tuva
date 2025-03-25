@@ -3,7 +3,7 @@
    )
 }}
 
-WITH combine_line_models AS (
+with combine_line_models as (
   {{ dbt_utils.union_relations(
     relations=[
       ref('service_category__pharmacy_institutional'),
@@ -17,11 +17,11 @@ WITH combine_line_models AS (
   ) }}
 )
 
-SELECT
-  l.claim_id,
-  l.claim_line_number,
-  l.service_category_1,
-  l.service_category_2,
-  l.service_category_3,
-  l.source_model_name
-FROM combine_line_models l
+select
+  l.claim_id
+  , l.claim_line_number
+  , l.service_category_1
+  , l.service_category_2
+  , l.service_category_3
+  , l.source_model_name
+from combine_line_models as l

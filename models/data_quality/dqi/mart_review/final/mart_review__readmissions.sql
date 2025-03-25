@@ -4,6 +4,6 @@
    )
 }}
 
-SELECT *
-FROM {{ ref('readmissions__readmission_summary') }}
-WHERE index_admission_flag = 1
+select *
+from {{ ref('readmissions__readmission_summary') }}
+where index_admission_flag = 1

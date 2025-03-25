@@ -25,7 +25,7 @@ with denominator as (
 
     select
           person_id
-    from {{ ref('quality_measures__int_adh_statins_denominator')}}
+    from {{ ref('quality_measures__int_adh_statins_denominator') }}
 
 )
 
@@ -75,8 +75,8 @@ with denominator as (
         , condition.recorded_date as exclusion_date
         , esrd_codes.concept_name as exclusion_reason
     from {{ ref('quality_measures__stg_core__condition') }} as condition
-    inner join esrd_codes 
-      on coalesce(condition.normalized_code, condition.source_code) = esrd_codes.code 
+    inner join esrd_codes
+      on coalesce(condition.normalized_code, condition.source_code) = esrd_codes.code
         and coalesce(condition.normalized_code_type, condition.source_code_type) = esrd_codes.code_system
     where condition.recorded_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
@@ -84,7 +84,7 @@ with denominator as (
 
 , exclusions as (
 
-    select 
+    select
           person_id
         , exclusion_date
         , exclusion_reason
@@ -92,7 +92,7 @@ with denominator as (
 
     union all
 
-    select 
+    select
           person_id
         , exclusion_date
         , exclusion_reason
@@ -102,7 +102,7 @@ with denominator as (
 
 , measure_exclusions as (
 
-    select 
+    select
           exclusions.person_id
         , exclusion_date
         , exclusion_reason
@@ -129,5 +129,5 @@ select
     , exclusion_date
     , exclusion_reason
     , exclusion_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run 
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

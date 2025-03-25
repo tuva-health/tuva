@@ -25,7 +25,7 @@ with denominator as (
 
     select
           person_id
-    from {{ ref('quality_measures__int_adhras_denominator')}}
+    from {{ ref('quality_measures__int_adhras_denominator') }}
 
 )
 
@@ -61,8 +61,8 @@ with denominator as (
         , condition.recorded_date as exclusion_date
         , codes.concept_name as exclusion_reason
     from {{ ref('quality_measures__stg_core__condition') }} as condition
-    inner join codes 
-      on coalesce(condition.normalized_code, condition.source_code) = codes.code 
+    inner join codes
+      on coalesce(condition.normalized_code, condition.source_code) = codes.code
         and coalesce(condition.normalized_code_type, condition.source_code_type) = codes.code_system
     where condition.recorded_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
@@ -76,14 +76,14 @@ with denominator as (
         , codes.concept_name as exclusion_reason
     from {{ ref('quality_measures__stg_pharmacy_claim') }} as pharmacy_claim
     inner join codes
-      on pharmacy_claim.ndc_code = codes.code 
+      on pharmacy_claim.ndc_code = codes.code
     where pharmacy_claim.dispensing_date between {{ performance_period_begin }} and {{ performance_period_end }}
 
 )
 
 , exclusions as (
 
-    select 
+    select
           person_id
         , exclusion_date
         , exclusion_reason
@@ -91,7 +91,7 @@ with denominator as (
 
     union all
 
-    select 
+    select
           person_id
         , exclusion_date
         , exclusion_reason
@@ -99,17 +99,17 @@ with denominator as (
 
     union all
 
-    select 
+    select
           person_id
         , exclusion_date
-        , exclusion_reason 
+        , exclusion_reason
     from sacubitril_pharmacy_claim
 
 )
 
 , measure_exclusions as (
 
-    select 
+    select
           exclusions.person_id
         , exclusion_date
         , exclusion_reason
@@ -136,5 +136,5 @@ select
     , exclusion_date
     , exclusion_reason
     , exclusion_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run 
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

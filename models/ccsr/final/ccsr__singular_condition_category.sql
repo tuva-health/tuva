@@ -3,7 +3,7 @@
    )
 }}
 
-select 
+select
       encounter_id
     , claim_id
     , person_id
@@ -13,7 +13,7 @@ select
     , parent_category_description
     , body_system
     , {{ var('dxccsr_version') }} as dxccsr_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ref('ccsr__long_condition_category')}}
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('ccsr__long_condition_category') }}
 where is_{{ var('record_type', 'ip') }}_default_category = 1
 and condition_rank = 1

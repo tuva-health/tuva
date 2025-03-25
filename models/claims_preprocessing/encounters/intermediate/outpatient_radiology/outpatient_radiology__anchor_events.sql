@@ -13,9 +13,9 @@ with service_category as (
     service_category_2 = 'outpatient radiology' --both professional and inst
 )
 
-select distinct 
+select distinct
     patient_data_source_id
     , start_date
     , hcpcs_code
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+, '{{ var('tuva_last_run') }}' as tuva_last_run
 from service_category

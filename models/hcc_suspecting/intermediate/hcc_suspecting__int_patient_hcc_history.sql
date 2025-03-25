@@ -73,7 +73,7 @@ with all_conditions as (
           end as current_year_billed
 
     from hcc_grouped
-         left join hcc_billed
+         left outer join hcc_billed
          on hcc_grouped.person_id = hcc_billed.person_id
          and hcc_grouped.hcc_code = hcc_billed.hcc_code
          and hcc_grouped.data_source = hcc_billed.data_source
@@ -107,7 +107,7 @@ with all_conditions as (
         ]) }} as contributing_factor
         , coalesce(last_billed, last_recorded) as condition_date
     from all_conditions
-         left join add_flag
+         left outer join add_flag
             on all_conditions.person_id = add_flag.person_id
             and all_conditions.hcc_code = add_flag.hcc_code
             and all_conditions.data_source = add_flag.data_source
@@ -184,5 +184,5 @@ select
     , reason
     , contributing_factor
     , suspect_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

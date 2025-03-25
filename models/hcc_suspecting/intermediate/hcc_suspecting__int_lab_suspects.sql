@@ -63,7 +63,7 @@ with egfr_labs as (
         , max_lab_date.max_result_date
         , max(egfr_labs.result_date) as lookback_result_date
     from egfr_labs
-        left join max_lab_date
+        left outer join max_lab_date
         on egfr_labs.person_id = max_lab_date.person_id
         and egfr_labs.data_source = max_lab_date.data_source
     where egfr_labs.result_date <= {{ dateadd('day', -90, 'max_result_date') }}
@@ -159,7 +159,7 @@ with egfr_labs as (
     from unioned
         inner join seed_hcc_descriptions
             on unioned.hcc_code = seed_hcc_descriptions.hcc_code
-        left join billed_hccs
+        left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
@@ -218,5 +218,5 @@ select
     , reason
     , contributing_factor
     , suspect_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

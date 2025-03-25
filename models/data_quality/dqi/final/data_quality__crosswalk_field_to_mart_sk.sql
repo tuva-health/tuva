@@ -14,7 +14,7 @@ with results as (
         table_name as input_layer_table_name
       , claim_type
       , field_name
-      , cast(NULL as {{ dbt.type_string() }}) AS mart_name
+      , cast(null as {{ dbt.type_string() }}) as mart_name
     from {{ ref('data_quality__data_quality_detail') }}
 
     union all
@@ -35,8 +35,9 @@ with results as (
       , claim_type
       , field_name
       , mart_name
-      , DENSE_RANK () OVER (ORDER BY input_layer_table_name, claim_type, field_name) as table_claim_type_field_sk
-	, '{{ var('tuva_last_run')}}' as tuva_last_run
+      , dense_rank() over (
+order by input_layer_table_name, claim_type, field_name) as table_claim_type_field_sk
+	, '{{ var('tuva_last_run') }}' as tuva_last_run
     from results
     group by
         input_layer_table_name

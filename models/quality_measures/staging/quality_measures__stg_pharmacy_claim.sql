@@ -11,7 +11,7 @@ select
     , ndc_code
     , days_supply
     , paid_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -22,7 +22,7 @@ select
     , ndc_code
     , days_supply
     , paid_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}

@@ -16,7 +16,7 @@ with chronic_conditions as (
         , claim_id
         , recorded_date as start_date
         , normalized_code_type as code_type
-        , replace(normalized_code,'.','') as code
+        , replace(normalized_code, '.', '') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__condition') }}
 
@@ -43,7 +43,7 @@ with chronic_conditions as (
         , claim_id
         , procedure_date as start_date
         , normalized_code_type as code_type
-        , replace(normalized_code,'.','') as code
+        , replace(normalized_code, '.', '') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__procedure') }}
 
@@ -149,9 +149,9 @@ select distinct
     , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }}) as condition_category
     , cast(inclusions_unioned.condition as {{ dbt.type_string() }}) as condition
     , cast(inclusions_unioned.data_source as {{ dbt.type_string() }}) as data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from inclusions_unioned
-     left join exclusions_diagnosis
+     left outer join exclusions_diagnosis
          on inclusions_unioned.claim_id = exclusions_diagnosis.claim_id
          and inclusions_unioned.condition = exclusions_diagnosis.condition
 where exclusions_diagnosis.claim_id is null

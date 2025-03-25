@@ -17,7 +17,7 @@ select
     , hcpcs_modifier_3
     , hcpcs_modifier_4
     , hcpcs_modifier_5
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medical_claim') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -34,7 +34,7 @@ select
     , hcpcs_modifier_3
     , hcpcs_modifier_4
     , hcpcs_modifier_5
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medical_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
