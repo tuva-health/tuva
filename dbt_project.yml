@@ -124,8 +124,6 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.3','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.3','icd_10_pcs.csv',compression=true,null_marker=true) }}"
-      terminology__icd10_pcs_cms_ontology:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.3','icd_10_pcs_cms_ontology.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_cm:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.3','icd_9_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_pcs:
