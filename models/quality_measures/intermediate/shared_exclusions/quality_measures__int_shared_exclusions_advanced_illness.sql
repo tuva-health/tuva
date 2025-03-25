@@ -139,7 +139,7 @@ with patients_with_frailty as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
                  "patients_with_frailty.exclusion_reason",
                  "' with '",
                  "med_claim_exclusions.concept_name",
@@ -161,7 +161,7 @@ with patients_with_frailty as (
     select distinct
           patients_with_frailty.person_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
                  "patients_with_frailty.exclusion_reason",
                  "' with '",
                  "procedure_exclusions.concept_name",
@@ -189,7 +189,7 @@ with patients_with_frailty as (
               med_claim_exclusions.claim_start_date
             , med_claim_exclusions.claim_end_date
           ) as exclusion_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
                  "patients_with_frailty.exclusion_reason",
                  "' with '",
                  "med_claim_exclusions.concept_name",
@@ -217,7 +217,7 @@ with patients_with_frailty as (
     select distinct
           patients_with_frailty.person_id
         , procedure_exclusions.procedure_date as exclusion_date
-        , {{ dbt.concat([
+        , {{ concat_custom([
                  "patients_with_frailty.exclusion_reason",
                  "' with '",
                  "procedure_exclusions.concept_name",

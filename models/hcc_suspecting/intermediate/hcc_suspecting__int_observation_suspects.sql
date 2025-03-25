@@ -283,13 +283,13 @@ with conditions as (
         , condition_concept_name
         , hcc_code
         , hcc_description
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "'BMI result '",
             "observation_result",
             "case"
             " when condition_code is null then '' "
             " else " ~
-            dbt.concat(["' with '",
+            concat_custom(["' with '",
                         "condition_concept_name",
                         "'('",
                         "condition_code",
@@ -366,7 +366,7 @@ with conditions as (
         , depression_assessments_ordered.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "'PHQ-9 result '",
             "depression_assessments_ordered.result",
             "' on '",

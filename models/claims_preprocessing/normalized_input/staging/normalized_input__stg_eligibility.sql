@@ -7,7 +7,7 @@
 
 select
       person_id
-    , {{ dbt.concat([
+    , {{ concat_custom([
         "person_id",
         "coalesce(data_source,'')",
         "coalesce(payer,'')",

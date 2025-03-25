@@ -6,7 +6,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -25,7 +25,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -44,7 +44,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -63,7 +63,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -82,7 +82,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -101,7 +101,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -120,7 +120,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (

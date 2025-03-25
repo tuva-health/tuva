@@ -13,9 +13,9 @@ select
     , cast(payer as {{ dbt.type_string() }} ) as payer
     , cast({{ quote_column('plan') }} as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
     , cast(prescribing_provider_npi as {{ dbt.type_string() }} ) as prescribing_provider_id
-    , cast(coalesce({{ dbt.concat(["pres.provider_last_name", "', '", "pres.provider_first_name"]) }}, pres.provider_organization_name) as {{ dbt.type_string() }} ) as prescribing_provider_name
+    , cast(coalesce({{ concat_custom(["pres.provider_last_name", "', '", "pres.provider_first_name"]) }}, pres.provider_organization_name) as {{ dbt.type_string() }} ) as prescribing_provider_name
     , cast(dispensing_provider_npi as {{ dbt.type_string() }} ) as dispensing_provider_id
-    , cast(coalesce({{ dbt.concat(["disp.provider_last_name", "', '", "disp.provider_first_name"]) }}, disp.provider_organization_name) as {{ dbt.type_string() }} ) as dispensing_provider_name    , cast(dispensing_date as date ) as dispensing_date
+    , cast(coalesce({{ concat_custom(["disp.provider_last_name", "', '", "disp.provider_first_name"]) }}, disp.provider_organization_name) as {{ dbt.type_string() }} ) as dispensing_provider_name    , cast(dispensing_date as date ) as dispensing_date
     , cast(ndc_code as {{ dbt.type_string() }} ) as ndc_code
     , cast(ndc.fda_description as {{ dbt.type_string() }} ) as ndc_description
     , cast(quantity as int ) as quantity
