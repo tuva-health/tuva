@@ -71,6 +71,26 @@ run_dbt_debug() {
   echo "$dbt_output"
 }
 
+# Function to run dbt clean
+run_dbt_clean() {
+  echo "Running dbt clean..."
+  if ! dbt clean; then
+    echo "Error: dbt clean failed." >&2
+    exit 1
+  fi
+  echo "dbt clean completed successfully."
+}
+
+# Function to run dbt deps
+run_dbt_deps() {
+  echo "Running dbt deps..."
+  if ! dbt deps; then
+    echo "Error: dbt deps failed. Unable to install dependencies." >&2
+    exit 1
+  fi
+  echo "dbt deps completed successfully."
+}
+
 # Function to prompt user confirmation (Only runs in local mode)
 prompt_user_confirmation() {
   local debug_output="$1"
@@ -361,6 +381,12 @@ main() {
   # Run dbt debug and capture output for potential confirmation
   # Suppress debug output showing in main log, only show if error or needed for prompt
   debug_output=$(run_dbt_debug)
+
+  # Run dbt clean to remove the target directory
+  run_dbt_clean
+
+  # Run dbt deps to install dependencies
+  run_dbt_deps
 
   # Prompt user ONLY if in local mode
   prompt_user_confirmation "$debug_output"
