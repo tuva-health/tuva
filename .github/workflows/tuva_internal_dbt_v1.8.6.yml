@@ -76,15 +76,15 @@ jobs:
           echo "default:
             outputs:
               dev:
-                account: "{{ env_var('DBT_TUVA_SNOWFLAKE_ACCOUNT') }}"
+                account: \"{{ env_var('DBT_TUVA_SNOWFLAKE_ACCOUNT') }}\"
                 database: dev_ci_testing
-                password: "{{ env_var('DBT_SNOWFLAKE_CI_PASSWORD') }}"
-                role: "{{ env_var('DBT_SNOWFLAKE_CI_ROLE') }}"
-                schema: "{{ env_var('DBT_SNOWFLAKE_CI_SCHEMA') }}"
+                password: \"{{ env_var('DBT_SNOWFLAKE_CI_PASSWORD') }}\"
+                role: \"{{ env_var('DBT_SNOWFLAKE_CI_ROLE') }}\"
+                schema: \"{{ env_var('DBT_SNOWFLAKE_CI_SCHEMA') }}\"
                 threads: 8
                 type: snowflake
-                user: "{{ env_var('DBT_SNOWFLAKE_CI_USER') }}"
-                warehouse: "{{ env_var('DBT_SNOWFLAKE_CI_WAREHOUSE') }}"
+                user: \"{{ env_var('DBT_SNOWFLAKE_CI_USER') }}\"
+                warehouse: \"{{ env_var('DBT_SNOWFLAKE_CI_WAREHOUSE') }}\"
             target: dev" > ~/.dbt/profiles.yml
 
       - name: Check if lint script exists
