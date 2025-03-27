@@ -110,15 +110,16 @@ jobs:
         run: |
           output_file="SQLFLUFF_LINTER_OUTPUT.TXT" # Matches script variable
           if [ -f "$output_file" ]; then
+            # Read the file content, preserving newlines
             content=$(cat "$output_file")
           else
             content="Lint output file ($output_file) not found."
           fi
-          # Escape characters for multiline JSON/YAML compatibility
           content="${content//'%'/'%25'}"
-          content="${content//$'\n'/'%0A'}"
-          content="${content//$'\r'/'%0D'}"
-          echo "content=$content" >> $GITHUB_OUTPUT
+          EOF_MARKER=$(uuidgen)
+          echo "content<<${EOF_MARKER}" >> $GITHUB_OUTPUT
+          echo "$content" >> $GITHUB_OUTPUT
+          echo "${EOF_MARKER}" >> $GITHUB_OUTPUT
         shell: bash
 
       - name: Create Comment on PR Failure
