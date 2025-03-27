@@ -30,7 +30,7 @@ procedures_aggregated as (
         , approach
         , count(claim_id) as n_occurrences_with_approach
         , n_total_occurrences
-        , n_occurrences_with_approach / n_total_occurrences*100 as approach_rate
+        , count(claim_id) / n_total_occurrences*100 as approach_rate
     from procedure_base
     group by 
         ccsr_category
