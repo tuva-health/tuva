@@ -3,7 +3,7 @@
    )
 }}
 
-with CTE as (
+with cte as (
 select * from {{ ref('data_quality__condition_claim_id') }}
 
 union all
@@ -661,16 +661,16 @@ select * from {{ ref('data_quality__observation_patient_id') }}
 )
 
 select
-    DATA_SOURCE
-    , cast(SOURCE_DATE as {{ dbt.type_string() }}) as SOURCE_DATE
-    , TABLE_NAME
-    , DRILL_DOWN_KEY
-    , DRILL_DOWN_VALUE
-    , FIELD_NAME
-    , BUCKET_NAME
-    , INVALID_REASON
-    , FIELD_VALUE
-    , TUVA_LAST_RUN
+    data_source
+    , cast(source_date as {{ dbt.type_string() }}) as source_date
+    , table_name
+    , drill_down_key
+    , drill_down_value
+    , field_name
+    , bucket_name
+    , invalid_reason
+    , field_value
+    , tuva_last_run
     , dense_rank() over (
-order by DATA_SOURCE, TABLE_NAME, FIELD_NAME) + 100000 as SUMMARY_SK
-from CTE
+order by data_source, table_name, field_name) + 100000 as summary_sk
+from cte
