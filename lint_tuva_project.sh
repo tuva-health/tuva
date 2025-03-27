@@ -400,16 +400,12 @@ main() {
   if ! run_sqlfluff; then
     # run_sqlfluff returns non-zero
     echo -e "\nLinting process completed with issues detected. Check logs above and $SQLFLUFF_OUTPUT_FILE." >&2
-    # The trap will handle cleanup and exit with the non-zero status from run_sqlfluff
-    # No 'exit 1' needed here because set -e and the ! condition handle it.
-    # If set -e is not used, you would need 'exit 1' here.
+    exit 1
   else
     # run_sqlfluff returns 0
     echo -e "\nLinting process completed successfully!"
   fi
 
-  # Cleanup is handled by the trap on successful completion as well
-  # Script reaches end, trap runs, exits with 0
 }
 
 # --- Run Main ---
@@ -418,4 +414,4 @@ main() {
 echo "Starting Lint Script - Mode: $MODE, Fix: $RUN_FIX, Time: $(date)" > "$SQLFLUFF_OUTPUT_FILE"
 echo "Log file: $SQLFLUFF_OUTPUT_FILE"
 
-main # Arguments were already parsed
+main
