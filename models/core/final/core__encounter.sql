@@ -6,7 +6,7 @@
 
 {% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
 
-    select *, 'claim' as encounter_source_type
+    select *,'claim' as encounter_source_type
     from {{ ref('core__stg_claims_encounter') }}
 
     union all
