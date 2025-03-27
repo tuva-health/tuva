@@ -19,13 +19,13 @@ select distinct
   , cal_death.full_date as normalized_death_date
   , cal_enroll_start.full_date as normalized_enrollment_start_date
   , cal_enroll_end.full_date as normalized_enrollment_end_date
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('normalized_input__stg_eligibility') }} elig
-left join {{ ref('reference_data__calendar') }} cal_dob
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('normalized_input__stg_eligibility') }} as elig
+left outer join {{ ref('reference_data__calendar') }} as cal_dob
     on elig.birth_date = cal_dob.full_date
-left join {{ ref('reference_data__calendar') }} cal_death
+left outer join {{ ref('reference_data__calendar') }} as cal_death
     on elig.death_date = cal_death.full_date
-left join {{ ref('reference_data__calendar') }} cal_enroll_start
+left outer join {{ ref('reference_data__calendar') }} as cal_enroll_start
     on elig.enrollment_start_date = cal_enroll_start.full_date
-left join {{ ref('reference_data__calendar') }} cal_enroll_end
+left outer join {{ ref('reference_data__calendar') }} as cal_enroll_end
     on elig.enrollment_end_date = cal_enroll_end.full_date

@@ -5,56 +5,56 @@
 }}
 
 with data_sources as (
-SELECT DISTINCT data_source
-FROM {{ ref('core__condition')}}
+select distinct data_source
+from {{ ref('core__condition') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__eligibility')}}
+select distinct data_source
+from {{ ref('core__eligibility') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__encounter')}}
+select distinct data_source
+from {{ ref('core__encounter') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__location')}}
+select distinct data_source
+from {{ ref('core__location') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__medical_claim')}}
+select distinct data_source
+from {{ ref('core__medical_claim') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__member_months')}}
+select distinct data_source
+from {{ ref('core__member_months') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__patient')}}
+select distinct data_source
+from {{ ref('core__patient') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__pharmacy_claim')}}
+select distinct data_source
+from {{ ref('core__pharmacy_claim') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__practitioner')}}
+select distinct data_source
+from {{ ref('core__practitioner') }}
 
-UNION ALL
+union all
 
-SELECT DISTINCT data_source
-FROM {{ ref('core__procedure')}}
+select distinct data_source
+from {{ ref('core__procedure') }}
 )
 
-SELECT DISTINCT
+select distinct
     data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from data_sources

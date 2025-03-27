@@ -13,7 +13,7 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} as med
 inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpatient
   on med.claim_id = outpatient.claim_id
-where 
+where
   substring(med.bill_type_code, 1, 2) in ('72')
   or med.primary_taxonomy_code in (
       '2472R0900X'

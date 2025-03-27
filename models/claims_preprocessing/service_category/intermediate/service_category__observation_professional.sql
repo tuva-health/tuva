@@ -16,5 +16,5 @@ from {{ ref('service_category__stg_medical_claim') }} as med
 inner join {{ ref('service_category__stg_professional') }} as prof
   on med.claim_id = prof.claim_id
   and med.claim_line_number = prof.claim_line_number
-where 
+where
   med.hcpcs_code in ('G0378', 'G0379')

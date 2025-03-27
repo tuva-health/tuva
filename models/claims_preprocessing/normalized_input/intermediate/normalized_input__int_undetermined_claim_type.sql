@@ -158,30 +158,30 @@ select
     , procedure_date_24
     , procedure_date_25
     , data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('normalized_input__stg_medical_claim') }} med
-left join {{ ref('terminology__admit_source')}} ad_src
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('normalized_input__stg_medical_claim') }} as med
+left outer join {{ ref('terminology__admit_source') }} as ad_src
     on med.admit_source_code = ad_src.admit_source_code
-left join {{ ref('terminology__admit_type')}} ad_type
+left outer join {{ ref('terminology__admit_type') }} as ad_type
     on med.admit_type_code = ad_type.admit_type_code
-left join {{ ref('terminology__discharge_disposition')}} dis
+left outer join {{ ref('terminology__discharge_disposition') }} as dis
     on med.discharge_disposition_code = dis.discharge_disposition_code
-left join {{ ref('terminology__place_of_service')}} pos
+left outer join {{ ref('terminology__place_of_service') }} as pos
     on med.place_of_service_code = pos.place_of_service_code
-left join {{ ref('terminology__bill_type')}} tob
+left outer join {{ ref('terminology__bill_type') }} as tob
     on med.bill_type_code = tob.bill_type_code
-left join {{ ref('terminology__ms_drg')}} msdrg
+left outer join {{ ref('terminology__ms_drg') }} as msdrg
     on med.drg_code_type = 'ms-drg'
     and med.drg_code = msdrg.ms_drg_code
-left join {{ ref('terminology__apr_drg')}} aprdrg
+left outer join {{ ref('terminology__apr_drg') }} as aprdrg
     on med.drg_code_type = 'apr-drg'
     and med.drg_code = aprdrg.apr_drg_code
-left join {{ ref('terminology__revenue_center')}} rev
+left outer join {{ ref('terminology__revenue_center') }} as rev
     on med.revenue_center_code = rev.revenue_center_code
-left join {{ ref('terminology__provider')}} rendnpi
+left outer join {{ ref('terminology__provider') }} as rendnpi
     on med.rendering_npi = rendnpi.npi
-left join {{ ref('terminology__provider')}} billnpi
+left outer join {{ ref('terminology__provider') }} as billnpi
     on med.billing_npi = billnpi.npi
-left join {{ ref('terminology__provider')}} facnpi
+left outer join {{ ref('terminology__provider') }} as facnpi
     on med.facility_npi = facnpi.npi
 where claim_type in ('undetermined')

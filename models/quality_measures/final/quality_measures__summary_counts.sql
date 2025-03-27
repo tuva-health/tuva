@@ -20,7 +20,7 @@ with summary_long as (
 
 )
 
-, calculate_performance_rate  as (
+, calculate_performance_rate as (
 
     select
           measure_id
@@ -33,8 +33,8 @@ with summary_long as (
         , sum(exclusion_flag) as exclusion_sum
         , (
             cast(sum(performance_flag) as {{ dbt.type_numeric() }}) /
-                (cast(count(performance_flag) as {{ dbt.type_numeric() }}) )
-          )*100 as performance_rate
+                (cast(count(performance_flag) as {{ dbt.type_numeric() }}))
+          ) * 100 as performance_rate
     from summary_long
     group by
           measure_id
@@ -56,7 +56,7 @@ with summary_long as (
         , cast(denominator_sum as integer) as denominator_sum
         , cast(numerator_sum as integer) as numerator_sum
         , cast(exclusion_sum as integer) as exclusion_sum
-        , round(cast(performance_rate as {{ dbt.type_numeric() }}),3) as performance_rate
+        , round(cast(performance_rate as {{ dbt.type_numeric() }}), 3) as performance_rate
     from calculate_performance_rate
 
 )
@@ -71,5 +71,5 @@ select
     , numerator_sum
     , exclusion_sum
     , performance_rate
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

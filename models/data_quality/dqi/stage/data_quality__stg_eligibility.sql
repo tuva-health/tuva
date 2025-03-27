@@ -4,4 +4,4 @@
    )
 }}
 
-select * from {{ ref('eligibility')}}
+select * from {{ ref('eligibility') }}

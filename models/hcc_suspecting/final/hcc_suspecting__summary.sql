@@ -61,5 +61,5 @@ select
     , patient_birth_date
     , patient_age
     , suspecting_gaps
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

@@ -31,8 +31,8 @@ with seed_adjustment_rates as (
     select
         person_id
         , cast({{ substring('year_month', 1, 4) }} as integer) as eligible_year
-        , COUNT(1) as member_months
-    from  {{ ref('cms_hcc__stg_core__member_months') }}
+        , count(1) as member_months
+    from {{ ref('cms_hcc__stg_core__member_months') }}
     group by
         person_id
         , cast({{ substring('year_month', 1, 4) }} as integer)
@@ -142,7 +142,7 @@ with seed_adjustment_rates as (
         , blended.collection_start_date
         , blended.collection_end_date
     from blended
-        left join seed_adjustment_rates
+        left outer join seed_adjustment_rates
             on blended.payment_year = seed_adjustment_rates.payment_year
 
 )
@@ -160,7 +160,7 @@ with seed_adjustment_rates as (
         , normalized.collection_start_date
         , normalized.collection_end_date
     from normalized
-        left join seed_adjustment_rates
+        left outer join seed_adjustment_rates
             on normalized.payment_year = seed_adjustment_rates.payment_year
 
 )
@@ -180,7 +180,7 @@ with seed_adjustment_rates as (
         , payment.collection_start_date
         , payment.collection_end_date
     from payment
-    left join member_months
+    left outer join member_months
             on payment.person_id = member_months.person_id
             and payment.payment_year = member_months.eligible_year
 )
@@ -189,12 +189,12 @@ with seed_adjustment_rates as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
-        , round(cast(v24_risk_score as {{ dbt.type_numeric() }}),3) as v24_risk_score
-        , round(cast(v28_risk_score as {{ dbt.type_numeric() }}),3) as v28_risk_score
-        , round(cast(blended_risk_score as {{ dbt.type_numeric() }}),3) as blended_risk_score
-        , round(cast(normalized_risk_score as {{ dbt.type_numeric() }}),3) as normalized_risk_score
-        , round(cast(payment_risk_score as {{ dbt.type_numeric() }}),3) as payment_risk_score
-        , round(cast(payment_risk_score_weighted_by_months as {{ dbt.type_numeric() }}),3) as payment_risk_score_weighted_by_months
+        , round(cast(v24_risk_score as {{ dbt.type_numeric() }}), 3) as v24_risk_score
+        , round(cast(v28_risk_score as {{ dbt.type_numeric() }}), 3) as v28_risk_score
+        , round(cast(blended_risk_score as {{ dbt.type_numeric() }}), 3) as blended_risk_score
+        , round(cast(normalized_risk_score as {{ dbt.type_numeric() }}), 3) as normalized_risk_score
+        , round(cast(payment_risk_score as {{ dbt.type_numeric() }}), 3) as payment_risk_score
+        , round(cast(payment_risk_score_weighted_by_months as {{ dbt.type_numeric() }}), 3) as payment_risk_score_weighted_by_months
         , cast(member_months as integer) as member_months
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
@@ -215,5 +215,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

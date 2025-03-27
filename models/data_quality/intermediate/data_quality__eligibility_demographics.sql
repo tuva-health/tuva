@@ -3,7 +3,7 @@
 )}}
 
 
-with eligibility_spans as(
+with eligibility_spans as (
     select distinct
         {{ concat_custom([
             "member_id",

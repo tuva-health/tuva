@@ -4,7 +4,7 @@
 }}
 
 with multiple_sources as (
-    select distinct 
+    select distinct
         med.claim_id
       , med.claim_line_number
       , 'outpatient' as service_category_1
@@ -15,14 +15,14 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as med
     inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpatient
       on med.claim_id = outpatient.claim_id
-    where 
+    where
       (substring(med.revenue_center_code, 1, 3) in ('025', '026', '063', '089') -- pharmacy and iv therapy
       or med.revenue_center_code = '0547'
       or med.ccs_category = '240') -- medications
 
     union all
 
-    select distinct 
+    select distinct
         med.claim_id
       , med.claim_line_number
       , 'inpatient' as service_category_1
@@ -33,12 +33,12 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as med
     inner join {{ ref('service_category__stg_inpatient_institutional') }} as outpatient
       on med.claim_id = outpatient.claim_id
-    where 
+    where
       (substring(med.revenue_center_code, 1, 3) in ('025', '026', '063', '089') -- pharmacy and iv therapy
       or med.revenue_center_code = '0547')
 )
 
-select 
+select
     claim_id
   , claim_line_number
   , service_category_1

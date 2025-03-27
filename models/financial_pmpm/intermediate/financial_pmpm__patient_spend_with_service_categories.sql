@@ -10,7 +10,7 @@ with claims_with_service_categories as (
     , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , coalesce(claim_start_date,claim_end_date) as claim_date
+    , coalesce(claim_start_date, claim_end_date) as claim_date
     , paid_amount
     , allowed_amount
     , data_source
@@ -24,7 +24,7 @@ with claims_with_service_categories as (
     , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , {{  concat_custom([date_part('year', 'claim_date'),
+    , {{ concat_custom([date_part('year', 'claim_date'),
                       dbt.right(
                       concat_custom(["'0'", date_part('month', 'claim_date')])
                       , 2)]) }} as year_month
@@ -55,7 +55,7 @@ with claims_with_service_categories as (
     , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , {{  concat_custom([date_part('year', 'claim_date'),
+    , {{ concat_custom([date_part('year', 'claim_date'),
                       dbt.right(
                       concat_custom(["'0'", date_part('month', 'claim_date')])
                       , 2)]) }} as year_month
@@ -85,7 +85,7 @@ select
   , sum(paid_amount) as total_paid
   , sum(allowed_amount) as total_allowed
   , data_source
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
   from combine_medical_and_rx
 group by
     person_id

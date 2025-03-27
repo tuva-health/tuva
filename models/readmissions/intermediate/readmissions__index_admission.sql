@@ -26,13 +26,12 @@
 
 
 
-select distinct a.encounter_id, '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('readmissions__encounter') }} a
-inner join {{ ref('readmissions__index_time_requirement') }} b
+select distinct a.encounter_id, '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('readmissions__encounter') }} as a
+inner join {{ ref('readmissions__index_time_requirement') }} as b
     on a.encounter_id = b.encounter_id
-inner join {{ ref('readmissions__index_discharge_requirement') }} c
+inner join {{ ref('readmissions__index_discharge_requirement') }} as c
     on a.encounter_id = c.encounter_id
-left join {{ ref('readmissions__exclusion') }} d
+left outer join {{ ref('readmissions__exclusion') }} as d
     on a.encounter_id = d.encounter_id
 where d.encounter_id is null
-

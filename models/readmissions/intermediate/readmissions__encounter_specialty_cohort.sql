@@ -36,10 +36,10 @@ with cohort_ranks as (
 
     --encounter ids in procedure based cohorts
         select procs.encounter_id, 1 as c_rank
-        from {{ ref('readmissions__procedure_ccs') }} procs
-        left join {{ ref('readmissions__surgery_gynecology_cohort') }} sgc
+        from {{ ref('readmissions__procedure_ccs') }} as procs
+        left outer join {{ ref('readmissions__surgery_gynecology_cohort') }} as sgc
             on procs.procedure_code = sgc.icd_10_pcs
-        left join {{ ref('readmissions__specialty_cohort') }} sgsc
+        left outer join {{ ref('readmissions__specialty_cohort') }} as sgsc
             on procs.ccs_procedure_category = sgsc.ccs and sgsc.specialty_cohort = 'Surgery/Gynecology'
         where sgc.icd_10_pcs is not null or sgsc.ccs is not null
 
@@ -47,8 +47,8 @@ with cohort_ranks as (
 
     --encounter ids in diagnosis based cohorts
     select diag.encounter_id, cohort_ranks.c_rank
-    from {{ ref('readmissions__encounter_with_ccs') }} diag
-    inner join {{ ref('readmissions__specialty_cohort') }} sc
+    from {{ ref('readmissions__encounter_with_ccs') }} as diag
+    inner join {{ ref('readmissions__specialty_cohort') }} as sc
         on diag.ccs_diagnosis_category = sc.ccs and sc.procedure_or_diagnosis = 'Diagnosis'
     inner join cohort_ranks
         on sc.specialty_cohort = cohort_ranks.cohort
@@ -65,10 +65,9 @@ with cohort_ranks as (
 
 
 --getting all encounters, with labeled cohorts, if no cohort cohort is "medicine"
-select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort, '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('readmissions__encounter') }} enc
-left join main_encounter_cohort mec
+select enc.encounter_id, coalesce(cohort_ranks.cohort, 'Medicine') as specialty_cohort, '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('readmissions__encounter') }} as enc
+left outer join main_encounter_cohort as mec
     on enc.encounter_id = mec.encounter_id
-left join cohort_ranks
+left outer join cohort_ranks
     on mec.main_c_rank = cohort_ranks.c_rank
-

@@ -29,7 +29,7 @@ with stg_eligibility as (
         , dates.collection_start_date
         , dates.collection_end_date
         , {{ concat_custom(['dates.payment_year', "'-12-31'"]) }} as payment_year_end_date
-        , row_number() over(
+        , row_number() over (
             partition by elig.person_id, dates.collection_end_date
             order by elig.enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
@@ -57,7 +57,7 @@ with stg_eligibility as (
         , patient.sex
         , patient.birth_date
         , dates.payment_year
-        , floor({{ datediff('birth_date', 'payment_year_age_date', 'year') }} ) as payment_year_age
+        , floor({{ datediff('birth_date', 'payment_year_age_date', 'year') }}) as payment_year_age
         , patient.death_date
     from {{ ref('cms_hcc__stg_core__patient') }} as patient
     cross join payment_year_age_dates as dates
@@ -144,16 +144,16 @@ with stg_eligibility as (
               end as enrollment_status_default
         {% else %}
             , case
-                when add_enrollment.enrollment_status is null then TRUE
-                else FALSE
+                when add_enrollment.enrollment_status is null then true
+                else false
               end as enrollment_status_default
         {% endif %}
     from stg_eligibility
-        left join add_enrollment
+        left outer join add_enrollment
             on stg_eligibility.person_id = add_enrollment.person_id
             and stg_eligibility.payment_year = add_enrollment.payment_year
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
-        left join stg_patient
+        left outer join stg_patient
             on stg_eligibility.person_id = stg_patient.person_id
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
@@ -223,12 +223,12 @@ with stg_eligibility as (
           end as gender
         , age_group
         , case
-            when dual_status_code in ('01','02','03','04','05','06','08') then 'Yes'
+            when dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
             else 'No'
           end as medicaid_status
         , case
-            when dual_status_code in ('02','04','08') then 'Full'
-            when dual_status_code in ('01','03','05','06') then 'Partial'
+            when dual_status_code in ('02', '04', '08') then 'Full'
+            when dual_status_code in ('01', '03', '05', '06') then 'Partial'
             else 'Non'
           end as dual_status
         /*
@@ -237,11 +237,11 @@ with stg_eligibility as (
            used, if available.
         */
         , case
-            when original_reason_entitlement_code in ('0','2') then 'Aged'
-            when original_reason_entitlement_code in ('1','3') then 'Disabled'
-            when original_reason_entitlement_code is null and medicare_status_code in ('10','11','31') then 'Aged'
-            when original_reason_entitlement_code is null and medicare_status_code in ('20','21') then 'Disabled'
-            when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 'Aged'
+            when original_reason_entitlement_code in ('0', '2') then 'Aged'
+            when original_reason_entitlement_code in ('1', '3') then 'Disabled'
+            when original_reason_entitlement_code is null and medicare_status_code in ('10', '11', '31') then 'Aged'
+            when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') then 'Disabled'
+            when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
         , cast('No' as {{ dbt.type_string() }}) as institutional_status
@@ -251,8 +251,8 @@ with stg_eligibility as (
                 when dual_status_code is null then 1
                 else 0
             {% else %}
-                when dual_status_code is null then TRUE
-                else FALSE
+                when dual_status_code is null then true
+                else false
             {% endif %}
           end as medicaid_dual_status_default
         /* Setting default true when OREC or Medicare Status is ESRD, or null */
@@ -263,17 +263,17 @@ with stg_eligibility as (
                 when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 1
                 else 0
             {% else %}
-                when original_reason_entitlement_code in ('2') then TRUE
-                when original_reason_entitlement_code is null and medicare_status_code in ('31') then TRUE
-                when coalesce(original_reason_entitlement_code,medicare_status_code) is null then TRUE
-                else FALSE
+                when original_reason_entitlement_code in ('2') then true
+                when original_reason_entitlement_code is null and medicare_status_code in ('31') then true
+                when coalesce(original_reason_entitlement_code, medicare_status_code) is null then true
+                else false
             {% endif %}
           end as orec_default
         /* Setting default true until institutional logic is added */
         {% if target.type == 'fabric' %}
             , 1 as institutional_status_default
         {% else %}
-            , TRUE as institutional_status_default
+            , true as institutional_status_default
         {% endif %}
     from add_age_group
 
@@ -324,5 +324,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

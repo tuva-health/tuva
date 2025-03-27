@@ -5,7 +5,7 @@
 
 select
     cast(encounter_id as {{ dbt.type_string() }}) as encounter_id
-  , cast(person_id as {{ dbt.type_string() }} ) as person_id
+  , cast(person_id as {{ dbt.type_string() }}) as person_id
   , cast(encounter_type as {{ dbt.type_string() }}) as encounter_type
   , cast('clinical' as {{ dbt.type_string() }}) as encounter_group
   , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date
@@ -38,9 +38,9 @@ select
   , cast(drg_code_type as {{ dbt.type_string() }}) as drg_code_type
   , cast(drg_code as {{ dbt.type_string() }}) as drg_code
   , cast(drg_description as {{ dbt.type_string() }}) as drg_description
-  , cast(paid_amount as {{ dbt.type_numeric() }} ) as paid_amount
-  , cast(allowed_amount as {{ dbt.type_numeric() }} ) as allowed_amount
-  , cast(charge_amount as {{ dbt.type_numeric() }} ) as charge_amount
+  , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount
+  , cast(allowed_amount as {{ dbt.type_numeric() }}) as allowed_amount
+  , cast(charge_amount as {{ dbt.type_numeric() }}) as charge_amount
   , cast(null as {{ dbt.type_int() }}) as claim_count
   , cast(null as {{ dbt.type_int() }}) as inst_claim_count
   , cast(null as {{ dbt.type_int() }}) as prof_claim_count

@@ -23,10 +23,10 @@ and
 (
 ccs_diagnosis_category in
     (select distinct ccs_diagnosis_category
-     from {{ ref('readmissions__exclusion_ccs_diagnosis_category') }} )
+     from {{ ref('readmissions__exclusion_ccs_diagnosis_category') }})
 )
 )
 
 
-select *, '{{ var('tuva_last_run')}}' as tuva_last_run
+select *, '{{ var('tuva_last_run') }}' as tuva_last_run
 from exclusions

@@ -5,7 +5,7 @@
 }}
 
 
-with claim_dates as(
+with claim_dates as (
     select
         claim_id
         , claim_line_number
@@ -23,7 +23,7 @@ with claim_dates as(
     from {{ ref('normalized_input__medical_claim') }}
 )
 
-, claim_year_month as(
+, claim_year_month as (
     select
           claim_id
         , claim_line_number
@@ -59,9 +59,9 @@ select distinct
     , mm.member_month_key
     , claim.inferred_claim_start_year_month
     , claim.inferred_claim_start_column_used
-    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
-from {{ ref('core__member_months')}} mm
-inner join claim_year_month claim
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('core__member_months') }} as mm
+inner join claim_year_month as claim
     on mm.person_id = claim.person_id
     and mm.member_id = claim.member_id
     and mm.payer = claim.payer

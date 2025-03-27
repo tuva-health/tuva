@@ -4,7 +4,7 @@
 }}
 
 
-SELECT
+select
     person_id
     , dispensing_date
     , paid_date
@@ -13,5 +13,5 @@ SELECT
     , payer
     , {{ quote_column('plan') }}
     , data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }}

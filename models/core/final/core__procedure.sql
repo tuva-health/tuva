@@ -36,7 +36,7 @@ select
   , all_procedures.source_code_type
   , all_procedures.source_code
   , all_procedures.source_description
-  , case when all_procedures.normalized_code_type is not null then  all_procedures.normalized_code_type
+  , case when all_procedures.normalized_code_type is not null then all_procedures.normalized_code_type
       when icd10.icd_10_pcs is not null then 'icd-10-pcs'
       when icd9.icd_9_pcs is not null then 'icd-9-pcs'
       when hcpcs.hcpcs is not null then 'hcpcs'
@@ -46,14 +46,14 @@ select
       , icd10.icd_10_pcs
       , icd9.icd_9_pcs
       , hcpcs.hcpcs
-      ,snomed_ct.snomed_ct ) as normalized_code
-  ,  coalesce(all_procedures.normalized_description
+      , snomed_ct.snomed_ct) as normalized_code
+  , coalesce(all_procedures.normalized_description
       , icd10.description
       , icd9.short_description
       , hcpcs.short_description
-      , snomed_ct.description) normalized_description
+      , snomed_ct.description) as normalized_description
   , case when coalesce(all_procedures.normalized_code, all_procedures.normalized_description) is not null then 'manual'
-         when coalesce(icd10.icd_10_pcs,icd9.icd_9_pcs, hcpcs.hcpcs, snomed_ct.snomed_ct) is not null then 'automatic'
+         when coalesce(icd10.icd_10_pcs, icd9.icd_9_pcs, hcpcs.hcpcs, snomed_ct.snomed_ct) is not null then 'automatic'
          end as mapping_method
   , all_procedures.modifier_1
   , all_procedures.modifier_2
@@ -64,16 +64,16 @@ select
   , all_procedures.data_source
   , all_procedures.tuva_last_run
 from all_procedures
-left join {{ ref('terminology__icd_10_pcs') }} icd10
+left outer join {{ ref('terminology__icd_10_pcs') }} as icd10
     on all_procedures.source_code_type = 'icd-10-pcs'
         and all_procedures.source_code = icd10.icd_10_pcs
-left join {{ ref('terminology__icd_9_pcs') }} icd9
+left outer join {{ ref('terminology__icd_9_pcs') }} as icd9
     on all_procedures.source_code_type = 'icd-9-pcs'
         and all_procedures.source_code = icd9.icd_9_pcs
-left join {{ ref('terminology__hcpcs_level_2') }} hcpcs
+left outer join {{ ref('terminology__hcpcs_level_2') }} as hcpcs
     on all_procedures.source_code_type = 'hcpcs'
         and all_procedures.source_code = hcpcs.hcpcs
-left join {{ ref('terminology__snomed_ct')}} snomed_ct
+left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
     on all_procedures.source_code_type = 'snomed-ct'
         and all_procedures.source_code = snomed_ct.snomed_ct
 
@@ -133,7 +133,7 @@ left join {{ ref('terminology__icd_9_pcs') }} icd9
 left join {{ ref('terminology__hcpcs_level_2') }} hcpcs
     on all_procedures.source_code_type = 'hcpcs'
         and all_procedures.source_code = hcpcs.hcpcs
-left join {{ ref('terminology__snomed_ct')}} snomed_ct
+left join {{ ref('terminology__snomed_ct') }} snomed_ct
     on all_procedures.source_code_type = 'snomed-ct'
         and all_procedures.source_code = snomed_ct.snomed_ct
 left join {{ ref('custom_mapped') }} custom_mapped

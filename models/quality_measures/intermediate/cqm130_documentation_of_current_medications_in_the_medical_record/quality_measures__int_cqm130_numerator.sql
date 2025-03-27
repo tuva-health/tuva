@@ -25,7 +25,7 @@ with denominator as (
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
-    where lower(concept_name) in  (
+    where lower(concept_name) in (
           'eligible clinician attests to documenting current medications'
     )
 
@@ -36,7 +36,7 @@ with denominator as (
     select
         person_id
       , procedure_date
-      , coalesce (
+      , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -44,7 +44,7 @@ with denominator as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -68,8 +68,8 @@ with denominator as (
 
     select
           person_id
-        , coalesce(claim_end_date,claim_start_date) as encounter_date
-    from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
+        , coalesce(claim_end_date, claim_start_date) as encounter_date
+    from {{ ref('quality_measures__stg_medical_claim') }} as medical_claim
     inner join medication_code
         on medical_claim.hcpcs_code = medication_code.code
           and medication_code.code_system = 'hcpcs'
@@ -78,7 +78,7 @@ with denominator as (
 
 , qualifying_procedure as (
 
-    select 
+    select
           documenting_meds_procedures.person_id
         , documenting_meds_procedures.procedure_date as encounter_date
         , denominator.performance_period_begin
@@ -94,8 +94,8 @@ with denominator as (
 )
 
 , qualifying_claims as (
-    
-    select 
+
+    select
           documenting_meds_claims.person_id
         , documenting_meds_claims.encounter_date
         , denominator.performance_period_begin
@@ -164,5 +164,5 @@ select
     , evidence_date
     , evidence_value
     , numerator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

@@ -32,7 +32,7 @@ select
     , max(case when lower(column_name) = 'procedure_date_23' then normalized_code else null end) as procedure_date_23
     , max(case when lower(column_name) = 'procedure_date_24' then normalized_code else null end) as procedure_date_24
     , max(case when lower(column_name) = 'procedure_date_25' then normalized_code else null end) as procedure_date_25
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__int_procedure_date_voting') }}
 where (occurrence_row_count = 1
         and occurrence_count > next_occurrence_count)

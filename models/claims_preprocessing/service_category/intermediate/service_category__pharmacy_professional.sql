@@ -3,19 +3,18 @@
    )
 }}
 
-select distinct 
+select distinct
     med.claim_id
     , med.claim_line_number
     , med.claim_line_id
     , case when place_of_service_code = '11' then 'office-based' else 'outpatient' end as service_category_1
     , 'pharmacy' as service_category_2
     , 'pharmacy' as service_category_3
-    ,'{{ this.name }}' as source_model_name
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} med
-inner join {{ ref('service_category__stg_professional') }} prof on med.claim_id = prof.claim_id 
+    , '{{ this.name }}' as source_model_name
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }} as med
+inner join {{ ref('service_category__stg_professional') }} as prof on med.claim_id = prof.claim_id
 and
 med.claim_line_number = prof.claim_line_number
 where
 ccs_category = '240' --medications
-

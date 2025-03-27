@@ -105,5 +105,5 @@ select
     , drug_code
     , code_system
     , data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

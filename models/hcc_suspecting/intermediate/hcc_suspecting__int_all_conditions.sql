@@ -46,9 +46,9 @@ with conditions as (
         , seed_hcc_mapping.hcc_code
         , seed_hcc_descriptions.hcc_description
     from conditions
-         left join seed_hcc_mapping
+         left outer join seed_hcc_mapping
          on conditions.code = seed_hcc_mapping.diagnosis_code
-         left join seed_hcc_descriptions
+         left outer join seed_hcc_descriptions
          on seed_hcc_mapping.hcc_code = seed_hcc_descriptions.hcc_code
     where conditions.code_type = 'icd-10-cm'
 
@@ -76,5 +76,5 @@ select
     , hcc_code
     , hcc_description
     , data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

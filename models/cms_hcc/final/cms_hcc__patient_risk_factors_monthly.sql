@@ -168,7 +168,7 @@ with demographic_factors as (
         , unioned.collection_start_date
         , unioned.collection_end_date
     from unioned
-        left join demographic_defaults
+        left outer join demographic_defaults
             on unioned.person_id = demographic_defaults.person_id
             and unioned.model_version = demographic_defaults.model_version
             and unioned.payment_year = demographic_defaults.payment_year
@@ -193,7 +193,7 @@ with demographic_factors as (
         {% endif %}
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(risk_factor_description as {{ dbt.type_string() }}) as risk_factor_description
-        , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
@@ -215,5 +215,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

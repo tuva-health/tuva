@@ -1,6 +1,6 @@
 {{ config(
    enabled = var('financial_pmpm_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
-)}}
+) }}
 
 select
     year_month
@@ -76,7 +76,7 @@ select
   , sum(telehealth_visit_allowed) / count(1) as telehealth_visit_allowed
   , sum(urgent_care_allowed) / count(1) as urgent_care_allowed
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('financial_pmpm__pmpm_prep') }} a
+from {{ ref('financial_pmpm__pmpm_prep') }} as a
 group by
   year_month
 , payer

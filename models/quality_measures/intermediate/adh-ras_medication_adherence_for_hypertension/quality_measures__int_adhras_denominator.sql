@@ -26,9 +26,9 @@ with performance_period as (
 
 )
 
-, pharmacy_claim  as (
+, pharmacy_claim as (
 
-    select 
+    select
           person_id
         , dispensing_date
         , ndc_code
@@ -44,10 +44,10 @@ with performance_period as (
         , dispensing_date
         , days_supply
         , ndc_code
-    from pharmacy_claim 
+    from pharmacy_claim
     inner join visit_codes
         on pharmacy_claim.ndc_code = visit_codes.code
-    
+
 )
 
 , patient_within_performance_period as (
@@ -65,7 +65,7 @@ with performance_period as (
 
 )
 
-/* 
+/*
     These patients need to pass two checks
     - First medication fill date should be at least 91 days before the end of measurement period
     - Should have at least two distinct Date of Service (FillDate) for rx
@@ -78,7 +78,8 @@ with performance_period as (
         , dispensing_date
         , days_supply
         , ndc_code
-        , dense_rank() over (partition by person_id order by dispensing_date) as dense_rank
+        , dense_rank() over (partition by person_id
+order by dispensing_date) as dense_rank
     from patient_within_performance_period
 
 )
@@ -120,7 +121,7 @@ treatment period days is abbreviated as tpd
         , days_supply
     from patient_with_tpd
     where tpd > 89
-    
+
 )
 
 , second_check_patient as (
@@ -144,7 +145,7 @@ treatment period days is abbreviated as tpd
     from first_check_patient as valid_patients1
     inner join second_check_patient as valid_patients2
         on valid_patients1.person_id = valid_patients2.person_id
-     
+
 )
 
 , patient_with_age as (
@@ -183,7 +184,7 @@ treatment period days is abbreviated as tpd
         , measure_name
         , measure_version
         , 1 as denominator_flag
-    from patient_with_age 
+    from patient_with_age
     where age > 17
 
 )
@@ -206,7 +207,7 @@ treatment period days is abbreviated as tpd
 
 )
 
-select 
+select
       person_id
     , dispensing_date
     , first_dispensing_date
@@ -218,5 +219,5 @@ select
     , measure_name
     , measure_version
     , denominator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

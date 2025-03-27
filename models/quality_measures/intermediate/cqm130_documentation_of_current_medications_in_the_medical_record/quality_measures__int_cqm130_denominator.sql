@@ -18,19 +18,19 @@ with visit_codes as (
 
 , visits_encounters as (
 
-    select 
+    select
           person_id
-        , coalesce(encounter.encounter_start_date,encounter.encounter_end_date) as procedure_encounter_date -- alias only to enable union later
-        , coalesce(encounter.encounter_end_date,encounter.encounter_start_date) as claims_encounter_date -- alias only to enable union later
-    from {{ ref('quality_measures__stg_core__encounter') }} encounter
+        , coalesce(encounter.encounter_start_date, encounter.encounter_end_date) as procedure_encounter_date -- alias only to enable union later
+        , coalesce(encounter.encounter_end_date, encounter.encounter_start_date) as claims_encounter_date -- alias only to enable union later
+    from {{ ref('quality_measures__stg_core__encounter') }} as encounter
     inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
-        on coalesce(encounter.encounter_end_date,encounter.encounter_start_date) >= pp.performance_period_begin
-            and coalesce(encounter.encounter_start_date,encounter.encounter_end_date) <= pp.performance_period_end
+        on coalesce(encounter.encounter_end_date, encounter.encounter_start_date) >= pp.performance_period_begin
+            and coalesce(encounter.encounter_start_date, encounter.encounter_end_date) <= pp.performance_period_end
     where lower(encounter_type) in (
           'home health'
         , 'telehealth'
     )
-    
+
     or lower(encounter_group) in (
           'office based'
         , 'outpatient'
@@ -40,28 +40,28 @@ with visit_codes as (
 
 , procedure_encounters as (
 
-    select 
+    select
           person_id
         , procedure_date as procedure_encounter_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claims_encounter_date
-    from {{ ref('quality_measures__stg_core__procedure') }} procs
+    from {{ ref('quality_measures__stg_core__procedure') }} as procs
     inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
         on procedure_date between pp.performance_period_begin and pp.performance_period_end
     inner join visit_codes
-        on coalesce(procs.normalized_code,procs.source_code) = visit_codes.code
+        on coalesce(procs.normalized_code, procs.source_code) = visit_codes.code
 
 )
 
 , claims_encounters as (
-    
-    select 
+
+    select
           person_id
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as procedure_encounter_date
-        , coalesce(claim_end_date,claim_start_date) as claims_encounter_date
-    from {{ ref('quality_measures__stg_medical_claim') }} medical_claim
-    inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp 
-        on coalesce(claim_end_date,claim_start_date)  >=  pp.performance_period_begin
-            and coalesce(claim_start_date,claim_end_date) <=  pp.performance_period_end
+        , coalesce(claim_end_date, claim_start_date) as claims_encounter_date
+    from {{ ref('quality_measures__stg_medical_claim') }} as medical_claim
+    inner join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
+        on coalesce(claim_end_date, claim_start_date) >= pp.performance_period_begin
+            and coalesce(claim_start_date, claim_end_date) <= pp.performance_period_end
     inner join visit_codes
         on medical_claim.hcpcs_code = visit_codes.code
 
@@ -78,7 +78,7 @@ with visit_codes as (
     from procedure_encounters
 
     union all
-    
+
     select *, cast(null as {{ dbt.type_string() }}) as visit_enc, cast(null as {{ dbt.type_string() }}) as proc_enc, 'c' as claim_enc
     from claims_encounters
 
@@ -115,7 +115,7 @@ with visit_codes as (
 )
 
 , latest_patient_encounters as (
-	
+
 	select
 		  max_encounter_dates_by_patient.person_id
 		, max_encounter_dates_by_patient.max_encounter_date
@@ -134,8 +134,8 @@ with visit_codes as (
         , procedure_encounter_date
         , claims_encounter_date
         , floor({{ datediff('birth_date', 'e.max_encounter_date', 'hour') }} / 8760.0) as max_age
-    from {{ ref('quality_measures__stg_core__patient') }} p
-    inner join latest_patient_encounters e
+    from {{ ref('quality_measures__stg_core__patient') }} as p
+    inner join latest_patient_encounters as e
         on p.person_id = e.person_id
     where p.death_date is null
 
@@ -156,9 +156,9 @@ with visit_codes as (
         , pp.measure_version
         , 1 as denominator_flag
     from patients_with_age
-    cross join {{ ref('quality_measures__int_cqm130__performance_period') }} pp
+    cross join {{ ref('quality_measures__int_cqm130__performance_period') }} as pp
     where max_age >= 18
-    
+
 )
 
 , add_data_types as (
@@ -178,7 +178,7 @@ with visit_codes as (
 
 )
 
-select 
+select
       person_id
     , age
     , procedure_encounter_date
@@ -189,5 +189,5 @@ select
     , measure_name
     , measure_version
     , denominator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types
