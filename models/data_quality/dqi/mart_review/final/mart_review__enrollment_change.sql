@@ -4,64 +4,64 @@
    )
 }}
 
-with RANKEDMONTHS as (
+with rankedmonths as (
     select
-        PERSON_ID
-        , YEAR_MONTH
-        , DATA_SOURCE
-        , lag(YEAR_MONTH_DATE, 1) over (partition by PERSON_ID, DATA_SOURCE
-order by YEAR_MONTH_DATE) as PREV_YEAR_MONTH
-        , lead(YEAR_MONTH_DATE, 1) over (partition by PERSON_ID, DATA_SOURCE
-order by YEAR_MONTH_DATE) as NEXT_YEAR_MONTH
-        , YEAR_MONTH_DATE
+        person_id
+        , year_month
+        , data_source
+        , lag(year_month_date, 1) over (partition by person_id, data_source
+order by year_month_date) as prev_year_month
+        , lead(year_month_date, 1) over (partition by person_id, data_source
+order by year_month_date) as next_year_month
+        , year_month_date
     from {{ ref('mart_review__stg_member_month') }}
 )
-, CHANGES as (
+, changes as (
  select
-    PERSON_ID
-    , DATA_SOURCE
-    , YEAR_MONTH_DATE as CHANGE_MONTH
+    person_id
+    , data_source
+    , year_month_date as change_month
     , case
-        when PREV_YEAR_MONTH is null
-            or {{ dateadd('month', -1, 'year_month_date') }} != PREV_YEAR_MONTH
+        when prev_year_month is null
+            or {{ dateadd('month', -1, 'year_month_date') }} != prev_year_month
         then 'added'
-    end as CHANGE_TYPE
-from RANKEDMONTHS
+    end as change_type
+from rankedmonths
 union all
 select
-    PERSON_ID
-    , DATA_SOURCE,
-    {{ dateadd('month', 1, 'year_month_date') }} as CHANGE_MONTH
+    person_id
+    , data_source
+    , {{ dateadd('month', 1, 'year_month_date') }} as change_month
     , case
-        when NEXT_YEAR_MONTH is null
-            or {{ dateadd('month', 1, 'year_month_date') }} != NEXT_YEAR_MONTH
+        when next_year_month is null
+            or {{ dateadd('month', 1, 'year_month_date') }} != next_year_month
         then 'removed'
-    end as CHANGE_TYPE
-from RANKEDMONTHS
+    end as change_type
+from rankedmonths
 
 )
-, FINAL as (
+, final as (
     select
-       {{ concat_custom(["person_id", "'|'", "change_month"]) }} as MEMBERMONTHKEY
-        , DATA_SOURCE
-        , PERSON_ID
-        , CHANGE_MONTH
-        , CHANGE_TYPE
-    from CHANGES
-    where CHANGE_TYPE is not null
+       {{ concat_custom(["person_id", "'|'", "change_month"]) }} as membermonthkey
+        , data_source
+        , person_id
+        , change_month
+        , change_type
+    from changes
+    where change_type is not null
 )
-, RESULT as (
+, result as (
     select
-        DATA_SOURCE
-        , CHANGE_MONTH
-        , CHANGE_TYPE
-        , count(*) as MEMBER_COUNT
-    from FINAL
-    group by DATA_SOURCE
-    , CHANGE_MONTH
-    , CHANGE_TYPE
+        data_source
+        , change_month
+        , change_type
+        , count(*) as member_count
+    from final
+    group by data_source
+    , change_month
+    , change_type
 )
 
 
-select * , '{{ var('tuva_last_run') }}' as TUVA_LAST_RUN
-from RESULT
+select * , '{{ var('tuva_last_run') }}' as tuva_last_run
+from result
