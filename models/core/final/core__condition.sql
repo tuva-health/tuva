@@ -114,7 +114,7 @@ select
       , icd9.icd_9_cm
       , snomed_ct.snomed_ct
       , custom_mapped.normalized_code
-      ) as NORMALIZED_CODE
+      ) as normalized_code
   , coalesce(
         all_conditions.normalized_description
       , icd10.short_description
