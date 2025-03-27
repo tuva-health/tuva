@@ -264,7 +264,7 @@ run_sqlfluff() {
 
           # Optionally run fix just to see/log its output if lint failed
           echo -e "\n[CI Mode] Running sqlfluff fix (for logging purposes, outcome already determined)..."
-          fix_output=$(sqlfluff --nocolor fix . 2>&1) || fix_status=$?
+          fix_output=$(sqlfluff fix . 2>&1) || fix_status=$?
           _log_sqlfluff_output "FIX (Check, Informational)" "$fix_output" "$filter_pattern"
           # We don't change final_exit_code based on fix_status in CI mode here
       else
