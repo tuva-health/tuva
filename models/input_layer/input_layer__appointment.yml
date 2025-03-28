@@ -1,0 +1,88 @@
+version: 2
+models:
+  - name: input_layer__appointment
+    description: 'Mapping check to make sure all columns are mapped appropriately into the input layer.'
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+      tags: input_layer
+      materialized: view
+    columns:
+      - name: appointment_id
+        description: 'Unique identifier for the appointment.'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - unique:
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - not_null:
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: patient_id
+        description: 'References the patient associated with the appointment.'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: provider_id
+        description: 'Healthcare provider assigned to the appointment.'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: appt_status
+        description: 'Appointment status (scheduled, cancelled, completed, etc.).'
+        tests:
+          - accepted_values:
+              values:
+                [
+                  'proposed',
+                  'pending',
+                  'booked',
+                  'arrived',
+                  'fulfilled',
+                  'cancelled',
+                  'noshow',
+                  'entered-in-error',
+                  'checked-in',
+                  'waitlist',
+                ]
+      - name: cancellation_reason
+        description: 'Reason for appointment cancellation, if applicable.'
+      - name: appointment_type_code
+        description: 'Type of the appointment (e.g., follow-up, consultation).'
+      - name: reason_code
+        description: 'Reason for scheduling the appointment (e.g., consultation, check-up).'
+      - name: reason_description
+        description: 'Detailed reason for the appointment.'
+      - name: start_time
+        description: 'Scheduled start time of the appointment.'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: end_time
+        description: 'Scheduled end time of the appointment.'
+      - name: created_at
+        description: 'Timestamp when the appointment was initially created.'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: updated_at
+        description: 'Timestamp of the last modification.'
+      - name: location_id
+        description: 'Facility or location where the appointment will take place.'
+      - name: data_source
+        description: 'Source system that provided the appointment data.'
+      - name: tuva_last_run
+        description: 'Last time the data was updated.'
