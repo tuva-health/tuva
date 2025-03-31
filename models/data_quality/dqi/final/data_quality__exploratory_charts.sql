@@ -27,9 +27,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('month', ilmc.paid_date)      as x_axis
          , DATE_TRUNC('year', ilmc.claim_end_date)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilmc.claim_end_date)    as y_axis
-         , DATETRUNC(month, ilmc.paid_date)         as x_axis
-         , DATETRUNC(year, ilmc.claim_end_date)     as chart_filter
+         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as y_axis
+         , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)         as x_axis
+         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as y_axis
          , DATE_TRUNC('MONTH', ilmc.paid_date)      as x_axis
@@ -56,9 +56,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            , DATE_TRUNC('month', ilmc.paid_date)
            , DATE_TRUNC('year', ilmc.claim_end_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilmc.claim_end_date)
-           , DATETRUNC(month, ilmc.paid_date)
-           , DATETRUNC(year, ilmc.claim_end_date)
+           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilmc.claim_end_date)
            , DATE_TRUNC('MONTH', ilmc.paid_date)
@@ -92,9 +92,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('month', ilmc.paid_date)      as x_axis
          , DATE_TRUNC('year', ilmc.claim_end_date)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilmc.claim_end_date)    as y_axis
-         , DATETRUNC(month, ilmc.paid_date)         as x_axis
-         , DATETRUNC(year, ilmc.claim_end_date)     as chart_filter
+         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as y_axis
+         , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)         as x_axis
+         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as y_axis
          , DATE_TRUNC('MONTH', ilmc.paid_date)      as x_axis
@@ -121,9 +121,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            , DATE_TRUNC('month', ilmc.paid_date)
            , DATE_TRUNC('year', ilmc.claim_end_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilmc.claim_end_date)
-           , DATETRUNC(month, ilmc.paid_date)
-           , DATETRUNC(year, ilmc.claim_end_date)
+           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilmc.claim_end_date)
            , DATE_TRUNC('MONTH', ilmc.paid_date)
@@ -156,9 +156,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('month', ilmc.claim_end_date) as x_axis
          , DATE_TRUNC('year', ilmc.claim_end_date)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(NULL as DATE)                       as y_axis
-         , DATETRUNC(month, ilmc.claim_end_date)    as x_axis
-         , DATETRUNC(year, ilmc.claim_end_date)     as chart_filter
+         , cast(NULL as VARCHAR)                       as y_axis
+         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
          , cast(NULL as DATE)                       as y_axis
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as x_axis
@@ -183,8 +183,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            DATE_TRUNC('month', ilmc.claim_end_date)
            , DATE_TRUNC('year', ilmc.claim_end_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilmc.claim_end_date)
-           , DATETRUNC(year, ilmc.claim_end_date)
+           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilmc.claim_end_date)
            , DATE_TRUNC('YEAR', ilmc.claim_end_date)
@@ -211,7 +211,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          {% elif target.type in ('postgres', 'duckdb') %}
          , DATE_TRUNC('year', ilmc.claim_end_date) as x_axis
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(year, ilmc.claim_end_date)    as x_axis
+         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)    as x_axis
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('YEAR', ilmc.claim_end_date) as x_axis
          {% elif target.type == 'athena' %}
@@ -229,7 +229,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type in ('postgres', 'duckdb') %}
            DATE_TRUNC('year', ilmc.claim_end_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, ilmc.claim_end_date)
+           cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% elif target.type == 'athena' %}
@@ -257,8 +257,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('year', ilmc.claim_end_date)  as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilmc.claim_end_date)    as x_axis
-         , DATETRUNC(year, ilmc.claim_end_date)     as chart_filter
+         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilmc.claim_end_date) as x_axis
@@ -283,8 +283,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            DATE_TRUNC('month', ilmc.claim_end_date)
            , DATE_TRUNC('year', ilmc.claim_end_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilmc.claim_end_date)
-           , DATETRUNC(year, ilmc.claim_end_date)
+           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilmc.claim_end_date)
            , DATE_TRUNC('YEAR', ilmc.claim_end_date)
@@ -315,8 +315,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , cast(NULL as DATE)                      as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(year, ilmc.claim_end_date)    as x_axis
-         , cast(NULL as DATE)                      as chart_filter
+         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(NULL as VARCHAR)             as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('YEAR', ilmc.claim_end_date) as x_axis
@@ -339,7 +339,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type in ('postgres', 'duckdb') %}
            DATE_TRUNC('year', ilmc.claim_end_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, ilmc.claim_end_date)
+           cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% elif target.type == 'athena' %}
@@ -368,9 +368,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('month', ilpc.paid_date)              as x_axis
          , DATE_TRUNC('year', ilpc.dispensing_date)         as chart_filter
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilpc.dispensing_date)           as y_axis
-         , DATETRUNC(month, ilpc.paid_date)                 as x_axis
-         , DATETRUNC(year, ilpc.dispensing_date)            as chart_filter
+         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)           as y_axis
+         , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)                 as x_axis
+         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)            as chart_filter
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilpc.dispensing_date)        as y_axis
          , DATE_TRUNC('MONTH', ilpc.paid_date)              as x_axis
@@ -397,9 +397,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            , DATE_TRUNC('month', ilpc.paid_date)
            , DATE_TRUNC('year', ilpc.dispensing_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilpc.dispensing_date)
-           , DATETRUNC(month, ilpc.paid_date)
-           , DATETRUNC(year, ilpc.dispensing_date)
+           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilpc.dispensing_date)
            , DATE_TRUNC('MONTH', ilpc.paid_date)
@@ -433,9 +433,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('month', ilpc.paid_date)              as x_axis
          , DATE_TRUNC('year', ilpc.dispensing_date)         as chart_filter
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilpc.dispensing_date)           as y_axis
-         , DATETRUNC(month, ilpc.paid_date)                 as x_axis
-         , DATETRUNC(year, ilpc.dispensing_date)            as chart_filter
+         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)           as y_axis
+         , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)                 as x_axis
+         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)            as chart_filter
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilpc.dispensing_date)        as y_axis
          , DATE_TRUNC('MONTH', ilpc.paid_date)              as x_axis
@@ -462,9 +462,9 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            , DATE_TRUNC('month', ilpc.paid_date)
            , DATE_TRUNC('year', ilpc.dispensing_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilpc.dispensing_date)
-           , DATETRUNC(month, ilpc.paid_date)
-           , DATETRUNC(year, ilpc.dispensing_date)
+           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilpc.dispensing_date)
            , DATE_TRUNC('MONTH', ilpc.paid_date)
@@ -496,10 +496,10 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('month', ilpc.dispensing_date) as x_axis
          , DATE_TRUNC('year', ilpc.dispensing_date)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilpc.dispensing_date)    as x_axis
-         , DATETRUNC(year, ilpc.dispensing_date)     as chart_filter
+         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
-         , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
+         , DATE_TRUNC('MONTH', ilpc.dispensing_date) asx_axis
          , DATE_TRUNC('YEAR', ilpc.dispensing_date)  as chart_filter
          {% elif target.type == 'athena' %}
          , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
@@ -519,8 +519,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            DATE_TRUNC('month', ilpc.dispensing_date)
            , DATE_TRUNC('year', ilpc.dispensing_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilpc.dispensing_date)
-           , DATETRUNC(year, ilpc.dispensing_date)
+           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilpc.dispensing_date)
            , DATE_TRUNC('YEAR', ilpc.dispensing_date)
@@ -547,7 +547,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          {% elif target.type in ('postgres', 'duckdb') %}
          , DATE_TRUNC('year', ilpc.dispensing_date) as x_axis
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(year, ilpc.dispensing_date)    as x_axis
+         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)    as x_axis
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('YEAR', ilpc.dispensing_date) as x_axis
          {% elif target.type == 'athena' %}
@@ -565,7 +565,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type in ('postgres', 'duckdb') %}
            DATE_TRUNC('year', ilpc.dispensing_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, ilpc.dispensing_date)
+           cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% elif target.type == 'athena' %}
@@ -593,8 +593,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , DATE_TRUNC('year', ilpc.dispensing_date)  as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(month, ilpc.dispensing_date)    as x_axis
-         , DATETRUNC(year, ilpc.dispensing_date)     as chart_filter
+         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)     as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('MONTH', ilpc.dispensing_date) as x_axis
@@ -619,8 +619,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            DATE_TRUNC('month', ilpc.dispensing_date)
            , DATE_TRUNC('year', ilpc.dispensing_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(month, ilpc.dispensing_date)
-           , DATETRUNC(year, ilpc.dispensing_date)
+           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('MONTH', ilpc.dispensing_date)
            , DATE_TRUNC('YEAR', ilpc.dispensing_date)
@@ -651,8 +651,8 @@ WITH medical_paid_amount_vs_end_date_matrix as (
          , cast(NULL as DATE)                       as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , DATETRUNC(year, ilpc.dispensing_date)    as x_axis
-         , cast(NULL as DATE)                       as chart_filter
+         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(NULL as VARCHAR)                       as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , DATE_TRUNC('YEAR', ilpc.dispensing_date) as x_axis
@@ -675,7 +675,7 @@ WITH medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type in ('postgres', 'duckdb') %}
            DATE_TRUNC('year', ilpc.dispensing_date)
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, ilpc.dispensing_date)
+           cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% elif target.type == 'athena' %}
