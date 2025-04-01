@@ -120,7 +120,7 @@ select d.encounter_id
 , hp.diagnosis_code_type as primary_diagnosis_code_type
 , hp.diagnosis_code_1 as primary_diagnosis_code
 , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-, hf.facility_id as facility_ide
+, hf.facility_id as facility_id
 , b.provider_organization_name as facility_name
 , phy.billing_id
 , {{ concat_custom(["b2.provider_first_name", "' '", "b2.provider_last_name"]) }} as provider_name
