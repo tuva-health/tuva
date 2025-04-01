@@ -3526,6 +3526,16 @@ models:
       - claims_preprocessing
       - encounters
 
+  - name: office_visits__int_detail_values
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      materialized: table
+      tags:
+      - claims_preprocessing
+      - encounters
+
   - name: office_visits__int_office_visits_encounter_ranking
     config:
       schema: |
