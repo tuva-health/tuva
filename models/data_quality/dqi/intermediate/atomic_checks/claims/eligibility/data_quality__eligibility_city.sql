@@ -10,7 +10,7 @@ SELECT DISTINCT
         ,coalesce(m.member_id, 'NULL') as drill_down_value
     ,'ELIGIBILITY' AS claim_type
     ,'CITY' AS field_name
-    ,case when m.race is  null then 'null'
+    ,case when m.city is  null then 'null'
                              else 'valid' end as bucket_name
     ,cast(null as {{ dbt.type_string() }}) as invalid_reason
     ,CAST(city as {{ dbt.type_string() }}) AS field_value
