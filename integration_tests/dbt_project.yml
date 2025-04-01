@@ -17,6 +17,8 @@ vars:
 
   tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
+  quoted_plan_column: "{{ quote_column('plan') }}"
+
   ## The Tuva Project can support claims and clinical data.
   # By default, all models are disabled.
   # Use the vars below to enabled or disable sections of The Tuva Project.
