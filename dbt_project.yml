@@ -206,7 +206,7 @@ seeds:
         cms_hcc__enrollment_interaction_factors:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.4','cms_hcc_enrollment_interaction_factors.csv',compression=true,null_marker=true) }}"
         cms_hcc__icd_10_cm_mappings:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.4','cms_hcc_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.5','cms_hcc_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
         cms_hcc__payment_hcc_count_factors:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.4','cms_hcc_payment_hcc_count_factors.csv',compression=true,null_marker=true) }}"
       data_quality:
