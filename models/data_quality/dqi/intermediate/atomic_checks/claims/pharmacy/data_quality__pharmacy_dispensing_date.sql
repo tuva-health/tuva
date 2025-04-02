@@ -16,13 +16,13 @@ SELECT
     , 'PHARMACY' AS claim_type
     , 'DISPENSING_DATE' AS field_name
     , case
-        when m.dispensing_date > tuva_last_run then 'invalid'
+        when m.dispensing_date > cte.tuva_last_run then 'invalid'
         when m.dispensing_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'invalid'
         when m.dispensing_date is null then 'null'
         else 'valid'
     end as bucket_name
     , case
-        when m.dispensing_date > tuva_last_run then 'future'
+        when m.dispensing_date > cte.tuva_last_run then 'future'
         when m.dispensing_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'too old'
         else null
         end as invalid_reason
