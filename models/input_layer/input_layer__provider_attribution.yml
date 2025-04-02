@@ -14,6 +14,8 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - person_id
+            - payer
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - year_month
             - data_source
           tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
