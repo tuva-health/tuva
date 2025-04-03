@@ -18,14 +18,14 @@ SELECT
     , m.claim_type as claim_type
     , 'PAID_DATE' AS field_name
     , case
-        when m.paid_date > tuva_last_run then 'invalid'
+        when m.paid_date > cte.tuva_last_run then 'invalid'
         when m.paid_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'invalid'
         when m.paid_date < m.claim_start_date then 'invalid'
         when m.paid_date is null then 'null'
         else 'valid'
     end as bucket_name
     , case
-        when m.paid_date > tuva_last_run then 'future'
+        when m.paid_date > cte.tuva_last_run then 'future'
         when m.paid_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp="cte.tuva_last_run") }} then 'too old'
         when m.paid_date < m.claim_start_date then 'paid date before claim start date'
         else null
