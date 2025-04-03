@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False)) | as_bool
+     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
+ | as_bool
    )
 }}
 
@@ -17,4 +18,4 @@ select
     , cast(longitude as {{ dbt.type_float() }} ) as longitude
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
     , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
-from {{ ref('location') }}
+from {{ ref('input_layer__location') }}

@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 )}}
 
 with input_medical as (
@@ -10,7 +10,7 @@ with input_medical as (
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
     , sum(allowed_amount) as allowed_amount
-  from {{ ref('medical_claim') }}
+  from {{ ref('input_layer__medical_claim') }}
 )
 
 , input_pharmacy as (
@@ -21,14 +21,14 @@ with input_medical as (
     , count(*) as record_count
     , sum(paid_amount) as paid_amount
     , sum(allowed_amount) as allowed_amount
-  from {{ ref('pharmacy_claim') }}
+  from {{ ref('input_layer__pharmacy_claim') }}
 )
 
 ,input_eligibility as (
 select
     cast('eligibility' as {{ dbt.type_string() }}) as table_name
   , count(distinct person_id) as patient_count
-  , count(distinct {{ dbt.concat([
+  , count(distinct {{ concat_custom([
         'member_id'
       , "'-'"
       , 'enrollment_start_date'
@@ -39,7 +39,7 @@ select
       , "'-'"
       , quote_column('plan')
     ]) }}) as span_count
-from {{ ref('eligibility') }}
+from {{ ref('input_layer__eligibility') }}
 )
 
   , input_member_months as (

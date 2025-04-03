@@ -14,5 +14,5 @@ select distinct
 , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'professional'
-  and place_of_service_code in ('52','53','57','58')
+  and place_of_service_code in ('52','53')
   

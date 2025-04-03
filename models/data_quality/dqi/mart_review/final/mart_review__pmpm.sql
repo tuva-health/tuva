@@ -14,7 +14,7 @@ SELECT *,
        office_based_paid * member_months AS office_based_paid_absolute,
        ancillary_paid * member_months AS ancillary_paid_absolute,
        other_paid * member_months AS other_paid_absolute,
-        {{ dbt.concat([
+        {{ concat_custom([
             'data_source',
             "'|'",
             'year_month']) }} as data_source_month_key

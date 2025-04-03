@@ -1,7 +1,6 @@
 {{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
-   )
-}}
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+)}}
 
 with medical_claim as (
     select
@@ -21,7 +20,7 @@ with medical_claim as (
       , max(case when term.entity_type_code = '2' then 1 else 0 end) as wrong_entity_type_rendering_npi
       , max(case when term3.entity_type_code = '1' then 1 else 0 end) as wrong_entity_type_facility_npi
 
-    from {{ ref('medical_claim') }} as m
+    from {{ ref('input_layer__medical_claim') }} as m
     left join {{ ref('terminology__provider') }} as term
       on m.rendering_npi = term.npi
     left join {{ ref('terminology__provider') }} as term2

@@ -12,7 +12,7 @@
 
 
 select
-       {{ dbt.concat([
+       {{ concat_custom([
             "person_id",
             "'-'",
             "member_id",

@@ -17,7 +17,7 @@ SELECT DISTINCT
         when m.medicare_status_code is not null and term.medicare_status_code is null then 'Medicare Status Code does not join to Terminology Medicare Status table'
         else null
     end as invalid_reason
-    , {{ dbt.concat(["m.medicare_status_code", "'|'", "coalesce(term.medicare_status_description,'')"]) }} as field_value
+    , {{ concat_custom(["m.medicare_status_code", "'|'", "coalesce(term.medicare_status_description,'')"]) }} as field_value
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('eligibility')}} m
 left join {{ ref('terminology__medicare_status')}} term on m.medicare_status_code = term.medicare_status_code

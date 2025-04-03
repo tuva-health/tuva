@@ -7,7 +7,7 @@
 
 select
       person_id
-    , {{ dbt.concat([
+    , {{ concat_custom([
         "person_id",
         "coalesce(data_source,'')",
         "coalesce(payer,'')",
@@ -45,4 +45,4 @@ select
     , file_name
     , file_date
     , ingest_datetime
-from {{ ref('eligibility') }}
+from {{ ref('input_layer__eligibility') }}

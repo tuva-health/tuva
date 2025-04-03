@@ -10,8 +10,21 @@ models:
       tags: cms_hcc
       materialized: table
     description: >
-      This final model displays the contributing demographic and disease risk 
-      factors, interactions, and HCCs for each enrollee in the payment year.
+      This final model displays the contributing demographic and disease risk  factors,
+      interactions, and HCCs for each enrollee in the payment year.
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+# description: Check to see if there is at least one record in HCC conditions
+          min_value: 1 # (Optional)
+          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
+            meta:
+              dqi_test_description: "Check to see if there is at least one record
+                in HCC conditions"
     columns:
       - name: person_id
         description: Unique ID for the patient.

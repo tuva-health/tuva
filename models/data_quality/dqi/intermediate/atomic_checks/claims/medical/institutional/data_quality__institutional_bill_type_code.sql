@@ -10,7 +10,7 @@ with base as (
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["base.bill_type_code", "'|'", "coalesce(term.bill_type_description, '')"]) }} as field
+        , {{ concat_custom(["base.bill_type_code", "'|'", "coalesce(term.bill_type_description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__bill_type')}} as term on base.bill_type_code = term.bill_type_code

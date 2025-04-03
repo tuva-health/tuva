@@ -7,6 +7,8 @@ select
       encounter_id
     , claim_id
     , person_id
+    , normalized_code
+    , code_description
     , ccsr_category
     , ccsr_category_description
     , ccsr_parent_category

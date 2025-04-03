@@ -31,4 +31,4 @@ select
     , file_name
     , file_date
     , ingest_datetime
-from {{ ref('pharmacy_claim') }}
+from {{ ref('input_layer__pharmacy_claim') }}

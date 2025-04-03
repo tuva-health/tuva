@@ -636,7 +636,7 @@ where procedure_code_25 is not null
 
 select distinct
 {{ dbt.safe_cast(
-    dbt.concat([
+    concat_custom([
         "unpivot_cte.data_source",
         "'_'",
         "unpivot_cte.claim_id",

@@ -1,12 +1,10 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
- | as_bool
-   )
-}}
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+)}}
 
 with eligibility_spans as(
     select distinct
-        {{ dbt.concat([
+        {{ concat_custom([
             "member_id",
             "'-'",
             "enrollment_start_date",
@@ -19,7 +17,7 @@ with eligibility_spans as(
         ]) }} as eligibility_span_id
         , payer
         , payer_type
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 )
 
 , missing_payer_type as(

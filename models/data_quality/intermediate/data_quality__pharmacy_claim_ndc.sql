@@ -1,13 +1,13 @@
 {{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
-) }}
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+)}}
 
 with pharmacy_claim as (
   select
       claim_id
     , max(case when term.ndc is null and m.ndc_code is not null then 1 else 0 end) as invalid_ndc
     , max(case when m.ndc_code is null then 1 else 0 end) as missing_ndc
-  from {{ ref('pharmacy_claim') }} m
+  from {{ ref('input_layer__pharmacy_claim') }} m
   left join {{ ref('terminology__ndc') }} as term
     on m.ndc_code = term.ndc
   group by

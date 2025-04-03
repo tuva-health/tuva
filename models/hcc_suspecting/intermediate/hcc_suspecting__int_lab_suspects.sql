@@ -124,7 +124,7 @@ with egfr_labs as (
             when result between 30 and 44 then '328'
             when result between 45 and 59 then '329'
           end as hcc_code
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "'eGFR ('",
             "code",
             "') result '",

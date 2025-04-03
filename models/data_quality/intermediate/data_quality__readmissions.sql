@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 )}}
 
 
@@ -34,7 +34,7 @@ with disqualified_unpivot as (
 
 -- Using the transformed data to perform aggregation
 select 
-    {{ dbt.concat(["'inpatient encounter '", "d.disqualified_reason"]) }} as data_quality_check
+    {{ concat_custom(["'inpatient encounter '", "d.disqualified_reason"]) }} as data_quality_check
     ,  count(distinct encounter_id) as result_count
       , '{{ var('tuva_last_run') }}' as tuva_last_run
 from disqualified_unpivot d

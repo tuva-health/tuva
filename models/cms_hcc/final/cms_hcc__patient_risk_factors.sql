@@ -16,3 +16,8 @@ select
     , payment_year
     , '{{ var('tuva_last_run')}}' as tuva_last_run
 from {{ ref('cms_hcc__patient_risk_factors_monthly') }}
+where collection_end_date = (
+        select max(collection_end_date)
+        from {{ ref('cms_hcc__patient_risk_factors_monthly') }}
+        where payment_year = {{ var('cms_hcc_payment_year') }}
+    )

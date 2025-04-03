@@ -9,7 +9,7 @@ from {{ ref('data_quality__stg_institutional_inpatient') }}
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["base.drg_code", "'|'", "coalesce(ms.ms_drg_description, apr.apr_drg_description, '')"]) }} as field
+        , {{ concat_custom(["base.drg_code", "'|'", "coalesce(ms.ms_drg_description, apr.apr_drg_description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__ms_drg')}} as ms on base.drg_code = ms.ms_drg_code and base.drg_code_type = 'ms-drg'

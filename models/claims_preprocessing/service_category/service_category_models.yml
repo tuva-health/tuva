@@ -11,6 +11,21 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
+    tests:
+      - dbt_expectations.expect_table_row_count_to_be_between:
+# description: This is a check in one of the final downstream marts to see if service_category__service_category_grouper is populated. If this is flagging, please check other areas further upstream on the input layer.
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_service_categories', 'dqi_usability']
+          min_value: 1
+          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
+            meta:
+              dqi_test_description: "This is a check in one of the final downstream
+                marts to see if service_category__service_category_grouper is populated.
+                If this is flagging, please check other areas further upstream on
+                the input layer."
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -137,7 +152,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__ambulance_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -257,7 +272,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__outpatient_hospice_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -329,7 +344,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__inpatient_rehab_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -507,7 +522,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__acute_inpatient_institutional_other
     config:
       schema: |
@@ -540,7 +555,7 @@ models:
       tags:
         - service_category_grouper
         - claims_preprocessing
-  
+
   - name: service_category__observation_professional
     config:
       schema: |
@@ -563,7 +578,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
   - name: service_category__office_based_other_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -573,7 +588,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__office_based_physical_therapy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -584,7 +599,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
   - name: service_category__office_based_radiology
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -594,7 +609,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
   - name: service_category__office_based_surgery_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -604,7 +619,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__pharmacy_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -615,7 +630,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__pharmacy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -626,8 +641,8 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
-  
+
+
   - name: service_category__outpatient_physical_therapy_institutional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -637,7 +652,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_physical_therapy_professional
     description: service categories flagged by corresponding codes and value sets
@@ -648,7 +663,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_radiology_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -659,7 +674,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_radiology_professional
     description: service categories flagged by corresponding codes and value sets
@@ -670,7 +685,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_substance_use_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -681,7 +696,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_substance_use_professional
     description: service categories flagged by corresponding codes and value sets
@@ -692,7 +707,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_surgery_institutional
     description: service categories flagged by corresponding codes and value sets
@@ -703,8 +718,8 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
-  
+
+
   - name: service_category__outpatient_surgery_professional
     description: service categories flagged by corresponding codes and value sets
     config:
@@ -714,7 +729,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-        
+
 
   - name: service_category__outpatient_rehab_institutional
     description: flagging outpatient claims for outpatient rehab service categories
@@ -725,7 +740,7 @@ models:
       materialized: table
       tags:
         - service_category_grouper
-  
+
 #staging:
   - name: service_category__stg_medical_claim
     description: Staging med claims for sc grouper
@@ -765,6 +780,32 @@ models:
         - claims_preprocessing
 
   - name: service_category__stg_office_based
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: service_category__inpatient_substance_use_professional
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+
+  - name: service_category__outpatient_skilled_nursing_institutional
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}
+      materialized: view
+      tags:
+        - service_category_grouper
+        - claims_preprocessing
+  - name: service_category__dme_institutional
     config:
       schema: |
         {%- if var('tuva_schema_prefix', None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{%- else %}claims_preprocessing{%- endif -%}

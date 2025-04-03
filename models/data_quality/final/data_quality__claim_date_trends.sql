@@ -1,13 +1,12 @@
 {{ config(
-     enabled = var('data_quality_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+)}}
 
 with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -16,7 +15,7 @@ with date_stage as(
             , cast({{ date_part("year", "claim_start_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "claim_start_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('medical_claim') }}
+        from {{ ref('input_layer__medical_claim') }}
         group by
             cast({{ date_part("year", "claim_start_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "claim_start_date") }} as {{ dbt.type_string() }})
@@ -26,7 +25,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -35,7 +34,7 @@ with date_stage as(
             , cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('medical_claim') }}
+        from {{ ref('input_layer__medical_claim') }}
         group by
             cast({{ date_part("year", "claim_end_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "claim_end_date") }} as {{ dbt.type_string() }})
@@ -45,7 +44,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -54,7 +53,7 @@ with date_stage as(
             , cast({{ date_part("year", "admission_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "admission_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('medical_claim') }}
+        from {{ ref('input_layer__medical_claim') }}
         group by
             cast({{ date_part("year", "admission_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "admission_date") }} as {{ dbt.type_string() }})
@@ -64,7 +63,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -73,7 +72,7 @@ with date_stage as(
             , cast({{ date_part("year", "discharge_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "discharge_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('medical_claim') }}
+        from {{ ref('input_layer__medical_claim') }}
         group by
             cast({{ date_part("year", "discharge_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "discharge_date") }} as {{ dbt.type_string() }})
@@ -83,7 +82,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -92,7 +91,7 @@ with date_stage as(
             , cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('medical_claim') }}
+        from {{ ref('input_layer__medical_claim') }}
         group by
             cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }})
@@ -102,7 +101,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -111,7 +110,7 @@ with date_stage as(
             , cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('pharmacy_claim') }}
+        from {{ ref('input_layer__pharmacy_claim') }}
         group by
             cast({{ date_part("year", "dispensing_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "dispensing_date") }} as {{ dbt.type_string() }})
@@ -121,7 +120,7 @@ with date_stage as(
 
     select
         date_field
-        , {{ dbt.concat(["year", dbt.right(dbt.concat(["'0'", "month"]), 2)]) }} as year_month
+        , {{ concat_custom(["year", dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
         , result_count
     from
     (
@@ -130,7 +129,7 @@ with date_stage as(
             , cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }}) as year
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }}) as month
             , count(distinct claim_id) as result_count
-        from {{ ref('pharmacy_claim') }}
+        from {{ ref('input_layer__pharmacy_claim') }}
         group by
             cast({{ date_part("year", "paid_date") }} as {{ dbt.type_string() }})
             , cast({{ date_part("month", "paid_date") }} as {{ dbt.type_string() }})

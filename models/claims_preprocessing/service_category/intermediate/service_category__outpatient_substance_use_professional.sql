@@ -17,11 +17,12 @@ inner join {{ ref('service_category__stg_professional') }} as prof
   on med.claim_id = prof.claim_id
   and med.claim_line_number = prof.claim_line_number
 where 
-  med.default_ccsr_category_description_op in (
+  (med.default_ccsr_category_description_op in (
       'MBD026'
     , 'SYM008'
     , 'MBD025'
     , 'SYM009'
     , 'MBD034'
   )
-  and med.place_of_service_code <> '11'
+  and med.place_of_service_code <> '11')
+  or med.place_of_service_code in ('57','58')

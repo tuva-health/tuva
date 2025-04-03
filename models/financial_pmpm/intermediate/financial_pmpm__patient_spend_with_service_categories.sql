@@ -24,9 +24,9 @@ with claims_with_service_categories as (
     , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , {{  dbt.concat([date_part('year', 'claim_date'),
+    , {{  concat_custom([date_part('year', 'claim_date'),
                       dbt.right(
-                      dbt.concat(["'0'", date_part('month', 'claim_date')])
+                      concat_custom(["'0'", date_part('month', 'claim_date')])
                       , 2)]) }} as year_month
     , paid_amount
     , allowed_amount
@@ -55,9 +55,9 @@ with claims_with_service_categories as (
     , {{ quote_column('plan') }}
     , service_category_1
     , service_category_2
-    , {{  dbt.concat([date_part('year', 'claim_date'),
+    , {{  concat_custom([date_part('year', 'claim_date'),
                       dbt.right(
-                      dbt.concat(["'0'", date_part('month', 'claim_date')])
+                      concat_custom(["'0'", date_part('month', 'claim_date')])
                       , 2)]) }} as year_month
     , paid_amount
     , allowed_amount

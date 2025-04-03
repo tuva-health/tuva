@@ -1,12 +1,10 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
- | as_bool
-   )
-}}
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+)}}
 
 with eligibility_spans as(
     select distinct
-        {{ dbt.concat([
+        {{ concat_custom([
             "member_id",
             "'-'",
             "enrollment_start_date",
@@ -19,7 +17,7 @@ with eligibility_spans as(
         ]) }} as eligibility_span_id
         , enrollment_start_date
         , enrollment_end_date
-    from {{ ref('eligibility') }}
+    from {{ ref('input_layer__eligibility') }}
 )
 
 , missing_start_date as (
@@ -82,9 +80,9 @@ nonsensical_dates as (
         'Nonsensical dates' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
-    where enrollment_start_date < '1900-01-01'
-    or enrollment_end_date < '1900-01-01'
-    or enrollment_start_date > '2100-01-01'
+    where enrollment_start_date < {{ dbt.cast("'1900-01-01'", api.Column.translate_type('date')) }}
+    or enrollment_end_date < {{ dbt.cast("'1900-01-01'", api.Column.translate_type('date')) }}
+    or enrollment_start_date > {{ dbt.cast("'2100-01-01'", api.Column.translate_type('date')) }}
 )
 
 select *, '{{ var('tuva_last_run')}}' as tuva_last_run from missing_start_date

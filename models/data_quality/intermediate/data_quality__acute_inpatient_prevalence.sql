@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_enabled', var('tuva_marts_enabled', False)) | as_bool
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 )}}
 
 with total_cte as (
@@ -10,7 +10,7 @@ where encounter_type = 'acute inpatient'
 
 ,cte as (
 select 
-    {{ dbt.concat([
+    {{ concat_custom([
         'drg_code',
         "' - '",
         'drg_description'
@@ -25,7 +25,7 @@ where encounter_type = 'acute inpatient'
 and
 drg_code is not null
 group by 
-    {{ dbt.concat([
+    {{ concat_custom([
         'drg_code',
         "' - '",
         'drg_description'

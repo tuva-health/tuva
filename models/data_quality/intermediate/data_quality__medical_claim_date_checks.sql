@@ -1,7 +1,6 @@
 {{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
-   )
-}}
+     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
+)}}
 
 with medical_claim as (
     select m.claim_id,

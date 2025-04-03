@@ -24,10 +24,32 @@ with drg_requirement as (
   from {{ ref('service_category__stg_medical_claim') }}
   where claim_type = 'institutional'
     and substring(bill_type_code, 1, 2) in (
-      '11'  -- hospital inpatient 
-    , '12'  -- hospital inpatient 
-    , '21'  -- SNF inpatient
-    , '82'  -- inpatient hospice
+      '11'  -- Hospital Inpatient (Part A)
+    , '12'  -- Hospital Inpatient (Part B)
+    , '21'  -- Skilled Nursing Facility (SNF) Inpatient (Part A)
+    , '82'  -- Hospital-based Hospice (Inpatient)
+    , '15'  -- Hospital Intermediate Care - Level I
+    , '16'  -- Hospital Intermediate Care - Level II
+    , '17'  -- Hospital Subacute Inpatient
+    , '18'  -- Hospital Swing Beds
+    , '22'  -- Skilled Nursing Facility (SNF) Inpatient (Part B)
+    , '25'  -- SNF Intermediate Care - Level I
+    , '26'  -- SNF Intermediate Care - Level II
+    , '27'  -- SNF Subacute Inpatient
+    , '28'  -- SNF Swing Beds
+    , '31'  -- Home Health Inpatient (Part A)
+    , '41'  -- Religious Nonmedical Hospital Inpatient (Part A)
+    , '42'  -- Religious Nonmedical Hospital Inpatient (Part B)
+    , '45'  -- Religious Nonmedical Hospital Intermediate Care - Level I
+    , '46'  -- Religious Nonmedical Hospital Intermediate Care - Level II
+    , '47'  -- Religious Nonmedical Hospital Subacute Inpatient
+    , '48'  -- Religious Nonmedical Hospital Swing Beds
+    , '61'  -- Intermediate Care Inpatient (Part A)
+    , '62'  -- Intermediate Care Inpatient (Part B)
+    , '65'  -- Intermediate Care - Level I
+    , '66'  -- Intermediate Care - Level II
+    , '67'  -- Intermediate Care Subacute Inpatient
+    , '68'  -- Intermediate Care Swing Beds
     )
 )
 

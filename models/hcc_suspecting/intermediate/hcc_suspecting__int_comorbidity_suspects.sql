@@ -199,7 +199,7 @@ with conditions as (
         , condition_2_recorded_date
         , current_year_billed
         , cast('Comorbidity suspect' as {{ dbt.type_string() }}) as reason
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "condition_1_concept_name",
             "' ('",
             "condition_1_code",

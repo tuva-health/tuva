@@ -111,7 +111,7 @@ with all_medications as (
         , drug_code
         , current_year_billed
         , cast('Medication suspect' as {{ dbt.type_string() }}) as reason
-        , {{ dbt.concat([
+        , {{ concat_custom([
             "concept_name",
             "drug_code",
             "') dispensed on '",

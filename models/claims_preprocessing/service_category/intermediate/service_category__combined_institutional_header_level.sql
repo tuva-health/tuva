@@ -25,6 +25,7 @@ WITH combine_header_models AS (
       ref('service_category__inpatient_rehab_institutional'),
       ref('service_category__outpatient_rehab_institutional'),
       ref('service_category__outpatient_substance_use_institutional'),
+      ref('service_category__outpatient_skilled_nursing_institutional'),
       ref('service_category__outpatient_surgery_institutional')
     ],
     exclude=["_loaded_at"]

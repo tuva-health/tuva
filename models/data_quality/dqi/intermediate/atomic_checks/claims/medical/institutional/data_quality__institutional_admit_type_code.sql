@@ -9,7 +9,7 @@ from {{ ref('data_quality__stg_institutional_inpatient') }}
 
 unique_field as (
     select distinct claim_id
-        , {{ dbt.concat(["base.admit_type_code", "'|'", "coalesce(term.admit_type_description, '')"]) }} as field
+        , {{ concat_custom(["base.admit_type_code", "'|'", "coalesce(term.admit_type_description, '')"]) }} as field
         , data_source
     from base
     left join {{ ref('terminology__admit_type')}} as term on base.admit_type_code = term.admit_type_code
