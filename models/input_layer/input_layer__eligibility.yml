@@ -14,9 +14,9 @@ models:
             - person_id
             - enrollment_start_date
             - enrollment_end_date
-            - member_id
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - payer
-            - data_source
+            - data_source     
           tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
             'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification',
             'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission']

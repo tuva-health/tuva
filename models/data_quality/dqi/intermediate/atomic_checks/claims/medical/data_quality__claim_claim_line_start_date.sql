@@ -18,14 +18,14 @@ select
     , m.claim_type as claim_type
     , 'CLAIM_LINE_START_DATE' as field_name
     , case
-        when m.claim_line_start_date > tuva_last_run then 'invalid'
+        when m.claim_line_start_date > cte.tuva_last_run then 'invalid'
         when m.claim_line_start_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp = "cte.tuva_last_run") }} then 'invalid'
         when m.claim_line_start_date < m.claim_start_date then 'invalid'
         when m.claim_line_start_date is null then 'null'
         else 'valid'
     end as bucket_name
     , case
-        when m.claim_line_start_date > tuva_last_run then 'future'
+        when m.claim_line_start_date > cte.tuva_last_run then 'future'
         when m.claim_line_start_date < {{ dbt.dateadd(datepart="year", interval=-10, from_date_or_timestamp = "cte.tuva_last_run" ) }} then 'too old'
         when m.claim_line_start_date < m.claim_start_date then 'line date less than than claim date'
         else null
