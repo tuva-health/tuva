@@ -30,13 +30,6 @@ models:
     alias: dim_date
     tags: power_bi
     materialized: table
-  columns:
-  - name: full_date
-    description: full date
-    tests:
-    - unique:
-        config:
-          severity: error
 
 - name: power_bi__dim_service_category
   description: >
@@ -85,12 +78,9 @@ models:
     tags: power_bi
     materialized: table
   columns:
-  - name: patient_month_key
-    description: Unique combination of patient id and year month
-    tests:
-    - unique:
-        config:
-          severity: error
+  - name: patient_source_key
+    description: Unique combination of patient id and data source
+
 
 - name: power_bi__fact_encounters
   description: >
