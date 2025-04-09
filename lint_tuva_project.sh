@@ -1,4 +1,33 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# Script: lint_tuva_project.sh
+# Description: Runs dbt, compiles the project, and then uses SQLFluff to lint
+#              and optionally fix SQL files within the dbt project.
+#              Includes specific logic for handling integration test files and
+#              temporarily modifying dbt_project.yml for compilation.
+#              Designed for both local development and CI environments.
+#
+# Usage:
+#   Local (Default - runs fix): ./lint_tuva_project.sh
+#   Local (Lint only, no fix): ./lint_tuva_project.sh --no-fix
+#   CI Mode (Lint only, fails on issues): ./lint_tuva_project.sh --ci
+#
+# Prerequisites:
+#   - Bash shell (standard on Linux/macOS, available via Git Bash or WSL on Windows)
+#   - dbt-core installed and configured for the project
+#   - sqlfluff and sqlfluff-templater-dbt installed
+#   - Must be run from the root of the dbt project directory.
+#
+# Outputs:
+#   - Logs filtered linting/fixing output to SQLFLUFF_LINTER_OUTPUT.TXT
+#   - Prints progress and filtered results to the terminal.
+#   - Exits with 0 on success, 1 on failure (lint errors or script errors).
+#
+# Notes:
+#   - Temporarily modifies dbt_project.yml (backs up as dbt_project.yml.bak).
+#   - Copies/removes files in models/integration_tests and seeds/integration_tests.
+#   - Use the --ci flag for automated checks where fixing is not desired.
+# ==============================================================================
 
 # Exit on error, treat unset variables as error, exit on pipeline failure
 set -euo pipefail
