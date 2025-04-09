@@ -13,15 +13,15 @@ with diagnosis as (
       and pqi.value_set_name = 'diabetes_diagnosis_codes'
       and pqi_number = '16'
     where c.encounter_id is not null
-),
+)
 
 
-procedures as (
+, procedures as (
     select distinct
         p.encounter_id
       , p.data_source
     from {{ ref('ahrq_measures__stg_pqi_procedure') }} as p
-    inner join diagnosis as d 
+    inner join diagnosis as d
       on p.encounter_id = d.encounter_id
       and d.data_source = p.data_source
     inner join {{ ref('pqi__value_sets') }} as pqi
@@ -38,14 +38,14 @@ select
   , e.encounter_id
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('ahrq_measures__stg_pqi_inpatient_encounter') }} as e
-inner join {{ ref('ahrq_measures__int_pqi_16_denom') }} as denom 
+inner join {{ ref('ahrq_measures__int_pqi_16_denom') }} as denom
   on e.person_id = denom.person_id
   and e.data_source = denom.data_source
   and e.year_number = denom.year_number
     inner join procedures as p
   on e.encounter_id = p.encounter_id
   and e.data_source = p.data_source
-left join {{ ref('ahrq_measures__int_pqi_16_exclusions') }} as shared
+left outer join {{ ref('ahrq_measures__int_pqi_16_exclusions') }} as shared
   on e.encounter_id = shared.encounter_id
   and e.data_source = shared.data_source
 where shared.encounter_id is null

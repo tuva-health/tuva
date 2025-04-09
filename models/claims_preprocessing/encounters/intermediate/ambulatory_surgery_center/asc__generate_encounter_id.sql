@@ -82,4 +82,3 @@ from numbered_data as nd
 inner join numbered_encounters as ne
   on nd.patient_data_source_id = ne.patient_data_source_id
   and nd.encounter_group = ne.encounter_group
-

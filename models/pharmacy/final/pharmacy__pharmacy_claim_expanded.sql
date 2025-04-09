@@ -3,7 +3,7 @@
 ) }}
 
 with all_drugs as (
-  select 
+  select
       p.data_source
     , p.claim_id
     , p.claim_line_number
@@ -30,36 +30,37 @@ with all_drugs as (
     , r.clinical_product_tty as generic_tty
     , r.ingredient_name
     , r.dose_form_name
-    , case 
-        when ga.brand_with_generic_available is not null 
-          then 'brand_with_generic_available' 
-        else r.brand_vs_generic 
+    , case
+        when ga.brand_with_generic_available is not null
+          then 'brand_with_generic_available'
+        else r.brand_vs_generic
       end as generic_available
     , opp.brand_cost_per_unit
     , opp.generic_average_cost_per_unit
     , opp.brand_less_generic_cost_per_unit
     , opp.generic_available_total_opportunity
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
   from {{ ref('pharmacy__stg_pharmacy_claim') }} as p
-  left join {{ ref('terminology__rxnorm_brand_generic') }} as r 
+  left outer join {{ ref('terminology__rxnorm_brand_generic') }} as r
     on p.rxcui = r.product_rxcui
-  left join {{ ref('pharmacy__int_brand_with_generic_available') }} as ga 
+  left outer join {{ ref('pharmacy__int_brand_with_generic_available') }} as ga
     on p.rxcui = ga.brand_with_generic_available
-  left join {{ ref('pharmacy__brand_generic_opportunity') }} as opp 
+  left outer join {{ ref('pharmacy__brand_generic_opportunity') }} as opp
     on p.claim_id = opp.claim_id
     and p.claim_line_number = opp.claim_line_number
     and p.data_source = opp.data_source
 )
 
 , generic_available as (
-  select 
+  select
       *
-    , row_number() over (order by ndc_code, data_source) as generic_available_sk
+    , row_number() over (
+order by ndc_code, data_source) as generic_available_sk
   from all_drugs
   where generic_available = 'brand_with_generic_available'
 )
 
-select 
+select
     a.data_source
   , a.claim_id
   , a.claim_line_number
@@ -92,7 +93,7 @@ select
   , a.generic_available_total_opportunity
   , g.generic_available_sk
 from all_drugs as a
-left join generic_available as g 
+left outer join generic_available as g
   on a.claim_id = g.claim_id
   and a.claim_line_number = g.claim_line_number
   and a.data_source = g.data_source

@@ -5,14 +5,14 @@
 
 
 select
-  m.person_id 
+  m.person_id
   , d.patient_data_source_id
   , m.claim_id
   , m.claim_line_number
   , {{ concat_custom(["m.claim_id","'|'","cast(m.claim_line_number as " ~ dbt.type_string() ~ ")"]) }} as claim_line_id
   , m.claim_type
-  , coalesce(m.admission_date,m.claim_line_start_date,m.claim_start_date) as start_date
-  , coalesce(m.discharge_date,m.claim_line_end_date,m.claim_end_date) as end_date
+  , coalesce(m.admission_date, m.claim_line_start_date, m.claim_start_date) as start_date
+  , coalesce(m.discharge_date, m.claim_line_end_date, m.claim_end_date) as end_date
   , m.admission_date
   , m.discharge_date
   , m.claim_start_date
@@ -60,21 +60,21 @@ select
   , m.allowed_amount
   , m.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('normalized_input__medical_claim') }} m
-inner join {{ ref('service_category__service_category_grouper') }} g on m.claim_id = g.claim_id
+from {{ ref('normalized_input__medical_claim') }} as m
+inner join {{ ref('service_category__service_category_grouper') }} as g on m.claim_id = g.claim_id
 and
 m.claim_line_number = g.claim_line_number
 and g.duplicate_row_number = 1
-inner join {{ ref('encounters__patient_data_source_id') }} d on m.person_id = d.person_id
+inner join {{ ref('encounters__patient_data_source_id') }} as d on m.person_id = d.person_id
 and
 m.data_source = d.data_source
-left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} dx on m.diagnosis_code_1 = dx.icd_10_cm_code
-left join {{ ref('terminology__provider') }} p on m.facility_id = p.npi
-left join {{ ref('terminology__ccs_services_procedures') }} c on m.hcpcs_code = c.hcpcs_code
-left join {{ ref('terminology__nitos') }} n on m.hcpcs_code = n.hcpcs_code
-left join {{ ref('terminology__ms_drg') }} msdrg on m.drg_code_type = 'ms-drg' and m.drg_code = msdrg.ms_drg_code
-left join {{ ref('terminology__apr_drg') }} aprdrg on m.drg_code_type = 'apr-drg' and m.drg_code = aprdrg.apr_drg_code
-left join {{ ref('terminology__revenue_center') }} r on m.revenue_center_code = r.revenue_center_code
-left join {{ ref('terminology__place_of_service') }} pos on m.place_of_service_code = pos.place_of_service_code
-left join {{ ref('terminology__bill_type') }} bt on m.bill_type_code = bt.bill_type_code
-left join {{ ref('terminology__provider')}} rend on m.rendering_id = rend.npi
+left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as dx on m.diagnosis_code_1 = dx.icd_10_cm_code
+left outer join {{ ref('terminology__provider') }} as p on m.facility_id = p.npi
+left outer join {{ ref('terminology__ccs_services_procedures') }} as c on m.hcpcs_code = c.hcpcs_code
+left outer join {{ ref('terminology__nitos') }} as n on m.hcpcs_code = n.hcpcs_code
+left outer join {{ ref('terminology__ms_drg') }} as msdrg on m.drg_code_type = 'ms-drg' and m.drg_code = msdrg.ms_drg_code
+left outer join {{ ref('terminology__apr_drg') }} as aprdrg on m.drg_code_type = 'apr-drg' and m.drg_code = aprdrg.apr_drg_code
+left outer join {{ ref('terminology__revenue_center') }} as r on m.revenue_center_code = r.revenue_center_code
+left outer join {{ ref('terminology__place_of_service') }} as pos on m.place_of_service_code = pos.place_of_service_code
+left outer join {{ ref('terminology__bill_type') }} as bt on m.bill_type_code = bt.bill_type_code
+left outer join {{ ref('terminology__provider') }} as rend on m.rendering_id = rend.npi

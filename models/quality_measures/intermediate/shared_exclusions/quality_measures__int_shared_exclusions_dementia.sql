@@ -142,5 +142,5 @@ select
     , 'dementia' as exclusion_type
     , dispensing_date
     , paid_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from frailty_with_dementia

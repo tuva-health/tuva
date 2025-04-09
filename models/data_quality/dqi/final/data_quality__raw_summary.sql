@@ -3,7 +3,7 @@
 ) }}
 
 with cte as (
-    select 
+    select
         'input_layer' as source
       , 'eligibility' as table_name
       , count(*) as row_count
@@ -14,7 +14,7 @@ with cte as (
 
     union all
 
-    select 
+    select
         'raw_data' as source
       , 'eligibility' as table_name
       , null as row_count
@@ -25,7 +25,7 @@ with cte as (
 
     union all
 
-    select 
+    select
         'input_layer' as source
       , 'medical_claim' as table_name
       , count(*) as row_count
@@ -36,7 +36,7 @@ with cte as (
 
     union all
 
-    select 
+    select
         'raw_data' as source
       , 'medical_claim' as table_name
       , null as row_count
@@ -47,7 +47,7 @@ with cte as (
 
     union all
 
-    select 
+    select
         'input_layer' as source
       , 'pharmacy_claim' as table_name
       , count(*) as row_count
@@ -58,7 +58,7 @@ with cte as (
 
     union all
 
-    select 
+    select
         'raw_data' as source
       , 'pharmacy_claim' as table_name
       , null as row_count

@@ -9,10 +9,11 @@ with latest_test_invocation as (
         select
             invocation_id
             , generated_at
-            , ROW_NUMBER() OVER (partition by command order by generated_at desc) as row_num
+            , ROW_NUMBER() over (partition by command
+order by generated_at desc) as row_num
         from {{ ref('dbt_invocations') }}
         where command = 'test'
-    ) ranked_invocations
+    ) as ranked_invocations
     where row_num = 1
 )
 
@@ -84,22 +85,22 @@ select
         when dt.tags like '%"tuva_dqi_sev_3"%' then 3
         when dt.tags like '%"tuva_dqi_sev_4"%' then 4
         when dt.tags like '%"tuva_dqi_sev_5"%' then 5
-        else NULL
+        else null
     end as severity_level
 
     -- Create flag columns for different categories (0 or 1)
-    ,case when dt.tags like '%"dqi_service_categories"%' then 1 else 0 end as flag_service_categories
-    ,case when dt.tags like '%"dqi_ccsr"%' then 1 else 0 end as flag_ccsr
-    ,case when dt.tags like '%"dqi_cms_chronic_conditions"%' then 1 else 0 end as flag_cms_chronic_conditions
-    ,case when dt.tags like '%"dqi_tuva_chronic_conditions"%' then 1 else 0 end as flag_tuva_chronic_conditions
-    ,case when dt.tags like '%"dqi_cms_hccs"%' then 1 else 0 end as flag_cms_hccs
-    ,case when dt.tags like '%"dqi_ed_classification"%' then 1 else 0 end as flag_ed_classification
-    ,case when dt.tags like '%"dqi_financial_pmpm"%' then 1 else 0 end as flag_financial_pmpm
-    ,case when dt.tags like '%"dqi_quality_measures"%' then 1 else 0 end as flag_quality_measures
-    ,case when dt.tags like '%"dqi_readmission"%' then 1 else 0 end as flag_readmission
+    , case when dt.tags like '%"dqi_service_categories"%' then 1 else 0 end as flag_service_categories
+    , case when dt.tags like '%"dqi_ccsr"%' then 1 else 0 end as flag_ccsr
+    , case when dt.tags like '%"dqi_cms_chronic_conditions"%' then 1 else 0 end as flag_cms_chronic_conditions
+    , case when dt.tags like '%"dqi_tuva_chronic_conditions"%' then 1 else 0 end as flag_tuva_chronic_conditions
+    , case when dt.tags like '%"dqi_cms_hccs"%' then 1 else 0 end as flag_cms_hccs
+    , case when dt.tags like '%"dqi_ed_classification"%' then 1 else 0 end as flag_ed_classification
+    , case when dt.tags like '%"dqi_financial_pmpm"%' then 1 else 0 end as flag_financial_pmpm
+    , case when dt.tags like '%"dqi_quality_measures"%' then 1 else 0 end as flag_quality_measures
+    , case when dt.tags like '%"dqi_readmission"%' then 1 else 0 end as flag_readmission
 
 from {{ ref('dbt_tests') }} as dt
-left join {{ ref('elementary_test_results') }} as etr
+left outer join {{ ref('elementary_test_results') }} as etr
     on dt.unique_id = etr.test_unique_id
 inner join latest_test_invocation as lti
     on etr.invocation_id = lti.invocation_id

@@ -103,5 +103,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

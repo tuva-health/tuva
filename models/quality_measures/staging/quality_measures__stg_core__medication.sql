@@ -8,13 +8,13 @@
 select
       person_id
     , encounter_id
-    , prescribing_date  
+    , prescribing_date
     , dispensing_date
     , source_code_type
     , source_code
     , ndc_code
     , rxnorm_code
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medication') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -28,7 +28,7 @@ select
     , source_code
     , ndc_code
     , rxnorm_code
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medication') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}

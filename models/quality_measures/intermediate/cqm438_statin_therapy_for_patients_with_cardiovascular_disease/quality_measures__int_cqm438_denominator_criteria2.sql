@@ -49,7 +49,7 @@ with cholesterol_codes as (
     select
           person_id
         , procedure_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -99,8 +99,8 @@ with cholesterol_codes as (
     , labs.result as evidence_value
     , coalesce(collection_date, result_date) as evidence_date
     , cholesterol_codes.concept_name
-    , row_number() over(partition by labs.person_id order by
-                          labs.result desc
+    , row_number() over (partition by labs.person_id
+                          order by labs.result desc
                         , result_date desc) as rn
     from labs
     inner join cholesterol_codes
@@ -121,7 +121,7 @@ with cholesterol_codes as (
           person_id
         , evidence_date
     from cholesterol_tests_with_result
-    where rn= 1
+    where rn = 1
         and cast(evidence_value as {{ dbt.type_numeric() }}) >= 190
 
 )
@@ -160,7 +160,7 @@ with cholesterol_codes as (
         , measure_name
         , measure_version
     from all_patients_with_cholesterol
-    inner join {{ref('quality_measures__int_cqm438__performance_period')}} pp
+    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} as pp
     on evidence_date <= pp.performance_period_end
 
 )
@@ -185,5 +185,5 @@ select
     , measure_id
     , measure_name
     , measure_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

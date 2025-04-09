@@ -21,5 +21,5 @@ select
           when drug then 'drug'
           else 'unclassified'
    end as classification
-from {{ ref('ed_classification__int_map_primary_dx') }} a
+from {{ ref('ed_classification__int_map_primary_dx') }} as a
 where ed_classification_capture = 1

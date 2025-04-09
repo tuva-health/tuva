@@ -12,10 +12,10 @@ with service_category as (
   from {{ ref('encounters__stg_medical_claim') }}
   where
     service_category_2 = 'ambulatory surgery center' -- include both professional and institutional claims as anchor events
- 
+
 )
 
-select distinct 
+select distinct
 claim_id
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+, '{{ var('tuva_last_run') }}' as tuva_last_run
 from service_category

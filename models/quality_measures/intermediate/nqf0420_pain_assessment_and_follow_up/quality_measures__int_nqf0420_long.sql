@@ -69,7 +69,7 @@ with denominator as (
         , denominator.measure_id
         , denominator.measure_name
         , denominator.measure_version
-        , (row_number() over(
+        , (row_number() over (
             partition by
                   denominator.person_id
                 , denominator.performance_period_begin
@@ -77,15 +77,15 @@ with denominator as (
                 , denominator.measure_id
                 , denominator.measure_name
               order by
-                  case when numerator.evidence_date is null then 1 else 0 end,
-                  numerator.evidence_date desc
-                , case when exclusions.exclusion_date is null then 1 else 0 end,
-                  exclusions.exclusion_date desc
+                  case when numerator.evidence_date is null then 1 else 0 end
+                  , numerator.evidence_date desc
+                , case when exclusions.exclusion_date is null then 1 else 0 end
+                  , exclusions.exclusion_date desc
           )) as rn
     from denominator
-        left join numerator
+        left outer join numerator
             on denominator.person_id = numerator.person_id
-        left join exclusions
+        left outer join exclusions
             on denominator.person_id = exclusions.person_id
 
 )
@@ -148,5 +148,5 @@ select
     , measure_id
     , measure_name
     , measure_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

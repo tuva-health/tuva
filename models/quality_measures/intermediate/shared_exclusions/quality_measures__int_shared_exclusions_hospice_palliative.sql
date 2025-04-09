@@ -21,8 +21,8 @@ with exclusion_codes as (
             when 'ICD10PCS' then 'icd-10-pcs'
           else lower(code_system) end as code_system
         , concept_name
-    From {{ref('quality_measures__value_sets')}}
-    where lower(concept_name) in  (
+    from {{ ref('quality_measures__value_sets') }}
+    where lower(concept_name) in (
             'hospice encounter'
           , 'hospice care ambulatory'
           , 'hospice diagnosis'
@@ -38,18 +38,18 @@ with exclusion_codes as (
           person_id
         , claim_id
         , recorded_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'snomed' then 'snomed-ct'
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
-    from {{ ref('quality_measures__stg_core__condition') }} 
+    from {{ ref('quality_measures__stg_core__condition') }}
 
 )
 
@@ -71,7 +71,7 @@ with exclusion_codes as (
     select
           person_id
         , observation_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -79,7 +79,7 @@ with exclusion_codes as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -92,7 +92,7 @@ with exclusion_codes as (
     select
           person_id
         , procedure_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -100,7 +100,7 @@ with exclusion_codes as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -164,8 +164,8 @@ with exclusion_codes as (
 
 )
 
-, patients_with_exclusions as(
-    
+, patients_with_exclusions as (
+
     select person_id
         , recorded_date as exclusion_date
         , concept_name as exclusion_reason
@@ -199,5 +199,5 @@ select
     , exclusion_date
     , exclusion_reason
     , 'hospice_palliative' as exclusion_type
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from patients_with_exclusions

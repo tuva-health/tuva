@@ -26,43 +26,43 @@ with eligibility_spans as(
         count(*) as result_count
     from eligibility_spans
     where enrollment_start_date is null
-),
+)
 
-missing_end_date as (
+, missing_end_date as (
     select
         'Missing enrollment_end_date' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
     where enrollment_end_date is null
-),
+)
 
-invalid_start_date as (
+, invalid_start_date as (
     select
         'Enrollment_start_date populated with something other than a date' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
     where enrollment_start_date is not null
     and not {{ try_to_cast_date('enrollment_start_date') }} is not null
-),
+)
 
-invalid_end_date as (
+, invalid_end_date as (
     select
         'Enrollment_end_date populated with something other than a date' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
     where enrollment_end_date is not null
     and not {{ try_to_cast_date('enrollment_end_date') }} is not null
-),
+)
 
-start_after_end as (
+, start_after_end as (
     select
         'Enrollment_start_date after enrollment_end_date' as data_quality_check,
         count(*) as result_count
     from eligibility_spans
     where enrollment_start_date > enrollment_end_date
-),
+)
 
-future_end_date as (
+, future_end_date as (
     select
         'Future enrollment_end_date' as data_quality_check,
         count(*) as result_count
@@ -73,9 +73,9 @@ future_end_date as (
         where enrollment_end_date > current_date
     {% endif %}
 
-),
+)
 
-nonsensical_dates as (
+, nonsensical_dates as (
     select
         'Nonsensical dates' as data_quality_check,
         count(*) as result_count

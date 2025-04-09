@@ -23,7 +23,7 @@ with denominator as (
         , code_system
         , concept_name
     from {{ ref('quality_measures__value_sets') }}
-    where lower(concept_name) in  (
+    where lower(concept_name) in (
           'high intensity statin therapy'
         , 'low intensity statin therapy'
         , 'moderate intensity statin therapy'
@@ -37,7 +37,7 @@ with denominator as (
     select
         person_id
       , procedure_date
-      , coalesce (
+      , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -45,7 +45,7 @@ with denominator as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -55,7 +55,7 @@ with denominator as (
 
 , procedure_statin_related as (
 
-    select 
+    select
           procedures.person_id
         , procedures.procedure_date as evidence_date
     from procedures
@@ -89,7 +89,7 @@ with denominator as (
     inner join statin_codes
         on medications.source_code = statin_codes.code
         and medications.source_code_type = statin_codes.code_system
-        
+
 )
 
 , qualifying_patients as (
@@ -117,7 +117,7 @@ with denominator as (
 
 , qualifying_patients_with_denominator as (
 
-    select 
+    select
           qualifying_patients.person_id
         , qualifying_patients.evidence_date
         , denominator.performance_period_begin
@@ -129,8 +129,8 @@ with denominator as (
     from qualifying_patients
     inner join denominator
     on qualifying_patients.person_id = denominator.person_id
-    and evidence_date between 
-            denominator.performance_period_begin and 
+    and evidence_date between
+            denominator.performance_period_begin and
                 denominator.performance_period_end
 
 )

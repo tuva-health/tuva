@@ -37,7 +37,7 @@ select
   , coalesce(num.num_count, 0) / d.denom_count * 100000 as rate_per_100_thousand
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from denom as d
-left join num
+left outer join num
     on d.pqi_number = num.pqi_number
     and d.year_number = num.year_number
     and d.data_source = num.data_source

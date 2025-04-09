@@ -14,7 +14,7 @@ select
     , source_code
     , normalized_code_type
     , normalized_code
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__lab_result') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -28,7 +28,7 @@ select
     , source_code
     , normalized_code_type
     , normalized_code
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__lab_result') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}

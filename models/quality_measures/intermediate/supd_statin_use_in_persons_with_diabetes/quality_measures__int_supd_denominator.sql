@@ -34,12 +34,12 @@ with diabetics_codes as (
           person_id
         , dispensing_date
     from rx_diabetes
-    inner join {{ ref('quality_measures__int_supd__performance_period') }} pp
+    inner join {{ ref('quality_measures__int_supd__performance_period') }} as pp
         on dispensing_date between pp.performance_period_begin and pp.performance_period_end
 
 )
 
-/* 
+/*
     These patients need to pass a check
     - Should have at least two distinct Date of Service (FillDate) for rx
 */
@@ -50,7 +50,7 @@ with diabetics_codes as (
           person_id
         , dispensing_date
         , dense_rank() over (
-            partition by 
+            partition by
                   person_id
             order by dispensing_date
         ) as dr
@@ -68,7 +68,7 @@ with diabetics_codes as (
 )
 
 , qualifying_patients_with_age as (
-    
+
     select
           patients.person_id
         , floor({{ datediff('birth_date', 'pp.performance_period_begin', 'hour') }} / 8760.0) as age
@@ -77,10 +77,10 @@ with diabetics_codes as (
         , measure_id
         , measure_name
         , measure_version
-    from {{ ref('quality_measures__stg_core__patient') }} patients
+    from {{ ref('quality_measures__stg_core__patient') }} as patients
     inner join check_passed_patients
         on patients.person_id = check_passed_patients.person_id
-    cross join {{ ref('quality_measures__int_supd__performance_period') }} pp
+    cross join {{ ref('quality_measures__int_supd__performance_period') }} as pp
     where patients.death_date is null
 
 )
@@ -125,5 +125,5 @@ select
     , measure_name
     , measure_version
     , denominator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

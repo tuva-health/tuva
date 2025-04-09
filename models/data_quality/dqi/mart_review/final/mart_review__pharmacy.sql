@@ -50,15 +50,15 @@ select
   , pe.generic_available_sk
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }} as p
-left join {{ ref('terminology__ndc') }} as n 
+left outer join {{ ref('terminology__ndc') }} as n 
   on p.ndc_code = n.ndc
-left join {{ ref('terminology__rxnorm_brand_generic') }} as r 
+left outer join {{ ref('terminology__rxnorm_brand_generic') }} as r 
   on n.rxcui = r.product_rxcui
-left join {{ ref('terminology__rxnorm_to_atc') }} as a 
+left outer join {{ ref('terminology__rxnorm_to_atc') }} as a 
   on n.rxcui = a.rxcui
-left join {{ ref('core__practitioner') }} as prac 
+left outer join {{ ref('core__practitioner') }} as prac 
   on p.prescribing_provider_id = prac.practitioner_id
-left join {{ ref('pharmacy__pharmacy_claim_expanded') }} as pe 
+left outer join {{ ref('pharmacy__pharmacy_claim_expanded') }} as pe 
   on p.data_source = pe.data_source
   and p.claim_id = pe.claim_id
   and p.claim_line_number = pe.claim_line_number

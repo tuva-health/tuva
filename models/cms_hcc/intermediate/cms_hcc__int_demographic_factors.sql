@@ -105,7 +105,7 @@ with members as (
             and members.medicaid_status = seed_demographic_factors.medicaid_status
             and members.dual_status = seed_demographic_factors.dual_status
                 /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-            and CASE WHEN members.age_group IN ('65-69','70-74','75-79','80-84','85-89','90-94','>=95') THEN 'Aged' ELSE members.orec END = seed_demographic_factors.orec
+            and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
             and members.institutional_status = seed_demographic_factors.institutional_status
     where members.enrollment_status = 'Continuing'
         and seed_demographic_factors.model_version = 'CMS-HCC-V24'
@@ -174,7 +174,7 @@ with members as (
             and members.medicaid_status = seed_demographic_factors.medicaid_status
             and members.dual_status = seed_demographic_factors.dual_status
                 /* THIS CARVE OUT EXISTS AS MEMBERS WITH OREC = DISABLED OVER 65 SHOULD GET THE AGED DEMO FACTOR. */
-            and CASE WHEN members.age_group IN ('65-69','70-74','75-79','80-84','85-89','90-94','>=95') THEN 'Aged' ELSE members.orec END = seed_demographic_factors.orec
+            and case when members.age_group in ('65-69', '70-74', '75-79', '80-84', '85-89', '90-94', '>=95') then 'Aged' else members.orec end = seed_demographic_factors.orec
             and members.institutional_status = seed_demographic_factors.institutional_status
     where members.enrollment_status = 'Continuing'
         and seed_demographic_factors.model_version = 'CMS-HCC-V28'
@@ -215,7 +215,7 @@ with members as (
             , cast(orec_default as boolean) as orec_default
             , cast(institutional_status_default as boolean) as institutional_status_default
         {% endif %}
-        , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+        , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
@@ -244,5 +244,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types
