@@ -21,7 +21,7 @@ with source_mapping as (
        meds.ndc_code
        , ndc.ndc
        ) as ndc_code
-   ,  coalesce(
+   , coalesce(
        meds.ndc_description
        , ndc.fda_description
        , ndc.rxnorm_description
@@ -62,11 +62,11 @@ with source_mapping as (
    , meds.practitioner_id
    , meds.data_source
    , meds.tuva_last_run
-from {{ ref('core__stg_clinical_medication')}} meds
-    left join {{ref('terminology__ndc')}} ndc
+from {{ ref('core__stg_clinical_medication') }} as meds
+    left outer join {{ ref('terminology__ndc') }} as ndc
         on meds.source_code_type = 'ndc'
         and meds.source_code = ndc.ndc
-    left join {{ref('terminology__rxnorm_to_atc')}} rxatc
+    left outer join {{ ref('terminology__rxnorm_to_atc') }} as rxatc
         on meds.source_code_type = 'rxnorm'
         and meds.source_code = rxatc.rxcui
 
@@ -140,11 +140,11 @@ from {{ ref('core__stg_clinical_medication')}} meds
    , meds.practitioner_id
    , meds.data_source
    , meds.tuva_last_run
-from {{ ref('core__stg_clinical_medication')}} meds
-    left join {{ref('terminology__ndc')}} ndc
+from {{ ref('core__stg_clinical_medication') }} meds
+    left join {{ ref('terminology__ndc') }} ndc
         on meds.source_code_type = 'ndc'
         and meds.source_code = ndc.ndc
-    left join {{ref('terminology__rxnorm_to_atc')}} rxatc
+    left join {{ ref('terminology__rxnorm_to_atc') }} rxatc
         on meds.source_code_type = 'rxnorm'
         and meds.source_code = rxatc.rxcui
     left join {{ ref('custom_mapped') }} custom_mapped_ndc
@@ -232,8 +232,8 @@ select
    , sm.practitioner_id
    , sm.data_source
    , sm.tuva_last_run
-from source_mapping sm
-    left join {{ref('terminology__ndc')}} ndc
+from source_mapping as sm
+    left outer join {{ ref('terminology__ndc') }} as ndc
         on sm.ndc_code = ndc.ndc
-    left join {{ref('terminology__rxnorm_to_atc')}} rxatc
-        on coalesce( sm.rxnorm_code, ndc.rxcui ) = rxatc.rxcui
+    left outer join {{ ref('terminology__rxnorm_to_atc') }} as rxatc
+        on coalesce(sm.rxnorm_code, ndc.rxcui) = rxatc.rxcui

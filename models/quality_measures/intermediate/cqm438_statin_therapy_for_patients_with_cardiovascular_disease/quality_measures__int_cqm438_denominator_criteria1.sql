@@ -34,7 +34,7 @@ with ascvd_codes as (
         , source_code_type
         , normalized_code
         , normalized_code_type
-    from {{ ref('quality_measures__stg_core__condition')}}
+    from {{ ref('quality_measures__stg_core__condition') }}
 
 )
 
@@ -55,7 +55,7 @@ with ascvd_codes as (
     select
           person_id
         , procedure_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -110,7 +110,7 @@ with ascvd_codes as (
         , pp.measure_name
         , pp.measure_version
     from historical_ascvd
-    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} pp
+    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} as pp
     on evidence_date <= pp.performance_period_end
 
 )
@@ -128,7 +128,7 @@ with ascvd_codes as (
 
 )
 
-select 
+select
       person_id
     , performance_period_begin
     , performance_period_end

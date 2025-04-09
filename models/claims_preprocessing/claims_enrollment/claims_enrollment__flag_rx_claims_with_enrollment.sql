@@ -5,7 +5,7 @@
 }}
 
 
-with claim_dates as(
+with claim_dates as (
     select
         claim_id
         , claim_line_number
@@ -37,9 +37,9 @@ select distinct
     , claim.data_source
     , mm.member_month_key
     , claim.paid_year_month
-    , cast('{{ var('tuva_last_run')}}' as {{ dbt.type_timestamp() }} ) as tuva_last_run
-from {{ ref('core__member_months')}} mm
-inner join claim_dates claim
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+from {{ ref('core__member_months') }} as mm
+inner join claim_dates as claim
     on mm.person_id = claim.person_id
     and mm.member_id = claim.member_id
     and mm.payer = claim.payer

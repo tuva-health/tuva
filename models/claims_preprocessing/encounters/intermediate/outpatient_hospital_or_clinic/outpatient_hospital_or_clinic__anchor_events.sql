@@ -9,14 +9,14 @@ with service_category as (
       , patient_data_source_id
       , start_date
     from {{ ref('encounters__stg_medical_claim') }}
-    where 
+    where
       service_category_2 in (
           'outpatient hospital or clinic' -- both prof and inst
         , 'observation' -- orphaned obs that didn't roll up to other encounter
       )
 )
 
-select distinct 
+select distinct
     claim_id
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from service_category

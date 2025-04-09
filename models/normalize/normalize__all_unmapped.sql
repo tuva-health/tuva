@@ -15,10 +15,10 @@ with agg_cte as (
 )
 
 select i.SOURCE_CODE_TYPE, i.SOURCE_CODE, i.SOURCE_DESCRIPTION,
-       sum(i.item_count) as item_count,
-       {{ dbt.listagg(measure="distinct i.domain", delimiter_text="', '", order_by_clause="order by i.domain" )}} as domains,
-       {{ dbt.listagg(measure="distinct i.DATA_SOURCE", delimiter_text="', '", order_by_clause="order by i.DATA_SOURCE" )}} as data_sources,
-       cast( null as {{ dbt.type_string() }} ) as normalized_code_type,
+       sum(i.item_count) as item_count
+       , {{ dbt.listagg(measure="distinct i.domain", delimiter_text="', '", order_by_clause="order by i.domain" )}} as domains -- noqa
+       , {{ dbt.listagg(measure="distinct i.DATA_SOURCE", delimiter_text="', '", order_by_clause="order by i.DATA_SOURCE" )}} as data_sources -- noqa
+       , cast( null as {{ dbt.type_string() }} ) as normalized_code_type,
        cast( null as {{ dbt.type_string() }} ) as normalized_code,
        cast( null as {{ dbt.type_string() }} ) as normalized_description,
        cast( null as {{ dbt.type_string() }} ) as not_mapped,

@@ -5,24 +5,24 @@
 
 with claim_start_end as (
   select
-    claim_id,
-    patient_data_source_id,
-    min(start_date) as start_date,
-    max(end_date) as end_date
+    claim_id
+    , patient_data_source_id
+    , min(start_date) as start_date
+    , max(end_date) as end_date
   from {{ ref('encounters__stg_medical_claim') }}
   group by claim_id, patient_data_source_id
 )
 
 , base as (
   select distinct
-    enc.claim_id,
-    enc.patient_data_source_id,
-    c.start_date,
-    c.end_date,
-    enc.facility_id,
-    enc.discharge_disposition_code
-  from {{ ref('encounters__stg_medical_claim') }} enc
-  inner join claim_start_end c 
+    enc.claim_id
+    , enc.patient_data_source_id
+    , c.start_date
+    , c.end_date
+    , enc.facility_id
+    , enc.discharge_disposition_code
+  from {{ ref('encounters__stg_medical_claim') }} as enc
+  inner join claim_start_end as c
     on enc.claim_id = c.claim_id
     and c.patient_data_source_id = enc.patient_data_source_id
   where
@@ -31,24 +31,25 @@ with claim_start_end as (
 
 , add_row_num as (
   select
-    patient_data_source_id,
-    claim_id,
-    start_date,
-    end_date,
-    discharge_disposition_code,
-    facility_id,
-    row_number() over (partition by patient_data_source_id order by end_date, start_date, claim_id) as row_num
+    patient_data_source_id
+    , claim_id
+    , start_date
+    , end_date
+    , discharge_disposition_code
+    , facility_id
+    , row_number() over (partition by patient_data_source_id
+order by end_date, start_date, claim_id) as row_num
   from base
 )
 
 , check_for_merges_with_larger_row_num as (
   select
-    aa.patient_data_source_id,
-    aa.claim_id as claim_id_a,
-    bb.claim_id as claim_id_b,
-    aa.row_num as row_num_a,
-    bb.row_num as row_num_b,
-    case
+    aa.patient_data_source_id
+    , aa.claim_id as claim_id_a
+    , bb.claim_id as claim_id_b
+    , aa.row_num as row_num_a
+    , bb.row_num as row_num_b
+    , case
       when aa.end_date = bb.end_date and aa.facility_id = bb.facility_id then 1
       when {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
         and aa.facility_id = bb.facility_id
@@ -108,9 +109,9 @@ with claim_start_end as (
         else 0
       end as close_flag
   from add_row_num as aa
-  left join claim_ids_that_merge_with_larger_row_num as bb
+  left outer join claim_ids_that_merge_with_larger_row_num as bb
     on aa.claim_id = bb.claim_id
-  left join claim_ids_having_a_smaller_row_num_merging_with_a_larger_row_num as cc
+  left outer join claim_ids_having_a_smaller_row_num_merging_with_a_larger_row_num as cc
     on aa.claim_id = cc.claim_id
 )
 
@@ -150,7 +151,7 @@ with claim_start_end as (
     , aa.close_flag
     , bb.min_closing_row
   from close_flags as aa
-  left join find_min_closing_row_num_for_every_claim as bb
+  left outer join find_min_closing_row_num_for_every_claim as bb
     on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.claim_id = bb.claim_id
 )
@@ -168,7 +169,6 @@ with claim_start_end as (
     , aa.min_closing_row
     , bb.claim_id as encounter_id
   from add_min_closing_row_to_every_claim as aa
-  left join add_min_closing_row_to_every_claim as bb
+  left outer join add_min_closing_row_to_every_claim as bb
     on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.min_closing_row = bb.row_num
-

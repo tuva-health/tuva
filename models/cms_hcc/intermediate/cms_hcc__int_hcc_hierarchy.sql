@@ -48,10 +48,10 @@ with hcc_mapping as (
         , hcc_mapping.collection_end_date
         , hcc_mapping.hcc_code
     from hcc_mapping
-        left join seed_hcc_hierarchy as hcc_top_level
+        left outer join seed_hcc_hierarchy as hcc_top_level
             on hcc_mapping.hcc_code = hcc_top_level.hcc_code
             and hcc_mapping.model_version = hcc_top_level.model_version
-        left join seed_hcc_hierarchy as hcc_exclusions
+        left outer join seed_hcc_hierarchy as hcc_exclusions
             on hcc_mapping.hcc_code = hcc_exclusions.hccs_to_exclude
             and hcc_mapping.model_version = hcc_exclusions.model_version
     where hcc_top_level.hcc_code is null
@@ -95,7 +95,7 @@ with hcc_mapping as (
         , hccs_with_hierarchy.hcc_code
         , min(hcc_mapping.hcc_code) as top_level_hcc
     from hccs_with_hierarchy
-        left join hcc_mapping
+        left outer join hcc_mapping
             on hcc_mapping.person_id = hccs_with_hierarchy.person_id
             and hcc_mapping.hcc_code = hccs_with_hierarchy.top_level_hcc
             and hcc_mapping.model_version = hccs_with_hierarchy.model_version
@@ -148,13 +148,13 @@ with hcc_mapping as (
         inner join seed_hcc_hierarchy
             on hcc_mapping.hcc_code = seed_hcc_hierarchy.hcc_code
             and hcc_mapping.model_version = seed_hcc_hierarchy.model_version
-        left join lower_level_inclusions
+        left outer join lower_level_inclusions
             on hcc_mapping.person_id = lower_level_inclusions.person_id
             and hcc_mapping.hcc_code = lower_level_inclusions.hcc_code
             and hcc_mapping.model_version = lower_level_inclusions.model_version
             and hcc_mapping.payment_year = lower_level_inclusions.payment_year
             and hcc_mapping.collection_end_date = lower_level_inclusions.collection_end_date
-        left join hierarchy_applied
+        left outer join hierarchy_applied
             on hcc_mapping.person_id = hierarchy_applied.person_id
             and hcc_mapping.hcc_code = hierarchy_applied.hcc_code
             and hcc_mapping.model_version = hierarchy_applied.model_version
@@ -195,5 +195,5 @@ select
     , collection_start_date
     , collection_end_date
     , hcc_code
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

@@ -67,6 +67,47 @@ The easiest way to test your changes is to use the dbt project inside the packag
 
 You only need to test your changes in one data warehouse. When you submit your pull request, we will use our automated CI testing workflows to test all of our supported data warehouses.
 
+### How to run the linter
+This project includes a script (lint_tuva_project.sh) to ensure SQL code quality and consistency using dbt and SQLFluff.
+It compiles the dbt project and then lints the SQL files.
+
+#### Prerequisites
+
+Before running the script, ensure you have the following installed and accessible in your environment's PATH:
+1. **Bash:**
+   * **Linux/macOS:** Usually pre-installed.
+   * **Windows:** Install Git Bash (recommended) or use the Windows Subsystem for Linux (WSL).
+2. **dbt:** dbt-core and any necessary adapters must be installed (e.g., `pip install dbt-core dbt-<adapter>`). Your dbt profile should be configured correctly.
+3. **SQLFluff:** The linter and dbt templater must be installed (e.g., `pip install sqlfluff sqlfluff-templater-dbt`).
+
+#### How to Run
+You must run the script from the root directory of your dbt project.
+1. Make the script executable (Linux/macOS/Git Bash/WSL):
+   ```bash
+   chmod +x lint_tuva_project.sh
+   ```
+2. Execute the script:
+* **On Linux / macOS / Git Bash / WSL:**
+  * Default (Local Development - Lints and Fixes):
+    ```bash
+    ./lint_tuva_project.sh
+    ```
+  **This command will:**
+    * Run dbt clean and dbt deps.
+    * Temporarily modify dbt_project.yml (backing up the original).
+    * Copy integration test files.
+    * Run dbt compile.
+    * Run sqlfluff fix to automatically correct linting errors.
+    * Run sqlfluff lint to report any remaining errors.
+    * Clean up temporary changes.
+    * Output results to the terminal and SQLFLUFF_LINTER_OUTPUT.TXT.
+
+#### Running on VS Code on Windows
+
+* Make sure python interpreter is selected `> Python: Select Interpreter` command
+* Select `> Create New Terminal (With Profile)` and select "Git Bash" (requires installation of git bash).
+* Follow the how to run instructions above.
+
 ### Submitting your changes
 
 When you are ready, create a pull request in GitHub using our template. See GitHub’s [guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request-from-a-fork) for help with creating pull requests from a fork. We will work with you if anything comes up during our review and testing. Once your PR is merged, your contributions will be publicly visible on the Tuva Project repositories.

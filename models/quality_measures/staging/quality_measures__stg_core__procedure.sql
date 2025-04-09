@@ -15,5 +15,5 @@ select
     , modifier_3
     , modifier_4
     , modifier_5
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__procedure') }}

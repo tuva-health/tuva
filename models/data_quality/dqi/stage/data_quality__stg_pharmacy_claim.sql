@@ -4,4 +4,4 @@
    )
 }}
 
-select * from {{ ref('pharmacy_claim')}}
+select * from {{ ref('pharmacy_claim') }}

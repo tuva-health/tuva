@@ -5,12 +5,12 @@
 
 with claim_start_end as (
 select claim_id
-,patient_data_source_id
-,min(start_date) as start_date
-,max(end_date) as end_date 
+, patient_data_source_id
+, min(start_date) as start_date
+, max(end_date) as end_date
   from {{ ref('encounters__stg_medical_claim') }}
   group by claim_id
-  ,patient_data_source_id
+  , patient_data_source_id
 )
 
 , base as (
@@ -21,8 +21,8 @@ select claim_id
     , c.end_date
     , enc.facility_id
     , enc.discharge_disposition_code
-  from {{ ref('encounters__stg_medical_claim') }} enc
-    inner join claim_start_end c on enc.claim_id = c.claim_id
+  from {{ ref('encounters__stg_medical_claim') }} as enc
+    inner join claim_start_end as c on enc.claim_id = c.claim_id
   and
   c.patient_data_source_id = enc.patient_data_source_id
   where
@@ -38,7 +38,8 @@ select claim_id
     , end_date
     , discharge_disposition_code
     , facility_id
-    , row_number() over (partition by patient_data_source_id order by end_date, start_date, claim_id) as row_num
+    , row_number() over (partition by patient_data_source_id
+order by end_date, start_date, claim_id) as row_num
   from base
 )
 
@@ -117,9 +118,9 @@ select claim_id
         else 0
       end as close_flag
   from add_row_num as aa
-  left join claim_ids_that_merge_with_larger_row_num as bb
+  left outer join claim_ids_that_merge_with_larger_row_num as bb
     on aa.claim_id = bb.claim_id
-  left join claim_ids_having_a_smaller_row_num_merging_with_a_larger_row_num as cc
+  left outer join claim_ids_having_a_smaller_row_num_merging_with_a_larger_row_num as cc
     on aa.claim_id = cc.claim_id
 )
 
@@ -159,7 +160,7 @@ select claim_id
     , aa.close_flag
     , bb.min_closing_row
   from close_flags as aa
-  left join find_min_closing_row_num_for_every_claim as bb
+  left outer join find_min_closing_row_num_for_every_claim as bb
     on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.claim_id = bb.claim_id
 )
@@ -177,7 +178,7 @@ select claim_id
     , aa.min_closing_row
     , bb.claim_id as encounter_id
   from add_min_closing_row_to_every_claim as aa
-  left join add_min_closing_row_to_every_claim as bb
+  left outer join add_min_closing_row_to_every_claim as bb
     on aa.patient_data_source_id = bb.patient_data_source_id
     and aa.min_closing_row = bb.row_num
 )
@@ -189,9 +190,12 @@ select
   , end_date
   , discharge_disposition_code
   , facility_id
-  , row_number() over (partition by encounter_id order by start_date, end_date, claim_id) as encounter_claim_number
-  , row_number() over (partition by encounter_id order by start_date desc, end_date desc, claim_id desc) as encounter_claim_number_desc
+  , row_number() over (partition by encounter_id
+order by start_date, end_date, claim_id) as encounter_claim_number
+  , row_number() over (partition by encounter_id
+order by start_date desc, end_date desc, claim_id desc) as encounter_claim_number_desc
   , close_flag
   , min_closing_row
-  , dense_rank() over (order by encounter_id) as encounter_id
+  , dense_rank() over (
+order by encounter_id) as encounter_id
 from add_encounter_id

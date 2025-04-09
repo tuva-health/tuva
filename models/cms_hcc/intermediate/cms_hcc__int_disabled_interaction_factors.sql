@@ -90,7 +90,7 @@ with demographics as (
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(description as {{ dbt.type_string() }}) as description
-    , round(cast(coefficient as {{ dbt.type_numeric() }}),3) as coefficient
+    , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
     , cast(factor_type as {{ dbt.type_string() }}) as factor_type
     , cast(model_version as {{ dbt.type_string() }}) as model_version
     , cast(payment_year as integer) as payment_year
@@ -109,5 +109,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

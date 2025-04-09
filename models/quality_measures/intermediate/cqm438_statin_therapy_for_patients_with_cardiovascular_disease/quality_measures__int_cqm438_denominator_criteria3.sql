@@ -52,9 +52,9 @@ with diabetes_codes as (
         , performance_period_end
         , measure_id
         , measure_name
-        , measure_version 
+        , measure_version
     from diabetes_conditions
-    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} pp
+    inner join {{ ref('quality_measures__int_cqm438__performance_period') }} as pp
     on evidence_date <= pp.performance_period_end
 
 )
@@ -72,12 +72,12 @@ with diabetes_codes as (
 
 )
 
-select 
+select
       person_id
     , performance_period_begin
     , performance_period_end
     , measure_id
     , measure_name
     , measure_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

@@ -6,26 +6,25 @@
 
 with cte as (
 select {{ try_to_cast_date('d.source_date' ) }} as source_date_type
-    ,summary_sk
-    ,SUM(CASE WHEN bucket_name = 'valid' THEN 1 ELSE 0 END) as valid_num
-    ,SUM(CASE WHEN bucket_name <> 'null' THEN 1 ELSE 0 END) as fill_num
-    ,COUNT(drill_down_value) as denom
-from {{ ref('data_quality__data_quality_detail') }} d
+    , summary_sk
+    , SUM(case when bucket_name = 'valid' then 1 else 0 end) as valid_num
+    , SUM(case when bucket_name <> 'null' then 1 else 0 end) as fill_num
+    , COUNT(drill_down_value) as denom
+from {{ ref('data_quality__data_quality_detail') }} as d
 group by
     {{ try_to_cast_date('d.source_date') }}
-    ,summary_sk
+    , summary_sk
 
 )
 
 select
       c.first_day_of_month
     , summary_sk
-    , sum(valid_num) as valid_num
-    , sum(fill_num) as fill_num
-    , sum(denom)  as denom
+    , SUM(valid_num) as valid_num
+    , SUM(fill_num) as fill_num
+    , SUM(denom) as denom
 from cte
-left join {{ ref('reference_data__calendar') }} c on cte.source_date_type = c.full_date
+left outer join {{ ref('reference_data__calendar') }} as c on cte.source_date_type = c.full_date
 group by
       c.first_day_of_month
     , summary_sk
-

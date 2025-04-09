@@ -11,10 +11,10 @@ with service_category as (
   from {{ ref('encounters__stg_medical_claim') }}
   where
     service_category_2 = 'home health' -- both prof and inst as anchors
-    
+
 )
 
-select distinct 
+select distinct
 claim_id
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+, '{{ var('tuva_last_run') }}' as tuva_last_run
 from service_category
