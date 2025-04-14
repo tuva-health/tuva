@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',False))
-   )
-}}
 
 {% if var('clinical_enabled', False) == true and var('claims_enabled', False) == true -%}
 

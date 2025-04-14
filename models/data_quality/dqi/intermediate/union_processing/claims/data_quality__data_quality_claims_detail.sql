@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',False)
-   )
-}}
 
 with unioned_data as (
 select

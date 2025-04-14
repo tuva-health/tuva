@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('claims_enabled', var('clinical_enabled', False))
-) }}
 
 {#
 This code ensures all fields that have atomic level data quality checks

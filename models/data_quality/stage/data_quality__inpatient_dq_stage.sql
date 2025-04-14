@@ -1,6 +1,3 @@
-{{ config(
-     enabled = (var('enable_legacy_data_quality', False) and var('claims_preprocessing_enabled', var('claims_enabled', var('tuva_marts_enabled', False)))) | as_bool
-)}}
 
 with drg_requirement as (
   select distinct

@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
 /*
 Steps for staging the medical claim data:
     1) Filter to risk-adjustable claims per claim type for the collection year.

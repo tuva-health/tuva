@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',false))) | as_bool
-   )
-}}
 
 with collection_date_range as (
 

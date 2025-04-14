@@ -1,6 +1,3 @@
-{{ config(
-     enabled = (var('enable_legacy_data_quality', False) and var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
-)}}
 
 with cte as (
 select sum(case when numerator_sum = 0 then 1 else 0 end) as numerator_zero_count

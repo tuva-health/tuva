@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('readmissions_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
 
 -- Here we add a CCS diagnosis category to
 -- every encounter that we can add a CCS diagnosis category to.

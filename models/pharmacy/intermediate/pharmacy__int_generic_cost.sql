@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('brand_generic_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
-) }}
 
 /* for each brand rxcui, what is the average cost/unit of generics available*/
 

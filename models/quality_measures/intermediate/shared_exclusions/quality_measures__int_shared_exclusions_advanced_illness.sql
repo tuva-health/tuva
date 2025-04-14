@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',false)))) | as_bool
-   )
-}}
 
 with patients_with_frailty as (
 

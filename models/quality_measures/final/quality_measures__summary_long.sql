@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('quality_measures_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
-   )
-}}
 
 /* measures should already be at the full eligibility population grain */
 with union_measures as (

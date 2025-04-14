@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False)) | as_bool
-   )
-}}
 
 select
     cast(encounter_id as {{ dbt.type_string() }}) as encounter_id

@@ -3,10 +3,6 @@ All condition discharge diagnosis left join with probabilistic
 indicators of ED classification terminology
 */
 
-{{ config(
-     enabled = var('ed_classification_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
 {% set colnames = ["edcnnpa", "edcnpa", "epct", "noner", "injury", "psych", "alcohol", "drug"] %}
 
 with condition as (

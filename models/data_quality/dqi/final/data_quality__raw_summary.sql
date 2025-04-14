@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('claims_enabled', False)
-) }}
 
 with cte as (
     select

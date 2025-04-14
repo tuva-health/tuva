@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',False))
-   )
-}}
 
 
 with cte as (

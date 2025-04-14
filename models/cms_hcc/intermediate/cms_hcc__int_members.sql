@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
 /*
 Steps for transforming eligibility data into member demographics:
     1) Determine enrollment status using eligibility from the collection year.

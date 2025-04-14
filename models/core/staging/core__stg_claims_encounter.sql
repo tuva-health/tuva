@@ -1,8 +1,4 @@
 
-{{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False)) | as_bool
-   )
-}}
 
 -- *************************************************
 -- This dbt model creates the encounter table in core using dbt_utils.union_relations.

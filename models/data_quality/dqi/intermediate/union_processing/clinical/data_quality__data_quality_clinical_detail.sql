@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('clinical_enabled',False)
-   )
-}}
 
 with cte as (
 select * from {{ ref('data_quality__condition_claim_id') }}

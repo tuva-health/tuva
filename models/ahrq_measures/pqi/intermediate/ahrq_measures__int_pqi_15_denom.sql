@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('pqi_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
-) }}
 
 select distinct
     cast(substring(e.year_month, 1, 4) as int) as year_number

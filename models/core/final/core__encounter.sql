@@ -1,8 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))
- | as_bool
-   )
-}}
 
 {% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
 

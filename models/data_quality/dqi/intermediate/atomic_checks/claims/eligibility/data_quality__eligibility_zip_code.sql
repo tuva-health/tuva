@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('claims_enabled', False)
-) }}
 
 select distinct -- to bring to claim_ID grain
     m.data_source

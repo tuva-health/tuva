@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('clinical_enabled', False)
-) }}
 
 with icd9 as (
     select

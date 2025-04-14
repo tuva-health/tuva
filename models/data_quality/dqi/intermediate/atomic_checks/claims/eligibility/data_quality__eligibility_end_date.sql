@@ -1,6 +1,3 @@
-{{ config(
-    enabled = var('claims_enabled', False)
-) }}
 
 select distinct
     m.data_source

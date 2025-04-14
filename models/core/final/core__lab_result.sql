@@ -1,8 +1,3 @@
-{{ config(
-     enabled = var('clinical_enabled',var('tuva_marts_enabled',False))
- | as_bool
-   )
-}}
 
 {% if var('enable_normalize_engine',false) != true %}
 

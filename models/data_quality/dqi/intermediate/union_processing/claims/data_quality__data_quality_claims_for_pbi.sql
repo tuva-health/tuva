@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',False)
-   )
-}}
 
 with ranked_examples as (
        select

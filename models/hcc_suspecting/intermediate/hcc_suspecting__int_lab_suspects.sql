@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('hcc_suspecting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
-   )
-}}
 
 with egfr_labs as (
 

@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('clinical_enabled',False)
-   )
-}}
 
 select * from {{ ref('data_quality__primary_keys_condition_condition_id') }}
 

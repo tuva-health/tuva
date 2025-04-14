@@ -1,9 +1,4 @@
 
-{{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
- | as_bool
-   )
-}}
 
 with all_providers_in_claims_dataset as (
 select distinct facility_id as npi

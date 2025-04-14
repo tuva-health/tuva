@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('clinical_enabled',false)
-   )
-}}
 
 with ranked_examples as (
        select

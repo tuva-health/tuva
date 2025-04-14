@@ -1,8 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',var('tuva_marts_enabled',False))
- | as_bool
-   )
-}}
 
 with data_sources as (
 select distinct data_source

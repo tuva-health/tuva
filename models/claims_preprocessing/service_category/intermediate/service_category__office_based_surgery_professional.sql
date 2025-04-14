@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
 
 {# Since HCPCS is a string, we need to exclude values that would fall in our comparison range for alphanumeric values #}
 with numeric_hcpcs as (

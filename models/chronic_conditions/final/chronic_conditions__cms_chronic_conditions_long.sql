@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('cms_chronic_conditions_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
-   )
-}}
 
 {% if target.type == 'fabric' %}
 with conditions_unioned as (

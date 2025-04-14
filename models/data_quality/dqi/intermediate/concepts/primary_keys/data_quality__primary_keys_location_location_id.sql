@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('clinical_enabled',False)
-   )
-}}
 
 with valid_conditions as (
     select

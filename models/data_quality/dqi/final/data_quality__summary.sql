@@ -1,7 +1,3 @@
-{{ config(
-     enabled = var('claims_enabled',var('clinical_enabled',false))
-   )
-}}
 
 with cte as (
     select distinct fm.field_name
