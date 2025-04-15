@@ -99,21 +99,25 @@ with combine as (
     and a.year_month = b.year_month
     and a.payer = b.payer
     and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
+    and a.data_source = b.data_source
   left outer join {{ ref('financial_pmpm__service_category_2_paid_pivot') }} as c
     on a.person_id = c.person_id
     and a.year_month = c.year_month
     and a.payer = c.payer
     and a.{{ quote_column('plan') }} = c.{{ quote_column('plan') }}
+    and a.data_source = c.data_source
   left outer join {{ ref('financial_pmpm__service_category_1_allowed_pivot') }} as d
     on a.person_id = d.person_id
     and a.year_month = d.year_month
     and a.payer = d.payer
     and a.{{ quote_column('plan') }} = d.{{ quote_column('plan') }}
+    and a.data_source = d.data_source
   left outer join {{ ref('financial_pmpm__service_category_2_allowed_pivot') }} as e
     on a.person_id = e.person_id
     and a.year_month = e.year_month
     and a.payer = e.payer
     and a.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
+    and a.data_source = e.data_source
 )
 
 select

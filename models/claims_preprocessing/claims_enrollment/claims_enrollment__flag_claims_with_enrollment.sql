@@ -62,3 +62,4 @@ inner join claim_year_month as claim
     and mm.payer = claim.payer
     and mm.{{ quote_column('plan') }} = claim.{{ quote_column('plan') }}
     and mm.year_month = claim.inferred_claim_start_year_month
+    and mm.data_source = claim.data_source

@@ -40,3 +40,4 @@ inner join claim_dates as claim
     and mm.payer = claim.payer
     and mm.{{ quote_column('plan') }} = claim.{{ quote_column('plan') }}
     and mm.year_month = claim.paid_year_month
+    and mm.data_source = claim.data_source
