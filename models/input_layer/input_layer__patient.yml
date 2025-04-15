@@ -133,6 +133,22 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          # Only run this test for non-BigQuery databases
+          - accepted_values:
+              values: [ '0', '1' ]
+              tags: [ 'tuva_dqi_sev_2', 'dqi' ]
+              config:
+                severity: warn
+                enabled: "{{ target.type != 'bigquery' }}"
+          # BigQuery specific test with proper casting
+          - accepted_values:
+              values: [ '0', '1' ]
+              tags: [ 'tuva_dqi_sev_2', 'dqi' ]
+              config:
+                severity: warn
+                enabled: "{{ target.type == 'bigquery' }}"
+              quote: false
+              column_name: "CAST(death_flag AS STRING)"
       - name: social_security_number
         description: '{{ doc("social_security_number") }}'
         tests:
