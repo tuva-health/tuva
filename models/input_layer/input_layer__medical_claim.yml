@@ -656,6 +656,7 @@ models:
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: rendering_tin
         description: '{{ doc("rendering_tin") }}'
+        column_type: text
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
