@@ -11,7 +11,7 @@
 -- for the HWR measure:
 --
 --     Time Requirement: The discharge data must be at least 30 days
---                       earlier than the last dischareg date available
+--                       earlier than the last discharge date available
 --                       in the dataset.
 -- 
 --     Discharge Requirements: The patient must not be discharged to another
