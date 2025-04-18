@@ -110,6 +110,42 @@ models:
           `dbt_utils.pretty_time` as the local time of the `dbt run` 
           environment.  Timezone is configurable via the `tuva_last_run` var.
 
+  - name: pharmacy__pdc
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: pdc
+      tags:
+        - pharmacy
+      materialized: table
+    description: >
+      Calculates drug eras based on pharmacy claims, applying a 30-day persistence window, and computes the Proportion of Days Covered (PDC) for each era.
+    columns:
+      - name: person_id
+        description: Unique identifier for each person in the dataset.
+      - name: ingredient_rxcui
+        description: RxNorm Concept Unique Identifier (RxCUI) for the active ingredient of the drug.
+      - name: ingredient_name
+        description: Name of the active ingredient.
+      - name: drug_era_start_date
+        description: The start date of the continuous period (drug era) during which the person was exposed to the ingredient.
+      - name: drug_era_end_date
+        description: The end date of the continuous period (drug era), considering a 30-day persistence window.
+      - name: drug_exposure_count
+        description: The total number of pharmacy claims (dispensing events) contributing to the drug era.
+      - name: total_days_exposed
+        description: The total number of days the person was exposed to the drug during the drug era, calculated as the sum of days supply from all claims within the era.
+      - name: era_duration_in_days
+        description: The total duration of the drug era in days, calculated as the difference between the drug era end date and start date. When start and end dates are the same, this is calculated as 1 day
+      - name: gap_days
+        description: The number of days within the drug era (from start to end date) where the person was not covered by a drug supply, considering the 30-day persistence window logic.
+      - name: pdc
+        description: Proportion of Days Covered. The percentage of days within the drug era that the person had supply of the medication. Calculated as (Total Days Exposed / Era Duration Days) * 100.
+  
   - name: pharmacy__pharmacy_claim_expanded
     config:
       schema: |
@@ -219,6 +255,36 @@ models:
     description: >
       Intermediate view identifying brand drugs that have generic equivalents available.
 
+  - name: pharmacy__int_calculate_sub_exposures
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: _int_calculate_sub_exposures
+      tags:
+        - pharmacy
+      materialized: view
+    description: >
+      Intermediate model that groups overlapping drug exposures into continuous sub-exposure periods before applying the persistence window.
+    columns:
+      - name: person_id
+        description: Unique identifier for each person.
+      - name: ingredient_rxcui
+        description: RxNorm Concept Unique Identifier (RxCUI) for the ingredient.
+      - name: ingredient_name
+        description: Name of the active ingredient.
+      - name: drug_sub_exposure_start_date
+        description: The start date of a continuous sub-exposure period.
+      - name: drug_sub_exposure_end_date
+        description: The end date of a continuous sub-exposure period.
+      - name: drug_exposure_count
+        description: The number of original pharmacy claims grouped into this sub-exposure.
+      - name: days_exposed
+        description: The number of days covered by this specific sub-exposure period (end_date - start_date).
+  
   - name: pharmacy__int_claims_current_cost
     config:
       schema: |
@@ -266,6 +332,36 @@ models:
 
 ## Staging
 
+  - name: pharmacy__stg_add_ingredient_concepts
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}
+          {{var('tuva_schema_prefix')}}_pharmacy
+        {%- else -%}
+          pharmacy
+        {%- endif -%}
+      alias: stg_add_ingredient_concepts
+      tags:
+        - pharmacy
+      materialized: ephemeral
+    description: >
+      Staging model that selects relevant columns from pharmacy_claim, joins with product-to-ingredient mapping, and calculates initial drug exposure end dates.
+    columns:
+      - name: drug_exposure_id
+        description: Unique identifier constructed for each drug exposure line (claim_id-claim_line_number).
+      - name: person_id
+        description: Unique identifier for each person.
+      - name: ingredient_rxcui
+        description: RxNorm Concept Unique Identifier (RxCUI) for the ingredient, mapped from NDC.
+      - name: ingredient_name
+        description: Name of the active ingredient.
+      - name: drug_exposure_start_date
+        description: The date the drug was dispensed (dispensing_date).
+      - name: days_supply
+        description: The number of days supply provided.
+      - name: drug_exposure_end_date
+        description: The calculated end date of the drug supply based on dispensing_date and days_supply.
+  
   - name: pharmacy__stg_pharmacy_claim
     config:
       schema: |
