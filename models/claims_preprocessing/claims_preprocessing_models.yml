@@ -89,6 +89,15 @@ models:
       tags: 
         - normalized_input
         - claims_preprocessing
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - member_id
+            - enrollment_start_date
+            - enrollment_end_date
+            - payer
+            - plan
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
@@ -196,6 +205,7 @@ models:
           combination_of_columns:
             - claim_id
             - claim_line_number
+            - data_source
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -808,6 +818,12 @@ models:
       tags: 
         - normalized_input
         - claims_preprocessing
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
+            - data_source
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
