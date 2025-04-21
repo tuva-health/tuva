@@ -1,0 +1,328 @@
+version: 2
+
+models:
+## Final
+  - name: fhir_preprocessing__coverage
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: coverage
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Coverage FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  - name: fhir_preprocessing__condition
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: condition
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Condition FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  - name: fhir_preprocessing__explanation_of_benefit
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: explanation_of_benefit
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Explanation of Benefit FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  - name: fhir_preprocessing__medication_dispense
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: medication_dispense
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Medication Dispense FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  - name: fhir_preprocessing__observation
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: observation
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Final mapping for Observation FHIR resource. Combines observations
+      and lab results.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  - name: fhir_preprocessing__patient
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: patient
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Patient FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+
+  - name: fhir_preprocessing__procedure
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: procedure
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Procedure FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  ## Intermediate
+  - name: fhir_preprocessing__int_lab_result
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_lab_result
+      tags: fhir_preprocessing
+      materialized: table
+    description: Prep labs to be joined with observations.
+
+  - name: fhir_preprocessing__int_observation
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_observation
+      tags: fhir_preprocessing
+      materialized: table
+    description: Prep observations to be joined with labs.
+
+  - name: fhir_preprocessing__int_medical_claim_diagnosis
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_diagnosis
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep medical claims diagnosis list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_medical_claim_eob
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_eob
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep medical claims to be joined with pharmacy claims for the Explanation 
+      of Benefit resource. Combines nested lists for Diagnosis, Item, Procedure, 
+      Supporting Info, and Total.
+
+  - name: fhir_preprocessing__int_medical_claim_item
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_item
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep claim Item list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_medical_claim_item_adjudication
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_item_adjudication
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep adjudication for claim Item list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_medical_claim_item_modifier
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_item_modifier
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep modifiers for claim Item list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_medical_claim_procedure
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_procedure
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep procedure list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_medical_claim_supporting_info
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_supporting_info
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep claim Supporting Info list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_medical_claim_total
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_medical_claim_total
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep claim Total list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_pharmacy_claim_eob
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_pharmacy_eob
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep pharmacy claims to be joined with medical claims for the Explanation 
+      of Benefit resource. Combines nested lists for Item, Supporting Info, 
+      and Total.
+
+  - name: fhir_preprocessing__int_pharmacy_claim_item
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_pharmacy_claim_item
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep claim Item list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_pharmacy_claim_item_adjudication
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_pharmacy_claim_item_adjudication
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep adjudication for claim Item list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_pharmacy_claim_supporting_info
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_pharmacy_claim_supporting_info
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep claim Supporting Info list for the Explanation of Benefit resource.
+
+  - name: fhir_preprocessing__int_pharmacy_claim_total
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_pharmacy_claim_total
+      tags: fhir_preprocessing
+      materialized: table
+    description: >
+      Prep claim Total list for the Explanation of Benefit resource.
+
+  ## Staging
+  - name: fhir_preprocessing__stg_core__condition
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_condition
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging conditions from core.
+
+  - name: fhir_preprocessing__stg_core__eligibility
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_eligibility
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging eligibility from core.
+
+  - name: fhir_preprocessing__stg_core__lab_result
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_lab_result
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging lab results from core.
+
+  - name: fhir_preprocessing__stg_core__medical_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_medical_claim
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging medical claims from core.
+
+  - name: fhir_preprocessing__stg_core__medication
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_medication
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging medications from core.
+
+  - name: fhir_preprocessing__stg_core__observation
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_observation
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging observations from core.
+
+  - name: fhir_preprocessing__stg_core__pharmacy_claim
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_pharmacy_claim
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging pharmacy claims from core.
+
+  - name: fhir_preprocessing__stg_core__procedure
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: _stg_procedure
+      tags: fhir_preprocessing
+      materialized: ephemeral
+    description: Staging procedures from core.
