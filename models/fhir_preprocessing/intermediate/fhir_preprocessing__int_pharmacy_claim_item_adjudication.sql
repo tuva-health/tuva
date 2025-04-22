@@ -13,8 +13,8 @@ with adjudication_amount as (
         , 'USD' as eob_item_adjudication_amount_currency
         /* required by HEDIS, cannot be <= $0 */
         , case
-            when paid_amount <= 0 then cast(0.01 as {{ dbt.type_string() }} ) /* cast as string for union */
-            else cast(paid_amount as {{ dbt.type_string() }} ) /* cast as string for union */
+            when paid_amount <= 0 then cast(0.01 as {{ dbt.type_numeric() }} )
+            else cast(paid_amount as {{ dbt.type_numeric() }} )
           end as eob_item_adjudication_amount_value
     from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }}
 
@@ -30,8 +30,12 @@ with adjudication_amount as (
             when in_network_flag = 0 then 'outofnetwork'
             else 'other'
           end as eob_item_adjudication_category_code
-        , null as eob_item_adjudication_amount_currency /* required for union */
-        , null as eob_item_adjudication_amount_value /* required for union */
+        , 'USD' as eob_item_adjudication_amount_currency
+        /* required by HEDIS, cannot be <= $0 */
+        , case
+            when paid_amount <= 0 then cast(0.01 as {{ dbt.type_numeric() }} )
+            else cast(paid_amount as {{ dbt.type_numeric() }} )
+          end as eob_item_adjudication_amount_value
     from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }}
 )
 
@@ -53,7 +57,7 @@ select
                   'eob_item_adjudication_category_system', eob_item_adjudication_category_system
                 , 'eob_item_adjudication_category_code', eob_item_adjudication_category_code
                 , 'eob_item_adjudication_amount_currency', eob_item_adjudication_amount_currency
-                , 'eob_item_adjudication_amount_value', cast(eob_item_adjudication_amount_value as {{ dbt.type_numeric() }} )
+                , 'eob_item_adjudication_amount_value', eob_item_adjudication_amount_value
             )
         )
       ) as eob_item_adjudication_list

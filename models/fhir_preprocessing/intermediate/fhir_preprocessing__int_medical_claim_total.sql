@@ -11,8 +11,8 @@ with total_amount as (
         , 'benefit' as eob_total_category_code
         , 'USD' as eob_total_amount_currency
         /* required by HEDIS, cannot be <= $0 */
-        , case when paid_amount <= 0 then cast(0.01 as {{ dbt.type_string() }} ) /* cast as string for union */
-            else cast(paid_amount as {{ dbt.type_string() }} ) /* cast as string for union */
+        , case when paid_amount <= 0 then cast(0.01 as {{ dbt.type_numeric() }} )
+            else cast(paid_amount as {{ dbt.type_numeric() }} )
           end as eob_total_amount_value
     from {{ ref('fhir_preprocessing__stg_core__medical_claim') }}
     where claim_line_number = 1 /* filter to claim header */
@@ -29,8 +29,11 @@ with total_amount as (
             when in_network_flag = 0 then 'outofnetwork'
             else 'other'
           end as eob_total_category_code
-        , null as eob_total_amount_currency /* required for union */
-        , null as eob_total_amount_value /* required for union */
+        , 'USD' as eob_total_amount_currency
+        /* required by HEDIS, cannot be <= $0 */
+        , case when paid_amount <= 0 then cast(0.01 as {{ dbt.type_numeric() }} )
+            else cast(paid_amount as {{ dbt.type_numeric() }} )
+          end as eob_total_amount_value
     from {{ ref('fhir_preprocessing__stg_core__medical_claim') }}
     where claim_line_number = 1 /* filter to claim header */
 
@@ -53,7 +56,7 @@ select
                   'eob_total_category_system', eob_total_category_system
                 , 'eob_total_category_code', eob_total_category_code
                 , 'eob_total_amount_currency', eob_total_amount_currency
-                , 'eob_total_amount_value', cast(eob_total_amount_value as {{ dbt.type_numeric() }} )
+                , 'eob_total_amount_value', eob_total_amount_value
             )
         )
       ) as eob_total_list
