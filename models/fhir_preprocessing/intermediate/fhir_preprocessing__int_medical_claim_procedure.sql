@@ -48,11 +48,11 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_procedure_sequence', eob_procedure_sequence
-                , 'eob_procedure_system', eob_procedure_system
-                , 'eob_procedure_code', eob_procedure_code
-                , 'eob_procedure_display', eob_procedure_display
-                , 'eob_procedure_type_code', eob_procedure_type_code
+                  'eobProcedureSequence', eob_procedure_sequence
+                , 'eobProcedureSystem', eob_procedure_system
+                , 'eobProcedureCode', eob_procedure_code
+                , 'eobProcedureDisplay', eob_procedure_display
+                , 'eobProcedureTypeCode', eob_procedure_type_code
             )
         ) within group (order by eob_procedure_sequence)
       ) as eob_procedure_list

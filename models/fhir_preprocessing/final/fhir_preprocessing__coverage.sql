@@ -6,7 +6,7 @@ select
       person_id as patient_internal_id
     /* create hash due to FHIR limit of 64 characters for max length of strings */
     , {{ dbt_utils.generate_surrogate_key(['eligibility_id']) }} as resource_internal_id
-    , payer as coverage_payor
+    , payer as organization_name
     , plan as coverage_plan
     , enrollment_start_date as coverage_period_start
     , enrollment_end_date as coverage_period_end

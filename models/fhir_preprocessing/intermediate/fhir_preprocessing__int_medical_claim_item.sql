@@ -63,17 +63,18 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_item_sequence', eob_item_sequence
-                , 'eob_item_revenue_code', eob_item_revenue_code
-                , 'eob_item_revenue_display', eob_item_revenue_display
-                , 'eob_item_product_or_service_system', eob_item_product_or_service_system
-                , 'eob_item_product_or_service_code', eob_item_product_or_service_code
-                , 'eob_item_serviced_date', eob_item_serviced_date
-                , 'eob_item_location_system', eob_item_location_system
-                , 'eob_item_location_code', eob_item_location_code
-                , 'eob_item_location_display', eob_item_location_display
-                , 'eob_item_adjudication_list', eob_item_adjudication_list
-                , 'eob_item_modifier_list', eob_item_modifier_list
+                  'eobItemSequence', eob_item_sequence
+                , 'eobItemRevenueCode', eob_item_revenue_code
+                , 'eobItemRevenueDisplay', eob_item_revenue_display
+                , 'eobItemProductOrServiceSystem', eob_item_product_or_service_system
+                , 'eobItemProductOrServiceCode', eob_item_product_or_service_code
+                , 'eobItemServicedDate', eob_item_serviced_date
+                , 'eobItemLocationSystem', eob_item_location_system
+                , 'eobItemLocationCode', eob_item_location_code
+                , 'eobItemLocationDisplay', eob_item_location_display
+                /* parse_json added to prevent lists from being treated as strings and getting escaped when nested */
+                , 'eobItemAdjudicationList', parse_json(eob_item_adjudication_list)
+                , 'eobItemModifierList', parse_json(eob_item_modifier_list)
             )
         ) within group (order by eob_item_sequence)
       ) as eob_item_list

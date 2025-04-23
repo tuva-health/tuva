@@ -19,6 +19,8 @@ select
     , plan
     , billing_id
     , billing_name
+    , rendering_id
+    , rendering_name
     , admission_date
     , discharge_date
     , bill_type_code
@@ -54,6 +56,8 @@ select
     , plan
     , billing_id
     , billing_name
+    , rendering_id
+    , rendering_name
     , admission_date
     , discharge_date
     , bill_type_code
@@ -90,6 +94,8 @@ from {{ ref('core__medical_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as plan
         , cast(null as {{ dbt.type_string() }} ) as billing_id
         , cast(null as {{ dbt.type_string() }} ) as billing_name
+        , cast(null as {{ dbt.type_string() }} ) as rendering_id
+        , cast(null as {{ dbt.type_string() }} ) as rendering_name
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as discharge_date
         , cast(null as {{ dbt.type_string() }} ) as bill_type_code
@@ -122,6 +128,8 @@ from {{ ref('core__medical_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as plan
         , cast(null as {{ dbt.type_string() }} ) as billing_id
         , cast(null as {{ dbt.type_string() }} ) as billing_name
+        , cast(null as {{ dbt.type_string() }} ) as rendering_id
+        , cast(null as {{ dbt.type_string() }} ) as rendering_name
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as discharge_date
         , cast(null as {{ dbt.type_string() }} ) as bill_type_code

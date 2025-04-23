@@ -38,11 +38,12 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_item_sequence', eob_item_sequence
-                , 'eob_item_product_or_service_system', eob_item_product_or_service_system
-                , 'eob_item_product_or_service_code', eob_item_product_or_service_code
-                , 'eob_item_serviced_date', eob_item_serviced_date
-                , 'eob_item_adjudication_list', eob_item_adjudication_list
+                  'eobItemSequence', eob_item_sequence
+                , 'eobItemProductOrServiceSystem', eob_item_product_or_service_system
+                , 'eobItemProductOrServiceCode', eob_item_product_or_service_code
+                , 'eobItemServicedDate', eob_item_serviced_date
+                /* parse_json added to prevent lists from being treated as strings and getting escaped when nested */
+                , 'eobItemAdjudicationList', parse_json(eob_item_adjudication_list)
             )
         ) within group (order by eob_item_sequence)
       ) as eob_item_list

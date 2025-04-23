@@ -53,10 +53,10 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_total_category_system', eob_total_category_system
-                , 'eob_total_category_code', eob_total_category_code
-                , 'eob_total_amount_currency', eob_total_amount_currency
-                , 'eob_total_amount_value', eob_total_amount_value
+                  'eobTotalCategorySystem', eob_total_category_system
+                , 'eobTotalCategoryCode', eob_total_category_code
+                , 'eobTotalAmountCurrency', eob_total_amount_currency
+                , 'eobTotalAmountValue', eob_total_amount_value
             )
         )
       ) as eob_total_list

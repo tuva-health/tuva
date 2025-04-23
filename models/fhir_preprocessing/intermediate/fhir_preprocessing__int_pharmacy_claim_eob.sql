@@ -103,8 +103,9 @@ with eligibility as (
         , null as eob_billable_period_end /* required for union with medical eob */
         , pharmacy_claim.paid_date as eob_created
         , pharmacy_claim.payer as organization_name
-        , pharmacy_claim.dispensing_provider_id as practitioner_internal_id
-        , pharmacy_claim.dispensing_provider_name as practitioner_name_text
+        /* required for FHIR validation, default to dummy practitioner */
+        , coalesce(pharmacy_claim.dispensing_provider_id, '9999999999') as practitioner_internal_id
+        , coalesce(pharmacy_claim.dispensing_provider_name, 'Dummy Practitioner') as practitioner_name_text
         , {{ dbt_utils.generate_surrogate_key(['pharmacy_claim.eligibility_id']) }} as coverage_internal_id
         , null as eob_diagnosis_list /* required for union with medical eob */
         , null as eob_procedure_list /* required for union with medical eob */

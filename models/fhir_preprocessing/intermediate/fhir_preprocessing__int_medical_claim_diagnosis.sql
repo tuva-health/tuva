@@ -39,11 +39,11 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_diagnosis_sequence', eob_diagnosis_sequence
-                , 'eob_diagnosis_system', eob_diagnosis_system
-                , 'eob_diagnosis_code', eob_diagnosis_code
-                , 'eob_diagnosis_display', eob_diagnosis_display
-                , 'eob_diagnosis_type_code', eob_diagnosis_type_code
+                  'eobDiagnosisSequence', eob_diagnosis_sequence
+                , 'eobDiagnosisSystem', eob_diagnosis_system
+                , 'eobDiagnosisCode', eob_diagnosis_code
+                , 'eobDiagnosisDisplay', eob_diagnosis_display
+                , 'eobDiagnosisTypeCode', eob_diagnosis_type_code
             )
         ) within group (order by eob_diagnosis_sequence)
       ) as eob_diagnosis_list

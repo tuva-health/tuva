@@ -54,10 +54,10 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_item_adjudication_category_system', eob_item_adjudication_category_system
-                , 'eob_item_adjudication_category_code', eob_item_adjudication_category_code
-                , 'eob_item_adjudication_amount_currency', eob_item_adjudication_amount_currency
-                , 'eob_item_adjudication_amount_value', eob_item_adjudication_amount_value
+                  'eobItemAdjudicationCategorySystem', eob_item_adjudication_category_system
+                , 'eobItemAdjudicationCategoryCode', eob_item_adjudication_category_code
+                , 'eobItemAdjudicationAmountCurrency', eob_item_adjudication_amount_currency
+                , 'eobItemAdjudicationAmountValue', eob_item_adjudication_amount_value
             )
         )
       ) as eob_item_adjudication_list

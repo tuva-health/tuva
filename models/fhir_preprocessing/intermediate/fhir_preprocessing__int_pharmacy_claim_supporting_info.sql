@@ -78,11 +78,11 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_supporting_info_sequence', eob_supporting_info_sequence
-                , 'eob_supporting_info_category_code', eob_supporting_info_category_code
-                , 'eob_supporting_info_value_quantity', cast(eob_supporting_info_value_quantity as {{ dbt.type_numeric() }} )
-                , 'eob_supporting_info_code', eob_supporting_info_code
-                , 'eob_supporting_info_system', eob_supporting_info_system
+                  'eobSupportingInfoSequence', eob_supporting_info_sequence
+                , 'eobSupportingInfoCategoryCode', eob_supporting_info_category_code
+                , 'eobSupportingInfoValueQuantity', cast(eob_supporting_info_value_quantity as {{ dbt.type_numeric() }} )
+                , 'eobSupportingInfoCode', eob_supporting_info_code
+                , 'eobSupportingInfoSystem', eob_supporting_info_system
             )
         ) within group (order by eob_supporting_info_sequence)
       ) as eob_supporting_info_list

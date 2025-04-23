@@ -76,6 +76,8 @@ with eligibility as (
         , medical_claim.payer
         , medical_claim.billing_id
         , medical_claim.billing_name
+        , medical_claim.rendering_id
+        , medical_claim.rendering_name
         , eligibility.eligibility_id
         , medical_claim.data_source
         , row_number() over (
@@ -110,6 +112,8 @@ with eligibility as (
         , payer
         , billing_id
         , billing_name
+        , rendering_id
+        , rendering_name
         , eligibility_id
         , data_source
     from add_coverage
@@ -135,8 +139,17 @@ with eligibility as (
             , medical_claim.claim_start_date
           ) as eob_created
         , medical_claim.payer as organization_name
-        , medical_claim.billing_id as practitioner_internal_id
-        , medical_claim.billing_name as practitioner_name_text
+        /* required for FHIR validation, default to dummy practitioner */
+        , coalesce(
+              medical_claim.billing_id
+            , medical_claim.rendering_id
+            , '9999999999'
+          ) as practitioner_internal_id
+        , coalesce(
+              medical_claim.billing_name
+            , medical_claim.rendering_name
+            , 'Dummy Practitioner'
+          ) as practitioner_name_text
         , {{ dbt_utils.generate_surrogate_key(['medical_claim.eligibility_id']) }} as coverage_internal_id
         , claim_diagnosis.eob_diagnosis_list
         , claim_procedure.eob_procedure_list

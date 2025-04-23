@@ -86,8 +86,8 @@ select
     , to_json(
         array_agg(
             object_construct(
-                  'eob_item_modifier_system', eob_item_modifier_system
-                , 'eob_item_modifier_code', eob_item_modifier_code
+                  'eobItemModifierSystem', eob_item_modifier_system
+                , 'eobItemModifierCode', eob_item_modifier_code
             )
         )
       ) as eob_item_modifier_list
