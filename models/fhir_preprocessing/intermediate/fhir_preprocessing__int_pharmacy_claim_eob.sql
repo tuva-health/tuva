@@ -55,6 +55,7 @@ with eligibility as (
         , pharmacy_claim.dispensing_provider_id
         , pharmacy_claim.dispensing_provider_name
         , eligibility.eligibility_id
+        , pharmacy_claim.data_source
         , row_number() over (
             partition by
                   pharmacy_claim.person_id
@@ -84,6 +85,7 @@ with eligibility as (
         , dispensing_provider_id
         , dispensing_provider_name
         , eligibility_id
+        , data_source
     from add_coverage
     where coverage_row_num = 1
 
@@ -103,12 +105,13 @@ with eligibility as (
         , pharmacy_claim.payer as organization_name
         , pharmacy_claim.dispensing_provider_id as practitioner_internal_id
         , pharmacy_claim.dispensing_provider_name as practitioner_name_text
-        , pharmacy_claim.eligibility_id as coverage_internal_id
+        , {{ dbt_utils.generate_surrogate_key(['pharmacy_claim.eligibility_id']) }} as coverage_internal_id
         , null as eob_diagnosis_list /* required for union with medical eob */
         , null as eob_procedure_list /* required for union with medical eob */
         , claim_supporting_info.eob_supporting_info_list
         , claim_item.eob_item_list
         , claim_total.eob_total_list
+        , pharmacy_claim.data_source
     from dedupe as pharmacy_claim
         left outer join claim_supporting_info
             on pharmacy_claim.claim_id = claim_supporting_info.claim_id
@@ -137,4 +140,5 @@ select
     , eob_supporting_info_list
     , eob_item_list
     , eob_total_list
+    , data_source
 from pharmacy_eob

@@ -77,6 +77,7 @@ with eligibility as (
         , medical_claim.billing_id
         , medical_claim.billing_name
         , eligibility.eligibility_id
+        , medical_claim.data_source
         , row_number() over (
             partition by
                   medical_claim.person_id
@@ -110,6 +111,7 @@ with eligibility as (
         , billing_id
         , billing_name
         , eligibility_id
+        , data_source
     from add_coverage
     where coverage_row_num = 1
 
@@ -135,12 +137,13 @@ with eligibility as (
         , medical_claim.payer as organization_name
         , medical_claim.billing_id as practitioner_internal_id
         , medical_claim.billing_name as practitioner_name_text
-        , medical_claim.eligibility_id as coverage_internal_id
+        , {{ dbt_utils.generate_surrogate_key(['medical_claim.eligibility_id']) }} as coverage_internal_id
         , claim_diagnosis.eob_diagnosis_list
         , claim_procedure.eob_procedure_list
         , claim_supporting_info.eob_supporting_info_list
         , claim_item.eob_item_list
         , claim_total.eob_total_list
+        , medical_claim.data_source
     from dedupe as medical_claim
         left outer join claim_diagnosis
             on medical_claim.claim_id = claim_diagnosis.claim_id
@@ -173,4 +176,5 @@ select
     , eob_supporting_info_list
     , eob_item_list
     , eob_total_list
+    , data_source
 from medical_eob

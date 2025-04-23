@@ -33,4 +33,5 @@ select
     , eob_supporting_info_list
     , eob_item_list
     , eob_total_list
+    , data_source
 from unioned
