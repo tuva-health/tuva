@@ -4,7 +4,8 @@
 }}
 select
       person_id as patient_internal_id
-    , eligibility_id as resource_internal_id
+    /* create hash due to FHIR limit of 64 characters for max length of strings */
+    , {{ dbt_utils.generate_surrogate_key(['eligibility_id']) }} as resource_internal_id
     , payer as coverage_payor
     , plan as coverage_plan
     , enrollment_start_date as coverage_period_start
@@ -59,4 +60,5 @@ select
         when lower(plan) like '%MPO%' then 'MPO'
         when lower(plan) like '%MEP%' then 'MEP'
       end as coverage_type
+    , data_source
 from {{ ref('fhir_preprocessing__stg_core__eligibility') }}
