@@ -17,7 +17,8 @@ with adjudication as (
 
     select
           pharmacy_claim.claim_id
-        , pharmacy_claim.claim_line_number as eob_item_sequence
+        /* required for FHIR validation, sequence must be >0, temporary fix for possible issues with ADR  */
+        , abs(pharmacy_claim.claim_line_number) as eob_item_sequence
         , 'NDC' as eob_item_product_or_service_system
         , pharmacy_claim.ndc_code as eob_item_product_or_service_code
         , coalesce(
@@ -29,6 +30,7 @@ with adjudication as (
         left outer join adjudication
             on pharmacy_claim.claim_id = adjudication.claim_id
             and pharmacy_claim.claim_line_number = adjudication.claim_line_number
+    where pharmacy_claim.ndc_code is not null
 
 )
 

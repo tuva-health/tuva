@@ -27,14 +27,16 @@ with adjudication as (
 
     select
           medical_claim.claim_id
-        , medical_claim.claim_line_number as eob_item_sequence
+        /* required for FHIR validation, sequence must be >0, temporary fix for possible issues with ADR  */
+        , abs(medical_claim.claim_line_number) as eob_item_sequence
         , medical_claim.revenue_center_code as eob_item_revenue_code
         , medical_claim.revenue_center_description as eob_item_revenue_display
         , case
             when medical_claim.hcpcs_code is not null then 'CPT'
             else null
           end as eob_item_product_or_service_system
-        , medical_claim.hcpcs_code as eob_item_product_or_service_code
+        /* required for FHIR validation, default to dummy code */
+        , coalesce(medical_claim.hcpcs_code, '00000') as eob_item_product_or_service_code
         , coalesce(
               medical_claim.claim_line_start_date
             , medical_claim.claim_start_date
