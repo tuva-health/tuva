@@ -43,6 +43,52 @@ with eligibility as (
 
 )
 
+/* add window function to dedupe if there is overlapping coverage */
+, add_coverage as (
+
+    select
+          pharmacy_claim.person_id
+        , pharmacy_claim.pharmacy_claim_id
+        , pharmacy_claim.claim_id
+        , pharmacy_claim.paid_date
+        , pharmacy_claim.payer
+        , pharmacy_claim.dispensing_provider_id
+        , pharmacy_claim.dispensing_provider_name
+        , eligibility.eligibility_id
+        , row_number() over (
+            partition by
+                  pharmacy_claim.person_id
+                , pharmacy_claim.pharmacy_claim_id
+            order by eligibility.enrollment_start_date desc
+        ) as coverage_row_num
+    from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }} as pharmacy_claim
+        left outer join eligibility
+            on pharmacy_claim.person_id = eligibility.person_id
+            and pharmacy_claim.payer = eligibility.payer
+            and pharmacy_claim.plan = eligibility.plan
+            and pharmacy_claim.paid_date
+                between eligibility.enrollment_start_date
+                and eligibility.enrollment_end_date
+    where pharmacy_claim.claim_line_number = 1 /* filter to claim header */
+
+)
+
+, dedupe as (
+
+    select
+          person_id
+        , pharmacy_claim_id
+        , claim_id
+        , paid_date
+        , payer
+        , dispensing_provider_id
+        , dispensing_provider_name
+        , eligibility_id
+    from add_coverage
+    where coverage_row_num = 1
+
+)
+
 , pharmacy_eob as (
 
     select
@@ -57,20 +103,13 @@ with eligibility as (
         , pharmacy_claim.payer as organization_name
         , pharmacy_claim.dispensing_provider_id as practitioner_internal_id
         , pharmacy_claim.dispensing_provider_name as practitioner_name_text
-        , eligibility.eligibility_id as coverage_internal_id
+        , pharmacy_claim.eligibility_id as coverage_internal_id
         , null as eob_diagnosis_list /* required for union with medical eob */
         , null as eob_procedure_list /* required for union with medical eob */
         , claim_supporting_info.eob_supporting_info_list
         , claim_item.eob_item_list
         , claim_total.eob_total_list
-    from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }} as pharmacy_claim
-        left outer join eligibility
-            on pharmacy_claim.person_id = eligibility.person_id
-            and pharmacy_claim.payer = eligibility.payer
-            and pharmacy_claim.plan = eligibility.plan
-            and pharmacy_claim.paid_date
-                between eligibility.enrollment_start_date
-                and eligibility.enrollment_end_date
+    from dedupe as pharmacy_claim
         left outer join claim_supporting_info
             on pharmacy_claim.claim_id = claim_supporting_info.claim_id
         left outer join claim_item

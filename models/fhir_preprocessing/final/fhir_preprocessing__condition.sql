@@ -2,7 +2,7 @@
      enabled = var('fhir_preprocessing_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
-select
+select distinct
       condition.person_id as patient_internal_id
     , condition.condition_id as resource_internal_id
     , coalesce(
@@ -42,3 +42,4 @@ from {{ ref('fhir_preprocessing__stg_core__condition') }} as condition
     left outer join {{ ref('fhir_preprocessing__stg_core__encounter') }} as encounter
         on coalesce(condition.claim_id, condition.encounter_id) = encounter.encounter_id
 where condition.condition_id is not null
+and condition.normalized_code_type is not null

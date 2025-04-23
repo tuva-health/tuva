@@ -50,6 +50,7 @@ select
     , claim_end_date
     , claim_line_start_date
     , payer
+    , plan
     , billing_id
     , billing_name
     , admission_date
@@ -84,6 +85,7 @@ from {{ ref('core__medical_claim') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
         , cast(null as {{ dbt.type_string() }} ) as payer
+        , cast(null as {{ dbt.type_string() }} ) as plan
         , cast(null as {{ dbt.type_string() }} ) as billing_id
         , cast(null as {{ dbt.type_string() }} ) as billing_name
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
@@ -114,6 +116,7 @@ from {{ ref('core__medical_claim') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
         , cast(null as {{ dbt.type_string() }} ) as payer
+        , cast(null as {{ dbt.type_string() }} ) as plan
         , cast(null as {{ dbt.type_string() }} ) as billing_id
         , cast(null as {{ dbt.type_string() }} ) as billing_name
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date

@@ -2,7 +2,7 @@
      enabled = var('fhir_preprocessing_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
-select
+select distinct
       person_id as patient_internal_id
     , procedure_id as resource_internal_id
     , 'completed' as procedureStatus
@@ -17,3 +17,4 @@ select
     , practitioner_id as practitionerNPI
 from {{ ref('fhir_preprocessing__stg_core__procedure') }}
 where procedure_id is not null
+and normalized_code_type is not null
