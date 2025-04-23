@@ -15,4 +15,5 @@ select
     , coalesce(ndc_description,rxnorm_description) as medication_code_display
     , days_supply as medication_dispense_days_supply_value
     , dispensing_date as medication_dispense_when_handed_over
+    , data_source
 from {{ ref('fhir_preprocessing__stg_core__medication') }}

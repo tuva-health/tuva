@@ -9,4 +9,5 @@ select
     , sex as gender
     , race
     , birth_date
+    , data_source
 from {{ ref('fhir_preprocessing__stg_core__patient') }}
