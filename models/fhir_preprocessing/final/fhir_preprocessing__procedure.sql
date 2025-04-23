@@ -5,7 +5,7 @@
 select distinct
       person_id as patient_internal_id
     , procedure_id as resource_internal_id
-    , 'completed' as procedureStatus
+    , 'completed' as procedure_status
     , case
         when lower(coalesce(normalized_code_type, source_code_type)) = 'icd-10-pcs' then 'ICD10'
         when lower(coalesce(normalized_code_type, source_code_type)) = 'icd-9-pcs' then 'ICD9'
@@ -14,7 +14,9 @@ select distinct
     , coalesce(normalized_code, source_code) as procedure_code
     , coalesce(normalized_description, source_description) as procedure_display
     , procedure_date as procedure_performed_datetime
-    , practitioner_id as practitionerNPI
+    , practitioner_id as practitioner_npi
+    , data_source
 from {{ ref('fhir_preprocessing__stg_core__procedure') }}
 where procedure_id is not null
 and normalized_code_type is not null
+and claim_id is null /* claim procedures are included in the EOB resource */

@@ -5,10 +5,7 @@
 select distinct
       condition.person_id as patient_internal_id
     , condition.condition_id as resource_internal_id
-    , coalesce(
-          condition.claim_id
-        , condition.encounter_id
-      ) as encounter_internal_id
+    , condition.encounter_id as encounter_internal_id
     , 'encounter-diagnosis' as condition_category
     , condition.recorded_date as condition_recorded_datetime
     , coalesce(
@@ -38,8 +35,9 @@ select distinct
       end as encounter_class_code
     , encounter.encounter_start_date as encounter_start_datetime
     , encounter.encounter_end_date as encounter_end_datetime
+    , condition.data_source
 from {{ ref('fhir_preprocessing__stg_core__condition') }} as condition
     left outer join {{ ref('fhir_preprocessing__stg_core__encounter') }} as encounter
-        on coalesce(condition.claim_id, condition.encounter_id) = encounter.encounter_id
-where condition.condition_id is not null
-and condition.normalized_code_type is not null
+        on condition.encounter_id = encounter.encounter_id
+where condition.normalized_code_type is not null
+and condition.claim_id is null /* claim conditions are included in the EOB resource */
