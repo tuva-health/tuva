@@ -106,7 +106,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_lab_result
+      alias: _int_lab_result
       tags: fhir_preprocessing
       materialized: table
     description: Prep labs to be joined with observations.
@@ -115,7 +115,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_observation
+      alias: _int_observation
       tags: fhir_preprocessing
       materialized: table
     description: Prep observations to be joined with labs.
@@ -124,7 +124,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_diagnosis
+      alias: _int_medical_claim_diagnosis
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -134,7 +134,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_eob
+      alias: _int_medical_claim_eob
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -146,7 +146,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_item
+      alias: _int_medical_claim_item
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -156,7 +156,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_item_adjudication
+      alias: _int_medical_claim_item_adjudication
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -166,7 +166,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_item_modifier
+      alias: _int_medical_claim_item_modifier
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -176,7 +176,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_procedure
+      alias: _int_medical_claim_procedure
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -186,7 +186,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_supporting_info
+      alias: _int_medical_claim_supporting_info
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -196,7 +196,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_medical_claim_total
+      alias: _int_medical_claim_total
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -206,7 +206,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_pharmacy_eob
+      alias: _int_pharmacy_eob
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -218,7 +218,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_pharmacy_claim_item
+      alias: _int_pharmacy_claim_item
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -228,7 +228,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_pharmacy_claim_item_adjudication
+      alias: _int_pharmacy_claim_item_adjudication
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -238,7 +238,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_pharmacy_claim_supporting_info
+      alias: _int_pharmacy_claim_supporting_info
       tags: fhir_preprocessing
       materialized: table
     description: >
@@ -248,7 +248,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_pharmacy_claim_total
+      alias: _int_pharmacy_claim_total
       tags: fhir_preprocessing
       materialized: table
     description: >
