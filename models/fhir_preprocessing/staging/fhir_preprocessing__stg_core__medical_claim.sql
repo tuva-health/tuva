@@ -35,6 +35,7 @@ select
     , paid_date
     , paid_amount
     , in_network_flag
+    , data_source
 from {{ ref('core__medical_claim') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -69,6 +70,7 @@ select
     , paid_date
     , paid_amount
     , in_network_flag
+    , data_source
 from {{ ref('core__medical_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -104,6 +106,7 @@ from {{ ref('core__medical_claim') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
         , cast(null as {{ dbt.type_string() }} ) as paid_amount
         , cast(null as {{ dbt.type_string() }} ) as in_network_flag
+        , cast(null as {{ dbt.type_string() }} ) as data_source
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as medical_claim_id
@@ -135,6 +138,7 @@ from {{ ref('core__medical_claim') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
         , cast(null as {{ dbt.type_string() }} ) as paid_amount
         , cast(null as {{ dbt.type_string() }} ) as in_network_flag
+        , cast(null as {{ dbt.type_string() }} ) as data_source
     limit 0
 {%- endif %}
 

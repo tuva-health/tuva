@@ -15,4 +15,5 @@ select
     , normalized_code
     , normalized_description
     , condition_rank
+    , data_source
 from {{ ref('core__condition') }}

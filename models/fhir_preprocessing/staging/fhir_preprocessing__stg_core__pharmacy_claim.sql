@@ -21,6 +21,7 @@ select
     , paid_amount
     , in_network_flag
     , ndc_code
+    , data_source
 from {{ ref('core__pharmacy_claim') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -41,6 +42,7 @@ select
     , paid_amount
     , in_network_flag
     , ndc_code
+    , data_source
 from {{ ref('core__pharmacy_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -62,6 +64,7 @@ from {{ ref('core__pharmacy_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as paid_amount
         , cast(null as {{ dbt.type_string() }} ) as in_network_flag
         , cast(null as {{ dbt.type_string() }} ) as ndc_code
+        , cast(null as {{ dbt.type_string() }} ) as data_source
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as pharmacy_claim_id
@@ -79,6 +82,7 @@ from {{ ref('core__pharmacy_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as paid_amount
         , cast(null as {{ dbt.type_string() }} ) as in_network_flag
         , cast(null as {{ dbt.type_string() }} ) as ndc_code
+        , cast(null as {{ dbt.type_string() }} ) as data_source
     limit 0
 {%- endif %}
 

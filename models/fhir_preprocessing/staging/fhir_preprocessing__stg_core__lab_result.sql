@@ -20,6 +20,7 @@ select
     , result
     , normalized_units
     , source_units
+    , data_source
 from {{ ref('core__lab_result') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -39,6 +40,7 @@ select
     , result
     , normalized_units
     , source_units
+    , data_source
 from {{ ref('core__lab_result') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -59,6 +61,7 @@ from {{ ref('core__lab_result') }}
         , cast(null as {{ dbt.type_string() }} ) as result
         , cast(null as {{ dbt.type_string() }} ) as normalized_units
         , cast(null as {{ dbt.type_string() }} ) as source_units
+        , cast(null as {{ dbt.type_string() }} ) as data_source
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as lab_result_id
@@ -75,6 +78,7 @@ from {{ ref('core__lab_result') }}
         , cast(null as {{ dbt.type_string() }} ) as result
         , cast(null as {{ dbt.type_string() }} ) as normalized_units
         , cast(null as {{ dbt.type_string() }} ) as source_units
+        , cast(null as {{ dbt.type_string() }} ) as data_source
     limit 0
 {%- endif %}
 

@@ -16,6 +16,7 @@ select
     , enrollment_end_date
     , subscriber_relation
     , subscriber_id
+    , data_source
 from {{ ref('core__eligibility') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -31,6 +32,7 @@ select
     , enrollment_end_date
     , subscriber_relation
     , subscriber_id
+    , data_source
 from {{ ref('core__eligibility') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -47,6 +49,7 @@ from {{ ref('core__eligibility') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as enrollment_end_date
         , cast(null as {{ dbt.type_string() }} ) as subscriber_relation
         , cast(null as {{ dbt.type_string() }} ) as subscriber_id
+        , cast(null as {{ dbt.type_string() }} ) as data_source
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as eligibility_id
@@ -59,6 +62,7 @@ from {{ ref('core__eligibility') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as enrollment_end_date
         , cast(null as {{ dbt.type_string() }} ) as subscriber_relation
         , cast(null as {{ dbt.type_string() }} ) as subscriber_id
+        , cast(null as {{ dbt.type_string() }} ) as data_source
     limit 0
 {%- endif %}
 

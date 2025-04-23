@@ -15,6 +15,7 @@ select
     , rxnorm_description
     , days_supply
     , dispensing_date
+    , data_source
 from {{ ref('core__medication') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -29,6 +30,7 @@ select
     , rxnorm_description
     , days_supply
     , dispensing_date
+    , data_source
 from {{ ref('core__medication') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
@@ -44,6 +46,7 @@ from {{ ref('core__medication') }}
         , cast(null as {{ dbt.type_string() }} ) as rxnorm_description
         , cast(null as {{ dbt.type_string() }} ) as days_supply
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+        , cast(null as {{ dbt.type_string() }} ) as data_source
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as medication_id
@@ -55,6 +58,7 @@ from {{ ref('core__medication') }}
         , cast(null as {{ dbt.type_string() }} ) as rxnorm_description
         , cast(null as {{ dbt.type_string() }} ) as days_supply
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+        , cast(null as {{ dbt.type_string() }} ) as data_source
     limit 0
 {%- endif %}
 

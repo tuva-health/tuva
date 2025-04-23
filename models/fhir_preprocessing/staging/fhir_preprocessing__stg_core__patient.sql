@@ -9,4 +9,5 @@ select
     , sex
     , race
     , birth_date
+    , data_source
 from {{ ref('core__patient') }}

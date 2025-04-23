@@ -25,4 +25,5 @@ select
     , observation_date as observation_datetime
     , result as observation_value
     , coalesce(normalized_units,source_units) as observation_value_units
+    , data_source
 from {{ ref('fhir_preprocessing__stg_core__observation') }}

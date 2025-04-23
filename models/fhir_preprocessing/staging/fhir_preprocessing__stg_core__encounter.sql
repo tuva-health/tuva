@@ -8,4 +8,5 @@ select
     , encounter_group
     , encounter_start_date
     , encounter_end_date
+    , data_source
 from {{ ref('core__encounter') }}

@@ -15,4 +15,5 @@ select
     , source_description
     , procedure_date
     , practitioner_id
+    , data_source
 from {{ ref('core__procedure') }}

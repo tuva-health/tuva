@@ -27,4 +27,5 @@ select
     , observation_datetime
     , observation_value
     , observation_value_units
+    , data_source
 from unioned
