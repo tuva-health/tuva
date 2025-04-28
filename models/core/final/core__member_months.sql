@@ -44,6 +44,7 @@ with final_before_attribution_fields as (
   and a.{{ quote_column('plan') }} = b.{{ quote_column('plan') }}
   and a.data_source = b.data_source
 )
+
 select
     member_month_key
   , person_id

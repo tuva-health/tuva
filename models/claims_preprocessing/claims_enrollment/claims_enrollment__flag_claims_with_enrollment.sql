@@ -45,7 +45,6 @@ with claim_dates as (
             )
         ]) }} as inferred_claim_start_year_month
 from claim_dates
-
 )
 
 select distinct
