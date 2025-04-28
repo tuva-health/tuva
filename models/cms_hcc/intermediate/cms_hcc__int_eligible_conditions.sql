@@ -25,16 +25,22 @@ Jinja is used to set payment year variable.
 with medical_claims as (
 
     select
-          claim_id
-        , claim_line_number
-        , claim_type
-        , person_id
-        , claim_start_date
-        , claim_end_date
-        , bill_type_code
-        , hcpcs_code
-    from {{ ref('cms_hcc__stg_core__medical_claim') }}
-
+          medical_claims.claim_id
+        , medical_claims.claim_line_number
+        , medical_claims.claim_type
+        , medical_claims.person_id
+        , medical_claims.claim_start_date
+        , medical_claims.claim_end_date
+        , medical_claims.admission_date
+        , medical_claims.discharge_date
+        , medical_claims.bill_type_code
+        , medical_claims.hcpcs_code
+        , dates.payment_year
+        , dates.collection_start_date
+        , dates.collection_end_date  
+    from {{ ref('cms_hcc__stg_core__medical_claim') }} as medical_claims
+    inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+        on medical_claims.claim_end_date between dates.collection_start_date and dates.collection_end_date
 )
 
 , conditions as (
@@ -66,17 +72,17 @@ with medical_claims as (
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
+        , medical_claims.admission_date
+        , medical_claims.discharge_date
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
-        , dates.payment_year
-        , dates.collection_start_date
-        , dates.collection_end_date
+        , medical_claims.payment_year
+        , medical_claims.collection_start_date
+        , medical_claims.collection_end_date
     from medical_claims
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
-        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+            and cpt_hcpcs_list.payment_year = medical_claims.payment_year
     where claim_type = 'professional'
 
 )
@@ -90,16 +96,22 @@ with medical_claims as (
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
+        , medical_claims.admission_date
+        , medical_claims.discharge_date        
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
         , dates.payment_year
         , dates.collection_start_date
         , dates.collection_end_date
     from medical_claims
-        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+    left join {{ ref('cms_hcc__int_covid_episodes') }} as covid
+        on  medical_claims.person_id = covid.person_id
+        -- NOTE: Assuming if a claim starts within the COVID-19 window, then it is excluded despite possibly continuing beyond
+        -- the COVID-19 episode window
+        and date_trunc('month', medical_claims.admission_date) = covid.yearmo_trunc
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('11', '41')
+        and covid.person_id is null -- Exclude any covid episodes for inpatient claims
 
 )
 
@@ -112,17 +124,17 @@ with medical_claims as (
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
+        , medical_claims.admission_date
+        , medical_claims.discharge_date        
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
-        , dates.payment_year
-        , dates.collection_start_date
-        , dates.collection_end_date
+        , medical_claims.payment_year
+        , medical_claims.collection_start_date
+        , medical_claims.collection_end_date
     from medical_claims
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
-        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+            and cpt_hcpcs_list.payment_year = medical_claims.payment_year
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
 
@@ -146,6 +158,8 @@ with medical_claims as (
         , eligible_claims.payment_year
         , eligible_claims.collection_start_date
         , eligible_claims.collection_end_date
+        , eligible_claims.admission_date
+        , eligible_claims.discharge_date
         , conditions.code
     from eligible_claims
         inner join conditions

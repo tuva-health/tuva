@@ -605,6 +605,30 @@ models:
       - name: payment_year
         description: Payment year associated with the collection period
 
+  - name: cms_hcc__int_covid_episodes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: _int_monthly_collection_dates
+      tags: cms_hcc
+      materialized: table
+    description: >
+      COVID-19 episodes dates per person defined per CMS specifications found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - yearmo_trunc    
+    columns:
+      - name: person_id
+        description: Unique ID for the patient.
+        tests:
+          - not_null
+      - name: yearmo_trunc
+        description: The year month in date format truncated to the first day of the month
+      - name: tuva_last_run
+        description: The date the model was run.
+      
 ## Staging
   - name: cms_hcc__stg_core__condition
     config:
