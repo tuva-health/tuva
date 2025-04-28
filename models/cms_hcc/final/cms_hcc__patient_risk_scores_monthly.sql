@@ -32,7 +32,7 @@ with seed_adjustment_rates as (
         mm.person_id
         , cast({{ substring(year_month, 1, 4) }} as integer) as eligible_year
         , count(1) as member_months
-    from {{ ref('cms_hcc__stg_core__member_months') }} mm
+    from {{ ref('cms_hcc__stg_core__member_months') }} as mm
     /* 
     Exclude all COVID-19 related episodes
     Refer to https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf
@@ -40,7 +40,7 @@ with seed_adjustment_rates as (
     */
     left join {{ ref('cms_hcc__int_covid_episodes') }} as covid
         on  covid.person_id = mm.person_id 
-        and TO_DATE(year_month || '01', 'YYYYMMDD') = covid.yearmo_trunc
+        and to_date(year_month || '01', 'YYYYMMDD') = covid.yearmo_trunc
     where covid.person_id is null
     group by
         person_id
