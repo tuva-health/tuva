@@ -35,7 +35,7 @@ with final_before_attribution_fields as (
     , b.custom_attributed_provider_practice
     , b.custom_attributed_provider_organization
     , b.custom_attributed_provider_lob
-    
+
   from final_before_attribution_fields as a
   left outer join {{ ref('financial_pmpm__stg_provider_attribution') }} as b
   on a.person_id = b.person_id

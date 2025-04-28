@@ -72,7 +72,7 @@ with stg_eligibility as (
     and a.enrollment_end_date >= b.month_start_date
 )
 
-select 
+select
     m.member_month_key
   , a.person_id
   , a.member_id
