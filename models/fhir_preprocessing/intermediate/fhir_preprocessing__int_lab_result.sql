@@ -4,7 +4,7 @@
 }}
 select
       person_id as patient_internal_id
-    , lab_result_id as resource_internal_id
+    , {{ dbt_utils.generate_surrogate_key(['lab_result_id']) }} as resource_internal_id
     , encounter_id as encounter_internal_id
     , case
         when lower(status) in ('final', 'f') then 'final'

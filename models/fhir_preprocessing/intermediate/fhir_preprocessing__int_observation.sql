@@ -4,7 +4,7 @@
 }}
 select
       person_id as patient_internal_id
-    , observation_id as resource_internal_id
+    , {{ dbt_utils.generate_surrogate_key(['observation_id']) }} as resource_internal_id
     , encounter_id as encounter_internal_id
     , 'final' as observation_status
     , case
