@@ -12,7 +12,7 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as claim_id
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date
+    , cast(null as date) as procedure_date
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
     , cast(null as {{ dbt.type_string() }} ) as source_description
@@ -36,7 +36,7 @@ select
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as claim_id
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date
+    , cast(null as date) as procedure_date
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
     , cast(null as {{ dbt.type_string() }} ) as source_description

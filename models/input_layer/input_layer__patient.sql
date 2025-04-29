@@ -13,9 +13,9 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as last_name
     , cast(null as {{ dbt.type_string() }} ) as sex
     , cast(null as {{ dbt.type_string() }} ) as race
-    , cast(null as {{ dbt.type_date() }} ) as birth_date
-    , cast(null as {{ dbt.type_date() }} ) as death_date
-    , cast(null as {{ dbt.type_int() }} ) as death_flag
+    , cast(null as date) as birth_date
+    , cast(null as date) as death_date
+    , cast(null as integer) as death_flag
     , cast(null as {{ dbt.type_string() }} ) as social_security_number
     , cast(null as {{ dbt.type_string() }} ) as address
     , cast(null as {{ dbt.type_string() }} ) as city
@@ -37,9 +37,9 @@ select
     , cast(null as {{ dbt.type_string() }} ) as last_name
     , cast(null as {{ dbt.type_string() }} ) as sex
     , cast(null as {{ dbt.type_string() }} ) as race
-    , cast(null as {{ dbt.type_date() }} ) as birth_date
-    , cast(null as {{ dbt.type_date() }} ) as death_date
-    , cast(null as {{ dbt.type_int() }} ) as death_flag
+    , cast(null as date) as birth_date
+    , cast(null as date) as death_date
+    , cast(null as integer) as death_flag
     , cast(null as {{ dbt.type_string() }} ) as social_security_number
     , cast(null as {{ dbt.type_string() }} ) as address
     , cast(null as {{ dbt.type_string() }} ) as city

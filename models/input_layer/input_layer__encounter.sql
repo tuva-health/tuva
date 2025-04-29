@@ -11,9 +11,9 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
-    , cast(null as {{ dbt.type_date() }} ) as encounter_start_date
-    , cast(null as {{ dbt.type_date() }} ) as encounter_end_date
-    , cast(null as {{ dbt.type_int() }} ) as length_of_stay
+    , cast(null as date) as encounter_start_date
+    , cast(null as date) as encounter_end_date
+    , cast(null as integer) as length_of_stay
     , cast(null as {{ dbt.type_string() }} ) as admit_source_code
     , cast(null as {{ dbt.type_string() }} ) as admit_source_description
     , cast(null as {{ dbt.type_string() }} ) as admit_type_code
@@ -43,9 +43,9 @@ select
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_type
-    , cast(null as {{ dbt.type_date() }} ) as encounter_start_date
-    , cast(null as {{ dbt.type_date() }} ) as encounter_end_date
-    , cast(null as {{ dbt.type_int() }} ) as length_of_stay
+    , cast(null as date) as encounter_start_date
+    , cast(null as date) as encounter_end_date
+    , cast(null as integer) as length_of_stay
     , cast(null as {{ dbt.type_string() }} ) as admit_source_code
     , cast(null as {{ dbt.type_string() }} ) as admit_source_description
     , cast(null as {{ dbt.type_string() }} ) as admit_type_code

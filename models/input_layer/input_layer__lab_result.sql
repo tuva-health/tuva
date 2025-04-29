@@ -22,16 +22,16 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as normalized_component
     , cast(null as {{ dbt.type_string() }} ) as status
     , cast(null as {{ dbt.type_string() }} ) as result
-    , cast(null as {{ dbt.type_date() }} ) as result_date
-    , cast(null as {{ dbt.type_date() }} ) as collection_date
+    , cast(null as date) as result_date
+    , cast(null as date) as collection_date
     , cast(null as {{ dbt.type_string() }} ) as source_units
     , cast(null as {{ dbt.type_string() }} ) as normalized_units
     , cast(null as {{ dbt.type_string() }} ) as source_reference_range_low
     , cast(null as {{ dbt.type_string() }} ) as source_reference_range_high
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_low
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_high
-    , cast(null as {{ dbt.type_int() }} ) as source_abnormal_flag
-    , cast(null as {{ dbt.type_int() }} ) as normalized_abnormal_flag
+    , cast(null as integer) as source_abnormal_flag
+    , cast(null as integer) as normalized_abnormal_flag
     , cast(null as {{ dbt.type_string() }} ) as specimen
     , cast(null as {{ dbt.type_string() }} ) as ordering_practitioner_id
     , cast(null as {{ dbt.type_string() }} ) as data_source
@@ -55,16 +55,16 @@ select
     , cast(null as {{ dbt.type_string() }} ) as normalized_component
     , cast(null as {{ dbt.type_string() }} ) as status
     , cast(null as {{ dbt.type_string() }} ) as result
-    , cast(null as {{ dbt.type_date() }} ) as result_date
-    , cast(null as {{ dbt.type_date() }} ) as collection_date
+    , cast(null as date) as result_date
+    , cast(null as date) as collection_date
     , cast(null as {{ dbt.type_string() }} ) as source_units
     , cast(null as {{ dbt.type_string() }} ) as normalized_units
     , cast(null as {{ dbt.type_string() }} ) as source_reference_range_low
     , cast(null as {{ dbt.type_string() }} ) as source_reference_range_high
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_low
     , cast(null as {{ dbt.type_string() }} ) as normalized_reference_range_high
-    , cast(null as {{ dbt.type_int() }} ) as source_abnormal_flag
-    , cast(null as {{ dbt.type_int() }} ) as normalized_abnormal_flag
+    , cast(null as integer) as source_abnormal_flag
+    , cast(null as integer) as normalized_abnormal_flag
     , cast(null as {{ dbt.type_string() }} ) as specimen
     , cast(null as {{ dbt.type_string() }} ) as ordering_practitioner_id
     , cast(null as {{ dbt.type_string() }} ) as data_source

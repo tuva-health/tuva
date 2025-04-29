@@ -8,18 +8,18 @@ from {{ ref('medical_claim') }}
 {% if target.type == 'fabric' %}
 select top 0
       cast(null as {{ dbt.type_string() }} ) as claim_id
-    , cast(null as {{ dbt.type_int() }} ) as claim_line_number
+    , cast(null as integer) as claim_line_number
     , cast(null as {{ dbt.type_string() }} ) as claim_type
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-    , cast(null as {{ dbt.type_date() }} ) as claim_start_date
-    , cast(null as {{ dbt.type_date() }} ) as claim_end_date
-    , cast(null as {{ dbt.type_date() }} ) as claim_line_start_date
-    , cast(null as {{ dbt.type_date() }} ) as claim_line_end_date
-    , cast(null as {{ dbt.type_date() }} ) as admission_date
-    , cast(null as {{ dbt.type_date() }} ) as discharge_date
+    , cast(null as date) as claim_start_date
+    , cast(null as date) as claim_end_date
+    , cast(null as date) as claim_line_start_date
+    , cast(null as date) as claim_line_end_date
+    , cast(null as date) as admission_date
+    , cast(null as date) as discharge_date
     , cast(null as {{ dbt.type_string() }} ) as admit_source_code
     , cast(null as {{ dbt.type_string() }} ) as admit_type_code
     , cast(null as {{ dbt.type_string() }} ) as discharge_disposition_code
@@ -28,7 +28,7 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as drg_code_type
     , cast(null as {{ dbt.type_string() }} ) as drg_code
     , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
-    , cast(null as {{ dbt.type_int() }} ) as service_unit_quantity
+    , cast(null as integer) as service_unit_quantity
     , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
     , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
     , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
@@ -40,7 +40,7 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as billing_npi
     , cast(null as {{ dbt.type_string() }} ) as billing_tin
     , cast(null as {{ dbt.type_string() }} ) as facility_npi
-    , cast(null as {{ dbt.type_date() }} ) as paid_date
+    , cast(null as date) as paid_date
     , cast(null as {{ dbt.type_float() }} ) as paid_amount
     , cast(null as {{ dbt.type_float() }} ) as allowed_amount
     , cast(null as {{ dbt.type_float() }} ) as charge_amount
@@ -125,52 +125,52 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as procedure_code_23
     , cast(null as {{ dbt.type_string() }} ) as procedure_code_24
     , cast(null as {{ dbt.type_string() }} ) as procedure_code_25
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_1
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_2
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_3
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_4
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_5
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_6
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_7
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_8
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_9
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_10
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_11
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_12
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_13
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_14
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_15
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_16
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_17
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_18
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_19
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_20
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_21
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_22
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_23
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_24
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_25
-    , cast(null as {{ dbt.type_int() }} ) as in_network_flag
+    , cast(null as date) as procedure_date_1
+    , cast(null as date) as procedure_date_2
+    , cast(null as date) as procedure_date_3
+    , cast(null as date) as procedure_date_4
+    , cast(null as date) as procedure_date_5
+    , cast(null as date) as procedure_date_6
+    , cast(null as date) as procedure_date_7
+    , cast(null as date) as procedure_date_8
+    , cast(null as date) as procedure_date_9
+    , cast(null as date) as procedure_date_10
+    , cast(null as date) as procedure_date_11
+    , cast(null as date) as procedure_date_12
+    , cast(null as date) as procedure_date_13
+    , cast(null as date) as procedure_date_14
+    , cast(null as date) as procedure_date_15
+    , cast(null as date) as procedure_date_16
+    , cast(null as date) as procedure_date_17
+    , cast(null as date) as procedure_date_18
+    , cast(null as date) as procedure_date_19
+    , cast(null as date) as procedure_date_20
+    , cast(null as date) as procedure_date_21
+    , cast(null as date) as procedure_date_22
+    , cast(null as date) as procedure_date_23
+    , cast(null as date) as procedure_date_24
+    , cast(null as date) as procedure_date_25
+    , cast(null as integer) as in_network_flag
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name
-    , cast(null as {{ dbt.type_date() }} ) as file_date
+    , cast(null as date) as file_date
     , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run -- Added based on pattern
+    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 {% else %}
 select
       cast(null as {{ dbt.type_string() }} ) as claim_id
-    , cast(null as {{ dbt.type_int() }} ) as claim_line_number
+    , cast(null as integer) as claim_line_number
     , cast(null as {{ dbt.type_string() }} ) as claim_type
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as member_id
     , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-    , cast(null as {{ dbt.type_date() }} ) as claim_start_date
-    , cast(null as {{ dbt.type_date() }} ) as claim_end_date
-    , cast(null as {{ dbt.type_date() }} ) as claim_line_start_date
-    , cast(null as {{ dbt.type_date() }} ) as claim_line_end_date
-    , cast(null as {{ dbt.type_date() }} ) as admission_date
-    , cast(null as {{ dbt.type_date() }} ) as discharge_date
+    , cast(null as date) as claim_start_date
+    , cast(null as date) as claim_end_date
+    , cast(null as date) as claim_line_start_date
+    , cast(null as date) as claim_line_end_date
+    , cast(null as date) as admission_date
+    , cast(null as date) as discharge_date
     , cast(null as {{ dbt.type_string() }} ) as admit_source_code
     , cast(null as {{ dbt.type_string() }} ) as admit_type_code
     , cast(null as {{ dbt.type_string() }} ) as discharge_disposition_code
@@ -179,7 +179,7 @@ select
     , cast(null as {{ dbt.type_string() }} ) as drg_code_type
     , cast(null as {{ dbt.type_string() }} ) as drg_code
     , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
-    , cast(null as {{ dbt.type_int() }} ) as service_unit_quantity
+    , cast(null as integer) as service_unit_quantity
     , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
     , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
     , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
@@ -191,7 +191,7 @@ select
     , cast(null as {{ dbt.type_string() }} ) as billing_npi
     , cast(null as {{ dbt.type_string() }} ) as billing_tin
     , cast(null as {{ dbt.type_string() }} ) as facility_npi
-    , cast(null as {{ dbt.type_date() }} ) as paid_date
+    , cast(null as date) as paid_date
     , cast(null as {{ dbt.type_float() }} ) as paid_amount
     , cast(null as {{ dbt.type_float() }} ) as allowed_amount
     , cast(null as {{ dbt.type_float() }} ) as charge_amount
@@ -276,37 +276,37 @@ select
     , cast(null as {{ dbt.type_string() }} ) as procedure_code_23
     , cast(null as {{ dbt.type_string() }} ) as procedure_code_24
     , cast(null as {{ dbt.type_string() }} ) as procedure_code_25
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_1
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_2
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_3
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_4
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_5
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_6
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_7
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_8
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_9
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_10
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_11
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_12
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_13
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_14
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_15
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_16
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_17
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_18
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_19
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_20
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_21
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_22
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_23
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_24
-    , cast(null as {{ dbt.type_date() }} ) as procedure_date_25
-    , cast(null as {{ dbt.type_int() }} ) as in_network_flag
+    , cast(null as date) as procedure_date_1
+    , cast(null as date) as procedure_date_2
+    , cast(null as date) as procedure_date_3
+    , cast(null as date) as procedure_date_4
+    , cast(null as date) as procedure_date_5
+    , cast(null as date) as procedure_date_6
+    , cast(null as date) as procedure_date_7
+    , cast(null as date) as procedure_date_8
+    , cast(null as date) as procedure_date_9
+    , cast(null as date) as procedure_date_10
+    , cast(null as date) as procedure_date_11
+    , cast(null as date) as procedure_date_12
+    , cast(null as date) as procedure_date_13
+    , cast(null as date) as procedure_date_14
+    , cast(null as date) as procedure_date_15
+    , cast(null as date) as procedure_date_16
+    , cast(null as date) as procedure_date_17
+    , cast(null as date) as procedure_date_18
+    , cast(null as date) as procedure_date_19
+    , cast(null as date) as procedure_date_20
+    , cast(null as date) as procedure_date_21
+    , cast(null as date) as procedure_date_22
+    , cast(null as date) as procedure_date_23
+    , cast(null as date) as procedure_date_24
+    , cast(null as date) as procedure_date_25
+    , cast(null as integer) as in_network_flag
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name
-    , cast(null as {{ dbt.type_date() }} ) as file_date
+    , cast(null as date) as file_date
     , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run -- Added based on pattern
+    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 limit 0
 {%- endif %}
 

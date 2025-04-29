@@ -11,8 +11,8 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
-    , cast(null as {{ dbt.type_date() }} ) as dispensing_date
-    , cast(null as {{ dbt.type_date() }} ) as prescribing_date
+    , cast(null as date) as dispensing_date
+    , cast(null as date) as prescribing_date
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
     , cast(null as {{ dbt.type_string() }} ) as source_description
@@ -24,9 +24,9 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as atc_description
     , cast(null as {{ dbt.type_string() }} ) as route
     , cast(null as {{ dbt.type_string() }} ) as strength
-    , cast(null as {{ dbt.type_int() }} ) as quantity
+    , cast(null as integer) as quantity
     , cast(null as {{ dbt.type_string() }} ) as quantity_unit
-    , cast(null as {{ dbt.type_int() }} ) as days_supply
+    , cast(null as integer) as days_supply
     , cast(null as {{ dbt.type_string() }} ) as practitioner_id
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name
@@ -38,8 +38,8 @@ select
     , cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
-    , cast(null as {{ dbt.type_date() }} ) as dispensing_date
-    , cast(null as {{ dbt.type_date() }} ) as prescribing_date
+    , cast(null as date) as dispensing_date
+    , cast(null as date) as prescribing_date
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
     , cast(null as {{ dbt.type_string() }} ) as source_description
@@ -51,9 +51,9 @@ select
     , cast(null as {{ dbt.type_string() }} ) as atc_description
     , cast(null as {{ dbt.type_string() }} ) as route
     , cast(null as {{ dbt.type_string() }} ) as strength
-    , cast(null as {{ dbt.type_int() }} ) as quantity
+    , cast(null as integer) as quantity
     , cast(null as {{ dbt.type_string() }} ) as quantity_unit
-    , cast(null as {{ dbt.type_int() }} ) as days_supply
+    , cast(null as integer) as days_supply
     , cast(null as {{ dbt.type_string() }} ) as practitioner_id
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name

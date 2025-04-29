@@ -12,7 +12,7 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as panel_id
-    , cast(null as {{ dbt.type_date() }} ) as observation_date
+    , cast(null as date) as observation_date
     , cast(null as {{ dbt.type_string() }} ) as observation_type
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
@@ -30,7 +30,7 @@ select top 0
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name
     , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run -- Added based on pattern
+    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 {% else %}
 select
       cast(null as {{ dbt.type_string() }} ) as observation_id
@@ -38,7 +38,7 @@ select
     , cast(null as {{ dbt.type_string() }} ) as patient_id
     , cast(null as {{ dbt.type_string() }} ) as encounter_id
     , cast(null as {{ dbt.type_string() }} ) as panel_id
-    , cast(null as {{ dbt.type_date() }} ) as observation_date
+    , cast(null as date) as observation_date
     , cast(null as {{ dbt.type_string() }} ) as observation_type
     , cast(null as {{ dbt.type_string() }} ) as source_code_type
     , cast(null as {{ dbt.type_string() }} ) as source_code
@@ -56,7 +56,7 @@ select
     , cast(null as {{ dbt.type_string() }} ) as data_source
     , cast(null as {{ dbt.type_string() }} ) as file_name
     , cast(null as {{ dbt.type_timestamp() }} ) as ingest_datetime
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run -- Added based on pattern
+    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
 limit 0
 {%- endif %}
 
