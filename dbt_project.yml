@@ -58,6 +58,22 @@ vars:
     ## Set this variable to true if you want legacy data quality models to build
     enable_legacy_data_quality: false
 
+    ## Disable all input layer models by default
+    enable_condition: false
+    enable_eligibility: false
+    enable_encounter: false
+    enable_lab_result: false
+    enable_location: false
+    enable_medical_claim: false
+    enable_medication: false
+    enable_observation: false
+    enable_patient: false
+    enable_pharmacy_claim: false
+    enable_practitioner: false
+    enable_procedure: false
+    enable_provider_attribution: false
+
+
 on-run-end:
   - "{{ log_warning_for_seeds() }}"
 
