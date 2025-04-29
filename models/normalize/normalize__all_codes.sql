@@ -1,9 +1,12 @@
+{{ config(
+     enabled = (  var('enable_normalize_engine', False) == True
+               ) | as_bool
+   )
+}}
 with agg_cte as (
-    {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
     select * From {{ref('normalize__stg_unmapped_lab_result')}} union all
     select * From {{ref('normalize__stg_unmapped_medication')}} union all
     select * From {{ref('normalize__stg_unmapped_observation')}} union all
-    {%- endif %}
     select * From {{ref('normalize__stg_unmapped_condition')}} union all
     select * From {{ref('normalize__stg_unmapped_procedure')}}
 )
