@@ -7,7 +7,10 @@ select
     , first_name as name_first
     , last_name as name_last
     , sex as gender
-    , race
+    , case
+        when race is null then 'UNK'
+        else race
+      end as race
     , birth_date
     , data_source
 from {{ ref('fhir_preprocessing__stg_core__patient') }}

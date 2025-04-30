@@ -102,6 +102,24 @@ models:
             - resource_internal_id
 
   ## Intermediate
+  - name: fhir_preprocessing__int_coverage
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_coverage
+      tags: fhir_preprocessing
+      materialized: table
+    description: Prep coverage product for Coverage resource.
+
+  - name: fhir_preprocessing__int_coverage_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: int_coverage_type
+      tags: fhir_preprocessing
+      materialized: table
+    description: Prep coverage type list for the Coverage resource.
+
   - name: fhir_preprocessing__int_lab_result
     config:
       schema: |
