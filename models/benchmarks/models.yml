@@ -1,0 +1,131 @@
+version: 2
+
+models:
+  - name: benchmarks__person_year
+    description: |
+        flat table for training ml models on 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: person_year
+      materialized: table
+      tags: 
+        - benchmarks_train
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - plan
+            - year_nbr      
+
+  - name: benchmarks__pivot_condition
+    description: |
+        flat table for training ml models on 
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: int_pivot_condition
+      materialized: table
+      tags: 
+        - benchmarks_train
+
+
+  - name: benchmarks__predict_member_month
+    description: |
+        member_month grain table for data viz with expected values
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_member_month
+      materialized: table
+      tags: 
+        - benchmarks_view
+
+  - name: benchmarks__unpivot
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_unpivot
+      materialized: table
+      tags: 
+        - benchmarks_view
+
+  - name: benchmarks__unpivot_encounters
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_unpivot_encounters
+      materialized: table
+      tags: 
+        - benchmarks_view
+
+  - name: benchmarks__inpatient_input
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_inpatient_input
+      materialized: table
+      tags: 
+        - benchmarks_train
+
+  - name: benchmarks__predict_inpatient
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_inpatient
+      materialized: table
+      tags: 
+        - benchmarks_view
+
+  - name: benchmarks__unpivot_inpatient
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: unpivot_inpatient
+      materialized: table
+      tags: 
+        - benchmarks_view
+
+  - name: benchmarks__pivot_hcc
+    description: |
+        hcc_person_year
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: int_pivot_hcc
+      materialized: table
+      tags: 
+        - benchmarks_train
+
+  - name: benchmarks__pivot_cms_condition
+    description: |
+        hcc_person_year
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: int_pivot_cms_condition
+      materialized: table
+      tags: 
+        - benchmarks_train
+      
