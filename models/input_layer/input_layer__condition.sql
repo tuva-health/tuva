@@ -3,5 +3,5 @@
    )
 }}
 
-SELECT *
-FROM {{ ref('condition') }}
+select *
+from {{ ref('condition') }}

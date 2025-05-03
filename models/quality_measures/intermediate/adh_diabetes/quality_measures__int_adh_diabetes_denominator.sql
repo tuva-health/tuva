@@ -38,12 +38,12 @@ with diabetics_codes as (
         , days_supply
         , performance_period_end -- to use in latter cte for days in treatment period calculation
     from rx_diabetes
-    inner join {{ ref('quality_measures__int_adh_diabetes__performance_period') }} pp
+    inner join {{ ref('quality_measures__int_adh_diabetes__performance_period') }} as pp
         on dispensing_date between pp.performance_period_begin and pp.performance_period_end
 
 )
 
-/* 
+/*
     These patients need to pass two checks
     - First medication fill date should be at least 91 days before the end of measurement period
     - Should have at least two distinct Date of Service (FillDate) for rx
@@ -56,7 +56,7 @@ with diabetics_codes as (
         , dispensing_date
         , performance_period_end
         , dense_rank() over (
-            partition by 
+            partition by
                   person_id
                 , performance_period_end
             order by dispensing_date
@@ -73,22 +73,22 @@ with diabetics_codes as (
         , performance_period_end
     from rx_fill_order
     where dr = 1
-          
+
 )
 
 , timely_fill_check as (
 
     select
           person_id
-        , ( 1 + {{ dbt.datediff (
+        , (1 + {{ dbt.datediff (
                                   datepart = 'day'
                                 , first_date = 'dispensing_date'
                                 , second_date = 'performance_period_end'
                             )
-            }} )
+            }})
             as days_in_treatment_period
-        /*  
-            Performance Period end minus dispensing date results in 
+        /*
+            Performance Period end minus dispensing date results in
             second_date non-inclusive difference, so to include both of these days
             1 day is added
         */
@@ -122,12 +122,12 @@ with diabetics_codes as (
         , first_check_passed_patients.days_in_treatment_period
     from first_check_passed_patients
     inner join second_check_passed_patients
-        on first_check_passed_patients.person_id = second_check_passed_patients.person_id 
+        on first_check_passed_patients.person_id = second_check_passed_patients.person_id
 
 )
 
 , qualifying_patients_with_age as (
-    
+
     select
           patients.person_id
         , floor({{ datediff('birth_date', 'pp.performance_period_begin', 'hour') }} / 8760.0) as age
@@ -137,10 +137,10 @@ with diabetics_codes as (
         , measure_id
         , measure_name
         , measure_version
-    from {{ ref('quality_measures__stg_core__patient') }} patients
+    from {{ ref('quality_measures__stg_core__patient') }} as patients
     inner join qualifying_patients
         on patients.person_id = qualifying_patients.person_id
-    cross join {{ ref('quality_measures__int_adh_diabetes__performance_period') }} pp
+    cross join {{ ref('quality_measures__int_adh_diabetes__performance_period') }} as pp
     where patients.death_date is null
 
 )
@@ -221,5 +221,5 @@ select
     , measure_name
     , measure_version
     , denominator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

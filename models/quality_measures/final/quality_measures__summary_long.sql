@@ -53,7 +53,7 @@ with union_measures as (
         , union_measures.measure_name
         , union_measures.measure_version
     from patient
-        left join union_measures
+        left outer join union_measures
             on patient.person_id = union_measures.person_id
 )
 
@@ -93,5 +93,5 @@ select
     , measure_id
     , measure_name
     , measure_version
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

@@ -22,7 +22,7 @@
 {%- endset -%}
 
 with denominator as (
-  
+
     select
         person_id
     from {{ ref('quality_measures__int_nqf0420_denominator') }}
@@ -47,7 +47,7 @@ with denominator as (
     select
           person_id
         , procedure_date
-        , coalesce (
+        , coalesce(
               normalized_code_type
             , case
                 when lower(source_code_type) = 'cpt' then 'hcpcs'
@@ -55,7 +55,7 @@ with denominator as (
                 else lower(source_code_type)
               end
           ) as code_type
-        , coalesce (
+        , coalesce(
               normalized_code
             , source_code
           ) as code
@@ -103,8 +103,8 @@ with denominator as (
 
 )
 
-, patients_with_exclusions as(
-    
+, patients_with_exclusions as (
+
     select
         person_id
       , exclusion_date
@@ -113,7 +113,7 @@ with denominator as (
 
     union all
 
-    select 
+    select
           person_id
         , procedure_date as exclusion_date
         , concept_name as exclusion_reason
@@ -123,10 +123,10 @@ with denominator as (
 
 , valid_exclusions as (
 
-  select 
+  select
         patients_with_exclusions.person_id
       , patients_with_exclusions.exclusion_date
-      , patients_with_exclusions.exclusion_reason  
+      , patients_with_exclusions.exclusion_reason
   from patients_with_exclusions
   inner join denominator
       on patients_with_exclusions.person_id = denominator.person_id

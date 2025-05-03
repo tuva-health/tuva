@@ -4,7 +4,7 @@
 }}
 
 with procedure_base as (
-    select 
+    select
         encounter_id
         , claim_id
         , normalized_code
@@ -15,14 +15,14 @@ with procedure_base as (
         , clinical_domain
         , operation
         , approach
-        , count(claim_id) over 
+        , count(claim_id) over
             (partition by ccsr_category, operation) as n_total_occurrences
     from {{ ref('ccsr__long_procedure_category') }}
     -- include only records that map to a CCSR procedure category
     where ccsr_category is not null
-),
+)
 
-procedures_aggregated as (
+, procedures_aggregated as (
     select
         ccsr_category
         , ccsr_category_description
@@ -30,9 +30,9 @@ procedures_aggregated as (
         , approach
         , count(claim_id) as n_occurrences_with_approach
         , n_total_occurrences
-        , count(claim_id) / n_total_occurrences*100 as approach_rate
+        , count(claim_id) / n_total_occurrences * 100 as approach_rate
     from procedure_base
-    group by 
+    group by
         ccsr_category
         , ccsr_category_description
         , operation
@@ -40,7 +40,7 @@ procedures_aggregated as (
         , n_total_occurrences
 )
 
-select 
+select
     *
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from procedures_aggregated

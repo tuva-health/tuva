@@ -35,7 +35,7 @@ with period_end as (
         cast('{{ var('quality_measures_period_end') }}' as date)
         {%- endif %}
          as performance_period_end
-         
+
 )
 
 /*

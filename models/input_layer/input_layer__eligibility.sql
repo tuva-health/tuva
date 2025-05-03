@@ -3,5 +3,5 @@
  | as_bool
    )
 }}
-SELECT *
-FROM {{ ref('eligibility') }}
+select *
+from {{ ref('eligibility') }}

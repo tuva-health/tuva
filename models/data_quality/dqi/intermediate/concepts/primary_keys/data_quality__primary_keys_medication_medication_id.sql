@@ -3,76 +3,78 @@
    )
 }}
 
-WITH valid_conditions AS (
-    SELECT
+with valid_conditions as (
+    select
         *
-    FROM
+    from
         {{ ref('data_quality__medication_medication_id') }}
-    WHERE
+    where
         bucket_name = 'valid'
 )
 , uniqueness_check as (
-        SELECT
-                field_value,
-                COUNT(*) AS duplicate_count
-        FROM
-                valid_conditions
-        GROUP BY
+        select
                 field_value
-        HAVING
+                , COUNT(*) as duplicate_count
+        from
+                valid_conditions
+        group by
+                field_value
+        having
                 COUNT(*) > 1
 )
 
-, random_sample AS (
-    SELECT
-        data_source,
-        source_date,
-        table_name,
-        drill_down_key,
-        drill_down_value,
-        field_name,
-        field_value,
-        bucket_name,
-        row_number() over (order by drill_down_key) as row_number_value
-    FROM
+, random_sample as (
+    select
+        data_source
+        , source_date
+        , table_name
+        , drill_down_key
+        , drill_down_value
+        , field_name
+        , field_value
+        , bucket_name
+        , ROW_NUMBER() over (
+order by drill_down_key) as row_number_value
+    from
         {{ ref('data_quality__medication_medication_id') }}
-    WHERE
+    where
         bucket_name = 'valid'
 )
 
-, duplicates_summary AS (
-    SELECT
-        a.data_source,
-        a.source_date,
-        a.table_name,
-        a.drill_down_key,
-        a.drill_down_value,
-        a.field_name,
-        a.field_value,
-        a.bucket_name,
-        b.duplicate_count,
-        row_number() over (order by drill_down_key) as row_number_value
-    FROM
-        {{ ref('data_quality__medication_medication_id') }} a
-    JOIN
-        uniqueness_check b on a.field_value = b.field_value
+, duplicates_summary as (
+    select
+        a.data_source
+        , a.source_date
+        , a.table_name
+        , a.drill_down_key
+        , a.drill_down_value
+        , a.field_name
+        , a.field_value
+        , a.bucket_name
+        , b.duplicate_count
+        , ROW_NUMBER() over (
+order by drill_down_key) as row_number_value
+    from
+        {{ ref('data_quality__medication_medication_id') }} as a
+    inner join
+        uniqueness_check as b on a.field_value = b.field_value
 )
 
-SELECT
+select
     *
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from
     duplicates_summary
 where row_number_value <= 5
 
 union all
 
-SELECT
-    *,
-    0 as duplicate_count
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-FROM
+select
+    *
+    , 0 as duplicate_count
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from
     random_sample
-WHERE
+where
     row_number_value <= 5
-    and NOT EXISTS (SELECT 1 FROM duplicates_summary)
+    and not exists (select 1 from duplicates_summary)

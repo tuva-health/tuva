@@ -4,7 +4,7 @@
 }}
 
 with codes as (
-    
+
     select
           icd_10_cm_code as code
         , icd_10_cm_code_description as code_description
@@ -22,24 +22,24 @@ with codes as (
 , long_union as (
     -- generate select & union statements to pivot category columns to rows
     {% for i in range(1,7,1) %}
-    select 
+    select
           code
         , code_description
         , substring(ccsr_category_{{ i }}, 1, 3) as ccsr_parent_category
         , ccsr_category_{{ i }} as ccsr_category
         , ccsr_category_{{ i }}_description as ccsr_category_description
         , {{ i }} as ccsr_category_rank
-        , CASE WHEN ccsr_category_{{ i }} = default_ccsr_category_ip THEN 1 ELSE 0 END as is_ip_default_category
-        , CASE WHEN ccsr_category_{{ i }} = default_ccsr_category_op THEN 1 ELSE 0 END as is_op_default_category
-    from codes 
+        , case when ccsr_category_{{ i }} = default_ccsr_category_ip then 1 else 0 end as is_ip_default_category
+        , case when ccsr_category_{{ i }} = default_ccsr_category_op then 1 else 0 end as is_op_default_category
+    from codes
     {{ "union all" if not loop.last else "" }}
     {%- endfor %}
 
 )
 
 select distinct
-    *,
-    '{{ var('tuva_last_run')}}' as tuva_last_run
+    *
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from long_union
 -- as not all diagnosis codes have multiple categories, we can discard nulls
 where ccsr_category is not null

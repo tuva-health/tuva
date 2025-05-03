@@ -5,9 +5,9 @@
 
 select distinct
     ov.patient_data_source_id
-    ,ov.start_date
-    ,ov.claim_id
-    ,ov.claim_line_number
-    ,ov.old_encounter_id
-from {{ ref('office_visits__int_office_visits')}} ov
+    , ov.start_date
+    , ov.claim_id
+    , ov.claim_line_number
+    , ov.old_encounter_id
+from {{ ref('office_visits__int_office_visits') }} as ov
 where service_category_2 = 'office-based pt/ot/st'

@@ -37,7 +37,7 @@ select
     , quote_identifiers = False
     , suffix='_paid'
   ) }}
-, '{{ var('tuva_last_run')}}' as tuva_last_run
+, '{{ var('tuva_last_run') }}' as tuva_last_run
 from service_cat_1
 group by
   person_id

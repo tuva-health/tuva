@@ -99,7 +99,7 @@ with medical_claims as (
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
     where claim_type = 'institutional'
-        and substring(bill_type_code, 1, 2) in ('11','41')
+        and substring(bill_type_code, 1, 2) in ('11', '41')
 
 )
 
@@ -124,7 +124,7 @@ with medical_claims as (
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.payment_year = dates.payment_year
     where claim_type = 'institutional'
-        and substring(bill_type_code, 1, 2) in ('12','13','43','71','73','76','77','85')
+        and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
 
 )
 
@@ -172,5 +172,5 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

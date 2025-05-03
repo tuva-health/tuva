@@ -37,7 +37,7 @@ with conditions as (
         {% if target.type == 'fabric' or target.type == 'duckdb' %}
          , TRY_CAST(result AS {{ dbt.type_numeric() }}) AS result
         {% else %}
-        , CAST(result AS {{ dbt.type_numeric() }}) AS result
+        , CAST(result as {{ dbt.type_numeric() }}) as result
         {% endif %}
         , code_type
         , code
@@ -96,7 +96,7 @@ with conditions as (
         inner join seed_clinical_concepts
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
-    where lower(seed_clinical_concepts.concept_name) = 'depression assessment (phq-9)'
+    where LOWER(seed_clinical_concepts.concept_name) = 'depression assessment (phq-9)'
 
 )
 
@@ -114,7 +114,7 @@ with conditions as (
         inner join seed_clinical_concepts
             on conditions.code_type = seed_clinical_concepts.code_system
             and conditions.code = seed_clinical_concepts.code
-    where lower(seed_clinical_concepts.concept_name) = 'diabetes'
+    where LOWER(seed_clinical_concepts.concept_name) = 'diabetes'
 
 )
 
@@ -132,7 +132,7 @@ with conditions as (
         inner join seed_clinical_concepts
             on conditions.code_type = seed_clinical_concepts.code_system
             and conditions.code = seed_clinical_concepts.code
-    where lower(seed_clinical_concepts.concept_name) = 'essential hypertension'
+    where LOWER(seed_clinical_concepts.concept_name) = 'essential hypertension'
 
 )
 
@@ -150,7 +150,7 @@ with conditions as (
         inner join seed_clinical_concepts
             on conditions.code_type = seed_clinical_concepts.code_system
             and conditions.code = seed_clinical_concepts.code
-    where lower(seed_clinical_concepts.concept_name) = 'obstructive sleep apnea'
+    where LOWER(seed_clinical_concepts.concept_name) = 'obstructive sleep apnea'
 
 )
 
@@ -177,7 +177,7 @@ with conditions as (
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'obstructive_sleep_apnea.recorded_date') }}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
-    where lower(seed_clinical_concepts.concept_name) = 'bmi'
+    where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 30
 
 )
@@ -204,7 +204,7 @@ with conditions as (
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'diabetes.recorded_date') }}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
-    where lower(seed_clinical_concepts.concept_name) = 'bmi'
+    where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 35
 
 )
@@ -231,7 +231,7 @@ with conditions as (
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'hypertension.recorded_date') }}
         inner join seed_hcc_descriptions
             on hcc_code = '48'
-    where lower(seed_clinical_concepts.concept_name) = 'bmi'
+    where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 35
 
 )
@@ -243,9 +243,9 @@ with conditions as (
         , numeric_observations.data_source
         , numeric_observations.observation_date
         , numeric_observations.result as observation_result
-        , cast(null as {{ dbt.type_string() }}) as condition_code
-        , cast(null as date) as condition_date
-        , cast(null as {{ dbt.type_string() }}) as condition_concept_name
+        , CAST(null as {{ dbt.type_string() }}) as condition_code
+        , CAST(null as date) as condition_date
+        , CAST(null as {{ dbt.type_string() }}) as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -254,7 +254,7 @@ with conditions as (
             and numeric_observations.code = seed_clinical_concepts.code
         inner join seed_hcc_descriptions
             on hcc_code = '48'
-    where lower(seed_clinical_concepts.concept_name) = 'bmi'
+    where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
     and result >= 40
 
 )
@@ -318,14 +318,14 @@ with conditions as (
         , depression_assessment.code
         , depression_assessment.data_source
         , depression_assessment.concept_name
-        , row_number() over (
+        , ROW_NUMBER() over (
             partition by
                   depression_assessment.person_id
                 , depression_assessment.data_source
             order by
-                case when depression_assessment.observation_date is null then 1 else 0 end,
-                depression_assessment.observation_date desc
-        ) assessment_order
+                case when depression_assessment.observation_date is null then 1 else 0 end
+                , depression_assessment.observation_date desc
+        ) as assessment_order
     from depression_assessment
 
 )
@@ -340,14 +340,14 @@ with conditions as (
         , data_source
         , concept_name
         , result
-        , row_number() over (
+        , ROW_NUMBER() over (
             partition by
                   person_id
                 , data_source
             --order by result desc nulls last
             order by
-                case when result is null then 1 else 0 end,
-                result desc
+                case when result is null then 1 else 0 end
+                , result desc
         ) as result_order --order the last three assessments by result value
     from eligible_depression_assessments
     where assessment_order <= 3
@@ -361,8 +361,8 @@ with conditions as (
         , depression_assessments_ordered.data_source
         , depression_assessments_ordered.observation_date
         , depression_assessments_ordered.result as observation_result
-        , cast(null as {{ dbt.type_string() }}) as condition_code
-        , cast(null as date) as condition_date
+        , CAST(null as {{ dbt.type_string() }}) as condition_code
+        , CAST(null as date) as condition_date
         , depression_assessments_ordered.concept_name as condition_concept_name
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
@@ -404,7 +404,7 @@ with conditions as (
         , unioned.contributing_factor
         , billed_hccs.current_year_billed
     from unioned
-        left join billed_hccs
+        left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
@@ -425,7 +425,7 @@ with conditions as (
         , hcc_description
         , contributing_factor
         , current_year_billed
-        , cast('Observation suspect' as {{ dbt.type_string() }}) as reason
+        , CAST('Observation suspect' as {{ dbt.type_string() }}) as reason
         , observation_date as suspect_date
     from add_billed_flag
 
@@ -434,23 +434,23 @@ with conditions as (
 , add_data_types as (
 
     select
-          cast(person_id as {{ dbt.type_string() }}) as person_id
-        , cast(data_source as {{ dbt.type_string() }}) as data_source
-        , cast(observation_date as date) as observation_date
-        , cast(observation_result as {{ dbt.type_string() }}) as observation_result
-        , cast(condition_code as {{ dbt.type_string() }}) as condition_code
-        , cast(condition_date as date) as condition_date
-        , cast(condition_concept_name as {{ dbt.type_string() }}) as condition_concept_name
-        , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
-        , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
+          CAST(person_id as {{ dbt.type_string() }}) as person_id
+        , CAST(data_source as {{ dbt.type_string() }}) as data_source
+        , CAST(observation_date as date) as observation_date
+        , CAST(observation_result as {{ dbt.type_string() }}) as observation_result
+        , CAST(condition_code as {{ dbt.type_string() }}) as condition_code
+        , CAST(condition_date as date) as condition_date
+        , CAST(condition_concept_name as {{ dbt.type_string() }}) as condition_concept_name
+        , CAST(hcc_code as {{ dbt.type_string() }}) as hcc_code
+        , CAST(hcc_description as {{ dbt.type_string() }}) as hcc_description
         {% if target.type == 'fabric' %}
             , cast(current_year_billed as bit) as current_year_billed
         {% else %}
-            , cast(current_year_billed as boolean) as current_year_billed
+            , CAST(current_year_billed as boolean) as current_year_billed
         {% endif %}
-        , cast(reason as {{ dbt.type_string() }}) as reason
-        , cast(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
-        , cast(suspect_date as date) as suspect_date
+        , CAST(reason as {{ dbt.type_string() }}) as reason
+        , CAST(contributing_factor as {{ dbt.type_string() }}) as contributing_factor
+        , CAST(suspect_date as date) as suspect_date
     from add_standard_fields
 
 )
@@ -469,5 +469,5 @@ select
     , reason
     , contributing_factor
     , suspect_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

@@ -13,7 +13,7 @@ select distinct
   , '{{ this.name }}' as source_model_name
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
-where 
+where
   claim_type = 'professional'
   and (
     hcpcs_code between 'A0425' and 'A0436'

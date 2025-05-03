@@ -13,7 +13,7 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} as s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
   on s.claim_id = a.claim_id
-where 
+where
   s.primary_taxonomy_code in (
       '324500000X'
     , '261QR0405X'

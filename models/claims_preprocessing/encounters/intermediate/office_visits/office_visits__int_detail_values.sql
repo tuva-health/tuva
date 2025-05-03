@@ -4,55 +4,55 @@
 }}
 with encounter_date as (
   select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'office visit surgery' as encounter_type
+  , start_date as encounter_start_date
+  , 'office visit surgery' as encounter_type
   from {{ ref('office_visits__int_office_visits_surgery') }}
 
   union all
 
 select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'office visit injections' as encounter_type
+  , start_date as encounter_start_date
+  , 'office visit injections' as encounter_type
   from {{ ref('office_visits__int_office_visits_injections') }}
 
-  union all 
+  union all
 
 select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'office visit radiology' as encounter_type
+  , start_date as encounter_start_date
+  , 'office visit radiology' as encounter_type
   from {{ ref('office_visits__int_office_visits_radiology') }}
 
   union all
 
 select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'office visit - other' as encounter_type
+  , start_date as encounter_start_date
+  , 'office visit - other' as encounter_type
   from {{ ref('office_visits__int_office_visits') }}
 
-  union all 
+  union all
 
 select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'office visit' as encounter_type
+  , start_date as encounter_start_date
+  , 'office visit' as encounter_type
   from {{ ref('office_visits__int_office_visits_em') }}
 
-  union all 
+  union all
 
 select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'telehealth' as encounter_type
+  , start_date as encounter_start_date
+  , 'telehealth' as encounter_type
   from {{ ref('office_visits__int_office_visits_telehealth') }}
 
-  union all 
+  union all
 
 select distinct old_encounter_id
-  ,start_date as encounter_start_date
-  ,'office visit pt/ot/st' as encounter_type
+  , start_date as encounter_start_date
+  , 'office visit pt/ot/st' as encounter_type
   from {{ ref('office_visits__int_office_visits') }}
 )
 
 
-    select 
+    select
       stg.paid_amount
     , stg.allowed_amount
     , stg.charge_amount
@@ -72,16 +72,17 @@ select distinct old_encounter_id
     , cli.old_encounter_id
     , cli.encounter_type
     , cli.encounter_group
-    , d.encounter_start_date 
-    , row_number() over (partition by cli.encounter_id order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
-    from  {{ ref('encounters__stg_medical_claim') }} stg
-    inner join {{ ref('encounters__combined_claim_line_crosswalk') }} cli on stg.claim_id = cli.claim_id  
+    , d.encounter_start_date
+    , row_number() over (partition by cli.encounter_id
+order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
+    from {{ ref('encounters__stg_medical_claim') }} as stg
+    inner join {{ ref('encounters__combined_claim_line_crosswalk') }} as cli on stg.claim_id = cli.claim_id
     and
     stg.claim_line_number = cli.claim_line_number
     and
     cli.encounter_group = 'office based'
     and
     cli.claim_line_attribution_number = 1
-    inner join encounter_date d on cli.old_encounter_id = d.old_encounter_id
+    inner join encounter_date as d on cli.old_encounter_id = d.old_encounter_id
     and
     d.encounter_type = cli.encounter_type

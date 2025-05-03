@@ -35,6 +35,7 @@
     from
         read_csv('s3://{{ uri }}/{{ pattern }}*',
         {% if null_marker == true %} nullstr = '\N' {% else %} nullstr = '' {% endif %},
+         quote = '"', escape = '"',
          header=true,
          columns= { {{ cols }} } )
 
@@ -44,10 +45,19 @@
 {{ sql }}
 {% endcall %}
 
+{% set count_sql %}
+  SELECT COUNT(*) AS row_count FROM {{ this }}
+{% endset %}
+
+{% call statement('count',fetch_result=true) %}
+  {{ count_sql }}
+{% endcall %}
+
 {% if execute %}
 {# debugging { log(sql, True)} #}
-{% set results = load_result('ducksql') %}
-{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ,True) }}
+{% set count_result = load_result('count') %}
+{% set row_count = count_result.table.columns[0].values()[0] if count_result.table else 0 %}
+{{ log("Loaded data from external s3 resource\n  loaded to: " ~ this ~ "\n  from: s3://" ~ uri ~ "/" ~ pattern ~ "*\n  rows: " ~ row_count,True) }}
 {# debugging { log(results, True) } #}
 {% endif %}
 

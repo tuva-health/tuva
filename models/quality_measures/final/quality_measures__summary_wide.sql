@@ -67,7 +67,7 @@ with measures_long as (
         , performance_flag
     from measures_long
     where measure_id = 'ADH-RAS'
-    
+
 )
 
 , supd as (
@@ -102,19 +102,19 @@ with measures_long as (
         , max(supd.performance_flag) as supd
         , max(adh_statins.performance_flag) as adh_statins
     from measures_long
-        left join cqm_438
+        left outer join cqm_438
             on measures_long.person_id = cqm_438.person_id
-        left join cqm_130
+        left outer join cqm_130
             on measures_long.person_id = cqm_130.person_id
-        left join nqf_0420
+        left outer join nqf_0420
             on measures_long.person_id = nqf_0420.person_id
-        left join adh_diabetes
+        left outer join adh_diabetes
             on measures_long.person_id = adh_diabetes.person_id
-        left join adh_ras
+        left outer join adh_ras
             on measures_long.person_id = adh_ras.person_id
-        left join supd
+        left outer join supd
             on measures_long.person_id = supd.person_id
-        left join adh_statins
+        left outer join adh_statins
             on measures_long.person_id = adh_statins.person_id
     group by measures_long.person_id
 
@@ -144,5 +144,5 @@ select
     , cqm_438
     , nqf_0420
     , supd
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

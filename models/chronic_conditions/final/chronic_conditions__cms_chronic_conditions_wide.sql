@@ -38,9 +38,9 @@ select
         , else_value= 0
         , quote_identifiers = False
       ) }}
-      , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('cms_chronic_conditions__stg_core__patient') }} p
-     left join conditions
+      , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('cms_chronic_conditions__stg_core__patient') }} as p
+     left outer join conditions
         on p.person_id = conditions.person_id
 group by
     p.person_id

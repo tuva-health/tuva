@@ -2,7 +2,7 @@
     enabled = var('brand_generic_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 ) }}
 
-select 
+select
     p.ndc_code
   , n.fda_description as ndc_description
   , p.data_source
@@ -21,6 +21,5 @@ select
   , p.refills
   , p.paid_date
 from {{ ref('core__pharmacy_claim') }} as p
-left join {{ ref('terminology__ndc') }} as n 
+left outer join {{ ref('terminology__ndc') }} as n
   on p.ndc_code = n.ndc
-

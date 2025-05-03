@@ -825,6 +825,12 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         provider_organization_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_other_organization_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_other_organization_name_type_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+        provider_other_organization_name_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         parent_organization_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         practice_address_line_1: |
@@ -864,6 +870,12 @@ seeds:
         description: 'The last name of the provider.'
       - name: provider_organization_name
         description: 'The organization name of the provider.'
+      - name: provider_other_organization_name
+        description: 'Other organization name of the provider (for Type 2 NPI).'
+      - name: provider_other_organization_name_type_code
+        description: 'The type code for the other organization name of the provider.'
+      - name: provider_other_organization_name_type_description
+        description: 'The type description for the other organization name of the provider.'
       - name: parent_organization_name
         description: 'The parent organization name of the provider.'
       - name: practice_address_line_1

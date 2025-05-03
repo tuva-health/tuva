@@ -177,7 +177,7 @@ with conditions as (
         , unioned.condition_2_recorded_date
         , billed_hccs.current_year_billed
     from unioned
-        left join billed_hccs
+        left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
@@ -258,5 +258,5 @@ select
     , reason
     , contributing_factor
     , suspect_date
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

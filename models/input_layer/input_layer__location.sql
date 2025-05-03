@@ -3,5 +3,5 @@
  | as_bool
    )
 }}
-SELECT *
-FROM {{ ref('location') }}
+select *
+from {{ ref('location') }}

@@ -1,5 +1,6 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
+     enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
+ | as_bool
    )
 }}
 
@@ -31,7 +32,7 @@ select
     , max(case when column_name = 'DIAGNOSIS_POA_23' then normalized_code else null end) as diagnosis_poa_23
     , max(case when column_name = 'DIAGNOSIS_POA_24' then normalized_code else null end) as diagnosis_poa_24
     , max(case when column_name = 'DIAGNOSIS_POA_25' then normalized_code else null end) as diagnosis_poa_25
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__int_present_on_admit_voting') }}
 where (occurrence_row_count = 1
         and occurrence_count > next_occurrence_count)

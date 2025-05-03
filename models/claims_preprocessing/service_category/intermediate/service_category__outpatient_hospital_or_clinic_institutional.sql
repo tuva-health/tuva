@@ -4,7 +4,7 @@
 }}
 
 with multiple_sources as (
-    select distinct 
+    select distinct
         m.claim_id
       , 'outpatient hospital or clinic' as service_category_2
       , 'outpatient hospital or clinic' as service_category_3
@@ -13,19 +13,19 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as m
     inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
       on m.claim_id = o.claim_id
-    where 
+    where
       substring(m.bill_type_code, 1, 2) in (
-        '13',  -- Hospital Outpatient
-        '43',  -- Religious Nonmedical Hospital Outpatient
-        '44',  -- Religious Nonmedical Hospital Other (Part B)
-        '71',  -- Clinic Rural Health Center (RHC)
-        '72',  -- Clinic Hospital-based or Independent Renal Dialysis Center
-        '73',  -- Clinic Federally Qualified Health Center (FQHC)
-        '74',  -- Clinic Other Rehabilitation Facility (ORF)
-        '75',  -- Clinic Comprehensive Outpatient Rehabilitation Facility (CORF)
-        '76',  -- Clinic Community Mental Health Center (CMHC)
-        '77',  -- Clinic Free-standing Provider-based FQHC
-        '79'   -- Clinic Other
+        '13'  -- Hospital Outpatient
+        , '43'  -- Religious Nonmedical Hospital Outpatient
+        , '44'  -- Religious Nonmedical Hospital Other (Part B)
+        , '71'  -- Clinic Rural Health Center (RHC)
+        , '72'  -- Clinic Hospital-based or Independent Renal Dialysis Center
+        , '73'  -- Clinic Federally Qualified Health Center (FQHC)
+        , '74'  -- Clinic Other Rehabilitation Facility (ORF)
+        , '75'  -- Clinic Comprehensive Outpatient Rehabilitation Facility (CORF)
+        , '76'  -- Clinic Community Mental Health Center (CMHC)
+        , '77'  -- Clinic Free-standing Provider-based FQHC
+        , '79'   -- Clinic Other
       )
 
     union all
@@ -39,7 +39,7 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as m
     inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
       on m.claim_id = o.claim_id
-    where 
+    where
       m.ccs_category = '227' -- Consultation, evaluation, and preventative care
 )
 

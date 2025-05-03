@@ -15,6 +15,6 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} as med
 inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpatient
   on med.claim_id = outpatient.claim_id
-where 
+where
   (med.hcpcs_code between 'A0425' and 'A0436')
   or med.revenue_center_code = '0540'

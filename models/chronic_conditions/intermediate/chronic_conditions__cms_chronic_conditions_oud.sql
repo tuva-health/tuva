@@ -32,7 +32,7 @@ with chronic_conditions as (
         , claim_id
         , recorded_date as start_date
         , normalized_code_type as code_type
-        , replace(normalized_code,'.','') as code
+        , replace(normalized_code, '.', '') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__condition') }}
 
@@ -44,7 +44,7 @@ with chronic_conditions as (
           person_id
         , claim_id
         , paid_date as start_date
-        , replace(ndc_code,'.','') as code
+        , replace(ndc_code, '.', '') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__pharmacy_claim') }}
 
@@ -57,7 +57,7 @@ with chronic_conditions as (
         , claim_id
         , procedure_date as start_date
         , normalized_code_type as code_type
-        , replace(normalized_code,'.','') as code
+        , replace(normalized_code, '.', '') as code
         , data_source
     from {{ ref('cms_chronic_conditions__stg_core__procedure') }}
 
@@ -159,7 +159,7 @@ with chronic_conditions as (
              on patient_medications.code = chronic_conditions.code
          inner join exclusions_other_chronic_conditions
              on patient_medications.person_id = exclusions_other_chronic_conditions.person_id
-         left join inclusions_diagnosis
+         left outer join inclusions_diagnosis
              on patient_medications.person_id = inclusions_diagnosis.person_id
     where chronic_conditions.inclusion_type = 'Include'
     and chronic_conditions.code_system = 'NDC'
@@ -198,8 +198,8 @@ select distinct
     , cast(inclusions_unioned.condition_category as {{ dbt.type_string() }}) as condition_category
     , cast(inclusions_unioned.condition as {{ dbt.type_string() }}) as condition
     , cast(inclusions_unioned.data_source as {{ dbt.type_string() }}) as data_source
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from inclusions_unioned
-     left join exclusions_medication
+     left outer join exclusions_medication
          on inclusions_unioned.person_id = exclusions_medication.person_id
 where exclusions_medication.person_id is null

@@ -3,18 +3,17 @@
    )
 }}
 
-select distinct 
+select distinct
   a.claim_id
   , a.claim_line_number
   , a.claim_line_id
   , 'office based' as service_type
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('service_category__stg_medical_claim') }} a
-inner join  {{ ref('service_category__stg_professional') }} p on a.claim_id = p.claim_id 
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }} as a
+inner join {{ ref('service_category__stg_professional') }} as p on a.claim_id = p.claim_id
 and
 a.claim_line_number = p.claim_line_number
-where a.place_of_service_code in ( '11' -- office
-,'02' --telehealth 
-,'10' --telehealth
+where a.place_of_service_code in ('11' -- office
+, '02' --telehealth 
+, '10' --telehealth
 )
-

@@ -48,9 +48,9 @@ with denominator as (
     from patients_taking_statin_meds
     inner join denominator
       on patients_taking_statin_meds.person_id = denominator.person_id
-        and dispensing_date between 
+        and dispensing_date between
           denominator.performance_period_begin and denominator.performance_period_end
-        
+
 )
 
 , numerator as (
@@ -79,5 +79,5 @@ select
     , evidence_date
     , evidence_value
     , numerator_flag
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

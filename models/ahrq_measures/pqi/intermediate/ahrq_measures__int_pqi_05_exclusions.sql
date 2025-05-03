@@ -14,9 +14,9 @@ with resp_an as (
       and pqi.value_set_name = 'cystic_fibrosis_and_anomalies_of_the_respiratory_system'
       and pqi_number = '05'
     where c.encounter_id is not null
-),
+)
 
-union_cte as (
+, union_cte as (
     select
         encounter_id
       , data_source
@@ -37,8 +37,8 @@ select
   , data_source
   , exclusion_reason
   , row_number() over (
-      partition by encounter_id, data_source 
+      partition by encounter_id, data_source
       order by exclusion_reason
     ) as exclusion_number
-  , '{{ var('tuva_last_run')}}' as tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from union_cte

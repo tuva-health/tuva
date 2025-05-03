@@ -3,7 +3,7 @@
    )
 }}
 
-select 
+select
      icd_10_pcs as code
     , icd_10_pcs_description as code_description
     , prccsr as ccsr_category
@@ -15,7 +15,7 @@ select
     , ont.approach
     , ont.device
     , ont.qualifier
-    , '{{ var('tuva_last_run')}}' as tuva_last_run
-from {{ ref('ccsr__prccsr_v2023_1_cleaned_map')}} as ccsr_map
-left join {{ ref('terminology__icd10_pcs_cms_ontology') }} as ont
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('ccsr__prccsr_v2023_1_cleaned_map') }} as ccsr_map
+left outer join {{ ref('terminology__icd10_pcs_cms_ontology') }} as ont
     on ccsr_map.icd_10_pcs = ont.icd10pcs_code
