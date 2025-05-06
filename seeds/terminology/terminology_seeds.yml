@@ -790,7 +790,7 @@ seeds:
         present_on_admit_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         present_on_admit_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
     columns:
       - name: present_on_admit_code
         description: 'The code representing if the condition was present on admission.'
