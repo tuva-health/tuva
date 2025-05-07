@@ -59,7 +59,7 @@ with service_category_1_mapping as (
     left outer join {{ ref('service_category__combined_institutional_header_level') }} as b
       on a.claim_id = b.claim_id
       and a.data_source = b.data_source
-    left outer join {{ ref('service_category__service_categories') }} as s 
+    left outer join {{ ref('service_category__service_categories') }} as s
       on b.service_category_2 = s.service_category_2
       and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
@@ -91,7 +91,7 @@ with service_category_1_mapping as (
       on a.claim_id = b.claim_id
       and a.claim_line_number = b.claim_line_number
       and a.data_source = b.data_source
-    left outer join {{ ref('service_category__service_categories') }} as s 
+    left outer join {{ ref('service_category__service_categories') }} as s
       on b.service_category_2 = s.service_category_2
       and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
@@ -146,7 +146,7 @@ select
     , d.source_model_name
     , s.data_source
 from service_category_2_deduplication as d
-inner join {{ ref('service_category__stg_medical_claim') }} as s 
+inner join {{ ref('service_category__stg_medical_claim') }} as s
   on d.claim_id = s.claim_id
   and d.claim_line_number = s.claim_line_number
   and d.data_source = s.data_source

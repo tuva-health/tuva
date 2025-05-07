@@ -19,7 +19,7 @@ where
   or (
     med.hcpcs_code in ('Q5001', 'Q5002', 'Q5003', 'Q5009')
     and not exists (
-      select 1 
+      select 1
       from {{ ref('service_category__home_health_institutional') }} as hhi
       where med.claim_id = hhi.claim_id
       and med.data_source = hhi.data_source

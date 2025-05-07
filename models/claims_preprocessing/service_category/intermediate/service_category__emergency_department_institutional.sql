@@ -36,7 +36,7 @@ where revenue_center_code in ('0450', '0451', '0452', '0459', '0981')
 
 )
 
-select 
+select
     claim_id
     , data_source
     , 'outpatient' as service_category_1

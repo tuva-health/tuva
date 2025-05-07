@@ -33,7 +33,7 @@ inner join {{ ref('service_category__stg_outpatient_institutional') }} as outpat
 where med.primary_taxonomy_code = '261QA1903X'
 )
 
-select distinct 
+select distinct
     claim_id
     , data_source
     , 'outpatient' as service_category_1
