@@ -117,7 +117,7 @@ seeds:
       terminology__gender:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','gender.csv',compression=true,null_marker=true) }}"
       terminology__hcpcs_level_2:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','hcpcs_level_2.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','hcpcs_level_2.csv',compression=true,null_marker=true) }}"
       terminology__hcpcs_to_rbcs:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','hcpcs_to_rbcs.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_cm:
