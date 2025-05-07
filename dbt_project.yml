@@ -145,7 +145,7 @@ seeds:
       terminology__ms_drg_weights_los:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','ms_drg_weights_los.csv',compression=true,null_marker=true) }}"
       terminology__ms_drg:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','ms_drg.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','ms_drg.csv',compression=true,null_marker=true) }}"
       terminology__ndc:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','ndc.csv',compression=true,null_marker=true) }}"
       terminology__nitos:
