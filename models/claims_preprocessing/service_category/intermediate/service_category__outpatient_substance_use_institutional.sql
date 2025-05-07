@@ -5,6 +5,7 @@
 
 select distinct
     med.claim_id
+  , med.data_source
   , 'outpatient' as service_category_1
   , 'outpatient substance use' as service_category_2
   , 'outpatient substance use' as service_category_3
@@ -13,6 +14,7 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} as med
 inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
   on med.claim_id = o.claim_id
+  and med.data_source = o.data_source
 where
   med.default_ccsr_category_description_op in (
       'MBD026'
