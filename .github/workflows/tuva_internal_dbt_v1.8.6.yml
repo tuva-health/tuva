@@ -273,7 +273,12 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      # Changed to compile to save processing time
+      # Breaking up dbt build into seed then compile to try and speed up processing
+      - name: dbt-seed
+        run: |
+          dbt seed --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+        working-directory: ci_testing
+
       - name: dbt-compile
         run: |
           dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
