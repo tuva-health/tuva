@@ -14,6 +14,6 @@ select distinct
   , '{{ this.name }}' as source_model_name
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as s
-inner join {{ ref('service_category__stg_inpatient_institutional') }} as a 
+inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
 on s.claim_id = a.claim_id
 and s.data_source = a.data_source

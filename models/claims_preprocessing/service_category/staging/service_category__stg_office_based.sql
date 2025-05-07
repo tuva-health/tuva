@@ -11,7 +11,7 @@ select distinct
   , 'office based' as service_type
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as a
-  inner join {{ ref('service_category__stg_professional') }} as p 
+  inner join {{ ref('service_category__stg_professional') }} as p
   on a.claim_id = p.claim_id
   and a.claim_line_number = p.claim_line_number
   and a.data_source = p.data_source
