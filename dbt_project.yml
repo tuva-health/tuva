@@ -155,7 +155,7 @@ seeds:
       terminology__payer_type:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','payer_type.csv',compression=true,null_marker=true) }}"
       terminology__place_of_service:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','place_of_service.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','place_of_service.csv',compression=true,null_marker=true) }}"
       terminology__present_on_admission:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','present_on_admission.csv',compression=true,null_marker=true) }}"
       terminology__provider:
