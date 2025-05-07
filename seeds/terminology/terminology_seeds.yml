@@ -146,6 +146,8 @@ seeds:
       column_types:
         encounter_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        encounter_group: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: encounter_type
         description: 'The type of the encounter.'
