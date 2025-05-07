@@ -127,7 +127,7 @@ seeds:
         discharge_disposition_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         discharge_disposition_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1024) {%- endif -%}
     columns:
       - name: discharge_disposition_code
         description: 'The code representing the discharge disposition.'
