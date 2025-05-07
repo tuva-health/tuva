@@ -97,7 +97,7 @@ seeds:
 
     terminology:
       terminology__admit_source:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','admit_source.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','admit_source.csv',compression=true,null_marker=true) }}"
       terminology__admit_type:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','admit_type.csv',compression=true,null_marker=true) }}"
       terminology__apr_drg:
