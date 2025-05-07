@@ -127,9 +127,9 @@ seeds:
       terminology__icd10_pcs_cms_ontology:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','icd_10_pcs_cms_ontology.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_cm:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','icd_9_cm.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','icd_9_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_pcs:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','icd_9_pcs.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','icd_9_pcs.csv',compression=true,null_marker=true) }}"
       terminology__loinc:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','loinc.csv',compression=true,null_marker=true) }}"
       terminology__loinc_deprecated_mapping:
