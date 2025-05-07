@@ -7,6 +7,7 @@ with service_category_1_mapping as (
     select distinct
         a.claim_id
         , a.claim_line_number
+        , a.data_source
         , a.claim_type
         , case when s.service_category_1 is null and b.service_category_1 is not null then 'Service cat value not in seed table'
             else b.service_category_1
@@ -25,11 +26,11 @@ with service_category_1_mapping as (
         , b.source_model_name
     from {{ ref('service_category__stg_medical_claim') }} as a
     left outer join {{ ref('service_category__combined_professional') }} as b
-    on a.claim_id = b.claim_id
-    and a.claim_line_number = b.claim_line_number
+      on a.claim_id = b.claim_id
+      and a.claim_line_number = b.claim_line_number
+      and a.data_source = b.data_source
     left outer join {{ ref('service_category__service_categories') }} as s on b.service_category_2 = s.service_category_2
-    and
-    b.service_category_3 = s.service_category_3
+      and b.service_category_3 = s.service_category_3
     where a.claim_type = 'professional'
 
     union all
@@ -37,6 +38,7 @@ with service_category_1_mapping as (
     select distinct
         a.claim_id
         , a.claim_line_number
+        , a.data_source
         , a.claim_type
         , case when s.service_category_1 is null and b.service_category_1 is not null then 'Service cat value not in seed table'
             else b.service_category_1
@@ -55,10 +57,11 @@ with service_category_1_mapping as (
         , b.source_model_name
     from {{ ref('service_category__stg_medical_claim') }} as a
     left outer join {{ ref('service_category__combined_institutional_header_level') }} as b
-    on a.claim_id = b.claim_id
-    left outer join {{ ref('service_category__service_categories') }} as s on b.service_category_2 = s.service_category_2
-    and
-    b.service_category_3 = s.service_category_3
+      on a.claim_id = b.claim_id
+      and a.data_source = b.data_source
+    left outer join {{ ref('service_category__service_categories') }} as s 
+      on b.service_category_2 = s.service_category_2
+      and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
 
     union all
@@ -66,6 +69,7 @@ with service_category_1_mapping as (
     select distinct
         a.claim_id
         , a.claim_line_number
+        , a.data_source
         , a.claim_type
         , case when s.service_category_1 is null and b.service_category_1 is not null then 'Service cat value not in seed table'
             else b.service_category_1
@@ -84,11 +88,12 @@ with service_category_1_mapping as (
         , b.source_model_name
     from {{ ref('service_category__stg_medical_claim') }} as a
     left outer join {{ ref('service_category__combined_institutional_line_level') }} as b
-    on a.claim_id = b.claim_id
-    and a.claim_line_number = b.claim_line_number
-    left outer join {{ ref('service_category__service_categories') }} as s on b.service_category_2 = s.service_category_2
-    and
-    b.service_category_3 = s.service_category_3
+      on a.claim_id = b.claim_id
+      and a.claim_line_number = b.claim_line_number
+      and a.data_source = b.data_source
+    left outer join {{ ref('service_category__service_categories') }} as s 
+      on b.service_category_2 = s.service_category_2
+      and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
 )
 
@@ -96,6 +101,7 @@ with service_category_1_mapping as (
     select
         claim_id
         , claim_line_number
+        , data_source
         , claim_type
         , service_category_1
         , service_category_2
@@ -111,6 +117,7 @@ order by coalesce(priority, 99999)) as duplicate_row_number
 select
     d.claim_id
     , d.claim_line_number
+    , d.data_source
     , d.claim_type
     , coalesce(service_category_1, 'other') as service_category_1
     , coalesce(service_category_2, 'other') as service_category_2
@@ -139,6 +146,7 @@ select
     , d.source_model_name
     , s.data_source
 from service_category_2_deduplication as d
-inner join {{ ref('service_category__stg_medical_claim') }} as s on d.claim_id = s.claim_id
-and
-d.claim_line_number = s.claim_line_number
+inner join {{ ref('service_category__stg_medical_claim') }} as s 
+  on d.claim_id = s.claim_id
+  and d.claim_line_number = s.claim_line_number
+  and d.data_source = s.data_source

@@ -6,6 +6,7 @@
 with multiple_sources as (
     select distinct
         m.claim_id
+      , m.data_source
       , 'outpatient rehabilitation' as service_category_2
       , 'outpatient rehabilitation' as service_category_3
       , '{{ this.name }}' as source_model_name
@@ -13,6 +14,7 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as m
     inner join {{ ref('service_category__stg_outpatient_institutional') }} as i
       on m.claim_id = i.claim_id
+      and m.data_source = i.data_source
     where
       m.primary_taxonomy_code in (
           '283X00000X'
@@ -32,6 +34,7 @@ with multiple_sources as (
 
 select distinct
     claim_id
+  , data_source
   , 'outpatient' as service_category_1
   , service_category_2
   , service_category_3

@@ -5,33 +5,41 @@
 with multiple_sources as (
 
 select distinct
-  m.claim_id
-, 'outpatient psychiatric' as service_category_2
-, 'outpatient psychiatric' as service_category_3
-, '{{ this.name }}' as source_model_name
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+    m.claim_id
+  , m.data_source
+  , 'outpatient psychiatric' as service_category_2
+  , 'outpatient psychiatric' as service_category_3
+  , '{{ this.name }}' as source_model_name
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as m
-inner join {{ ref('service_category__stg_outpatient_institutional') }} as i on m.claim_id = i.claim_id
+  inner join {{ ref('service_category__stg_outpatient_institutional') }} as i 
+  on m.claim_id = i.claim_id
+  and m.data_source = i.data_source
 where m.revenue_center_code in ('0513', '0905')
 
 union all
 
 select distinct
-  m.claim_id
-, 'outpatient psychiatric' as service_category_2
-, 'outpatient psychiatric' as service_category_3
-, '{{ this.name }}' as source_model_name
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+    m.claim_id
+  , m.data_source
+  , 'outpatient psychiatric' as service_category_2
+  , 'outpatient psychiatric' as service_category_3
+  , '{{ this.name }}' as source_model_name
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as m
-inner join {{ ref('service_category__stg_outpatient_institutional') }} as i on m.claim_id = i.claim_id
+inner join {{ ref('service_category__stg_outpatient_institutional') }} as i 
+  on m.claim_id = i.claim_id
+  and m.data_source = i.data_source
 where m.primary_taxonomy_code in ('283Q00000X'
                                   , '273R00000X')
 )
 
-select distinct claim_id
-, 'outpatient' as service_category_1
-, service_category_2
-, service_category_3
-, source_model_name
-, tuva_last_run
+select distinct 
+  claim_id
+  , data_source
+  , 'outpatient' as service_category_1
+  , service_category_2
+  , service_category_3
+  , source_model_name
+  , tuva_last_run
 from multiple_sources
