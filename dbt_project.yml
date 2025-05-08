@@ -111,7 +111,7 @@ seeds:
       terminology__discharge_disposition:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','discharge_disposition.csv',compression=true,null_marker=true) }}"
       terminology__encounter_type:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','encounter_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','encounter_type.csv',compression=true,null_marker=true) }}"
       terminology__ethnicity:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.9','ethnicity.csv',compression=true,null_marker=true) }}"
       terminology__gender:
