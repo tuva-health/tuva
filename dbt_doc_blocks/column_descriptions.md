@@ -1,3 +1,109 @@
+{% docs appointment_id %}
+Unique identifier for the appointment.
+{% enddocs %}
+
+{% docs appt_status %}
+Appointment status (scheduled, cancelled, completed, etc.).
+Possible values:
+- `proposed`
+- `pending`
+- `booked`
+- `arrived`
+- `fulfilled`
+- `cancelled`
+- `noshow`
+- `entered-in-error`
+- `checked-in`
+- `waitlist`
+{% enddocs %}
+
+{% docs appointment_type_code %}
+Type of appointment (e.g., follow-up, consultation).
+{% enddocs %}
+
+{% docs appointment_group %}
+Categorization of the appointment, e.g., `clinical`.
+{% enddocs %}
+
+{% docs provider_id %}
+ID for the provider for the appointment.
+{% enddocs %}
+
+{% docs appointment_start_time %}
+Scheduled start time of the appointment.
+{% enddocs %}
+
+{% docs appointment_end_time %}
+Scheduled end time of the appointment.
+{% enddocs %}
+
+{% docs reason_code %}
+Reason for scheduling the appointment (e.g., consultation, check-up).
+{% enddocs %}
+
+{% docs reason_description %}
+Detailed reason for the appointment.
+{% enddocs %}
+
+{% docs cancellation_reason %}
+Reason for appointment cancellation, if applicable.
+{% enddocs %}
+
+{% docs virtual_service %}
+Indicates if this is a virtual (telehealth) appointment.
+{% enddocs %}
+
+{% docs telehealth_flag %}
+Flag indicating whether the appointment is a telehealth visit.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs emergency_flag %}
+Flag indicating whether the appointment is an emergency visit.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs home_visit_flag %}
+Flag indicating whether the appointment is a home visit.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs specialist_referral_flag %}
+Flag indicating if this is a specialist referral.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs primary_care_flag %}
+Flag indicating if this is a primary care appointment.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs preventive_care_flag %}
+Flag indicating if this is a preventive care appointment.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs recurrence_id %}
+Unique identifier for recurring appointments.
+{% enddocs %}
+
+{% docs recurrence_type %}
+Type of recurrence (e.g., daily, weekly, monthly).
+{% enddocs %}
+
+{% docs recurring_appointment_flag %}
+Flag indicating if the appointment is recurring.  
+Possible values: `1` (Yes) or `0` (No).
+{% enddocs %}
+
+{% docs created_at %}
+Timestamp when the appointment was initially created.
+{% enddocs %}
+
+{% docs updated_at %}
+Timestamp of the last modification.
+{% enddocs %}
+
 {% docs accession_number %}
 The lab order number from the source system.
 {% enddocs %}
