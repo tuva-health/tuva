@@ -119,12 +119,12 @@ select
     , d.claim_line_number
     , d.data_source
     , d.claim_type
-    , coalesce(service_category_1, 'other') as service_category_1
-    , coalesce(service_category_2, 'other') as service_category_2
-    , coalesce(service_category_3, 'other') as service_category_3
-    , original_service_cat_2
-    , original_service_cat_3
-    , duplicate_row_number
+    , coalesce(d.service_category_1, 'other') as service_category_1
+    , coalesce(d.service_category_2, 'other') as service_category_2
+    , coalesce(d.service_category_3, 'other') as service_category_3
+    , d.original_service_cat_2
+    , d.original_service_cat_3
+    , d.duplicate_row_number
     , s.ccs_category
     , s.ccs_category_description
     , s.drg_code
@@ -144,7 +144,6 @@ select
     , s.bill_type_code
     , s.bill_type_description
     , d.source_model_name
-    , s.data_source
 from service_category_2_deduplication as d
 inner join {{ ref('service_category__stg_medical_claim') }} as s
   on d.claim_id = s.claim_id
