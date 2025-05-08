@@ -1,0 +1,3687 @@
+version: 2
+models:
+
+# Data Quality - Acute Inpatient
+- name: data_quality__acute_inpatient_institutional_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: acute_inpatient_institutional_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all acute inpatient institutional claims together with relevant fields and data quality flags for those claims. 
+      Here we define the logic for what constitutes an acute inpatient institutional claim by pulling all claim_ids from the 'aip_venn_diagram' 
+      table that meet the logic we have chosen (e.g. all claims from the 'aip_venn_diagram' model with flag rb_drg_bill = 1).
+      By default this model is written so that an acute inpatient institutional claim is one that meets the 3 requirements 
+      (DRG requirement, bill type requirement, and room & board requirement), i.e. a claim that has rb_drg_bill = 1 in the 'aip_venn_diagram' model. 
+      This logic can be modified inside this model if, for example, we are missing a key field in the data source.
+  columns:
+      - name: claim_id
+        description: The claim_id given in the input layer.
+      - name: person_id
+        description: The person_id for this claim.
+      - name: merge_start_date
+        description: The start date of the merge period for this claim.
+      - name: merge_end_date
+        description: The end date of the merge period for this claim.
+      - name: drg_code
+        description: The DRG code assigned to this claim.
+      - name: diagnosis_code_1
+        description: The primary diagnosis code for this claim.
+      - name: admit_type_code
+        description: The admit type code for this claim.
+      - name: admit_source_code
+        description: The admit source code for this claim.
+      - name: discharge_disposition_code
+        description: The discharge disposition code for this claim.
+      - name: facility_npi
+        description: The facility NPI associated with this claim.
+      - name: rendering_npi
+        description: The rendering NPI associated with this claim.
+      - name: paid_amount
+        description: The total paid amount for this claim.
+      - name: usable_for_aip_encounter
+        description: >
+          An acute IP claim is usable for defining encounters if it has a usable_person_id = 1 and usable_merge_dates = 1.
+      - name: dq_problem
+        description: >
+          0 or 1 flag. 1 iff any of the following data quality flags are 0:
+          usable_person_id, usable_merge_dates, usable_drg_code, usable_diagnosis_code_1, 
+          usable_admit_type_code, usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
+      - name: usable_person_id
+        description: >
+          0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+      - name: usable_merge_dates
+        description: >
+          0 or 1 flag. Has value of 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+          and merge_start_date <= merge_end_date.
+      - name: usable_drg_code
+        description: >
+          0 or 1 flag. Has value of 1 iff there is a usable value of drg_code for the claim (unique_drg_code = 1 or determinable_drg_code = 1).
+      - name: usable_diagnosis_code_1
+        description: >
+          0 or 1 flag. Has value of 1 iff there is a usable value of diagnosis_code_1 for the claim (unique_diagnosis_code_1 = 1 or determinable_diagnosis_code_1 = 1).
+      - name: usable_admit_type_code
+        description: >
+          0 or 1 flag. Has value of 1 iff there is a usable value of admit_type_code for the claim (unique_admit_type_code = 1 or determinable_admit_type_code = 1).
+      - name: usable_admit_source_code
+        description: >
+          0 or 1 flag. Has value of 1 iff there is a usable value of admit_source_code for the claim (unique_admit_source_code = 1 or determinable_admit_source_code = 1).
+      - name: usable_discharge_disposition_code
+        description: >
+          0 or 1 flag. Has value of 1 iff there is a usable value of discharge_disposition_code for the claim (unique_discharge_disposition_code = 1 or determinable_discharge_disposition_code = 1).
+      - name: usable_facility_npi
+        description: >
+          0 or 1 flag. Has value of 1 iff the facility_npi is populated for at least one claim line and unique across claim lines.
+      - name: usable_rendering_npi
+        description: >
+          0 or 1 flag. Has value of 1 iff the rendering_npi is populated for at least one claim line and unique across claim lines.
+      - name: tuva_last_run
+        description: The date and timestamp of the dbt run.
+
+- name: data_quality__admit_source_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: admit_source_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table summarizes how admit_source_code looks for all claims. The table is at the claim grain, meaning there is one row 
+      for each unique claim_id in the medical_claim table. For each claim_id, several flags describe the state of the admit_source_code 
+      field for that claim, as well as the assigned_admit_source_code, which is the value of admit_source_code we should use for this claim 
+      for any analytics purposes. If the assigned_admit_source_code field is null for a claim, this means there is no usable value of 
+      admit_source_code for the claim.
+  columns:
+    - name: claim_id
+      description: >
+        The claim_id given in the input layer. This is a PK on this table because there is one row per claim_id. 
+        Every claim_id present in the input layer should be present on this table.
+    - name: missing_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing admit_source_code, i.e., if the admit_source_code is null for every line on the claim.
+    - name: always_invalid_admit_source_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null admit_source_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_admit_source_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of admit_source_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_admit_source_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of admit_source_code on the claim is a valid value from terminology.
+    - name: unique_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of admit_source_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_source_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_source_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_admit_source_code = 1 or determinable_admit_source_code = 1.
+    - name: assigned_admit_source_code
+      description: >
+        The assigned value of admit_source_code for the claim. This field will only be populated when usable_admit_source_code = 1. 
+        If this field is not populated it means that there is no usable value of admit_source_code for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__admit_type_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: admit_type_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table summarizes how admit_type_code looks for all claims. The table is at the claim grain, meaning there is one row 
+      for each unique claim_id in the medical_claim table. For each claim_id, several flags describe the state of the admit_type_code 
+      field for that claim, as well as the assigned_admit_type_code, which is the value of admit_type_code we should use for this claim 
+      for any analytics purposes. If the assigned_admit_type_code field is null for a claim, this means there is no usable value of 
+      admit_type_code for the claim.
+  columns:
+    - name: claim_id
+      description: >
+        The claim_id given in the input layer. This is a PK on this table because there is one row per claim_id. 
+        Every claim_id present in the input layer should be present on this table.
+    - name: missing_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing admit_type_code, i.e., if the admit_type_code is null for every line on the claim.
+    - name: always_invalid_admit_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null admit_type_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_admit_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of admit_type_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_admit_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of admit_type_code on the claim is a valid value from terminology.
+    - name: unique_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of admit_type_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_type_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_type_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_admit_type_code = 1 or determinable_admit_type_code = 1.
+    - name: assigned_admit_type_code
+      description: >
+        The assigned value of admit_type_code for the claim. This field will only be populated when usable_admit_type_code = 1. 
+        If this field is not populated it means that there is no usable value of admit_type_code for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_claims_adjacent_and_not_merging
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_adjacent_and_not_merging
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to list all pairs of claims that are adjacent for the same patient but are not merged into the same encounter. 
+      There is only one row in the table for each unique pair of such claims (always listing the smaller claim number first as claim_id_a and the 
+      larger claim number second as claim_id_b). Adjacent claims would not be merged into an encounter for a patient if they have different facility_npi 
+      or the discharge disposition code of the first one is <> '30' (still a patient). In this table we can easily check that pairs of adjacent claims 
+      not merged into a common encounter indeed have different facility_npi values or the first claim has discharge disposition <> '30', and also that 
+      they have different encounter_id values.
+  columns:
+    - name: person_id
+      description: The person_id associated with the claim.
+    - name: claim_id_a
+      description: The first claim in the pair (smaller claim_id).
+    - name: claim_id_b
+      description: The second claim in the pair (larger claim_id).
+    - name: merge_start_a
+      description: The merge_start_date for claim_id_a.
+    - name: merge_end_a
+      description: The merge_end_date for claim_id_a.
+    - name: merge_start_b
+      description: The merge_start_date for claim_id_b.
+    - name: merge_end_b
+      description: The merge_end_date for claim_id_b.
+    - name: facility_npi_a
+      description: The facility_npi for claim_id_a.
+    - name: facility_npi_b
+      description: The facility_npi for claim_id_b.
+    - name: different_facility_npi
+      description: >
+        0 or 1 flag. It is = 1 iff facility_npi_a <> facility_npi_b.
+    - name: discharge_disposition_code_a
+      description: The discharge_disposition_code of claim_id_a.
+    - name: ddc_not_30
+      description: >
+        0 or 1 flag. It is = 1 iff discharge_disposition_code_a <> '30'.
+    - name: encounter_id_a
+      description: The encounter_id for claim_id_a.
+    - name: encounter_id_b
+      description: The encounter_id for claim_id_b.
+    - name: different_encounter_id
+      description: >
+        0 or 1 flag. It is = 1 iff encounter_id_a <> encounter_id_b.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_claims_belonging_to_multiple_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_belonging_to_multiple_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show that the encounter grouper is assigning each claim to one and only one encounter. 
+      This table lists all claims that are assigned to more than one encounter. There should be zero claims assigned to more 
+      than one encounter if the encounter grouper works correctly, so this table should always be empty.
+  columns:
+    - name: person_id
+      description: The person_id associated with the claim.
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: encounter_count
+      description: >
+        The number of encounters that this claim is assigned to. This is required to be >1 for any row populated on this table, 
+        but this shouldn't happen, so this table should be empty.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_claims_not_merging_to_other_claims_in_their_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_not_merging_to_other_claims_in_their_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show all claims that are part of a multi-claim encounter but do not merge to at least one other claim in their encounter. 
+      This should never happen, so this table should be empty.
+  columns:
+    - name: claim_id
+      description: >
+        The specific problematic claim_id for a claim that is part of a multi-claim encounter but does not merge with any other claim 
+        that are part of its encounter.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_claims_overlapping_and_not_merging
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_overlapping_and_not_merging
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to list all pairs of claims that overlap in time for the same patient but are not merged into the same encounter. 
+      There is only one row in the table for each unique pair of such claims (always listing the smaller claim number first as claim_id_a and the 
+      larger claim number second as claim_id_b). The only reason why claims overlapping in time would not be merged into an encounter for a patient 
+      is because they have different facility_npi. In this table we can easily check that pairs of claims overlapping in time and not merged into 
+      a common encounter indeed have different facility_npi values and encounter_id values.
+  columns:
+    - name: person_id
+      description: The person_id associated with the claim.
+    - name: claim_id_a
+      description: The first claim in the pair (smaller claim_id).
+    - name: claim_id_b
+      description: The second claim in the pair (larger claim_id).
+    - name: merge_start_a
+      description: The merge_start_date for claim_id_a.
+    - name: merge_end_a
+      description: The merge_end_date for claim_id_a.
+    - name: merge_start_b
+      description: The merge_start_date for claim_id_b.
+    - name: merge_end_b
+      description: The merge_end_date for claim_id_b.
+    - name: facility_npi_a
+      description: The facility_npi for claim_id_a.
+    - name: facility_npi_b
+      description: The facility_npi for claim_id_b.
+    - name: different_facility_npi
+      description: >
+        0 or 1 flag. It is = 1 iff facility_npi_a <> facility_npi_b.
+    - name: encounter_id_a
+      description: The encounter_id for claim_id_a.
+    - name: encounter_id_b
+      description: The encounter_id for claim_id_b.
+    - name: different_encounter_id
+      description: >
+        0 or 1 flag. It is = 1 iff encounter_id_a <> encounter_id_b.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_claims_per_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_per_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table shows a summary of how many claims are used to make up multiple-claim encounters. 
+  columns:
+    - name: number_of_claims_in_encounter
+      description: The number of claims that make up an encounter
+    - name: number_of_times_this_happens
+      description: The total number of multiple-claim encounters that are made up of "number_of_claims_in_encounter" claims
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_claims_that_merge_to_a_different_claim_within_same_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_claims_that_merge_to_a_different_claim_within_same_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows all pairs of claims that are merged to each other and are from the same encounter. 
+      If claim X merges to claim Y, that will appear as two rows on this table, one with claim_id_a = X and claim_id_b = Y, 
+      and another with claim_id_a = Y and claim_id_b = X. The purpose of this table is to verify that every claim that is part 
+      of a multi-claim encounter (i.e., every claim that is in the table aip_multiple_claim_encounters) indeed merges to at least 
+      one other claim that is part of the same encounter. We need to verify that every claim present in the claim_id field of table 
+      aip_multiple_claim_encounters appears also in the claim_id_a field of this table.
+  columns:
+    - name: claim_id_a
+      description: The first claim in the pair (smaller claim_id).
+    - name: claim_id_b
+      description: The second claim in the pair (larger claim_id).
+    - name: merge_start_date_a
+      description: The merge_start_date for claim_id_a.
+    - name: merge_end_date_a
+      description: The merge_end_date for claim_id_a.
+    - name: merge_start_date_b
+      description: The merge_start_date for claim_id_b.
+    - name: merge_end_date_b
+      description: The merge_end_date for claim_id_b.
+    - name: ddc_a
+      description: The discharge disposition code for claim_id_a.
+    - name: ddc_b
+      description: The discharge disposition code for claim_id_b.
+    - name: facility_npi_a
+      description: The facility NPI associated with claim_id_a.
+    - name: facility_npi_b
+      description: The facility NPI associated with claim_id_b.
+    - name: merge_flag
+      description: >
+        Indicates whether the claims are merged into the same encounter. This flag verifies if both claims belong to the same encounter.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table queries many tables on this board to tell the Acute Inpatient Data Quality Story.
+
+- name: data_quality__aip_encounter_id
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounter_id
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to create an acute inpatient encounter_id that merges claims into encounters. 
+      The table is at the claim grain, i.e., there is one row for each acute inpatient institutional claim in the 
+      acute_inpatient_institutional_claims table that has usable_for_aip_encounter = 1. N different claims that are 
+      merged into a single encounter would be represented as N rows on this table with different claim_ids but the same encounter_id.
+  columns:
+    - name: person_id
+      description: The person_id associated with the claim.
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: encounter_id
+      description: >
+        The encounter_id assigned to the encounter.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_encounters_final_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounters_final_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table summarizes interesting metrics about the final list of usable acute inpatient encounters 
+    from the table acute_inpatient_encounters_final.
+    
+- name: data_quality__aip_encounters_final
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounters_final
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      description: >
+      This table shows all final usable acute inpatient encounters with rolled-up payments from professional claims. 
+      The table is at the encounter grain, meaning count(*) = count(distinct encounter_id) on this table.
+  columns:
+    - name: person_id
+      description: The person_id associated with the encounter.
+    - name: encounter_id
+      description: The unique identifier for the encounter.
+    - name: encounter_start_date
+      description: >
+        The earliest merge_start_date across all claims making up the encounter.
+    - name: encounter_end_date
+      description: >
+        The latest merge_end_date across all claims making up the encounter.
+    - name: los
+      description: >
+        Length of stay of the encounter. It is equal to (encounter_end_date - encounter_start_date).
+    - name: drg_code
+      description: >
+        The DRG code selected from the earliest claim in the encounter where this field is populated.
+    - name: diagnosis_code_1
+      description: >
+        The primary diagnosis code selected from the earliest claim in the encounter where this field is populated.
+    - name: admit_type_code
+      description: >
+        The admit type code selected from the earliest claim in the encounter where this field is populated.
+    - name: admit_source_code
+      description: >
+        The admit source code selected from the earliest claim in the encounter where this field is populated.
+    - name: discharge_disposition_code
+      description: >
+        The discharge disposition code selected from the latest claim in the encounter where this field is populated.
+    - name: facility_npi
+      description: >
+        The facility NPI selected from the earliest claim in the encounter where this field is populated.
+    - name: rendering_npi
+      description: >
+        The rendering NPI selected from the earliest claim in the encounter where this field is populated.
+    - name: institutional_paid_amount
+      description: >
+        The total paid amount coming from institutional claims for the encounter.
+    - name: dq_problem
+      description: >
+        0 or 1 flag. It is = 1 iff any of the following data quality flags are 0:
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code,
+        usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of drg_code for the encounter.
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of diagnosis_code_1 for the encounter.
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_type_code for the encounter.
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_source_code for the encounter.
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of discharge_disposition_code for the encounter.
+    - name: usable_facility_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff for at least one claim in the encounter, 
+        the facility_npi is populated for at least one claim line and unique across claim lines.
+    - name: usable_rendering_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff for at least one claim in the encounter, 
+        the rendering_npi is populated for at least one claim line and unique across claim lines.
+    - name: single_claim_encounter
+      description: >
+        0 or 1 flag. Has value of 1 iff the encounter is made up of a single acute inpatient institutional claim.
+    - name: multi_claim_encounter
+      description: >
+        0 or 1 flag. Has value of 1 iff the encounter is made up of multiple acute inpatient institutional claims.
+    - name: has_professional_claims
+      description: >
+        0 or 1 flag. Has value of 1 iff there are professional claims that roll up to the encounter.
+    - name: professional_paid_amount
+      description: >
+        The total paid amount coming from professional claims for the encounter.
+    - name: total_paid_amount
+      description: >
+        The total paid amount for the encounter (from institutional + professional claims). 
+        This field is equal to institutional_paid_amount + professional_paid_amount.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_encounters_institutional_definition
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_encounters_institutional_definition
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows all acute inpatient encounters as defined by institutional claims with the key fields for each of these encounters 
+      that we can get from institutional claims. This includes both single-claim encounters and multi-claim encounters.
+      Here we select only claims from the aip_single_claim_encounter table that have usable_for_aip_encounter = 1.
+  columns:
+    - name: person_id
+      description: The person_id associated with the encounter.
+    - name: encounter_id
+      description: The unique identifier for the encounter.
+    - name: encounter_start_date
+      description: >
+        The earliest merge_start_date across all claims making up the encounter.
+    - name: encounter_end_date
+      description: >
+        The latest merge_end_date across all claims making up the encounter.
+    - name: drg_code
+      description: >
+        The DRG code selected from the earliest claim in the encounter where this field is populated.
+    - name: diagnosis_code_1
+      description: >
+        The primary diagnosis code selected from the earliest claim in the encounter where this field is populated.
+    - name: admit_type_code
+      description: >
+        The admit type code selected from the earliest claim in the encounter where this field is populated.
+    - name: admit_source_code
+      description: >
+        The admit source code selected from the earliest claim in the encounter where this field is populated.
+    - name: discharge_disposition_code
+      description: >
+        The discharge disposition code selected from the latest claim in the encounter where this field is populated.
+    - name: facility_npi
+      description: >
+        The facility NPI selected from the earliest claim in the encounter where this field is populated.
+    - name: rendering_npi
+      description: >
+        The rendering NPI selected from the earliest claim in the encounter where this field is populated.
+    - name: paid_amount
+      description: >
+        The total paid amount coming from institutional claims for the entire encounter.
+    - name: dq_problem
+      description: >
+        0 or 1 flag. Has value of 1 iff any of the following data quality flags are 0:
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
+        usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of drg_code for the encounter.
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of diagnosis_code_1 for the encounter.
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_type_code for the encounter.
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_source_code for the encounter.
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of discharge_disposition_code for the encounter.
+    - name: usable_facility_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff for at least one claim in the encounter, 
+        the facility_npi is populated for at least one claim line and unique across claim lines.
+    - name: usable_rendering_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff for at least one claim in the encounter, 
+        the rendering_npi is populated for at least one claim line and unique across claim lines.
+    - name: single_claim_encounter
+      description: >
+        0 or 1 flag. Has value of 1 iff the encounter is made up of a single acute inpatient institutional claim.
+    - name: multi_claim_encounter
+      description: >
+        0 or 1 flag. Has value of 1 iff the encounter is made up of multiple acute inpatient institutional claims.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_inst_claims_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_inst_claims_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table summarizes interesting things about acute inpatient institutional claims.
+
+- name: data_quality__aip_multiple_claim_encounter_dq_flags
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounter_dq_flags
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows data quality flags for encounters that are made up of multiple claims. These flags indicate when the multiple claims 
+      forming the same encounter have inconsistent values for fields that should be consistent at the encounter level: drg_code, 
+      diagnosis_code_1, admit_type_code, admit_source_code, discharge_disposition_code, facility_npi, and rendering_npi.
+  columns:
+    - name: person_id
+      description: The person_id associated with the encounter.
+    - name: encounter_id
+      description: The unique identifier for the encounter.
+    - name: dq_problem
+      description: >
+        0 or 1 flag. It is = 1 iff any of the following flags are 1, i.e., if the encounter has inconsistent values across its claims 
+        for any of the fields that should be consistent and unique for all claims making up the encounter.
+    - name: multiple_drg_code
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of drg_code across different claims making up the encounter.
+    - name: multiple_diagnosis_code_1
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of diagnosis_code_1 across different claims making up the encounter.
+    - name: multiple_admit_type_code
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of admit_type_code across different claims making up the encounter.
+    - name: multiple_admit_source_code
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of admit_source_code across different claims making up the encounter.
+    - name: multiple_discharge_disposition_code
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of discharge_disposition_code across different claims making up the encounter.
+    - name: multiple_facility_npi
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of facility_npi across different claims making up the encounter.
+    - name: multiple_rendering_npi
+      description: >
+        0 or 1 flag. It is = 1 iff there are multiple values of rendering_npi across different claims making up the encounter.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_multiple_claim_encounter_fields
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounter_fields
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows, for each acute inpatient encounter composed of multiple claims (i.e., for each encounter made from the claims 
+      in the table aip_multiple_claim_encounters), the values of the following fields for the encounter: drg_code, 
+      diagnosis_code_1, admit_type_code, admit_source_code, discharge_disposition_code, facility_npi, and rendering_npi.
+
+      When an encounter is composed of multiple claims, we order those claims chronologically (order by merge_start_date, merge_end_date, claim_id) 
+      and use the earliest claim with the populated field of interest to pick the field value for the encounter. We do this for these fields:
+      drg_code, diagnosis_code_1, admit_type_code, admit_source_code, facility_npi, rendering_npi.
+      To select the discharge_disposition_code for the encounter, we order the claims in descending chronological order 
+      (order by merge_end_date, merge_start_date, claim_id desc) and use the latest claim with a populated discharge_disposition_code 
+      to pick the value of discharge_disposition_code for the encounter.
+  columns:
+    - name: person_id
+      description: The person_id associated with the encounter.
+    - name: encounter_id
+      description: The unique identifier for the encounter.
+    - name: encounter_start_date
+      description: >
+        The earliest merge_start_date across all claims making up the encounter.
+    - name: encounter_end_date
+      description: >
+        The latest merge_end_date across all claims making up the encounter.
+    - name: drg_code
+      description: >
+        The DRG code selected from the earliest claim in the encounter where this field is populated.
+    - name: diagnosis_code_1
+      description: >
+        The primary diagnosis code selected from the earliest claim in the encounter where this field is populated.
+    - name: admit_type_code
+      description: >
+        The admit type code selected from the earliest claim in the encounter where this field is populated.
+    - name: admit_source_code
+      description: >
+        The admit source code selected from the earliest claim in the encounter where this field is populated.
+    - name: discharge_disposition_code
+      description: >
+        The discharge disposition code selected from the latest claim in the encounter where this field is populated.
+    - name: facility_npi
+      description: >
+        The facility NPI selected from the earliest claim in the encounter where this field is populated.
+    - name: rendering_npi
+      description: >
+        The rendering NPI selected from the earliest claim in the encounter where this field is populated.
+    - name: paid_amount
+      description: >
+        The total paid amount coming from institutional claims for the entire encounter.
+    - name: dq_problem
+      description: >
+        0 or 1 flag. Has value of 1 iff any of the following data quality flags are 0:
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code,
+        usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of drg_code for the encounter.
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of diagnosis_code_1 for the encounter.
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_type_code for the encounter.
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_source_code for the encounter.
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of discharge_disposition_code for the encounter.
+    - name: usable_facility_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff for at least one claim in the encounter,
+        the facility_npi is populated for at least one claim line and unique across claim lines.
+    - name: usable_rendering_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff for at least one claim in the encounter,
+        the rendering_npi is populated for at least one claim line and unique across claim lines.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_multiple_claim_encounters_dq_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounters_dq_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows a summary of data quality problems specific to acute inpatient encounters made up of multiple acute inpatient institutional claims. 
+      When an encounter is made up of multiple acute inpatient institutional claims, it is possible for those claims to have different values for fields 
+      that should be unique to the encounter: DRG, diagnosis_code_1, admit_type_code, admit_source_code, discharge_disposition_code, facility_npi, and rendering_npi.
+      
+      The table aip_multiple_claim_encounter_fields constructs acute inpatient encounters that are made up of multiple acute inpatient institutional claims 
+      (using logic specified in that dbt model to pick unique values of the relevant fields from the multiple claims that make up the encounter). 
+      This table reports on how often these relevant fields have different values across different institutional claims making up an encounter.
+
+- name: data_quality__aip_multiple_claim_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_multiple_claim_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists claims from the acute_inpatient_institutional_claims table that are part of multiple claim encounters 
+      (i.e., claims that merge with other claims to form acute inpatient encounters). We also add a flag called 
+      part_of_multi_claim_encounter = 1 to all rows. Note that for a claim to be part of an encounter (i.e., for a claim 
+      to be in the table aip_encounter_id) it must have usable_for_aip_encounter = 1. Therefore, all claims in this table 
+      have usable_for_aip_encounter = 1.
+  columns:
+    - name: person_id
+      description: The person_id associated with the claim.
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: encounter_id
+      description: The encounter_id assigned to the single claim encounter.
+    - name: merge_start_date
+      description: The start date of the merge period for this claim.
+    - name: merge_end_date
+      description: The end date of the merge period for this claim.
+    - name: drg_code
+      description: The DRG code assigned to this claim.
+    - name: diagnosis_code_1
+      description: The primary diagnosis code for this claim.
+    - name: admit_type_code
+      description: The admit type code for this claim.
+    - name: admit_source_code
+      description: The admit source code for this claim.
+    - name: discharge_disposition_code
+      description: The discharge disposition code for this claim.
+    - name: facility_npi
+      description: The facility NPI associated with this claim.
+    - name: rendering_npi
+      description: The rendering NPI associated with this claim.
+    - name: paid_amount
+      description: The total paid amount for this claim.
+    
+    - name: usable_for_aip_encounter
+      description: >
+        An acute IP claim is usable for defining encounters if it has a usable_person_id = 1 and usable_merge_dates = 1.
+    - name: dq_problem
+      description: >
+        0 or 1 flag. 1 iff any of the following data quality flags are 0:
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
+        usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of drg_code for the claim 
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines. 
+        By construction, all claims in this table have usable_person_id = 1.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. Has value of 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date. By construction, all claims in this table have usable_merge_dates = 1.
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of diagnosis_code_1 for the claim 
+        (unique_diagnosis_code_1 = 1 or determinable_diagnosis_code_1 = 1).
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_type_code for the claim 
+        (unique_admit_type_code = 1 or determinable_admit_type_code = 1).
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_source_code for the claim 
+        (unique_admit_source_code = 1 or determinable_admit_source_code = 1).
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of discharge_disposition_code for the claim 
+        (unique_discharge_disposition_code = 1 or determinable_discharge_disposition_code = 1).
+    - name: usable_facility_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff the facility_npi is populated for at least one claim line and unique across claim lines.
+    - name: usable_rendering_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff the rendering_npi is populated for at least one claim line and unique across claim lines.
+    - name: part_of_multi_claim_encounter
+      description: >
+        This has a value of 1 for every row on this table because by definition all claims on this table are claims that merge 
+        with other claims to form an encounter.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_single_claim_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_single_claim_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists claims from the acute_inpatient_institutional_claims table that are single claim encounters 
+      (i.e., claims that do not merge with other claims to form acute inpatient encounters). We also add a flag called 
+      part_of_multi_claim_encounter = 0 to all rows. Note that for a claim to be part of an encounter (i.e., for a claim 
+      to be in the table aip_encounter_id) it must have usable_for_aip_encounter = 1. Therefore, all claims in this table 
+      have usable_for_aip_encounter = 1.
+  columns:
+    - name: person_id
+      description: The person_id associated with the claim.
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: encounter_id
+      description: The encounter_id assigned to the single claim encounter.
+    - name: merge_start_date
+      description: The start date of the merge period for this claim.
+    - name: merge_end_date
+      description: The end date of the merge period for this claim.
+    - name: drg_code
+      description: The DRG code assigned to this claim.
+    - name: diagnosis_code_1
+      description: The primary diagnosis code for this claim.
+    - name: admit_type_code
+      description: The admit type code for this claim.
+    - name: admit_source_code
+      description: The admit source code for this claim.
+    - name: discharge_disposition_code
+      description: The discharge disposition code for this claim.
+    - name: facility_npi
+      description: The facility NPI associated with this claim.
+    - name: rendering_npi
+      description: The rendering NPI associated with this claim.
+    - name: paid_amount
+      description: The total paid amount for this claim.
+
+
+    - name: usable_for_aip_encounter
+      description: >
+        An acute IP claim is usable for defining encounters if it has a usable_person_id = 1 and usable_merge_dates = 1.
+    - name: dq_problem
+      description: >
+        0 or 1 flag. 1 iff any of the following data quality flags are 0:
+        usable_person_id, usable_merge_dates, usable_diagnosis_code_1, usable_admit_type_code, 
+        usable_admit_source_code, usable_discharge_disposition_code, usable_facility_npi, usable_rendering_npi.
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines. 
+        By construction, all claims in this table have usable_person_id = 1.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. Has value of 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date. By construction, all claims in this table have usable_merge_dates = 1.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of drg_code for the claim 
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of diagnosis_code_1 for the claim 
+        (unique_diagnosis_code_1 = 1 or determinable_diagnosis_code_1 = 1).
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_type_code for the claim 
+        (unique_admit_type_code = 1 or determinable_admit_type_code = 1).
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of admit_source_code for the claim 
+        (unique_admit_source_code = 1 or determinable_admit_source_code = 1).
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is a usable value of discharge_disposition_code for the claim 
+        (unique_discharge_disposition_code = 1 or determinable_discharge_disposition_code = 1).
+    - name: usable_facility_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff the facility_npi is populated for at least one claim line and unique across claim lines.
+    - name: usable_rendering_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff the rendering_npi is populated for at least one claim line and unique across claim lines.
+    - name: part_of_multi_claim_encounter
+      description: >
+        This has a value of 0 for every row on this table because by definition all claims on this table are claims that do not merge 
+        with other claims to form an encounter.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_venn_diagram
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_venn_diagram
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that meet at least one of the 3 requirements that may be used to classify a claim as an acute inpatient claim 
+      (the DRG requirement, the bill type requirement, and the room & board requirement). That is, this table lists the union of all distinct 
+      claims that are in one of these 3 previous models: 'bill', 'drg', 'rb_claims'. For each claim, there are flags that indicate what requirements 
+      that claim meets.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: rb
+      description: >
+        0 or 1 flag. Indicates if the claim meets the room & board requirement: at least one 'basic' Room & Board rev code. 
+        Here is where we enforce the logic that for a claim to meet the room & board requirement, it must have at least one 'basic' Room & Board rev code.
+    - name: drg
+      description: >
+        0 or 1 flag. Indicates if the claim meets the DRG requirement: it has a usable DRG.
+    - name: bill
+      description: >
+        0 or 1 flag. Indicates if the claim meets the bill type requirement: it has a usable bill_type_code starting with '11' or '12'.
+    - name: rb_drg
+      description: >
+        0 or 1 flag. Indicates if the claim meets both the room & board and the DRG requirements.
+    - name: rb_bill
+      description: >
+        0 or 1 flag. Indicates if the claim meets both the room & board and the bill type requirement.
+    - name: drg_bill
+      description: >
+        0 or 1 flag. Indicates if the claim meets both the DRG and the bill type requirements.
+    - name: rb_drg_bill
+      description: >
+        0 or 1 flag. Indicates if the claim meets the room & board, the DRG, and the bill type requirements.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__aip_venn_diagram_key_areas
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_venn_diagram_key_areas
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table shows the number and percent of claims in each key area of the Venn diagram.
+
+- name: data_quality__aip_venn_diagram_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: aip_venn_diagram_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+      If we draw a Venn diagram of the 3 requirements that may be relevant to tag institutional claims as 'acute inpatient' claims, 
+      we get a Venn diagram of 3 intersecting sets, yielding 2^3 distinct areas. This table tells us how many claims fall into each 
+      of those areas (with the exception of the null set: the number of claims that don't meet any of the 3 requirements).
+
+      So this table always has exactly 7 rows:
+      - rb
+      - drg
+      - bill
+      - rb_drg
+      - rb_bill
+      - drg_bill
+      - rb_drg_bill
+      with each of those rows telling us exactly how many claims fall into each of the 7 relevant areas.
+  columns:
+    - name: index
+      description: The index identifying the specific area in the Venn diagram.
+    - name: venn_section
+      description: >
+        The section of the Venn diagram corresponding to one of the 7 relevant areas (e.g., rb, drg, bill, etc.).
+    - name: claims
+      description: The number of claims that fall into the corresponding Venn section.
+    - name: percent_of_institutional_claims
+      description: >
+        The percentage of institutional claims that fall into the corresponding Venn section.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__all_line_level_room_and_board_rev_codes
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: all_line_level_room_and_board_rev_codes
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all distinct room & board revenue codes on claims. The table has one row per distinct revenue_center_code 
+      (per claim present in the input layer medical_claim table) that is between '0100' and '0219' or between '1000' and '1002'. 
+      These ranges are considered "Room & Board" codes, but there may be codes in that range that are invalid according to terminology, 
+      which is why the valid_revenue_center_code flag is included. Each valid revenue center code in these ranges must fall into one of 
+      the following categories: 'basic', 'hospice', 'leave of absence', or 'behavioral'. A claim meets the "Room & Board Requirement" 
+      if it has at least one valid revenue_center_code of the 'basic' type, as enforced in the aip_venn_diagram table.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: revenue_center_code
+      description: A distinct revenue_center_code present on the claim.
+    - name: valid_revenue_center_code
+      description: >
+        0 or 1 flag. Indicates if the revenue_center_code is a valid code from terminology.
+    - name: basic
+      description: >
+        0 or 1 flag. Indicates if the rev code is a 'basic' code.
+    - name: hospice
+      description: >
+        0 or 1 flag. Indicates if the rev code is a 'hospice' code.
+    - name: loa
+      description: >
+        0 or 1 flag. Indicates if the rev code is a 'leave of absence' code.
+    - name: behavioral
+      description: >
+        0 or 1 flag. Indicates if the rev code is a 'behavioral' code.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__all_prof_aip_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: all_prof_aip_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table shows all acute inpatient professional claims with relevant fields.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: person_id
+      description: The person_id for this claim.
+    - name: paid_amount
+      description: >
+        The total paid amount for lines on the claim with place_of_service = '21'.
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+    - name: merge_start_date
+      description: The merge_start_date for this claim.
+    - name: merge_end_date
+      description: The merge_end_date for this claim.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: usable_prof_claim
+      description: >
+        0 or 1 flag. Has value of 1 iff usable_person_id = 1 and usable_merge_dates = 1.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__all_prof_aip_claims_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: all_prof_aip_claims_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table shows a summary of the data quality problems of all acute inpatient professional claims. 
+
+- name: data_quality__assigned_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all claims that have a:
+      - determinable admit_source_code
+      - undeterminable admit_source_code
+      - unique admit_source_code
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_source_code
+      description: >
+        This field is populated only for claims with a 'determinable' or 'unique' admit_source_code. For claims with an 'undeterminable' admit_source_code this field is null 
+        because we do not assign an admit_source_code to those claims.
+    - name: assignment_method
+      description: > 
+        This is always either 'determinable', 'undeterminable', or 'unique'. When it takes the value 'undeterminable', that means that we cannot assign an admit_source_code 
+        to the claim, so the admit_source_code field will be null.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__assigned_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+      This table lists all claims that have a:
+      - determinable admit_type_code
+      - undeterminable admit_type_code
+      - unique admit_type_code
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_type_code
+      description: >
+        This field is populated only for claims with a 'determinable' or 'unique' admit_type_code. For claims with an 'undeterminable' admit_type_code this field is null 
+        because we do not assign an admit_type_code to those claims.
+    - name: assignment_method
+      description: > 
+        This is always either 'determinable', 'undeterminable', or 'unique'. When it takes the value 'undeterminable', that means that we cannot assign an admit_type_code 
+        to the claim, so the admit_type_code field will be null.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__assigned_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all claims that have a:
+      - determinable bill_type_code
+      - undeterminable bill_type_code
+      - unique bill_type_code
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: bill_type_code
+      description: >
+        This field is populated only for claims with a 'determinable' or 'unique' bill_type_code. For claims with an 'undeterminable' bill_type_code this field is null 
+        because we do not assign a bill_type_code to those claims.
+    - name: assignment_method
+      description: > 
+        This is always either 'determinable', 'undeterminable', or 'unique'. When it takes the value 'undeterminable', that means that we cannot assign a bill_type_code 
+        to the claim, so the bill_type_code field will be null.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__assigned_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+      This table lists all claims that have a:
+      - determinable diagnosis_code_1
+      - undeterminable diagnosis_code_1
+      - unique diagnosis_code_1
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: diagnosis_code_1
+      description: >
+        This field is populated only for claims with a 'determinable' or 'unique' diagnosis_code_1. 
+        For claims with an 'undeterminable' diagnosis_code_1, this field is null because we do not assign a discharge_disposition_code to those claims.
+    - name: assignment_method
+      description: >
+        This is always either 'determinable', 'undeterminable', or 'unique'. 
+        When it takes the value 'undeterminable', that means that we cannot assign a diagnosis_code_1 to the claim, 
+        so the diagnosis_code_1 field will be null.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__assigned_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+      This table lists all claims that have a:
+      - determinable discharge_disposition_code
+      - undeterminable discharge_disposition_code
+      - unique discharge_disposition_code
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: discharge_disposition_code
+      description: >
+        This field is populated only for claims with a 'determinable' or 'unique' discharge_disposition_code. 
+        For claims with an 'undeterminable' discharge_disposition_code, this field is null because we do not assign a discharge_disposition_code to those claims.
+    - name: assignment_method
+      description: >
+        This is always either 'determinable', 'undeterminable', or 'unique'. 
+        When it takes the value 'undeterminable', that means that we cannot assign a discharge_disposition_code to the claim, 
+        so the discharge_disposition_code field will be null.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__assigned_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: assigned_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+      This table lists all claims that have a:
+      - determinable drg_code
+      - undeterminable drg_code
+      - unique drg_code
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: drg_code
+      description: >
+        This field is populated only for claims with a 'determinable' or 'unique' drg_code. 
+        For claims with an 'undeterminable' drg_code, this field is null because we do not assign a drg_code to those claims.
+    - name: assignment_method
+      description: >
+        This is always either 'determinable', 'undeterminable', or 'unique'. 
+        When it takes the value 'undeterminable', that means that we cannot assign a drg_code to the claim, 
+        so the drg_code field will be null.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer eligibility, medical_claim and pharmacy_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+
+- name: data_quality__bill
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: bill
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims with a usable inpatient bill type. There is one row per distinct claim_id that has a 
+      usable bill_type_code that starts with '11' or '12'.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__bill_type_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: bill_type_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table summarizes how bill_type_code looks for all claims. The table is at the claim grain, meaning there is one row 
+      for each unique claim_id in the medical_claim table. For each claim_id, several flags describe the state of the bill_type_code 
+      field for that claim, as well as the assigned_bill_type_code, which is the value of bill_type_code we should use for this claim 
+      for any analytics purposes. If the assigned_bill_type_code field is null for a claim, this means there is no usable value of 
+      bill_type_code for the claim.
+  columns:
+    - name: claim_id
+      description: >
+        The claim_id given in the input layer. This is a PK on this table because there is one row per claim_id. 
+        Every claim_id present in the input layer should be present on this table.
+    - name: missing_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing bill_type_code, i.e., if the bill_type_code is null for every line on the claim.
+    - name: always_invalid_bill_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null bill_type_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_bill_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of bill_type_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_bill_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of bill_type_code on the claim is a valid value from terminology.
+    - name: unique_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of bill_type_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of bill_type_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of bill_type_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_bill_type_code = 1 or determinable_bill_type_code = 1.
+    - name: assigned_bill_type_code
+      description: >
+        The assigned value of bill_type_code for the claim. This field will only be populated when usable_bill_type_code = 1. 
+        If this field is not populated it means that there is no usable value of bill_type_code for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__calculated_claim_type_detailed_breakdown
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: calculated_claim_type_detailed_breakdown
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    This table shows a more detailed breakdown of how often claims with different calculated claim types have professional and institutional 
+    fields populated and when they have valid values for professional and institutional fields. The table gives a count of distinct claims for 
+    each value of the tuple: (calculated_claim_type, has_institutional_fields, has_valid_institutional_fields, has_professional_fields, 
+    has_valid_professional_fields). This allows us to see at a glance things like, for example, when there are:
+    - claims that are determined to be institutional but have professional fields populated
+    - claims that are determined to be institutional but have no valid institutional fields from terminology
+    - claims that are determined to be professional but have no valid professional fields from terminology
+  columns:
+    - name: calculated_claim_type
+      description: Is always either 'professional', 'institutional', or 'undetermined'.
+    - name: total_claims
+      description: Gives the total count of claims with this calculated claim type.
+    - name: percent_of_claims
+      description: Gives the percent of claims with this calculated claim type.
+    - name: has_institutional_fields
+      description: > 
+        0 or 1 flag. Has value of 1 iff at least one claim line has an institutional field, i.e. if at least one claim line has at least one of these 7 
+        fields populated: bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code.
+    - name: has_valid_institutional_fields
+      description: >
+        0 or 1 flag. Has value of 1 iff at least one claim line has a valid institutional field, i.e. if at least one claim line has at least one of these 7 
+        fields populated with a valid value from terminology: bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code.
+    - name: has_professional_fields
+      description: 0 or 1 flag. Has value of 1 iff at least one claim line has a professional field, i.e. if at least one claim line has a populated place_of_service_code.
+    - name: has_valid_professional_fields
+      description: 0 or 1 flag. Has value of 1 iff at least one claim line has a valid professional field, i.e. if at least one claim line has a valid place_of_service_code from terminology.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__calculated_claim_type_percentages
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: calculated_claim_type_percentages
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table shows how frequently each calculated claim type occurs in the dataset.
+  columns:
+    - name: calculated_claim_type
+      description: Is always either 'professional', 'institutional', or 'undetermined'
+    - name: total_claims
+      description: Gives the total count of claims with this calculated claim type.
+    - name: percent_of_claims
+      description: Gives the percent of claims with this calculated claim type.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__claim_dates
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: claim_dates
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    The purpose of this table is to list all relevant dates for medical claims: 
+    claim_start_date, claim_end_date, admission_date, discharge_date, claim_line_start_date, and claim_line_end_date. 
+    The table is at the claim line grain, so there is one row in this table for each line in the input layer medical claim table. 
+    Dates that are not valid (i.e. not from the calendar table) are replaced by null values in this table.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: claim_line_number
+      description: The claim_line_number given in the input layer.
+    - name: claim_start_date
+      description: The claim_start_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_end_date
+      description: The claim_end_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: admission_date
+      description: The admission_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: discharge_date
+      description: The discharge_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_line_start_date
+      description: The claim_line_start_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: claim_line_end_date
+      description: The claim_line_end_date for this claim line. It is either valid (i.e. from the calendar table) or null.
+    - name: merge_start_date
+      description: >
+        The merge_start_date for this claim, calculated as the earliest valid date among
+        admission_date, claim_start_date, or claim_line_start_date. It is either valid or null.
+    - name: merge_end_date
+      description: >
+        The merge_end_date for this claim, calculated as the latest valid date among
+        discharge_date, claim_end_date, or claim_line_end_date. It is either valid or null.
+    - name: merge_start_date_after_merge_end_date
+      description: 0 or 1 flag. Has value of 1 if the merge_start_date is greater than the merge_end_date.
+    - name: usable_merge_dates
+      description: 0 or 1 flag. Has value of 1 if both merge_start_date and merge_end_date are valid and merge_start_date <= merge_end_date.
+    - name: dx_date
+      description: >
+        The date assigned to diagnosis codes for this claim, calculated as the latest valid date among
+        claim_end_date, claim_start_date, discharge_date, admission_date, claim_line_end_date, or claim_line_start_date.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__claim_grain_calculated_dates
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: claim_grain_calculated_dates
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This model lists useful calculated dates at the claim grain. The table contains one row per claim_id 
+      and includes calculated start and end dates for potential claim merging and diagnosis date assignment.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: merge_start_date
+      description: >
+        The merge_start_date for this claim, calculated as the earliest valid date among 
+        admission_date, claim_start_date, or claim_line_start_date. It is either valid or null.
+    - name: merge_end_date
+      description: >
+        The merge_end_date for this claim, calculated as the latest valid date among 
+        discharge_date, claim_end_date, or claim_line_end_date. It is either valid or null.
+    - name: merge_start_date_after_merge_end_date
+      description: 0 or 1 flag. Has value of 1 if the merge_start_date is greater than the merge_end_date.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: dx_date
+      description: The date we assign to diagnosis codes present on this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__claim_type
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: claim_type
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table determines the claim type for each claim based on other fields. It uses logic to categorize claims as
+    either institutional or professional based on the presence of specific fields and their values.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: calculated_claim_type
+      description: The claim type calculated using other fields. It is always either 'institutional', 'professional', or 'undetermined'.
+    - name: has_institutional_fields
+      description: >
+        0 or 1 flag. Has value of 1 iff at least one of these 7 fields is populated (not null) for at least one line in the claim; 
+        bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code.
+    - name: has_valid_institutional_fields
+      description: >
+        0 or 1 flag. Has value of 1 iff at least one of these 7 fields is populated with a valid value from terminology for at least one line on the claim; 
+        bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code.
+    - name: has_professional_fields
+      description: 0 or 1 flag. Has value of 1 if the claim has at least one populated professional-specific field.
+    - name: has_valid_professional_fields
+      description: 0 or 1 flag. Has value of 1 if the claim has at least one valid professional-specific field.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__data_marts_populating
+  config: 
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: data_marts_populating
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table counts the number of rows in the data marts final tables that are populated by the data model.
+  columns:
+    - name: data_mart
+      description: The name of the data mart.
+    - name: table_name
+      description: The name of the table in the data mart.
+    - name: row_count
+      description: The number of rows in the table.
+
+- name: data_quality__determinable_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "determinable" admit_source_code.
+      Definition: A claim is said to have a "determinable" admit_source_code if it has more than one valid admit_source_code 
+      and there is a valid admit_source_code that occurs more frequently than any other valid admit_source_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_source_code_1
+      description: The most commonly occurring admit_source_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times admit_source_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have admit_source_code_1.
+    - name: admit_source_code_2
+      description: The second most commonly occurring admit_source_code on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times admit_source_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have admit_source_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__determinable_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "determinable" admit_type_code.
+      Definition: A claim is said to have a "determinable" admit_type_code if it has more than one valid admit_type_code 
+      and there is a valid admit_type_code that occurs more frequently than any other valid admit_type_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_type_code_1
+      description: The most commonly occurring admit_type_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times admit_type_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have admit_type_code_1.
+    - name: admit_type_code_2
+      description: The second most commonly occurring admit_type_code on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times admit_type_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have admit_type_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__determinable_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all claims that have a "determinable" bill_type_code.
+    Definition: A claim is said to have a "determinable" bill_type_code if it has more than one valid bill_type_code and there is a valid bill_type_code 
+    that occurs more frequently than any other valid bill_type_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: bill_type_code_1
+      description: The most commonly occurring bill_type_code on the claim
+    - name: occurrences_1
+      description: The number of times bill_type_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have bill_type_code_1
+    - name: bill_type_code_2
+      description: The second most commonly occurring bill_type_code on the claim
+    - name: occurrences_2
+      description: The number of times bill_type_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have bill_type_code_2
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__determinable_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "determinable" diagnosis_code_1.
+      Definition: A claim is said to have a "determinable" diagnosis_code_1 if it has more than one valid diagnosis_code_1 
+      and there is a valid diagnosis_code_1 that occurs more frequently than any other valid diagnosis_code_1 on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: diagnosis_code_1_1
+      description: The most commonly occurring diagnosis_code_1 on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times diagnosis_code_1_1 occurs on the claim, i.e., the number of claim lines on the claim that have diagnosis_code_1_1.
+    - name: diagnosis_code_1_2
+      description: The second most commonly occurring diagnosis_code_1 on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times diagnosis_code_1_2 occurs on the claim, i.e., the number of claim lines on the claim that have diagnosis_code_1_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__determinable_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "determinable" discharge_disposition_code.
+      Definition: A claim is said to have a "determinable" discharge_disposition_code if it has more than one valid discharge_disposition_code 
+      and there is a valid discharge_disposition_code that occurs more frequently than any other valid discharge_disposition_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: discharge_disposition_code_1
+      description: The most commonly occurring discharge_disposition_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times discharge_disposition_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have discharge_disposition_code_1.
+    - name: discharge_disposition_code_2
+      description: The second most commonly occurring discharge_disposition_code on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times discharge_disposition_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have discharge_disposition_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__determinable_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: determinable_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "determinable" drg_code.
+      Definition: A claim is said to have a "determinable" drg_code if it has more than one valid drg_code 
+      and there is a valid drg_code that occurs more frequently than any other valid drg_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: drg_code_1
+      description: The most commonly occurring drg_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times drg_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have drg_code_1.
+    - name: drg_code_2
+      description: The second most commonly occurring drg_code on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times drg_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have drg_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__diagnosis_code_1_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: diagnosis_code_1_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table summarizes how diagnosis_code_1 looks for all claims. The table is at the claim grain, meaning there is one row 
+      for each unique claim_id in the medical_claim table. For each claim_id, several flags describe the state of the diagnosis_code_1 
+      field for that claim, as well as the assigned_diagnosis_code_1, which is the value of diagnosis_code_1 we should use for this claim 
+      for any analytics purposes. If the assigned_diagnosis_code_1 field is null for a claim, this means there is no usable value of 
+      diagnosis_code_1 for the claim.
+  columns:
+    - name: claim_id
+      description: >
+        The claim_id given in the input layer. This is a PK on this table because there is one row per claim_id. 
+        Every claim_id present in the input layer should be present on this table.
+    - name: missing_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing diagnosis_code_1, i.e., if the diagnosis_code_1 is null for every line on the claim.
+    - name: always_invalid_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null diagnosis_code_1 on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of diagnosis_code_1 on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of diagnosis_code_1 on the claim is a valid value from terminology.
+    - name: unique_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of diagnosis_code_1 on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of diagnosis_code_1 on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of diagnosis_code_1 on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_diagnosis_code_1 = 1 or determinable_diagnosis_code_1 = 1.
+    - name: assigned_diagnosis_code_1
+      description: >
+        The assigned value of diagnosis_code_1 for the claim. This field will only be populated when usable_diagnosis_code_1 = 1. 
+        If this field is not populated it means that there is no usable value of diagnosis_code_1 for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__discharge_disposition_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: discharge_disposition_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table summarizes how discharge_disposition_code looks for all claims. The table is at the claim grain, meaning there is one row 
+      for each unique claim_id in the medical_claim table. For each claim_id, several flags describe the state of the discharge_disposition_code 
+      field for that claim, as well as the assigned_discharge_disposition_code, which is the value of discharge_disposition_code we should use 
+      for this claim for any analytics purposes. If the assigned_discharge_disposition_code field is null for a claim, this means there is no 
+      usable value of discharge_disposition_code for the claim.
+  columns:
+    - name: claim_id
+      description: >
+        The claim_id given in the input layer. This is a PK on this table because there is one row per claim_id. 
+        Every claim_id present in the input layer should be present on this table.
+    - name: missing_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing discharge_disposition_code, i.e., if the discharge_disposition_code is null for every line on the claim.
+    - name: always_invalid_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null discharge_disposition_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of discharge_disposition_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of discharge_disposition_code on the claim is a valid value from terminology.
+    - name: unique_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of discharge_disposition_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of discharge_disposition_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of discharge_disposition_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_discharge_disposition_code = 1 or determinable_discharge_disposition_code = 1.
+    - name: assigned_discharge_disposition_code
+      description: >
+        The assigned value of discharge_disposition_code for the claim. This field will only be populated when usable_discharge_disposition_code = 1. 
+        If this field is not populated it means that there is no usable value of discharge_disposition_code for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__distinct_room_and_board_rev_codes_per_claim
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: distinct_room_and_board_rev_codes_per_claim
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows us how many claims have each occurring count of distinct room & board rev codes.
+      This model is useful to see how common it is for claims to have different numbers of distinct room and board rev codes.
+  columns:
+    - name: distinct_rev_code_count
+      description: >
+        Positive integer representing the number of distinct room & board rev codes a claim has.
+    - name: claim_count
+      description: >
+        Positive integer representing the number of distinct claims that have the rev code count given by the first column.
+    - name: claim_percent
+      description: >
+        Claim_count from the previous column * 100, divided by the number of claims that have at least one rev code 
+        between '0100' and '0219' or between '1000' and '1002'.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__drg
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: drg
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims with a usable DRG code. There is one row per distinct claim_id that has a usable DRG code 
+      (from terminology).
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__eligibility_atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: eligibility_atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer eligibility table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+    It is an intermediate table for building atomic_data_utility table.
+
+- name: data_quality__eligibility_atomic_data_utility_stage_01
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: eligibility_atomic_data_utility_stage_01
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    Intermediate table for building eligibility_atomic_data_utility table.
+
+- name: data_quality__eligibility_atomic_data_utility_stage_02
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: eligibility_atomic_data_utility_stage_02
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    Intermediate table for building eligibility_atomic_data_utility table.
+
+- name: data_quality__header_values
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: header_values
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists header-level fields for each claim (header fields for which we used the voting system to determine a value).
+      This table is at the claim grain. The table has one row for every unique claim_id in the input layer medical_claim table.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: calculated_claim_type
+      description: >
+        The claim type calculated using other fields. It is always either 'institutional', 'professional', or 'undetermined'.
+
+
+    - name: missing_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing bill_type_code, i.e., if the bill_type_code is null for every line on the claim.
+    - name: always_invalid_bill_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null bill_type_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_bill_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of bill_type_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_bill_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of bill_type_code on the claim is a valid value from terminology.
+    - name: unique_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of bill_type_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of bill_type_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of bill_type_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_bill_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_bill_type_code = 1 or determinable_bill_type_code = 1.
+    - name: assigned_bill_type_code
+      description: >
+        The assigned value of bill_type_code for the claim. This field will only be populated when usable_bill_type_code = 1. 
+        If this field is not populated it means that there is no usable value of bill_type_code for the claim.
+
+
+    - name: missing_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing drg_code, i.e., if the drg_code is null for every line on the claim.
+    - name: always_invalid_drg_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null drg_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_drg_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of drg_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_drg_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of drg_code on the claim is a valid value from terminology.
+    - name: unique_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of drg_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of drg_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of drg_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_drg_code = 1 or determinable_drg_code = 1.
+    - name: assigned_drg_code
+      description: >
+        The assigned value of drg_code for the claim. This field will only be populated when usable_drg_code = 1. 
+        If this field is not populated it means that there is no usable value of drg_code for the claim.
+
+        
+    - name: missing_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing admit_type_code, i.e., if the admit_type_code is null for every line on the claim.
+    - name: always_invalid_admit_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null admit_type_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_admit_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of admit_type_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_admit_type_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of admit_type_code on the claim is a valid value from terminology.
+    - name: unique_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of admit_type_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_type_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_type_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_admit_type_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_admit_type_code = 1 or determinable_admit_type_code = 1.
+    - name: assigned_admit_type_code
+      description: >
+        The assigned value of admit_type_code for the claim. This field will only be populated when usable_admit_type_code = 1. 
+        If this field is not populated it means that there is no usable value of admit_type_code for the claim.
+
+        
+    - name: missing_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing admit_source_code, i.e., if the admit_source_code is null for every line on the claim.
+    - name: always_invalid_admit_source_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null admit_source_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_admit_source_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of admit_source_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_admit_source_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of admit_source_code on the claim is a valid value from terminology.
+    - name: unique_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of admit_source_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_source_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of admit_source_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_admit_source_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_admit_source_code = 1 or determinable_admit_source_code = 1.
+    - name: assigned_admit_source_code
+      description: >
+        The assigned value of admit_source_code for the claim. This field will only be populated when usable_admit_source_code = 1. 
+        If this field is not populated it means that there is no usable value of admit_source_code for the claim.
+
+        
+    - name: missing_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing discharge_disposition_code, i.e., if the discharge_disposition_code is null for every line on the claim.
+    - name: always_invalid_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null discharge_disposition_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of discharge_disposition_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of discharge_disposition_code on the claim is a valid value from terminology.
+    - name: unique_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of discharge_disposition_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of discharge_disposition_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of discharge_disposition_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_discharge_disposition_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_discharge_disposition_code = 1 or determinable_discharge_disposition_code = 1.
+    - name: assigned_discharge_disposition_code
+      description: >
+        The assigned value of discharge_disposition_code for the claim. This field will only be populated when usable_discharge_disposition_code = 1. 
+        If this field is not populated it means that there is no usable value of discharge_disposition_code for the claim.
+
+        
+    - name: missing_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing diagnosis_code_1, i.e., if the diagnosis_code_1 is null for every line on the claim.
+    - name: always_invalid_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null diagnosis_code_1 on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of diagnosis_code_1 on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of diagnosis_code_1 on the claim is a valid value from terminology.
+    - name: unique_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of diagnosis_code_1 on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of diagnosis_code_1 on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of diagnosis_code_1 on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_diagnosis_code_1
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_diagnosis_code_1 = 1 or determinable_diagnosis_code_1 = 1.
+    - name: assigned_diagnosis_code_1
+      description: >
+        The assigned value of diagnosis_code_1 for the claim. This field will only be populated when usable_diagnosis_code_1 = 1. 
+        If this field is not populated it means that there is no usable value of diagnosis_code_1 for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__header_values_graph
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: header_values_graph
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: The purpose of this table is to show, for each header value, the percent of all institutional claims that fall in each of the categories.
+
+- name: data_quality__header_values_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: header_values_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show a subset of the header_values_graph table, namely the rows the correspond to the usable percentages of each header value. 
+      This is helpful just to visually see this more easily.
+
+- name: data_quality__how_often_each_admit_source_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_admit_source_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the (claim_id, admit_source_code) grain. Only claims that have at least one valid admit_source_code appear on this table. 
+      There is one row for each distinct valid admit_source_code that appears on each claim. The purpose of the table is to show how many times 
+      each distinct valid admit_source_code appears on each claim. This is useful for claims that have more than one valid admit_source_code because 
+      we can determine which of those, if any, appears more frequently than the others. Note that in theory a claim should have at most one 
+      admit_source_code, but as a result of data quality problems this may not be the case. This table helps explore situations where there is 
+      more than one valid admit_source_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_source_code
+      description: A distinct valid admit_source_code that appears on the claim.
+    - name: occurrences
+      description: The number of times this admit_source_code appears on the claim.
+    - name: ranking
+      description: >
+        Positive integer (1, 2, 3, 4, ...) that ranks admit_source_code from most commonly occurring to least commonly occurring, 
+        i.e., 1 = the most commonly occurring one on the claim, 2 = the second most commonly occurring one, etc.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__how_often_each_admit_type_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_admit_type_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the (claim_id, admit_type_code) grain. Only claims that have at least one valid admit_type_code appear on this table. 
+      There is one row for each distinct valid admit_type_code that appears on each claim. The purpose of the table is to show how many times 
+      each distinct valid admit_type_code appears on each claim. This is useful for claims that have more than one valid admit_type_code because 
+      we can determine which of those, if any, appears more frequently than the others. Note that in theory a claim should have at most one 
+      admit_type_code, but as a result of data quality problems this may not be the case. This table helps explore situations where there is 
+      more than one valid admit_type_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_type_code
+      description: A distinct valid admit_type_code that appears on the claim.
+    - name: occurrences
+      description: The number of times this admit_type_code appears on the claim.
+    - name: ranking
+      description: >
+        Positive integer (1, 2, 3, 4, ...) that ranks admit_type_code from most commonly occurring to least commonly occurring, 
+        i.e., 1 = the most commonly occurring one on the claim, 2 = the second most commonly occurring one, etc.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__how_often_each_bill_type_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_bill_type_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the (claim_id, bill_type_code) grain. Only claims that have at least one valid bill type_code appear on this table. There is one row for each 
+      distinct valid bill-type code that appears on each claim. The purpose of the table is to show how many times each distinct valid bill type code appears on each claim. 
+      This is useful for claims that have more than one valid bill_type_code because we can determine which of those, if any, appears more frequently than the others. 
+      Note that in theory a claim should have at most one bill-type-code, but as a result of data quality problems this may not be the case. 
+      This table helps explore situations where there is more than one valid bill type code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: bill_type_code
+      description: The value of bill_type_code that is populated for this claim line.
+    - name: occurrences
+      description: Number of times this bill_type_code appears on the claim
+    - name: ranking
+      description: Ranking of occurrence frequency (1 = most commonly occurring one on the claim, 2 = second most commonly occurring one, etc.)
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__how_often_each_diagnosis_code_1_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_diagnosis_code_1_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the (claim_id, diagnosis_code_1) grain. Only claims that have at least one valid diagnosis_code_1 appear on this table. 
+      There is one row for each distinct valid diagnosis_code_1 that appears on each claim. The purpose of the table is to show how many times 
+      each distinct valid diagnosis_code_1 appears on each claim. This is useful for claims that have more than one valid diagnosis_code_1 because 
+      we can determine which of those, if any, appears more frequently than the others. Note that in theory a claim should have at most one 
+      diagnosis_code_1, but as a result of data quality problems this may not be the case. This table helps explore situations where there is 
+      more than one valid diagnosis_code_1 per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: diagnosis_code_1
+      description: A distinct valid diagnosis_code_1 that appears on the claim.
+    - name: occurrences
+      description: The number of times this diagnosis_code_1 appears on the claim.
+    - name: ranking
+      description: >
+        Positive integer (1, 2, 3, 4, ...) that ranks diagnosis_code_1 from most commonly occurring to least commonly occurring, 
+        i.e., 1 = the most commonly occurring one on the claim, 2 = the second most commonly occurring one, etc.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__how_often_each_discharge_disposition_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_discharge_disposition_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the (claim_id, discharge_disposition_code) grain. Only claims that have at least one valid discharge_disposition_code appear on this table. 
+      There is one row for each distinct valid discharge_disposition_code that appears on each claim. The purpose of the table is to show how many times 
+      each distinct valid discharge_disposition_code appears on each claim. This is useful for claims that have more than one valid discharge_disposition_code because 
+      we can determine which of those, if any, appears more frequently than the others. Note that in theory a claim should have at most one 
+      discharge_disposition_code, but as a result of data quality problems this may not be the case. This table helps explore situations where there is 
+      more than one valid discharge_disposition_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: discharge_disposition_code
+      description: A distinct valid discharge_disposition_code that appears on the claim.
+    - name: occurrences
+      description: The number of times this discharge_disposition_code appears on the claim.
+    - name: ranking
+      description: >
+        Positive integer (1, 2, 3, 4, ...) that ranks discharge_disposition_code from most commonly occurring to least commonly occurring, 
+        i.e., 1 = the most commonly occurring one on the claim, 2 = the second most commonly occurring one, etc.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__how_often_each_drg_code_occurs
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: how_often_each_drg_code_occurs
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the (claim_id, drg_code) grain. Only claims that have at least one valid drg_code appear on this table. 
+      There is one row for each distinct valid drg_code that appears on each claim. The purpose of the table is to show how many times 
+      each distinct valid drg_code appears on each claim. This is useful for claims that have more than one valid drg_code because 
+      we can determine which of those, if any, appears more frequently than the others. Note that in theory a claim should have at most one 
+      drg_code, but as a result of data quality problems this may not be the case. This table helps explore situations where there is 
+      more than one valid drg_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: drg_code
+      description: A distinct valid drg_code that appears on the claim.
+    - name: occurrences
+      description: The number of times this drg_code appears on the claim.
+    - name: ranking
+      description: >
+        Positive integer (1, 2, 3, 4, ...) that ranks drg_code from most commonly occurring to least commonly occurring, 
+        i.e., 1 = the most commonly occurring one on the claim, 2 = the second most commonly occurring one, etc.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__line_grain
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: line_grain
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    The purpose of this table is to show if each claim line has institutional fields, valid institutional fields (i.e. from terminology), professional fields, 
+    and valid professional fields (i.e. from terminology). The table is at the claim line grain.
+  columns:
+  - name: claim_id
+    description: The unique identifier for the claim provided in the input layer.
+  - name: claim_line_number
+    description: The unique identifier for the claim line provided in the input layer.
+  - name: has_institutional_fields
+    description: >
+      A flag (0 or 1) indicating if at least one of the following fields is populated (not null) for this claim line: 
+      bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code.
+  - name: has_valid_institutional_fields
+    description: >
+      A flag (0 or 1) indicating if at least one of the following fields is populated with a valid value from terminology for this claim line: 
+      bill_type_code, drg_code, admit_type_code, admit_source_code, discharge_disposition_code, revenue_center_code.
+  - name: has_professional_fields
+    description: A flag (0 or 1) indicating if this claim line has a populated (not null) place_of_service_code.
+  - name: has_valid_professional_fields
+    description: A flag (0 or 1) indicating if this claim line has a valid place_of_service_code value from terminology.
+  - name: tuva_last_run
+    description: The date and timestamp of the dbt run.
+
+- name: data_quality__medical_claim_atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: medical_claim_atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer medical_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+    It is an intermediate table for building atomic_data_utility table.
+
+- name: data_quality__medical_claim_atomic_data_utility_stage_01
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: medical_claim_atomic_data_utility_stage_01
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    Intermediate table for building medical_claim_atomic_data_utility table.
+
+- name: data_quality__medical_claim_atomic_data_utility_stage_02
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: medical_claim_atomic_data_utility_stage_02
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    Intermediate table for building medical_claim_atomic_data_utility table.
+
+- name: data_quality__drg_code_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: drg_code_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table summarizes how drg_code looks for all claims. The table is at the claim grain, meaning there is one row 
+      for each unique claim_id in the medical_claim table. For each claim_id, several flags describe the state of the drg_code 
+      field for that claim, as well as the assigned_drg_code, which is the value of drg_code we should use for this claim 
+      for any analytics purposes. If the assigned_drg_code field is null for a claim, this means there is no usable value of 
+      drg_code for the claim.
+  columns:
+    - name: claim_id
+      description: >
+        The claim_id given in the input layer. This is a PK on this table because there is one row per claim_id. 
+        Every claim_id present in the input layer should be present on this table.
+    - name: missing_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim has a missing drg_code, i.e., if the drg_code is null for every line on the claim.
+    - name: always_invalid_drg_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null drg_code on the claim is invalid, i.e., not a valid value from terminology.
+    - name: valid_and_invalid_drg_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff there are both valid and invalid values of drg_code on different lines of the claim. 
+        Valid means that it is a value from terminology.
+    - name: always_valid_drg_code
+      description: >
+        0 or 1 flag. Has a value of 1 iff every non null value of drg_code on the claim is a valid value from terminology.
+    - name: unique_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there is only one valid value of drg_code on the claim. 
+        Valid means that it is a value from terminology.
+    - name: determinable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of drg_code on the claim, 
+        but there is one of them which occurs more frequently than the others.
+    - name: undeterminable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff there are more than one valid values of drg_code on the claim, 
+        but there is not one of them that occurs more frequently than the others.
+    - name: usable_drg_code
+      description: >
+        0 or 1 flag. Has value of 1 iff unique_drg_code = 1 or determinable_drg_code = 1.
+    - name: assigned_drg_code
+      description: >
+        The assigned value of drg_code for the claim. This field will only be populated when usable_drg_code = 1. 
+        If this field is not populated it means that there is no usable value of drg_code for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__other_header_values
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: other_header_values
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows other header values (for which we do not do a voting system to determine their value) for all claims. 
+      The table is at the claim grain. There is one row for every claim_id in the input layer medical_claim table.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: person_id
+      description: >
+        The person_id for this claim. This field is null if the person_id field is not usable (i.e., if usable_person_id = 0).
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+    - name: facility_npi
+      description: >
+        The facility_npi for this claim. This field is null if the facility_npi field is not usable (i.e., if usable_facility_npi = 0).
+    - name: usable_facility_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff the facility_npi is populated for at least one claim line and unique across claim lines.
+    - name: rendering_npi
+      description: >
+        The rendering_npi for this claim. This field is null if the rendering_npi field is not usable (i.e., if usable_rendering_npi = 0).
+    - name: usable_rendering_npi
+      description: >
+        0 or 1 flag. Has value of 1 iff the rendering_npi is populated for at least one claim line and unique across claim lines.
+    - name: paid_amount
+      description: The total paid amount for the claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pharmacy_claim_atomic_data_utility
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pharmacy_claim_atomic_data_utility
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+    The purpose of this table is to show how often key fields in the input layer pharmacy_claim table:
+    - are missing
+    - have invalid values
+    - have duplicate values (i.e. more than one distinct value per claim)
+    It is an intermediate table for building atomic_data_utility table.
+
+- name: data_quality__pk_at_input_layer_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_at_input_layer_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table just confirms whether each input layer table has a correct PK.
+
+- name: data_quality__pk_at_input_layer
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_at_input_layer
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table shows us the number of rows and the number of unique PK rows in each input layer table.
+
+- name: data_quality__pk_eligibility_trending
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_eligibility_trending
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show for each historic data refresh (i.e., for each ingest_datetime), 
+      whether the eligibility table has a correct primary key (PK).
+  columns:
+    - name: ingest_datetime
+      description: >
+        The datetime when a batch of data was ingested.
+    - name: eligibility_row_count
+      description: >
+        The count of rows in the eligibility table that were ingested in that ingest_datetime.
+    - name: eligibility_pk_count
+      description: >
+        The count of distinct values of the primary key (person_id, plan, enrollment_start_date, enrollment_end_date) 
+        in the eligibility table that were ingested in that ingest_datetime.
+    - name: correct_pk
+      description: |
+        This field is 'YES' when eligibility_row_count = eligibility_pk_count. 
+        This field is 'NO' when eligibility_row_count <> eligibility_pk_count.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pk_medical_claim_trending
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_medical_claim_trending
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show for each historic data refresh (i.e., for each ingest_datetime), 
+      whether the medical_claim table has a correct primary key (PK).
+  columns:
+    - name: ingest_datetime
+      description: >
+        The datetime when a batch of data was ingested.
+    - name: medical_claim_row_count
+      description: >
+        The count of rows in the medical_claim table that were ingested in that ingest_datetime.
+    - name: medical_claim_pk_count
+      description: >
+        The count of distinct values of the primary key (claim_id, claim_line_number) 
+        in the medical_claim table that were ingested in that ingest_datetime.
+    - name: correct_pk
+      description: |
+        This field is 'YES' when medical_claim_row_count = medical_claim_pk_count. 
+        This field is 'NO' when medical_claim_row_count <> medical_claim_pk_count.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pk_pharmacy_claim_trending
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pk_pharmacy_claim_trending
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      The purpose of this table is to show for each historic data refresh (i.e., for each ingest_datetime), 
+      whether the pharmacy_claim table has a correct primary key (PK).
+  columns:
+    - name: ingest_datetime
+      description: >
+        The datetime when a batch of data was ingested.
+    - name: pharmacy_claim_row_count
+      description: >
+        The count of rows in the pharmacy_claim table that were ingested in that ingest_datetime.
+    - name: pharmacy_claim_pk_count
+      description: >
+        The count of distinct values of the primary key (claim_id, claim_line_number) 
+        in the pharmacy_claim table that were ingested in that ingest_datetime.
+    - name: correct_pk
+      description: |
+        This field is 'YES' when pharmacy_claim_row_count = pharmacy_claim_pk_count. 
+        This field is 'NO' when pharmacy_claim_row_count <> pharmacy_claim_pk_count.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pos_all
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pos_all
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all distinct and non-null place_of_service_codes for all claims. This table has one row for each distinct 
+    and non-null place_of_service_code that appears on each of the claims.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: calculated_claim_type
+      description: The claim type calculated using other fields. It is always either 'institutional', 'professional', or 'undetermined'.
+    - name: place_of_service_code
+      description: One of the distinct, non-null place_of_service_code values that are populated for this claim.
+    - name: valid_place_of_service_code
+      description: 0 or 1 flag. Has value of 1 iff the value of place_of_service_code represented on this row is from terminology.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__pos_invalid
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: pos_invalid
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all (non-null) invalid values of place_of_service_code. This table has one row for each distinct non-null and invalid place_of_service_code 
+    that appears on any claims. The table will be empty if there are no non-null and invalid values of place_of_service_code in the dataset.
+  columns:
+    - name: invalid_pos
+      description: A distinct non-null and invalid value of place_of_service_code that appears in the dataset.
+    - name: number_of_claims
+      description: The number of distinct claims in the dataset that have this invalid value of place_of_service_code.
+    - name: percent_of_professional_claims
+      description: The percent of all professional claims that have this invalid value of place_of_service_code.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__prof_aip_overlap_summary
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_aip_overlap_summary
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This shows a summary of how many acute inpatient professional claims overlap with one acute inpatient encounter, 
+    multiple acute inpatient encounters, or no acute inpatient encounters.
+
+- name: data_quality__prof_claims_overlapping_with_aip_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_aip_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows all usable acute inpatient professional claims and gives the encounter_id of the acute inpatient encounter 
+      (as defined by acute inpatient institutional claims) that they overlap with. If an acute inpatient professional claim overlaps 
+      with multiple encounters, there will be one row in this table for each encounter it overlaps with. Only usable acute inpatient 
+      professional claims are included in this table (i.e., rows from the table all_prof_aip_claims with usable_prof_claim = 1).
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: person_id
+      description: The person_id for this claim.
+    - name: paid_amount
+      description: >
+        The total paid amount for lines on the claim with place_of_service = '21'.
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+    - name: usable_prof_claim
+      description: >
+        0 or 1 flag. Has value of 1 iff the claim is usable (i.e., if usable_person_id = 1 and merge_start_date <= merge_end_date).
+    - name: merge_start_date
+      description: The merge_start_date for this claim.
+    - name: merge_end_date
+      description: The merge_end_date for this claim.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: encounter_id
+      description: >
+        Encounter ID for an acute inpatient encounter (from table aip_encounters_institutional_definition) that this claim overlaps with. 
+        This field is NULL if this professional claim does not overlap with any acute inpatient encounters from the aip_encounters_institutional_definition table.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__prof_claims_overlapping_with_multiple_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_multiple_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows all usable acute inpatient professional claims that overlap with multiple acute inpatient encounters 
+      (i.e., all claims from the table prof_claims_overlapping_with_aip_encounters that overlap with multiple acute inpatient encounters).
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: person_id
+      description: The person_id for this claim.
+    - name: paid_amount
+      description: >
+        The total paid amount for lines on the claim with place_of_service = '21'.
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+    - name: merge_start_date
+      description: The merge_start_date for this claim.
+    - name: merge_end_date
+      description: The merge_end_date for this claim.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: encounter_id
+      description: >
+        Encounter ID for an acute inpatient encounter (from table aip_encounters_institutional_definition) that this claim overlaps with. 
+        This field is NULL if this professional claim does not overlap with any acute inpatient encounters from the aip_encounters_institutional_definition table.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__prof_claims_overlapping_with_no_encounters
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_no_encounters
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows all usable acute inpatient professional claims that overlap with no acute inpatient encounters 
+      (i.e., all claims from the table prof_claims_overlapping_with_aip_encounters that overlap with no acute inpatient encounters).
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: person_id
+      description: The person_id for this claim.
+    - name: paid_amount
+      description: >
+        The total paid amount for lines on the claim with place_of_service = '21'.
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+    - name: merge_start_date
+      description: The merge_start_date for this claim.
+    - name: merge_end_date
+      description: The merge_end_date for this claim.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: encounter_id
+      description: >
+        Encounter ID for an acute inpatient encounter (from table aip_encounters_institutional_definition) that this claim overlaps with. 
+        This field is NULL if this professional claim does not overlap with any acute inpatient encounters from the aip_encounters_institutional_definition table.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__prof_claims_overlapping_with_one_encounter
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: prof_claims_overlapping_with_one_encounter
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows all usable acute inpatient professional claims that overlap with exactly one acute inpatient encounter 
+      (i.e., all claims from the table prof_claims_overlapping_with_aip_encounters that overlap with exactly one acute inpatient encounter).
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: person_id
+      description: The person_id for this claim.
+    - name: paid_amount
+      description: >
+        The total paid amount for lines on the claim with place_of_service = '21'.
+    - name: usable_person_id
+      description: >
+        0 or 1 flag. Has value of 1 iff the person_id is populated for at least one claim line and unique across claim lines.
+    - name: merge_start_date
+      description: The merge_start_date for this claim.
+    - name: merge_end_date
+      description: The merge_end_date for this claim.
+    - name: usable_merge_dates
+      description: >
+        0 or 1 flag. 1 iff both the merge_start_date and merge_end_date for this claim are from the calendar table 
+        and merge_start_date <= merge_end_date.
+    - name: encounter_id
+      description: >
+        Encounter ID for an acute inpatient encounter (from table aip_encounters_institutional_definition) that this claim overlaps with. 
+        This field is NULL if this professional claim does not overlap with any acute inpatient encounters from the aip_encounters_institutional_definition table.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__rb_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: rb_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims with at least one room & board (R&B) rev code. A claim is included if it has at least one rev code between '0100' and '0219' 
+      or between '1000' and '1002'. Note that some codes in these ranges might not be from the latest terminology, which is why the 'has_a_valid_rev_code' flag 
+      is included.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: distinct_rev_code_count
+      description: >
+        Positive integer: count of distinct R&B rev codes this claim has.
+    - name: has_a_valid_rev_code
+      description: 0 or 1 flag, indicates if the claim has at least one valid rev code.
+    - name: has_an_invalid_rev_code
+      description: 0 or 1 flag, indicates if the claim has at least one invalid rev code.
+    - name: basic
+      description: 0 or 1 flag, indicates if the claim has at least one basic rev code.
+    - name: hospice
+      description: 0 or 1 flag, indicates if the claim has at least one hospice rev code.
+    - name: loa
+      description: 0 or 1 flag, indicates if the claim has at least one leave of absence rev code.
+    - name: behavioral
+      description: 0 or 1 flag, indicates if the claim has at least one behavioral rev code.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__rev_all
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: rev_all
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all distinct and non-null revenue_center_codes for all claims. This table has one row for each distinct and non-null 
+    revenue_center_code that appears on each of the claims.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: revenue_center_code
+      description: One of the distinct, non-null revenue_center_code values that are populated for this claim.
+    - name: valid_revenue_center_code
+      description: 0 or 1 flag. Has value of 1 iff the value of revenue_center_code represented on this row is from terminology.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__rev_invalid
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: rev_invalid
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table lists all (non-null) invalid values of revenue_center_code. This table has one row for each distinct non-null and invalid 
+    revenue_center_code that appears on any claims. The table will be empty if there are no non-null and invalid values of revenue_center_code in the dataset.
+  columns:
+    - name: invalid_rev
+      description: A distinct non-null and invalid value of revenue_center_code that appears in the dataset.
+    - name: number_of_claims
+      description: The number of distinct claims in the dataset that have this invalid value of revenue_center_code.
+    - name: percent_of_institutional_claims
+      description: The percent of all institutional claims that have this invalid value of revenue_center_code.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__types_of_room_and_board_rev_codes_on_claims
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: types_of_room_and_board_rev_codes_on_claims
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table shows how many claims there are with each existing combination of the 4 types of room & board revenue codes 
+      ('basic', 'hospice', 'loa', 'behavioral'). This table can give us intuition about which of the 4 categories of rev codes 
+      ('basic', 'hospice', 'leave of absence', 'behavioral') between '0100' and '0219' or between '1000' and '1002' most 
+      frequently occur in claims.
+  columns:
+    - name: basic
+      description: >
+        0 or 1 flag. Indicates if the claim has at least one 'basic' room & board revenue code.
+    - name: hospice
+      description: >
+        0 or 1 flag. Indicates if the claim has at least one 'hospice' room & board revenue code.
+    - name: loa
+      description: >
+        0 or 1 flag. Indicates if the claim has at least one 'leave of absence' room & board revenue code.
+    - name: behavioral
+      description: >
+        0 or 1 flag. Indicates if the claim has at least one 'behavioral' room & board revenue code.
+    - name: claim_count
+      description: >
+        The count of claims that have the particular combination of flags indicated by the first 4 columns.
+    - name: claim_percent
+      description: >
+        The percentage of claims that have the particular combination of flags indicated by the first 4 columns. 
+        This is calculated as a percentage of all claims that have at least one room & board revenue code.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__undeterminable_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have an "undeterminable" admit_source_code.
+      Definition: A claim is said to have an "undeterminable" admit_source_code if it has more than one valid admit_source_code 
+      and there is no single valid admit_source_code that occurs more frequently than any other valid admit_source_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_source_code_1
+      description: The most commonly occurring admit_source_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times admit_source_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have admit_source_code_1.
+    - name: admit_source_code_2
+      description: >
+        The second most commonly occurring admit_source_code on the claim, which by definition occurs as frequently as admit_source_code_1 on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times admit_source_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have admit_source_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__undeterminable_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have an "undeterminable" admit_type_code.
+      Definition: A claim is said to have an "undeterminable" admit_type_code if it has more than one valid admit_type_code 
+      and there is no single valid admit_type_code that occurs more frequently than any other valid admit_type_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_type_code_1
+      description: The most commonly occurring admit_type_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times admit_type_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have admit_type_code_1.
+    - name: admit_type_code_2
+      description: >
+        The second most commonly occurring admit_type_code on the claim, which by definition occurs as frequently as admit_type_code_1 on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times admit_type_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have admit_type_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__undeterminable_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: |
+      This table lists all claims that have an "undeterminable" bill_type_code. A claim is said to have an "undeterminable" bill_type_code if it has more than 
+      one valid bill_type_code and there is no single valid bill_type_code that occurs more frequently than any other valid bill_type_code on the claim.
+  columns:
+    - name: claim_id
+      description: The unique identifier for the claim.
+    - name: bill_type_code_1
+      description: The most commonly occurring bill_type_code on the claim.
+    - name: occurrences_1
+      description: The number of times bill_type_code_1 occurs on the claim (i.e., the number of claim lines with this code).
+    - name: bill_type_code_2
+      description: The second most commonly occurring bill_type_code on the claim, which occurs as frequently as bill_type_code_1.
+    - name: occurrences_2
+      description: The number of times bill_type_code_2 occurs on the claim (i.e., the number of claim lines with this code).
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__undeterminable_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have an "undeterminable" diagnosis_code_1.
+      Definition: A claim is said to have an "undeterminable" diagnosis_code_1 if it has more than one valid diagnosis_code_1 
+      and there is no single valid diagnosis_code_1 that occurs more frequently than any other valid diagnosis_code_1 on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: diagnosis_code_1_1
+      description: The most commonly occurring diagnosis_code_1 on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times diagnosis_code_1_1 occurs on the claim, i.e., the number of claim lines on the claim that have diagnosis_code_1_1.
+    - name: diagnosis_code_1_2
+      description: >
+        The second most commonly occurring diagnosis_code_1 on the claim, which by definition occurs as frequently as diagnosis_code_1_1 on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times diagnosis_code_1_2 occurs on the claim, i.e., the number of claim lines on the claim that have diagnosis_code_1_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__undeterminable_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have an "undeterminable" discharge_disposition_code.
+      Definition: A claim is said to have an "undeterminable" discharge_disposition_code if it has more than one valid discharge_disposition_code 
+      and there is no single valid discharge_disposition_code that occurs more frequently than any other valid discharge_disposition_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: discharge_disposition_code_1
+      description: The most commonly occurring discharge_disposition_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times discharge_disposition_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have discharge_disposition_code_1.
+    - name: discharge_disposition_code_2
+      description: >
+        The second most commonly occurring discharge_disposition_code on the claim, which by definition occurs as frequently as discharge_disposition_code_1 on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times discharge_disposition_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have discharge_disposition_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__undeterminable_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: undeterminable_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have an "undeterminable" drg_code.
+      Definition: A claim is said to have an "undeterminable" drg_code if it has more than one valid drg_code 
+      and there is no single valid drg_code that occurs more frequently than any other valid drg_code on the claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: drg_code_1
+      description: The most commonly occurring drg_code on the claim.
+    - name: occurrences_1
+      description: >
+        The number of times drg_code_1 occurs on the claim, i.e., the number of claim lines on the claim that have drg_code_1.
+    - name: drg_code_2
+      description: >
+        The second most commonly occurring drg_code on the claim, which by definition occurs as frequently as drg_code_1 on the claim.
+    - name: occurrences_2
+      description: >
+        The number of times drg_code_2 occurs on the claim, i.e., the number of claim lines on the claim that have drg_code_2.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__unique_admit_source_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_admit_source_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "unique" admit_source_code.
+      Definition: A claim is said to have a "unique" admit_source_code if there is only one unique valid admit_source_code on the claim. 
+      Note that a claim may have multiple different admit_source_codes on different claim lines, but if only one of those is valid, 
+      the claim would still be said to have a "unique" admit_source_code according to this definition.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_source_code
+      description: The value of the unique valid admit_source_code for this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__unique_admit_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_admit_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "unique" admit_type_code.
+      Definition: A claim is said to have a "unique" admit_type_code if there is only one unique valid admit_type_code on the claim. 
+      Note that a claim may have multiple different admit_type_codes on different claim lines, but if only one of those is valid, 
+      the claim would still be said to have a "unique" admit_type_code according to this definition.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: admit_type_code
+      description: The value of the unique valid admit_type_code for this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__unique_bill_type_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_bill_type_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "unique" bill_type_code.
+      Definition: A claim is said to have a "unique" bill_type_code if there is only one unique valid bill_type_code on the claim. 
+      Note that a claim may have multiple different bill_type_codes on different claim lines, but if only one of those is valid, 
+      the claim would still be said to have a "unique" bill_type_code according to this definition.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: bill_type_code
+      description: The value of the unique valid bill_type_code for this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.  
+
+- name: data_quality__unique_diagnosis_code_1
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_diagnosis_code_1
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "unique" diagnosis_code_1.
+      Definition: A claim is said to have a "unique" diagnosis_code_1 if there is only one unique valid diagnosis_code_1 on the claim. 
+      Note that a claim may have multiple different diagnosis_code_1s on different claim lines, but if only one of those is valid, 
+      the claim would still be said to have a "unique" diagnosis_code_1 according to this definition.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: diagnosis_code_1
+      description: The value of the unique valid diagnosis_code_1 for this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__unique_discharge_disposition_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_discharge_disposition_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "unique" discharge_disposition_code.
+      Definition: A claim is said to have a "unique" discharge_disposition_code if there is only one unique valid discharge_disposition_code on the claim. 
+      Note that a claim may have multiple different discharge_disposition_codes on different claim lines, but if only one of those is valid, 
+      the claim would still be said to have a "unique" discharge_disposition_code according to this definition.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: discharge_disposition_code
+      description: The value of the unique valid discharge_disposition_code for this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__unique_drg_code
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: unique_drg_code
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table lists all claims that have a "unique" drg_code.
+      Definition: A claim is said to have a "unique" drg_code if there is only one unique valid drg_code on the claim. 
+      Note that a claim may have multiple different drg_code on different claim lines, but if only one of those is valid, 
+      the claim would still be said to have a "unique" drg_code according to this definition.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: drg_code
+      description: The value of the unique valid drg_code for this claim.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__usable_pos_code_histogram
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: usable_pos_code_histogram
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: This table is a histogram of the number of usable place of service codes on professional claims.
+  columns:
+    - name: field
+      description: A label for the histogram bin.
+    - name: number_of_claims
+      description: The number of distinct professional claims in the dataset that have this number of usable place of service codes.
+    - name: percent_of_professional_claims
+      description: The percent of all professional claims that have this number of usable place of service codes.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__usable_rev_code_histogram
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: usable_rev_code_histogram
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    This table is a histogram of the number of usable (which just means the rev code is valid, i.e. from terminology) rev codes on institutional claims.
+  columns:
+    - name: field
+      description: A label for the histogram bin.
+    - name: number_of_claims
+      description: The number of distinct claims in the dataset that have this number of usable revenue_center_code.
+    - name: percent_of_institutional_claims
+      description: The percent of all institutional claims that have this number of usable revenue_center_codes.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_admit_source_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_admit_source_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the claim_id grain. Only claims that have at least one valid admit_source_code appear on this table, 
+      i.e., there is one row for each claim_id in the input layer medical_claim table that has at least one valid admit_source_code. 
+      The purpose of the table is to show how many distinct valid admit_source_codes each claim_id has. Note that in theory a claim 
+      should have at most one admit_source_code, but as a result of data quality problems this may not be the case. This table helps 
+      explore situations where there is more than one valid admit_source_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: valid_admit_source_code_count
+      description: >
+        The number of distinct valid admit_source_codes that appear on the claim. This number is always a positive integer: 1, 2, 3, ...
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_admit_type_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_admit_type_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the claim_id grain. Only claims that have at least one valid admit_type_code appear on this table, 
+      i.e., there is one row for each claim_id in the input layer medical_claim table that has at least one valid admit_type_code. 
+      The purpose of the table is to show how many distinct valid admit_type_codes each claim_id has. Note that in theory a claim 
+      should have at most one admit_type_code, but as a result of data quality problems this may not be the case. This table helps 
+      explore situations where there is more than one valid admit_type_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: valid_admit_type_code_count
+      description: >
+        The number of distinct valid admit_type_codes that appear on the claim. This number is always a positive integer: 1, 2, 3, ...
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_bill_type_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_bill_type_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the claim_id grain. Only claims that have at least one valid bill_type_code appear on this table, i.e., there is one row for each claim_id 
+      in the input layer medical_claim table that has at least one valid bill_type_code. 
+      The purpose of the table is to show how many distinct valid bill type_codes each claim_id has. Note that in theory a claim should have at most one bill type_code, 
+      but as a result of data quality problems this may not be the case. This table helps explore situations where there is more than one valid bill_type_code per claim.
+  columns:
+    - name: claim_id
+      description: Unique identifier for each claim
+    - name: valid_bill_type_code_count
+      description: Number of distinct valid bill_type_codes that appear on the claim. This number is always a positive integer (1,2,3,...)
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_diagnosis_code_1_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_diagnosis_code_1_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the claim_id grain. Only claims that have at least one valid diagnosis_code_1 appear on this table, 
+      i.e., there is one row for each claim_id in the input layer medical_claim table that has at least one valid diagnosis_code_1. 
+      The purpose of the table is to show how many distinct valid diagnosis_code_1s each claim_id has. Note that in theory a claim 
+      should have at most one diagnosis_code_1, but as a result of data quality problems this may not be the case. This table helps 
+      explore situations where there is more than one valid diagnosis_code_1 per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: valid_diagnosis_code_1_count
+      description: >
+        The number of distinct valid diagnosis_code_1s that appear on the claim. This number is always a positive integer: 1, 2, 3, ...
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_discharge_disposition_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_discharge_disposition_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the claim_id grain. Only claims that have at least one valid discharge_disposition_code appear on this table, 
+      i.e., there is one row for each claim_id in the input layer medical_claim table that has at least one valid discharge_disposition_code. 
+      The purpose of the table is to show how many distinct valid discharge_disposition_codes each claim_id has. Note that in theory a claim 
+      should have at most one discharge_disposition_code, but as a result of data quality problems this may not be the case. This table helps 
+      explore situations where there is more than one valid discharge_disposition_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: valid_discharge_disposition_code_count
+      description: >
+        The number of distinct valid discharge_disposition_codes that appear on the claim. This number is always a positive integer: 1, 2, 3, ...
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_drg_code_counts
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_drg_code_counts
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+      This table is at the claim_id grain. Only claims that have at least one valid drg_code appear on this table, 
+      i.e., there is one row for each claim_id in the input layer medical_claim table that has at least one valid drg_code. 
+      The purpose of the table is to show how many distinct valid drg_code each claim_id has. Note that in theory a claim 
+      should have at most one drg_code, but as a result of data quality problems this may not be the case. This table helps 
+      explore situations where there is more than one valid drg_code per claim.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: valid_drg_code_count
+      description: >
+        The number of distinct valid drg_codes that appear on the claim. This number is always a positive integer: 1, 2, 3, ...
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
+
+- name: data_quality__valid_values
+  config:
+    schema: |
+        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_data_quality
+        {% else %}data_quality{%- endif -%}
+    alias: valid_values
+    tags:
+      - data_quality_aip
+    materialized: table
+  description: >
+    The purpose of this table is to determine if several of the fields in the input layer medical claim table have valid values, 
+    i.e. values from terminology. This table is at the claim line grain (there is one row for every row in the input layer 
+    medical_claim table). For each row in the medical_claim table we list fields for which we want to check if there is a 
+    valid value from terminology, together with a flag that checks if the field is valid.
+  columns:
+    - name: claim_id
+      description: The claim_id given in the input layer.
+    - name: claim_line_number
+      description: The claim_line_number given in the input layer.
+    - name: bill_type_code
+      description: The value of bill_type_code that is populated for this claim line.
+    - name: valid_bill_type_code
+      description: 0 or 1 flag. Has value of 1 if the value of bill_type_code for this claim line is from terminology.
+    - name: drg_code
+      description: The value of drg_code that is populated for this claim line.
+    - name: valid_drg_code
+      description: 0 or 1 flag. Has value of 1 if the value of drg_code for this claim line is from terminology.
+    - name: admit_type_code
+      description: The value of admit_type_code that is populated for this claim line.
+    - name: valid_admit_type_code
+      description: 0 or 1 flag. Has value of 1 if the value of admit_type_code for this claim line is from terminology.
+    - name: admit_source_code
+      description: The value of admit_source_code that is populated for this claim line.
+    - name: valid_admit_source_code
+      description: 0 or 1 flag. Has value of 1 if the value of admit_source_code for this claim line is from terminology.
+    - name: discharge_disposition_code
+      description: The value of discharge_disposition_code that is populated for this claim line.
+    - name: valid_discharge_disposition_code
+      description: 0 or 1 flag. Has value of 1 if the value of discharge_disposition_code for this claim line is from terminology.
+    - name: revenue_center_code
+      description: The value of revenue_center_code that is populated for this claim line.
+    - name: valid_revenue_center_code
+      description: 0 or 1 flag. Has value of 1 if the value of revenue_center_code for this claim line is from terminology.
+    - name: place_of_service_code
+      description: The value of place_of_service_code that is populated for this claim line.
+    - name: valid_place_of_service_code
+      description: 0 or 1 flag. Has value of 1 if the value of place_of_service_code for this claim line is from terminology.
+    - name: admission_date
+      description: The value of admission_date that is populated for this claim line.
+    - name: valid_admission_date
+      description: 0 or 1 flag. Has value of 1 if the value of admission_date for this claim line is from the calendar table.
+    - name: discharge_date
+      description: The value of discharge_date that is populated for this claim line.
+    - name: valid_discharge_date
+      description: 0 or 1 flag. Has value of 1 if the value of discharge_date for this claim line is from the calendar table.
+    - name: claim_start_date
+      description: The value of claim_start_date that is populated for this claim line.
+    - name: valid_claim_start_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_start_date for this claim line is from the calendar table.
+    - name: claim_end_date
+      description: The value of claim_end_date that is populated for this claim line.
+    - name: valid_claim_end_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_end_date for this claim line is from the calendar table.
+    - name: claim_line_start_date
+      description: The value of claim_line_start_date that is populated for this claim line.
+    - name: valid_claim_line_start_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_line_start_date for this claim line is from the calendar table.
+    - name: claim_line_end_date
+      description: The value of claim_line_end_date that is populated for this claim line.
+    - name: valid_claim_line_end_date
+      description: 0 or 1 flag. Has value of 1 if the value of claim_line_end_date for this claim line is from the calendar table.
+    - name: diagnosis_code_1
+      description: The value of diagnosis_code_1 that is populated for this claim line.
+    - name: valid_diagnosis_code_1
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_1 for this claim line is from terminology.
+    - name: diagnosis_code_2
+      description: The value of diagnosis_code_2 that is populated for this claim line.
+    - name: valid_diagnosis_code_2
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_2 for this claim line is from terminology.
+    - name: diagnosis_code_3
+      description: The value of diagnosis_code_3 that is populated for this claim line.
+    - name: valid_diagnosis_code_3
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_3 for this claim line is from terminology.
+    - name: diagnosis_code_4
+      description: The value of diagnosis_code_4 that is populated for this claim line.
+    - name: valid_diagnosis_code_4
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_4 for this claim line is from terminology.
+    - name: diagnosis_code_5
+      description: The value of diagnosis_code_5 that is populated for this claim line.
+    - name: valid_diagnosis_code_5
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_5 for this claim line is from terminology.
+    - name: diagnosis_code_6
+      description: The value of diagnosis_code_6 that is populated for this claim line.
+    - name: valid_diagnosis_code_6
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_6 for this claim line is from terminology.
+    - name: diagnosis_code_7
+      description: The value of diagnosis_code_7 that is populated for this claim line.
+    - name: valid_diagnosis_code_7
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_7 for this claim line is from terminology.
+    - name: diagnosis_code_8
+      description: The value of diagnosis_code_8 that is populated for this claim line.
+    - name: valid_diagnosis_code_8
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_8 for this claim line is from terminology.
+    - name: diagnosis_code_9
+      description: The value of diagnosis_code_9 that is populated for this claim line.
+    - name: valid_diagnosis_code_9
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_9 for this claim line is from terminology.
+    - name: diagnosis_code_10
+      description: The value of diagnosis_code_10 that is populated for this claim line.
+    - name: valid_diagnosis_code_10
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_10 for this claim line is from terminology.
+    - name: diagnosis_code_11
+      description: The value of diagnosis_code_11 that is populated for this claim line.
+    - name: valid_diagnosis_code_11
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_11 for this claim line is from terminology.
+    - name: diagnosis_code_12
+      description: The value of diagnosis_code_12 that is populated for this claim line.
+    - name: valid_diagnosis_code_12
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_12 for this claim line is from terminology.
+    - name: diagnosis_code_13
+      description: The value of diagnosis_code_13 that is populated for this claim line.
+    - name: valid_diagnosis_code_13
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_13 for this claim line is from terminology.
+    - name: diagnosis_code_14
+      description: The value of diagnosis_code_14 that is populated for this claim line.
+    - name: valid_diagnosis_code_14
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_14 for this claim line is from terminology.
+    - name: diagnosis_code_15
+      description: The value of diagnosis_code_15 that is populated for this claim line.
+    - name: valid_diagnosis_code_15
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_15 for this claim line is from terminology.
+    - name: diagnosis_code_16
+      description: The value of diagnosis_code_16 that is populated for this claim line.
+    - name: valid_diagnosis_code_16
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_16 for this claim line is from terminology.
+    - name: diagnosis_code_17
+      description: The value of diagnosis_code_17 that is populated for this claim line.
+    - name: valid_diagnosis_code_17
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_17 for this claim line is from terminology.
+    - name: diagnosis_code_18
+      description: The value of diagnosis_code_18 that is populated for this claim line.
+    - name: valid_diagnosis_code_18
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_18 for this claim line is from terminology.
+    - name: diagnosis_code_19
+      description: The value of diagnosis_code_19 that is populated for this claim line.
+    - name: valid_diagnosis_code_19
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_19 for this claim line is from terminology.
+    - name: diagnosis_code_20
+      description: The value of diagnosis_code_20 that is populated for this claim line.
+    - name: valid_diagnosis_code_20
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_20 for this claim line is from terminology.
+    - name: diagnosis_code_21
+      description: The value of diagnosis_code_21 that is populated for this claim line.
+    - name: valid_diagnosis_code_21
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_21 for this claim line is from terminology.
+    - name: diagnosis_code_22
+      description: The value of diagnosis_code_22 that is populated for this claim line.
+    - name: valid_diagnosis_code_22
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_22 for this claim line is from terminology.
+    - name: diagnosis_code_23
+      description: The value of diagnosis_code_23 that is populated for this claim line.
+    - name: valid_diagnosis_code_23
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_23 for this claim line is from terminology.
+    - name: diagnosis_code_24
+      description: The value of diagnosis_code_24 that is populated for this claim line.
+    - name: valid_diagnosis_code_24
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_24 for this claim line is from terminology.
+    - name: diagnosis_code_25
+      description: The value of diagnosis_code_25 that is populated for this claim line.
+    - name: valid_diagnosis_code_25
+      description: 0 or 1 flag. Has value of 1 if the value of diagnosis_code_25 for this claim line is from terminology.
+    - name: tuva_last_run
+      description: The date and timestamp of the dbt run.
