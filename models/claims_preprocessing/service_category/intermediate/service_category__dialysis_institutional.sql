@@ -5,6 +5,7 @@
 
 select distinct
     med.claim_id
+  , med.data_source
   , 'outpatient' as service_category_1
   , 'dialysis' as service_category_2
   , 'dialysis' as service_category_3

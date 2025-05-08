@@ -5,6 +5,7 @@
 
 select distinct
     a.claim_id
+  , a.data_source
   , 'inpatient' as service_category_1
   , 'inpatient substance use' as service_category_2
   , 'inpatient substance use' as service_category_3
@@ -13,6 +14,7 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} as s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
   on s.claim_id = a.claim_id
+  and s.data_source = a.data_source
 where
   s.primary_taxonomy_code in (
       '324500000X'
