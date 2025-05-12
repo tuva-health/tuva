@@ -127,7 +127,7 @@ seeds:
         discharge_disposition_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         discharge_disposition_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1024) {%- endif -%}
     columns:
       - name: discharge_disposition_code
         description: 'The code representing the discharge disposition.'
@@ -144,9 +144,15 @@ seeds:
         - terminology
         - claims_preprocessing
       column_types:
+        encounter_group : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         encounter_type : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        encounter_group: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
     columns:
+      - name: encounter_group
+        description: 'The group of the encounter.'
       - name: encounter_type
         description: 'The type of the encounter.'
 
@@ -790,7 +796,7 @@ seeds:
         present_on_admit_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         present_on_admit_description : |
-          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1024) {%- endif -%}
     columns:
       - name: present_on_admit_code
         description: 'The code representing if the condition was present on admission.'
@@ -824,6 +830,12 @@ seeds:
         provider_credential: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         provider_organization_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_other_organization_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
+        provider_other_organization_name_type_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(80) {%- endif -%}
+        provider_other_organization_name_type_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
         parent_organization_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(95) {%- endif -%}
@@ -864,6 +876,12 @@ seeds:
         description: 'The last name of the provider.'
       - name: provider_organization_name
         description: 'The organization name of the provider.'
+      - name: provider_other_organization_name
+        description: 'Other organization name of the provider (for Type 2 NPI).'
+      - name: provider_other_organization_name_type_code
+        description: 'The type code for the other organization name of the provider.'
+      - name: provider_other_organization_name_type_description
+        description: 'The type description for the other organization name of the provider.'
       - name: parent_organization_name
         description: 'The parent organization name of the provider.'
       - name: practice_address_line_1
