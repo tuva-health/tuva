@@ -1,4 +1,3 @@
-{# tests/generic/test_warn_if_null_percentage_above_zero.sql #}
 {% test warn_if_null_percentage_above_zero(model, column_name) %}
 
 {#-
