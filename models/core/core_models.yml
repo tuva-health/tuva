@@ -261,6 +261,16 @@ models:
       description: '{{ doc("inst_claim_count") }}'
     - name: prof_claim_count
       description: '{{ doc("prof_claim_count") }}'
+      tests:
+      - dbt_expectations.expect_column_values_to_be_between:
+          description: "Inpatient encounter missing professional claim"
+          min_value: 1
+          row_condition: "encounter_type = 'acute inpatient'"
+          strictly: true
+          tags: ['tuva_dqi_sev_5', 'dqi']
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
     - name: source_model
       description: '{{ doc("source_model") }}'
     - name: encounter_source_type
