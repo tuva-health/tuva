@@ -78,6 +78,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: procedure_date
         description: '{{ doc("procedure_date") }}'
         tests:
