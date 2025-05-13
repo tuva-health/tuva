@@ -6,17 +6,11 @@ require-dbt-version: ">=1.5.0"
 profile: default
 
 models:
-  ## see docs: https://docs.elementary-data.com/
   elementary:
-    ## elementary models will be created in the schema '<your_schema>_elementary'
-    +schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_elementary{% else %}elementary{%- endif -%}
-    ## To disable elementary for dev, uncomment this:
-    # enabled: "{{ target.name in ['prod','analytics'] }}"
+    enabled: true # Change to false to disable all models in the elementary package
 
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
-
 
 vars:
     ## CCSR data mart vars
