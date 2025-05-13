@@ -15,7 +15,7 @@ models:
     # enabled: "{{ target.name in ['prod','analytics'] }}"
 
 flags:
-  require_explicit_package_overrides_for_builtin_materializations: false
+  require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
 
 
 vars:
@@ -59,6 +59,7 @@ vars:
     enable_legacy_data_quality: false
 
 on-run-end:
+  - "{{ log_invocation_start() }}"
   - "{{ log_warning_for_seeds() }}"
 
 model-paths: ["models"]
