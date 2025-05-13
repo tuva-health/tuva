@@ -33,6 +33,17 @@ models:
             severity: warn
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
               true)) | as_bool }}"
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          description: "Death date cannot be after birth date."
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
+          column_A: death_date
+          column_B: birth_date
+          or_equal: true
+          row_condition: "death_date is not null"
+          config:
+            severity: warn
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+              true)) | as_bool }}"
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -100,11 +111,24 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - relationships:
+              to: ref('terminology__race')
+              field: description
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: birth_date
         description: '{{ doc("birth_date") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -121,7 +145,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: A person should not have multiple birthdays.
+              description: A person should not have multiple birthdays.
               min_value: 1
               max_value: 1
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
@@ -147,7 +171,7 @@ models:
         description: '{{ doc("death_date") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -197,7 +221,7 @@ models:
         description: '{{ doc("enrollment_start_date") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -223,7 +247,7 @@ models:
         description: '{{ doc("enrollment_end_date") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -245,6 +269,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: payer
         description: '{{ doc("payer") }}'
         tests:
@@ -253,6 +283,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: payer_type
         description: '{{ doc("payer_type") }}'
         tests:
@@ -269,6 +305,12 @@ models:
                 severity: warn
                 # Disabled for bigquery as relationships dbt test does not work when the alias and the field are the same name
                 enabled: "{{ ((target.type != 'fabric') and (target.type != 'bigquery') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: plan
         description: '{{ doc("plan") }}'
         tests:
@@ -277,6 +319,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: original_reason_entitlement_code
         description: '{{ doc("original_reason_entitlement_code") }}'
         tests:
@@ -292,7 +340,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
-# description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
+              description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               values: ['0', '1', '2', '3']
               config:
@@ -309,7 +357,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
-# description: https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january
+              description: https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
               values: ['00', '01', '02', '03', '04', '05', '06', '08', '09', '10']
               config:
@@ -326,7 +374,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
-# description: https://resdac.org/cms-data/variables/medicare-status-code-january
+              description: https://resdac.org/cms-data/variables/medicare-status-code-january
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               values: ['00', '10', '11', '20', '21', '31', '40']
               config:
@@ -358,6 +406,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: last_name
         description: '{{ doc("last_name") }}'
         tests:
@@ -366,6 +420,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: social_security_number
         description: '{{ doc("social_security_number") }}'
         tests:
@@ -390,6 +450,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: city
         description: '{{ doc("city") }}'
         tests:
@@ -398,6 +464,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: state
         description: '{{ doc("state") }}'
         tests:
@@ -406,6 +478,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: zip_code
         description: '{{ doc("zip_code") }}'
         tests:
@@ -414,6 +492,20 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              description: "Zip codes should be between 5 and 10 digits long, more specifically 5,9, or 10 digits. "
+              min_value: 5
+              max_value: 10
+              strictly: false
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: phone
         description: '{{ doc("phone") }}'
         tests:
@@ -430,6 +522,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:
@@ -449,6 +547,14 @@ models:
           - dbt_expectations.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime]
               tags: ['tuva_dqi_sev_2', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              tags: [ 'tuva_dqi_sev_3', 'dqi']
+              min_value: '''1900-01-01'''
+              max_value: '''2100-01-01'''
+              strictly: false
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"

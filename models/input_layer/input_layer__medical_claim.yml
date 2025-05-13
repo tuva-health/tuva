@@ -81,7 +81,7 @@ models:
         description: '{{ doc("claim_type") }}'
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: A claim cannot be both professional and institutional within the same claim id.
+              description: A claim cannot be both professional and institutional within the same claim id.
               min_value: 1
               max_value: 1
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
@@ -116,7 +116,7 @@ models:
         description: '{{ doc("person_id") }}'
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: A claim should not belong to two different people.
+              description: A claim should not belong to two different people.
               min_value: 1
               max_value: 1
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
@@ -157,6 +157,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_financial_pmpm']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: plan
         description: '{{ doc("plan") }}'
         tests:
@@ -165,11 +171,17 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_financial_pmpm']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: claim_start_date
         description: '{{ doc("claim_start_date") }}'
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: A claim should not have multiple start dates within the same claim id.
+              description: A claim should not have multiple start dates within the same claim id.
               min_value: 1
               max_value: 1
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
@@ -191,7 +203,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
                 'dqi_readmission']
@@ -223,7 +235,7 @@ models:
         description: '{{ doc("claim_end_date") }}'
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: A claim should not have multiple end dates within the same claim id.
+              description: A claim should not have multiple end dates within the same claim id.
               min_value: 1
               max_value: 1
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
@@ -252,7 +264,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
                 'dqi_readmission']
@@ -282,7 +294,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -299,6 +311,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_financial_pmpm']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: claim_line_end_date
         description: '{{ doc("claim_line_end_date") }}'
         tests:
@@ -313,6 +331,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_financial_pmpm']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: admission_date
         description: '{{ doc("admission_date") }}'
         tests:
@@ -322,7 +346,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_tuva_chronic_conditions']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -348,7 +372,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_between:
-# description: This is a test on all dates to see if they are within a reasonable range. 
+              description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_tuva_chronic_conditions']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
@@ -394,7 +418,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
-# description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
+              description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               regex: "^[0-59]$"
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -421,7 +445,7 @@ models:
         description: '{{ doc("place_of_service_code") }}'
         tests:
           - not_null:
-# description: If a claim is professional, it should have a place of service code via CMS-1500. 
+              description: If a claim is professional, it should have a place of service code via CMS-1500.
               tags: ['tuva_dqi_sev_4', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
@@ -442,7 +466,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
-# description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
+              description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               regex: "^[0-9]{2}$"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
@@ -454,7 +478,7 @@ models:
         description: '{{ doc("bill_type_code") }}'
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: A claim should not have multiple bill type codes within the same claim id.
+              description: A claim should not have multiple bill type codes within the same claim id.
               min_value: 1
               max_value: 1
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_chronic_conditions']
@@ -479,7 +503,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
-# description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
+              description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
               regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions']
               config:
@@ -524,7 +548,7 @@ models:
         description: '{{ doc("revenue_center_code") }}'
         tests:
           - not_null:
-# description: Missing revenue codes for institutional claims. Severity 5 as triggers if at least on revenue code is missing. 
+              description: Missing revenue codes for institutional claims. Severity 5 as triggers if at least on revenue code is missing.
               tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
@@ -534,7 +558,7 @@ models:
                   dqi_test_description: "Missing revenue codes for institutional claims.
                     Severity 5 as triggers if at least on revenue code is missing. "
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
-# description: For institutional claims, should be some distinct count of different revenue codes
+              description: For institutional claims, should be some distinct count of different revenue codes
               tags: ['tuva_dqi_sev_4', 'dqi', 'dqi_financial_pmpm']
               min_value: 5
               max_value: 1000
@@ -583,7 +607,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
-# description: Procedure code should not be null on professional claims.
+              description: Procedure code should not be null on professional claims.
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_financial_pmpm',
                 'dqi_quality_measures']
               config:
@@ -654,6 +678,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: rendering_tin
         description: '{{ doc("rendering_tin") }}'
         tests:
@@ -662,6 +692,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: billing_npi
         description: >
           Billing NPI for the claim (typically represents organization billing  the
@@ -683,6 +719,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: billing_tin
         description: '{{ doc("billing_tin") }}'
         tests:
@@ -691,6 +733,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: facility_npi
         description: >
           Facility NPI for the claim (typically represents the facility where  services
@@ -726,6 +774,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: paid_amount
         description: '{{ doc("paid_amount") }}'
         tests:
@@ -741,6 +795,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: allowed_amount
         description: '{{ doc("allowed_amount") }}'
         tests:
@@ -868,6 +928,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Expect there to be a diagnosis code on most claims."
+              tags: ['tuva_dqi_sev_4', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
+                'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_readmission']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: diagnosis_code_2
         description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
         tests:
@@ -2344,6 +2411,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
@@ -2352,6 +2425,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:

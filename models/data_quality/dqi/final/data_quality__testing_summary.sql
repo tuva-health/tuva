@@ -55,6 +55,7 @@ select
         -- Completeness tests
         when dt.short_name = 'expect_column_to_exist' then 'completeness'
         when dt.short_name = 'not_null' then 'completeness'
+        when dt.short_name = 'warn_if_null_percentage_above_zero' then 'completeness'
 
         -- Validity tests
         when dt.short_name = 'expect_column_values_to_be_of_type' then 'validity'
