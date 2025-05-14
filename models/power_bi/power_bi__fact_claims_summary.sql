@@ -12,6 +12,14 @@ select
     , medical_claim_id
     , encounter_id
     , encounter_type_sk
+    ,primary_provider_id
+    ,provider_type
+    ,specialty
+    , primary_diagnosis_code
+    , primary_diagnosis_description
+    , ccsr_parent_category
+    , ccsr_category
+    , ccsr_category_description
     , person_id
     , patient_source_key
     , sum(paid_amount) as paid_amount
@@ -24,5 +32,13 @@ group by
     , medical_claim_id
     , encounter_id
     , encounter_type_sk
+        ,primary_provider_id
+    ,provider_type
+    ,specialty
+    , primary_diagnosis_code
+    , primary_diagnosis_description
+    , ccsr_parent_category
+    , ccsr_category
+    , ccsr_category_description
     , person_id
     , patient_source_key

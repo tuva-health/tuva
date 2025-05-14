@@ -31,6 +31,17 @@ models:
     tags: power_bi
     materialized: table
 
+- name: power_bi__dim_year
+  description: >
+    Year dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_year
+    tags: power_bi
+    materialized: table
+
 - name: power_bi__dim_service_category
   description: >
     Unique service categories dimension for use in Power BI data models.
@@ -49,6 +60,24 @@ models:
         config:
           severity: error
 
+- name: power_bi__dim_encounter_group
+  description: >
+    Unique encounter group dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_encounter_group
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: encounter_group_sk
+    description: SK for unique encounter groups
+    tests:
+    - unique:
+        config:
+          severity: error
+
 - name: power_bi__dim_encounter_type
   description: >
     Unique encounter type dimension for use in Power BI data models.
@@ -61,7 +90,25 @@ models:
     materialized: table
   columns:
   - name: encounter_type_sk
-    description: SK for unique combination of encounter groups and types
+    description: SK for unique encounter types
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: power_bi__dim_encounter_provider
+  description: >
+    Unique primary provider dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: dim_encounter_provider
+    tags: power_bi
+    materialized: table
+  columns:
+  - name: encounter_id
+    description: ID for unique encounters
     tests:
     - unique:
         config:
