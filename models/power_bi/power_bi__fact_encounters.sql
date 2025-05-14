@@ -3,6 +3,7 @@ select
     , person_id
     , {{ dbt.concat(["person_id", "'|'", "data_source"]) }} as patient_source_key
     , TO_CHAR(encounter_start_date, 'YYYYMM') as year_month
+    , eg.encounter_group_sk
     , et.encounter_type_sk
     , encounter_start_date
     , encounter_end_date
@@ -45,5 +46,5 @@ select
     , tuva_last_run
     , encounter_source_type
 from {{ ref('core__encounter') }} e
-inner join {{ ref('power_bi__dim_encounter_type') }} et on e.encounter_group = et.encounter_group
-    AND e.encounter_type = et.encounter_type
+inner join {{ ref('power_bi__dim_encounter_group') }} eg on e.encounter_group = eg.encounter_group
+inner join {{ ref('power_bi__dim_encounter_type') }} et on e.encounter_type = et.encounter_type

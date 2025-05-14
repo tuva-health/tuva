@@ -1,14 +1,35 @@
 with encounter_sk as (
     select
-        encounter_id
-        ,encounter_type_sk
-    from {{ ref('power_bi__fact_encounters') }}
+        e.encounter_id
+        ,e.encounter_group_sk
+        ,e.encounter_type_sk
+        ,e.primary_diagnosis_code
+        ,e.primary_diagnosis_description
+        ,primary_provider_id
+        ,provider_type
+        ,specialty
+        ,ccsr.ccsr_parent_category
+        ,ccsr.ccsr_category
+        ,ccsr.ccsr_category_description
+    from {{ ref('power_bi__fact_encounters') }} e
+    inner join {{ ref('power_bi__dim_encounter_provider') }} p on e.encounter_id = p.encounter_id
+    left join {{ ref('ccsr__dx_vertical_pivot') }} ccsr on e.primary_diagnosis_code = ccsr.code
+        and ccsr.ccsr_category_rank = 1
 )
 
 select
     medical_claim_id
     , mc.encounter_id
+    , encounter_group_sk
     , encounter_type_sk
+    , primary_diagnosis_code
+    , primary_diagnosis_description
+    ,primary_provider_id
+    ,provider_type
+    ,specialty
+    , ccsr_parent_category
+    , ccsr_category
+    , ccsr_category_description
     , person_id
     , {{ dbt.concat(["person_id", "'|'", "data_source"]) }} as patient_source_key
     , TO_CHAR(claim_start_date, 'YYYYMM') as year_month
@@ -65,7 +86,7 @@ select
     , in_network_flag
     , data_source
     , tuva_last_run
-from core.medical_claim mc
+from {{ ref('core__medical_claim') }} mc
 INNER JOIN {{ ref('power_bi__dim_service_category') }} sc on mc.service_category_1 = sc.service_category_1
     AND mc.service_category_2 = sc.service_category_2
     AND mc.service_category_3 = sc.service_category_3
