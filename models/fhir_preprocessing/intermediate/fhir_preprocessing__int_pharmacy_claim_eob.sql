@@ -94,25 +94,31 @@ with eligibility as (
 , pharmacy_eob as (
 
     select
-          pharmacy_claim.person_id as patient_internal_id
-        , pharmacy_claim.pharmacy_claim_id as resource_internal_id
-        , pharmacy_claim.claim_id as unique_claim_id
+          cast(pharmacy_claim.person_id as {{ dbt.type_string() }} ) as patient_internal_id
+        , cast(pharmacy_claim.pharmacy_claim_id as {{ dbt.type_string() }} ) as resource_internal_id
+        , cast(pharmacy_claim.claim_id as {{ dbt.type_string() }} ) as unique_claim_id
         , 'pharmacy' as eob_type_code
-        , null as eob_subtype_code /* required for union with medical eob */
-        , null as eob_billable_period_start /* required for union with medical eob */
-        , null as eob_billable_period_end /* required for union with medical eob */
-        , pharmacy_claim.paid_date as eob_created
-        , pharmacy_claim.payer as organization_name
+        , cast(null as {{ dbt.type_string() }} ) as eob_subtype_code /* required for union with medical eob */
+        , cast(null as date) as eob_billable_period_start /* required for union with medical eob */
+        , cast(null as date) as eob_billable_period_end /* required for union with medical eob */
+        , cast(pharmacy_claim.paid_date as date) as eob_created
+        , cast(pharmacy_claim.payer as {{ dbt.type_string() }} ) as organization_name
         /* required for FHIR validation, default to dummy practitioner */
-        , coalesce(pharmacy_claim.dispensing_provider_id, '9999999999') as practitioner_internal_id
-        , coalesce(pharmacy_claim.dispensing_provider_name, 'Dummy Practitioner') as practitioner_name_text
-        , {{ dbt_utils.generate_surrogate_key(['pharmacy_claim.eligibility_id']) }} as coverage_internal_id
-        , null as eob_diagnosis_list /* required for union with medical eob */
-        , null as eob_procedure_list /* required for union with medical eob */
-        , claim_supporting_info.eob_supporting_info_list
-        , claim_item.eob_item_list
-        , claim_total.eob_total_list
-        , pharmacy_claim.data_source
+        , coalesce(
+              cast(pharmacy_claim.dispensing_provider_id  as {{ dbt.type_string() }} )
+            , '9999999999'
+          ) as practitioner_internal_id
+        , coalesce(
+              cast(pharmacy_claim.dispensing_provider_name as {{ dbt.type_string() }} )
+            , 'Dummy Practitioner'
+          ) as practitioner_name_text
+        , cast({{ dbt_utils.generate_surrogate_key(['pharmacy_claim.eligibility_id']) }} as {{ dbt.type_string() }} ) as coverage_internal_id
+        , cast(null as {{ dbt.type_string() }} ) as eob_diagnosis_list /* required for union with medical eob */
+        , cast(null as {{ dbt.type_string() }} ) as eob_procedure_list /* required for union with medical eob */
+        , cast(claim_supporting_info.eob_supporting_info_list as {{ dbt.type_string() }} ) as eob_supporting_info_list
+        , cast(claim_item.eob_item_list as {{ dbt.type_string() }} ) as eob_item_list
+        , cast(claim_total.eob_total_list as {{ dbt.type_string() }} ) as eob_total_list
+        , cast(pharmacy_claim.data_source as {{ dbt.type_string() }} ) as data_source
     from dedupe as pharmacy_claim
         left outer join claim_supporting_info
             on pharmacy_claim.claim_id = claim_supporting_info.claim_id

@@ -16,16 +16,16 @@ with unioned as (
 )
 
 select
-      patient_internal_id
-    , resource_internal_id
-    , encounter_internal_id
-    , observation_status
-    , observation_category
-    , observation_code_system
-    , observation_code
-    , observation_code_text
-    , observation_datetime
-    , observation_value
-    , observation_value_units
-    , data_source
+      cast(patient_internal_id as {{ dbt.type_string() }} ) as patient_internal_id
+    , cast(resource_internal_id as {{ dbt.type_string() }} ) as resource_internal_id
+    , cast(encounter_internal_id as {{ dbt.type_string() }} ) as encounter_internal_id
+    , cast(observation_status as {{ dbt.type_string() }} ) as observation_status
+    , cast(observation_category as {{ dbt.type_string() }} ) as observation_category
+    , cast(observation_code_system as {{ dbt.type_string() }} ) as observation_code_system
+    , cast(observation_code as {{ dbt.type_string() }} ) as observation_code
+    , cast(observation_code_text as {{ dbt.type_string() }} ) as observation_code_text
+    , cast(observation_datetime as {{ dbt.type_timestamp() }} ) as observation_datetime
+    , cast(observation_value as {{ dbt.type_string() }} ) as observation_value
+    , cast(observation_value_units as {{ dbt.type_string() }} ) as observation_value_units
+    , cast(data_source as {{ dbt.type_string() }} ) as data_source
 from unioned

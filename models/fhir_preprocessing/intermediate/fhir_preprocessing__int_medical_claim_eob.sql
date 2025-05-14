@@ -124,39 +124,39 @@ with eligibility as (
 , medical_eob as (
 
     select
-          medical_claim.person_id as patient_internal_id
-        , medical_claim.medical_claim_id as resource_internal_id
-        , medical_claim.claim_id as unique_claim_id
-        , medical_claim.claim_type as eob_type_code
+          cast(medical_claim.person_id as {{ dbt.type_string() }} ) as patient_internal_id
+        , cast(medical_claim.medical_claim_id as {{ dbt.type_string() }} ) as resource_internal_id
+        , cast(medical_claim.claim_id as {{ dbt.type_string() }} ) as unique_claim_id
+        , cast(medical_claim.claim_type as {{ dbt.type_string() }} ) as eob_type_code
         , case
             when medical_claim.encounter_group = 'inpatient' then 'inpatient'
             else 'outpatient'
           end as eob_subtype_code
-        , medical_claim.claim_start_date as eob_billable_period_start
-        , medical_claim.claim_end_date as eob_billable_period_end
+        , cast(medical_claim.claim_start_date as date) as eob_billable_period_start
+        , cast(medical_claim.claim_end_date as date) as eob_billable_period_end
         , coalesce(
-              medical_claim.paid_date
-            , medical_claim.claim_start_date
+              cast(medical_claim.paid_date as date)
+            , cast(medical_claim.claim_start_date as date)
           ) as eob_created
-        , medical_claim.payer as organization_name
+        , cast(medical_claim.payer as {{ dbt.type_string() }} ) as organization_name
         /* required for FHIR validation, default to dummy practitioner */
         , coalesce(
-              medical_claim.billing_id
-            , medical_claim.rendering_id
+              cast(medical_claim.billing_id as {{ dbt.type_string() }} )
+            , cast(medical_claim.rendering_id as {{ dbt.type_string() }} )
             , '9999999999'
           ) as practitioner_internal_id
         , coalesce(
-              medical_claim.billing_name
-            , medical_claim.rendering_name
+              cast(medical_claim.billing_name as {{ dbt.type_string() }} )
+            , cast(medical_claim.rendering_name as {{ dbt.type_string() }} )
             , 'Dummy Practitioner'
           ) as practitioner_name_text
-        , {{ dbt_utils.generate_surrogate_key(['medical_claim.eligibility_id']) }} as coverage_internal_id
-        , claim_diagnosis.eob_diagnosis_list
-        , claim_procedure.eob_procedure_list
-        , claim_supporting_info.eob_supporting_info_list
-        , claim_item.eob_item_list
-        , claim_total.eob_total_list
-        , medical_claim.data_source
+        , cast({{ dbt_utils.generate_surrogate_key(['medical_claim.eligibility_id']) }} as {{ dbt.type_string() }} ) as coverage_internal_id
+        , cast(claim_diagnosis.eob_diagnosis_list as {{ dbt.type_string() }} ) as eob_diagnosis_list
+        , cast(claim_procedure.eob_procedure_list as {{ dbt.type_string() }} ) as eob_procedure_list
+        , cast(claim_supporting_info.eob_supporting_info_list as {{ dbt.type_string() }} ) as eob_supporting_info_list
+        , cast(claim_item.eob_item_list as {{ dbt.type_string() }} ) as eob_item_list
+        , cast(claim_total.eob_total_list as {{ dbt.type_string() }} ) as eob_total_list
+        , cast(medical_claim.data_source as {{ dbt.type_string() }} ) as data_source
     from dedupe as medical_claim
         left outer join claim_diagnosis
             on medical_claim.claim_id = claim_diagnosis.claim_id
