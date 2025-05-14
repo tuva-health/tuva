@@ -43,18 +43,16 @@ with add_sequence as (
 )
 
 /* create a json string for CSV export */
-select
-      claim_id
-    , to_json(
-        array_agg(
-            object_construct(
-                  'eobProcedureSequence', eob_procedure_sequence
-                , 'eobProcedureSystem', eob_procedure_system
-                , 'eobProcedureCode', eob_procedure_code
-                , 'eobProcedureDisplay', eob_procedure_display
-                , 'eobProcedureTypeCode', eob_procedure_type_code
-            )
-        ) within group (order by eob_procedure_sequence)
-      ) as eob_procedure_list
-from staging
-group by claim_id
+{{ create_json_object(
+    table_ref='staging',
+    group_by_col='claim_id',
+    order_by_col='eob_procedure_sequence',
+    object_col_name='eob_procedure_list',
+    object_col_list=[
+        'eob_procedure_sequence'
+        , 'eob_procedure_system'
+        , 'eob_procedure_code'
+        , 'eob_procedure_display'
+        , 'eob_procedure_type_code'
+    ]
+) }}

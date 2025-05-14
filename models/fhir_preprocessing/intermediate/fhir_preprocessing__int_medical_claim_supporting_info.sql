@@ -59,19 +59,17 @@ with admission_period as (
 )
 
 /* create a json string for CSV export */
-select
-      claim_id
-    , to_json(
-        array_agg(
-            object_construct(
-                  'eobSupportingInfoSequence', eob_supporting_info_sequence
-                , 'eobSupportingInfoCategoryCode', eob_supporting_info_category_code
-                , 'eobSupportingInfoCode', eob_supporting_info_code
-                , 'eobSupportingInfoSystem', eob_supporting_info_system
-                , 'eobSupportingInfoTimingStart', eob_supporting_info_timing_start
-                , 'eobSupportingInfoTimingEnd', eob_supporting_info_timing_end
-            )
-        ) within group (order by eob_supporting_info_sequence)
-      ) as eob_supporting_info_list
-from add_sequence
-group by claim_id
+{{ create_json_object(
+    table_ref='add_sequence',
+    group_by_col='claim_id',
+    order_by_col='eob_supporting_info_sequence',
+    object_col_name='eob_supporting_info_list',
+    object_col_list=[
+        'eob_supporting_info_sequence'
+        , 'eob_supporting_info_category_code'
+        , 'eob_supporting_info_code'
+        , 'eob_supporting_info_system'
+        , 'eob_supporting_info_timing_start'
+        , 'eob_supporting_info_timing_end'
+    ]
+) }}

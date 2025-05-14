@@ -48,20 +48,15 @@ with adjudication_amount as (
 )
 
 /* create a json string for CSV export */
-select
-      claim_id
-    , claim_line_number
-    , to_json(
-        array_agg(
-            object_construct(
-                  'eobItemAdjudicationCategorySystem', eob_item_adjudication_category_system
-                , 'eobItemAdjudicationCategoryCode', eob_item_adjudication_category_code
-                , 'eobItemAdjudicationAmountCurrency', eob_item_adjudication_amount_currency
-                , 'eobItemAdjudicationAmountValue', eob_item_adjudication_amount_value
-            )
-        )
-      ) as eob_item_adjudication_list
-from unioned
-group by
-      claim_id
-    , claim_line_number
+{{ create_json_object(
+    table_ref='unioned',
+    group_by_col='claim_id, claim_line_number',
+    order_by_col=none,
+    object_col_name='eob_item_adjudication_list',
+    object_col_list=[
+        'eob_item_adjudication_category_system'
+        , 'eob_item_adjudication_category_code'
+        , 'eob_item_adjudication_amount_currency'
+        , 'eob_item_adjudication_amount_value'
+    ]
+) }}

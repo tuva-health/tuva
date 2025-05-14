@@ -34,18 +34,16 @@ with staging as (
 )
 
 /* create a json string for CSV export */
-select
-      claim_id
-    , to_json(
-        array_agg(
-            object_construct(
-                  'eobDiagnosisSequence', eob_diagnosis_sequence
-                , 'eobDiagnosisSystem', eob_diagnosis_system
-                , 'eobDiagnosisCode', eob_diagnosis_code
-                , 'eobDiagnosisDisplay', eob_diagnosis_display
-                , 'eobDiagnosisTypeCode', eob_diagnosis_type_code
-            )
-        ) within group (order by eob_diagnosis_sequence)
-      ) as eob_diagnosis_list
-from staging
-group by claim_id
+{{ create_json_object(
+    table_ref='staging',
+    group_by_col='claim_id',
+    order_by_col='eob_diagnosis_sequence',
+    object_col_name='eob_diagnosis_list',
+    object_col_list=[
+        'eob_diagnosis_sequence'
+        , 'eob_diagnosis_system'
+        , 'eob_diagnosis_code'
+        , 'eob_diagnosis_display'
+        , 'eob_diagnosis_type_code'
+    ]
+) }}

@@ -76,18 +76,13 @@ with coverage_staging as (
 )
 
 /* create a json string for CSV export */
-select
-      patient_internal_id
-    , resource_internal_id
-    , to_json(
-        array_agg(
-            object_construct(
-                  'coverageTypeSystem', coverage_type_system
-                , 'coverageTypeCode', coverage_type_code
-            )
-        )
-      ) as coverage_type_list
-from unioned
-group by
-      patient_internal_id
-    , resource_internal_id
+{{ create_json_object(
+    table_ref='unioned',
+    group_by_col='patient_internal_id, resource_internal_id',
+    order_by_col=none,
+    object_col_name='coverage_type_list',
+    object_col_list=[
+        'coverage_type_system'
+        , 'coverage_type_code'
+    ]
+) }}

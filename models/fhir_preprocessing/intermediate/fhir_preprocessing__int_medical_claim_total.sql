@@ -48,17 +48,15 @@ with total_amount as (
 )
 
 /* create a json string for CSV export */
-select
-      claim_id
-    , to_json(
-        array_agg(
-            object_construct(
-                  'eobTotalCategorySystem', eob_total_category_system
-                , 'eobTotalCategoryCode', eob_total_category_code
-                , 'eobTotalAmountCurrency', eob_total_amount_currency
-                , 'eobTotalAmountValue', eob_total_amount_value
-            )
-        )
-      ) as eob_total_list
-from unioned
-group by claim_id
+{{ create_json_object(
+    table_ref='unioned',
+    group_by_col='claim_id',
+    order_by_col=none,
+    object_col_name='eob_total_list',
+    object_col_list=[
+        'eob_total_category_system'
+        , 'eob_total_category_code'
+        , 'eob_total_amount_currency'
+        , 'eob_total_amount_value'
+    ]
+) }}
