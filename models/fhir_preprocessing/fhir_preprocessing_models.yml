@@ -2,20 +2,6 @@ version: 2
 
 models:
 ## Final
-  - name: fhir_preprocessing__coverage
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: coverage
-      tags: fhir_preprocessing
-      materialized: table
-    description: Final mapping for Coverage FHIR resource.
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - patient_internal_id
-            - resource_internal_id
-
   - name: fhir_preprocessing__condition
     config:
       schema: |
@@ -24,6 +10,20 @@ models:
       tags: fhir_preprocessing
       materialized: table
     description: Final mapping for Condition FHIR resource.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - patient_internal_id
+            - resource_internal_id
+
+  - name: fhir_preprocessing__coverage
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
+      alias: coverage
+      tags: fhir_preprocessing
+      materialized: table
+    description: Final mapping for Coverage FHIR resource.
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -106,7 +106,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_coverage
+      alias: _int_coverage
       tags: fhir_preprocessing
       materialized: table
     description: Prep coverage product for Coverage resource.
@@ -115,7 +115,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: int_coverage_type
+      alias: _int_coverage_type
       tags: fhir_preprocessing
       materialized: table
     description: Prep coverage type list for the Coverage resource.
@@ -224,7 +224,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_fhir_preprocessing{% else %}fhir_preprocessing{%- endif -%}
-      alias: _int_pharmacy_eob
+      alias: _int_pharmacy_claim_eob
       tags: fhir_preprocessing
       materialized: table
     description: >
