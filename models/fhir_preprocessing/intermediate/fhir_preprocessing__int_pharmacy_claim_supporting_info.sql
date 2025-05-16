@@ -9,8 +9,8 @@ with days_supply as (
           claim_id
         , 'dayssupply' as eob_supporting_info_category_code
         , cast(days_supply as {{ dbt.type_string() }} ) as eob_supporting_info_value_quantity /* cast as string for union */
-        , null as eob_supporting_info_code /* required for union */
-        , null as eob_supporting_info_system /* required for union */
+        , cast(null as {{ dbt.type_string() }} ) as eob_supporting_info_code /* required for union */
+        , cast(null as {{ dbt.type_string() }} ) as eob_supporting_info_system /* required for union */
     from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }}
     where claim_line_number = 1 /* filter to claim header */
     and days_supply is not null
@@ -23,8 +23,8 @@ with days_supply as (
           claim_id
         , 'refillnum' as eob_supporting_info_category_code
         , cast(refills as {{ dbt.type_string() }} ) as eob_supporting_info_value_quantity /* cast as string for union */
-        , null as eob_supporting_info_code /* required for union */
-        , null as eob_supporting_info_system /* required for union */
+        , cast(null as {{ dbt.type_string() }} ) as eob_supporting_info_code /* required for union */
+        , cast(null as {{ dbt.type_string() }} ) as eob_supporting_info_system /* required for union */
     from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }}
     where claim_line_number = 1 /* filter to claim header */
     and refills is not null

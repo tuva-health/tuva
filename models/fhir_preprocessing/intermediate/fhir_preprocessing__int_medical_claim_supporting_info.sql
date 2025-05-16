@@ -8,8 +8,8 @@ with admission_period as (
     select
           claim_id
         , 'admissionperiod' as eob_supporting_info_category_code
-        , null as eob_supporting_info_code /* required for union */
-        , null as eob_supporting_info_system /* required for union */
+        , cast(null as {{ dbt.type_string() }} ) as eob_supporting_info_code /* required for union */
+        , cast(null as {{ dbt.type_string() }} ) as eob_supporting_info_system /* required for union */
         , admission_date as eob_supporting_info_timing_start
         , discharge_date as eob_supporting_info_timing_end
     from {{ ref('fhir_preprocessing__stg_core__medical_claim') }}
@@ -25,8 +25,8 @@ with admission_period as (
         , 'typeofbill' as eob_supporting_info_category_code
         , bill_type_code as eob_supporting_info_code
         , 'UBTOB' as eob_supporting_info_system
-        , null as eob_supporting_info_timing_start /* required for union */
-        , null as eob_supporting_info_timing_end /* required for union */
+        , cast(null as date) as eob_supporting_info_timing_start /* required for union */
+        , cast(null as date) as eob_supporting_info_timing_end /* required for union */
     from {{ ref('fhir_preprocessing__stg_core__medical_claim') }}
     where claim_line_number = 1 /* filter to claim header */
     and bill_type_code is not null
