@@ -6,8 +6,13 @@ require-dbt-version: ">=1.5.0"
 profile: default
 
 models:
+  ## see docs: https://docs.elementary-data.com/
   elementary:
-    enabled: true # Change to false to disable all models in the elementary package
+    ## elementary models will be created in the schema '<your_schema>_elementary'
+    +schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_elementary{% else %}elementary{%- endif -%}
+    ## To disable elementary for dev, uncomment this:
+    # enabled: "{{ target.name in ['prod','analytics'] }}"
 
 flags:
   require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
@@ -51,9 +56,9 @@ vars:
 
     ## Set this variable to true if you want legacy data quality models to build
     enable_legacy_data_quality: false
-
-on-run-end:
+on-run-start:
   - "{{ log_invocation_start() }}"
+on-run-end:
   - "{{ log_warning_for_seeds() }}"
 
 model-paths: ["models"]

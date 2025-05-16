@@ -1,5 +1,5 @@
 {% macro create_tuva_invocations_table() %}
-    {% do create_schema('metadata') %}
+    {% do adapter.create_schema(api.Relation.create(database=target.database, schema="metadata")) %}
     {% set create_table_query %}
         create table if not exists metadata.tuva_invocations
         (
