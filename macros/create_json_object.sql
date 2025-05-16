@@ -58,7 +58,7 @@ select
                 {% if not loop.first %}, {% endif -%}
                 '{{ snake_to_camel(col) }}',
                 {%- if 'list' in col | lower -%}
-                parse_json({{ col }}) /* parse_json added to prevent nested objects from being escaped */
+                parse_json( {{ col }} ) /* parse_json added to prevent nested objects from being escaped */
                 {%- else -%}
                 {{ col }}
                 {%- endif -%}
@@ -72,5 +72,23 @@ group by {{ group_by_col }}
 {% endmacro %}
 
 /* bigquery */
+{% macro bigquery__create_json_object(table_ref,group_by_col, order_by_col, object_col_name,object_col_list) %}
+select
+    {{ group_by_col }}
+    , to_json_string(
+        array_agg(
+            struct(
+                {%- for col in object_col_list %}
+                {% if not loop.first %}, {% endif -%}
+                {{ col }} as {{ snake_to_camel(col) }}
+                {%- endfor %}
+            )
+        {% if order_by_col -%} order by {{ order_by_col }} {%- endif %}
+        )
+    ) as {{ object_col_name }}
+from {{ table_ref }}
+group by {{ group_by_col }}
+{% endmacro %}
+
 /* redshift */
 /* fabric */
