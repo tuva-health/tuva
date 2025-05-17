@@ -360,9 +360,9 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: icd_10_cm
-        description: 'The ICD-10-CM code.'
+        description: 'Alpha-Numeric ICD-10-CM Code.'
       - name: header_flag
-        description: 'Flag indicating if the code is a header.'
+        description: 'Binary Flag with value = 1 if the code is billable, and 0 indicating if the code is a header, which is a non-billable summary code found in the file.'
       - name: short_description
         description: 'The short description of the ICD-10-CM code.'
       - name: long_description
