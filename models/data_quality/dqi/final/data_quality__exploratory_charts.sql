@@ -64,9 +64,9 @@ with medical_paid_amount_vs_end_date_matrix as (
            , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilmc.claim_end_date)
+           , DATE_TRUNC('MONTH', ilmc.paid_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% endif %}
 )
 
@@ -129,9 +129,9 @@ with medical_paid_amount_vs_end_date_matrix as (
            , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilmc.claim_end_date)
+           , DATE_TRUNC('MONTH', ilmc.paid_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% endif %}
 )
 
@@ -183,8 +183,8 @@ with medical_paid_amount_vs_end_date_matrix as (
            cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , CAST(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilmc.claim_end_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% endif %}
 )
 
@@ -226,7 +226,7 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type == 'athena' %}
            cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% endif %}
 )
 
@@ -283,8 +283,8 @@ with medical_paid_amount_vs_end_date_matrix as (
            cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , CAST(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilmc.claim_end_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% endif %}
 )
 
@@ -336,7 +336,7 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type == 'athena' %}
            cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           DATE_TRUNC('YEAR', ilmc.claim_end_date)
            {% endif %}
 )
 
@@ -400,9 +400,9 @@ with medical_paid_amount_vs_end_date_matrix as (
            , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilpc.dispensing_date)
+           , DATE_TRUNC('MONTH', ilpc.paid_date)
+           , DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% endif %}
 )
 
@@ -465,9 +465,9 @@ with medical_paid_amount_vs_end_date_matrix as (
            , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilpc.dispensing_date)
+           , DATE_TRUNC('MONTH', ilpc.paid_date)
+           , DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% endif %}
 )
 
@@ -519,8 +519,8 @@ with medical_paid_amount_vs_end_date_matrix as (
            cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , CAST(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilpc.dispensing_date)
+           , DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% endif %}
 )
 
@@ -557,13 +557,12 @@ with medical_paid_amount_vs_end_date_matrix as (
            cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
            cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
            cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% endif %}
 )
 
@@ -620,8 +619,8 @@ with medical_paid_amount_vs_end_date_matrix as (
            cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , CAST(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilpc.dispensing_date)
+           , DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% endif %}
 )
 
@@ -673,7 +672,7 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type == 'athena' %}
            cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           DATE_TRUNC('YEAR', ilpc.dispensing_date)
            {% endif %}
 )
 
@@ -772,8 +771,8 @@ with medical_paid_amount_vs_end_date_matrix as (
            cast(DATE_TRUNC('MONTH', ilmc.claim_start_date) as VARCHAR)
            , cast(DATE_TRUNC('YEAR', ilmc.claim_start_date) as VARCHAR)
            {% else %} -- snowflake and redshift
-           CAST(DATE_TRUNC('MONTH', ilmc.claim_start_date) as VARCHAR)
-           , CAST(DATE_TRUNC('YEAR', ilmc.claim_start_date) as VARCHAR)
+           DATE_TRUNC('MONTH', ilmc.claim_start_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_start_date)
            {% endif %}
 )
 
@@ -809,7 +808,7 @@ with medical_paid_amount_vs_end_date_matrix as (
         {% elif target.type == 'athena' %}
         cast(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR)
         {% else %} -- snowflake and redshift
-        CAST(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR)
+        DATE_TRUNC('MONTH', claim_start_date)
         {% endif %}
 )
 
@@ -844,7 +843,7 @@ with medical_paid_amount_vs_end_date_matrix as (
         {% elif target.type == 'athena' %}
         cast(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR)
         {% else %} -- snowflake and redshift
-        CAST(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR)
+        DATE_TRUNC('MONTH', dispensing_date)
         {% endif %}
 )
 
