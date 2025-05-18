@@ -781,17 +781,17 @@ with medical_paid_amount_vs_end_date_matrix as (
     select
         COALESCE(claim_type, 'unknown') as claim_type,
         {% if target.type == 'bigquery' %}
-        cast(DATE_TRUNC(claim_start_date, MONTH) as STRING) as date_month,
+        DATE_TRUNC(claim_start_date, MONTH) as date_month,
         {% elif target.type in ('postgres', 'duckdb') %}
-        cast(DATE_TRUNC('month', claim_start_date) as VARCHAR) as date_month,
+        DATE_TRUNC('month', claim_start_date) as date_month,
         {% elif target.type == 'fabric' %}
-        cast(DATETRUNC(month, claim_start_date) as VARCHAR) as date_month,
+        DATETRUNC(month, claim_start_date) as date_month,
         {% elif target.type == 'databricks' %}
-        cast(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR) as date_month,
+        DATE_TRUNC('MONTH', claim_start_date) as date_month,
         {% elif target.type == 'athena' %}
-        cast(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR) as date_month,
+        DATE_TRUNC('MONTH', claim_start_date) as date_month,
         {% else %} -- snowflake and redshift
-        CAST(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR) as date_month,
+        DATE_TRUNC('MONTH', claim_start_date) as date_month,
         {% endif %}
         SUM(paid_amount) as paid_amount
     from {{ ref('input_layer__medical_claim') }}
@@ -799,17 +799,17 @@ with medical_paid_amount_vs_end_date_matrix as (
     group by
         COALESCE(claim_type, 'unknown'),
         {% if target.type == 'bigquery' %}
-        cast(DATE_TRUNC(claim_start_date, MONTH) as STRING)
+        DATE_TRUNC(claim_start_date, MONTH)
         {% elif target.type in ('postgres', 'duckdb') %}
-        cast(DATE_TRUNC('month', claim_start_date) as VARCHAR)
+        DATE_TRUNC('month', claim_start_date)
         {% elif target.type == 'fabric' %}
-        cast(DATETRUNC(month, claim_start_date) as VARCHAR)
+        DATETRUNC(month, claim_start_date)
         {% elif target.type == 'databricks' %}
-        cast(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR)
+        DATE_TRUNC('MONTH', claim_start_date)
         {% elif target.type == 'athena' %}
-        cast(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR)
+        DATE_TRUNC('MONTH', claim_start_date)
         {% else %} -- snowflake and redshift
-        CAST(DATE_TRUNC('MONTH', claim_start_date) as VARCHAR)
+        DATE_TRUNC('MONTH', claim_start_date)
         {% endif %}
 )
 
@@ -817,34 +817,34 @@ with medical_paid_amount_vs_end_date_matrix as (
     select
         'pharmacy' as claim_type,
         {% if target.type == 'bigquery' %}
-        cast(DATE_TRUNC(dispensing_date, MONTH) as STRING) as date_month,
+        DATE_TRUNC(dispensing_date, MONTH) as date_month,
         {% elif target.type in ('postgres', 'duckdb') %}
-        cast(DATE_TRUNC('month', dispensing_date) as VARCHAR) as date_month,
+        DATE_TRUNC('month', dispensing_date) as date_month,
         {% elif target.type == 'fabric' %}
-        cast(DATETRUNC(month, dispensing_date) as VARCHAR) as date_month,
+        DATETRUNC(month, dispensing_date) as date_month,
         {% elif target.type == 'databricks' %}
-        cast(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR) as date_month,
+        DATE_TRUNC('MONTH', dispensing_date) as date_month,
         {% elif target.type == 'athena' %}
-        cast(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR) as date_month,
+        DATE_TRUNC('MONTH', dispensing_date) as date_month,
         {% else %} -- snowflake and redshift
-        CAST(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR) as date_month,
+        DATE_TRUNC('MONTH', dispensing_date) as date_month,
         {% endif %}
         SUM(paid_amount) as paid_amount
     from {{ ref('input_layer__pharmacy_claim') }}
     where dispensing_date is not null
     group by
         {% if target.type == 'bigquery' %}
-        cast(DATE_TRUNC(dispensing_date, MONTH) as STRING)
+        DATE_TRUNC(dispensing_date, MONTH)
         {% elif target.type in ('postgres', 'duckdb') %}
-        cast(DATE_TRUNC('month', dispensing_date) as VARCHAR)
+        DATE_TRUNC('month', dispensing_date)
         {% elif target.type == 'fabric' %}
-        cast(DATETRUNC(month, dispensing_date) as VARCHAR)
+        DATETRUNC(month, dispensing_date)
         {% elif target.type == 'databricks' %}
-        cast(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR)
+        DATE_TRUNC('MONTH', dispensing_date)
         {% elif target.type == 'athena' %}
-        cast(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR)
+        DATE_TRUNC('MONTH', dispensing_date)
         {% else %} -- snowflake and redshift
-        CAST(DATE_TRUNC('MONTH', dispensing_date) as VARCHAR)
+        DATE_TRUNC('MONTH', dispensing_date)
         {% endif %}
 )
 
@@ -879,33 +879,29 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% if target.type == 'bigquery' %}
          , cast(DATE_TRUNC(acm.date_month, MONTH) as STRING) as x_axis
          , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as chart_filter
-         , CAST(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
          , cast(DATE_TRUNC('month', acm.date_month) as VARCHAR) as x_axis
          , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as chart_filter
-         , CAST(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as NUMERIC) as value
          {% elif target.type == 'fabric' %}
          , cast(DATETRUNC(month, acm.date_month) as VARCHAR) as x_axis
          , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as chart_filter
-         , cast(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as NUMERIC) as value
          {% elif target.type == 'databricks' %}
          , cast(DATE_TRUNC('MONTH', acm.date_month) as VARCHAR) as x_axis
          , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as chart_filter
-         , cast(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as DOUBLE) as value
          {% elif target.type == 'athena' %}
          , cast(DATE_TRUNC('MONTH', acm.date_month) as VARCHAR) as x_axis
          , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as chart_filter
-         , cast(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , CAST(DATE_TRUNC('MONTH', acm.date_month) as VARCHAR) as x_axis
          , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as chart_filter
-         , CAST(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as NUMERIC) as value
          {% endif %}
+         , CAST(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as NUMERIC) as value
 
     from all_claims_monthly acm
     inner join total_paid_monthly tpm
         on acm.date_month = tpm.date_month
 )
+
 
 {% if target.type == 'fabric' %}
 select * from medical_paid_amount_vs_end_date_matrix
