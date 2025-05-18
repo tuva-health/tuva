@@ -16,6 +16,15 @@ models:
           config:
             severity: error
             enabled: "{{ (var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures']
+          column_A: death_date
+          column_B: birth_date
+          or_equal: True
+          row_condition: "death_date is not null"
+          config:
+            severity: warn
+            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
@@ -68,6 +77,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: last_name
         description: '{{ doc("last_name") }}'
         tests:
@@ -76,6 +91,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: sex
         description: '{{ doc("sex") }}'
         tests:
@@ -84,6 +105,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_4', 'dqi', 'dqi_quality_measures']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - accepted_values:
               values: ['male', 'female', 'unknown']
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
@@ -98,6 +125,19 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - relationships:
+              to: ref('terminology__race')
+              field: description
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: birth_date
         description: '{{ doc("birth_date") }}'
         tests:
@@ -112,6 +152,20 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_quality_measures']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures']
+              min_value: '''1900-01-01'''
+              max_value: '''2100-01-01'''
+              strictly: false
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: death_date
         description: '{{ doc("death_date") }}'
         tests:
@@ -126,6 +180,14 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              tags: [ 'tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures']
+              min_value: '''1900-01-01'''
+              max_value: '''2100-01-01'''
+              strictly: false
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: death_flag
         description: '{{ doc("death_flag") }}'
         tests:
@@ -166,6 +228,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: city
         description: '{{ doc("city") }}'
         tests:
@@ -174,6 +242,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: state
         description: '{{ doc("state") }}'
         tests:
@@ -182,6 +256,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: zip_code
         description: '{{ doc("zip_code") }}'
         tests:
@@ -190,6 +270,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: county
         description: '{{ doc("county") }}'
         tests:
@@ -198,6 +284,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: latitude
         description: '{{ doc("county") }}'
         tests:
@@ -206,6 +298,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: longitude
         description: '{{ doc("longitude") }}'
         tests:
@@ -214,6 +312,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: phone
         description: '{{ doc("phone") }}'
         tests:
@@ -230,6 +334,12 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true) and var('enable_patient', false)) | as_bool }}"
+          - the_tuva_project.warn_if_null_percentage_above_zero:
+              description: "Percentage of values that are null."
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:

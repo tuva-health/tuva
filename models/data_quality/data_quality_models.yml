@@ -1,8 +1,35 @@
 version: 2
 models:
+  - name: data_quality__testing_summary
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: testing_summary
+      tags:
+        - data_quality
+        - dqi
+  - name: data_quality__exploratory_charts
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: exploratory_charts
+      tags:
+        - data_quality
+        - dqi
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - DATA_QUALITY_CATEGORY
+            - GRAPH_NAME
+            - LEVEL_OF_DETAIL
+            - Y_AXIS
+            - X_AXIS
+          config:
+            severity: error
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
 
-#### Data Quality
-## Final
   - name: data_quality__chronic_conditions_prevalence
     config:
       schema: |
@@ -10,7 +37,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: chronic_conditions_prevalence
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__chronic_conditions_none
@@ -20,7 +47,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: chronic_conditions_none
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__encounters_cost_and_utilization_trend
@@ -30,7 +57,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: encounters_cost_and_utilization_trend
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__service_category_pmpm_trend
@@ -40,7 +67,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: service_category_pmpm_trend
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__dx_and_px
@@ -50,7 +77,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: dx_and_px
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: data_quality_check
@@ -68,7 +95,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: eligibility_date_checks
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: data_quality_check
@@ -87,7 +114,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: eligibility_demographics
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: data_quality_check
@@ -107,7 +134,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: eligibility_missing_person_id
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: data_quality_check
@@ -126,7 +153,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: eligibility_missing_payer
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: data_quality_check
@@ -144,7 +171,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: encounters_cost_and_utilization
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__encounters_missing_groups_union
@@ -154,7 +181,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: encounters_missing_groups_union
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__encounters_missing_groups
@@ -164,7 +191,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: encounters_missing_groups
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
 
@@ -175,7 +202,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: eligibility_trend
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: year_month
@@ -193,7 +220,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: claim_date_trends
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: year_month
@@ -229,7 +256,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_test_summary
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: data_quality_check
@@ -250,7 +277,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: analytics_reference_summary
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__analytics_checks_summary
@@ -260,7 +287,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: analytics_checks_summary
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
     columns:
@@ -282,7 +309,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: pharmacy_claim_person_id
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__pharmacy_claim_date_checks
@@ -292,7 +319,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: pharmacy_claim_date_checks
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__pharmacy_claim_ndc
@@ -302,7 +329,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: pharmacy_claim_ndc
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__pharmacy_claim_prescription_details
@@ -312,7 +339,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: pharmacy_claim_prescription_details
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__pharmacy_claim_npi
@@ -322,7 +349,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: pharmacy_claim_npi
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__pharmacy_claim_volume_and_dollars
@@ -332,7 +359,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: pharmacy_claim_volume_and_dollars
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: year_month
@@ -352,7 +379,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: primary_key_check
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__medical_claim_person_id
@@ -362,7 +389,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: medical_claim_person_id
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__medical_claim_date_checks
@@ -372,7 +399,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: medical_claim_date_checks
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__medical_claim_inst_header_fields
@@ -382,7 +409,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: medical_claim_inst_header_fields
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__medical_claim_claim_line_fields
@@ -392,7 +419,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: medical_claim_claim_line_fields
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__medical_claim_provider_npi
@@ -402,7 +429,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: medical_claim_provider_npi
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__medical_claim_volume_and_dollars
@@ -412,7 +439,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: medical_claim_volume_and_dollars
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: year_month
@@ -432,7 +459,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_loss
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: table_name
@@ -458,7 +485,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: core_populated
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: table_name
@@ -475,7 +502,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: analytics_populated
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
     columns:
       - name: table_name
@@ -491,7 +518,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_readmissions
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
 
@@ -502,7 +529,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_readmissions_reference
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__service_categories_pmpm
@@ -512,7 +539,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: service_categories_pmpm
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__cms_hcc
@@ -522,7 +549,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_cms_hcc
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__cms_hcc_reference
@@ -532,7 +559,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_cms_hcc_reference
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__quality_measures_reference
@@ -542,7 +569,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_quality_measures_reference
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__quality_measures
@@ -552,7 +579,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_quality_measures
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__acute_inpatient_reference
@@ -562,7 +589,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_acute_inpatient_reference
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__acute_inpatient
@@ -572,7 +599,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_acute_inpatient
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__acute_inpatient_prevalence
@@ -582,7 +609,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_acute_inpatient_prevalence
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__ed_classification
@@ -592,7 +619,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_ed_classification
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__ed_classification_reference
@@ -602,7 +629,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_ed_classification_reference
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__financial_pmpm
@@ -612,7 +639,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_financial_pmpm
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
   - name: data_quality__claim_percent
@@ -622,7 +649,7 @@ models:
         {% else %}data_quality{%- endif -%}
       alias: data_quality_claim_percent
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
 
 
@@ -634,7 +661,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: view
 
   - name: data_quality__inpatient_dq_stage
@@ -643,5 +670,5 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       tags:
-        - data_quality_audit
+        - data_quality
       materialized: table
