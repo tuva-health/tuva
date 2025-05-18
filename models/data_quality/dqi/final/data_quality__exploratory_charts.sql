@@ -777,6 +777,83 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
 )
 
+, medical_claims_monthly as (
+    select
+        COALESCE(claim_type, 'unknown') as claim_type,
+        {% if target.type == 'bigquery' %}
+        DATE_TRUNC(claim_start_date, MONTH) as date_month,
+        {% elif target.type in ('postgres', 'duckdb') %}
+        DATE_TRUNC('month', claim_start_date) as date_month,
+        {% elif target.type == 'fabric' %}
+        DATETRUNC(month, claim_start_date) as date_month,
+        {% elif target.type == 'databricks' %}
+        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        {% elif target.type == 'athena' %}
+        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        {% else %} -- snowflake and redshift
+        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        {% endif %}
+        SUM(paid_amount) as paid_amount
+    from {{ ref('input_layer__medical_claim') }}
+    where claim_start_date is not null
+    group by
+        COALESCE(claim_type, 'unknown'),
+        {% if target.type == 'bigquery' %}
+        DATE_TRUNC(claim_start_date, MONTH)
+        {% elif target.type in ('postgres', 'duckdb') %}
+        DATE_TRUNC('month', claim_start_date)
+        {% elif target.type == 'fabric' %}
+        DATETRUNC(month, claim_start_date)
+        {% elif target.type == 'databricks' %}
+        DATE_TRUNC('MONTH', claim_start_date)
+        {% elif target.type == 'athena' %}
+        DATE_TRUNC('MONTH', claim_start_date)
+        {% else %} -- snowflake and redshift
+        DATE_TRUNC('MONTH', claim_start_date)
+        {% endif %}
+)
+
+, pharmacy_claims_monthly as (
+    select
+        'pharmacy' as claim_type,
+        {% if target.type == 'bigquery' %}
+        DATE_TRUNC(dispensing_date, MONTH) as date_month,
+        {% elif target.type in ('postgres', 'duckdb') %}
+        DATE_TRUNC('month', dispensing_date) as date_month,
+        {% elif target.type == 'fabric' %}
+        DATETRUNC(month, dispensing_date) as date_month,
+        {% elif target.type == 'databricks' %}
+        DATE_TRUNC('MONTH', dispensing_date) as date_month,
+        {% elif target.type == 'athena' %}
+        DATE_TRUNC('MONTH', dispensing_date) as date_month,
+        {% else %} -- snowflake and redshift
+        DATE_TRUNC('MONTH', dispensing_date) as date_month,
+        {% endif %}
+        SUM(paid_amount) as paid_amount
+    from {{ ref('input_layer__pharmacy_claim') }}
+    where dispensing_date is not null
+    group by
+        {% if target.type == 'bigquery' %}
+        DATE_TRUNC(dispensing_date, MONTH)
+        {% elif target.type in ('postgres', 'duckdb') %}
+        DATE_TRUNC('month', dispensing_date)
+        {% elif target.type == 'fabric' %}
+        DATETRUNC(month, dispensing_date)
+        {% elif target.type == 'databricks' %}
+        DATE_TRUNC('MONTH', dispensing_date)
+        {% elif target.type == 'athena' %}
+        DATE_TRUNC('MONTH', dispensing_date)
+        {% else %} -- snowflake and redshift
+        DATE_TRUNC('MONTH', dispensing_date)
+        {% endif %}
+)
+
+, all_claims_monthly as (
+    select claim_type, date_month, paid_amount from medical_claims_monthly
+    union all
+    select claim_type, date_month, paid_amount from pharmacy_claims_monthly
+)
+
 , total_paid_yearly as (
     select
         {% if target.type == 'bigquery' %}
