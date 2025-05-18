@@ -777,130 +777,216 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
 )
 
-, medical_claims_monthly as (
+, total_paid_yearly as (
     select
-        COALESCE(claim_type, 'unknown') as claim_type,
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(claim_start_date, MONTH) as date_month,
+        DATE_TRUNC(date_month, YEAR) as year_date,
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', claim_start_date) as date_month,
+        DATE_TRUNC('year', date_month) as year_date,
         {% elif target.type == 'fabric' %}
-        DATETRUNC(month, claim_start_date) as date_month,
+        DATETRUNC(year, date_month) as year_date,
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        DATE_TRUNC('YEAR', date_month) as year_date,
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        DATE_TRUNC('YEAR', date_month) as year_date,
         {% else %} -- snowflake and redshift
-        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        DATE_TRUNC('YEAR', date_month) as year_date,
         {% endif %}
-        SUM(paid_amount) as paid_amount
-    from {{ ref('input_layer__medical_claim') }}
-    where claim_start_date is not null
-    group by
-        COALESCE(claim_type, 'unknown'),
-        {% if target.type == 'bigquery' %}
-        DATE_TRUNC(claim_start_date, MONTH)
-        {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', claim_start_date)
-        {% elif target.type == 'fabric' %}
-        DATETRUNC(month, claim_start_date)
-        {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', claim_start_date)
-        {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', claim_start_date)
-        {% else %} -- snowflake and redshift
-        DATE_TRUNC('MONTH', claim_start_date)
-        {% endif %}
-)
-
-, pharmacy_claims_monthly as (
-    select
-        'pharmacy' as claim_type,
-        {% if target.type == 'bigquery' %}
-        DATE_TRUNC(dispensing_date, MONTH) as date_month,
-        {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', dispensing_date) as date_month,
-        {% elif target.type == 'fabric' %}
-        DATETRUNC(month, dispensing_date) as date_month,
-        {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', dispensing_date) as date_month,
-        {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', dispensing_date) as date_month,
-        {% else %} -- snowflake and redshift
-        DATE_TRUNC('MONTH', dispensing_date) as date_month,
-        {% endif %}
-        SUM(paid_amount) as paid_amount
-    from {{ ref('input_layer__pharmacy_claim') }}
-    where dispensing_date is not null
-    group by
-        {% if target.type == 'bigquery' %}
-        DATE_TRUNC(dispensing_date, MONTH)
-        {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', dispensing_date)
-        {% elif target.type == 'fabric' %}
-        DATETRUNC(month, dispensing_date)
-        {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', dispensing_date)
-        {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', dispensing_date)
-        {% else %} -- snowflake and redshift
-        DATE_TRUNC('MONTH', dispensing_date)
-        {% endif %}
-)
-
-, all_claims_monthly as (
-    select claim_type, date_month, paid_amount from medical_claims_monthly
-    union all
-    select claim_type, date_month, paid_amount from pharmacy_claims_monthly
-)
-
-, total_paid_monthly as (
-    select
-        date_month,
-        SUM(paid_amount) as total_paid
+        SUM(paid_amount) as total_yearly_paid
     from all_claims_monthly
-    group by date_month
+    group by
+        {% if target.type == 'bigquery' %}
+        DATE_TRUNC(date_month, YEAR)
+        {% elif target.type in ('postgres', 'duckdb') %}
+        DATE_TRUNC('year', date_month)
+        {% elif target.type == 'fabric' %}
+        DATETRUNC(year, date_month)
+        {% elif target.type == 'databricks' %}
+        DATE_TRUNC('YEAR', date_month)
+        {% elif target.type == 'athena' %}
+        DATE_TRUNC('YEAR', date_month)
+        {% else %} -- snowflake and redshift
+        DATE_TRUNC('YEAR', date_month)
+        {% endif %}
 )
 
-, claim_type_spend_distribution_monthly as (
+, professional_claims_yearly_pct as (
     select 'reasonableness' as data_quality_category
-         , 'claim_type_spend_distribution_monthly' as graph_name
-         , 'month' as level_of_detail
-         , case
-             when acm.claim_type = 'institutional' then 'institutional (benchmark: 50%-80%)'
-             when acm.claim_type = 'professional' then 'professional (benchmark: 20%-40%)'
-             when acm.claim_type = 'pharmacy' then 'pharmacy (benchmark: 10%-30%)'
-             else acm.claim_type
-           end as y_axis_description
-         , 'claim_start_date' as x_axis_description
-         , 'claim_year' as filter_description
+         , 'professional_claims_yearly_percentage' as graph_name
+         , 'year' as level_of_detail
+         , 'professional (benchmark: 20%-40%)' as y_axis_description
+         , 'claim_year' as x_axis_description
+         , 'N/A' as filter_description
          , 'percent_of_total_spend' as sum_description
-         , acm.claim_type as y_axis
+         , 'professional' as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, MONTH) as STRING) as x_axis
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as chart_filter
+         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', acm.date_month) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as chart_filter
+         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, acm.date_month) as VARCHAR) as x_axis
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as chart_filter
+         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', acm.date_month) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as chart_filter
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', acm.date_month) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as chart_filter
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% else %} -- snowflake and redshift
-         , CAST(DATE_TRUNC('MONTH', acm.date_month) as VARCHAR) as x_axis
-         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as chart_filter
+         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
-         , CAST(acm.paid_amount / NULLIF(tpm.total_paid, 0) * 100 as NUMERIC) as value
+         , CAST(null as STRING) as chart_filter
+         , CAST(SUM(acm.paid_amount) / NULLIF(tpy.total_yearly_paid, 0) * 100 as NUMERIC) as value
 
     from all_claims_monthly acm
-    inner join total_paid_monthly tpm
-        on acm.date_month = tpm.date_month
+    inner join total_paid_yearly tpy
+        on {% if target.type == 'bigquery' %}
+           DATE_TRUNC(acm.date_month, YEAR) = tpy.year_date
+           {% elif target.type in ('postgres', 'duckdb') %}
+           DATE_TRUNC('year', acm.date_month) = tpy.year_date
+           {% elif target.type == 'fabric' %}
+           DATETRUNC(year, acm.date_month) = tpy.year_date
+           {% elif target.type == 'databricks' %}
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% elif target.type == 'athena' %}
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% else %} -- snowflake and redshift
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% endif %}
+    where acm.claim_type = 'professional'
+    group by
+         y_axis
+         {% if target.type == 'bigquery' %}
+         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING)
+         {% elif target.type in ('postgres', 'duckdb') %}
+         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR)
+         {% elif target.type == 'fabric' %}
+         , cast(DATETRUNC(year, acm.date_month) as VARCHAR)
+         {% elif target.type == 'databricks' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% elif target.type == 'athena' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% else %} -- snowflake and redshift
+         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% endif %}
+         , tpy.total_yearly_paid
 )
+
+, institutional_claims_yearly_pct as (
+    select 'reasonableness' as data_quality_category
+         , 'institutional_claims_yearly_percentage' as graph_name
+         , 'year' as level_of_detail
+         , 'institutional (benchmark: 50%-80%)' as y_axis_description
+         , 'claim_year' as x_axis_description
+         , 'N/A' as filter_description
+         , 'percent_of_total_spend' as sum_description
+         , 'institutional' as y_axis
+         {% if target.type == 'bigquery' %}
+         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as x_axis
+         {% elif target.type in ('postgres', 'duckdb') %}
+         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as x_axis
+         {% elif target.type == 'fabric' %}
+         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as x_axis
+         {% elif target.type == 'databricks' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         {% elif target.type == 'athena' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         {% else %} -- snowflake and redshift
+         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         {% endif %}
+         , CAST(null as STRING) as chart_filter
+         , CAST(SUM(acm.paid_amount) / NULLIF(tpy.total_yearly_paid, 0) * 100 as NUMERIC) as value
+
+    from all_claims_monthly acm
+    inner join total_paid_yearly tpy
+        on {% if target.type == 'bigquery' %}
+           DATE_TRUNC(acm.date_month, YEAR) = tpy.year_date
+           {% elif target.type in ('postgres', 'duckdb') %}
+           DATE_TRUNC('year', acm.date_month) = tpy.year_date
+           {% elif target.type == 'fabric' %}
+           DATETRUNC(year, acm.date_month) = tpy.year_date
+           {% elif target.type == 'databricks' %}
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% elif target.type == 'athena' %}
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% else %} -- snowflake and redshift
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% endif %}
+    where acm.claim_type = 'institutional'
+    group by
+         y_axis
+         {% if target.type == 'bigquery' %}
+         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING)
+         {% elif target.type in ('postgres', 'duckdb') %}
+         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR)
+         {% elif target.type == 'fabric' %}
+         , cast(DATETRUNC(year, acm.date_month) as VARCHAR)
+         {% elif target.type == 'databricks' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% elif target.type == 'athena' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% else %} -- snowflake and redshift
+         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% endif %}
+         , tpy.total_yearly_paid
+)
+
+, pharmacy_claims_yearly_pct as (
+    select 'reasonableness' as data_quality_category
+         , 'pharmacy_claims_yearly_percentage' as graph_name
+         , 'year' as level_of_detail
+         , 'pharmacy (benchmark: 10%-30%)' as y_axis_description
+         , 'claim_year' as x_axis_description
+         , 'N/A' as filter_description
+         , 'percent_of_total_spend' as sum_description
+         , 'pharmacy' as y_axis
+         {% if target.type == 'bigquery' %}
+         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as x_axis
+         {% elif target.type in ('postgres', 'duckdb') %}
+         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as x_axis
+         {% elif target.type == 'fabric' %}
+         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as x_axis
+         {% elif target.type == 'databricks' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         {% elif target.type == 'athena' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         {% else %} -- snowflake and redshift
+         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         {% endif %}
+         , CAST(null as STRING) as chart_filter
+         , CAST(SUM(acm.paid_amount) / NULLIF(tpy.total_yearly_paid, 0) * 100 as NUMERIC) as value
+
+    from all_claims_monthly acm
+    inner join total_paid_yearly tpy
+        on {% if target.type == 'bigquery' %}
+           DATE_TRUNC(acm.date_month, YEAR) = tpy.year_date
+           {% elif target.type in ('postgres', 'duckdb') %}
+           DATE_TRUNC('year', acm.date_month) = tpy.year_date
+           {% elif target.type == 'fabric' %}
+           DATETRUNC(year, acm.date_month) = tpy.year_date
+           {% elif target.type == 'databricks' %}
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% elif target.type == 'athena' %}
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% else %} -- snowflake and redshift
+           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           {% endif %}
+    where acm.claim_type = 'pharmacy'
+    group by
+         y_axis
+         {% if target.type == 'bigquery' %}
+         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING)
+         {% elif target.type in ('postgres', 'duckdb') %}
+         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR)
+         {% elif target.type == 'fabric' %}
+         , cast(DATETRUNC(year, acm.date_month) as VARCHAR)
+         {% elif target.type == 'databricks' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% elif target.type == 'athena' %}
+         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% else %} -- snowflake and redshift
+         , CAST(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         {% endif %}
+         , tpy.total_yearly_paid
+)
+
 
 
 {% if target.type == 'fabric' %}
@@ -908,11 +994,7 @@ select * from medical_paid_amount_vs_end_date_matrix
 union
 select * from medical_claim_count_vs_end_date_matrix
 union
-select * from medical_claim_paid_over_time_monthly
-union
 select * from medical_claim_paid_over_time_yearly
-union
-select * from medical_claim_volume_over_time_monthly
 union
 select * from medical_claim_volume_over_time_yearly
 union
@@ -920,27 +1002,23 @@ select * from pharmacy_paid_amount_vs_dispensing_date_matrix
 union
 select * from pharmacy_claim_count_vs_dispensing_date_matrix
 union
-select * from pharmacy_claim_paid_over_time_monthly
-union
 select * from pharmacy_claim_paid_over_time_yearly
-union
-select * from pharmacy_claim_volume_over_time_monthly
 union
 select * from pharmacy_claim_volume_over_time_yearly
 union
 select * from medical_claims_with_eligibility
 union
-select * from claim_type_spend_distribution_monthly
+select * from professional_claims_yearly_pct
+union
+select * from institutional_claims_yearly_pct
+union
+select * from pharmacy_claims_yearly_pct
 {% else %}
 select * from medical_paid_amount_vs_end_date_matrix
 union all
 select * from medical_claim_count_vs_end_date_matrix
 union all
-select * from medical_claim_paid_over_time_monthly
-union all
 select * from medical_claim_paid_over_time_yearly
-union all
-select * from medical_claim_volume_over_time_monthly
 union all
 select * from medical_claim_volume_over_time_yearly
 union all
@@ -948,15 +1026,15 @@ select * from pharmacy_paid_amount_vs_dispensing_date_matrix
 union all
 select * from pharmacy_claim_count_vs_dispensing_date_matrix
 union all
-select * from pharmacy_claim_paid_over_time_monthly
-union all
 select * from pharmacy_claim_paid_over_time_yearly
-union all
-select * from pharmacy_claim_volume_over_time_monthly
 union all
 select * from pharmacy_claim_volume_over_time_yearly
 union all
 select * from medical_claims_with_eligibility
 union all
-select * from claim_type_spend_distribution_monthly
+select * from professional_claims_yearly_pct
+union all
+select * from institutional_claims_yearly_pct
+union all
+select * from pharmacy_claims_yearly_pct
 {% endif %}
