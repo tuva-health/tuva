@@ -3,10 +3,6 @@
     enabled = (
         var('enable_input_layer_testing', true) | as_bool
     )
-    and
-    (
-        var('claims_enabled', var('tuva_marts_enabled', false)) | as_bool
-    )
 ) }}
 
 with medical_paid_amount_vs_end_date_matrix as (
@@ -685,6 +681,106 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
 )
 
+, medical_claims_with_eligibility as (
+    select 'completeness' as data_quality_category
+         , 'medical_claims_with_eligibility' as graph_name
+         , 'month' as level_of_detail
+         , 'N/A' as y_axis_description
+         , 'claim_start_date' as x_axis_description
+         , 'claim_year' as filter_description
+         , 'percentage_of_claims_with_eligibility' as sum_description
+         , CAST(null as DATE) as y_axis
+         {% if target.type == 'bigquery' %}
+         , DATE_TRUNC(ilmc.claim_start_date, MONTH) as x_axis
+         , DATE_TRUNC(ilmc.claim_start_date, YEAR) as chart_filter
+         , CAST(
+             COUNT(DISTINCT CASE WHEN EXISTS (
+                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
+                 WHERE ile.person_id = ilmc.person_id
+             ) THEN ilmc.claim_id END) * 100.0 /
+             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
+             as NUMERIC
+           ) as value
+         {% elif target.type in ('postgres', 'duckdb') %}
+         , DATE_TRUNC('month', ilmc.claim_start_date) as x_axis
+         , DATE_TRUNC('year', ilmc.claim_start_date) as chart_filter
+         , CAST(
+             COUNT(DISTINCT CASE WHEN EXISTS (
+                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
+                 WHERE ile.person_id = ilmc.person_id
+             ) THEN ilmc.claim_id END) * 100.0 /
+             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
+             as NUMERIC
+           ) as value
+         {% elif target.type == 'fabric' %}
+         , cast(DATETRUNC(month, ilmc.claim_start_date) as VARCHAR) as x_axis
+         , cast(DATETRUNC(year, ilmc.claim_start_date) as VARCHAR) as chart_filter
+         , cast(
+             COUNT(DISTINCT CASE WHEN EXISTS (
+                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
+                 WHERE ile.person_id = ilmc.person_id
+             ) THEN ilmc.claim_id END) * 100.0 /
+             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
+             as NUMERIC
+           ) as value
+         {% elif target.type == 'databricks' %}
+         , DATE_TRUNC('MONTH', ilmc.claim_start_date) as x_axis
+         , DATE_TRUNC('YEAR', ilmc.claim_start_date) as chart_filter
+         , cast(
+             COUNT(DISTINCT CASE WHEN EXISTS (
+                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
+                 WHERE ile.person_id = ilmc.person_id
+             ) THEN ilmc.claim_id END) * 100.0 /
+             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
+             as DOUBLE
+           ) as value
+         {% elif target.type == 'athena' %}
+         , DATE_TRUNC('MONTH', ilmc.claim_start_date) as x_axis
+         , DATE_TRUNC('YEAR', ilmc.claim_start_date) as chart_filter
+         , cast(
+             COUNT(DISTINCT CASE WHEN EXISTS (
+                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
+                 WHERE ile.person_id = ilmc.person_id
+             ) THEN ilmc.claim_id END) * 100.0 /
+             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
+             as DECIMAL
+           ) as value
+         {% else %} -- snowflake and redshift
+         , DATE_TRUNC('MONTH', ilmc.claim_start_date) as x_axis
+         , DATE_TRUNC('YEAR', ilmc.claim_start_date) as chart_filter
+         , CAST(
+             COUNT(DISTINCT CASE WHEN EXISTS (
+                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
+                 WHERE ile.person_id = ilmc.person_id
+             ) THEN ilmc.claim_id END) * 100.0 /
+             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
+             as NUMERIC
+           ) as value
+         {% endif %}
+
+    from {{ ref('input_layer__medical_claim') }} as ilmc
+
+    group by {% if target.type == 'bigquery' %}
+           DATE_TRUNC(ilmc.claim_start_date, MONTH)
+           , DATE_TRUNC(ilmc.claim_start_date, YEAR)
+           {% elif target.type in ('postgres', 'duckdb') %}
+           DATE_TRUNC('month', ilmc.claim_start_date)
+           , DATE_TRUNC('year', ilmc.claim_start_date)
+           {% elif target.type == 'fabric' %}
+           cast(DATETRUNC(month, ilmc.claim_start_date) as VARCHAR)
+           , cast(DATETRUNC(year, ilmc.claim_start_date) as VARCHAR)
+           {% elif target.type == 'databricks' %}
+           DATE_TRUNC('MONTH', ilmc.claim_start_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_start_date)
+           {% elif target.type == 'athena' %}
+           DATE_TRUNC('MONTH', ilmc.claim_start_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_start_date)
+           {% else %} -- snowflake and redshift
+           DATE_TRUNC('MONTH', ilmc.claim_start_date)
+           , DATE_TRUNC('YEAR', ilmc.claim_start_date)
+           {% endif %}
+)
+
 {% if target.type == 'fabric' %}
 select * from medical_paid_amount_vs_end_date_matrix
 union
@@ -709,6 +805,8 @@ union
 select * from pharmacy_claim_volume_over_time_monthly
 union
 select * from pharmacy_claim_volume_over_time_yearly
+union
+select * from medical_claims_with_eligibility
 {% else %}
 select * from medical_paid_amount_vs_end_date_matrix
 union all
@@ -733,4 +831,6 @@ union all
 select * from pharmacy_claim_volume_over_time_monthly
 union all
 select * from pharmacy_claim_volume_over_time_yearly
+union all
+select * from medical_claims_with_eligibility
 {% endif %}
