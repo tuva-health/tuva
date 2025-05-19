@@ -64,11 +64,49 @@ vars:
     enable_procedure: false
     enable_provider_attribution: false
 
-
 models:
   the_tuva_project:
+    ahrq_measures:
+      +enabled: "{{ var('enable_condition', false) or var('enable_encounter', false) or var('enable_eligibility', false) or var('enable_patient', false) or var('enable_procedure', false) }}"
+    ccsr:
+      +enabled: "{{ var('enable_condition', false) or var('enable_procedure', false) }}"
+    chronic_conditions:
+      +enabled: "{{ var('enable_condition', false) or var('enable_medical_claim', false) or var('enable_patient', false) or var('enable_pharmacy_claim', false) or var('enable_procedure', false) }}"
+    claims_expanded:
+      +enabled: "{{ var('enable_medical_claim', false) }}"
+    claims_preprocessing:
+      +enabled: "{{ var('enable_eligibility', false) or var('enable_medical_claim', false) or var('enable_pharmacy_claim', false) }}"
+    clinical_concept_library:
+      +enabled: True
+    cms_hcc:
+      +enabled: "{{ var('enable_condition', false) or var('enable_eligibility', false) or var('enable_medical_claim', false) or var('enable_patient', false) }}"
+    core:
+      +enabled: True
+    data_quality:
+      final:
+        +enabled: "{{ var('enable_legacy_data_quality', false) }}"
+      intermediate:
+        +enabled: "{{ var('enable_legacy_data_quality', false) }}"
+      stage:
+        +enabled: "{{ var('enable_legacy_data_quality', false) }}"
+    ed_classification:
+      +enabled: "{{ var('enable_encounter', false) or var('enable_patient', false) }}"
+    financial_pmpm:
+      +enabled: "{{ var('enable_eligibility', false) or var('enable_medical_claim', false) or var('enable_pharmacy_claim', false) or var('enable_provider_attribution', false) }}"
+    hcc_suspecting:
+      +enabled: "{{ var('enable_condition', false) or var('enable_lab_result', false) or var('enable_medication', false) or var('enable_observation', false) or var('enable_patient', false) or var('enable_pharmacy_claim', false) }}"
+#    input_layer:
+    normalize:
+      +enabled: "{{ var('enable_condition', false) or var('enable_lab_result', false) or var('enable_medication', false) or var('enable_observation', false) or var('enable_procedure', false) }}"
     pharmacy:
       +enabled: "{{ var('enable_pharmacy_claim', false) }}"
+    quality_measures:
+      +enabled: "{{ var('enable_condition', false) or var('enable_encounter', false) or var('enable_lab_result', false) or var('enable_medication', false) or var('enable_observation', false) or var('enable_patient', false) or var('enable_procedure', false) or var('enable_medical_claim', false) }}"
+    readmissions:
+      +enabled: "{{ var('enable_encounter', false) or var('enable_procedure', false) }}"
+
+
+
 
 
 on-run-end:
