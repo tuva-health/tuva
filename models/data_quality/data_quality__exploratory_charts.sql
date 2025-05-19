@@ -1007,19 +1007,18 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
     where acm.claim_type = 'professional'
     group by
-         y_axis
          {% if target.type == 'bigquery' %}
-         , cast(date_trunc(acm.date_month, YEAR) as STRING)
+         cast(date_trunc(acm.date_month, YEAR) as STRING)
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(date_trunc('year', acm.date_month) as VARCHAR)
+         cast(date_trunc('year', acm.date_month) as VARCHAR)
          {% elif target.type == 'fabric' %}
-         , cast(datetrunc(year, acm.date_month) as VARCHAR)
+         cast(datetrunc(year, acm.date_month) as VARCHAR)
          {% elif target.type == 'databricks' %}
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% elif target.type == 'athena' %}
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         ast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
          , tpy.total_yearly_paid
 )
@@ -1070,19 +1069,18 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
     where acm.claim_type = 'institutional'
     group by
-         y_axis
          {% if target.type == 'bigquery' %}
-         , cast(date_trunc(acm.date_month, YEAR) as STRING)
+         cast(date_trunc(acm.date_month, YEAR) as STRING)
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(date_trunc('year', acm.date_month) as VARCHAR)
+         cast(date_trunc('year', acm.date_month) as VARCHAR)
          {% elif target.type == 'fabric' %}
-         , cast(datetrunc(year, acm.date_month) as VARCHAR)
+         cast(datetrunc(year, acm.date_month) as VARCHAR)
          {% elif target.type == 'databricks' %}
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% elif target.type == 'athena' %}
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
          , tpy.total_yearly_paid
 )
@@ -1109,7 +1107,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as chart_filter
+         {% else %}
+         , cast(null as VARCHAR) as chart_filter
+         {% endif %}
          , cast(sum(acm.paid_amount) / nullif(tpy.total_yearly_paid, 0) * 100 as NUMERIC) as value
 
     from all_claims_monthly as acm
@@ -1129,19 +1131,18 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
     where acm.claim_type = 'pharmacy'
     group by
-         y_axis
          {% if target.type == 'bigquery' %}
-         , cast(date_trunc(acm.date_month, YEAR) as STRING)
+         cast(date_trunc(acm.date_month, YEAR) as STRING)
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(date_trunc('year', acm.date_month) as VARCHAR)
+         cast(date_trunc('year', acm.date_month) as VARCHAR)
          {% elif target.type == 'fabric' %}
-         , cast(datetrunc(year, acm.date_month) as VARCHAR)
+         cast(datetrunc(year, acm.date_month) as VARCHAR)
          {% elif target.type == 'databricks' %}
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% elif target.type == 'athena' %}
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
-         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
          , tpy.total_yearly_paid
 )
