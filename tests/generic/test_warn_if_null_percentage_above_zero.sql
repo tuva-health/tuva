@@ -30,33 +30,51 @@ calculation AS (
         total_rows,
         null_rows,
         CASE
-            WHEN total_rows = 0 THEN 0.0 -- Avoid division by zero for empty tables
-            -- Cast to DOUBLE PRECISION for division
-            ELSE (CAST(null_rows AS DOUBLE PRECISION) * 100.0) / total_rows
+            WHEN total_rows = 0 THEN 0.0
+            ELSE
+                {% if target.type == 'bigquery' %}
+                    (CAST(null_rows AS FLOAT64) * 100.0) / total_rows
+                {% elif target.type == 'fabric' %}
+                    (CAST(null_rows AS FLOAT) * 100.0) / total_rows
+                {% elif target.type in ('databricks', 'duckdb', 'athena') %}
+                    (CAST(null_rows AS DOUBLE) * 100.0) / total_rows
+                {% else %}
+                    (CAST(null_rows AS DOUBLE PRECISION) * 100.0) / total_rows
+                {% endif %}
         END AS null_percentage_raw
     FROM validation
-    WHERE null_rows > 0 -- Only calculate if there are nulls to report
+    WHERE null_rows > 0
 
 ),
 
--- Format the percentage using standard ROUND and CAST to DECIMAL for consistent .XX format
 validation_errors AS (
     SELECT
         total_rows,
         null_rows,
         null_percentage_raw,
-        -- Round to 2 decimal places, cast to DECIMAL(5,2) to enforce scale, then to VARCHAR
-        -- DECIMAL(5,2) is suitable for values 0.00 to 100.00
-        CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS VARCHAR) AS null_percentage_formatted
+        {% if target.type == 'bigquery' %}
+            CAST(ROUND(null_percentage_raw, 2) AS STRING) AS null_percentage_formatted
+        {% elif target.type == 'fabric' %}
+            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS VARCHAR) AS null_percentage_formatted
+        {% elif target.type in ('databricks', 'duckdb', 'athena') %}
+            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS STRING) AS null_percentage_formatted
+        {% else %}
+            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS VARCHAR) AS null_percentage_formatted
+        {% endif %}
     FROM calculation
 )
 
 SELECT
     '{{ column_name }}' AS column_tested,
-    -- Use ANSI SQL string concatenation '||'
-    'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS VARCHAR) || '/' || CAST(total_rows AS VARCHAR) || ' rows).' AS error_description,
+    {% if target.type == 'bigquery' %}
+        CONCAT('Column `{{ column_name }}` in model `{{ table_name }}` has ', null_percentage_formatted, '% NULL values (', CAST(null_rows AS STRING), '/', CAST(total_rows AS STRING), ' rows).') AS error_description,
+    {% elif target.type == 'fabric' %}
+        CONCAT('Column `{{ column_name }}` in model `{{ table_name }}` has ', null_percentage_formatted, '% NULL values (', CAST(null_rows AS VARCHAR), '/', CAST(total_rows AS VARCHAR), ' rows).') AS error_description,
+    {% elif target.type in ('databricks', 'duckdb', 'athena', 'snowflake', 'redshift') %}
+        'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS VARCHAR) || '/' || CAST(total_rows AS VARCHAR) || ' rows).' AS error_description,
+    {% else %}
+        'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS VARCHAR) || '/' || CAST(total_rows AS VARCHAR) || ' rows).' AS error_description,
+    {% endif %}
     '{{ query_to_find_nulls }}' AS query_to_find_nulls
 FROM validation_errors
--- The test fails (returns rows) if the validation_errors CTE has any rows (i.e., null_rows > 0).
-
 {% endtest %}
