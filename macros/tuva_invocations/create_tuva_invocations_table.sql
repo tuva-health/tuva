@@ -7,7 +7,7 @@
   {%- set table_name = 'tuva_invocations' -%}
   {%- set target_type = target.type -%}
   
-  {%- if target_type in ['bigquery','redshift','postgres','duckdb'] -%}
+  {%- if target_type in ['redshift','postgres','duckdb'] -%}
     {%- set sql -%}
         CREATE TABLE IF NOT EXISTS {{ schema_name }}.{{ table_name }}
         (
@@ -19,7 +19,7 @@
     {%- endset -%}
     {% do run_query(sql) %}
     {{ return(true) }}
-  {%- elif target_type in ['snowflake','databricks'] -%}
+  {%- elif target_type in ['snowflake','databricks','bigquery'] -%}
     {%- set sql -%}
         CREATE OR REPLACE TABLE {{ schema_name }}.{{ table_name }} 
         (
