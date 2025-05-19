@@ -9,7 +9,7 @@
   
   {%- if target_type in ['bigquery','redshift','postgres','duckdb'] -%}
     {%- set sql -%}
-        CREATE OR REPLACE TABLE {{ schema_name }}.{{ table_name }}
+        CREATE TABLE IF NOT EXISTS {{ schema_name }}.{{ table_name }}
         (
             invocation_id {{ dbt.type_string() }},
             project_name {{ dbt.type_string() }},
