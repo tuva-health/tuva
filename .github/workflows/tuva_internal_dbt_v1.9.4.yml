@@ -1,4 +1,4 @@
-name: tuva_internal_dbt_v1.8.6
+name: tuva_internal_dbt_v1.9.4
 on:
   workflow_dispatch:
   pull_request:
@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VERSION: '3.9'
+  PYTHON_VERSION: '3.11'
   LINT_SCRIPT_PATH: ./lint_tuva_project.sh
 
 #######  Secrets #######
@@ -65,7 +65,7 @@ jobs:
           python -m pip install --upgrade pip
           # Install dbt adapter needed for compile/lint (using Snowflake here)
           # Also install sqlfluff
-          pip install dbt-core==1.8.6 dbt-snowflake sqlfluff==3.3.1 sqlfluff-templater-dbt
+          pip install dbt-core==1.9.4 dbt-snowflake sqlfluff==3.3.1 sqlfluff-templater-dbt
 
       # --- Setup dbt Profile for Linting ---
       - name: Create dbt profiles directory
@@ -149,7 +149,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -159,7 +159,7 @@ jobs:
       - name: Install dbt-core and BigQuery adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-bigquery
+          pip install dbt-core==1.9.4 dbt-bigquery
 
       - name: Create dbt profiles.yml for BigQuery
         run: |
@@ -208,7 +208,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -225,7 +225,7 @@ jobs:
       - name: Install dbt-core and Fabric adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-fabric
+          pip install dbt-core==1.9.4 dbt-fabric
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/fabric
@@ -251,7 +251,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -261,7 +261,7 @@ jobs:
       - name: Install dbt-core and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-redshift
+          pip install dbt-core==1.9.4 dbt-redshift
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/redshift
@@ -293,7 +293,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -303,7 +303,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-snowflake
+          pip install dbt-core==1.9.4 dbt-snowflake
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -328,7 +328,7 @@ jobs:
     needs: snowflake_clinical_and_claims_enabled
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -338,7 +338,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-snowflake
+          pip install dbt-core==1.9.4 dbt-snowflake
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -364,7 +364,7 @@ jobs:
     needs: snowflake_claims_enabled
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -374,7 +374,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-snowflake
+          pip install dbt-core==1.9.4 dbt-snowflake
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -400,7 +400,7 @@ jobs:
     needs: snowflake_claims_prov_attribution_enabled
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -410,7 +410,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-snowflake
+          pip install dbt-core==1.9.4 dbt-snowflake
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
@@ -436,7 +436,7 @@ jobs:
     needs: snowflake_clinical_enabled
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -446,7 +446,7 @@ jobs:
       - name: Install dbt-core and Snowflake adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.8.6 dbt-snowflake
+          pip install dbt-core==1.9.4 dbt-snowflake
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
