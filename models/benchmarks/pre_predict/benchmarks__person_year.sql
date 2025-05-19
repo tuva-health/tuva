@@ -1,6 +1,6 @@
 with subset as (
   select distinct person_id
-  from core.member_months
+  from {{ ref('core__member_months') }}
 )
 
 , encounters as (
@@ -8,7 +8,7 @@ with subset as (
         e.person_id
       , e.data_source
       , mc.payer
-      , mc.plan
+      , mc.{{ quote_column('plan') }}
       , cal.year as year_nbr
       , sum(mc.paid_amount) as paid_amount
       , count(distinct e.encounter_id) as encounter_count
@@ -97,20 +97,20 @@ with subset as (
       on mc.person_id = mm.person_id
       and mc.data_source = mm.data_source
       and mc.payer = mm.payer
-      and mc.plan = mm.plan
+      and mc.{{ quote_column('plan') }} = mm.{{ quote_column('plan') }}
       and cal.year_month_int = mm.year_month
     group by
         e.person_id
       , e.data_source
       , mc.payer
-      , mc.plan
+      , mc.{{ quote_column('plan') }}
       , cal.year 
 )
 
 ,member_month as (
   select person_id
   ,payer
-  ,plan
+  ,{{ quote_column('plan') }}
   ,data_source
   ,left(year_month,4) as year_nbr
   ,count(year_month) as member_month_count
@@ -118,7 +118,7 @@ with subset as (
   group by 
   person_id
   ,payer
-  ,plan
+  ,{{ quote_column('plan') }}
   ,data_source
   ,left(year_month,4) 
 )
@@ -131,13 +131,17 @@ with subset as (
 
 select
   row_number() over (order by mm.person_id, mm.year_nbr)  as benchmark_key
-  , mm.year_nbr
+  , cast(mm.year_nbr as int) as year_nbr
   , mm.person_id
   , mm.payer
-  , mm.plan
+  , mm.{{ quote_column('plan') }}
   , mm.data_source
   , mm.member_month_count
-  , datediff(year,p.birth_date,to_date(mm.year_nbr || '-01-01')) AS age_at_year_start
+  , DATEDIFF(
+    YEAR,
+    p.birth_date,
+    CAST(CONCAT(mm.year_nbr, '-01-01') AS DATE)
+  ) AS age_at_year_start
   , case 
       when st.state_nm is not null then st.state_nm 
       else 'other' 
@@ -474,7 +478,7 @@ inner join {{ ref('benchmarks__pivot_hcc') }} phcc on mm.person_id = phcc.person
 left join encounters as e 
   on mm.person_id = e.person_id
   and mm.data_source = e.data_source
-  and mm.plan = e.plan
+  and mm.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
   and mm.payer = e.payer
   and mm.year_nbr = e.year_nbr
 left join {{ ref('terminology__race')}} r on p.race = r.description

@@ -17,7 +17,7 @@ models:
           combination_of_columns:
             - person_id
             - payer
-            - plan
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - year_nbr      
 
   - name: benchmarks__pivot_condition
