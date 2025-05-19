@@ -147,7 +147,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'claim_end_date' as x_axis_description
          , 'paid_year' as filter_description
          , 'total_paid_amount' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)   as x_axis
          , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
@@ -200,7 +204,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'claim_end_date' as x_axis_description
          , 'N/A' as filter_description
          , 'total_paid_amount' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)   as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
@@ -214,7 +222,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
          {% endif %}
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as chart_filter
+         {% else %}
+         , cast(null as VARCHAR) as chart_filter
+         {% endif %}
          , sum(ilmc.paid_amount) as value
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
@@ -242,7 +254,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'claim_end_date' as x_axis_description
          , 'paid_year' as filter_description
          , 'count_distinct_claim_id' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)   as x_axis
          , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
@@ -300,7 +316,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'claim_end_date' as x_axis_description
          , 'N/A' as filter_description
          , 'count_distinct_claim_id' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)   as x_axis
          , cast(NULL as STRING)                      as chart_filter
@@ -483,7 +503,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'dispensing_date' as x_axis_description
          , 'paid_year' as filter_description
          , 'paid_amount' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)   as x_axis
          , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)    as chart_filter
@@ -536,7 +560,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'dispensing_date' as x_axis_description
          , 'N/A' as filter_description
          , 'total_paid' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)   as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
@@ -550,7 +578,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
          {% endif %}
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as chart_filter
+         {% else %}
+         , cast(null as VARCHAR) as chart_filter
+         {% endif %}
          , sum(ilpc.paid_amount) as value
 
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
@@ -579,7 +611,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'dispensing_date' as x_axis_description
          , 'paid_year' as filter_description
          , 'count_distinct_claim_id' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)   as x_axis
          , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)    as chart_filter
@@ -637,7 +673,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'dispensing_date' as x_axis_description
          , 'N/A' as filter_description
          , 'count_distinct_claim_id' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)   as x_axis
          , cast(NULL as STRING)                       as chart_filter
@@ -689,7 +729,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'claim_start_date' as x_axis_description
          , 'claim_year' as filter_description
          , 'percentage_of_claims_with_eligibility' as sum_description
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as y_axis
+         {% else %}
+         , cast(null as VARCHAR) as y_axis
+         {% endif %}
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilmc.claim_start_date, MONTH) as STRING) as x_axis
          , cast(date_trunc(ilmc.claim_start_date, YEAR) as STRING) as chart_filter
@@ -919,7 +963,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as chart_filter
+         {% else %}
+         , cast(null as VARCHAR) as chart_filter
+         {% endif %}
          , cast(sum(acm.paid_amount) / nullif(tpy.total_yearly_paid, 0) * 100 as NUMERIC) as value
 
     from all_claims_monthly as acm
@@ -978,7 +1026,11 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
+         {% if target.type == 'bigquery' %}
          , cast(null as STRING) as chart_filter
+         {% else %}
+         , cast(null as VARCHAR) as chart_filter
+         {% endif %}
          , cast(sum(acm.paid_amount) / nullif(tpy.total_yearly_paid, 0) * 100 as NUMERIC) as value
 
     from all_claims_monthly as acm
