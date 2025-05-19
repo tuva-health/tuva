@@ -15,25 +15,25 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'total_paid_amount' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)   as y_axis
-         , cast(DATE_TRUNC(ilmc.paid_date, MONTH) as STRING)        as x_axis
-         , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
+         , cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)   as y_axis
+         , cast(date_trunc(ilmc.paid_date, MONTH) as STRING)        as x_axis
+         , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR) as y_axis
-         , cast(DATE_TRUNC('month', ilmc.paid_date) as VARCHAR)      as x_axis
-         , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR) as y_axis
+         , cast(date_trunc('month', ilmc.paid_date) as VARCHAR)      as x_axis
+         , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as y_axis
-         , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)         as x_axis
-         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
+         , cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)    as y_axis
+         , cast(datetrunc(month, ilmc.paid_date) as VARCHAR)         as x_axis
+         , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
-         , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
+         , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
-         , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
+         , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
          , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR) as x_axis
@@ -44,25 +44,25 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.paid_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.paid_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('month', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('month', ilmc.paid_date) as VARCHAR)
+           , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
-           , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
+           cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(datetrunc(month, ilmc.paid_date) as VARCHAR)
+           , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
            , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)
@@ -80,25 +80,25 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'unique_number_of_claims' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)   as y_axis
-         , cast(DATE_TRUNC(ilmc.paid_date, MONTH) as STRING)        as x_axis
-         , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
+         , cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)   as y_axis
+         , cast(date_trunc(ilmc.paid_date, MONTH) as STRING)        as x_axis
+         , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR) as y_axis
-         , cast(DATE_TRUNC('month', ilmc.paid_date) as VARCHAR)      as x_axis
-         , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR) as y_axis
+         , cast(date_trunc('month', ilmc.paid_date) as VARCHAR)      as x_axis
+         , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as y_axis
-         , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)         as x_axis
-         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
+         , cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)    as y_axis
+         , cast(datetrunc(month, ilmc.paid_date) as VARCHAR)         as x_axis
+         , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
-         , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
+         , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
-         , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
+         , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)      as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as y_axis
          , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR) as x_axis
@@ -109,25 +109,25 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.paid_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.paid_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('month', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('month', ilmc.paid_date) as VARCHAR)
+           , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
-           , cast(DATETRUNC(month, ilmc.paid_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
+           cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(datetrunc(month, ilmc.paid_date) as VARCHAR)
+           , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilmc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
            , cast(date_trunc('MONTH', ilmc.paid_date) as VARCHAR)
@@ -145,20 +145,20 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'total_paid_amount' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)   as x_axis
-         , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
+         , cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)   as x_axis
+         , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as x_axis
-         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
+         , cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
          , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as chart_filter
@@ -168,20 +168,20 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
+           cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
            , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
@@ -198,15 +198,15 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'total_paid_amount' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)   as x_axis
+         , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)   as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR) as x_axis
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)    as x_axis
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
          {% endif %}
@@ -216,15 +216,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
+           cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% endif %}
@@ -240,24 +240,24 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'count_distinct_claim_id' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)   as x_axis
-         , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
+         , cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)   as x_axis
+         , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)    as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)    as x_axis
-         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
+         , cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)     as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          , cast(count(distinct ilmc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)  as chart_filter
          , cast(count(distinct ilmc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR) as x_axis
@@ -268,20 +268,20 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_end_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_end_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('month', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilmc.claim_end_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
+           cast(datetrunc(month, ilmc.claim_end_date) as VARCHAR)
+           , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_end_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilmc.claim_end_date) as VARCHAR)
            , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
@@ -298,23 +298,23 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'count_distinct_claim_id' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)   as x_axis
+         , cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)   as x_axis
          , cast(NULL as STRING)                      as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR) as x_axis
          , cast(NULL as VARCHAR)                      as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)    as x_axis
          , cast(NULL as VARCHAR)             as chart_filter
          , cast(count(distinct ilmc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
          , cast(NULL as VARCHAR)                      as chart_filter
          , cast(count(distinct ilmc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR) as x_axis
          , cast(NULL as VARCHAR)                      as chart_filter
          , cast(count(distinct ilmc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
@@ -326,15 +326,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_end_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_end_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('year', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('year', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(year, ilmc.claim_end_date) as VARCHAR)
+           cast(datetrunc(year, ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('YEAR', ilmc.claim_end_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('YEAR', ilmc.claim_end_date) as VARCHAR)
            {% endif %}
@@ -351,25 +351,25 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'year' as filter_description
          , 'total_paid_amount' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)          as y_axis
-         , cast(DATE_TRUNC(ilpc.paid_date, MONTH) as STRING)                as x_axis
-         , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)           as chart_filter
+         , cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)          as y_axis
+         , cast(date_trunc(ilpc.paid_date, MONTH) as STRING)                as x_axis
+         , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)           as chart_filter
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR)        as y_axis
-         , cast(DATE_TRUNC('month', ilpc.paid_date) as VARCHAR)              as x_axis
-         , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)         as chart_filter
+         , cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR)        as y_axis
+         , cast(date_trunc('month', ilpc.paid_date) as VARCHAR)              as x_axis
+         , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)         as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)           as y_axis
-         , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)                 as x_axis
-         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)            as chart_filter
+         , cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)           as y_axis
+         , cast(datetrunc(month, ilpc.paid_date) as VARCHAR)                 as x_axis
+         , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)            as chart_filter
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
-         , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
+         , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
-         , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
+         , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as y_axis
          , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR) as x_axis
@@ -380,25 +380,25 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilpc.paid_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)
+           cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)
+           , cast(date_trunc(ilpc.paid_date, MONTH) as STRING)
+           , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('month', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('month', ilpc.paid_date) as VARCHAR)
+           , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
-           , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
+           cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(datetrunc(month, ilpc.paid_date) as VARCHAR)
+           , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
            , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)
@@ -416,25 +416,25 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_year' as filter_description
          , 'unique_number_of_claims' as sum_description
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)          as y_axis
-         , cast(DATE_TRUNC(ilpc.paid_date, MONTH) as STRING)                as x_axis
-         , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)           as chart_filter
+         , cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)          as y_axis
+         , cast(date_trunc(ilpc.paid_date, MONTH) as STRING)                as x_axis
+         , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)           as chart_filter
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR)        as y_axis
-         , cast(DATE_TRUNC('month', ilpc.paid_date) as VARCHAR)              as x_axis
-         , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)         as chart_filter
+         , cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR)        as y_axis
+         , cast(date_trunc('month', ilpc.paid_date) as VARCHAR)              as x_axis
+         , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)         as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)           as y_axis
-         , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)                 as x_axis
-         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)            as chart_filter
+         , cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)           as y_axis
+         , cast(datetrunc(month, ilpc.paid_date) as VARCHAR)                 as x_axis
+         , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)            as chart_filter
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
-         , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
+         , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
-         , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)        as y_axis
+         , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)              as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)         as chart_filter
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as y_axis
          , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR) as x_axis
@@ -445,25 +445,25 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilpc.paid_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)
+           cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)
+           , cast(date_trunc(ilpc.paid_date, MONTH) as STRING)
+           , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('month', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('month', ilpc.paid_date) as VARCHAR)
+           , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
-           , cast(DATETRUNC(month, ilpc.paid_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
+           cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(datetrunc(month, ilpc.paid_date) as VARCHAR)
+           , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('MONTH', ilpc.paid_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
            , cast(date_trunc('MONTH', ilpc.paid_date) as VARCHAR)
@@ -481,20 +481,20 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'paid_amount' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)   as x_axis
-         , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)    as chart_filter
+         , cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)   as x_axis
+         , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)    as chart_filter
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)    as x_axis
-         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)     as chart_filter
+         , cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)     as chart_filter
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
          , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as chart_filter
@@ -504,20 +504,20 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)
+           cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)
+           , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
+           cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
            , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
@@ -534,15 +534,15 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'total_paid' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)   as x_axis
+         , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)   as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR) as x_axis
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)    as x_axis
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
          {% endif %}
@@ -552,16 +552,16 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)
+           cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
+           cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
+           , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% endif %}
@@ -577,24 +577,24 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'count_distinct_claim_id' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)   as x_axis
-         , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)    as chart_filter
+         , cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)   as x_axis
+         , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)    as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)  as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)    as x_axis
-         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)     as chart_filter
+         , cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)     as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
          , cast(count(distinct ilpc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
+         , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)  as chart_filter
          , cast(count(distinct ilpc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
          , cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR) as x_axis
@@ -605,20 +605,20 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilpc.dispensing_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)
+           cast(date_trunc(ilpc.dispensing_date, MONTH) as STRING)
+           , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('month', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilpc.dispensing_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
+           cast(datetrunc(month, ilpc.dispensing_date) as VARCHAR)
+           , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilpc.dispensing_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilpc.dispensing_date) as VARCHAR)
            , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
@@ -635,23 +635,23 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'count_distinct_claim_id' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)   as x_axis
+         , cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)   as x_axis
          , cast(NULL as STRING)                       as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR) as x_axis
          , cast(NULL as VARCHAR)                       as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)    as x_axis
+         , cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)    as x_axis
          , cast(NULL as VARCHAR)                       as chart_filter
          , cast(count(distinct ilpc.claim_id) as NUMERIC) as value
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
          , cast(NULL as VARCHAR)                      as chart_filter
          , cast(count(distinct ilpc.claim_id) as DOUBLE) as value
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR) as x_axis
          , cast(NULL as VARCHAR)                       as chart_filter
          , cast(count(distinct ilpc.claim_id) as DECIMAL) as value
          {% else %} -- snowflake and redshift
@@ -663,15 +663,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__pharmacy_claim') }} as ilpc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilpc.dispensing_date, YEAR) as STRING)
+           cast(date_trunc(ilpc.dispensing_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('year', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('year', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(year, ilpc.dispensing_date) as VARCHAR)
+           cast(datetrunc(year, ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('YEAR', ilpc.dispensing_date) as VARCHAR)
+           cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('YEAR', ilpc.dispensing_date) as VARCHAR)
            {% endif %}
@@ -687,8 +687,8 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'percentage_of_claims_with_eligibility' as sum_description
          , cast(null as STRING) as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(ilmc.claim_start_date, MONTH) as STRING) as x_axis
-         , cast(DATE_TRUNC(ilmc.claim_start_date, YEAR) as STRING) as chart_filter
+         , cast(date_trunc(ilmc.claim_start_date, MONTH) as STRING) as x_axis
+         , cast(date_trunc(ilmc.claim_start_date, YEAR) as STRING) as chart_filter
          , CAST(
              COUNT(DISTINCT CASE WHEN EXISTS (
                  SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
@@ -698,8 +698,8 @@ with medical_paid_amount_vs_end_date_matrix as (
              as NUMERIC
            ) as value
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('month', ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('year', ilmc.claim_start_date) as VARCHAR) as chart_filter
+         , cast(date_trunc('month', ilmc.claim_start_date) as VARCHAR) as x_axis
+         , cast(date_trunc('year', ilmc.claim_start_date) as VARCHAR) as chart_filter
          , CAST(
              COUNT(DISTINCT CASE WHEN EXISTS (
                  SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
@@ -709,8 +709,8 @@ with medical_paid_amount_vs_end_date_matrix as (
              as NUMERIC
            ) as value
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(month, ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(DATETRUNC(year, ilmc.claim_start_date) as VARCHAR) as chart_filter
+         , cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR) as x_axis
+         , cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR) as chart_filter
          , cast(
              COUNT(DISTINCT CASE WHEN EXISTS (
                  SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
@@ -720,8 +720,8 @@ with medical_paid_amount_vs_end_date_matrix as (
              as NUMERIC
            ) as value
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
          , cast(
              COUNT(DISTINCT CASE WHEN EXISTS (
                  SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
@@ -731,8 +731,8 @@ with medical_paid_amount_vs_end_date_matrix as (
              as DOUBLE
            ) as value
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(DATE_TRUNC('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
+         , cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
          , cast(
              COUNT(DISTINCT CASE WHEN EXISTS (
                  SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
@@ -757,20 +757,20 @@ with medical_paid_amount_vs_end_date_matrix as (
     from {{ ref('input_layer__medical_claim') }} as ilmc
 
     group by {% if target.type == 'bigquery' %}
-           cast(DATE_TRUNC(ilmc.claim_start_date, MONTH) as STRING)
-           , cast(DATE_TRUNC(ilmc.claim_start_date, YEAR) as STRING)
+           cast(date_trunc(ilmc.claim_start_date, MONTH) as STRING)
+           , cast(date_trunc(ilmc.claim_start_date, YEAR) as STRING)
            {% elif target.type in ('postgres', 'duckdb') %}
-           cast(DATE_TRUNC('month', ilmc.claim_start_date) as VARCHAR)
-           , cast(DATE_TRUNC('year', ilmc.claim_start_date) as VARCHAR)
+           cast(date_trunc('month', ilmc.claim_start_date) as VARCHAR)
+           , cast(date_trunc('year', ilmc.claim_start_date) as VARCHAR)
            {% elif target.type == 'fabric' %}
-           cast(DATETRUNC(month, ilmc.claim_start_date) as VARCHAR)
-           , cast(DATETRUNC(year, ilmc.claim_start_date) as VARCHAR)
+           cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR)
+           , cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_start_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_start_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR)
            {% elif target.type == 'athena' %}
-           cast(DATE_TRUNC('MONTH', ilmc.claim_start_date) as VARCHAR)
-           , cast(DATE_TRUNC('YEAR', ilmc.claim_start_date) as VARCHAR)
+           cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR)
+           , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR)
            {% else %} -- snowflake and redshift
            cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR)
            , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR)
@@ -779,109 +779,115 @@ with medical_paid_amount_vs_end_date_matrix as (
 
 , medical_claims_monthly as (
     select
-        coalesce(claim_type, 'unknown') as claim_type,
+        coalesce(claim_type, 'unknown') as claim_type
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(claim_start_date, MONTH) as date_month,
+        , date_trunc(claim_start_date, MONTH) as date_month
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', claim_start_date) as date_month,
+        , date_trunc('month', claim_start_date) as date_month
         {% elif target.type == 'fabric' %}
-        DATETRUNC(month, claim_start_date) as date_month,
+        , datetrunc(month, claim_start_date) as date_month
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        , date_trunc('MONTH', claim_start_date) as date_month
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', claim_start_date) as date_month,
+        , date_trunc('MONTH', claim_start_date) as date_month
         {% else %} -- snowflake and redshift
-        date_trunc('MONTH', claim_start_date) as date_month,
+        , date_trunc('MONTH', claim_start_date) as date_month
         {% endif %}
-        sum(paid_amount) as paid_amount
+        , sum(paid_amount) as paid_amount
     from {{ ref('input_layer__medical_claim') }}
     where claim_start_date is not null
     group by
-        coalesce(claim_type, 'unknown'),
+        coalesce(claim_type, 'unknown')
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(claim_start_date, MONTH)
+        , date_trunc(claim_start_date, MONTH)
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', claim_start_date)
+        , date_trunc('month', claim_start_date)
         {% elif target.type == 'fabric' %}
-        DATETRUNC(month, claim_start_date)
+        , datetrunc(month, claim_start_date)
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', claim_start_date)
+        , date_trunc('MONTH', claim_start_date)
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', claim_start_date)
+        , date_trunc('MONTH', claim_start_date)
         {% else %} -- snowflake and redshift
-        date_trunc('MONTH', claim_start_date)
+        , date_trunc('MONTH', claim_start_date)
         {% endif %}
 )
 
 , pharmacy_claims_monthly as (
     select
-        'pharmacy' as claim_type,
+        'pharmacy' as claim_type
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(dispensing_date, MONTH) as date_month,
+        , date_trunc(dispensing_date, MONTH) as date_month
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', dispensing_date) as date_month,
+        , date_trunc('month', dispensing_date) as date_month
         {% elif target.type == 'fabric' %}
-        DATETRUNC(month, dispensing_date) as date_month,
+        , datetrunc(month, dispensing_date) as date_month
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', dispensing_date) as date_month,
+        , date_trunc('MONTH', dispensing_date) as date_month
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', dispensing_date) as date_month,
+        , date_trunc('MONTH', dispensing_date) as date_month
         {% else %} -- snowflake and redshift
-        date_trunc('MONTH', dispensing_date) as date_month,
+        , date_trunc('MONTH', dispensing_date) as date_month
         {% endif %}
-        sum(paid_amount) as paid_amount
+        , sum(paid_amount) as paid_amount
     from {{ ref('input_layer__pharmacy_claim') }}
     where dispensing_date is not null
     group by
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(dispensing_date, MONTH)
+        date_trunc(dispensing_date, MONTH)
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('month', dispensing_date)
+        date_trunc('month', dispensing_date)
         {% elif target.type == 'fabric' %}
-        DATETRUNC(month, dispensing_date)
+        datetrunc(month, dispensing_date)
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('MONTH', dispensing_date)
+        date_trunc('MONTH', dispensing_date)
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('MONTH', dispensing_date)
+        date_trunc('MONTH', dispensing_date)
         {% else %} -- snowflake and redshift
         date_trunc('MONTH', dispensing_date)
         {% endif %}
 )
 
 , all_claims_monthly as (
-    select claim_type, date_month, paid_amount from medical_claims_monthly
+    select claim_type
+           , date_month
+           , paid_amount
+    from medical_claims_monthly
     union all
-    select claim_type, date_month, paid_amount from pharmacy_claims_monthly
+    select claim_type
+           , date_month
+           , paid_amount
+    from pharmacy_claims_monthly
 )
 
 , total_paid_yearly as (
     select
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(date_month, YEAR) as year_date,
+        date_trunc(date_month, YEAR) as year_date
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('year', date_month) as year_date,
+        date_trunc('year', date_month) as year_date
         {% elif target.type == 'fabric' %}
-        DATETRUNC(year, date_month) as year_date,
+        datetrunc(year, date_month) as year_date
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('YEAR', date_month) as year_date,
+        date_trunc('YEAR', date_month) as year_date
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('YEAR', date_month) as year_date,
+        date_trunc('YEAR', date_month) as year_date
         {% else %} -- snowflake and redshift
-        date_trunc('YEAR', date_month) as year_date,
+        date_trunc('YEAR', date_month) as year_date
         {% endif %}
-        sum(paid_amount) as total_yearly_paid
+        , sum(paid_amount) as total_yearly_paid
     from all_claims_monthly
     group by
         {% if target.type == 'bigquery' %}
-        DATE_TRUNC(date_month, YEAR)
+        date_trunc(date_month, YEAR)
         {% elif target.type in ('postgres', 'duckdb') %}
-        DATE_TRUNC('year', date_month)
+        date_trunc('year', date_month)
         {% elif target.type == 'fabric' %}
-        DATETRUNC(year, date_month)
+        datetrunc(year, date_month)
         {% elif target.type == 'databricks' %}
-        DATE_TRUNC('YEAR', date_month)
+        date_trunc('YEAR', date_month)
         {% elif target.type == 'athena' %}
-        DATE_TRUNC('YEAR', date_month)
+        date_trunc('YEAR', date_month)
         {% else %} -- snowflake and redshift
         date_trunc('YEAR', date_month)
         {% endif %}
@@ -897,15 +903,15 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'percent_of_total_spend' as sum_description
          , 'professional' as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as x_axis
+         , cast(date_trunc(acm.date_month, YEAR) as STRING) as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('year', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as x_axis
+         , cast(datetrunc(year, acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
@@ -915,15 +921,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     from all_claims_monthly as acm
     inner join total_paid_yearly as tpy
         on {% if target.type == 'bigquery' %}
-           DATE_TRUNC(acm.date_month, YEAR) = tpy.year_date
+           date_trunc(acm.date_month, YEAR) = tpy.year_date
            {% elif target.type in ('postgres', 'duckdb') %}
-           DATE_TRUNC('year', acm.date_month) = tpy.year_date
+           date_trunc('year', acm.date_month) = tpy.year_date
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, acm.date_month) = tpy.year_date
+           datetrunc(year, acm.date_month) = tpy.year_date
            {% elif target.type == 'databricks' %}
-           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% elif target.type == 'athena' %}
-           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% else %} -- snowflake and redshift
            date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% endif %}
@@ -931,15 +937,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     group by
          y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING)
+         , cast(date_trunc(acm.date_month, YEAR) as STRING)
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR)
+         , cast(date_trunc('year', acm.date_month) as VARCHAR)
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR)
+         , cast(datetrunc(year, acm.date_month) as VARCHAR)
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
@@ -956,15 +962,15 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'percent_of_total_spend' as sum_description
          , 'institutional' as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as x_axis
+         , cast(date_trunc(acm.date_month, YEAR) as STRING) as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('year', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as x_axis
+         , cast(datetrunc(year, acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
@@ -974,15 +980,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     from all_claims_monthly as acm
     inner join total_paid_yearly as tpy
         on {% if target.type == 'bigquery' %}
-           DATE_TRUNC(acm.date_month, YEAR) = tpy.year_date
+           date_trunc(acm.date_month, YEAR) = tpy.year_date
            {% elif target.type in ('postgres', 'duckdb') %}
-           DATE_TRUNC('year', acm.date_month) = tpy.year_date
+           date_trunc('year', acm.date_month) = tpy.year_date
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, acm.date_month) = tpy.year_date
+           datetrunc(year, acm.date_month) = tpy.year_date
            {% elif target.type == 'databricks' %}
-           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% elif target.type == 'athena' %}
-           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% else %} -- snowflake and redshift
            date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% endif %}
@@ -990,15 +996,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     group by
          y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING)
+         , cast(date_trunc(acm.date_month, YEAR) as STRING)
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR)
+         , cast(date_trunc('year', acm.date_month) as VARCHAR)
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR)
+         , cast(datetrunc(year, acm.date_month) as VARCHAR)
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
@@ -1015,15 +1021,15 @@ with medical_paid_amount_vs_end_date_matrix as (
          , 'percent_of_total_spend' as sum_description
          , 'pharmacy' as y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING) as x_axis
+         , cast(date_trunc(acm.date_month, YEAR) as STRING) as x_axis
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('year', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR) as x_axis
+         , cast(datetrunc(year, acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR) as x_axis
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR) as x_axis
          {% endif %}
@@ -1033,15 +1039,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     from all_claims_monthly as acm
     inner join total_paid_yearly as tpy
         on {% if target.type == 'bigquery' %}
-           DATE_TRUNC(acm.date_month, YEAR) = tpy.year_date
+           date_trunc(acm.date_month, YEAR) = tpy.year_date
            {% elif target.type in ('postgres', 'duckdb') %}
-           DATE_TRUNC('year', acm.date_month) = tpy.year_date
+           date_trunc('year', acm.date_month) = tpy.year_date
            {% elif target.type == 'fabric' %}
-           DATETRUNC(year, acm.date_month) = tpy.year_date
+           datetrunc(year, acm.date_month) = tpy.year_date
            {% elif target.type == 'databricks' %}
-           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% elif target.type == 'athena' %}
-           DATE_TRUNC('YEAR', acm.date_month) = tpy.year_date
+           date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% else %} -- snowflake and redshift
            date_trunc('YEAR', acm.date_month) = tpy.year_date
            {% endif %}
@@ -1049,15 +1055,15 @@ with medical_paid_amount_vs_end_date_matrix as (
     group by
          y_axis
          {% if target.type == 'bigquery' %}
-         , cast(DATE_TRUNC(acm.date_month, YEAR) as STRING)
+         , cast(date_trunc(acm.date_month, YEAR) as STRING)
          {% elif target.type in ('postgres', 'duckdb') %}
-         , cast(DATE_TRUNC('year', acm.date_month) as VARCHAR)
+         , cast(date_trunc('year', acm.date_month) as VARCHAR)
          {% elif target.type == 'fabric' %}
-         , cast(DATETRUNC(year, acm.date_month) as VARCHAR)
+         , cast(datetrunc(year, acm.date_month) as VARCHAR)
          {% elif target.type == 'databricks' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% elif target.type == 'athena' %}
-         , cast(DATE_TRUNC('YEAR', acm.date_month) as VARCHAR)
+         , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
          , cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
