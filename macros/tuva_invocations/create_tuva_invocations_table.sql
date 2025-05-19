@@ -7,7 +7,7 @@
   {%- set table_name = 'tuva_invocations' -%}
   {%- set target_type = target.type -%}
   
-  {%- if target_type == 'bigquery' or target_type == 'fabric' -%}
+  {%- if target_type in ['bigquery','redshift','postgres','duckdb'] -%}
     {%- set sql -%}
         CREATE OR REPLACE TABLE {{ schema_name }}.{{ table_name }}
         (
@@ -17,7 +17,9 @@
             run_started_at {{ dbt.type_timestamp() }}
         )
     {%- endset -%}
-  {%- elif target_type == 'snowflake' -%}
+    {% do run_query(sql) %}
+    {{ return(true) }}
+  {%- elif target_type in ['snowflake','databricks'] -%}
     {%- set sql -%}
         CREATE OR REPLACE TABLE {{ schema_name }}.{{ table_name }} 
         (
@@ -27,19 +29,24 @@
             run_started_at {{ dbt.type_timestamp() }}
         )
     {%- endset -%}
-  {%- elif target_type == 'redshift' or target_type == 'postgres' or target_type == 'duckdb' -%}
-    {%- set sql -%}
-        CREATE TABLE IF NOT EXISTS {{ schema_name }}.{{ table_name }} 
+    {% do run_query(sql) %}
+    {{ return(true) }}
+    {%- if target_type in ['fabric'] -%}
+      {%- set sql -%}
+        IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{{ table_name }}' AND TABLE_SCHEMA = '{{ schema_name }}')
+        CREATE TABLE {{ schema_name }}.{{ table_name }}
         (
             invocation_id {{ dbt.type_string() }},
             project_name {{ dbt.type_string() }},
             tuva_package_version {{ dbt.type_string() }},
             run_started_at {{ dbt.type_timestamp() }}
         )
-    {%- endset -%}
+      {%- endset -%}
+      {% do run_query(sql) %}
+    {{ return(true) }}
+    {%- endif -%}
   {%- else -%}
-    {{ exceptions.raise_compiler_error("Unsupported target platform: " ~ target.type) }}
+    {{ return(false) }}
   {%- endif -%}
 
-  {% do run_query(sql) %}
 {% endmacro %}
