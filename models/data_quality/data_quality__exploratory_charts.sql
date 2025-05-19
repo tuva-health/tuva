@@ -1026,7 +1026,7 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% elif target.type == 'athena' %}
          cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% else %} -- snowflake and redshift
-         ast(date_trunc('YEAR', acm.date_month) as VARCHAR)
+         cast(date_trunc('YEAR', acm.date_month) as VARCHAR)
          {% endif %}
          , tpy.total_yearly_paid
 )
