@@ -732,26 +732,34 @@ with medical_paid_amount_vs_end_date_matrix as (
         'claim_year' as filter_description,
         'percentage_of_claims_with_eligibility' as sum_description,
         cast(null as VARCHAR) as y_axis,
-        mc.claim_month as x_axis,
-        mc.claim_year as chart_filter,
-        cast(coalesce(mc.claims_with_elig, 0) * 100.0 /
-            nullif(mc.total_claims, 0) as NUMERIC) as value
+        total.claim_month as x_axis,
+        total.claim_year as chart_filter,
+        cast(coalesce(with_elig.claims_with_elig, 0) * 100.0 /
+            nullif(total.total_claims, 0) as NUMERIC) as value
     from (
         select
-            cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR) as claim_month,
-            cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR) as claim_year,
-            count(distinct ilmc.claim_id) as total_claims,
-            sum(case when ile.person_id is not null then 1 else 0 end) as claims_with_elig
-        from {{ ref('input_layer__medical_claim') }} as ilmc
-        left join (
-            select distinct person_id
-            from {{ ref('input_layer__eligibility') }}
-        ) as ile
-            on ile.person_id = ilmc.person_id
+            cast(datetrunc(month, claim_start_date) as VARCHAR) as claim_month,
+            cast(datetrunc(year, claim_start_date) as VARCHAR) as claim_year,
+            count(distinct claim_id) as total_claims
+        from {{ ref('input_layer__medical_claim') }}
         group by
-            cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR),
-            cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR)
-    ) as mc
+            cast(datetrunc(month, claim_start_date) as VARCHAR),
+            cast(datetrunc(year, claim_start_date) as VARCHAR)
+    ) as total
+    left join (
+        select
+            cast(datetrunc(month, mc.claim_start_date) as VARCHAR) as claim_month,
+            cast(datetrunc(year, mc.claim_start_date) as VARCHAR) as claim_year,
+            count(distinct mc.claim_id) as claims_with_elig
+        from {{ ref('input_layer__medical_claim') }} as mc
+        inner join {{ ref('input_layer__eligibility') }} as e
+            on mc.person_id = e.person_id
+        group by
+            cast(datetrunc(month, mc.claim_start_date) as VARCHAR),
+            cast(datetrunc(year, mc.claim_start_date) as VARCHAR)
+    ) as with_elig
+    on total.claim_month = with_elig.claim_month
+    and total.claim_year = with_elig.claim_year
 )
 {% else %}
 , medical_claims_with_eligibility as (
