@@ -176,7 +176,7 @@ models:
               tags: ['tuva_dqi_sev_5', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: claim_start_date
         description: '{{ doc("claim_start_date") }}'
         tests:

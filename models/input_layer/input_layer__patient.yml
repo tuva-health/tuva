@@ -24,7 +24,7 @@ models:
           row_condition: "death_date is not null"
           config:
             severity: warn
-            enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}

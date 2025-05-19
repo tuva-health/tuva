@@ -324,7 +324,7 @@ models:
               tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: original_reason_entitlement_code
         description: '{{ doc("original_reason_entitlement_code") }}'
         tests:
@@ -505,7 +505,7 @@ models:
               strictly: false
               config:
                 severity: warn
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: phone
         description: '{{ doc("phone") }}'
         tests:
