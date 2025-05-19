@@ -721,6 +721,39 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% endif %}
 )
 
+{% if target.type == 'fabric' %}
+, medical_claims_with_eligibility as (
+    select
+        'completeness' as data_quality_category,
+        'medical_claims_with_eligibility' as graph_name,
+        'month' as level_of_detail,
+        'N/A' as y_axis_description,
+        'claim_start_date' as x_axis_description,
+        'claim_year' as filter_description,
+        'percentage_of_claims_with_eligibility' as sum_description,
+        cast(null as VARCHAR) as y_axis,
+        mc.claim_month as x_axis,
+        mc.claim_year as chart_filter,
+        cast(coalesce(mc.claims_with_elig, 0) * 100.0 /
+            nullif(mc.total_claims, 0) as NUMERIC) as value
+    from (
+        select
+            cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR) as claim_month,
+            cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR) as claim_year,
+            count(distinct ilmc.claim_id) as total_claims,
+            sum(case when ile.person_id is not null then 1 else 0 end) as claims_with_elig
+        from {{ ref('input_layer__medical_claim') }} as ilmc
+        left join (
+            select distinct person_id
+            from {{ ref('input_layer__eligibility') }}
+        ) as ile
+            on ile.person_id = ilmc.person_id
+        group by
+            cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR),
+            cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR)
+    ) as mc
+)
+{% else %}
 , medical_claims_with_eligibility as (
     select 'completeness' as data_quality_category
          , 'medical_claims_with_eligibility' as graph_name
@@ -749,17 +782,6 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('month', ilmc.claim_start_date) as VARCHAR) as x_axis
          , cast(date_trunc('year', ilmc.claim_start_date) as VARCHAR) as chart_filter
          , CAST(
-             COUNT(DISTINCT CASE WHEN EXISTS (
-                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
-                 WHERE ile.person_id = ilmc.person_id
-             ) THEN ilmc.claim_id END) * 100.0 /
-             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
-             as NUMERIC
-           ) as value
-         {% elif target.type == 'fabric' %}
-         , cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR) as chart_filter
-         , cast(
              COUNT(DISTINCT CASE WHEN EXISTS (
                  SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
                  WHERE ile.person_id = ilmc.person_id
@@ -810,9 +832,6 @@ with medical_paid_amount_vs_end_date_matrix as (
            {% elif target.type in ('postgres', 'duckdb') %}
            cast(date_trunc('month', ilmc.claim_start_date) as VARCHAR)
            , cast(date_trunc('year', ilmc.claim_start_date) as VARCHAR)
-           {% elif target.type == 'fabric' %}
-           cast(datetrunc(month, ilmc.claim_start_date) as VARCHAR)
-           , cast(datetrunc(year, ilmc.claim_start_date) as VARCHAR)
            {% elif target.type == 'databricks' %}
            cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR)
            , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR)
@@ -824,6 +843,7 @@ with medical_paid_amount_vs_end_date_matrix as (
            , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR)
            {% endif %}
 )
+{% endif %}
 
 , medical_claims_monthly as (
     select
