@@ -45,30 +45,6 @@ models:
       tags: 
         - benchmarks_view
 
-  - name: benchmarks__unpivot
-    description: |
-        unpivot for viz
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: benchmarks_unpivot
-      materialized: table
-      tags: 
-        - benchmarks_view
-
-  - name: benchmarks__unpivot_encounters
-    description: |
-        unpivot for viz
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: benchmarks_unpivot_encounters
-      materialized: table
-      tags: 
-        - benchmarks_view
-
   - name: benchmarks__inpatient_input
     description: |
         unpivot for viz
@@ -80,30 +56,6 @@ models:
       materialized: table
       tags: 
         - benchmarks_train
-
-  - name: benchmarks__predict_inpatient
-    description: |
-        unpivot for viz
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: predict_inpatient
-      materialized: table
-      tags: 
-        - benchmarks_view
-
-  - name: benchmarks__unpivot_inpatient
-    description: |
-        unpivot for viz
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: unpivot_inpatient
-      materialized: table
-      tags: 
-        - benchmarks_view
 
   - name: benchmarks__pivot_hcc
     description: |
