@@ -126,10 +126,8 @@ jobs:
           body: |
             ❌ **SQLFluff Linting Failed**
 
-            Issues were found that require correction.
+            Issues were found that require manual correction or are unfixable by `sqlfluff fix`.
             Please review the output below (or the full logs), fix the issues locally, and commit the changes.
-            
-            Please run linter and follow instructions here: https://github.com/tuva-health/tuva/blob/main/CONTRIBUTING.md#how-to-run-the-linter
 
             ```text
             ${{ steps.read-lint-output.outputs.content }}
@@ -243,10 +241,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -303,10 +300,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true,"provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -363,10 +359,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -423,10 +418,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","provider_attribution": true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","provider_attribution": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -513,10 +507,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -558,10 +551,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -603,10 +595,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -648,10 +639,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -687,15 +677,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      #Changed to seed then compile to speed up processing time
-      - name: dbt-seed
+      - name: dbt-build
         run: |
-          dbt seed --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
-        working-directory: ci_testing
-
-      - name: dbt-compile
-        run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -729,10 +713,10 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-      #Changed to compile to save processing time
-      - name: dbt-compile
+
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -767,10 +751,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -805,10 +788,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -843,10 +825,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -919,10 +900,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -957,10 +937,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -995,10 +974,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -1033,10 +1011,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
-      #Changed to compile to save processing time
-      - name: dbt-compile
+      - name: dbt-build
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
