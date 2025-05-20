@@ -142,48 +142,44 @@ select
     p.birth_date,
     CAST(CONCAT(mm.year_nbr, '-01-01') AS DATE)
   ) AS age_at_year_start
-  , case 
-      when st.state_nm is not null then st.state_nm 
-      else 'other' 
-    end as state
-  , case when r.description is not null then r.description else 'unknown' end as race
+  , case when st.state_nm is not null then st.state_nm else null end as state --values that don't match are null for xgboost
+  , case when r.description is not null then r.description else null end as race --values that don't match are null for xgboost
   , case when e.paid_amount < 0 then 0 else coalesce(e.paid_amount, 0) end as paid_amount
 
-,case when e.outpatient_paid < 0 then 0 else coalesce(e.outpatient_paid, 0) end as outpatient_paid_amount
-,case when e.other_paid < 0 then 0 else coalesce(e.other_paid, 0) end as other_paid_amount
-,case when e.office_based_paid < 0 then 0 else coalesce(e.office_based_paid, 0) end as office_based_paid_amount
-,case when e.inpatient_paid < 0 then 0 else coalesce(e.inpatient_paid, 0) end as inpatient_paid_amount
-
-,case when e.outpatient_injections_paid < 0 then 0 else coalesce(e.outpatient_injections_paid, 0) end as outpatient_injections_paid_amount
-,case when e.emergency_department_paid < 0 then 0 else coalesce(e.emergency_department_paid, 0) end as emergency_department_paid_amount
-,case when e.outpatient_radiology_paid < 0 then 0 else coalesce(e.outpatient_radiology_paid, 0) end as outpatient_radiology_paid_amount
-,case when e.outpatient_pt_ot_st_paid < 0 then 0 else coalesce(e.outpatient_pt_ot_st_paid, 0) end as outpatient_pt_ot_st_paid_amount
-,case when e.outpatient_hospice_paid < 0 then 0 else coalesce(e.outpatient_hospice_paid, 0) end as outpatient_hospice_paid_amount
-,case when e.urgent_care_paid < 0 then 0 else coalesce(e.urgent_care_paid, 0) end as urgent_care_paid_amount
-,case when e.outpatient_hospital_or_clinic_paid < 0 then 0 else coalesce(e.outpatient_hospital_or_clinic_paid, 0) end as outpatient_hospital_or_clinic_paid_amount
-,case when e.home_health_paid < 0 then 0 else coalesce(e.home_health_paid, 0) end as home_health_paid_amount
-,case when e.dialysis_paid < 0 then 0 else coalesce(e.dialysis_paid, 0) end as dialysis_paid_amount
-,case when e.outpatient_rehabilitation_paid < 0 then 0 else coalesce(e.outpatient_rehabilitation_paid, 0) end as outpatient_rehabilitation_paid_amount
-,case when e.outpatient_surgery_paid < 0 then 0 else coalesce(e.outpatient_surgery_paid, 0) end as outpatient_surgery_paid_amount
-,case when e.ambulatory_surgery_center_paid < 0 then 0 else coalesce(e.ambulatory_surgery_center_paid, 0) end as ambulatory_surgery_center_paid_amount
-,case when e.outpatient_psych_paid < 0 then 0 else coalesce(e.outpatient_psych_paid, 0) end as outpatient_psych_paid_amount
-,case when e.dme_orphaned_paid < 0 then 0 else coalesce(e.dme_orphaned_paid, 0) end as dme_orphaned_paid_amount
-,case when e.orphaned_claim_paid < 0 then 0 else coalesce(e.orphaned_claim_paid, 0) end as orphaned_claim_paid_amount
-,case when e.ambulance_orphaned_paid < 0 then 0 else coalesce(e.ambulance_orphaned_paid, 0) end as ambulance_orphaned_paid_amount
-,case when e.lab_orphaned_paid < 0 then 0 else coalesce(e.lab_orphaned_paid, 0) end as lab_orphaned_paid_amount
-,case when e.office_visit_radiology_paid < 0 then 0 else coalesce(e.office_visit_radiology_paid, 0) end as office_visit_radiology_paid_amount
-,case when e.office_visit_paid < 0 then 0 else coalesce(e.office_visit_paid, 0) end as office_visit_paid_amount
-,case when e.office_visit_surgery_paid < 0 then 0 else coalesce(e.office_visit_surgery_paid, 0) end as office_visit_surgery_paid_amount
-,case when e.office_visit_other_paid < 0 then 0 else coalesce(e.office_visit_other_paid, 0) end as office_visit_other_paid_amount
-,case when e.telehealth_paid < 0 then 0 else coalesce(e.telehealth_paid, 0) end as telehealth_paid_amount
-,case when e.office_visit_pt_ot_st_paid < 0 then 0 else coalesce(e.office_visit_pt_ot_st_paid, 0) end as office_visit_pt_ot_st_paid_amount
-,case when e.office_visit_injections_paid < 0 then 0 else coalesce(e.office_visit_injections_paid, 0) end as office_visit_injections_paid_amount
-,case when e.acute_inpatient_paid < 0 then 0 else coalesce(e.acute_inpatient_paid, 0) end as acute_inpatient_paid_amount
-,case when e.inpatient_hospice_paid < 0 then 0 else coalesce(e.inpatient_hospice_paid, 0) end as inpatient_hospice_paid_amount
-,case when e.inpatient_psych_paid < 0 then 0 else coalesce(e.inpatient_psych_paid, 0) end as inpatient_psych_paid_amount
-,case when e.inpatient_rehabilitation_paid < 0 then 0 else coalesce(e.inpatient_rehabilitation_paid, 0) end as inpatient_rehabilitation_paid_amount
-,case when e.inpatient_skilled_nursing_paid < 0 then 0 else coalesce(e.inpatient_skilled_nursing_paid, 0) end as inpatient_skilled_nursing_paid_amount
-
+, case when e.outpatient_paid < 0 then 0 else coalesce(e.outpatient_paid, 0) end as outpatient_paid_amount
+, case when e.other_paid < 0 then 0 else coalesce(e.other_paid, 0) end as other_paid_amount
+, case when e.office_based_paid < 0 then 0 else coalesce(e.office_based_paid, 0) end as office_based_paid_amount
+, case when e.inpatient_paid < 0 then 0 else coalesce(e.inpatient_paid, 0) end as inpatient_paid_amount
+ 
+, case when e.outpatient_injections_paid < 0 then 0 else coalesce(e.outpatient_injections_paid, 0) end as outpatient_injections_paid_amount
+, case when e.emergency_department_paid < 0 then 0 else coalesce(e.emergency_department_paid, 0) end as emergency_department_paid_amount
+, case when e.outpatient_radiology_paid < 0 then 0 else coalesce(e.outpatient_radiology_paid, 0) end as outpatient_radiology_paid_amount
+, case when e.outpatient_pt_ot_st_paid < 0 then 0 else coalesce(e.outpatient_pt_ot_st_paid, 0) end as outpatient_pt_ot_st_paid_amount
+, case when e.outpatient_hospice_paid < 0 then 0 else coalesce(e.outpatient_hospice_paid, 0) end as outpatient_hospice_paid_amount
+, case when e.urgent_care_paid < 0 then 0 else coalesce(e.urgent_care_paid, 0) end as urgent_care_paid_amount
+, case when e.outpatient_hospital_or_clinic_paid < 0 then 0 else coalesce(e.outpatient_hospital_or_clinic_paid, 0) end as outpatient_hospital_or_clinic_paid_amount
+, case when e.home_health_paid < 0 then 0 else coalesce(e.home_health_paid, 0) end as home_health_paid_amount
+, case when e.dialysis_paid < 0 then 0 else coalesce(e.dialysis_paid, 0) end as dialysis_paid_amount
+, case when e.outpatient_rehabilitation_paid < 0 then 0 else coalesce(e.outpatient_rehabilitation_paid, 0) end as outpatient_rehabilitation_paid_amount
+, case when e.outpatient_surgery_paid < 0 then 0 else coalesce(e.outpatient_surgery_paid, 0) end as outpatient_surgery_paid_amount
+, case when e.ambulatory_surgery_center_paid < 0 then 0 else coalesce(e.ambulatory_surgery_center_paid, 0) end as ambulatory_surgery_center_paid_amount
+, case when e.outpatient_psych_paid < 0 then 0 else coalesce(e.outpatient_psych_paid, 0) end as outpatient_psych_paid_amount
+, case when e.dme_orphaned_paid < 0 then 0 else coalesce(e.dme_orphaned_paid, 0) end as dme_orphaned_paid_amount
+, case when e.orphaned_claim_paid < 0 then 0 else coalesce(e.orphaned_claim_paid, 0) end as orphaned_claim_paid_amount
+, case when e.ambulance_orphaned_paid < 0 then 0 else coalesce(e.ambulance_orphaned_paid, 0) end as ambulance_orphaned_paid_amount
+, case when e.lab_orphaned_paid < 0 then 0 else coalesce(e.lab_orphaned_paid, 0) end as lab_orphaned_paid_amount
+, case when e.office_visit_radiology_paid < 0 then 0 else coalesce(e.office_visit_radiology_paid, 0) end as office_visit_radiology_paid_amount
+, case when e.office_visit_paid < 0 then 0 else coalesce(e.office_visit_paid, 0) end as office_visit_paid_amount
+, case when e.office_visit_surgery_paid < 0 then 0 else coalesce(e.office_visit_surgery_paid, 0) end as office_visit_surgery_paid_amount
+, case when e.office_visit_other_paid < 0 then 0 else coalesce(e.office_visit_other_paid, 0) end as office_visit_other_paid_amount
+, case when e.telehealth_paid < 0 then 0 else coalesce(e.telehealth_paid, 0) end as telehealth_paid_amount
+, case when e.office_visit_pt_ot_st_paid < 0 then 0 else coalesce(e.office_visit_pt_ot_st_paid, 0) end as office_visit_pt_ot_st_paid_amount
+, case when e.office_visit_injections_paid < 0 then 0 else coalesce(e.office_visit_injections_paid, 0) end as office_visit_injections_paid_amount
+, case when e.acute_inpatient_paid < 0 then 0 else coalesce(e.acute_inpatient_paid, 0) end as acute_inpatient_paid_amount
+, case when e.inpatient_hospice_paid < 0 then 0 else coalesce(e.inpatient_hospice_paid, 0) end as inpatient_hospice_paid_amount
+, case when e.inpatient_psych_paid < 0 then 0 else coalesce(e.inpatient_psych_paid, 0) end as inpatient_psych_paid_amount
+, case when e.inpatient_rehabilitation_paid < 0 then 0 else coalesce(e.inpatient_rehabilitation_paid, 0) end as inpatient_rehabilitation_paid_amount
+, case when e.inpatient_skilled_nursing_paid < 0 then 0 else coalesce(e.inpatient_skilled_nursing_paid, 0) end as inpatient_skilled_nursing_paid_amount
 
 , coalesce(e.outpatient_count, 0) as outpatient_count
 , coalesce(e.other_count, 0) as other_count
