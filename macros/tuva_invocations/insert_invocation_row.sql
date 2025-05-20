@@ -27,7 +27,7 @@
         
         {% do run_query(query) %}
 
-        {%- do the_tuva_project.trim_tuva_invocations() -%}
+        {%- do the_tuva_project.drop_old_tuva_invocations() -%}
     {%- endif -%}
 
 {% endmacro %}
