@@ -3,8 +3,8 @@
 )}}
 
 with member_months as (
-    select 
-        cast(count(1) as {{ dbt.type_numeric() }}) as member_months 
+    select
+        cast(count(1) as {{ dbt.type_numeric() }}) as member_months
     from {{ ref('core__member_months') }}
 )
 ,pkpy as (
@@ -13,7 +13,7 @@ select
     , enc.encounter_group
     , cast(enc.encounter_type as {{dbt.type_string()}}) as analytics_measure
     , case when avg(mm.member_months) = 0 then 0
-           else count(enc.encounter_id)  / avg(mm.member_months ) * 12000 
+           else count(enc.encounter_id)  / avg(mm.member_months ) * 12000
       end as data_source_value
 from {{ ref('core__encounter') }} as enc
 cross join member_months as mm
@@ -27,7 +27,7 @@ select
     , enc.encounter_group
     , cast(enc.encounter_type as {{dbt.type_string()}}) as analytics_measure
     , case when count(enc.encounter_id) = 0 then 0
-           else sum(enc.paid_amount) / count(enc.encounter_id) 
+           else sum(enc.paid_amount) / count(enc.encounter_id)
       end as data_source_value
 from {{ ref('core__encounter') }} as enc
 cross join member_months as mm
@@ -48,4 +48,4 @@ select
     ,ref_data.analytics_value
     ,cast('{{ var('tuva_last_run')}}' as {{dbt.type_string()}}) as tuva_last_run
 from paid_per
-left join {{ ref('data_quality__reference_mart_analytics') }} ref_data on paid_per.analytics_concept = paid_per.analytics_concept and paid_per.analytics_measure = paid_per.analytics_measure
+left join {{ ref('data_quality__reference_mart_analytics') }} ref_data on paid_per.analytics_concept = ref_data.analytics_concept and paid_per.analytics_measure = ref_data.analytics_measure
