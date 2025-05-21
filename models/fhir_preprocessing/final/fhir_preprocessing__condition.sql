@@ -16,10 +16,12 @@ select distinct
     , cast(condition.status as {{ dbt.type_string() }} ) as condition_clinical_status
     , case
         when lower(condition.normalized_code_type) = 'icd-10-cm'
-            and length(condition.normalized_code) > 3
-            then cast(substring(condition.normalized_code,1,3) as {{ dbt.type_string() }} )
-                || '.'
-                || cast(substring(condition.normalized_code,4) as {{ dbt.type_string() }} )
+            and {{ length('condition.normalized_code') }} > 3
+            then cast({{ concat_custom([
+                    "cast(substring(condition.normalized_code,1,3)",
+                    "'.'",
+                    "substring(condition.normalized_code,4)"
+                    ]) }} as {{ dbt.type_string() }} )
         else cast(condition.normalized_code as {{ dbt.type_string() }} )
       end as condition_code
     , case

@@ -16,7 +16,7 @@ select
     , claim_end_date
     , claim_line_start_date
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , billing_id
     , billing_name
     , rendering_id
@@ -53,7 +53,7 @@ select
     , claim_end_date
     , claim_line_start_date
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , billing_id
     , billing_name
     , rendering_id
@@ -91,7 +91,7 @@ from {{ ref('core__medical_claim') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
         , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as plan
+        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
         , cast(null as {{ dbt.type_string() }} ) as billing_id
         , cast(null as {{ dbt.type_string() }} ) as billing_name
         , cast(null as {{ dbt.type_string() }} ) as rendering_id
@@ -125,7 +125,7 @@ from {{ ref('core__medical_claim') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
         , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as plan
+        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
         , cast(null as {{ dbt.type_string() }} ) as billing_id
         , cast(null as {{ dbt.type_string() }} ) as billing_name
         , cast(null as {{ dbt.type_string() }} ) as rendering_id

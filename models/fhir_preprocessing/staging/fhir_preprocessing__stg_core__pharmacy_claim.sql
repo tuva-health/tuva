@@ -11,7 +11,7 @@ select
     , claim_id
     , claim_line_number
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , dispensing_provider_id
     , dispensing_provider_name
     , dispensing_date
@@ -32,7 +32,7 @@ select
     , claim_id
     , claim_line_number
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , dispensing_provider_id
     , dispensing_provider_name
     , dispensing_date
@@ -54,7 +54,7 @@ from {{ ref('core__pharmacy_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as claim_id
         , cast(null as {{ dbt.type_string() }} ) as claim_line_number
         , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as plan
+        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
         , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_id
         , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_name
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
@@ -72,7 +72,7 @@ from {{ ref('core__pharmacy_claim') }}
         , cast(null as {{ dbt.type_string() }} ) as claim_id
         , cast(null as {{ dbt.type_string() }} ) as claim_line_number
         , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as plan
+        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
         , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_id
         , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_name
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date

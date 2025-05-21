@@ -11,7 +11,7 @@ select
     , member_id
     , payer_type
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , enrollment_start_date
     , enrollment_end_date
     , subscriber_relation
@@ -27,7 +27,7 @@ select
     , member_id
     , payer_type
     , payer
-    , plan
+    , {{ quote_column('plan') }}
     , enrollment_start_date
     , enrollment_end_date
     , subscriber_relation
@@ -44,7 +44,7 @@ from {{ ref('core__eligibility') }}
         , cast(null as {{ dbt.type_string() }} ) as member_id
         , cast(null as {{ dbt.type_string() }} ) as payer_type
         , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as plan
+        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as enrollment_start_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as enrollment_end_date
         , cast(null as {{ dbt.type_string() }} ) as subscriber_relation
@@ -57,7 +57,7 @@ from {{ ref('core__eligibility') }}
         , cast(null as {{ dbt.type_string() }} ) as member_id
         , cast(null as {{ dbt.type_string() }} ) as payer_type
         , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as plan
+        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as enrollment_start_date
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as enrollment_end_date
         , cast(null as {{ dbt.type_string() }} ) as subscriber_relation

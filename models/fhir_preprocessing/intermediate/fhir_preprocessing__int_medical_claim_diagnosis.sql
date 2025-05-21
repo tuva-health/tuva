@@ -15,10 +15,12 @@ with staging as (
         /* HEDIS valuesets require formatted diagnosis codes */
         , case
             when lower(claim_condition.normalized_code_type) = 'icd-10-cm'
-              and length(claim_condition.normalized_code) > 3
-              then substring(claim_condition.normalized_code,1,3)
-                || '.'
-                || substring(claim_condition.normalized_code,4)
+              and {{ length('claim_condition.normalized_code') }} > 3
+              then {{ concat_custom([
+                    "substring(claim_condition.normalized_code,1,3)",
+                    "'.'",
+                    "substring(claim_condition.normalized_code,4)"
+                    ]) }}
             else claim_condition.normalized_code
           end as eob_diagnosis_code
         , replace(claim_condition.normalized_description,',','') as eob_diagnosis_display
