@@ -57,7 +57,7 @@ select
                 {% if not loop.first %}, {% endif -%}
                 '{{ snake_to_camel(col) }}',
                 {%- if 'list' in col | lower -%}
-                parse_json( {{ col }} ) /* parse_json added to prevent nested objects from being escaped */
+                parse_json( {{ col }} ) /* Parse JSON lists to prevent escaping */
                 {%- else -%}
                 {{ col }}
                 {%- endif -%}
@@ -78,7 +78,11 @@ select
             struct(
                 {%- for col in object_col_list %}
                 {% if not loop.first %}, {% endif -%}
+                {%- if 'list' in col | lower -%}
+                parse_json( {{ col }} ) as {{ snake_to_camel(col) }} /* Parse JSON lists to prevent escaping */
+                {%- else -%}
                 {{ col }} as {{ snake_to_camel(col) }}
+                {%- endif %}
                 {%- endfor %}
             )
         )
@@ -100,7 +104,7 @@ from (
                 {%- if not loop.first %}, {% endif -%}
                 '{{ snake_to_camel(col) }}',
                 {%- if 'list' in col | lower -%}
-                json_parse( {{ col }} ) /* from_json added to prevent nested objects from being escaped */
+                json_parse( {{ col }} ) /* Parse JSON lists to prevent escaping */
                 {%- else -%}
                 {{ col }}
                 {%- endif %}
