@@ -51,7 +51,6 @@ with adjudication_amount as (
 {{ create_json_object(
     table_ref='unioned',
     group_by_col='claim_id, claim_line_number',
-    order_by_col=none,
     object_col_name='eob_item_adjudication_list',
     object_col_list=[
         'eob_item_adjudication_category_system'

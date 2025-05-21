@@ -76,7 +76,6 @@ with days_supply as (
 {{ create_json_object(
     table_ref='add_sequence',
     group_by_col='claim_id',
-    order_by_col='eob_supporting_info_sequence',
     object_col_name='eob_supporting_info_list',
     object_col_list=[
         'eob_supporting_info_sequence'

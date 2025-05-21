@@ -19,12 +19,12 @@ with adjudication as (
           pharmacy_claim.claim_id
         /* required for FHIR validation, sequence must be >0, temporary fix for possible issues with ADR  */
         , abs(pharmacy_claim.claim_line_number) as eob_item_sequence
-        , 'NDC' as eob_item_product_or_service_system
+        , cast('NDC' as {{ dbt.type_string() }} ) as eob_item_product_or_service_system
         , pharmacy_claim.ndc_code as eob_item_product_or_service_code
-        , coalesce(
+        , cast(coalesce(
               pharmacy_claim.dispensing_date
             , pharmacy_claim.paid_date
-          ) as eob_item_serviced_date
+          ) as {{ dbt.type_string() }} ) as eob_item_serviced_date /* cast date to string for redshift support */
         , adjudication.eob_item_adjudication_list
     from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }} as pharmacy_claim
         left outer join adjudication
@@ -38,7 +38,6 @@ with adjudication as (
 {{ create_json_object(
     table_ref='joined',
     group_by_col='claim_id',
-    order_by_col='eob_item_sequence',
     object_col_name='eob_item_list',
     object_col_list=[
         'eob_item_sequence'

@@ -35,20 +35,19 @@
 {% macro create_json_object(
         table_ref,
         group_by_col,
-        order_by_col,
         object_col_name,
         object_col_list
         ) %}
-  {{ return(adapter.dispatch('create_json_object')(table_ref,group_by_col, order_by_col, object_col_name,object_col_list)) }}
+  {{ return(adapter.dispatch('create_json_object')(table_ref, group_by_col, object_col_name, object_col_list)) }}
 {% endmacro %}
 
 /* default */
-{% macro default__create_json_object(table_ref,group_by_col, order_by_col, object_col_name,object_col_list) %}
+{% macro default__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
   {{ exceptions.raise_compiler_error("The macro create_json_object is not implemented for this adapter.") }}
 {% endmacro %}
 
 /* snowflake */
-{% macro snowflake__create_json_object(table_ref,group_by_col, order_by_col, object_col_name,object_col_list) %}
+{% macro snowflake__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
 select
     {{ group_by_col }}
     , to_json(
@@ -64,15 +63,14 @@ select
                 {%- endif -%}
                 {%- endfor %}
             )
-        ) {% if order_by_col -%} within group (order by {{ order_by_col }} )
-        {%- endif %}
+        )
     ) as {{ object_col_name }}
 from {{ table_ref }}
 group by {{ group_by_col }}
 {% endmacro %}
 
 /* bigquery */
-{% macro bigquery__create_json_object(table_ref,group_by_col, order_by_col, object_col_name,object_col_list) %}
+{% macro bigquery__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
 select
     {{ group_by_col }}
     , to_json_string(
@@ -83,7 +81,6 @@ select
                 {{ col }} as {{ snake_to_camel(col) }}
                 {%- endfor %}
             )
-        {% if order_by_col -%} order by {{ order_by_col }} {%- endif %}
         )
     ) as {{ object_col_name }}
 from {{ table_ref }}
@@ -91,4 +88,28 @@ group by {{ group_by_col }}
 {% endmacro %}
 
 /* redshift */
+{% macro redshift__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
+select
+    {{ group_by_col }},
+    '[' || listagg(json_serialize(object_json), ',') || ']' as {{ object_col_name }}
+from (
+    select
+        {{ group_by_col }},
+        object(
+            {%- for col in object_col_list %}
+                {%- if not loop.first %}, {% endif -%}
+                '{{ snake_to_camel(col) }}',
+                {%- if 'list' in col | lower -%}
+                json_parse( {{ col }} ) /* from_json added to prevent nested objects from being escaped */
+                {%- else -%}
+                {{ col }}
+                {%- endif %}
+            {% endfor %}
+        ) as object_json
+    from {{ table_ref }}
+) sub
+group by {{ group_by_col }}
+{% endmacro %}
+
+
 /* fabric */

@@ -46,7 +46,6 @@ with add_sequence as (
 {{ create_json_object(
     table_ref='staging',
     group_by_col='claim_id',
-    order_by_col='eob_procedure_sequence',
     object_col_name='eob_procedure_list',
     object_col_list=[
         'eob_procedure_sequence'

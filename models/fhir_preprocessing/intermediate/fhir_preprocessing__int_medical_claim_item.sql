@@ -37,10 +37,10 @@ with adjudication as (
           end as eob_item_product_or_service_system
         /* required for FHIR validation, default to dummy code */
         , coalesce(medical_claim.hcpcs_code, '00000') as eob_item_product_or_service_code
-        , coalesce(
+        , cast(coalesce(
               medical_claim.claim_line_start_date
             , medical_claim.claim_start_date
-          ) as eob_item_serviced_date
+          ) as {{ dbt.type_string() }} ) as eob_item_serviced_date /* cast date to string for redshift support */
         , case
             when medical_claim.place_of_service_code is not null then 'POS'
             else null
@@ -63,7 +63,6 @@ with adjudication as (
 {{ create_json_object(
     table_ref='joined',
     group_by_col='claim_id',
-    order_by_col='eob_item_sequence',
     object_col_name='eob_item_list',
     object_col_list=[
         'eob_item_sequence'

@@ -16,9 +16,9 @@ with staging as (
         , case
             when lower(claim_condition.normalized_code_type) = 'icd-10-cm'
               and length(claim_condition.normalized_code) > 3
-              then substr(claim_condition.normalized_code,1,3)
+              then substring(claim_condition.normalized_code,1,3)
                 || '.'
-                || substr(claim_condition.normalized_code,4)
+                || substring(claim_condition.normalized_code,4)
             else claim_condition.normalized_code
           end as eob_diagnosis_code
         , replace(claim_condition.normalized_description,',','') as eob_diagnosis_display
@@ -37,7 +37,6 @@ with staging as (
 {{ create_json_object(
     table_ref='staging',
     group_by_col='claim_id',
-    order_by_col='eob_diagnosis_sequence',
     object_col_name='eob_diagnosis_list',
     object_col_list=[
         'eob_diagnosis_sequence'

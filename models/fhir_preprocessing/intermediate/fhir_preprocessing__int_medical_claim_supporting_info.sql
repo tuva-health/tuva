@@ -48,8 +48,9 @@ with admission_period as (
         , eob_supporting_info_category_code
         , eob_supporting_info_code
         , eob_supporting_info_system
-        , eob_supporting_info_timing_start
-        , eob_supporting_info_timing_end
+        /* cast date to string for redshift support */
+        , cast(eob_supporting_info_timing_start as {{ dbt.type_string() }} ) as eob_supporting_info_timing_start
+        , cast(eob_supporting_info_timing_end as {{ dbt.type_string() }} ) as eob_supporting_info_timing_end
         , row_number() over(
             partition by claim_id
             order by eob_supporting_info_category_code
@@ -62,7 +63,6 @@ with admission_period as (
 {{ create_json_object(
     table_ref='add_sequence',
     group_by_col='claim_id',
-    order_by_col='eob_supporting_info_sequence',
     object_col_name='eob_supporting_info_list',
     object_col_list=[
         'eob_supporting_info_sequence'

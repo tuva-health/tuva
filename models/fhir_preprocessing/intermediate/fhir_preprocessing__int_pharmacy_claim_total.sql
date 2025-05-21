@@ -51,7 +51,6 @@ with total_amount as (
 {{ create_json_object(
     table_ref='unioned',
     group_by_col='claim_id',
-    order_by_col=none,
     object_col_name='eob_total_list',
     object_col_list=[
         'eob_total_category_system'
