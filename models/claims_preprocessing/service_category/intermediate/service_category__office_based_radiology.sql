@@ -22,6 +22,7 @@ from {{ ref('service_category__stg_medical_claim') }} as med
   inner join {{ ref('service_category__stg_office_based') }} as o
   on med.claim_id = o.claim_id
   and med.claim_line_number = o.claim_line_number
+  and med.data_source = o.data_source
 where
   med.modality is not null
   and med.place_of_service_code = '11'

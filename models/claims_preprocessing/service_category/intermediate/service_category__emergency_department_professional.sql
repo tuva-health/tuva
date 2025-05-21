@@ -6,6 +6,7 @@
 select distinct
     med.claim_id
   , med.claim_line_number
+  , med.data_source
   , med.claim_line_id
   , 'outpatient' as service_category_1
   , 'emergency department' as service_category_2

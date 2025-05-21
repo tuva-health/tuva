@@ -5,6 +5,7 @@
 
 select distinct
   s.claim_id
+  , s.data_source
   , 'inpatient' as service_category_1
   , 'inpatient psychiatric' as service_category_2
   , 'inpatient psychiatric' as service_category_3
