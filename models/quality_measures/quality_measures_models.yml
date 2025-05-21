@@ -67,7 +67,7 @@ models:
           strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+            enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
             meta:
               dqi_test_description: "This is a check in one of the final downstream
