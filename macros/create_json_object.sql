@@ -128,12 +128,12 @@ select
                 {%- if 'list' in col | lower -%}
                     ISNULL({{ col }}, '[]')
                 {%- else -%}
-                    '"' + ISNULL(CAST({{ col }} AS {{ dbt.type_string() }}), '') + '"'
+                    '"' + ISNULL(CAST({{ col }} AS VARCHAR(MAX)), '') + '"'
                 {%- endif -%}
                 {%- if not loop.last %} + ',' + {%- endif %}
             {%- endfor %}
             + '}'
-        AS {{ dbt.type_string() }}), ','
+        AS VARCHAR(MAX)), ','
     ) + ']' AS {{ object_col_name }}
 from {{ table_ref }}
 group by {{ group_by_col }}
