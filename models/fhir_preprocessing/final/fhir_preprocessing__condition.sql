@@ -18,7 +18,7 @@ select distinct
         when lower(condition.normalized_code_type) = 'icd-10-cm'
             and {{ length('condition.normalized_code') }} > 3
             then cast({{ concat_custom([
-                    "cast(substring(condition.normalized_code,1,3)",
+                    "substring(condition.normalized_code,1,3)",
                     "'.'",
                     "substring(condition.normalized_code,4)"
                     ]) }} as {{ dbt.type_string() }} )
