@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_train', False) | as_bool
+    )
+}}
+
 with cte as 
 (
     select distinct person_id

@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_train', False) | as_bool
+    )
+}}
+
 with subset as (
   select distinct person_id
   from {{ ref('core__member_months') }}
@@ -43,10 +49,10 @@ with subset as (
       , count(distinct case when e.encounter_type = 'inpatient skilled nursing' then e.encounter_id else null end) as inpatient_skilled_nursing_count
 
 
-  , count(distinct case when e.encounter_group = 'inpatient' then e.encounter_id else null end) as inpatient_count
-  , count(distinct case when e.encounter_group = 'office based' then e.encounter_id else null end) as office_based_count
-  , count(distinct case when e.encounter_group = 'other' then e.encounter_id else null end) as other_count
-  , count(distinct case when e.encounter_group = 'outpatient' then e.encounter_id else null end) as outpatient_count
+      , count(distinct case when e.encounter_group = 'inpatient' then e.encounter_id else null end) as inpatient_count
+      , count(distinct case when e.encounter_group = 'office based' then e.encounter_id else null end) as office_based_count
+      , count(distinct case when e.encounter_group = 'other' then e.encounter_id else null end) as other_count
+      , count(distinct case when e.encounter_group = 'outpatient' then e.encounter_id else null end) as outpatient_count
 
 
       , sum( case when e.encounter_type = 'outpatient injections' then mc.paid_amount else 0 end) as outpatient_injections_paid

@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_train', False) | as_bool
+    )
+}}
+
 with cte as (
   select distinct ssa_fips_state_name as state_nm
     from {{ ref('reference_data__ssa_fips_state')}} s

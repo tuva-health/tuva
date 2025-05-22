@@ -12,6 +12,7 @@ models:
       materialized: table
       tags: 
         - benchmarks_train
+        - benchmarks
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -31,6 +32,7 @@ models:
       materialized: table
       tags: 
         - benchmarks_train
+        - benchmarks
 
 
   - name: benchmarks__predict_member_month
@@ -43,7 +45,8 @@ models:
       alias: predict_member_month
       materialized: table
       tags: 
-        - benchmarks_view
+        - benchmarks_analysis
+        - benchmarks
 
   - name: benchmarks__inpatient_input
     description: |
@@ -56,6 +59,7 @@ models:
       materialized: table
       tags: 
         - benchmarks_train
+        - benchmarks
 
   - name: benchmarks__pivot_hcc
     description: |
@@ -68,6 +72,7 @@ models:
       materialized: table
       tags: 
         - benchmarks_train
+        - benchmarks
 
   - name: benchmarks__pivot_cms_condition
     description: |
@@ -80,4 +85,4 @@ models:
       materialized: table
       tags: 
         - benchmarks_train
-      
+        - benchmarks

@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_train', False) | as_bool
+    )
+}}
+
 /* returns person year grain. Did the patient have the condition coded in each year? Not if they ever had the condition */
 WITH cte AS (
     SELECT DISTINCT

@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_already_created', False) | as_bool
+    )
+}}
+
 WITH expected_member_month AS (
     SELECT 
           p.benchmark_key
