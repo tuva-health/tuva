@@ -6,6 +6,7 @@
 select distinct
     med.claim_id
     , med.claim_line_number
+    , med.data_source
     , med.claim_line_id
     , 'office-based' as service_category_1
     , 'office-based radiology' as service_category_2
@@ -18,10 +19,10 @@ select distinct
     , '{{ this.name }}' as source_model_name
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }} as med
-inner join {{ ref('service_category__stg_office_based') }} as o on med.claim_id = o.claim_id
-and
-med.claim_line_number = o.claim_line_number
+  inner join {{ ref('service_category__stg_office_based') }} as o
+  on med.claim_id = o.claim_id
+  and med.claim_line_number = o.claim_line_number
+  and med.data_source = o.data_source
 where
-med.modality is not null
-and
-med.place_of_service_code = '11'
+  med.modality is not null
+  and med.place_of_service_code = '11'
