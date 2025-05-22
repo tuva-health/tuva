@@ -24,7 +24,7 @@ models:
             severity: error
             enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
-      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+      - the_tuva_project.expect_column_pair_values_A_to_be_greater_than_B:
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
           column_A: enrollment_end_date
           column_B: enrollment_start_date
@@ -33,7 +33,7 @@ models:
             severity: warn
             enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
-      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+      - the_tuva_project.expect_column_pair_values_A_to_be_greater_than_B:
           description: "Death date cannot be after birth date."
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
           column_A: death_date
@@ -53,7 +53,7 @@ models:
       - name: person_id
         description: '{{ doc("person_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
                 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
@@ -72,7 +72,7 @@ models:
       - name: member_id
         description: '{{ doc("member_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
@@ -80,7 +80,7 @@ models:
       - name: subscriber_id
         description: '{{ doc("subscriber_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -88,7 +88,7 @@ models:
       - name: gender
         description: '{{ doc("sex") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
@@ -106,7 +106,7 @@ models:
       - name: race
         description: '{{ doc("race") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -127,7 +127,7 @@ models:
       - name: birth_date
         description: '{{ doc("birth_date") }}'
         tests:
-          - dbt_expectations.expect_column_values_to_be_between:
+          - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
               min_value: "'1900-01-02'"
@@ -139,12 +139,12 @@ models:
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_unique_value_count_to_be_between:
+          - the_tuva_project.expect_column_unique_value_count_to_be_between:
               description: A person should not have multiple birthdays.
               min_value: 1
               max_value: 1
@@ -156,7 +156,7 @@ models:
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: 'A person should not have multiple birthdays.'
-          - dbt_expectations.expect_column_values_to_be_of_type:
+          - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               config:
@@ -170,7 +170,7 @@ models:
       - name: death_date
         description: '{{ doc("death_date") }}'
         tests:
-          - dbt_expectations.expect_column_values_to_be_between:
+          - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
               min_value: "'1900-01-02'"
@@ -182,12 +182,12 @@ models:
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
+          - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               config:
@@ -196,7 +196,7 @@ models:
       - name: death_flag
         description: '{{ doc("death_flag") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -220,7 +220,7 @@ models:
       - name: enrollment_start_date
         description: '{{ doc("enrollment_start_date") }}'
         tests:
-          - dbt_expectations.expect_column_values_to_be_between:
+          - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               min_value: "'1900-01-02'"
@@ -232,12 +232,12 @@ models:
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
+          - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               config:
@@ -246,7 +246,7 @@ models:
       - name: enrollment_end_date
         description: '{{ doc("enrollment_end_date") }}'
         tests:
-          - dbt_expectations.expect_column_values_to_be_between:
+          - the_tuva_project.expect_column_values_to_be_between:
               description: This is a test on all dates to see if they are within a reasonable range.
               tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               min_value: "'1900-01-02'"
@@ -258,12 +258,12 @@ models:
                 meta:
                   dqi_test_description: "This is a test on all dates to see if they
                     are within a reasonable range. "
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
+          - the_tuva_project.expect_column_values_to_be_of_type:
               column_type: date
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs', 'dqi_financial_pmpm']
               config:
@@ -278,7 +278,7 @@ models:
       - name: payer
         description: '{{ doc("payer") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
@@ -292,7 +292,7 @@ models:
       - name: payer_type
         description: '{{ doc("payer_type") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -314,7 +314,7 @@ models:
       - name: plan
         description: '{{ doc("plan") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
@@ -328,12 +328,12 @@ models:
       - name: original_reason_entitlement_code
         description: '{{ doc("original_reason_entitlement_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_value_lengths_to_equal:
+          - the_tuva_project.expect_column_value_lengths_to_equal:
               value: 1
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               config:
@@ -351,7 +351,7 @@ models:
       - name: dual_status_code
         description: '{{ doc("dual_status_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
@@ -368,7 +368,7 @@ models:
       - name: medicare_status_code
         description: '{{ doc("medicare_status_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
@@ -385,7 +385,7 @@ models:
       - name: group_id
         description: '{{ doc("first_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -393,7 +393,7 @@ models:
       - name: group_name
         description: '{{ doc("first_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -401,7 +401,7 @@ models:
       - name: first_name
         description: '{{ doc("first_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -415,7 +415,7 @@ models:
       - name: last_name
         description: '{{ doc("last_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -429,7 +429,7 @@ models:
       - name: social_security_number
         description: '{{ doc("social_security_number") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -437,7 +437,7 @@ models:
       - name: subscriber_relation
         description: '{{ doc("subscriber_relation") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -445,7 +445,7 @@ models:
       - name: address
         description: '{{ doc("address") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -459,7 +459,7 @@ models:
       - name: city
         description: '{{ doc("city") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -473,7 +473,7 @@ models:
       - name: state
         description: '{{ doc("state") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -487,7 +487,7 @@ models:
       - name: zip_code
         description: '{{ doc("zip_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -498,7 +498,7 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
-          - dbt_expectations.expect_column_value_lengths_to_be_between:
+          - the_tuva_project.expect_column_value_lengths_to_be_between:
               description: "Zip codes should be between 5 and 10 digits long, more specifically 5,9, or 10 digits. "
               min_value: 5
               max_value: 10
@@ -509,7 +509,7 @@ models:
       - name: phone
         description: '{{ doc("phone") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -517,7 +517,7 @@ models:
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
@@ -531,7 +531,7 @@ models:
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
@@ -539,18 +539,18 @@ models:
       - name: file_date
         description: '{{ doc("file_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
+          - the_tuva_project.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_between:
+          - the_tuva_project.expect_column_values_to_be_between:
               tags: [ 'tuva_dqi_sev_3', 'dqi']
               min_value: '''1900-01-01'''
               max_value: '''2100-01-01'''
@@ -561,12 +561,12 @@ models:
       - name: ingest_datetime
         description: '{{ doc("ingest_datetime") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
+          - the_tuva_project.expect_column_values_to_be_in_type_list:
               column_type_list: [date, datetime, time, timestamp, timestamp_ntz, timestampntz,
                 timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
                     with time zone, timestamp without time zone, datetime2, datetimeoffset]

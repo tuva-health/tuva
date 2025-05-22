@@ -13,7 +13,7 @@ models:
       This final model displays the contributing demographic and disease risk  factors,
       interactions, and HCCs for each enrollee in the payment year.
     tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
+      - the_tuva_project.expect_table_row_count_to_be_between:
           description: Check to see if there is at least one record in HCC conditions
           min_value: 1 # (Optional)
           strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
