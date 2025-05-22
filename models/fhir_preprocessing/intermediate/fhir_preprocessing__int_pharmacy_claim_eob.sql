@@ -1,8 +1,7 @@
 {{ config(
-     enabled = var('fhir_preprocessing_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
+     enabled = var('fhir_preprocessing_enabled',False) | as_bool
    )
 }}
-
 with eligibility as (
 
     select

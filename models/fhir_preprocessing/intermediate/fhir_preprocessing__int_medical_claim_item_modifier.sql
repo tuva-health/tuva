@@ -1,10 +1,8 @@
 {{ config(
-     enabled = var('fhir_preprocessing_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
+     enabled = var('fhir_preprocessing_enabled',False) | as_bool
    )
 }}
-
 /* unpivot hcpcs modifier codes into rows to be grouped into a json list for CSV export */
-
 with hcpcs_modifier_1 as (
 
     select
