@@ -117,3 +117,24 @@ group by {{ group_by_col }}
 
 
 /* fabric */
+{% macro fabric__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
+select
+    {{ group_by_col }},
+    '[' + STRING_AGG(
+        CAST(
+            '{' +
+            {%- for col in object_col_list %}
+                '"{{ snake_to_camel(col) }}":' +
+                {%- if 'list' in col | lower -%}
+                    ISNULL({{ col }}, '[]')
+                {%- else -%}
+                    '"' + ISNULL(CAST({{ col }} AS {{ dbt.type_string() }}), '') + '"'
+                {%- endif -%}
+                {%- if not loop.last %} + ',' + {%- endif %}
+            {%- endfor %}
+            + '}'
+        AS {{ dbt.type_string() }}), ','
+    ) + ']' AS {{ object_col_name }}
+from {{ table_ref }}
+group by {{ group_by_col }}
+{% endmacro %}
