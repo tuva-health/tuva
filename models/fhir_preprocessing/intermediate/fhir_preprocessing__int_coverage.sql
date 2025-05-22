@@ -10,7 +10,7 @@ with base as (
         /* create hash due to FHIR limit of 64 characters for max length of strings */
         , {{ dbt_utils.generate_surrogate_key(['eligibility_id']) }} as resource_internal_id
         , payer as organization_name
-        , plan as coverage_plan
+        , {{ quote_column('plan') }} as coverage_plan
         , payer_type
         , enrollment_start_date as coverage_period_start
         , enrollment_end_date as coverage_period_end

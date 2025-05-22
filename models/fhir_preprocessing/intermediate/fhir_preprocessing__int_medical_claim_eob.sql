@@ -9,7 +9,7 @@ with eligibility as (
           person_id
         , eligibility_id
         , payer
-        , plan
+        , {{ quote_column('plan') }}
         , enrollment_start_date
         , enrollment_end_date
     from {{ ref('fhir_preprocessing__stg_core__eligibility') }}
@@ -90,7 +90,7 @@ with eligibility as (
         left outer join eligibility
             on medical_claim.person_id = eligibility.person_id
             and medical_claim.payer = eligibility.payer
-            and medical_claim.plan = eligibility.plan
+            and medical_claim.{{ quote_column('plan') }} = eligibility.{{ quote_column('plan') }}
             and medical_claim.claim_start_date
                 between eligibility.enrollment_start_date
                 and eligibility.enrollment_end_date
