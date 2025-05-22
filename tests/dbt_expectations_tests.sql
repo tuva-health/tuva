@@ -1,4 +1,4 @@
-{% macro test_column_pair_values_a_greater_than_b(model, column_a, column_b, or_equal=False, row_condition=None) %}
+{% macro test_expect_column_pair_values_a_to_be_greater_than_b(model, column_a, column_b, or_equal=False, row_condition=None) %}
   {% if is_fabric() %}
     {{ return(test_column_pair_values_a_greater_than_b_fabric(model, column_a, column_b, or_equal, row_condition)) }}
   {% else %}
@@ -6,6 +6,7 @@
   {% endif %}
 {% endmacro %}
 
+{# Fabric implementation for column pair values A > B #}
 {% macro test_column_pair_values_a_greater_than_b_fabric(model, column_a, column_b, or_equal, row_condition) %}
   {%- set operator = '>=' if or_equal else '>' -%}
 
@@ -22,7 +23,7 @@
   WHERE NOT ({{ column_a }} {{ operator }} {{ column_b }})
 {% endmacro %}
 
-{% macro test_column_values_between(model, column_name, min_value=None, max_value=None, strictly=False, row_condition=None) %}
+{% macro test_expect_column_values_to_be_between(model, column_name, min_value=None, max_value=None, strictly=False, row_condition=None) %}
   {% if is_fabric() %}
     {{ return(test_column_values_between_fabric(model, column_name, min_value, max_value, strictly, row_condition)) }}
   {% else %}
@@ -50,7 +51,7 @@
     {% if max_value is not none %}NOT ({{ column_name }} {{ max_operator }} {{ max_value }}){% endif %}
 {% endmacro %}
 
-{% macro test_column_value_lengths_equal(model, column_name, value, row_condition=None) %}
+{% macro test_expect_column_value_lengths_to_equal(model, column_name, value, row_condition=None) %}
   {% if is_fabric() %}
     {{ return(test_column_value_lengths_equal_fabric(model, column_name, value, row_condition)) }}
   {% else %}
@@ -72,7 +73,7 @@
   WHERE LEN({{ column_name }}) != {{ value }}
 {% endmacro %}
 
-{% macro test_column_value_lengths_between(model, column_name, min_value=None, max_value=None, strictly=False, row_condition=None) %}
+{% macro test_expect_column_value_lengths_to_be_between(model, column_name, min_value=None, max_value=None, strictly=False, row_condition=None) %}
   {% if is_fabric() %}
     {{ return(test_column_value_lengths_between_fabric(model, column_name, min_value, max_value, strictly, row_condition)) }}
   {% else %}
@@ -100,7 +101,7 @@
     {% if max_value is not none %}NOT (LEN({{ column_name }}) {{ max_operator }} {{ max_value }}){% endif %}
 {% endmacro %}
 
-{% macro test_column_unique_value_count_between(model, column_name, min_value=None, max_value=None, group_by=None, strictly=False, row_condition=None) %}
+{% macro test_expect_column_unique_value_count_to_be_between(model, column_name, min_value=None, max_value=None, group_by=None, strictly=False, row_condition=None) %}
   {% if is_fabric() %}
     {{ return(test_column_unique_value_count_between_fabric(model, column_name, min_value, max_value, group_by, strictly, row_condition)) }}
   {% else %}
