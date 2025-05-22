@@ -3,7 +3,7 @@
    )
 }}
 select
-      cast(person_id as {{ dbt.type_string() }} ) as patient_internal_Id
+      cast(person_id as {{ dbt.type_string() }} ) as patient_internal_id
     , cast(first_name as {{ dbt.type_string() }} ) as name_first
     , cast(last_name as {{ dbt.type_string() }} ) as name_last
     , cast(sex as {{ dbt.type_string() }} ) as gender
