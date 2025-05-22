@@ -147,7 +147,7 @@ seeds:
       terminology__ms_drg:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','ms_drg.csv',compression=true,null_marker=true) }}"
       terminology__ndc:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','ndc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.12','ndc.csv',compression=true,null_marker=true) }}"
       terminology__nitos:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','nitos.csv',compression=true,null_marker=true) }}"
       terminology__other_provider_taxonomy:
@@ -165,9 +165,9 @@ seeds:
       terminology__revenue_center:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','revenue_center.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_to_atc:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.12','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_brand_generic:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','rxnorm_brand_generic.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.12','rxnorm_brand_generic.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','snomed_ct.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct_transitive_closures:
@@ -238,7 +238,7 @@ seeds:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.11','hcc_suspecting_icd_10_cm_mappings.csv',compression=true,null_marker=true) }}"
       pharmacy:
         pharmacy__rxnorm_generic_available:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.11','rxnorm_generic_available.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.12','rxnorm_generic_available.csv',compression=true,null_marker=true) }}"
       quality_measures:
         quality_measures__concepts:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.14.11','quality_measures_concepts.csv',compression=true,null_marker=true) }}"
