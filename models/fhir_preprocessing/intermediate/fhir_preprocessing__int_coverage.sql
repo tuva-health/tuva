@@ -22,29 +22,7 @@ with base as (
 
 )
 
-/* Add HEDIS-required product type mapping
-    PPO	Commercial PPO (preferred provider organization policy)
-    POS	Commerical POS (point of service policy)
-    CEP	Commercial EPO (exclusive provider organization)
-    HMO	Commercial HMO (health maintenance organization policy)
-    MCR	Medicare Advantage HMO (health maintenance organization policy)
-    MP	Medicare Advantage PPO (preferred provider organization policy)
-    MC	Medicare Cost
-    SN1	Special Needs Plan—Chronic Condition
-    SN2	Special Needs Plan—Institutionalized
-    SN3	Special Needs Plan—Dual Eligible
-    MCS	Medicare Advantage POS (point of service policy)
-    MMP	Medicare-Medicaid Plans
-    MDE	Medicare Direct Entities
-    MD	Medicaid Disabled HMO
-    MLI	Medicaid Low Income HMO
-    MRB	Medical Review Board
-    MCD	Medicaid
-    MMO	Exchange HMO (health maintenance organization policy)
-    MOS	Exchange POS (point of service policy)
-    MPO	Exchange PPO (preferred provider organization policy)
-    MEP	Exchange EPO (exclusive provider organization)
-*/
+/* Map to standardized codes for product type */
 , add_product as (
 
     select

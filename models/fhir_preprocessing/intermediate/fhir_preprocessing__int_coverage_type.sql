@@ -18,13 +18,13 @@ with coverage_staging as (
     select
           patient_internal_id
         , resource_internal_id
-        , 'HEDIS_COVERAGE_TYPE' as coverage_type_system
+        , 'COVERAGE_TYPE' as coverage_type_system
         , coverage_type_product as coverage_type_code
     from coverage_staging
 
 )
 
-/* Add HEDIS-required benefit type mapping for medical and pharmacy */
+/* Map to standardized codes for benefit type */
 , medical_benefit as (
 
     select
