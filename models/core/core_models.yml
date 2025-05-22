@@ -1308,3 +1308,103 @@ models:
       alias: _stg_clinical_procedure
       tags: core_stage_clinical
       materialized: view
+
+
+## Intermediate
+  - name: core__diagnosis_recorded_date
+    description: >
+      This table calculates the recorded_date for diagnosis codes on each claim.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _int_diagnosis_recorded_date
+      tags: core
+      materialized: table
+    columns:
+    - name: claim_id
+      description: '{{ doc("claim_id") }}'
+    - name: data_source
+      description: '{{ doc("data_source") }}'
+    - name: recorded_date
+      description: '{{ doc("recorded_date") }}'
+
+  - name: core__dedupe_header_fields
+    description: >
+      This table deduplicates relevant header fields used for each claim_id.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _int_dedupe_header_fields
+      tags: core
+      materialized: table
+    columns:
+    - name: claim_id
+      description: '{{ doc("claim_id") }}'
+    - name: data_source
+      description: '{{ doc("data_source") }}'
+    - name: person_id
+      description: '{{ doc("person_id") }}'
+    - name: member_id
+      description: '{{ doc("member_id") }}'
+    - name: diagnosis_code_type
+      description: '{{ doc("diagnosis_code_type") }}'
+    - name: diagnosis_code_1
+      description: '{{ doc("diagnosis_code_1") }}'
+
+  - name: core__recorded_date_and_header_fields
+    description: >
+      This table joins recorded dates to deduped header fields for each claim.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _int_recorded_date_and_header_fields
+      tags: core
+      materialized: table
+    columns:
+    - name: claim_id
+      description: '{{ doc("claim_id") }}'
+
+  - name: core__claims_conditions_long
+    description: >
+      This table unpivots the conditions to make it a tall table.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _int_claims_conditions_long
+      tags: core
+      materialized: table
+    columns:
+    - name: claim_id
+      description: '{{ doc("claim_id") }}'
+
+  - name: core__claims_conditions_normalized
+    description: >
+      This table normalizes conditions by joining to terminology.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _int_claims_conditions_normalized
+      tags: core
+      materialized: table
+    columns:
+    - name: claim_id
+      description: '{{ doc("claim_id") }}'
+
+  - name: core__claims_core_condition
+    description: >
+      This table is the part of the core condition table that comes from claims data.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _int_claims_core_condition
+      tags: core
+      materialized: table
+    columns:
+    - name: claim_id
+      description: '{{ doc("claim_id") }}'
