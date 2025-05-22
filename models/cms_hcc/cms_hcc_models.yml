@@ -20,7 +20,7 @@ models:
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions']
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+            enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
             meta:
               dqi_test_description: "Check to see if there is at least one record
