@@ -145,7 +145,7 @@
     {% if max_value is not none %}NOT (unique_value_count {{ max_operator }} {{ max_value }}){% endif %}
 {% endmacro %}
 
-{% macro test_column_exists(model, column_name) %}
+{% macro test_expect_column_to_exist(model, column_name) %}
   {% if is_fabric() %}
     {{ return(test_column_exists_fabric(model, column_name)) }}
   {% else %}
