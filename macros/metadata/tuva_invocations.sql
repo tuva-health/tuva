@@ -93,7 +93,7 @@
     {%- set retention_days = retention_days | int -%}
     
     {# Delete records older than the retention period #}
-    {% do log("Deleting old Tuva invocations older than " ~ retention_days ~ " days", info=True) %}
+    {% do log("Deleting Tuva invocations older than " ~ retention_days ~ " days", info=True) %}
     
     {# Use the dateadd function to calculate the cutoff date #}
      {% set dateadd = adapter.dispatch('dateadd', 'datetime') %}
