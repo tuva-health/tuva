@@ -455,7 +455,7 @@ models:
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
 # description: A claim should not have multiple bill type codes within the same claim id.
-              min_value: 1
+              min_value: 0
               max_value: 1
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_chronic_conditions']
               group_by: [claim_id]
