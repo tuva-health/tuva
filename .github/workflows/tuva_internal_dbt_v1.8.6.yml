@@ -151,6 +151,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -347,7 +349,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-
       # Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -423,7 +424,7 @@ jobs:
       # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -455,7 +456,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-
       # Changed to compile to save processing time
       - name: dbt-compile
         run: |
