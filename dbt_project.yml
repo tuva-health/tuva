@@ -143,7 +143,7 @@ seeds:
       terminology__medicare_status:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','medicare_status.csv',compression=true,null_marker=true) }}"
       terminology__ms_drg_weights_los:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','ms_drg_weights_los.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','ms_drg_weights_los.csv',compression=true,null_marker=true) }}"
       terminology__ms_drg:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','ms_drg.csv',compression=true,null_marker=true) }}"
       terminology__ndc:
