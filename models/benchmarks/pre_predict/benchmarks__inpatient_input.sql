@@ -28,7 +28,7 @@ select
       when r.description is not null then r.description 
       else 'unknown' 
     end as race
-  , case when drg_code_type = 'ms-drg' then drg_code else null end as ms_drg_code
+  , case when e.drg_code_type = 'ms-drg' then e.drg_code else null end as ms_drg_code
   , coalesce(ccsr.default_ccsr_category_description_ip, 'unknown') as ccsr_cat
   , datediff(year, p.birth_date, e.encounter_start_date) as age_at_admit
   , case 
