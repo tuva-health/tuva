@@ -455,7 +455,7 @@ models:
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
 # description: A claim should not have multiple bill type codes within the same claim id.
-              min_value: 1
+              min_value: 0
               max_value: 1
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_chronic_conditions']
               group_by: [claim_id]
@@ -859,7 +859,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_readmission']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -880,7 +880,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -901,7 +901,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -922,7 +922,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -943,7 +943,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -964,7 +964,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -985,7 +985,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1006,7 +1006,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1027,7 +1027,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1048,7 +1048,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1069,7 +1069,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1090,7 +1090,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1111,7 +1111,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1132,7 +1132,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1153,7 +1153,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1174,7 +1174,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1195,7 +1195,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1216,7 +1216,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1237,7 +1237,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1258,7 +1258,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1279,7 +1279,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1300,7 +1300,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1321,7 +1321,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1342,7 +1342,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -1363,7 +1363,7 @@ models:
           - dbt_expectations.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]

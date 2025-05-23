@@ -6,6 +6,7 @@
 select distinct
     claim_id
   , claim_line_number
+  , data_source
   , claim_line_id
   , 'ancillary' as service_category_1
   , 'ambulance' as service_category_2
