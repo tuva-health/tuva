@@ -10,7 +10,7 @@ WITH expected_member_month AS (
         , py.year_nbr
         , py.person_id
         , py.payer
-        , py.plan
+        , py.{{ quote_column('plan') }}
         , py.data_source
         , p.paid_amount_pred/py.member_month_count AS paid_amount_pred
         , p.outpatient_paid_amount_pred/py.member_month_count AS outpatient_paid_amount_pred
@@ -26,7 +26,7 @@ WITH expected_member_month AS (
         mc.person_id
       , mc.data_source
       , mc.payer
-      , mc.plan
+      , mc.{{ quote_column('plan') }}
       , cal.year_month_int AS year_month
       , SUM(mc.paid_amount) AS paid_amount
       , SUM(CASE WHEN mc.encounter_group = 'inpatient' THEN mc.paid_amount ELSE 0 END) AS inpatient_paid_amount_actual
@@ -41,13 +41,13 @@ WITH expected_member_month AS (
       ON mc.person_id = mm.person_id
       AND mc.data_source = mm.data_source
       AND mc.payer = mm.payer
-      AND mc.plan = mm.plan
+      AND mc.{{ quote_column('plan') }} = mm.{{ quote_column('plan') }}
       AND cal.year_month_int = mm.year_month
     GROUP BY
         mc.person_id
       , mc.data_source
       , mc.payer
-      , mc.plan
+      , mc.{{ quote_column('plan') }}
       , cal.year_month_int 
 )
 {# 
@@ -56,7 +56,7 @@ WITH expected_member_month AS (
         e.person_id
       , e.data_source
       , mc.payer
-      , mc.plan
+      , mc.{{ quote_column('plan') }}
       , cal.year_month_int AS year_month
       , COUNT(DISTINCT CASE WHEN e.encounter_type = 'acute inpatient' THEN e.encounter_id ELSE NULL END) AS inpatient_encounter_count
       , COUNT(DISTINCT CASE WHEN e.encounter_type = 'emergency department' THEN e.encounter_id ELSE NULL END) AS ed_encounter_count
@@ -74,20 +74,20 @@ WITH expected_member_month AS (
       ON mc.person_id = mm.person_id
       AND mc.data_source = mm.data_source
       AND mc.payer = mm.payer
-      AND mc.plan = mm.plan
+      AND mc.{{ quote_column('plan') }} = mm.{{ quote_column('plan') }}
       AND cal.year_month_int = mm.year_month
     GROUP BY
         e.person_id
       , e.data_source
       , mc.payer
-      , mc.plan
+      , mc.{{ quote_column('plan') }}
       , cal.year_month_int 
 ) #}
 
 , member_month AS (
   SELECT person_id
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , data_source
   , year_month
   , LEFT(year_month,4) AS year_nbr
@@ -96,7 +96,7 @@ WITH expected_member_month AS (
   GROUP BY 
   person_id
   , payer
-  , plan
+  , {{ quote_column('plan') }}
   , data_source
   , year_month
 )
@@ -112,7 +112,7 @@ SELECT
    cal.first_day_of_month,
    mm.person_id,
    mm.payer,
-   mm.plan,
+   mm.{{ quote_column('plan') }},
    mm.data_source,
    emm.benchmark_key,
 
@@ -138,12 +138,12 @@ LEFT JOIN claim AS c
   ON mm.person_id    = c.person_id
   AND mm.data_source = c.data_source
   AND mm.payer       = c.payer
-  AND mm.plan        = c.plan
+  AND mm.{{ quote_column('plan') }}        = c.{{ quote_column('plan') }}
   AND mm.year_month  = c.year_month
 
 INNER JOIN expected_member_month AS emm
   ON mm.year_nbr    = emm.year_nbr
   AND mm.person_id  = emm.person_id
   AND mm.payer      = emm.payer
-  AND mm.plan       = emm.plan
+  AND mm.{{ quote_column('plan') }}       = emm.{{ quote_column('plan') }}
   AND mm.data_source= emm.data_source
