@@ -242,7 +242,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -302,7 +301,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -362,7 +360,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -422,7 +419,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -512,7 +508,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -557,7 +552,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -602,7 +596,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -647,7 +640,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -686,7 +678,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-
       #Changed to seed then compile to speed up processing time
       - name: dbt-seed
         run: |
@@ -732,7 +723,7 @@ jobs:
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -766,7 +757,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -804,7 +794,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -842,7 +831,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -918,7 +906,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -956,7 +943,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -994,7 +980,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
@@ -1032,7 +1017,6 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-
       #Changed to compile to save processing time
       - name: dbt-compile
         run: |
