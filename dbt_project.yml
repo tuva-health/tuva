@@ -15,8 +15,7 @@ models:
     # enabled: "{{ target.name in ['prod','analytics'] }}"
 
 flags:
-  require_explicit_package_overrides_for_builtin_materializations: false
-
+  require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
 
 vars:
     ## CCSR data mart vars
@@ -57,7 +56,8 @@ vars:
 
     ## Set this variable to true if you want legacy data quality models to build
     enable_legacy_data_quality: false
-
+on-run-start:
+  - "{{ log_invocation_start() }}"
 on-run-end:
   - "{{ log_warning_for_seeds() }}"
 
