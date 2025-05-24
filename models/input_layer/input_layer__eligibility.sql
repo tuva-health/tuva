@@ -3,7 +3,7 @@
  | as_bool
    )
 }}
-SELECT e.person_id
+select e.person_id
      , e.member_id
      , e.subscriber_id
      , e.gender
