@@ -19,6 +19,7 @@ with combine_line_models as (
 
 select
   l.claim_id
+  , l.data_source
   , l.claim_line_number
   , l.service_category_1
   , l.service_category_2

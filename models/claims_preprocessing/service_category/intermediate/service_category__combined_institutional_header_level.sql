@@ -34,6 +34,7 @@ with combine_header_models as (
 
 select
   h.claim_id
+  , h.data_source
   , h.service_category_1
   , h.service_category_2
   , h.service_category_3
