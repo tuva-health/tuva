@@ -3,7 +3,7 @@
    )
 }}
 
-select 
+select
     a.claim_id
   , a.claim_line_number
   , a.data_source
