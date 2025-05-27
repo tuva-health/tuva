@@ -3,7 +3,7 @@
    )
 }}
 
-select distinct
+select
   claim_id
 , claim_line_number
 , claim_line_id
