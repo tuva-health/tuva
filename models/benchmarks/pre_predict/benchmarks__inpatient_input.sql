@@ -10,8 +10,10 @@ with cte as (
   where cast(s.ssa_fips_state_code as int) < 53
 )
 
+,final as (
 select
     e.encounter_id
+  , e.data_source
   , e.length_of_stay
   , e.discharge_disposition_code
   , case 
@@ -30,7 +32,7 @@ select
     end as race
   , case when e.drg_code_type = 'ms-drg' then e.drg_code else null end as ms_drg_code
   , coalesce(ccsr.default_ccsr_category_description_ip, 'unknown') as ccsr_cat
-  , datediff(year, p.birth_date, e.encounter_start_date) as age_at_admit
+  , datediff(year, p.birth_date, e.encounter_start_date) as age_at_admit_with_null
   , case 
       when e.discharge_disposition_code = '01' then 'home'
       when e.discharge_disposition_code = '06' then 'home health'
@@ -114,8 +116,8 @@ select
   , pc.erectile_dysfunction as cond_erectile_dysfunction
   , pc.abdominal_aortic_aneurysm as cond_abdominal_aortic_aneurysm
   , pc.gastroesophageal_reflux as cond_gastroesophageal_reflux
-from core.encounter e
-inner join core.patient p on e.person_id = p.person_id
+from {{ ref('core__encounter')}} e
+inner join {{ ref('core__patient')}} p on e.person_id = p.person_id
 inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.person_id 
   and
   year(e.encounter_start_date) = pc.year_nbr
@@ -124,3 +126,16 @@ left join cte s on p.state = s.state_nm
 left join {{ ref('terminology__race')}} r on p.race = r.description
 left join {{ ref('readmissions__readmission_summary')}} rs on e.encounter_id = rs.encounter_id
 where e.encounter_type = 'acute inpatient'
+)
+
+,handle_missing_age as (
+  select data_source
+  ,avg(age_at_admit_with_null) as avg_age_at_admit
+  from final
+  group by data_source
+)
+
+select final.*
+,coalesce(age_at_admit_with_null,h.avg_age_at_admit) as age_at_admit
+from final
+inner join handle_missing_age h on final.data_source = h.data_source
