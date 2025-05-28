@@ -14,6 +14,7 @@ with cte as (
 select
     e.encounter_id
   , e.data_source
+  , c.year as year_nbr
   , e.length_of_stay
   , e.discharge_disposition_code
   , case 
@@ -116,6 +117,7 @@ select
   , pc.erectile_dysfunction as cond_erectile_dysfunction
   , pc.abdominal_aortic_aneurysm as cond_abdominal_aortic_aneurysm
   , pc.gastroesophageal_reflux as cond_gastroesophageal_reflux
+  , year()
 from {{ ref('core__encounter')}} e
 inner join {{ ref('core__patient')}} p on e.person_id = p.person_id
 inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.person_id 
@@ -125,6 +127,7 @@ left join ccsr._value_set_dxccsr_v2023_1_cleaned_map ccsr on e.primary_diagnosis
 left join cte s on p.state = s.state_nm
 left join {{ ref('terminology__race')}} r on p.race = r.description
 left join {{ ref('readmissions__readmission_summary')}} rs on e.encounter_id = rs.encounter_id
+left join {{ ref('reference_data__calendar')}} c on e.encounter_start_date = c.full_date
 where e.encounter_type = 'acute inpatient'
 )
 
