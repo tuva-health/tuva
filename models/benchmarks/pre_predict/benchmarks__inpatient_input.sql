@@ -4,13 +4,7 @@
     )
 }}
 
-with cte as (
-  select distinct ssa_fips_state_name as state_nm
-    from {{ ref('reference_data__ssa_fips_state')}} s
-  where cast(s.ssa_fips_state_code as int) < 53
-)
-
-,final as (
+with final as (
 select
     e.encounter_id
   , e.data_source
@@ -23,10 +17,7 @@ select
       else 0 
     end as readmission_numerator
   , coalesce(rs.index_admission_flag,0) as readmission_denominator
-  , case 
-      when s.state_nm is not null then s.state_nm 
-      else null
-    end as state
+  , coalesce(st_ab.ansi_fips_state_name,st_full.ansi_fips_state_name) as state
   , case 
       when r.description is not null then r.description 
       else null
@@ -124,7 +115,8 @@ inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.perso
   and
   year(e.encounter_start_date) = pc.year_nbr
 left join ccsr._value_set_dxccsr_v2023_1_cleaned_map ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
-left join cte s on p.state = s.state_nm
+left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
+left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
 left join {{ ref('terminology__race')}} r on p.race = r.description
 left join {{ ref('readmissions__readmission_summary')}} rs on e.encounter_id = rs.encounter_id
 left join {{ ref('reference_data__calendar')}} c on e.encounter_start_date = c.full_date
