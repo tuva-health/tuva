@@ -22,11 +22,11 @@ select
   , coalesce(rs.index_admission_flag,0) as readmission_denominator
   , case 
       when s.state_nm is not null then s.state_nm 
-      else 'other' 
+      else null
     end as state
   , case 
       when r.description is not null then r.description 
-      else 'unknown' 
+      else null
     end as race
   , case when e.drg_code_type = 'ms-drg' then e.drg_code else null end as ms_drg_code
   , coalesce(ccsr.default_ccsr_category_description_ip, 'unknown') as ccsr_cat

@@ -48,6 +48,19 @@ models:
         - benchmarks_analysis
         - benchmarks
 
+  - name: benchmarks__predict_inpatient
+    description: |
+        joining inpatient predicts to encounter table actuals
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_inpatient
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+
   - name: benchmarks__inpatient_input
     description: |
         unpivot for viz
@@ -60,6 +73,8 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+
+      
 
   - name: benchmarks__pivot_hcc
     description: |
