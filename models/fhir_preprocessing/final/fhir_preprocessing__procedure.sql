@@ -35,6 +35,7 @@ select distinct
     , cast(procedure_date as {{ dbt.type_timestamp() }} ) as procedure_performed_datetime
     , cast(practitioner_id as {{ dbt.type_string() }} ) as practitioner_npi
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from {{ ref('fhir_preprocessing__stg_core__procedure') }}
 where procedure_id is not null
 and normalized_code_type is not null

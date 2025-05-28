@@ -22,4 +22,5 @@ select
     , cast(days_supply as {{ dbt.type_numeric() }} ) as medication_dispense_days_supply_value
     , cast(dispensing_date as date) as medication_dispense_when_handed_over
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from {{ ref('fhir_preprocessing__stg_core__medication') }}

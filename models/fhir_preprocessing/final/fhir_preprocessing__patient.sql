@@ -13,4 +13,5 @@ select
       end as race
     , cast(birth_date as date) as birth_date
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from {{ ref('fhir_preprocessing__stg_core__patient') }}

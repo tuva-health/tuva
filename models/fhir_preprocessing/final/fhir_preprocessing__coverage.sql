@@ -14,6 +14,7 @@ select
     , cast(coverage.coverage_subscriber_id as {{ dbt.type_string() }} ) as coverage_subscriber_id
     , cast(coverage.data_source as {{ dbt.type_string() }} ) as data_source
     , cast(coverage_type.coverage_type_list as {{ dbt.type_string() }} ) as coverage_type_list
+    , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from {{ ref('fhir_preprocessing__int_coverage') }} as coverage
     left outer join {{ ref('fhir_preprocessing__int_coverage_type') }} as coverage_type
         on coverage.patient_internal_id = coverage_type.patient_internal_id
