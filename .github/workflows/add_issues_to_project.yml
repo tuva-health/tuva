@@ -17,3 +17,23 @@ jobs:
           # setting the project url so this workflow can be used in other repos
           project-url: https://github.com/orgs/tuva-health/projects/3
           github-token: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: Assign issue to users
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue_number = context.payload.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+              
+            // Assign to product leads for prioritization
+            const assignees = ['jansenpa', 'cocozuloaga'];
+            
+            await github.rest.issues.addAssignees({
+              owner,
+              repo,
+              issue_number,
+              assignees
+            });
