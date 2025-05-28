@@ -12,8 +12,9 @@ select
     , cast(coverage.coverage_relationship as {{ dbt.type_string() }} ) as coverage_relationship
     , cast(coverage.coverage_status as {{ dbt.type_string() }} ) as coverage_status
     , cast(coverage.coverage_subscriber_id as {{ dbt.type_string() }} ) as coverage_subscriber_id
-    , cast(coverage.data_source as {{ dbt.type_string() }} ) as data_source
     , cast(coverage_type.coverage_type_list as {{ dbt.type_string() }} ) as coverage_type_list
+    , cast(coverage.data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from {{ ref('fhir_preprocessing__int_coverage') }} as coverage
     left outer join {{ ref('fhir_preprocessing__int_coverage_type') }} as coverage_type

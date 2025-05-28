@@ -28,5 +28,6 @@ select
     , cast(observation_value as {{ dbt.type_string() }} ) as observation_value
     , cast(observation_value_units as {{ dbt.type_string() }} ) as observation_value_units
     , cast(data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from unioned

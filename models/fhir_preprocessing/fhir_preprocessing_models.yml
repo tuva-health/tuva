@@ -15,6 +15,47 @@ models:
           combination_of_columns:
             - patient_internal_id
             - resource_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: resource_internal_id
+        description: Unique identifier for each record in the table.
+      - name: encounter_internal_id
+        description: '{{ doc("encounter_id") }}'
+      - name: condition_category
+        description: >
+          Hard-coded to "encounter-diagnosis" for FHIR mapping requirements 
+          (http://terminology.hl7.org/CodeSystem/condition-category).
+      - name: condition_recorded_datetime
+        description: '{{ doc("recorded_date") }}'
+      - name: condition_onset_datetime
+        description: '{{ doc("onset_date") }}'
+      - name: condition_abatement_datetime
+        description: '{{ doc("resolved_date") }}'
+      - name: condition_clinical_status
+        description: '{{ doc("status") }}'
+      - name: condition_code
+        description: '{{ doc("normalized_code") }}'
+      - name: condition_code_system
+        description: '{{ doc("normalized_code_type") }}'
+      - name: encounter_status
+        description: >
+          Hard-coded to "finished" for FHIR mapping requirements 
+          (http://hl7.org/fhir/encounter-status).
+      - name: encounter_class_code
+        description: > 
+          Mapped to FHIR requirement based on encounter_group
+          (http://terminology.hl7.org/CodeSystem/v3-ActCode).
+      - name: encounter_start_datetime
+        description: '{{ doc("encounter_start_date") }}'
+      - name: encounter_end_datetime
+        description: '{{ doc("encounter_end_date") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   - name: fhir_preprocessing__coverage
     config:
@@ -29,6 +70,38 @@ models:
           combination_of_columns:
             - patient_internal_id
             - resource_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: resource_internal_id
+        description: Unique identifier for each record in the table.
+      - name: organization_name
+        description: '{{ doc("payer") }}'
+      - name: coverage_plan
+        description: '{{ doc("plan") }}'
+      - name: coverage_period_start
+        description: '{{ doc("enrollment_start_date") }}'
+      - name: coverage_period_end
+        description: '{{ doc("enrollment_end_date") }}'
+      - name: coverage_relationship
+        description: '{{ doc("subscriber_relation") }}'
+      - name: coverage_status
+        description: >
+          Hard-coded to "active" for FHIR mapping requirements 
+          (http://hl7.org/fhir/fm-status).
+      - name: coverage_subscriber_id
+        description: '{{ doc("subscriber_id") }}'
+      - name: coverage_type_list
+        description: > 
+          Nested list of coverage product type and medical benefit. Mapped to 
+          FHIR requirement based on payer_type and coverage_plan
+          (http://terminology.hl7.org/CodeSystem/v3-ActCode).
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   - name: fhir_preprocessing__explanation_of_benefit
     config:
@@ -43,6 +116,59 @@ models:
           combination_of_columns:
             - patient_internal_id
             - resource_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: resource_internal_id
+        description: Unique identifier for each record in the table.
+      - name: unique_claim_id
+        description: '{{ doc("claim_id") }}'
+      - name: eob_type_code
+        description: '{{ doc("claim_type") }}'
+      - name: eob_subtype_code
+        description: >
+          Mapped to FHIR requirement based on encounter_group
+          (http://hl7.org/fhir/us/carin-bb/CodeSystem/C4BBInstitutionalClaimSubType).
+      - name: eob_billable_period_start
+        description: '{{ doc("claim_start_date") }}'
+      - name: eob_billable_period_end
+        description: '{{ doc("claim_end_date") }}'
+      - name: eob_created
+        description: '{{ doc("paid_date") }}'
+      - name: organization_name
+        description: '{{ doc("payer") }}'
+      - name: practitioner_internal_id
+        description: >
+          Billing or Rendering Provider ID. Required for FHIR validation, 
+          defaults to dummy ID "9999999999" if null.
+      - name: practitioner_name_text
+        description: > 
+          Billing or Rendering Provider name. Required for FHIR validation, 
+          defaults to dummy ID "Dummy Practitione" if null.
+      - name: coverage_internal_id
+        description: Unique identifier for relevant coverage record.
+      - name: eob_diagnosis_list
+        description: Nested list of diagnoses related to claim.
+      - name: eob_procedure_list
+        description: Nested list of procedures related to claim.
+      - name: eob_supporting_info_list
+        description: >
+          Nested list of supporting info related to claim (admission, 
+          discharge, and bill type for medical claim, or days supply and 
+          refills for pharmacy claim).
+      - name: eob_item_list
+        description: >
+          Nested list of claim item details (adjudication, modifiers, 
+          revenue codes, HCPC/CPT codes, and place of service for medical claim, 
+          or adjudication and drug codes for pharmacy claim).
+      - name: eob_total_list
+        description: Nested list of adjudication amounts.
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   - name: fhir_preprocessing__medication_dispense
     config:
@@ -57,6 +183,31 @@ models:
           combination_of_columns:
             - patient_internal_id
             - resource_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: resource_internal_id
+        description: Unique identifier for each record in the table.
+      - name: medication_dispense_status
+        description: >
+          Hard-coded to "completed" for FHIR mapping requirements 
+          (http://terminology.hl7.org/CodeSystem/medicationdispense-status).
+      - name: medication_code_system
+        description: Normalized code system.
+      - name: medication_code
+        description: Normalized code.
+      - name: medication_code_display
+        description: Normalized description.
+      - name: medication_dispense_days_supply_value
+        description: '{{ doc("days_supply") }}'
+      - name: medication_dispense_when_handed_over
+        description: '{{ doc("dispensing_date") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   - name: fhir_preprocessing__observation
     config:
@@ -73,6 +224,39 @@ models:
           combination_of_columns:
             - patient_internal_id
             - resource_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: resource_internal_id
+        description: Unique identifier for each record in the table.
+      - name: encounter_internal_id
+        description: '{{ doc("encounter_id") }}'
+      - name: observation_status
+        description: >
+          Mapped to FHIR requirement based on lab result status or hard-coded to 
+          "final" for observations (http://hl7.org/fhir/observation-status).
+      - name: observation_category
+        description: >
+          Mapped to FHIR requirement based on observation type or hard-coded to 
+          "laboratory" (http://hl7.org/fhir/observation-status).
+      - name: observation_code_system
+        description: Normalized code system.
+      - name: observation_code
+        description: Normalized code.
+      - name: observation_code_text
+        description: Normalized description.
+      - name: observation_datetime
+        description: '{{ doc("result_date") }}'
+      - name: observation_value
+        description: '{{ doc("result") }}'
+      - name: observation_value_units
+        description: '{{ doc("normalized_units") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   - name: fhir_preprocessing__patient
     config:
@@ -86,6 +270,25 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - patient_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: name_first
+        description: '{{ doc("first_name") }}'
+      - name: name_last
+        description: '{{ doc("last_name") }}'
+      - name: gender
+        description: '{{ doc("sex") }}'
+      - name: race
+        description: '{{ doc("race") }}'
+      - name: birth_date
+        description: '{{ doc("birth_date") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   - name: fhir_preprocessing__procedure
     config:
@@ -100,6 +303,31 @@ models:
           combination_of_columns:
             - patient_internal_id
             - resource_internal_id
+    columns:
+      - name: patient_internal_id
+        description: '{{ doc("person_id") }}'
+      - name: resource_internal_id
+        description: Unique identifier for each record in the table.
+      - name: procedure_status
+        description: >
+          Hard-coded to "completed" for FHIR mapping requirements 
+          (http://hl7.org/fhir/event-status).
+      - name: procedure_code_system
+        description: Normalized code system.
+      - name: procedure_code
+        description: Normalized code.
+      - name: procedure_display
+        description: Normalized description.
+      - name: procedure_performed_datetime
+        description: '{{ doc("procedure_date") }}'
+      - name: practitioner_npi
+        description: '{{ doc("practitioner_id") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+      - name: tuva_package_version
+        description: '{{ doc("tuva_package_version") }}'
 
   ## Intermediate
   - name: fhir_preprocessing__int_coverage

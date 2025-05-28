@@ -38,6 +38,7 @@ select distinct
     , cast(encounter.encounter_start_date as {{ dbt.type_timestamp() }} ) as encounter_start_datetime
     , cast(encounter.encounter_end_date as {{ dbt.type_timestamp() }} ) as encounter_end_datetime
     , cast(condition.data_source as {{ dbt.type_string() }} ) as data_source
+    , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     , cast('{{ the_tuva_project.get_tuva_package_version() }}' as {{ dbt.type_string() }} ) as tuva_package_version
 from {{ ref('fhir_preprocessing__stg_core__condition') }} as condition
     left outer join {{ ref('fhir_preprocessing__stg_core__encounter') }} as encounter
