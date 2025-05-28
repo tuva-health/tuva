@@ -5,7 +5,8 @@
 }}
 
 
-select
+with stg_eligibility as (
+  select
     cast(elig.person_id as {{ dbt.type_string() }}) as person_id
     , cast(elig.member_id as {{ dbt.type_string() }}) as member_id
     , cast(elig.subscriber_id as {{ dbt.type_string() }}) as subscriber_id
@@ -35,6 +36,81 @@ select
     , cast(elig.phone as {{ dbt.type_string() }}) as phone
     , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_string() }}) as tuva_last_run
-from {{ ref('normalized_input__stg_eligibility') }} as elig
-left outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm
+  from {{ ref('normalized_input__stg_eligibility') }} as elig
+  left outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm
     on elig.person_id_key = date_norm.person_id_key
+)
+
+, month_start_and_end_dates as (
+  select
+    {{ concat_custom(["year",
+                  dbt.right(concat_custom(["'0'", "month"]), 2)]) }} as year_month
+    , min(full_date) as month_start_date
+    , max(full_date) as month_end_date
+  from {{ ref('reference_data__calendar') }}
+  group by year, month, year_month
+)
+
+, member_month_calc as (
+  select distinct
+    dense_rank() over (
+      order by
+        a.person_id
+      , b.year_month
+      , a.payer
+      , a.{{ quote_column('plan') }}
+      , a.data_source
+      ) as member_month_key
+    , a.person_id
+    , b.year_month
+    , a.payer
+    , a.{{ quote_column('plan') }}
+    , a.data_source
+  from stg_eligibility as a
+  inner join month_start_and_end_dates as b
+    on a.enrollment_start_date <= b.month_end_date
+    and a.enrollment_end_date >= b.month_start_date
+)
+
+select
+    m.member_month_key
+  , a.person_id
+  , a.member_id
+  , a.subscriber_id
+  , a.gender
+  , a.race
+  , a.birth_date
+  , a.death_date
+  , a.death_flag
+  , a.enrollment_start_date
+  , a.enrollment_end_date
+  , a.payer
+  , a.payer_type
+  , a.{{ quote_column('plan') }}
+  , b.year_month
+  , a.original_reason_entitlement_code
+  , a.dual_status_code
+  , a.medicare_status_code
+  , a.group_id
+  , a.group_name
+  , a.first_name
+  , a.last_name
+  , a.social_security_number
+  , a.subscriber_relation
+  , a.address
+  , a.city
+  , a.state
+  , a.zip_code
+  , a.phone
+  , a.data_source
+  , a.tuva_last_run
+from stg_eligibility as a
+  inner join month_start_and_end_dates as b
+    on a.enrollment_start_date <= b.month_end_date
+    and a.enrollment_end_date >= b.month_start_date
+  inner join member_month_calc as m
+    on m.person_id = a.person_id
+    and m.payer = a.payer
+    and m.{{ quote_column('plan') }} = a.{{ quote_column('plan') }}
+    and m.data_source = a.data_source
+    and m.year_month = b.year_month

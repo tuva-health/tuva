@@ -57,13 +57,13 @@ Join our [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61
 The easiest way to test your changes is to use the dbt project inside the package called [integration_tests](https://github.com/tuva-health/the_tuva_project/tree/main/integration_tests).
 
 1. Set the project subdirectory to “integration_tests” if using dbt cloud or change directory (`cd integration_tests`) if using CLI.
-2. Choose a data source:
-   1. To use synthetic demo data:
-        -  Set test_data_override to true
-   3. To use your own data sources, update the vars in integration_tests/dbt_project.yml:
-        - Set input_database and input_schema to your testing sources
+2. In `integration_tests/dbt_project.yml`, choose a data source:
+   - To use synthetic demo data, set `use_synthetic_data` to true.
+   - To use your own data sources, set `input_database` and `input_schema` to your testing source.
 4. Run `dbt deps`.
 5. Run `dbt build`.
+
+_Windows Users: You may into an issue where `dbt deps` runs into an infinite loop (see bug report [here](https://github.com/dbt-labs/dbt-core/issues/9719)). To get around this, you'll need to "Run as administrator" your terminal of choice and run `dbt deps` there._
 
 You only need to test your changes in one data warehouse. When you submit your pull request, we will use our automated CI testing workflows to test all of our supported data warehouses.
 
@@ -80,33 +80,34 @@ Before running the script, ensure you have the following installed and accessibl
 2. **dbt:** dbt-core and any necessary adapters must be installed (e.g., `pip install dbt-core dbt-<adapter>`). Your dbt profile should be configured correctly.
 3. **SQLFluff:** The linter and dbt templater must be installed (e.g., `pip install sqlfluff sqlfluff-templater-dbt`).
 
-#### How to Run
-You must run the script from the root directory of your dbt project.
-1. Make the script executable (Linux/macOS/Git Bash/WSL):
+#### On Linux / macOS / Git Bash / WSL
+1. Go to the root directory of your dbt project.
+2. Make the script executable (Linux/macOS/Git Bash/WSL):
    ```bash
    chmod +x lint_tuva_project.sh
    ```
-2. Execute the script:
-* **On Linux / macOS / Git Bash / WSL:**
-  * Default (Local Development - Lints and Fixes):
+3. Execute the script:
     ```bash
     ./lint_tuva_project.sh
     ```
-  **This command will:**
-    * Run dbt clean and dbt deps.
-    * Temporarily modify dbt_project.yml (backing up the original).
-    * Copy integration test files.
-    * Run dbt compile.
-    * Run sqlfluff fix to automatically correct linting errors.
-    * Run sqlfluff lint to report any remaining errors.
-    * Clean up temporary changes.
-    * Output results to the terminal and SQLFLUFF_LINTER_OUTPUT.TXT.
 
-#### Running on VS Code on Windows
+#### On Windows VS Code
+1. Make sure python interpreter is selected `> Python: Select Interpreter` command
+2. Select `> Create New Terminal (With Profile)` and select "Git Bash" (requires installation of git bash).
+3. Follow the Git Bash instructions above.
 
-* Make sure python interpreter is selected `> Python: Select Interpreter` command
-* Select `> Create New Terminal (With Profile)` and select "Git Bash" (requires installation of git bash).
-* Follow the how to run instructions above.
+#### The Process
+The script will do the following:
+* Run dbt clean and dbt deps.
+* Temporarily modify dbt_project.yml (backing up the original).
+* Copy integration test files.
+* Run dbt compile.
+* Run sqlfluff fix to automatically correct linting errors.
+* Run sqlfluff lint to report any remaining errors.
+* Clean up temporary changes.
+* Output results to the terminal and SQLFLUFF_LINTER_OUTPUT.TXT.
+
+As the process is running you may see temporary changes as the linter is attempting to fix things. Wait till the process is complete before making any other changes. Check the output file for things you may need to manually address.
 
 ### Submitting your changes
 

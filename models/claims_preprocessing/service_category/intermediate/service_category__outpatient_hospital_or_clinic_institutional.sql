@@ -6,6 +6,7 @@
 with multiple_sources as (
     select distinct
         m.claim_id
+      , m.data_source
       , 'outpatient hospital or clinic' as service_category_2
       , 'outpatient hospital or clinic' as service_category_3
       , '{{ this.name }}' as source_model_name
@@ -13,6 +14,7 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as m
     inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
       on m.claim_id = o.claim_id
+      and m.data_source = o.data_source
     where
       substring(m.bill_type_code, 1, 2) in (
         '13'  -- Hospital Outpatient
@@ -32,6 +34,7 @@ with multiple_sources as (
 
     select distinct
         m.claim_id
+      , m.data_source
       , 'outpatient hospital or clinic' as service_category_2
       , 'outpatient hospital or clinic' as service_category_3
       , '{{ this.name }}' as source_model_name
@@ -39,12 +42,14 @@ with multiple_sources as (
     from {{ ref('service_category__stg_medical_claim') }} as m
     inner join {{ ref('service_category__stg_outpatient_institutional') }} as o
       on m.claim_id = o.claim_id
+      and m.data_source = o.data_source
     where
       m.ccs_category = '227' -- Consultation, evaluation, and preventative care
 )
 
 select distinct
     claim_id
+  , data_source
   , 'outpatient' as service_category_1
   , service_category_2
   , service_category_3
