@@ -47,43 +47,23 @@ from {{ ref('core__pharmacy_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-{% if target.type == 'fabric' %}
-    select top 0
-          cast(null as {{ dbt.type_string() }} ) as pharmacy_claim_id
-        , cast(null as {{ dbt.type_string() }} ) as person_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_line_number
-        , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-        , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_id
-        , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_name
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
-        , cast(null as {{ dbt.type_string() }} ) as days_supply
-        , cast(null as {{ dbt.type_string() }} ) as refills
-        , cast(null as {{ dbt.type_string() }} ) as paid_amount
-        , cast(null as {{ dbt.type_string() }} ) as in_network_flag
-        , cast(null as {{ dbt.type_string() }} ) as ndc_code
-        , cast(null as {{ dbt.type_string() }} ) as data_source
-{% else %}
-    select
-          cast(null as {{ dbt.type_string() }} ) as pharmacy_claim_id
-        , cast(null as {{ dbt.type_string() }} ) as person_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_line_number
-        , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-        , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_id
-        , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_name
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
-        , cast(null as {{ dbt.type_string() }} ) as days_supply
-        , cast(null as {{ dbt.type_string() }} ) as refills
-        , cast(null as {{ dbt.type_string() }} ) as paid_amount
-        , cast(null as {{ dbt.type_string() }} ) as in_network_flag
-        , cast(null as {{ dbt.type_string() }} ) as ndc_code
-        , cast(null as {{ dbt.type_string() }} ) as data_source
-    limit 0
-{%- endif %}
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
+      cast(null as {{ dbt.type_string() }} ) as pharmacy_claim_id
+    , cast(null as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as claim_id
+    , cast(null as {{ dbt.type_string() }} ) as claim_line_number
+    , cast(null as {{ dbt.type_string() }} ) as payer
+    , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
+    , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_id
+    , cast(null as {{ dbt.type_string() }} ) as dispensing_provider_name
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
+    , cast(null as {{ dbt.type_string() }} ) as days_supply
+    , cast(null as {{ dbt.type_string() }} ) as refills
+    , cast(null as {{ dbt.type_string() }} ) as paid_amount
+    , cast(null as {{ dbt.type_string() }} ) as in_network_flag
+    , cast(null as {{ dbt.type_string() }} ) as ndc_code
+    , cast(null as {{ dbt.type_string() }} ) as data_source
+{{ limit_zero()}}
 
 {%- endif %}

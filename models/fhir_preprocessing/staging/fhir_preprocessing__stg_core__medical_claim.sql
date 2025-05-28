@@ -79,75 +79,39 @@ from {{ ref('core__medical_claim') }}
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-{% if target.type == 'fabric' %}
-    select top 0
-          cast(null as {{ dbt.type_string() }} ) as medical_claim_id
-        , cast(null as {{ dbt.type_string() }} ) as person_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_line_number
-        , cast(null as {{ dbt.type_string() }} ) as claim_type
-        , cast(null as {{ dbt.type_string() }} ) as encounter_group
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
-        , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-        , cast(null as {{ dbt.type_string() }} ) as billing_id
-        , cast(null as {{ dbt.type_string() }} ) as billing_name
-        , cast(null as {{ dbt.type_string() }} ) as rendering_id
-        , cast(null as {{ dbt.type_string() }} ) as rendering_name
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as discharge_date
-        , cast(null as {{ dbt.type_string() }} ) as bill_type_code
-        , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
-        , cast(null as {{ dbt.type_string() }} ) as revenue_center_description
-        , cast(null as {{ dbt.type_string() }} ) as place_of_service_code
-        , cast(null as {{ dbt.type_string() }} ) as place_of_service_description
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_3
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_4
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_5
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
-        , cast(null as {{ dbt.type_string() }} ) as paid_amount
-        , cast(null as {{ dbt.type_string() }} ) as in_network_flag
-        , cast(null as {{ dbt.type_string() }} ) as data_source
-{% else %}
-    select
-          cast(null as {{ dbt.type_string() }} ) as medical_claim_id
-        , cast(null as {{ dbt.type_string() }} ) as person_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_id
-        , cast(null as {{ dbt.type_string() }} ) as claim_line_number
-        , cast(null as {{ dbt.type_string() }} ) as claim_type
-        , cast(null as {{ dbt.type_string() }} ) as encounter_group
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
-        , cast(null as {{ dbt.type_string() }} ) as payer
-        , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
-        , cast(null as {{ dbt.type_string() }} ) as billing_id
-        , cast(null as {{ dbt.type_string() }} ) as billing_name
-        , cast(null as {{ dbt.type_string() }} ) as rendering_id
-        , cast(null as {{ dbt.type_string() }} ) as rendering_name
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as discharge_date
-        , cast(null as {{ dbt.type_string() }} ) as bill_type_code
-        , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
-        , cast(null as {{ dbt.type_string() }} ) as revenue_center_description
-        , cast(null as {{ dbt.type_string() }} ) as place_of_service_code
-        , cast(null as {{ dbt.type_string() }} ) as place_of_service_description
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_3
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_4
-        , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_5
-        , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
-        , cast(null as {{ dbt.type_string() }} ) as paid_amount
-        , cast(null as {{ dbt.type_string() }} ) as in_network_flag
-        , cast(null as {{ dbt.type_string() }} ) as data_source
-    limit 0
-{%- endif %}
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
+      cast(null as {{ dbt.type_string() }} ) as medical_claim_id
+    , cast(null as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as claim_id
+    , cast(null as {{ dbt.type_string() }} ) as claim_line_number
+    , cast(null as {{ dbt.type_string() }} ) as claim_type
+    , cast(null as {{ dbt.type_string() }} ) as encounter_group
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_start_date
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_end_date
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as claim_line_start_date
+    , cast(null as {{ dbt.type_string() }} ) as payer
+    , cast(null as {{ dbt.type_string() }} ) as {{ quote_column('plan') }}
+    , cast(null as {{ dbt.type_string() }} ) as billing_id
+    , cast(null as {{ dbt.type_string() }} ) as billing_name
+    , cast(null as {{ dbt.type_string() }} ) as rendering_id
+    , cast(null as {{ dbt.type_string() }} ) as rendering_name
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as admission_date
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as discharge_date
+    , cast(null as {{ dbt.type_string() }} ) as bill_type_code
+    , cast(null as {{ dbt.type_string() }} ) as revenue_center_code
+    , cast(null as {{ dbt.type_string() }} ) as revenue_center_description
+    , cast(null as {{ dbt.type_string() }} ) as place_of_service_code
+    , cast(null as {{ dbt.type_string() }} ) as place_of_service_description
+    , cast(null as {{ dbt.type_string() }} ) as hcpcs_code
+    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_1
+    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_2
+    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_3
+    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_4
+    , cast(null as {{ dbt.type_string() }} ) as hcpcs_modifier_5
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
+    , cast(null as {{ dbt.type_string() }} ) as paid_amount
+    , cast(null as {{ dbt.type_string() }} ) as in_network_flag
+    , cast(null as {{ dbt.type_string() }} ) as data_source
+{{ limit_zero()}}
 
 {%- endif %}
