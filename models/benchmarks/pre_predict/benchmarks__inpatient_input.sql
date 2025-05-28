@@ -108,18 +108,17 @@ select
   , pc.erectile_dysfunction as cond_erectile_dysfunction
   , pc.abdominal_aortic_aneurysm as cond_abdominal_aortic_aneurysm
   , pc.gastroesophageal_reflux as cond_gastroesophageal_reflux
-  , year()
 from {{ ref('core__encounter')}} e
+inner join {{ ref('reference_data__calendar')}} c on e.encounter_start_date = c.full_date
 inner join {{ ref('core__patient')}} p on e.person_id = p.person_id
 inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.person_id 
   and
-  year(e.encounter_start_date) = pc.year_nbr
-left join ccsr._value_set_dxccsr_v2023_1_cleaned_map ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
+  c.year = pc.year_nbr
+left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
 left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
 left join {{ ref('terminology__race')}} r on p.race = r.description
 left join {{ ref('readmissions__readmission_summary')}} rs on e.encounter_id = rs.encounter_id
-left join {{ ref('reference_data__calendar')}} c on e.encounter_start_date = c.full_date
 where e.encounter_type = 'acute inpatient'
 )
 
