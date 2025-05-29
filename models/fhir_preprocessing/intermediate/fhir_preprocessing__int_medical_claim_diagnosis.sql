@@ -14,7 +14,7 @@ with staging as (
         /* HEDIS valuesets require formatted diagnosis codes */
         , case
             when lower(claim_condition.normalized_code_type) = 'icd-10-cm'
-              and {{ length('claim_condition.normalized_code') }} > 3
+              and {{ the_tuva_project.length('claim_condition.normalized_code') }} > 3
               then {{ concat_custom([
                     "substring(claim_condition.normalized_code,1,3)",
                     "'.'",

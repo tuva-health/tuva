@@ -16,7 +16,7 @@ select distinct
     , cast(condition.status as {{ dbt.type_string() }} ) as condition_clinical_status
     , case
         when lower(condition.normalized_code_type) = 'icd-10-cm'
-            and {{ length('condition.normalized_code') }} > 3
+            and {{ the_tuva_project.length('condition.normalized_code') }} > 3
             then cast({{ concat_custom([
                     "substring(condition.normalized_code,1,3)",
                     "'.'",
