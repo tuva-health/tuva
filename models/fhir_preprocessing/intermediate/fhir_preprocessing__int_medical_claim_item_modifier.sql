@@ -78,7 +78,7 @@ with hcpcs_modifier_1 as (
 )
 
 /* create a json string for CSV export */
-{{ create_json_object(
+{{ the_tuva_project.create_json_object(
     table_ref='unioned',
     group_by_col='claim_id, claim_line_number',
     object_col_name='eob_item_modifier_list',

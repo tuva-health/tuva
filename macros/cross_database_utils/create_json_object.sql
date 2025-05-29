@@ -55,7 +55,7 @@ select
             object_construct(
                 {%- for col in object_col_list %}
                 {% if not loop.first %}, {% endif -%}
-                '{{ snake_to_camel(col) }}',
+                '{{ the_tuva_project.snake_to_camel(col) }}',
                 {%- if 'list' in col | lower -%}
                 parse_json( {{ col }} ) /* Parse JSON lists to prevent escaping */
                 {%- else -%}
@@ -79,9 +79,9 @@ select
                 {%- for col in object_col_list %}
                 {% if not loop.first %}, {% endif -%}
                 {%- if 'list' in col | lower -%}
-                parse_json( {{ col }} ) as {{ snake_to_camel(col) }} /* Parse JSON lists to prevent escaping */
+                parse_json( {{ col }} ) as {{ the_tuva_project.snake_to_camel(col) }} /* Parse JSON lists to prevent escaping */
                 {%- else -%}
-                {{ col }} as {{ snake_to_camel(col) }}
+                {{ col }} as {{ the_tuva_project.snake_to_camel(col) }}
                 {%- endif %}
                 {%- endfor %}
             )
@@ -102,7 +102,7 @@ from (
         object(
             {%- for col in object_col_list %}
                 {%- if not loop.first %}, {% endif -%}
-                '{{ snake_to_camel(col) }}',
+                '{{ the_tuva_project.snake_to_camel(col) }}',
                 {%- if 'list' in col | lower -%}
                 json_parse( {{ col }} ) /* Parse JSON lists to prevent escaping */
                 {%- else -%}
@@ -124,7 +124,7 @@ select
         CAST(
             '{' +
             {%- for col in object_col_list %}
-                '"{{ snake_to_camel(col) }}":' +
+                '"{{ the_tuva_project.snake_to_camel(col) }}":' +
                 {%- if 'list' in col | lower -%}
                     ISNULL({{ col }}, '[]')
                 {%- else -%}

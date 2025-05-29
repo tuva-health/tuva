@@ -34,7 +34,7 @@ with adjudication as (
 )
 
 /* create a json string for CSV export */
-{{ create_json_object(
+{{ the_tuva_project.create_json_object(
     table_ref='joined',
     group_by_col='claim_id',
     object_col_name='eob_item_list',
