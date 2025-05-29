@@ -56,7 +56,6 @@ with unpivoted as (
              , actual_outpatient_paid_amount
              , actual_office_based_paid_amount
              , actual_other_paid_amount
-             , actual_ancillary_paid_amount
 
              , actual_inpatient_encounter_count
              , actual_outpatient_encounter_count
@@ -69,12 +68,11 @@ with unpivoted as (
              , actual_home_health_encounter_count
              , actual_snf_encounter_count
 
-             , expected_paid_amount
+             , expected_total_paid_amount
              , expected_inpatient_paid_amount
              , expected_outpatient_paid_amount
              , expected_office_based_paid_amount
              , expected_other_paid_amount
-             , expected_ancillary_paid_amount
              
              , expected_inpatient_encounter_count
              , expected_outpatient_encounter_count
@@ -127,9 +125,6 @@ select
 
         when metric = 'actual_other_paid_amount' then 'other paid amount'
         when metric = 'expected_other_paid_amount' then 'other paid amount'
-        
-        when metric = 'actual_ancillary_paid_amount' then 'ancillary paid amount'
-        when metric = 'expected_ancillary_paid_amount' then 'ancillary paid amount'
 
         when metric = 'actual_inpatient_encounter_count' then 'inpatient encounters'
         when metric = 'expected_inpatient_encounter_count' then 'inpatient encounters'
