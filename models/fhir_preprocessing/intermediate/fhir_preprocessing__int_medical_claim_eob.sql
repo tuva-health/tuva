@@ -83,7 +83,9 @@ with eligibility as (
             partition by
                   medical_claim.person_id
                 , medical_claim.medical_claim_id
-            order by eligibility.enrollment_start_date desc
+            order by
+                  eligibility.enrollment_start_date desc
+                , eligibility.enrollment_end_date desc
         ) as coverage_row_num
     from {{ ref('fhir_preprocessing__stg_core__medical_claim') }} as medical_claim
         left outer join eligibility

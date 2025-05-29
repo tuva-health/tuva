@@ -59,7 +59,9 @@ with eligibility as (
             partition by
                   pharmacy_claim.person_id
                 , pharmacy_claim.pharmacy_claim_id
-            order by eligibility.enrollment_start_date desc
+            order by
+                  eligibility.enrollment_start_date desc
+                , eligibility.enrollment_end_date desc
         ) as coverage_row_num
     from {{ ref('fhir_preprocessing__stg_core__pharmacy_claim') }} as pharmacy_claim
         left outer join eligibility
