@@ -42,7 +42,7 @@ with add_sequence as (
 )
 
 /* create a json string for CSV export */
-{{ the_tuva_project.(
+{{ the_tuva_project.create_json_object(
     table_ref='staging',
     group_by_col='claim_id',
     object_col_name='eob_procedure_list',
