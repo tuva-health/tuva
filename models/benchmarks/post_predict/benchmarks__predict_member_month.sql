@@ -18,17 +18,17 @@ with expected_member_month as (
         , p.office_based_paid_amount_pred/py.member_month_count as office_based_paid_amount_pred
         , p.inpatient_paid_amount_pred/py.member_month_count as inpatient_paid_amount_pred
 
-        , p.inpatient_count_pred as inpatient_encounter_count_pred
-        , p.office_based_count_pred as office_based_encounter_count_pred
-        , p.other_count_pred as other_encounter_count_pred
-        , p.outpatient_count_pred as outpatient_encounter_count_pred
+        , p.inpatient_count_pred/py.member_month_count as inpatient_encounter_count_pred
+        , p.office_based_count_pred/py.member_month_count as office_based_encounter_count_pred
+        , p.other_count_pred/py.member_month_count as other_encounter_count_pred
+        , p.outpatient_count_pred/py.member_month_count as outpatient_encounter_count_pred
 
-        , p.acute_inpatient_count_pred as acute_inpatient_encounter_count_pred
-        , p.emergency_department_count_pred as ed_encounter_count_pred
-        , p.inpatient_skilled_nursing_count_pred as inpatient_skilled_nursing_encounter_count_pred
-        , p.office_visit_count_pred as office_visit_encounter_count_pred
-        , p.home_health_count_pred as home_health_encounter_count_pred
-        , p.inpatient_skilled_nursing_count_pred as snf_encounter_count_pred
+        , p.acute_inpatient_count_pred/py.member_month_count as acute_inpatient_encounter_count_pred
+        , p.emergency_department_count_pred/py.member_month_count as ed_encounter_count_pred
+        , p.inpatient_skilled_nursing_count_pred/py.member_month_count as inpatient_skilled_nursing_encounter_count_pred
+        , p.office_visit_count_pred/py.member_month_count as office_visit_encounter_count_pred
+        , p.home_health_count_pred/py.member_month_count as home_health_encounter_count_pred
+        , p.inpatient_skilled_nursing_count_pred/py.member_month_count as snf_encounter_count_pred
 
     from {{ var('predictions_person_year') }} p 
     inner join {{ ref('benchmarks__person_year') }} py on p.benchmark_key = py.benchmark_key
