@@ -18,17 +18,17 @@ with expected_member_month as (
         , p.office_based_paid_amount_pred/py.member_month_count as office_based_paid_amount_pred
         , p.inpatient_paid_amount_pred/py.member_month_count as inpatient_paid_amount_pred
 
-        , p.inpatient_count_pred/py.member_month_count*12000 as inpatient_encounter_count_pred
-        , p.office_based_count_pred/py.member_month_count*12000 as office_based_encounter_count_pred
-        , p.other_count_pred/py.member_month_count*12000 as other_encounter_count_pred
-        , p.outpatient_count_pred/py.member_month_count*12000 as outpatient_encounter_count_pred
+        , p.inpatient_count_pred as inpatient_encounter_count_pred
+        , p.office_based_count_pred as office_based_encounter_count_pred
+        , p.other_count_pred as other_encounter_count_pred
+        , p.outpatient_count_pred as outpatient_encounter_count_pred
 
-        , p.acute_inpatient_count_pred/py.member_month_count*12000 as acute_inpatient_encounter_count_pred
-        , p.emergency_department_count_pred/py.member_month_count*12000 as ed_encounter_count_pred
-        , p.inpatient_skilled_nursing_count_pred/py.member_month_count*12000 as inpatient_skilled_nursing_encounter_count_pred
-        , p.office_visit_count_pred/py.member_month_count*12000 as office_visit_encounter_count_pred
-        , p.home_health_count_pred/py.member_month_count*12000 as home_health_encounter_count_pred
-        , p.inpatient_skilled_nursing_count_pred/py.member_month_count*12000 as snf_encounter_count_pred
+        , p.acute_inpatient_count_pred as acute_inpatient_encounter_count_pred
+        , p.emergency_department_count_pred as ed_encounter_count_pred
+        , p.inpatient_skilled_nursing_count_pred as inpatient_skilled_nursing_encounter_count_pred
+        , p.office_visit_count_pred as office_visit_encounter_count_pred
+        , p.home_health_count_pred as home_health_encounter_count_pred
+        , p.inpatient_skilled_nursing_count_pred as snf_encounter_count_pred
 
     from {{ var('predictions_person_year') }} p 
     inner join {{ ref('benchmarks__person_year') }} py on p.benchmark_key = py.benchmark_key
@@ -161,7 +161,7 @@ select
  , coalesce(enc.home_health_encounter_count, 0) as actual_home_health_encounter_count
  , coalesce(enc.snf_encounter_count, 0) as actual_snf_encounter_count
 
-   -- ==== EXPECTED (PRED) Encounter counts (rate per 12000 member months) ====
+   -- ==== EXPECTED (PRED) Encounter counts =============
  , coalesce(emm.inpatient_encounter_count_pred, 0) as expected_inpatient_encounter_count
  , coalesce(emm.outpatient_encounter_count_pred, 0) as expected_outpatient_encounter_count
  , coalesce(emm.office_based_encounter_count_pred, 0) as expected_office_based_encounter_count
