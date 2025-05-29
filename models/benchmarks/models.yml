@@ -74,7 +74,19 @@ models:
         - benchmarks_train
         - benchmarks
 
-      
+  - name: benchmarks__unpivot_inpatient
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_unpivot_inpatient
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+
 
   - name: benchmarks__pivot_hcc
     description: |

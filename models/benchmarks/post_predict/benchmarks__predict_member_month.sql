@@ -114,8 +114,8 @@ SELECT
    mm.payer,
    mm.{{ quote_column('plan') }},
    mm.data_source,
-   emm.benchmark_key,
-
+   emm.benchmark_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
    -- ==== ACTUAL PMPM paid amounts ====
    COALESCE(c.paid_amount,                  0) AS actual_paid_amount,
    COALESCE(c.inpatient_paid_amount_actual, 0) AS actual_inpatient_paid_amount,
