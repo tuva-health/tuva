@@ -16,6 +16,7 @@ WITH inpatient_pred AS (
 
 
 select e.encounter_id
+, ce.data_source
 , ce.encounter_start_date
 , cal.first_day_of_month
 , ce.person_id
@@ -28,7 +29,7 @@ select e.encounter_id
 , i.discharge_location_pred as expected_discharge_location
 , ce.facility_id
 , ce.facility_name
-, case when ce.drg_code_type = 'ms-drg' then concat(ce.drg_code,' ',ce.drg_code_description) else null end as ms_drg_code
+, case when ce.drg_code_type = 'ms-drg' then concat(ce.drg_code,' ',ce.drg_description) else null end as ms_drg_code
 , ce.paid_amount
 FROM {{ ref('benchmarks__inpatient_input') }}  e
 inner join inpatient_pred i on e.encounter_id = i.encounter_id
