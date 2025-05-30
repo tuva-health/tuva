@@ -356,7 +356,7 @@ seeds:
       column_types:
         icd_10_cm : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        header_flag : |
+        billable_code_flag : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         short_description : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -365,8 +365,8 @@ seeds:
     columns:
       - name: icd_10_cm
         description: 'Alpha-Numeric ICD-10-CM Code.'
-      - name: header_flag
-        description: 'Indicates a diagnosis "header" with a 1. A value of 1 means the code is NOT billable for HIPAA covered entities, and is just included in the ICD-10-CM listing for organizational purposes. A value of 0 indicates the code IS billable for HIPAA covered entities and is a valid diagnosis code. It should be uncommon for codes in claims or clinical data sources to contain header values, but if you want to ensure you are not capturing non-billable codes, filter out all codes from this table where header_flag = 1'
+      - name: billable_code_flag
+        description: 'Indicates a diagnosis "billable_code" with a 1. A value of 1 means the code is NOT billable for HIPAA covered entities, and is just included in the ICD-10-CM listing for organizational purposes. A value of 0 indicates the code IS billable for HIPAA covered entities and is a valid diagnosis code. It should be uncommon for codes in claims or clinical data sources to contain header values, but if you want to ensure you are not capturing non-billable codes, filter out all codes from this table where billable_code_flag = 1'
       - name: short_description
         description: 'The short description of the ICD-10-CM code.'
       - name: long_description
