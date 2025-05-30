@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_already_created', False) | as_bool
+    )
+}}
+
 with unpivoted as (
     select 
         year_month
