@@ -15,6 +15,7 @@ with final_before_attribution_fields as (
     , data_source
   from {{ ref('claims_enrollment__member_months') }} as a
 )
+
 select
     a.member_month_key
   , a.person_id
