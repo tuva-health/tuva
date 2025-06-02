@@ -43,7 +43,7 @@
 
 /* default */
 {% macro default__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
-  {{ exceptions.raise_compiler_error("The macro create_json_object is not implemented for this adapter.") }}
+  {{ exceptions.warn("The macro create_json_object is not implemented for this adapter.") }}
 {% endmacro %}
 
 /* snowflake */
@@ -115,7 +115,6 @@ from (
 group by {{ group_by_col }}
 {% endmacro %}
 
-
 /* fabric */
 {% macro fabric__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
 select
@@ -135,6 +134,29 @@ select
             + '}'
         AS VARCHAR(MAX)), ','
     ) + ']' AS {{ object_col_name }}
+from {{ table_ref }}
+group by {{ group_by_col }}
+{% endmacro %}
+
+/* duckdb */
+{% macro duckdb__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
+select
+    {{ group_by_col }}
+    , to_json(
+        list(
+            {
+                {%- for col in object_col_list %}
+                {% if not loop.first %}, {% endif -%}
+                '{{ the_tuva_project.snake_to_camel(col) }}':
+                {%- if 'list' in col | lower -%}
+                {{ col }}::JSON /* Cast to JSON to handle lists properly */
+                {%- else -%}
+                {{ col }}
+                {%- endif -%}
+                {%- endfor %}
+            }
+        )
+    ) as {{ object_col_name }}
 from {{ table_ref }}
 group by {{ group_by_col }}
 {% endmacro %}
