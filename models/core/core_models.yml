@@ -92,13 +92,16 @@ models:
       alias: eligibility
       tags: core
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - eligibility_id
+            - data_source
     columns:
     - name: eligibility_id
       description: '{{ doc("eligibility_id") }}'
       tests:
-        - unique:
-            config:
-              severity: warn
+        - not_null
     - name: person_id
       description: '{{ doc("person_id") }}'
       tests:
@@ -143,6 +146,8 @@ models:
       description: '{{ doc("group_name") }}'
     - name: data_source
       description: '{{ doc("data_source") }}'
+      tests:
+        - not_null
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
@@ -704,6 +709,11 @@ models:
       tags:
       - core
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - member_month_key
+            - data_source
     columns:
     - name: member_month_key
       description: '{{ doc("member_month_key") }}'
@@ -723,6 +733,8 @@ models:
       description: '{{ doc("plan") }}'
     - name: data_source
       description: '{{ doc("data_source") }}'
+      tests:
+        - not_null
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
     - name: payer_attributed_provider
@@ -1158,6 +1170,16 @@ models:
       tags: core_stage_claims
       materialized: table
 
+  - name: core__stg_claims_member_months
+    description: Staging core member months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _stg_claims_member_months
+      tags: core_stage_claims
+      materialized: view
+  
   - name: core__stg_claims_patient
     description: Staging core claims patients
     config:
