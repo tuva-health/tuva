@@ -121,7 +121,7 @@ seeds:
       terminology__hcpcs_to_rbcs:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.11','hcpcs_to_rbcs.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_cm:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.12','icd_10_cm.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','icd_10_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_10_pcs:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.12','icd_10_pcs.csv',compression=true,null_marker=true) }}"
       terminology__icd10_pcs_cms_ontology:
