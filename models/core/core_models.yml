@@ -1170,6 +1170,16 @@ models:
       tags: core_stage_claims
       materialized: table
 
+  - name: core__stg_claims_member_months
+    description: Staging core member months
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _stg_claims_member_months
+      tags: core_stage_claims
+      materialized: view
+  
   - name: core__stg_claims_patient
     description: Staging core claims patients
     config:
