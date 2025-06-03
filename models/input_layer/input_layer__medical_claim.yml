@@ -560,7 +560,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_match_regex:
-              regex: "^(\\\\d{3}|0\\\\d{3})$"
+              regex: "^(\\\\d{3}|[01239]\\\\d{3})$"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
