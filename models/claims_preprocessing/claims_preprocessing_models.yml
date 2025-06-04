@@ -72,6 +72,35 @@ models:
       - name: paid_year_month
         description: the year and month of the date the pharmacy claim was paid.
 
+  - name: claims_enrollment__member_months
+    description: This table contains member months matching enrollment
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      alias: member_months
+      tags:
+        - claims_preprocessing
+      materialized: table
+    columns:
+      - name: member_month_key
+        description: Unique identifier for each member month.
+      - name: person_id
+        description: Unique identifier for each patient in the dataset.
+      - name: member_id
+        description: >
+          Identifier that links a patient to a particular insurance product or 
+          health plan. A patient can have more than one member_id because they 
+          can have more than one insurance product/plan.
+      - name: year_month
+        description: The year and month of the member month.
+      - name: payer
+        description: Name of the payer.
+      - name: plan
+        description: Name of the plan.
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+
 
       
 ###   Normalized Claim Input Layer
@@ -196,6 +225,7 @@ models:
           combination_of_columns:
             - claim_id
             - claim_line_number
+            - data_source
     columns:
       - name: claim_id
         description: Unique identifier for each claim.

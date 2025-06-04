@@ -3,9 +3,10 @@
    )
 }}
 
-select distinct
+select
     a.claim_id
   , a.claim_line_number
+  , a.data_source
   , a.claim_line_id as claim_line_id
   , 'professional' as service_type
   , '{{ var('tuva_last_run') }}' as tuva_last_run
