@@ -32,7 +32,7 @@ One of the tenets of the Tuva Project is sharing healthcare data knowledge, and 
 
 ### Share your knowledge
 
-Another great way to contribute is to join our growing community of healthcare data practitioners in [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)! Here, we are trying to foster an open environment where we can share ideas and collaborate.
+Another great way to contribute is to join our growing community of healthcare data practitioners in [Slack](https://join.slack.com/t/thetuvaproject/shared_invite/zt-35lhyb3as-moCo~~7A3el1oG1vSyIPHQ)! Here, we are trying to foster an open environment where we can share ideas and collaborate.
 
 ### Use the Tuva Project
 

@@ -9,7 +9,7 @@ We're writing the open book on how to transform and analyze healthcare data.
 ### 🖥️ [Code](https://github.com/tuva-health)
 We're translating knowledge into precise code that anyone can run on their healthcare data.
 
-### 🤝 [Community](https://join.slack.com/t/thetuvaproject/shared_invite/zt-16iz61187-G522Mc2WGA2mHF57e0il0Q)
+### 🤝 [Community](https://join.slack.com/t/thetuvaproject/shared_invite/zt-35lhyb3as-moCo~~7A3el1oG1vSyIPHQ)
 We're building a community we're healthcare data people can ask questions and share knowledge about healthcare data.
 
 {% enddocs %}
