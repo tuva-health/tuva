@@ -622,13 +622,13 @@ seeds:
         ms_drg_title: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         drg_weight_raw: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         drg_weight: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         geometric_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         arithmetic_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ms_drg
         description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
