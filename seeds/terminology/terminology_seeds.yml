@@ -609,9 +609,11 @@ seeds:
       column_types:
         ms_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        fy_2024_final_post_acute_drg: |
+        fiscal_year: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        fy_2024_final_special_pay_drg: |
+        final_post_acute_drg: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        final_special_pay_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         mdc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -620,20 +622,22 @@ seeds:
         ms_drg_title: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         drg_weight_raw: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         drg_weight: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         geometric_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         arithmetic_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ms_drg
         description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
-      - name: fy_2024_final_post_acute_drg
-        description: 'Indicates if this is a FY 2024 final post-acute DRG.'
-      - name: fy_2024_final_special_pay_drg
-        description: 'Indicates if this is a FY 2024 final special pay DRG.'
+      - name: fiscal_year
+        description: 'Fiscal year for the DRG weight and LOS values.'
+      - name: final_post_acute_drg
+        description: 'Indicates if this is a final post-acute DRG for the given year.'
+      - name: final_special_pay_drg
+        description: 'Indicates if this is a final special pay DRG for the given year.'
       - name: mdc
         description: 'The Major Diagnostic Category (MDC) code associated with the MS-DRG.'
       - name: type

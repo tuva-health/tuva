@@ -44,7 +44,7 @@ with cte as (
     left outer join {{ ref('ccsr__dxccsr_v2023_1_body_systems') }} as b
       on p.ccsr_parent_category = b.ccsr_parent_category
     left outer join {{ ref('terminology__ms_drg_weights_los') }} as weights
-      on e.drg_code = weights.ms_drg
+      on e.drg_code = weights.ms_drg and date_part(year, e.encounter_start_date) = weights.fiscal_year
     where e.encounter_type = 'acute inpatient'
 )
 
