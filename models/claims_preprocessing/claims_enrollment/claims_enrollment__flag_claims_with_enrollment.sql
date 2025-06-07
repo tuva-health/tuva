@@ -60,7 +60,7 @@ select distinct
     , claim.inferred_claim_start_column_used
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from claim_year_month as claim
-inner join {{ ref('normalized_input__eligibility') }} as mm
+inner join {{ ref('claims_enrollment__member_months') }} as mm
     on mm.person_id = claim.person_id
     and mm.member_id = claim.member_id
     and mm.payer = claim.payer

@@ -6,6 +6,7 @@
 select distinct
     claim_id
   , claim_line_number
+  , data_source
   , claim_line_id
   , 'inpatient' as service_category_1
   , 'acute inpatient' as service_category_2

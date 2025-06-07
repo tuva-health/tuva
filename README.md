@@ -27,9 +27,10 @@ Check out our Quickstart guide [here](./QUICKSTART.md).
 - DuckDB (community supported)
 - Redshift
 - Snowflake
+- Microsoft Fabric
 
 
-This package supports dbt version `1.3.x` or higher.
+This package supports dbt version `1.5.x` or higher.
 <br/><br/>
 
 ## 🙋🏻‍♀️ Contributing

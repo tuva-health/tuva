@@ -43,6 +43,7 @@ with combined_professional_services as (
 select
     p.claim_id
     , p.claim_line_number
+    , p.data_source
     , p.claim_line_id
     , p.service_category_1
     , p.service_category_2

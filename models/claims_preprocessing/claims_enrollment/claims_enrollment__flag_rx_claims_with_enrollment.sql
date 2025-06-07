@@ -39,7 +39,7 @@ select distinct
     , claim.paid_year_month
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from claim_dates as claim
-inner join {{ ref('normalized_input__eligibility') }} as mm
+inner join {{ ref('claims_enrollment__member_months') }} as mm
     on mm.person_id = claim.person_id
     and mm.member_id = claim.member_id
     and mm.payer = claim.payer
