@@ -69,7 +69,7 @@ select
   , cast(coalesce(pharmacy_flag,0) as {{ dbt.type_int() }}) as pharmacy_flag
   , cast(coalesce(ed_flag,0) as {{ dbt.type_int() }}) as ed_flag
   , cast(coalesce(delivery_flag,0) as {{ dbt.type_int() }}) as delivery_flag
-  , cast(coalesce(delivery_type,0) as {{ dbt.type_string() }}) as delivery_type
+  , cast(delivery_type as {{ dbt.type_string() }}) as delivery_type
   , cast(coalesce(newborn_flag,0) as {{ dbt.type_int() }}) as newborn_flag
   , cast(coalesce(nicu_flag,0) as {{ dbt.type_int() }}) as nicu_flag
   , cast(coalesce(snf_part_b_flag,0) as {{ dbt.type_int() }}) as snf_part_b_flag
