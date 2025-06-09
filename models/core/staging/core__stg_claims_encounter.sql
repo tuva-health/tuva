@@ -49,7 +49,7 @@ select
   , cast(encounter_type as {{ dbt.type_string() }}) as encounter_type
   , cast(encounter_group as {{ dbt.type_string() }}) as encounter_group
   , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date
-  , {{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }} as encounter_end_date
+  , coalesce({{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }},{{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }}) as encounter_end_date
   , cast(length_of_stay as {{ dbt.type_int() }}) as length_of_stay
   , cast(admit_source_code as {{ dbt.type_string() }}) as admit_source_code
   , cast(admit_source_description as {{ dbt.type_string() }}) as admit_source_description

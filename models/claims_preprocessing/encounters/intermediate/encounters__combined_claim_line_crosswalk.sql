@@ -1,3 +1,6 @@
+/* This model unions together claim lines to encounter crosswalk, and assigns them a unqiue encounter type if claims were assigned to multiple encounters
+(This can happen a few ways - professional claims assigned to anchor event overlap and assigned to multiple  )
+*/
 {{ config(
      enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
    )
@@ -26,6 +29,7 @@ inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = m
 
 union all
 
+/* Intentionally bringing in professional claims assigned to inpatient stays in case admit is assigned to ED  */
 select claim_id
  , claim_line_number
  , encounter_id
@@ -117,9 +121,32 @@ union all
 select claim_id
 , claim_line_number
 , encounter_id
-, 'inpatient skilled nursing' as encounter_type
+, 'inpatient long term acute care' as encounter_type
 , 'inpatient' as encounter_group
 , 4 as priority_number
+from {{ ref('inpatient_long_term__prof_claims') }}
+where claim_attribution_number = 1
+
+union all
+
+select enc.claim_id
+, med.claim_line_number
+, enc.encounter_id
+, 'inpatient long term acute care' as encounter_type
+, 'inpatient' as encounter_group
+, 4 as priority_number
+from {{ ref('inpatient_long_term__generate_encounter_id') }} as enc
+inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
+
+
+union all
+
+select claim_id
+, claim_line_number
+, encounter_id
+, 'inpatient skilled nursing' as encounter_type
+, 'inpatient' as encounter_group
+, 5 as priority_number
 from {{ ref('inpatient_snf__prof_claims') }}
 where claim_attribution_number = 1
 
@@ -130,7 +157,7 @@ select enc.claim_id
 , enc.encounter_id
 , 'inpatient skilled nursing' as encounter_type
 , 'inpatient' as encounter_group
-, 4 as priority_number
+, 5 as priority_number
 from {{ ref('inpatient_snf__generate_encounter_id') }} as enc
 inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
 
@@ -141,7 +168,7 @@ select claim_id
 , encounter_id
 , 'inpatient substance use' as encounter_type
 , 'inpatient' as encounter_group
-, 5 as priority_number
+, 6 as priority_number
 from {{ ref('inpatient_substance_use__prof_claims') }}
 where claim_attribution_number = 1
 
@@ -152,18 +179,19 @@ select enc.claim_id
 , enc.encounter_id
 , 'inpatient substance use' as encounter_type
 , 'inpatient' as encounter_group
-, 5 as priority_number
+, 6 as priority_number
 from {{ ref('inpatient_substance_use__generate_encounter_id') }} as enc
 inner join {{ ref('encounters__stg_medical_claim') }} as med on enc.claim_id = med.claim_id
 
 union all
 
+/* Priority of sub office based types from office based group are set within office_visits__int_office_visits_union model */
 select claim_id
 , claim_line_number
 , old_encounter_id
 , encounter_type
 , 'office based' as encounter_group
-, 9 as priority_number --priority set in combined office visit encounter ranking model
+, 7 as priority_number 
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type = 'office visit radiology'
 
@@ -175,19 +203,19 @@ select claim_id
 , old_encounter_id
 , encounter_type
 , 'office based' as encounter_group
-, 10 as priority_number --priority set in combined office visit encounter ranking model
+, 8 as priority_number 
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type <> 'office visit radiology'
 
-
 union all
 
+/* urgent care set at lower priority than ed and inpatient to avoid over flagging urgent care due to variations in billing practices */
 select claim_id
 , claim_line_number
 , old_encounter_id
 , 'urgent care' as encounter_type
 , 'outpatient' as encounter_group
-, 11 as priority_number --urgent care needs to be lower than ed and inpatient
+, 9 as priority_number 
 from {{ ref('urgent_care__match_claims_to_anchor') }}
 
 union all
@@ -197,7 +225,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient psych' as encounter_type
 , 'outpatient' as encounter_group
-, 12 as priority_number
+, 10 as priority_number
 from {{ ref('outpatient_psych__match_claims_to_anchor') }}
 
 union all
@@ -207,7 +235,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient rehabilitation' as encounter_type
 , 'outpatient' as encounter_group
-, 13 as priority_number
+, 11 as priority_number
 from {{ ref('outpatient_rehab__match_claims_to_anchor') }}
 
 union all
@@ -217,30 +245,8 @@ select claim_id
 , old_encounter_id
 , 'ambulatory surgery center' as encounter_type
 , 'outpatient' as encounter_group
-, 14 as priority_number
+, 12 as priority_number
 from {{ ref('asc__match_claims_to_anchor') }}
-
-union all
-
-
-select claim_id
-, claim_line_number
-, old_encounter_id
-, 'outpatient hospital or clinic' as encounter_type
-, 'outpatient' as encounter_group
-, 999 as priority_number
-from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }} --lowest outpatient priority, roll up to more specific encounter type when available
-
-union all
-
-select claim_id
-, claim_line_number
-, old_encounter_id
-, 'outpatient surgery' as encounter_type
-, 'outpatient' as encounter_group
-, 18 as priority_number
-from {{ ref('outpatient_surgery__match_claims_to_anchor') }}
-
 
 union all
 
@@ -249,7 +255,7 @@ select claim_id
 , old_encounter_id
 , 'dialysis' as encounter_type
 , 'outpatient' as encounter_group
-, 15 as priority_number
+, 13 as priority_number
 from {{ ref('dialysis__match_claims_to_anchor') }}
 
 union all
@@ -259,7 +265,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient hospice' as encounter_type
 , 'outpatient' as encounter_group
-, 16 as priority_number
+, 14 as priority_number
 from {{ ref('outpatient_hospice__match_claims_to_anchor') }}
 
 union all
@@ -269,8 +275,19 @@ select claim_id
 , old_encounter_id
 , 'home health' as encounter_type
 , 'outpatient' as encounter_group
-, 17 as priority_number
+, 15 as priority_number
 from {{ ref('home_health__match_claims_to_anchor') }}
+
+union all
+
+select claim_id
+, claim_line_number
+, old_encounter_id
+, 'outpatient surgery' as encounter_type
+, 'outpatient' as encounter_group
+, 16 as priority_number
+from {{ ref('outpatient_surgery__match_claims_to_anchor') }}
+
 
 union all
 
@@ -279,7 +296,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient injections' as encounter_type
 , 'outpatient' as encounter_group
-, 19 as priority_number
+, 17 as priority_number
 from {{ ref('outpatient_injections__match_claims_to_anchor') }}
 
 union all
@@ -289,7 +306,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient pt/ot/st' as encounter_type
 , 'outpatient' as encounter_group
-, 20 as priority_number
+, 18 as priority_number
 from {{ ref('outpatient_ptotst__match_claims_to_anchor') }}
 
 union all
@@ -299,7 +316,7 @@ select claim_id
 , old_encounter_id
 , 'outpatient substance use' as encounter_type
 , 'outpatient' as encounter_group
-, 21 as priority_number
+, 19 as priority_number
 from {{ ref('outpatient_substance_use__match_claims_to_anchor') }}
 
 union all
@@ -309,8 +326,19 @@ select claim_id
 , old_encounter_id
 , 'outpatient radiology' as encounter_type
 , 'outpatient' as encounter_group
-, 22 as priority_number
+, 20 as priority_number
 from {{ ref('outpatient_radiology__match_claims_to_anchor') }}
+
+union all
+
+/* Set as lowest outpatient priority "catch all", roll up to more specific encounter type when available */
+select claim_id
+, claim_line_number
+, old_encounter_id
+, 'outpatient hospital or clinic' as encounter_type
+, 'outpatient' as encounter_group
+, 999 as priority_number
+from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }} 
 
 union all
 
