@@ -342,6 +342,8 @@ from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }}
 
 union all
 
+/* orphaned encounters are "last resort". Labs/DME/ambulance should roll up to inpatient/home health/etc. If unable to match, then they get their own encounter*/
+
 select claim_id
 , claim_line_number
 , old_encounter_id
