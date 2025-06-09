@@ -20,6 +20,7 @@ with base as (
       , ref('inpatient_rehab__encounter_grain')
       , ref('inpatient_snf__encounter_grain')
       , ref('inpatient_substance_use__encounter_grain')
+      , ref('inpatient_long_term__encounter_grain')
       , ref('urgent_care__encounter_grain')
       , ref('office_visit__encounter_grain')
       , ref('outpatient_hospice__encounter_grain')
