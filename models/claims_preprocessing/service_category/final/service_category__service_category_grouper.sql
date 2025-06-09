@@ -118,6 +118,14 @@ order by coalesce(priority, 99999)) as duplicate_row_number
     from service_category_1_mapping
 )
 
+/* We're bringing in ALL priorities to the final table for use in encounter flags
+(For example, regardless of final priority, we might still want to know if a claim could 
+ever be considered "ED" to flag inpatient events that came in through ED 
+
+Filter on this table where duplicate_row_number = 1 to avoid duplicates 
+*/
+
+
 select
     d.claim_id
     , d.claim_line_number

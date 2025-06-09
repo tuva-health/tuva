@@ -4291,6 +4291,17 @@ models:
         - claims_preprocessing
         - encounters
 
+  - name: encounters__prof_and_lower_priority
+    description: adding in lower priority institutional claims in one location with professional for grouping to higher level encounters
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {%- else -%}claims_preprocessing{%- endif -%}
+      materialized: table 
+      tags:
+        - claims_preprocessing
+        - encounters
+
   - name: encounters__stg_inpatient_institutional
     config:
       schema: |
