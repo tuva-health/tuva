@@ -16,7 +16,7 @@ with detail_values as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'inpatient rehabilitation'
+    cli.encounter_type = 'inpatient long term acute care'
     and
     cli.claim_line_attribution_number = 1
     inner join {{ ref('inpatient_long_term__start_end_dates') }} as ed on cli.old_encounter_id = ed.encounter_id
