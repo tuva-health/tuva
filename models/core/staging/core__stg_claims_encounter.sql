@@ -50,7 +50,7 @@ select
   , cast(encounter_type as {{ dbt.type_string() }}) as encounter_type
   , cast(encounter_group as {{ dbt.type_string() }}) as encounter_group
   , {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }} as encounter_start_date
-  , coalesce({{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }},{{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }}) as encounter_end_date
+  , coalesce({{ try_to_cast_date('encounter_end_date', 'YYYY-MM-DD') }}, {{ try_to_cast_date('encounter_start_date', 'YYYY-MM-DD') }}) as encounter_end_date
   , cast(length_of_stay as {{ dbt.type_int() }}) as length_of_stay
   , cast(admit_source_code as {{ dbt.type_string() }}) as admit_source_code
   , cast(admit_source_description as {{ dbt.type_string() }}) as admit_source_description
@@ -63,17 +63,17 @@ select
   , cast(facility_id as {{ dbt.type_string() }}) as facility_id
   , cast(facility_name as {{ dbt.type_string() }}) as facility_name
   , cast(facility_type as {{ dbt.type_string() }}) as facility_type
-  , cast(coalesce(observation_flag,0) as {{ dbt.type_int() }}) as observation_flag
-  , cast(coalesce(lab_flag,0) as {{ dbt.type_int() }}) as lab_flag
-  , cast(coalesce(dme_flag,0) as {{ dbt.type_int() }}) as dme_flag
-  , cast(coalesce(ambulance_flag,0) as {{ dbt.type_int() }}) as ambulance_flag
-  , cast(coalesce(pharmacy_flag,0) as {{ dbt.type_int() }}) as pharmacy_flag
-  , cast(coalesce(ed_flag,0) as {{ dbt.type_int() }}) as ed_flag
-  , cast(coalesce(delivery_flag,0) as {{ dbt.type_int() }}) as delivery_flag
+  , cast(coalesce(observation_flag, 0) as {{ dbt.type_int() }}) as observation_flag
+  , cast(coalesce(lab_flag, 0) as {{ dbt.type_int() }}) as lab_flag
+  , cast(coalesce(dme_flag, 0) as {{ dbt.type_int() }}) as dme_flag
+  , cast(coalesce(ambulance_flag, 0) as {{ dbt.type_int() }}) as ambulance_flag
+  , cast(coalesce(pharmacy_flag, 0) as {{ dbt.type_int() }}) as pharmacy_flag
+  , cast(coalesce(ed_flag, 0) as {{ dbt.type_int() }}) as ed_flag
+  , cast(coalesce(delivery_flag, 0) as {{ dbt.type_int() }}) as delivery_flag
   , cast(delivery_type as {{ dbt.type_string() }}) as delivery_type
-  , cast(coalesce(newborn_flag,0) as {{ dbt.type_int() }}) as newborn_flag
-  , cast(coalesce(nicu_flag,0) as {{ dbt.type_int() }}) as nicu_flag
-  , cast(coalesce(snf_part_b_flag,0) as {{ dbt.type_int() }}) as snf_part_b_flag
+  , cast(coalesce(newborn_flag, 0) as {{ dbt.type_int() }}) as newborn_flag
+  , cast(coalesce(nicu_flag, 0) as {{ dbt.type_int() }}) as nicu_flag
+  , cast(coalesce(snf_part_b_flag, 0) as {{ dbt.type_int() }}) as snf_part_b_flag
   , cast(primary_diagnosis_code_type as {{ dbt.type_string() }}) as primary_diagnosis_code_type
   , cast(primary_diagnosis_code as {{ dbt.type_string() }}) as primary_diagnosis_code
   , cast(primary_diagnosis_description as {{ dbt.type_string() }}) as primary_diagnosis_description

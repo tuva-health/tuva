@@ -191,7 +191,7 @@ select claim_id
 , old_encounter_id
 , encounter_type
 , 'office based' as encounter_group
-, 7 as priority_number 
+, 7 as priority_number
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type = 'office visit radiology'
 
@@ -203,7 +203,7 @@ select claim_id
 , old_encounter_id
 , encounter_type
 , 'office based' as encounter_group
-, 8 as priority_number 
+, 8 as priority_number
 from {{ ref('office_visits__int_office_visits_claim_line') }}
 where encounter_type <> 'office visit radiology'
 
@@ -215,7 +215,7 @@ select claim_id
 , old_encounter_id
 , 'urgent care' as encounter_type
 , 'outpatient' as encounter_group
-, 9 as priority_number 
+, 9 as priority_number
 from {{ ref('urgent_care__match_claims_to_anchor') }}
 
 union all
@@ -338,7 +338,7 @@ select claim_id
 , 'outpatient hospital or clinic' as encounter_type
 , 'outpatient' as encounter_group
 , 999 as priority_number
-from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }} 
+from {{ ref('outpatient_hospital_or_clinic__match_claims_to_anchor') }}
 
 union all
 
