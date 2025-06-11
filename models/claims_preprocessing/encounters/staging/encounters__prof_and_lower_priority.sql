@@ -7,7 +7,7 @@ here to access downstream from one place */
    )
 }}
 
-with cte as (
+with prof_and_low_priority_inst_claims as (
 select
   claim_id
 , claim_line_number
@@ -34,4 +34,4 @@ select distinct
 , claim_line_number
 , data_source
 , '{{ var('tuva_last_run') }}' as tuva_last_run
-from cte
+from prof_and_low_priority_inst_claims
