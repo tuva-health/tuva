@@ -8,7 +8,7 @@ with first_claim as (
     select
           encounter_id
         , patient_data_source_id
-    from {{ ref('inpatient_psych__generate_encounter_id') }}
+    from {{ ref('inpatient_long_term__generate_encounter_id') }}
     where encounter_claim_number = 1
 
 )
@@ -21,8 +21,8 @@ with first_claim as (
         , dat.encounter_end_date
         , dat.encounter_start_date
     from first_claim as f
-    inner join {{ ref('inpatient_psych__start_end_dates') }} as dat
-        on f.encounter_id = dat.encounter_id
+    inner join {{ ref('inpatient_long_term__start_end_dates') }} as dat
+         on f.encounter_id = dat.encounter_id
 
 )
 
