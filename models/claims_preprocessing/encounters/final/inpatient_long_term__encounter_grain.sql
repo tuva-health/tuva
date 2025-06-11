@@ -16,10 +16,10 @@ with detail_values as (
     and
     stg.claim_line_number = cli.claim_line_number
     and
-    cli.encounter_type = 'inpatient skilled nursing'
+    cli.encounter_type = 'inpatient long term acute care'
     and
     cli.claim_line_attribution_number = 1
-    inner join {{ ref('inpatient_snf__start_end_dates') }} as ed on cli.old_encounter_id = ed.encounter_id
+    inner join {{ ref('inpatient_long_term__start_end_dates') }} as ed on cli.old_encounter_id = ed.encounter_id
 )
 
 , encounter_cross_walk as (
@@ -74,8 +74,8 @@ where claim_type = 'institutional'
 , total_amounts as (
     select
     encounter_id
+, encounter_group
     , encounter_type
-    , encounter_group
     , sum(paid_amount) as total_paid_amount
     , sum(allowed_amount) as total_allowed_amount
     , sum(charge_amount) as total_charge_amount
@@ -86,6 +86,7 @@ from detail_values
 group by encounter_id
 , encounter_type
 , encounter_group
+
 )
 
 
@@ -100,7 +101,6 @@ group by encounter_id
        , max(case when scr.service_category_2 = 'emergency department' then 1 else 0 end) as ed_flag
        , max(case when scr.service_category_2 = 'pharmacy' then 1
               else 0 end) as pharmacy_flag
-       , max(case when scr.service_category_3 = 'inpatient part B' then 1 else 0 end) as snf_part_b_flag
     from detail_values as d
     left outer join {{ ref('service_category__service_category_grouper') }} as scr on d.claim_id = scr.claim_id
     and
@@ -130,7 +130,6 @@ select
 , sc.pharmacy_flag
 , sc.observation_flag
 , sc.ed_flag
-, sc.snf_part_b_flag
 , c.drg_code_type
 , c.drg_code
 , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
@@ -154,7 +153,7 @@ select
   end as mortality_flag
 , c.data_source
 , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('inpatient_snf__start_end_dates') }} as a
+from {{ ref('inpatient_long_term__start_end_dates') }} as a
 inner join encounter_cross_walk as x on a.encounter_id = x.old_encounter_id
 inner join total_amounts as tot on x.encounter_id = tot.encounter_id
 inner join service_category_flags as sc on x.encounter_id = sc.encounter_id

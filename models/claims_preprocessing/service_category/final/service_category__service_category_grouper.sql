@@ -29,7 +29,9 @@ with service_category_1_mapping as (
       on a.claim_id = b.claim_id
       and a.claim_line_number = b.claim_line_number
       and a.data_source = b.data_source
-    left outer join {{ ref('service_category__service_categories') }} as s on b.service_category_2 = s.service_category_2
+    left outer join {{ ref('service_category__service_categories') }} as s
+      on b.service_category_1 = s.service_category_1
+      and b.service_category_2 = s.service_category_2
       and b.service_category_3 = s.service_category_3
     where a.claim_type = 'professional'
 
@@ -60,7 +62,8 @@ with service_category_1_mapping as (
       on a.claim_id = b.claim_id
       and a.data_source = b.data_source
     left outer join {{ ref('service_category__service_categories') }} as s
-      on b.service_category_2 = s.service_category_2
+      on b.service_category_1 = s.service_category_1
+      and b.service_category_2 = s.service_category_2
       and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
 
@@ -92,7 +95,8 @@ with service_category_1_mapping as (
       and a.claim_line_number = b.claim_line_number
       and a.data_source = b.data_source
     left outer join {{ ref('service_category__service_categories') }} as s
-      on b.service_category_2 = s.service_category_2
+      on b.service_category_1 = s.service_category_1
+      and b.service_category_2 = s.service_category_2
       and b.service_category_3 = s.service_category_3
     where a.claim_type = 'institutional'
 )
@@ -113,6 +117,14 @@ with service_category_1_mapping as (
 order by coalesce(priority, 99999)) as duplicate_row_number
     from service_category_1_mapping
 )
+
+/* We're bringing in ALL priorities to the final table for use in encounter flags
+(For example, regardless of final priority, we might still want to know if a claim could
+ever be considered "ED" to flag inpatient events that came in through ED
+
+Filter on this table where duplicate_row_number = 1 to avoid duplicates
+*/
+
 
 select
     d.claim_id
