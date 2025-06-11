@@ -21,17 +21,6 @@ select
   , cast(attending_provider_name as {{ dbt.type_string() }}) as attending_provider_name
   , cast(facility_id as {{ dbt.type_string() }}) as facility_id
   , cast(facility_name as {{ dbt.type_string() }}) as facility_name
-  , cast(null as {{ dbt.type_string() }}) as facility_type
-  , cast(null as {{ dbt.type_int() }}) as observation_flag
-  , cast(null as {{ dbt.type_int() }}) as lab_flag
-  , cast(null as {{ dbt.type_int() }}) as dme_flag
-  , cast(null as {{ dbt.type_int() }}) as ambulance_flag
-  , cast(null as {{ dbt.type_int() }}) as pharmacy_flag
-  , cast(null as {{ dbt.type_int() }}) as ed_flag
-  , cast(null as {{ dbt.type_int() }}) as delivery_flag
-  , cast(null as {{ dbt.type_string() }}) as delivery_type
-  , cast(null as {{ dbt.type_int() }}) as newborn_flag
-  , cast(null as {{ dbt.type_int() }}) as nicu_flag
   , cast(primary_diagnosis_code_type as {{ dbt.type_string() }}) as primary_diagnosis_code_type
   , cast(primary_diagnosis_code as {{ dbt.type_string() }}) as primary_diagnosis_code
   , cast(primary_diagnosis_description as {{ dbt.type_string() }}) as primary_diagnosis_description
@@ -41,10 +30,7 @@ select
   , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount
   , cast(allowed_amount as {{ dbt.type_numeric() }}) as allowed_amount
   , cast(charge_amount as {{ dbt.type_numeric() }}) as charge_amount
-  , cast(null as {{ dbt.type_int() }}) as claim_count
-  , cast(null as {{ dbt.type_int() }}) as inst_claim_count
-  , cast(null as {{ dbt.type_int() }}) as prof_claim_count
-  , cast(null as {{ dbt.type_string() }}) as source_model
   , cast(data_source as {{ dbt.type_string() }}) as data_source
+  , cast('clinical' as {{ dbt.type_string() }}) as encounter_source_type 
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('input_layer__encounter') }}
