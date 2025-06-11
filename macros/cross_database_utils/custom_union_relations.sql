@@ -5,19 +5,20 @@
 -#}
 
 {%- macro custom_union_relations(relations, column_override=none, include=[], exclude=[], source_column_name='_dbt_source_relation', where=none) -%}
-    {#-
-      This is the router macro. 
-    -#}
-    {{ return(adapter.dispatch('union_relations', 'dbt_utils')(relations, column_override, include, exclude, source_column_name, where)) }}
+
+    {{ return(adapter.dispatch('custom_union_relations')(relations, column_override, include, exclude, source_column_name, where)) }}
+
 {% endmacro %}
 
+{%- macro default__custom_union_relations(relations, column_override=none, include=[], exclude=[], source_column_name='_dbt_source_relation', where=none) -%}
 
-{%- macro fabric__union_relations(relations, column_override=none, include=[], exclude=[], source_column_name='_dbt_source_relation', where=none) -%}
-    {#-
-      This is the FABRIC-SPECIFIC implementation.
-      It is only called when adapter is 'fabric'.
-    -#}
+    {{ dbt_utils.union_relations(relations, column_override, include, exclude, source_column_name, where) }}
 
+{%- endmacro %}
+
+
+{%- macro fabric__custom_union_relations(relations, column_override=none, include=[], exclude=[], source_column_name='_dbt_source_relation', where=none) -%}
+    
     {%- if exclude and include -%}
         {{ exceptions.raise_compiler_error("Both an exclude and include list were provided to the `union` macro. Only one is allowed") }}
     {%- endif -%}
@@ -121,15 +122,15 @@
                     {%- set col = column_superset[col_name] %}
                     {%- set col_type = column_override.get(col.column, col.data_type) %}
                     {%- set col_name = adapter.quote(col_name) if col_name in relation_columns[relation] else 'null' %}
-                    
+
                     {#- THIS IS THE CUSTOM LOGIC FOR FABRIC -#}
-                    {%- if col_type.startswith('datetime') %}
+                    {%- if col_type.lower().startswith('datetime') %}
                         {%- set precision = col_type.split('(')[1].split(')')[0] if '(' in col_type else '6' %}
                         cast({{ col_name }} as datetime2({{ precision }})) as {{ col.quoted }}
                     {%- else %}
                         cast({{ col_name }} as {{ col_type }}) as {{ col.quoted }}
                     {%- endif %}
-                    
+
                     {% if not loop.last %},{% endif -%}
 
                 {%- endfor %}
