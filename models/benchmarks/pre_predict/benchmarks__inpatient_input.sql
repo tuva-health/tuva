@@ -36,6 +36,7 @@ select
       when e.discharge_disposition_code in ('50', '51') then 'hospice' 
       else 'other' 
     end as discharge_location
+  /* tuva chronic conditions */
   , pc.hip_fracture as cond_hip_fracture
   , pc.type_1_diabetes_mellitus as cond_type_1_diabetes_mellitus
   , pc.no_chronic_conditions as cond_no_chronic_conditions
@@ -108,12 +109,185 @@ select
   , pc.erectile_dysfunction as cond_erectile_dysfunction
   , pc.abdominal_aortic_aneurysm as cond_abdominal_aortic_aneurysm
   , pc.gastroesophageal_reflux as cond_gastroesophageal_reflux
+
+/* cms conditions */
+  , pcms.cms_acute_myocardial_infarction
+  , pcms.cms_adhd_conduct_disorders_and_hyperkinetic_syndrome
+  , pcms.cms_alcohol_use_disorders
+  , pcms.cms_anemia
+  , pcms.cms_asthma
+  , pcms.cms_atrial_fibrillation_and_flutter
+  , pcms.cms_autism_spectrum_disorders
+  , pcms.cms_benign_prostatic_hyperplasia
+  , pcms.cms_bipolar_disorder
+  , pcms.cms_cancer_breast
+  , pcms.cms_cancer_urologic_kidney_renal_pelvis_and_ureter
+  , pcms.cms_cataract
+  , pcms.cms_cerebral_palsy
+  , pcms.cms_chronic_kidney_disease
+  , pcms.cms_chronic_obstructive_pulmonary_disease
+  , pcms.cms_depression_bipolar_or_other_depressive_mood_disorders
+  , pcms.cms_depressive_disorders
+  , pcms.cms_diabetes
+  , pcms.cms_drug_use_disorders
+  , pcms.cms_epilepsy
+  , pcms.cms_fibromyalgia_and_chronic_pain_and_fatigue
+  , pcms.cms_glaucoma
+  , pcms.cms_heart_failure_and_non_ischemic_heart_disease
+  , pcms.cms_hepatitis_a
+  , pcms.cms_hepatitis_b_acute_or_unspecified
+  , pcms.cms_hepatitis_c_acute
+  , pcms.cms_hepatitis_c_chronic
+  , pcms.cms_hepatitis_c_unspecified
+  , pcms.cms_hepatitis_e
+  , pcms.cms_human_immunodeficiency_virus_and_or_acquired_immunodeficiency_syndrome_hiv_aids
+  , pcms.cms_hypertension
+  , pcms.cms_ischemic_heart_disease
+  , pcms.cms_migraine_and_chronic_headache
+  , pcms.cms_muscular_dystrophy
+  , pcms.cms_opioid_use_disorder_oud
+  , pcms.cms_learning_disabilities
+  , pcms.cms_leukemias_and_lymphomas
+  , pcms.cms_parkinsons_disease_and_secondary_parkinsonism
+  , pcms.cms_peripheral_vascular_disease_pvd
+  , pcms.cms_personality_disorders
+  , pcms.cms_pneumonia_all_cause
+  , pcms.cms_sensory_blindness_and_visual_impairment
+  , pcms.cms_spinal_cord_injury
+  , pcms.cms_alzheimers_disease
+  , pcms.cms_anxiety_disorders
+  , pcms.cms_cancer_colorectal
+  , pcms.cms_cancer_endometrial
+  , pcms.cms_cancer_prostate
+  , pcms.cms_cystic_fibrosis_and_other_metabolic_developmental_disorders
+  , pcms.cms_hepatitis_b_chronic
+  , pcms.cms_hepatitis_d
+  , pcms.cms_hip_pelvic_fracture
+  , pcms.cms_hyperlipidemia
+  , pcms.cms_intellectual_disabilities_and_related_conditions
+  , pcms.cms_liver_disease_cirrhosis_and_other_liver_conditions_except_viral_hepatitis
+  , pcms.cms_non_alzheimers_dementia
+  , pcms.cms_multiple_sclerosis_and_transverse_myelitis
+  , pcms.cms_osteoporosis_with_or_without_pathological_fracture
+  , pcms.cms_post_traumatic_stress_disorder_ptsd
+  , pcms.cms_rheumatoid_arthritis_osteoarthritis
+  , pcms.cms_sensory_deafness_and_hearing_impairment
+  , pcms.cms_sickle_cell_disease
+  , pcms.cms_spina_bifida_and_other_congenital_anomalies_of_the_nervous_system
+  , pcms.cms_stroke_transient_ischemic_attack
+  , pcms.cms_tobacco_use
+  , pcms.cms_viral_hepatitis_general
+  , pcms.cms_schizophrenia
+  , pcms.cms_cancer_lung
+  , pcms.cms_hypothyroidism
+  , pcms.cms_mobility_impairments
+  , pcms.cms_obesity
+  , pcms.cms_other_developmental_delays
+  , pcms.cms_pressure_and_chronic_ulcers
+  , pcms.cms_schizophrenia_and_other_psychotic_disorders
+  , pcms.cms_traumatic_brain_injury_and_nonpsychotic_mental_disorders_due_to_brain_damage
+
+
+  /* hccs*/
+  , phcc.hcc_1
+  , phcc.hcc_2
+  , phcc.hcc_6
+  , phcc.hcc_8
+  , phcc.hcc_9
+  , phcc.hcc_10
+  , phcc.hcc_11
+  , phcc.hcc_12
+  , phcc.hcc_17
+  , phcc.hcc_18
+  , phcc.hcc_19
+  , phcc.hcc_21
+  , phcc.hcc_22
+  , phcc.hcc_23
+  , phcc.hcc_27
+  , phcc.hcc_28
+  , phcc.hcc_29
+  , phcc.hcc_33
+  , phcc.hcc_34
+  , phcc.hcc_35
+  , phcc.hcc_39
+  , phcc.hcc_40
+  , phcc.hcc_46
+  , phcc.hcc_47
+  , phcc.hcc_48
+  , phcc.hcc_51
+  , phcc.hcc_52
+  , phcc.hcc_54
+  , phcc.hcc_55
+  , phcc.hcc_56
+  , phcc.hcc_57
+  , phcc.hcc_58
+  , phcc.hcc_59
+  , phcc.hcc_60
+  , phcc.hcc_70
+  , phcc.hcc_71
+  , phcc.hcc_72
+  , phcc.hcc_73
+  , phcc.hcc_74
+  , phcc.hcc_75
+  , phcc.hcc_76
+  , phcc.hcc_77
+  , phcc.hcc_78
+  , phcc.hcc_79
+  , phcc.hcc_80
+  , phcc.hcc_82
+  , phcc.hcc_83
+  , phcc.hcc_84
+  , phcc.hcc_85
+  , phcc.hcc_86
+  , phcc.hcc_87
+  , phcc.hcc_88
+  , phcc.hcc_96
+  , phcc.hcc_99
+  , phcc.hcc_100
+  , phcc.hcc_103
+  , phcc.hcc_104
+  , phcc.hcc_106
+  , phcc.hcc_107
+  , phcc.hcc_108
+  , phcc.hcc_110
+  , phcc.hcc_111
+  , phcc.hcc_112
+  , phcc.hcc_114
+  , phcc.hcc_115
+  , phcc.hcc_122
+  , phcc.hcc_124
+  , phcc.hcc_134
+  , phcc.hcc_135
+  , phcc.hcc_136
+  , phcc.hcc_137
+  , phcc.hcc_138
+  , phcc.hcc_157
+  , phcc.hcc_158
+  , phcc.hcc_159
+  , phcc.hcc_161
+  , phcc.hcc_162
+  , phcc.hcc_166
+  , phcc.hcc_167
+  , phcc.hcc_169
+  , phcc.hcc_170
+  , phcc.hcc_173
+  , phcc.hcc_176
+  , phcc.hcc_186
+  , phcc.hcc_188
+  , phcc.hcc_189
+   
 from {{ ref('core__encounter')}} e
 inner join {{ ref('reference_data__calendar')}} c on e.encounter_start_date = c.full_date
 inner join {{ ref('core__patient')}} p on e.person_id = p.person_id
 inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.person_id 
   and
   c.year = pc.year_nbr
+inner join {{ ref('benchmarks__pivot_cms_condition') }} pcms on e.person_id = pcms.person_id 
+  and
+  e.year_nbr = mm.year_nbr
+inner join {{ ref('benchmarks__pivot_hcc') }} phcc on e.person_id = phcc.person_id 
+  and
+  phcc.year_nbr = mm.year_nbr  
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
 left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
