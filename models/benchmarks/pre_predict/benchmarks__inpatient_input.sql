@@ -284,10 +284,10 @@ inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.perso
   c.year = pc.year_nbr
 inner join {{ ref('benchmarks__pivot_cms_condition') }} pcms on e.person_id = pcms.person_id 
   and
-  e.year_nbr = mm.year_nbr
+  c.year = pcms.year_nbr
 inner join {{ ref('benchmarks__pivot_hcc') }} phcc on e.person_id = phcc.person_id 
   and
-  phcc.year_nbr = mm.year_nbr  
+  c.year = phcc.year_nbr  
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
 left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
