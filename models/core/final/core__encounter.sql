@@ -25,4 +25,3 @@
     from {{ ref('core__stg_claims_encounter') }}
 
 {%- endif %}
-
