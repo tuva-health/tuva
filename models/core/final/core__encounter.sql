@@ -6,7 +6,7 @@
 
 {% if var('clinical_enabled', false) == true and var('claims_enabled', false) == true -%}
 
-  {{ custom_union_relations(
+  {{ the_tuva_project.custom_union_relations(
     relations=[
       ref('core__stg_claims_encounter'),
       ref('core__stg_clinical_encounter')
