@@ -16,4 +16,4 @@ select
     , tuva_last_run
     , dense_rank() over (
 order by data_source, table_name, field_name) + 100000 as summary_sk
-from {{ ref("data_quality__data_quality_clinical_detail_base") }}
+from {{ ref("data_quality__data_quality_clinical_detail_union") }}
