@@ -5,8 +5,9 @@
 }}
 
 with subset as (
-  select distinct person_id
+  select distinct patient_id
   from {{ ref('core__member_months') }}
+
 )
 
 , encounters as (
@@ -120,6 +121,7 @@ with subset as (
   ,data_source
   ,left(year_month,4) as year_nbr
   ,count(year_month) as member_month_count
+
   from {{ ref('core__member_months') }} as mm
   group by 
   person_id
@@ -140,6 +142,7 @@ select
   , cast(mm.year_nbr as int) as year_nbr
   , mm.person_id
   , mm.payer
+  , p.sex
   , mm.{{ quote_column('plan') }}
   , mm.data_source
   , mm.member_month_count
@@ -148,7 +151,7 @@ select
     p.birth_date,
     CAST(CONCAT(mm.year_nbr, '-01-01') AS DATE)
   ) AS age_at_year_start
-  , case when st.state_nm is not null then st.state_nm else null end as state --values that don't match are null for xgboost
+  , coalesce(st_ab.ansi_fips_state_name,st_full.ansi_fips_state_name) as state --values that don't match are null for xgboost
   , case when r.description is not null then r.description else null end as race --values that don't match are null for xgboost
   , case when e.paid_amount < 0 then 0 else coalesce(e.paid_amount, 0) end as paid_amount
 
@@ -467,7 +470,8 @@ from member_month as mm
 inner join subset on mm.person_id = subset.person_id
 inner join {{ ref('core__patient') }} as p 
   on mm.person_id = p.person_id
-left join state_cte st on p.state = st.state_nm
+left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
+left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
 inner join {{ ref('benchmarks__pivot_condition') }} pc on mm.person_id = pc.person_id 
   and
   pc.year_nbr = mm.year_nbr

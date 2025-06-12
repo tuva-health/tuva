@@ -8,6 +8,7 @@ with final as (
 select
     e.encounter_id
   , e.data_source
+  , p.sex
   , c.year as year_nbr
   , e.length_of_stay
   , e.discharge_disposition_code
@@ -17,10 +18,10 @@ select
       else 0 
     end as readmission_numerator
   , coalesce(rs.index_admission_flag,0) as readmission_denominator
-  , coalesce(st_ab.ansi_fips_state_name,st_full.ansi_fips_state_name) as state
+  , coalesce(st_ab.ansi_fips_state_name,st_full.ansi_fips_state_name,'null_state') as state
   , case 
       when r.description is not null then r.description 
-      else null
+      else 'null_race'
     end as race
   , case when e.drg_code_type = 'ms-drg' then e.drg_code else null end as ms_drg_code
   , coalesce(ccsr.default_ccsr_category_description_ip, 'unknown') as ccsr_cat
