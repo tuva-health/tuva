@@ -465,7 +465,7 @@ select
   , phcc.hcc_186
   , phcc.hcc_188
   , phcc.hcc_189
- 
+, '{{ var('tuva_last_run') }}' as tuva_last_run 
 from member_month as mm
 inner join subset on mm.person_id = subset.person_id
 inner join {{ ref('core__patient') }} as p 
