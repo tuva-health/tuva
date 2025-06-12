@@ -31,6 +31,7 @@ select distinct
   dense_rank() over (
     order by
       a.person_id
+    , a.member_id
     , b.year_month
     , a.payer
     , a.{{ quote_column('plan') }}
