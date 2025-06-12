@@ -5,7 +5,7 @@
 }}
 
 with subset as (
-  select distinct patient_id
+  select distinct person_id
   from {{ ref('core__member_months') }}
 
 )
