@@ -8,7 +8,7 @@ with final as (
 select
     e.encounter_id
   , e.data_source
-  , coalesce(p.sex,unknown) as sex
+  , coalesce(p.sex,'unknown') as sex
   , c.year as year_nbr
   , e.length_of_stay
   , e.discharge_disposition_code
