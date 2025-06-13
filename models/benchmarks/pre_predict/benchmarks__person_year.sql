@@ -142,7 +142,7 @@ select
   , cast(mm.year_nbr as int) as year_nbr
   , mm.person_id
   , mm.payer
-  , p.sex
+  , coalesce(p.sex,'unknown')
   , mm.{{ quote_column('plan') }}
   , mm.data_source
   , mm.member_month_count
@@ -471,7 +471,7 @@ inner join subset on mm.person_id = subset.person_id
 inner join {{ ref('core__patient') }} as p 
   on mm.person_id = p.person_id
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
-left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
+left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_full.ansi_fips_state_name
 inner join {{ ref('benchmarks__pivot_condition') }} pc on mm.person_id = pc.person_id 
   and
   pc.year_nbr = mm.year_nbr

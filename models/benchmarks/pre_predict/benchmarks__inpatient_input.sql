@@ -8,7 +8,7 @@ with final as (
 select
     e.encounter_id
   , e.data_source
-  , p.sex
+  , coalesce(p.sex,unknown) as sex
   , c.year as year_nbr
   , e.length_of_stay
   , e.discharge_disposition_code
@@ -291,7 +291,7 @@ inner join {{ ref('benchmarks__pivot_hcc') }} phcc on e.person_id = phcc.person_
   c.year = phcc.year_nbr  
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
-left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_ab.ansi_fips_state_name
+left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_full.ansi_fips_state_name
 left join {{ ref('terminology__race')}} r on p.race = r.description
 left join {{ ref('readmissions__readmission_summary')}} rs on e.encounter_id = rs.encounter_id
 where e.encounter_type = 'acute inpatient'
