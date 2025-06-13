@@ -142,7 +142,7 @@ select
   , cast(mm.year_nbr as int) as year_nbr
   , mm.person_id
   , mm.payer
-  , coalesce(p.sex,'unknown')
+  , coalesce(p.sex,'unknown') as sex
   , mm.{{ quote_column('plan') }}
   , mm.data_source
   , mm.member_month_count
