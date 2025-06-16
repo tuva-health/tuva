@@ -9,7 +9,7 @@ with discharge_locations as (
     select 'home' as discharge_location union all
     select 'home health' as discharge_location union all
     select 'expired' as discharge_location union all
-    select 'transfer facility' as discharge_location union all
+    select 'transfer/other facility' as discharge_location union all
     select 'ipt rehab' as discharge_location union all
     select 'hospice' as discharge_location union all
     select 'other' as discharge_location
@@ -37,7 +37,7 @@ select
       when expected_vs_actual.eva = 'expected'
         and discharge_locations.discharge_location = 'expired' then p.discharge_pred_proba_expired
       when expected_vs_actual.eva = 'expected'
-        and discharge_locations.discharge_location = 'transfer facility' then p.discharge_pred_proba_transfer_other_facility
+        and discharge_locations.discharge_location = 'transfer/other facility' then p.discharge_pred_proba_transfer_other_facility
       when expected_vs_actual.eva = 'expected'
         and discharge_locations.discharge_location = 'ipt rehab' then p.discharge_pred_proba_ipt_rehab
       when expected_vs_actual.eva = 'expected'
