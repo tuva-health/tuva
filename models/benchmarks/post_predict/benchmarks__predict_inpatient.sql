@@ -10,6 +10,14 @@ WITH inpatient_pred AS (
           , p.length_of_stay_pred
           , p.readmission_pred
           , p.discharge_location_pred
+          , p.discharge_pred_proba_expired
+          , p.discharge_pred_proba_home
+          , p.discharge_pred_proba_home_health
+          , p.discharge_pred_proba_hospice
+          , p.discharge_pred_proba_ipt_rehab
+          , p.discharge_pred_proba_other
+          , p.discharge_pred_proba_snf
+          , p.discharge_pred_proba_transfer_other_facility
     FROM {{ var('predictions_inpatient') }} p 
     
 )
