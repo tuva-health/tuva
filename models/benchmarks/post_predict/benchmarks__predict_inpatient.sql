@@ -31,6 +31,14 @@ select e.encounter_id
 , ce.facility_name
 , case when ce.drg_code_type = 'ms-drg' then concat(ce.drg_code,' ',ce.drg_description) else null end as ms_drg_code
 , ce.paid_amount
+, i.discharge_pred_proba_expired
+, i.discharge_pred_proba_home
+, i.discharge_pred_proba_home_health
+, i.discharge_pred_proba_hospice
+, i.discharge_pred_proba_ipt_rehab
+, i.discharge_pred_proba_other
+, i.discharge_pred_proba_snf
+, i.discharge_pred_proba_transfer_other_facility
 FROM {{ ref('benchmarks__inpatient_input') }}  e
 inner join inpatient_pred i on e.encounter_id = i.encounter_id
 inner join {{ ref('core__encounter') }} ce on e.encounter_id = ce.encounter_id
