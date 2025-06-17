@@ -10,6 +10,21 @@ with subset as (
 
 )
 
+, first_last as (
+  select person_id
+  ,payer
+  ,{{ quote_column('plan') }}
+  ,cast(left(year_month,4) as int) as year_nbr
+  ,min(year_month) as first_month
+  ,max(year_month) as last_month
+  from {{ ref('core__member_months') }}
+  group by 
+  person_id
+  ,payer
+  ,cast(left(year_month,4) as int)
+  ,{{ quote_column('plan') }}
+)
+
 , encounters as (
     select
         e.person_id
@@ -146,6 +161,8 @@ select
   , mm.{{ quote_column('plan') }}
   , mm.data_source
   , mm.member_month_count
+  , fl.first_month
+  , fl.last_month
   , DATEDIFF(
     YEAR,
     p.birth_date,
@@ -465,11 +482,17 @@ select
   , phcc.hcc_186
   , phcc.hcc_188
   , phcc.hcc_189
+
 , '{{ var('tuva_last_run') }}' as tuva_last_run 
 from member_month as mm
 inner join subset on mm.person_id = subset.person_id
 inner join {{ ref('core__patient') }} as p 
   on mm.person_id = p.person_id
+inner join first_last fl on mm.person_id = fl.person_id 
+and
+and mm.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
+and
+fl.year_nbr = mm.year_nbr
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
 left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_full.ansi_fips_state_name
 inner join {{ ref('benchmarks__pivot_condition') }} pc on mm.person_id = pc.person_id 
