@@ -4,11 +4,25 @@
     )
 }}
 
-with final as (
+with first_last as (
+  select person_id
+  ,payer
+  ,{{ quote_column('plan') }}
+  ,cast(left(year_month,4) as int) as year_nbr
+  ,min(year_month) as first_month
+  ,max(year_month) as last_month
+  from {{ ref('core__member_months') }}
+  group by 
+  person_id
+  ,payer
+  ,cast(left(year_month,4) as int)
+  ,{{ quote_column('plan') }}
+)
+
+, final as (
 select
     e.encounter_id
   , e.data_source
-  , e.person_id
   , coalesce(p.sex,'unknown') as sex
   , c.year as year_nbr
   , e.length_of_stay
@@ -38,6 +52,9 @@ select
       when e.discharge_disposition_code in ('50', '51') then 'hospice' 
       else 'other' 
     end as discharge_location
+
+  , fl.first_month
+  , fl.last_month    
   /* tuva chronic conditions */
   , pc.hip_fracture as cond_hip_fracture
   , pc.type_1_diabetes_mellitus as cond_type_1_diabetes_mellitus
@@ -290,7 +307,11 @@ inner join {{ ref('benchmarks__pivot_cms_condition') }} pcms on e.person_id = pc
 inner join {{ ref('benchmarks__pivot_hcc') }} phcc on e.person_id = phcc.person_id 
   and
   c.year = phcc.year_nbr  
-
+inner join first_last fl on e.person_id = fl.person_id 
+  and
+  e.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
+  and
+  fl.year_nbr = c.year
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
 left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_full.ansi_fips_state_name
@@ -306,30 +327,8 @@ where e.encounter_type = 'acute inpatient'
   group by data_source
 )
 
-, first_last as (
-  select person_id
-  ,payer
-  ,{{ quote_column('plan') }}
-  ,cast(left(year_month,4) as int) as year_nbr
-  ,min(year_month) as first_month
-  ,max(year_month) as last_month
-  from {{ ref('core__member_months') }}
-  group by 
-  person_id
-  ,payer
-  ,cast(left(year_month,4) as int)
-  ,{{ quote_column('plan') }}
-)
-
 select final.*
 ,coalesce(age_at_admit_with_null,h.avg_age_at_admit) as age_at_admit
-,fl.first_month
-,fl.last_month
 , '{{ var('tuva_last_run') }}' as tuva_last_run
 from final
 inner join handle_missing_age h on final.data_source = h.data_source
-inner join first_last fl on final.person_id = fl.person_id 
-  and
-  final.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
-  and
-  fl.year_nbr = final.year_nbr  
