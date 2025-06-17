@@ -18,6 +18,31 @@ with first_last as (
   ,cast(left(year_month,4) as int)
   ,{{ quote_column('plan') }}
 )
+, enrollment_fields as 
+(
+select distinct
+ encounter_id
+,payer
+,plan
+,person_id
+,data_source
+from {{ ref('core__member_months') }}
+)
+
+,enrollment_row as 
+(
+select  encounter_id
+,payer
+,plan
+,person_id
+,data_source
+,row_number() over (partition by encounter_id order by payer
+                                                      ,plan
+                                                      ,person_id
+                                                      ,data_source
+                                                      ) as row_num
+from enrollment_fields
+)
 
 , final as (
 select
@@ -307,9 +332,16 @@ inner join {{ ref('benchmarks__pivot_cms_condition') }} pcms on e.person_id = pc
 inner join {{ ref('benchmarks__pivot_hcc') }} phcc on e.person_id = phcc.person_id 
   and
   c.year = phcc.year_nbr  
+inner join enrollment_row er on e.encounter_id = er.encounter_id 
+  and
+  er.row_num = 1
 inner join first_last fl on e.person_id = fl.person_id 
   and
-  e.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
+  er.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
+  and 
+  er.payer = fl.payer
+  and
+  er.data_source = fl.data_source
   and
   fl.year_nbr = c.year
 left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
