@@ -8,6 +8,7 @@ with final as (
 select
     e.encounter_id
   , e.data_source
+  , e.person_id
   , coalesce(p.sex,'unknown') as sex
   , c.year as year_nbr
   , e.length_of_stay
