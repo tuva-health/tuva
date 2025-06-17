@@ -482,7 +482,6 @@ select
   , phcc.hcc_186
   , phcc.hcc_188
   , phcc.hcc_189
-
 , '{{ var('tuva_last_run') }}' as tuva_last_run 
 from member_month as mm
 inner join subset on mm.person_id = subset.person_id
@@ -490,7 +489,7 @@ inner join {{ ref('core__patient') }} as p
   on mm.person_id = p.person_id
 inner join first_last fl on mm.person_id = fl.person_id 
 and
-and mm.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
+mm.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
 and
 fl.year_nbr = mm.year_nbr
 left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
