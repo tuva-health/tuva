@@ -7,6 +7,7 @@
 with first_last as (
   select person_id
   ,payer
+  ,data_source
   ,{{ quote_column('plan') }}
   ,cast(left(year_month,4) as int) as year_nbr
   ,min(year_month) as first_month
@@ -14,10 +15,12 @@ with first_last as (
   from {{ ref('core__member_months') }}
   group by 
   person_id
+  ,data_source
   ,payer
   ,cast(left(year_month,4) as int)
   ,{{ quote_column('plan') }}
 )
+
 , enrollment_fields as 
 (
 select distinct
@@ -26,7 +29,7 @@ select distinct
 ,plan
 ,person_id
 ,data_source
-from {{ ref('core__member_months') }}
+from {{ ref('core__medical_claim') }}
 )
 
 ,enrollment_row as 

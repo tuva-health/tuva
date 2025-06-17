@@ -13,6 +13,7 @@ with subset as (
 , first_last as (
   select person_id
   ,payer
+  ,data_source
   ,{{ quote_column('plan') }}
   ,cast(left(year_month,4) as int) as year_nbr
   ,min(year_month) as first_month
@@ -20,6 +21,7 @@ with subset as (
   from {{ ref('core__member_months') }}
   group by 
   person_id
+  ,data_source
   ,payer
   ,cast(left(year_month,4) as int)
   ,{{ quote_column('plan') }}
@@ -509,4 +511,5 @@ left join encounters as e
   and mm.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
   and mm.payer = e.payer
   and mm.year_nbr = e.year_nbr
+  and mm.data_source = e.data_source
 left join {{ ref('terminology__race')}} r on p.race = r.description
