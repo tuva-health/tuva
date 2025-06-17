@@ -22,6 +22,13 @@ WITH inpatient_pred AS (
     
 )
 
+,enrollment_flag as (
+    select encounter_id
+    ,max(enrollment_flag) as max_enrollment_flag
+    from {{ ref('core__encounter') }} e
+    group by encounter_id 
+)
+
 
 select e.encounter_id
 , ce.data_source
@@ -47,7 +54,9 @@ select e.encounter_id
 , i.discharge_pred_proba_other
 , i.discharge_pred_proba_snf
 , i.discharge_pred_proba_transfer_other_facility
+, ef.max_enrollment_flag as enrolled_encounter_flag
 FROM {{ ref('benchmarks__inpatient_input') }}  e
 inner join inpatient_pred i on e.encounter_id = i.encounter_id
 inner join {{ ref('core__encounter') }} ce on e.encounter_id = ce.encounter_id
 inner join {{ ref('reference_data__calendar') }} cal on ce.encounter_start_date = cal.full_date
+left join enrollment_flag ef on e.encounter_id = ef.encounter_id 
