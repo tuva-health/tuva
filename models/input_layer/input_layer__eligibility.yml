@@ -12,6 +12,7 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - person_id
+            - member_id
             - enrollment_start_date
             - enrollment_end_date
             - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
