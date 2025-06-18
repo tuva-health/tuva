@@ -25,7 +25,7 @@ WITH inpatient_pred AS (
 ,enrollment_flag as (
     select encounter_id
     ,max(enrollment_flag) as max_enrollment_flag
-    from {{ ref('core__encounter') }} e
+    from {{ ref('core__medical_claim') }} e
     group by encounter_id 
 )
 
