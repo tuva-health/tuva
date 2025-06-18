@@ -26,7 +26,7 @@ with first_last as (
 select distinct
  encounter_id
 ,payer
-,plan
+,{{ quote_column('plan') }}
 ,person_id
 ,data_source
 from {{ ref('core__medical_claim') }}
@@ -36,11 +36,11 @@ from {{ ref('core__medical_claim') }}
 (
 select  encounter_id
 ,payer
-,plan
+,{{ quote_column('plan') }}
 ,person_id
 ,data_source
 ,row_number() over (partition by encounter_id order by payer
-                                                      ,plan
+                                                      ,{{ quote_column('plan') }}
                                                       ,person_id
                                                       ,data_source
                                                       ) as row_num
