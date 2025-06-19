@@ -26,12 +26,10 @@ env:
   DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
 #######  Redshift
   DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
-  DBT_REDSHIFT_CI_HOST_MIGRATION_TESTING: ${{ secrets.DBT_REDSHIFT_CI_HOST_MIGRATION_TESTING }}
   DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
   DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
-  DBT_REDSHIFT_2_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_2_CI_PASSWORD }}
   DBT_REDSHIFT_CI_PORT: ${{ secrets.DBT_REDSHIFT_CI_PORT }}
-  #######  Snowflake
+#######  Snowflake
   DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
   DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
   DBT_SNOWFLAKE_CI_PASSWORD: ${{ secrets.DBT_SNOWFLAKE_CI_PASSWORD }}
@@ -187,7 +185,7 @@ jobs:
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true,"claims_enabled": true,"fhir_preprocessing_enabled": true}'
+          dbt build --full-refresh --profiles-dir ./profiles/bigquery --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"fhir_preprocessing_enabled": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -243,10 +241,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true}'
+          dbt compile --profiles-dir ./profiles/bigquery --vars '{"use_synthetic_data": true,"claims_enabled": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -302,10 +301,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","claims_enabled": true,"provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/bigquery --vars '{"use_synthetic_data": true,"claims_enabled": true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -361,10 +361,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","clinical_enabled": true}'
+          dbt compile --profiles-dir ./profiles/bigquery --vars '{"use_synthetic_data": true,"clinical_enabled": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -420,10 +421,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/bigquery
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/bigquery --vars '{"input_database": "dev-ci-testing","input_schema": "input_layer","provider_attribution": true}'
+          dbt compile --profiles-dir ./profiles/bigquery --vars '{"use_synthetic_data": true,"provider_attribution": true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -468,7 +470,7 @@ jobs:
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/fabric --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -509,10 +511,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt compile --profiles-dir ./profiles/fabric --vars '{"use_synthetic_data": true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -553,10 +556,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/fabric --vars '{"use_synthetic_data": true,"claims_enabled":true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -597,10 +601,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt compile --profiles-dir ./profiles/fabric --vars '{"use_synthetic_data": true,"clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -641,10 +646,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/fabric
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/fabric --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/fabric --vars '{"use_synthetic_data": true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -679,15 +685,16 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-      #Changed to seed then compile to speed up processing time
+
+      # Changed to seed then compile to speed up processing time
       - name: dbt-seed
         run: |
-          dbt seed --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true}'
+          dbt seed --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
+          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -721,10 +728,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -758,10 +766,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"claims_enabled":true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -795,10 +804,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -832,10 +842,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -873,7 +884,7 @@ jobs:
 
       - name: dbt-build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -907,10 +918,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true}'
+          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -944,10 +956,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","claims_enabled":true,"provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"claims_enabled":true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -981,10 +994,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","clinical_enabled":true}'
+          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"clinical_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -1018,10 +1032,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
-      #Changed to compile to save processing time
+
+      # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"input_database":"dev_ci_testing","input_schema":"input_layer","provider_attribution_enabled":true}'
+          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"provider_attribution_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
