@@ -95,7 +95,6 @@ with encounter_enhanced as (
 select
   encounter_id
   , person_id
-  , encounter_type
   , admit_date
   , discharge_date
   , actual_length_of_stay
