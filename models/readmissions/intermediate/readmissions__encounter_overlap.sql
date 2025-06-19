@@ -7,12 +7,10 @@
 with encounter_enhanced as (
   select
     *
-    -- Calculate actual length of stay in days
     , COALESCE(
       case
-        when discharge_date >= admit_date
-        then discharge_date - admit_date + 1
-        else 1
+        when {{ dbt.datediff("discharge_date", "admit_date","day") }} >= 1
+        then {{ dbt.datediff("discharge_date", "admit_date","day") }}
       end
       , 1
     ) as actual_length_of_stay
