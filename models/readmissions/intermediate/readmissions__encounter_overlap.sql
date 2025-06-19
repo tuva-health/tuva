@@ -58,7 +58,7 @@ with encounter_enhanced as (
 
 -- Create overlap groups by assigning a group identifier
 , overlap_groups as (
-  select
+  select distinct /* distinct here to prevent fan out for >2 overlapping encounters. */
     e1.encounter_id
     , e1.person_id
     , MIN(e2.encounter_id) over (
