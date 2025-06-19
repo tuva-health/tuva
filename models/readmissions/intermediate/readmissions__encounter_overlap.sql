@@ -10,8 +10,8 @@ with encounter_enhanced as (
     -- Calculate actual length of stay in days
     , COALESCE(
       case
-        when encounter_end_date >= encounter_start_date
-        then encounter_end_date - encounter_start_date + 1
+        when discharge_date >= admit_date
+        then discharge_date - admit_date + 1
         else 1
       end
       , 1
@@ -43,16 +43,16 @@ with encounter_enhanced as (
   select distinct
     e1.encounter_id
     , e1.person_id
-    , e1.encounter_start_date
-    , e1.encounter_end_date
+    , e1.admit_date
+    , e1.discharge_date
   from encounter_enhanced as e1
   where exists (
     select 1
     from encounter_enhanced as e2
     where e1.person_id = e2.person_id
       and e1.encounter_id != e2.encounter_id
-      and e1.encounter_start_date <= e2.encounter_end_date
-      and e1.encounter_end_date >= e2.encounter_start_date
+      and e1.admit_date <= e2.discharge_date
+      and e1.discharge_date >= e2.admit_date
   )
 )
 
@@ -67,8 +67,8 @@ with encounter_enhanced as (
   from overlapping_encounters as e1
   inner join overlapping_encounters as e2
     on e1.person_id = e2.person_id
-    and e1.encounter_start_date <= e2.encounter_end_date
-    and e1.encounter_end_date >= e2.encounter_start_date
+    and e1.admit_date <= e2.discharge_date
+    and e1.discharge_date >= e2.admit_date
 )
 
 -- Rank encounters within each overlap group
@@ -96,8 +96,8 @@ select
   encounter_id
   , person_id
   , encounter_type
-  , encounter_start_date
-  , encounter_end_date
+  , admit_date
+  , discharge_date
   , actual_length_of_stay
   , source_type_priority
   , completeness_score
