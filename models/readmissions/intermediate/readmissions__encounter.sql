@@ -18,6 +18,6 @@ select
     , cast(drg_code as {{ dbt.type_string() }}) as drg_code
     , cast(paid_amount as {{ dbt.type_numeric() }}) as paid_amount
     , cast(primary_diagnosis_code as {{ dbt.type_string() }}) as primary_diagnosis_code
-    , cast(encounter_source_type as {{ dbt.type_string() }})
+    , cast(encounter_source_type as {{ dbt.type_string() }}) as encounter_source_type
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('readmissions__stg_core__encounter') }}
