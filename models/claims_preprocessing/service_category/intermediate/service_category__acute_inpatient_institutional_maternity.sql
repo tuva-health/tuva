@@ -26,4 +26,4 @@ inner join {{ ref('terminology__ms_drg') }} as m
   on s.drg_code = m.ms_drg_code
   and s.drg_code_type = 'ms-drg'
 where
-  m.mdc_code in ('MDC 14', 'MDC 15')
+  m.mdc_code in ('14', '15')
