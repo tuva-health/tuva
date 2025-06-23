@@ -1,13 +1,13 @@
 {{
     config(
-        enabled = var('benchmarks_train', True) | as_bool
+        enabled = var('claims_enabled', False) | as_bool
     )
 }}
 
 with cte as (
     select distinct person_id
 , hcc_code
-, year(collection_end_date) as year_nbr
+, left(collection_end_date,4) as year_nbr
 from {{ ref('cms_hcc__int_disease_factors') }}
 where hcc_code is not null
 )

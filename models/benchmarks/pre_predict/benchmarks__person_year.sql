@@ -1,6 +1,6 @@
 {{
     config(
-        enabled = var('benchmarks_train', True) | as_bool
+        enabled = var('claims_enabled', False) | as_bool
     )
 }}
 

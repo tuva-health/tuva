@@ -1,6 +1,6 @@
 {{
     config(
-        enabled = var('benchmarks_train', True) | as_bool
+        enabled = var('claims_enabled', False) | as_bool
     )
 }}
 
@@ -8,7 +8,7 @@ with cte as (
     select distinct
          a.person_id
          , cal.year as year_nbr
-         , replace(replace(replace(replace(lower(c.condition_column_name), '''', ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name
+         , replace(replace(replace(replace(lower(c.condition_column_name), {{ dbt.string_literal("'") }}, ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name
     from {{ ref('core__condition') }} as a
     inner join {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }} as c
         on a.normalized_code = c.code
