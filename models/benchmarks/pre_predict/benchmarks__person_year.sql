@@ -12,19 +12,19 @@ with subset as (
 
 , first_last as (
   select person_id
-  ,payer
-  ,data_source
-  ,{{ quote_column('plan') }}
-  ,cast(left(year_month,4) as int) as year_nbr
-  ,min(year_month) as first_month
-  ,max(year_month) as last_month
+  , payer
+  , data_source
+  , {{ quote_column('plan') }}
+  , cast(left(year_month, 4) as int) as year_nbr
+  , min(year_month) as first_month
+  , max(year_month) as last_month
   from {{ ref('core__member_months') }}
-  group by 
+  group by
   person_id
-  ,data_source
-  ,payer
-  ,cast(left(year_month,4) as int)
-  ,{{ quote_column('plan') }}
+  , data_source
+  , payer
+  , cast(left(year_month, 4) as int)
+  , {{ quote_column('plan') }}
 )
 
 , encounters as (
@@ -73,51 +73,51 @@ with subset as (
       , count(distinct case when e.encounter_group = 'outpatient' then e.encounter_id else null end) as outpatient_count
 
 
-      , sum( case when e.encounter_type = 'outpatient injections' then mc.paid_amount else 0 end) as outpatient_injections_paid
-      , sum( case when e.encounter_type = 'emergency department' then mc.paid_amount else 0 end) as emergency_department_paid
-      , sum( case when e.encounter_type = 'outpatient radiology' then mc.paid_amount else 0 end) as outpatient_radiology_paid
-      , sum( case when e.encounter_type = 'outpatient pt/ot/st' then mc.paid_amount else 0 end) as outpatient_pt_ot_st_paid
-      , sum( case when e.encounter_type = 'outpatient hospice' then mc.paid_amount else 0 end) as outpatient_hospice_paid
-      , sum( case when e.encounter_type = 'urgent care' then mc.paid_amount else 0 end) as urgent_care_paid
-      , sum( case when e.encounter_type = 'outpatient hospital or clinic' then mc.paid_amount else 0 end) as outpatient_hospital_or_clinic_paid
-      , sum( case when e.encounter_type = 'home health' then mc.paid_amount else 0 end) as home_health_paid
-      , sum( case when e.encounter_type = 'dialysis' then mc.paid_amount else 0 end) as dialysis_paid
-      , sum( case when e.encounter_type = 'outpatient rehabilitation' then mc.paid_amount else 0 end) as outpatient_rehabilitation_paid
-      , sum( case when e.encounter_type = 'outpatient surgery' then mc.paid_amount else 0 end) as outpatient_surgery_paid
-      , sum( case when e.encounter_type = 'ambulatory surgery center' then mc.paid_amount else 0 end) as ambulatory_surgery_center_paid
-      , sum( case when e.encounter_type = 'outpatient psych' then mc.paid_amount else 0 end) as outpatient_psych_paid
-      , sum( case when e.encounter_type = 'dme - orphaned' then mc.paid_amount else 0 end) as dme_orphaned_paid
-      , sum( case when e.encounter_type = 'orphaned claim' then mc.paid_amount else 0 end) as orphaned_claim_paid
-      , sum( case when e.encounter_type = 'ambulance - orphaned' then mc.paid_amount else 0 end) as ambulance_orphaned_paid
-      , sum( case when e.encounter_type = 'lab - orphaned' then mc.paid_amount else 0 end) as lab_orphaned_paid
-      , sum( case when e.encounter_type = 'office visit radiology' then mc.paid_amount else 0 end) as office_visit_radiology_paid
-      , sum( case when e.encounter_type = 'office visit' then mc.paid_amount else 0 end) as office_visit_paid
-      , sum( case when e.encounter_type = 'office visit surgery' then mc.paid_amount else 0 end) as office_visit_surgery_paid
-      , sum( case when e.encounter_type = 'office visit - other' then mc.paid_amount else 0 end) as office_visit_other_paid
-      , sum( case when e.encounter_type = 'telehealth' then mc.paid_amount else 0 end) as telehealth_paid
-      , sum( case when e.encounter_type = 'office visit pt/ot/st' then mc.paid_amount else 0 end) as office_visit_pt_ot_st_paid
-      , sum( case when e.encounter_type = 'office visit injections' then mc.paid_amount else 0 end) as office_visit_injections_paid
-      , sum( case when e.encounter_type = 'acute inpatient' then mc.paid_amount else 0 end) as acute_inpatient_paid
-      , sum( case when e.encounter_type = 'inpatient hospice' then mc.paid_amount else 0 end) as inpatient_hospice_paid
-      , sum( case when e.encounter_type = 'inpatient psych' then mc.paid_amount else 0 end) as inpatient_psych_paid
-      , sum( case when e.encounter_type = 'inpatient rehabilitation' then mc.paid_amount else 0 end) as inpatient_rehabilitation_paid
-      , sum( case when e.encounter_type = 'inpatient skilled nursing' then mc.paid_amount else 0 end) as inpatient_skilled_nursing_paid
+      , sum(case when e.encounter_type = 'outpatient injections' then mc.paid_amount else 0 end) as outpatient_injections_paid
+      , sum(case when e.encounter_type = 'emergency department' then mc.paid_amount else 0 end) as emergency_department_paid
+      , sum(case when e.encounter_type = 'outpatient radiology' then mc.paid_amount else 0 end) as outpatient_radiology_paid
+      , sum(case when e.encounter_type = 'outpatient pt/ot/st' then mc.paid_amount else 0 end) as outpatient_pt_ot_st_paid
+      , sum(case when e.encounter_type = 'outpatient hospice' then mc.paid_amount else 0 end) as outpatient_hospice_paid
+      , sum(case when e.encounter_type = 'urgent care' then mc.paid_amount else 0 end) as urgent_care_paid
+      , sum(case when e.encounter_type = 'outpatient hospital or clinic' then mc.paid_amount else 0 end) as outpatient_hospital_or_clinic_paid
+      , sum(case when e.encounter_type = 'home health' then mc.paid_amount else 0 end) as home_health_paid
+      , sum(case when e.encounter_type = 'dialysis' then mc.paid_amount else 0 end) as dialysis_paid
+      , sum(case when e.encounter_type = 'outpatient rehabilitation' then mc.paid_amount else 0 end) as outpatient_rehabilitation_paid
+      , sum(case when e.encounter_type = 'outpatient surgery' then mc.paid_amount else 0 end) as outpatient_surgery_paid
+      , sum(case when e.encounter_type = 'ambulatory surgery center' then mc.paid_amount else 0 end) as ambulatory_surgery_center_paid
+      , sum(case when e.encounter_type = 'outpatient psych' then mc.paid_amount else 0 end) as outpatient_psych_paid
+      , sum(case when e.encounter_type = 'dme - orphaned' then mc.paid_amount else 0 end) as dme_orphaned_paid
+      , sum(case when e.encounter_type = 'orphaned claim' then mc.paid_amount else 0 end) as orphaned_claim_paid
+      , sum(case when e.encounter_type = 'ambulance - orphaned' then mc.paid_amount else 0 end) as ambulance_orphaned_paid
+      , sum(case when e.encounter_type = 'lab - orphaned' then mc.paid_amount else 0 end) as lab_orphaned_paid
+      , sum(case when e.encounter_type = 'office visit radiology' then mc.paid_amount else 0 end) as office_visit_radiology_paid
+      , sum(case when e.encounter_type = 'office visit' then mc.paid_amount else 0 end) as office_visit_paid
+      , sum(case when e.encounter_type = 'office visit surgery' then mc.paid_amount else 0 end) as office_visit_surgery_paid
+      , sum(case when e.encounter_type = 'office visit - other' then mc.paid_amount else 0 end) as office_visit_other_paid
+      , sum(case when e.encounter_type = 'telehealth' then mc.paid_amount else 0 end) as telehealth_paid
+      , sum(case when e.encounter_type = 'office visit pt/ot/st' then mc.paid_amount else 0 end) as office_visit_pt_ot_st_paid
+      , sum(case when e.encounter_type = 'office visit injections' then mc.paid_amount else 0 end) as office_visit_injections_paid
+      , sum(case when e.encounter_type = 'acute inpatient' then mc.paid_amount else 0 end) as acute_inpatient_paid
+      , sum(case when e.encounter_type = 'inpatient hospice' then mc.paid_amount else 0 end) as inpatient_hospice_paid
+      , sum(case when e.encounter_type = 'inpatient psych' then mc.paid_amount else 0 end) as inpatient_psych_paid
+      , sum(case when e.encounter_type = 'inpatient rehabilitation' then mc.paid_amount else 0 end) as inpatient_rehabilitation_paid
+      , sum(case when e.encounter_type = 'inpatient skilled nursing' then mc.paid_amount else 0 end) as inpatient_skilled_nursing_paid
 
 
-  , sum( case when e.encounter_group = 'inpatient' then mc.paid_amount else 0 end) as inpatient_paid
-  , sum( case when e.encounter_group = 'office based' then mc.paid_amount else 0 end) as office_based_paid
-  , sum( case when e.encounter_group = 'other' then mc.paid_amount else 0 end) as other_paid
-  , sum( case when e.encounter_group = 'outpatient' then mc.paid_amount else 0 end) as outpatient_paid
+  , sum(case when e.encounter_group = 'inpatient' then mc.paid_amount else 0 end) as inpatient_paid
+  , sum(case when e.encounter_group = 'office based' then mc.paid_amount else 0 end) as office_based_paid
+  , sum(case when e.encounter_group = 'other' then mc.paid_amount else 0 end) as other_paid
+  , sum(case when e.encounter_group = 'outpatient' then mc.paid_amount else 0 end) as outpatient_paid
 
 
 
     from {{ ref('core__medical_claim') }} as mc
     inner join subset on mc.person_id = subset.person_id
-    inner join {{ ref('core__encounter') }} as e 
+    inner join {{ ref('core__encounter') }} as e
       on e.encounter_id = mc.encounter_id
-    inner join {{ ref('reference_data__calendar') }} as cal 
+    inner join {{ ref('reference_data__calendar') }} as cal
       on e.encounter_start_date = cal.full_date
-    inner join {{ ref('core__member_months') }} as mm 
+    inner join {{ ref('core__member_months') }} as mm
       on mc.person_id = mm.person_id
       and mc.data_source = mm.data_source
       and mc.payer = mm.payer
@@ -128,49 +128,50 @@ with subset as (
       , e.data_source
       , mc.payer
       , mc.{{ quote_column('plan') }}
-      , cal.year 
+      , cal.year
 )
 
-,member_month as (
+, member_month as (
   select person_id
-  ,payer
-  ,{{ quote_column('plan') }}
-  ,data_source
-  ,left(year_month,4) as year_nbr
-  ,count(year_month) as member_month_count
+  , payer
+  , {{ quote_column('plan') }}
+  , data_source
+  , left(year_month, 4) as year_nbr
+  , count(year_month) as member_month_count
 
   from {{ ref('core__member_months') }} as mm
-  group by 
+  group by
   person_id
-  ,payer
-  ,{{ quote_column('plan') }}
-  ,data_source
-  ,left(year_month,4) 
+  , payer
+  , {{ quote_column('plan') }}
+  , data_source
+  , left(year_month, 4)
 )
 
-,state_cte as (
+, state_cte as (
   select distinct ssa_fips_state_name as state_nm
-    from {{ ref('reference_data__ssa_fips_state')}} s
+    from {{ ref('reference_data__ssa_fips_state') }} as s
   where cast(s.ssa_fips_state_code as int) < 53
 )
 
 select
-  row_number() over (order by mm.person_id, mm.year_nbr)  as benchmark_key
+  row_number() over (
+order by mm.person_id, mm.year_nbr) as benchmark_key
   , cast(mm.year_nbr as int) as year_nbr
   , mm.person_id
   , mm.payer
-  , coalesce(p.sex,'unknown') as sex
+  , coalesce(p.sex, 'unknown') as sex
   , mm.{{ quote_column('plan') }}
   , mm.data_source
   , mm.member_month_count
   , fl.first_month
   , fl.last_month
-  , DATEDIFF(
-    YEAR,
-    p.birth_date,
-    CAST(CONCAT(mm.year_nbr, '-01-01') AS DATE)
-  ) AS age_at_year_start
-  , coalesce(st_ab.ansi_fips_state_name,st_full.ansi_fips_state_name) as state --values that don't match are null for xgboost
+  , datediff(
+    year
+    , p.birth_date
+    , cast(concat(mm.year_nbr, '-01-01') as date)
+  ) as age_at_year_start
+  , coalesce(st_ab.ansi_fips_state_name, st_full.ansi_fips_state_name) as state --values that don't match are null for xgboost
   , case when r.description is not null then r.description else null end as race --values that don't match are null for xgboost
   , case when e.paid_amount < 0 then 0 else coalesce(e.paid_amount, 0) end as paid_amount
 
@@ -178,7 +179,7 @@ select
 , case when e.other_paid < 0 then 0 else coalesce(e.other_paid, 0) end as other_paid_amount
 , case when e.office_based_paid < 0 then 0 else coalesce(e.office_based_paid, 0) end as office_based_paid_amount
 , case when e.inpatient_paid < 0 then 0 else coalesce(e.inpatient_paid, 0) end as inpatient_paid_amount
- 
+
 , case when e.outpatient_injections_paid < 0 then 0 else coalesce(e.outpatient_injections_paid, 0) end as outpatient_injections_paid_amount
 , case when e.emergency_department_paid < 0 then 0 else coalesce(e.emergency_department_paid, 0) end as emergency_department_paid_amount
 , case when e.outpatient_radiology_paid < 0 then 0 else coalesce(e.outpatient_radiology_paid, 0) end as outpatient_radiology_paid_amount
@@ -484,32 +485,32 @@ select
   , phcc.hcc_186
   , phcc.hcc_188
   , phcc.hcc_189
-, '{{ var('tuva_last_run') }}' as tuva_last_run 
+, '{{ var('tuva_last_run') }}' as tuva_last_run
 from member_month as mm
 inner join subset on mm.person_id = subset.person_id
-inner join {{ ref('core__patient') }} as p 
+inner join {{ ref('core__patient') }} as p
   on mm.person_id = p.person_id
-inner join first_last fl on mm.person_id = fl.person_id 
+inner join first_last as fl on mm.person_id = fl.person_id
 and
 mm.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
 and
 fl.year_nbr = mm.year_nbr
-left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
-left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_full.ansi_fips_state_name
-inner join {{ ref('benchmarks__pivot_condition') }} pc on mm.person_id = pc.person_id 
+left outer join {{ ref('reference_data__ansi_fips_state') }} as st_ab on p.state = st_ab.ansi_fips_state_abbreviation
+left outer join {{ ref('reference_data__ansi_fips_state') }} as st_full on p.state = st_full.ansi_fips_state_name
+inner join {{ ref('benchmarks__pivot_condition') }} as pc on mm.person_id = pc.person_id
   and
   pc.year_nbr = mm.year_nbr
-inner join {{ ref('benchmarks__pivot_cms_condition') }} pcms on mm.person_id = pcms.person_id 
+inner join {{ ref('benchmarks__pivot_cms_condition') }} as pcms on mm.person_id = pcms.person_id
   and
   pcms.year_nbr = mm.year_nbr
-inner join {{ ref('benchmarks__pivot_hcc') }} phcc on mm.person_id = phcc.person_id 
+inner join {{ ref('benchmarks__pivot_hcc') }} as phcc on mm.person_id = phcc.person_id
   and
   phcc.year_nbr = mm.year_nbr
-left join encounters as e 
+left outer join encounters as e
   on mm.person_id = e.person_id
   and mm.data_source = e.data_source
   and mm.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
   and mm.payer = e.payer
   and mm.year_nbr = e.year_nbr
   and mm.data_source = e.data_source
-left join {{ ref('terminology__race')}} r on p.race = r.description
+left outer join {{ ref('terminology__race') }} as r on p.race = r.description

@@ -6,43 +6,42 @@
 
 with first_last as (
   select person_id
-  ,payer
-  ,data_source
-  ,{{ quote_column('plan') }}
-  ,cast(left(year_month,4) as int) as year_nbr
-  ,min(year_month) as first_month
-  ,max(year_month) as last_month
+  , payer
+  , data_source
+  , {{ quote_column('plan') }}
+  , cast(left(year_month, 4) as int) as year_nbr
+  , min(year_month) as first_month
+  , max(year_month) as last_month
   from {{ ref('core__member_months') }}
-  group by 
+  group by
   person_id
-  ,data_source
-  ,payer
-  ,cast(left(year_month,4) as int)
-  ,{{ quote_column('plan') }}
+  , data_source
+  , payer
+  , cast(left(year_month, 4) as int)
+  , {{ quote_column('plan') }}
 )
 
-, enrollment_fields as 
-(
+, enrollment_fields as (
 select distinct
  encounter_id
-,payer
-,{{ quote_column('plan') }}
-,person_id
-,data_source
+, payer
+, {{ quote_column('plan') }}
+, person_id
+, data_source
 from {{ ref('core__medical_claim') }}
 )
 
-,enrollment_row as 
-(
-select  encounter_id
-,payer
-,{{ quote_column('plan') }}
-,person_id
-,data_source
-,row_number() over (partition by encounter_id order by payer
-                                                      ,{{ quote_column('plan') }}
-                                                      ,person_id
-                                                      ,data_source
+, enrollment_row as (
+select encounter_id
+, payer
+, {{ quote_column('plan') }}
+, person_id
+, data_source
+, row_number() over (partition by encounter_id
+order by payer
+                                                      , {{ quote_column('plan') }}
+                                                      , person_id
+                                                      , data_source
                                                       ) as row_num
 from enrollment_fields
 )
@@ -51,38 +50,38 @@ from enrollment_fields
 select
     e.encounter_id
   , e.data_source
-  , coalesce(p.sex,'unknown') as sex
+  , coalesce(p.sex, 'unknown') as sex
   , c.year as year_nbr
   , e.length_of_stay
   , e.discharge_disposition_code
-  , case 
-      when rs.index_admission_flag = 1 
-       and rs.unplanned_readmit_30_flag = 1 then 1 
-      else 0 
+  , case
+      when rs.index_admission_flag = 1
+       and rs.unplanned_readmit_30_flag = 1 then 1
+      else 0
     end as readmission_numerator
-  , coalesce(rs.index_admission_flag,0) as readmission_denominator
-  , coalesce(st_ab.ansi_fips_state_name,st_full.ansi_fips_state_name,'null_state') as state
-  , case 
-      when r.description is not null then r.description 
+  , coalesce(rs.index_admission_flag, 0) as readmission_denominator
+  , coalesce(st_ab.ansi_fips_state_name, st_full.ansi_fips_state_name, 'null_state') as state
+  , case
+      when r.description is not null then r.description
       else 'null_race'
     end as race
   , case when e.drg_code_type = 'ms-drg' then e.drg_code else 'null_drg' end as ms_drg_code
   , coalesce(ccsr.default_ccsr_category_description_ip, 'unknown') as ccsr_cat
   , datediff(year, p.birth_date, e.encounter_start_date) as age_at_admit_with_null
-  , case 
+  , case
       when e.discharge_disposition_code = '01' then 'home'
       when e.discharge_disposition_code = '06' then 'home health'
       when e.discharge_disposition_code = '03' then 'snf'
       when e.discharge_disposition_code = '20' then 'expired'
       when e.discharge_disposition_code = '62' then 'ipt rehab'
-      when e.discharge_disposition_code in ('02', '63', '13', '12', '05', '04', '61', '65', '64') 
+      when e.discharge_disposition_code in ('02', '63', '13', '12', '05', '04', '61', '65', '64')
         then 'transfer/other facility'
-      when e.discharge_disposition_code in ('50', '51') then 'hospice' 
-      else 'other' 
+      when e.discharge_disposition_code in ('50', '51') then 'hospice'
+      else 'other'
     end as discharge_location
 
   , fl.first_month
-  , fl.last_month    
+  , fl.last_month
   /* tuva chronic conditions */
   , pc.hip_fracture as cond_hip_fracture
   , pc.type_1_diabetes_mellitus as cond_type_1_diabetes_mellitus
@@ -322,48 +321,48 @@ select
   , phcc.hcc_186
   , phcc.hcc_188
   , phcc.hcc_189
-   
-from {{ ref('core__encounter')}} e
-inner join {{ ref('reference_data__calendar')}} c on e.encounter_start_date = c.full_date
-inner join {{ ref('core__patient')}} p on e.person_id = p.person_id
-inner join {{ ref('benchmarks__pivot_condition') }} pc on e.person_id = pc.person_id 
+
+from {{ ref('core__encounter') }} as e
+inner join {{ ref('reference_data__calendar') }} as c on e.encounter_start_date = c.full_date
+inner join {{ ref('core__patient') }} as p on e.person_id = p.person_id
+inner join {{ ref('benchmarks__pivot_condition') }} as pc on e.person_id = pc.person_id
   and
   c.year = pc.year_nbr
-inner join {{ ref('benchmarks__pivot_cms_condition') }} pcms on e.person_id = pcms.person_id 
+inner join {{ ref('benchmarks__pivot_cms_condition') }} as pcms on e.person_id = pcms.person_id
   and
   c.year = pcms.year_nbr
-inner join {{ ref('benchmarks__pivot_hcc') }} phcc on e.person_id = phcc.person_id 
+inner join {{ ref('benchmarks__pivot_hcc') }} as phcc on e.person_id = phcc.person_id
   and
-  c.year = phcc.year_nbr  
-inner join enrollment_row er on e.encounter_id = er.encounter_id 
+  c.year = phcc.year_nbr
+inner join enrollment_row as er on e.encounter_id = er.encounter_id
   and
   er.row_num = 1
-inner join first_last fl on e.person_id = fl.person_id 
+inner join first_last as fl on e.person_id = fl.person_id
   and
   er.{{ quote_column('plan') }} = fl.{{ quote_column('plan') }}
-  and 
+  and
   er.payer = fl.payer
   and
   er.data_source = fl.data_source
   and
   fl.year_nbr = c.year
-left join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
-left join {{ ref('reference_data__ansi_fips_state')}} st_ab on p.state=st_ab.ansi_fips_state_abbreviation
-left join {{ ref('reference_data__ansi_fips_state')}} st_full on p.state=st_full.ansi_fips_state_name
-left join {{ ref('terminology__race')}} r on p.race = r.description
-left join {{ ref('readmissions__readmission_summary')}} rs on e.encounter_id = rs.encounter_id
+left outer join {{ ref('ccsr__dxccsr_v2023_1_cleaned_map') }} as ccsr on e.primary_diagnosis_code = ccsr.icd_10_cm_code
+left outer join {{ ref('reference_data__ansi_fips_state') }} as st_ab on p.state = st_ab.ansi_fips_state_abbreviation
+left outer join {{ ref('reference_data__ansi_fips_state') }} as st_full on p.state = st_full.ansi_fips_state_name
+left outer join {{ ref('terminology__race') }} as r on p.race = r.description
+left outer join {{ ref('readmissions__readmission_summary') }} as rs on e.encounter_id = rs.encounter_id
 where e.encounter_type = 'acute inpatient'
 )
 
-,handle_missing_age as (
+, handle_missing_age as (
   select data_source
-  ,avg(age_at_admit_with_null) as avg_age_at_admit
+  , avg(age_at_admit_with_null) as avg_age_at_admit
   from final
   group by data_source
 )
 
 select final.*
-,coalesce(age_at_admit_with_null,h.avg_age_at_admit) as age_at_admit
+, coalesce(age_at_admit_with_null, h.avg_age_at_admit) as age_at_admit
 , '{{ var('tuva_last_run') }}' as tuva_last_run
 from final
-inner join handle_missing_age h on final.data_source = h.data_source
+inner join handle_missing_age as h on final.data_source = h.data_source
