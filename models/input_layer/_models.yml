@@ -1,0 +1,183 @@
+version: 2
+
+models:
+  - name: input_layer__eligibility
+    description:  |
+      Mapping check to make sure all columns are mapped appropriately into the input layer.
+      The eligibility table includes information about a patient's health 
+      insurance coverage and demographics (note: we use the word patient as a 
+      synonym for member). Every claims dataset should include some sort of 
+      eligibility data, otherwise it's impossible to calculate member months, 
+      which are needed to calculate measures like PMPM.
+    config:
+      alias: verified_eligibility
+      contract:
+        enforced: true
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - member_id
+            - enrollment_start_date
+            - enrollment_end_date
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
+            - payer
+            - data_source
+          config:
+            severity: error
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          column_A: enrollment_end_date
+          column_B: enrollment_start_date
+          or_equal: true
+          config:
+            severity: warn
+    columns:
+      - name: person_id
+        data_type: varchar
+        description: ""
+        tests:
+          - not_null
+
+      - name: member_id
+        data_type: varchar
+        description: ""
+        tests:
+          - not_null
+
+      - name: subscriber_id
+        data_type: varchar
+        description: ""
+
+      - name: gender
+        data_type: varchar
+        description: ""
+
+      - name: race
+        data_type: varchar
+        description: ""
+
+      - name: birth_date
+        data_type: timestamp
+        description: ""
+
+      - name: death_date
+        data_type: timestamp
+        description: ""
+
+      - name: death_flag
+        data_type: boolean
+        description: ""
+
+      - name: enrollment_start_date
+        data_type: date
+        description: ""
+        tests:
+          - not_null
+
+      - name: enrollment_end_date
+        data_type: date
+        description: ""
+        tests:
+          - not_null
+
+      - name: payer
+        data_type: varchar
+        description: ""
+        tests:
+          - not_null
+
+      - name: payer_type
+        data_type: varchar
+        description: ""
+
+      - name: plan
+        data_type: varchar
+        description: ""
+        tests:
+          - not_null
+
+      - name: original_reason_entitlement_code
+        data_type: varchar
+        description: ""
+
+      - name: dual_status_code
+        data_type: varchar
+        description: ""
+
+      - name: medicare_status_code
+        data_type: varchar
+        description: ""
+
+      - name: group_id
+        data_type: varchar
+        description: ""
+
+      - name: group_name
+        data_type: varchar
+        description: ""
+
+      - name: first_name
+        data_type: varchar
+        description: ""
+
+      - name: last_name
+        data_type: varchar
+        description: ""
+
+      - name: social_security_number
+        data_type: varchar
+        description: ""
+
+      - name: subscriber_relation
+        data_type: varchar
+        description: ""
+
+      - name: address
+        data_type: varchar
+        description: ""
+
+      - name: city
+        data_type: varchar
+        description: ""
+
+      - name: state
+        data_type: varchar
+        description: ""
+
+      - name: zip_code
+        data_type: varchar
+        description: ""
+
+      - name: phone
+        data_type: varchar
+        description: ""
+
+      - name: data_source
+        data_type: varchar
+        description: ""
+        tests:
+          - not_null
+
+      - name: file_name
+        data_type: varchar
+        description: ""
+        tests:
+          - not_null
+
+      - name: file_date
+        data_type: date
+        description: ""
+
+      - name: ingest_datetime
+        data_type: timestamp
+        description: ""
+
+  - name: input_layer__medical_claim
+    description: ""
+    config:
+      alias: verified_medical_claim
+
+  - name: input_layer__pharmacy_claim
+    description: ""
+    config:
+      alias: verified_pharmacy_claim
