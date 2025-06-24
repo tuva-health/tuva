@@ -7,18 +7,19 @@
 with cte as (
     select distinct person_id
 , hcc_code
-, left(collection_end_date, 4) as year_nbr
-from {{ ref('cms_hcc__int_disease_factors') }}
+, c.year as year_nbr
+from {{ ref('cms_hcc__int_disease_factors') }} as i
+left outer join {{ ref('reference_data__calendar') }} as c on i.collection_end_date = c.full_date
 where hcc_code is not null
 )
 
 , member_month as (
     select mm.person_id
-    , left(year_month, 4) as year_nbr
+    , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
     , count(year_month) as member_month_count
     from {{ ref('core__member_months') }} as mm
     group by mm.person_id
-    , left(year_month, 4)
+    , cast(left(year_month, 4) as {{ dbt.type_int() }})
 )
 
 , condition_flags as (
