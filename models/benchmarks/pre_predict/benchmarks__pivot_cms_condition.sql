@@ -6,9 +6,15 @@
 
 with cte as (
     select distinct
-         a.person_id
-         , cal.year as year_nbr
-         , replace(replace(replace(replace(lower(c.condition_column_name), {{ dbt.string_literal("'") }}, ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name
+        a.person_id
+        , cal.year as year_nbr
+    {% if target.type == 'bigquery' %}
+        -- BigQuery syntax: Use "'" to represent a single quote character in a string
+        , replace(replace(replace(replace(lower(c.concept_name), "'", ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name
+    {% else %}
+        -- Standard SQL syntax: Use '''' to represent a single quote
+        , replace(replace(replace(replace(lower(c.concept_name), '''', ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name --noqa
+    {% endif %}
     from {{ ref('core__condition') }} as a
     inner join {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }} as c
         on a.normalized_code = c.code

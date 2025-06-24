@@ -7,9 +7,15 @@
 /* returns person year grain. Did the patient have the condition coded in each year? Not if they ever had the condition */
 with cte as (
     select distinct
-         a.person_id
-         , cal.year as year_nbr
-         , replace(replace(replace(replace(lower(c.concept_name), {{ dbt.string_literal("'") }}, ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name
+        a.person_id
+        , cal.year as year_nbr
+    {% if target.type == 'bigquery' %}
+        -- BigQuery syntax: Use "'" to represent a single quote character in a string
+        , replace(replace(replace(replace(lower(c.concept_name), "'", ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name
+    {% else %}
+        -- Standard SQL syntax: Use '''' to represent a single quote
+        , replace(replace(replace(replace(lower(c.concept_name), '''', ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name --noqa
+    {% endif %}
     from {{ ref('core__condition') }} as a
     inner join {{ ref('clinical_concept_library__value_set_member_relevant_fields') }} as c
         on a.normalized_code = c.code
