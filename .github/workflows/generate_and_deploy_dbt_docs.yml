@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -66,8 +66,8 @@ jobs:
           pip install dbt-core==1.8.6 dbt-snowflake
 
       # --- Setup dbt Profile ---
-      - name: Create dbt profiles directory
-        run: mkdir -p ~/.dbt
+      - name: Create dbt profiles directory in working directory
+        run: mkdir -p .dbt
 
       - name: Create dbt profiles.yml for Snowflake (for docs context)
         run: |
@@ -83,19 +83,34 @@ jobs:
                 type: snowflake
                 user: \"{{ env_var('DBT_SNOWFLAKE_CI_USER') }}\"
                 warehouse: \"{{ env_var('DBT_SNOWFLAKE_CI_WAREHOUSE') }}\"
-            target: dev" > ~/.dbt/profiles.yml
+            target: dev" > .dbt/profiles.yml
+
+      - name: Verify profiles.yml exists
+        run: |
+          echo "Current working directory: $(pwd)"
+          echo "Contents of .dbt directory:"
+          ls -la .dbt/
+          echo "Contents of profiles.yml:"
+          cat .dbt/profiles.yml
 
       - name: dbt-deps
-        run: dbt deps --profiles-dir ./.dbt
+        run: dbt deps --profiles-dir .dbt
 
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./.dbt
+        run: dbt debug --profiles-dir .dbt
 
       - name: dbt-build
-        run: dbt build --profiles-dir ./.dbt
+        run: dbt build --profiles-dir .dbt
 
       - name: dbt-docs-generate
-        run: dbt docs generate --profiles-dir ./.dbt
+        run: dbt docs generate --profiles-dir .dbt
+
+      - name: Verify target directory was created
+        run: |
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of target directory:"
+          ls -la target/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
