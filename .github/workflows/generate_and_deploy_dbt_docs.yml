@@ -3,6 +3,8 @@ name: Generate and Deploy dbt Docs
 on:
   release:
     types: [published]  # Triggers when a release is published
+  push:
+    branches: [ update-docs-workflow ]  # Test branch - remove after testing
   workflow_dispatch:  # Allows manual triggering
     inputs:
       environment:
