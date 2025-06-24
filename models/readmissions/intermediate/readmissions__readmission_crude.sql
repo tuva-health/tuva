@@ -16,19 +16,15 @@ select
     , enc.admit_date
     , enc.discharge_date
 from {{ ref('readmissions__encounter') }} as enc
-left outer join {{ ref('readmissions__encounter_overlap') }} as over_a
-    on enc.encounter_id = over_a.encounter_id_a
-left outer join {{ ref('readmissions__encounter_overlap') }} as over_b
-    on enc.encounter_id = over_b.encounter_id_b
 where
     admit_date is not null
     and
     discharge_date is not null
     and
     admit_date <= discharge_date
-and over_a.encounter_id_a is null and over_b.encounter_id_b is null
+and not exists (select 1 from {{ ref('readmissions__encounter_overlap') }} as overlap
+                         where overlap.encounter_id = enc.encounter_id and overlap.is_best_encounter = 0)
     )
-
 
 , encounter_sequence as (
 select

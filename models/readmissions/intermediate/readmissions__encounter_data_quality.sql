@@ -54,12 +54,9 @@ select
 	else 0
     end as no_diagnosis_ccs_flag
     , aa.ccs_diagnosis_category as diagnosis_ccs
-    , case
-        when aa.encounter_id in (select distinct encounter_id_a
-	                         from {{ ref('readmissions__encounter_overlap') }})
-	     or
-	     aa.encounter_id in (select distinct encounter_id_b
-	                         from {{ ref('readmissions__encounter_overlap') }})
+    , case /* WHEN ENCOUNTER IS NOT THE BEST, THEN FLAG THIS ERROR. */
+        when exists (select 1 from {{ ref('readmissions__encounter_overlap') }} as overlap
+                              where aa.encounter_id = overlap.encounter_id and overlap.is_best_encounter = 0)
 	then 1
 	else 0
     end as overlaps_with_another_encounter_flag
