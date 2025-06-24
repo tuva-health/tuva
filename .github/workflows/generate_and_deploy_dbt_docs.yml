@@ -76,6 +76,9 @@ jobs:
           dbt docs generate --profiles-dir ./profiles/snowflake
         working-directory: ci_testing
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
