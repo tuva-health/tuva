@@ -686,15 +686,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      # Changed to seed then compile to speed up processing time
-      - name: dbt-seed
+      - name: dbt-build
         run: |
-          dbt seed --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true}'
-        working-directory: ci_testing
-
-      - name: dbt-compile
-        run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
@@ -732,7 +726,7 @@ jobs:
       # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"claims_enabled":true}'
+          dbt compile --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"claims_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
