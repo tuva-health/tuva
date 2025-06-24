@@ -65,17 +65,37 @@ jobs:
           python -m pip install --upgrade pip
           pip install dbt-core==1.8.6 dbt-snowflake
 
+      # --- Setup dbt Profile ---
+      - name: Create dbt profiles directory
+        run: mkdir -p ~/.dbt
+
+      - name: Create dbt profiles.yml for Snowflake (for docs context)
+        run: |
+          echo "default:
+            outputs:
+              dev:
+                account: \"{{ env_var('DBT_TUVA_SNOWFLAKE_ACCOUNT') }}\"
+                database: dev_ci_testing
+                password: \"{{ env_var('DBT_SNOWFLAKE_CI_PASSWORD') }}\"
+                role: \"{{ env_var('DBT_SNOWFLAKE_CI_ROLE') }}\"
+                schema: \"{{ env_var('DBT_SNOWFLAKE_CI_SCHEMA') }}\"
+                threads: 8
+                type: snowflake
+                user: \"{{ env_var('DBT_SNOWFLAKE_CI_USER') }}\"
+                warehouse: \"{{ env_var('DBT_SNOWFLAKE_CI_WAREHOUSE') }}\"
+            target: dev" > ~/.dbt/profiles.yml
+
       - name: dbt-deps
-        run: dbt deps --profiles-dir ./profiles/snowflake
+        run: dbt deps --profiles-dir ./.dbt
 
       - name: dbt-debug
-        run: dbt debug --profiles-dir ./profiles/snowflake
+        run: dbt debug --profiles-dir ./.dbt
 
       - name: dbt-build
-        run: dbt build --profiles-dir ./profiles/snowflake
+        run: dbt build --profiles-dir ./.dbt
 
       - name: dbt-docs-generate
-        run: dbt docs generate --profiles-dir ./profiles/snowflake
+        run: dbt docs generate --profiles-dir ./.dbt
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
