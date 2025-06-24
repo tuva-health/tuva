@@ -71,9 +71,11 @@ jobs:
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
 
+      - name: dbt-build
+        run: dbt build --full-refresh --profiles-dir ./profiles/snowflake
+
       - name: dbt-docs-generate
-        run: |
-          dbt docs generate --profiles-dir ./profiles/snowflake
+        run: dbt docs generate --profiles-dir ./profiles/snowflake
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
