@@ -33,7 +33,6 @@ concurrency:
 
 env:
   PYTHON_VERSION: '3.9'
-  LINT_SCRIPT_PATH: ./lint_tuva_project.sh
 
 #######  Secrets #######
 #######  Snowflake
@@ -47,7 +46,10 @@ env:
 
 jobs:
   generate-docs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latestdefaults:
+    defaults:
+      run:
+        working-directory: ./ci_testing
 
     steps:
       - name: Checkout repository
@@ -65,16 +67,13 @@ jobs:
 
       - name: dbt-deps
         run: dbt deps --profiles-dir ./profiles/snowflake
-        working-directory: ci_testing
 
       - name: dbt-debug
         run: dbt debug --profiles-dir ./profiles/snowflake
-        working-directory: ci_testing
 
       - name: dbt-docs-generate
         run: |
           dbt docs generate --profiles-dir ./profiles/snowflake
-        working-directory: ci_testing
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -82,7 +81,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './target'  # dbt generates docs in the target directory
+          path: './ci_testing/target'  # dbt generates docs in the target directory
 
   deploy:
     needs: generate-docs
