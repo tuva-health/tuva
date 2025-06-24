@@ -13,8 +13,9 @@ models:
       alias: verified_eligibility
       contract:
         enforced: true
-    data_tests:
+    tests:
       - dbt_utils.unique_combination_of_columns:
+          name: eligibility_unique_key
           combination_of_columns:
             - person_id
             - member_id
@@ -26,6 +27,7 @@ models:
           config:
             severity: error
       - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          name: eligibility_enrollment_start_date_is_before_end_date
           column_A: enrollment_end_date
           column_B: enrollment_start_date
           or_equal: true
@@ -51,6 +53,11 @@ models:
       - name: gender
         data_type: varchar
         description: ""
+        tests:
+          - not_null
+          - accepted_values:
+              name: eligibility_gender__is_part_of_set
+              values: ['male', 'female', 'unknown']
 
       - name: race
         data_type: varchar
@@ -59,26 +66,64 @@ models:
       - name: birth_date
         data_type: timestamp
         description: ""
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              name: is_reasonable__eligibility_birth_date
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+              strictly: false
+          - dbt_expectations.expect_column_distinct_count_to_equal:
+              name: is_unique_per_person_id__eligibility_birth_date
+              value: 1
+              group_by: [person_id]
 
       - name: death_date
         data_type: timestamp
         description: ""
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              name: is_reasonable__eligibility_death_date
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+              strictly: false
+          - dbt_expectations.expect_column_distinct_count_to_be_less_than:
+              name: is_unique_per_person_id__eligibility_death_date
+              value: 2
+              group_by: [person_id]
 
       - name: death_flag
         data_type: boolean
         description: ""
+        tests:
+          - accepted_values:
+              name: is_part_of_set__eligibility_death_flag
+              values: [0, 1]
+              quote: false
+              config:
+                enabled: "{{ target.type == 'bigquery' }}"
 
       - name: enrollment_start_date
         data_type: date
         description: ""
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              name: is_reasonable__eligibility_enrollment_start_date
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+              strictly: false
 
       - name: enrollment_end_date
         data_type: date
         description: ""
         tests:
           - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              name: is_reasonable__eligibility_enrollment_end_date
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+              strictly: false
 
       - name: payer
         data_type: varchar
@@ -89,6 +134,10 @@ models:
       - name: payer_type
         data_type: varchar
         description: ""
+#        tests:
+#          - relationships:
+#              to: ref('terminology__payer_type')
+#              field: payer_type
 
       - name: plan
         data_type: varchar
@@ -99,14 +148,36 @@ models:
       - name: original_reason_entitlement_code
         data_type: varchar
         description: ""
+        tests:
+          - accepted_values:
+              name: is_part_of_set__eligibility_original_reason_entitlement_code
+              values: ['0', '1', '2', '3']
+              # TODO: Should this instead reference a terminology model?
+              # description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
 
       - name: dual_status_code
         data_type: varchar
         description: ""
+        tests:
+          - accepted_values:
+              name: is_part_of_set__eligibility_dual_status_code
+              values: [ '00', '01', '02', '03', '04', '05', '06', '08', '09', '10' ]
+              # TODO: Should this instead reference a terminology model?
+              # description: https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january
+              config:
+                severity: warn
 
       - name: medicare_status_code
         data_type: varchar
         description: ""
+        tests:
+          - accepted_values:
+              name: is_part_of_set__eligibility_medicare_status_code
+              values: [ '00', '10', '11', '20', '21', '31', '40' ]
+              # TODO: Should this instead reference a terminology model?
+              # description: https://resdac.org/cms-data/variables/medicare-status-code-january
+              config:
+                severity: warn
 
       - name: group_id
         data_type: varchar
@@ -167,10 +238,19 @@ models:
       - name: file_date
         data_type: date
         description: ""
+        tests:
+          - not_null
 
       - name: ingest_datetime
         data_type: timestamp
         description: ""
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              name: is_valid_type__eligibility_ingest_datetime
+              column_type_list: [date, datetime, time, timestamp, timestamp_ntz, timestampntz,
+                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
+                    with time zone, timestamp without time zone, datetime2, datetimeoffset]
 
   - name: input_layer__medical_claim
     description: ""
