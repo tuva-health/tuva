@@ -7,7 +7,7 @@
 with cte as (
     select distinct person_id
 , hcc_code
-, left(collection_end_date,4) as year_nbr
+, left(collection_end_date, 4) as year_nbr
 from {{ ref('cms_hcc__int_disease_factors') }}
 where hcc_code is not null
 )
