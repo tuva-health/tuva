@@ -31,7 +31,8 @@ pharmacy_claims as (
 final as (
     select  
         p.data_source
-        , count(*) as n_overlapping_rows
+        , 'overlap' as test
+        , count(*) as n_rows
     from pharmacy_claims as p
     inner join eligibility as e
     on p.person_id = e.person_id
@@ -40,10 +41,25 @@ final as (
     and p.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
     and p.dispensing_date between e.enrollment_start_date and e.enrollment_end_date
     group by p.data_source
+    union all
+    select
+        data_source
+        , 'pharmacy claim' as test
+        , count(*) as n_rows
+    from pharmacy_claims as pc
+    group by pc.data_source
+    union all
+    select
+        data_source
+        , 'eligibility' as test
+        , count(*) as n_rows
+    from eligibility as el
+    group by el.data_source
 )
 
 select 
     data_source
-    , n_overlapping_rows
+    , test
+    , n_rows
 from final
-where n_overlapping_rows < 1
+where n_rows < 1
