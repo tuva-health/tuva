@@ -4,6 +4,20 @@ on:
   release:
     types: [published]  # Triggers when a release is published
   workflow_dispatch:  # Allows manual triggering
+    inputs:
+      environment:
+        description: 'Environment (production/staging)'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+      force_deploy:
+        description: 'Force deployment even on pre-release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -70,9 +84,10 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: github-pages
+      name: ${{ github.event.release.prerelease && 'github-pages-staging' || 'github-pages' }}
       url: ${{ steps.deployment.outputs.page_url }}
 
+    if: ${{ !github.event.release.prerelease || github.event.inputs.force_deploy == 'true' }}
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
