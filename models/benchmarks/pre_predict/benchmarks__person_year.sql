@@ -136,7 +136,7 @@ with subset as (
   , payer
   , {{ quote_column('plan') }}
   , data_source
-  , left(year_month, 4) as year_nbr
+  , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
   , count(year_month) as member_month_count
 
   from {{ ref('core__member_months') }} as mm
@@ -145,7 +145,7 @@ with subset as (
   , payer
   , {{ quote_column('plan') }}
   , data_source
-  , left(year_month, 4)
+  , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
 )
 
 , state_cte as (
