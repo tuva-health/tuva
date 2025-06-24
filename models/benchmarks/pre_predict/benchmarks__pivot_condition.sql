@@ -26,11 +26,11 @@ with cte as (
 
 , member_month as (
     select mm.person_id
-    , left(year_month, 4) as year_nbr
+    , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
     , count(year_month) as member_month_count
     from {{ ref('core__member_months') }} as mm
     group by mm.person_id
-    , left(year_month, 4)
+    , cast(left(year_month, 4) as {{ dbt.type_int() }})
 )
 
 /* top 25 by pmpm and top 50 prevelance in CMS data */
