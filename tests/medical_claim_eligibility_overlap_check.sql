@@ -15,22 +15,22 @@ with eligibility as (
         , {{ quote_column('plan') }}
         , data_source
     from {{ ref('input_layer__eligibility') }}
-),
+)
 
-medical_claims as (
+, medical_claims as (
     select
         person_id
         , member_id
         , payer
         , {{ quote_column('plan') }}
         , data_source
-        , coalesce(claim_start_date, admission_date, claim_line_start_date) 
+        , coalesce(claim_start_date, admission_date, claim_line_start_date)
             as inferred_claim_start_date
     from {{ ref('input_layer__medical_claim') }}
-),
+)
 
-final as (
-    select  
+, final as (
+    select
         m.data_source
         , 'overlap' as test
         , count(*) as n_rows
@@ -58,7 +58,7 @@ final as (
     group by el.data_source
 )
 
-select 
+select
     data_source
     , test
     , n_rows

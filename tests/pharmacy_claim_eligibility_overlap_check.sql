@@ -15,9 +15,9 @@ with eligibility as (
         , {{ quote_column('plan') }}
         , data_source
     from {{ ref('input_layer__eligibility') }}
-),
+)
 
-pharmacy_claims as (
+, pharmacy_claims as (
     select
         person_id
         , member_id
@@ -26,10 +26,10 @@ pharmacy_claims as (
         , data_source
         , dispensing_date
     from {{ ref('input_layer__pharmacy_claim') }}
-),
+)
 
-final as (
-    select  
+, final as (
+    select
         p.data_source
         , 'overlap' as test
         , count(*) as n_rows
@@ -57,7 +57,7 @@ final as (
     group by el.data_source
 )
 
-select 
+select
     data_source
     , test
     , n_rows
