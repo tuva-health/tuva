@@ -1,25 +1,13 @@
 name: Generate and Deploy dbt Docs
 
 on:
-  release:
-    types: [published]  # Triggers when a release is published
   push:
-    branches: [ update-docs-workflow ]  # Test branch - remove after testing
-  workflow_dispatch:  # Allows manual triggering
-    inputs:
-      environment:
-        description: 'Environment (production/staging)'
-        required: false
-        default: 'production'
-        type: choice
-        options:
-        - production
-        - staging
-      force_deploy:
-        description: 'Force deployment even on pre-release'
-        required: false
-        default: false
-        type: boolean
+    branches:
+      - main
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - '**.sql'
 
 permissions:
   contents: read
@@ -118,17 +106,16 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './integration_tests/docs_generate/target'  # dbt generates docs in the target directory
+          path: './integration_tests/docs_generate/target'
 
   deploy:
     needs: generate-docs
     runs-on: ubuntu-latest
 
     environment:
-      name: ${{ github.event.release.prerelease && 'github-pages-staging' || 'github-pages' }}
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
-    if: ${{ !github.event.release.prerelease || github.event.inputs.force_deploy == 'true' }}
     steps:
     - name: Deploy to GitHub Pages
       id: deployment
