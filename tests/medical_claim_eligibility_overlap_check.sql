@@ -47,18 +47,18 @@ with eligibility as (
     on m.person_id = e.person_id
     and m.data_source = e.data_source
     group by m.data_source
-),
+)
 
-final as (
+, final as (
     select
         oc.data_source
         , oc.n_rows as n_overlapping_records
         , coalesce(mc.n_rows, 0) < 1 as is_mc_empty
         , coalesce(ec.n_rows, 0) < 1 as is_elig_empty
     from overlap_check as oc
-    left join mc_records_check as mc
+    left outer join mc_records_check as mc
     on oc.data_source = mc.data_source
-    left join elig_records_check as ec
+    left outer join elig_records_check as ec
     on oc.data_source = ec.data_source
 )
 
