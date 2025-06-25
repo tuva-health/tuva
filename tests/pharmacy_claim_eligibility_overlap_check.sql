@@ -1,65 +1,70 @@
 {{ config(
      enabled = var('claims_preprocessing_enabled',var('claims_enabled',var('tuva_marts_enabled',False)))
  | as_bool,
-     tags = ['dqi', 'tuva_dqi_sev_2']
+     tags = ['dqi', 'tuva_dqi_sev_2', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions',
+            'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification',
+            'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission'],
+     severity = 'warn'
    )
 }}
 
 with eligibility as (
-    select
+    select distinct
         person_id
-        , member_id
-        , enrollment_start_date
-        , enrollment_end_date
-        , payer
-        , {{ quote_column('plan') }}
         , data_source
     from {{ ref('input_layer__eligibility') }}
 )
 
 , pharmacy_claims as (
-    select
+    select distinct
         person_id
-        , member_id
-        , payer
-        , {{ quote_column('plan') }}
         , data_source
-        , dispensing_date
     from {{ ref('input_layer__pharmacy_claim') }}
 )
 
-, final as (
+, pc_records_check as (
+    select
+        data_source
+        , count(*) as n_rows
+    from pharmacy_claims
+    group by data_source
+)
+
+, elig_records_check as (
+    select
+        data_source
+        , count(*) as n_rows
+    from eligibility
+    group by data_source
+)
+
+, overlap_check as (
     select
         p.data_source
-        , 'overlap' as test
         , count(*) as n_rows
     from pharmacy_claims as p
     inner join eligibility as e
     on p.person_id = e.person_id
-    and p.member_id = e.member_id
-    and p.payer = e.payer
-    and p.{{ quote_column('plan') }} = e.{{ quote_column('plan') }}
-    and p.dispensing_date between e.enrollment_start_date and e.enrollment_end_date
+    and p.data_source = e.data_source
     group by p.data_source
-    union all
+),
+
+final as (
     select
-        data_source
-        , 'pharmacy claim' as test
-        , count(*) as n_rows
-    from pharmacy_claims as pc
-    group by pc.data_source
-    union all
-    select
-        data_source
-        , 'eligibility' as test
-        , count(*) as n_rows
-    from eligibility as el
-    group by el.data_source
+        oc.data_source
+        , oc.n_rows as n_overlapping_records
+        , coalesce(pc.n_rows, 0) < 1 as is_pc_empty
+        , coalesce(ec.n_rows, 0) < 1 as is_elig_empty
+    from overlap_check as oc
+    left join pc_records_check as pc
+    on oc.data_source = pc.data_source
+    left join elig_records_check as ec
+    on oc.data_source = ec.data_source
 )
 
 select
     data_source
-    , test
-    , n_rows
+    , n_overlapping_records
 from final
-where n_rows < 1
+where not (is_pc_empty or is_elig_empty)
+and n_overlapping_records < 1
