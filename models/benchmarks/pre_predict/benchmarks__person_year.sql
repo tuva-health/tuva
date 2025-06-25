@@ -122,7 +122,7 @@ with subset as (
       and mc.data_source = mm.data_source
       and mc.payer = mm.payer
       and mc.{{ quote_column('plan') }} = mm.{{ quote_column('plan') }}
-      and cal.year_month_int = mm.year_month
+      and cast(cal.year_month_int as int) = cast(mm.year_month as int)
     group by
         e.person_id
       , e.data_source
@@ -165,11 +165,11 @@ order by mm.person_id, mm.year_nbr) as benchmark_key
   , mm.member_month_count
   , fl.first_month
   , fl.last_month
-  , datediff(
-    year
-    , p.birth_date
-    , cast(concat(mm.year_nbr, '-01-01') as date)
-  ) as age_at_year_start
+  , {{ dbt.date_diff(
+      'p.birth_date',
+      "cast(concat(mm.year_nbr, '-01-01') as date)",
+      'year'
+  ) }} as age_at_year_start
   , coalesce(st_ab.ansi_fips_state_name, st_full.ansi_fips_state_name) as state --values that don't match are null for xgboost
   , case when r.description is not null then r.description else null end as race --values that don't match are null for xgboost
   , case when e.paid_amount < 0 then 0 else coalesce(e.paid_amount, 0) end as paid_amount
