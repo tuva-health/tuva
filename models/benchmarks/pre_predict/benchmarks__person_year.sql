@@ -165,7 +165,7 @@ order by mm.person_id, mm.year_nbr) as benchmark_key
   , mm.member_month_count
   , fl.first_month
   , fl.last_month
-  , {{ dbt.date_diff(
+  , {{ datediff(
       'p.birth_date',
       "cast(concat(mm.year_nbr, '-01-01') as date)",
       'year'
