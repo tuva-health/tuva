@@ -6,7 +6,7 @@
 
 with subset as (
   select distinct person_id
-  from {{ ref('core__member_months') }}
+  from {{ ref('benchmarks__stg_core__member_months') }}
 
 )
 
@@ -18,7 +18,7 @@ with subset as (
   , cast(left(year_month, 4) as int) as year_nbr
   , min(year_month) as first_month
   , max(year_month) as last_month
-  from {{ ref('core__member_months') }}
+  from {{ ref('benchmarks__stg_core__member_months') }}
   group by
   person_id
   , data_source
@@ -111,13 +111,13 @@ with subset as (
 
 
 
-    from {{ ref('core__medical_claim') }} as mc
+    from {{ ref('benchmarks__stg_core__medical_claim') }} as mc
     inner join subset on mc.person_id = subset.person_id
-    inner join {{ ref('core__encounter') }} as e
+    inner join {{ ref('benchmarks__stg_core__encounter') }} as e
       on e.encounter_id = mc.encounter_id
-    inner join {{ ref('reference_data__calendar') }} as cal
+    inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
       on e.encounter_start_date = cal.full_date
-    inner join {{ ref('core__member_months') }} as mm
+    inner join {{ ref('benchmarks__stg_core__member_months') }} as mm
       on mc.person_id = mm.person_id
       and mc.data_source = mm.data_source
       and mc.payer = mm.payer
@@ -138,7 +138,7 @@ with subset as (
   , data_source
   , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
   , count(year_month) as member_month_count
-  from {{ ref('core__member_months') }} as mm
+  from {{ ref('benchmarks__stg_core__member_months') }} as mm
   group by
   person_id
   , payer
@@ -487,7 +487,7 @@ order by mm.person_id, mm.year_nbr) as benchmark_key
 , '{{ var('tuva_last_run') }}' as tuva_last_run
 from member_month as mm
 inner join subset on mm.person_id = subset.person_id
-inner join {{ ref('core__patient') }} as p
+inner join {{ ref('benchmarks__stg_core__patient') }} as p
   on mm.person_id = p.person_id
 inner join first_last as fl on mm.person_id = fl.person_id
 and

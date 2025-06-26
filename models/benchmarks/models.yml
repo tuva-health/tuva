@@ -131,3 +131,82 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+
+  # Staging models
+  - name: benchmarks__stg_core__condition
+    description: Staging model for core condition data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+  
+
+  - name: benchmarks__stg_core__member_months
+    description: Staging model for core member months data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+
+  - name: benchmarks__stg_core__medical_claim
+    description: Staging model for core medical claim data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+
+  - name: benchmarks__stg_core__encounter
+    description: Staging model for core encounter data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+
+  - name: benchmarks__stg_core__patient
+    description: Staging model for core patient data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+
+  - name: benchmarks__stg_reference_data__calendar
+    description: Staging model for reference calendar data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+
+  - name: benchmarks__stg_cms_hcc__int_disease_factors
+    description: Staging model for CMS HCC disease factors data used in benchmarks
+    config:
+      materialized: view
+      tags: 
+        - benchmarks_train
+        - benchmarks      
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}

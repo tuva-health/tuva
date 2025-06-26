@@ -12,7 +12,7 @@ with first_last as (
   , cast(left(year_month, 4) as int) as year_nbr
   , min(year_month) as first_month
   , max(year_month) as last_month
-  from {{ ref('core__member_months') }}
+  from {{ ref('benchmarks__stg_core__member_months') }}
   group by
   person_id
   , data_source
@@ -28,7 +28,7 @@ select distinct
 , {{ quote_column('plan') }}
 , person_id
 , data_source
-from {{ ref('core__medical_claim') }}
+from {{ ref('benchmarks__stg_core__medical_claim') }}
 )
 
 , enrollment_row as (
@@ -322,9 +322,9 @@ select
   , phcc.hcc_188
   , phcc.hcc_189
 
-from {{ ref('core__encounter') }} as e
-inner join {{ ref('reference_data__calendar') }} as c on e.encounter_start_date = c.full_date
-inner join {{ ref('core__patient') }} as p on e.person_id = p.person_id
+from {{ ref('benchmarks__stg_core__encounter') }} as e
+inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as c on e.encounter_start_date = c.full_date
+inner join {{ ref('benchmarks__stg_core__patient') }} as p on e.person_id = p.person_id
 inner join {{ ref('benchmarks__pivot_condition') }} as pc on e.person_id = pc.person_id
   and
   c.year = pc.year_nbr

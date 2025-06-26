@@ -150,10 +150,10 @@ with expected_member_month as (
       , sum(case when mc.encounter_type = 'telehealth' then mc.paid_amount else 0 end) as telehealth_paid_amount_actual
       , sum(case when mc.encounter_type = 'urgent care' then mc.paid_amount else 0 end) as urgent_care_paid_amount_actual
 
-    from {{ ref('core__medical_claim') }} as mc
-    inner join {{ ref('reference_data__calendar') }} as cal
+    from {{ ref('benchmarks__stg_core__medical_claim') }} as mc
+    inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
       on mc.claim_end_date = cal.full_date
-    inner join {{ ref('core__member_months') }} as mm
+    inner join {{ ref('benchmarks__stg_core__member_months') }} as mm
       on mc.person_id = mm.person_id
       and mc.data_source = mm.data_source
       and mc.payer = mm.payer
@@ -217,12 +217,12 @@ with expected_member_month as (
       , count(distinct case when e.encounter_type = 'telehealth' then e.encounter_id else null end) as telehealth_encounter_count
       , count(distinct case when e.encounter_type = 'urgent care' then e.encounter_id else null end) as urgent_care_encounter_count
 
-    from {{ ref('core__medical_claim') }} as mc
-    inner join {{ ref('core__encounter') }} as e
+    from {{ ref('benchmarks__stg_core__medical_claim') }} as mc
+    inner join {{ ref('benchmarks__stg_core__encounter') }} as e
       on e.encounter_id = mc.encounter_id
-    inner join {{ ref('reference_data__calendar') }} as cal
+    inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
       on e.encounter_start_date = cal.full_date
-    inner join {{ ref('core__member_months') }} as mm
+    inner join {{ ref('benchmarks__stg_core__member_months') }} as mm
       on mc.person_id = mm.person_id
       and mc.data_source = mm.data_source
       and mc.payer = mm.payer
@@ -245,7 +245,7 @@ with expected_member_month as (
   , year_month
   , left(year_month,4) as year_nbr
   , 1 as member_month_count
-  from {{ ref('core__member_months') }} as mm
+  from {{ ref('benchmarks__stg_core__member_months') }} as mm
   group by
     person_id
   , payer
@@ -258,7 +258,7 @@ with expected_member_month as (
   select distinct
     year_month_int as year_month
   , first_day_of_month
-  from {{ ref('reference_data__calendar') }}
+  from {{ ref('benchmarks__stg_reference_data__calendar') }}
 )
 
 select

@@ -15,10 +15,10 @@ with cte as (
         -- Standard SQL syntax: Use '''' to represent a single quote
         , replace(replace(replace(replace(lower(c.condition_column_name), '''', ''), '.', ''), '-', ''), ' ', '_') as cleaned_concept_name --noqa
     {% endif %}
-    from {{ ref('core__condition') }} as a
+    from {{ ref('benchmarks__stg_core__condition') }} as a
     inner join {{ ref('chronic_conditions__cms_chronic_conditions_hierarchy') }} as c
         on a.normalized_code = c.code
-    inner join {{ ref('reference_data__calendar') }} as cal
+    inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
         on a.recorded_date = cal.full_date
 )
 
@@ -26,7 +26,7 @@ with cte as (
     select mm.person_id
     , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
     , count(year_month) as member_month_count
-    from {{ ref('core__member_months') }} as mm
+    from {{ ref('benchmarks__stg_core__member_months') }} as mm
     group by mm.person_id
     , cast(left(year_month, 4) as {{ dbt.type_int() }})
 )
