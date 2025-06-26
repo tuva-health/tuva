@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_train', False) | as_bool
+    )
+}}
+
 select
     full_date
     , year
