@@ -29,7 +29,6 @@ env:
   DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
   DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
   DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
-  DBT_REDSHIFT_CI_PORT: ${{ secrets.DBT_REDSHIFT_CI_PORT }}
 #######  Snowflake
   DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
   DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
@@ -270,15 +269,9 @@ jobs:
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      # Breaking up dbt build into seed then compile to try and speed up processing
-      - name: dbt-seed
+      - name: dbt-build
         run: |
-          dbt seed --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true}'
-        working-directory: ci_testing
-
-      - name: dbt-compile
-        run: |
-          dbt compile --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled":true,"claims_enabled":true,"fhir_preprocessing_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
