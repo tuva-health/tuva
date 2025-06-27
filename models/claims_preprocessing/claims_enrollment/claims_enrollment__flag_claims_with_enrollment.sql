@@ -14,11 +14,11 @@ with claim_dates as (
         , payer
         , {{ quote_column('plan') }}
         , data_source
-        , coalesce(claim_start_date, admission_date, claim_line_start_date) as inferred_claim_start_date
+        , coalesce(claim_line_start_date, claim_start_date, admission_date) as inferred_claim_start_date
         , case
-            when claim_start_date is not null then 'claim_start_date'
-            when claim_start_date is null and admission_date is not null then 'admission_date'
-            when claim_start_date is null and admission_date is null and claim_line_start_date is not null then 'claim_line_start_date'
+            when claim_line_start_date is not null then 'claim_line_start_date'
+            when claim_line_start_date is null and claim_start_date is not null then 'claim_start_date'
+            when claim_line_start_date is null and claim_start_date is null and admission_date is not null then 'admission_date'
         end as inferred_claim_start_column_used
     from {{ ref('normalized_input__medical_claim') }}
 )
