@@ -8,9 +8,10 @@ models:
     description: This table contains claims with matching enrollment
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: flag_claims_with_enrollment
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_flag_claims_with_enrollment{% else %}flag_claims_with_enrollment{%- endif -%}
       tags:
         - claims_preprocessing
       materialized: table
@@ -47,9 +48,10 @@ models:
     description: This table contains pharmacy claims with matching enrollment
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: flag_rx_claims_with_enrollment
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_flag_rx_claims_with_enrollment{% else %}flag_rx_claims_with_enrollment{%- endif -%}
       tags:
         - claims_preprocessing
       materialized: table
@@ -111,9 +113,10 @@ models:
         supplemental insurance eligibility.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: normalized_input_eligibility
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_normalized_input_eligibility{% else %}normalized_input_eligibility{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -213,9 +216,10 @@ models:
       patients and billed by the provider to the insurer as claims.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: normalized_input_medical_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_normalized_input_medical_claim{% else %}normalized_input_medical_claim{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -831,9 +835,10 @@ models:
       were filled and billed to the insurer.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: normalized_input_pharmacy_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_normalized_input_pharmacy_claim{% else %}normalized_input_pharmacy_claim{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -920,9 +925,10 @@ models:
   - name: normalized_input__int_admit_source_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_admit_source_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_admit_source_final{% else %}_int_normalized_input_admit_source_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -931,9 +937,10 @@ models:
   - name: normalized_input__int_admit_source_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_admit_source_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_admit_source_voting{% else %}_int_normalized_input_admit_source_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -942,9 +949,10 @@ models:
   - name: normalized_input__int_admit_type_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_admit_type_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_admit_type_final{% else %}_int_normalized_input_admit_type_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -953,9 +961,10 @@ models:
   - name: normalized_input__int_admit_type_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_admit_type_normalize_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_admit_type_normalize_voting{% else %}_int_normalized_input_admit_type_normalize_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -964,9 +973,10 @@ models:
   - name: normalized_input__int_bill_type_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_bill_type_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_bill_type_final{% else %}_int_normalized_input_bill_type_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -976,9 +986,10 @@ models:
   - name: normalized_input__int_bill_type_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_bill_type_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_bill_type_voting{% else %}_int_normalized_input_bill_type_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -988,9 +999,10 @@ models:
   - name: normalized_input__int_diagnosis_code_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_diagnosis_code_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_diagnosis_code_final{% else %}_int_normalized_input_diagnosis_code_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1000,9 +1012,10 @@ models:
   - name: normalized_input__int_diagnosis_code_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_diagnosis_code_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_diagnosis_code_normalize{% else %}_int_normalized_input_diagnosis_code_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1011,9 +1024,10 @@ models:
   - name: normalized_input__int_diagnosis_code_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_diagnosis_code_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_diagnosis_code_voting{% else %}_int_normalized_input_diagnosis_code_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1022,9 +1036,10 @@ models:
   - name: normalized_input__int_discharge_disposition_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_discharge_disposition_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_discharge_disposition_final{% else %}_int_normalized_input_discharge_disposition_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1033,9 +1048,10 @@ models:
   - name: normalized_input__int_discharge_disposition_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_discharge_disposition_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_discharge_disposition_voting{% else %}_int_normalized_input_discharge_disposition_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1044,9 +1060,10 @@ models:
   - name: normalized_input__int_eligibility_dates_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_eligibility_dates_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_eligibility_dates_normalize{% else %}_int_normalized_input_eligibility_dates_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1055,9 +1072,10 @@ models:
   - name: normalized_input__int_medical_claim_date_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_medical_claim_date_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_medical_claim_date_normalize{% else %}_int_normalized_input_medical_claim_date_normalize{%- endif -%}
       materialized: table
       tags:
         - normalized_input
@@ -1066,9 +1084,10 @@ models:
   - name: normalized_input__int_medical_date_aggregation
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_medical_date_aggregation
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_medical_date_aggregation{% else %}_int_normalized_input_medical_date_aggregation{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1078,9 +1097,10 @@ models:
   - name: normalized_input__int_medical_npi_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_medical_npi_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_medical_npi_normalize{% else %}_int_normalized_input_medical_npi_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1091,9 +1111,10 @@ models:
   - name: normalized_input__int_drg_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_drg_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_drg_final{% else %}_int_normalized_input_drg_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1102,9 +1123,10 @@ models:
   - name: normalized_input__int_drg_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_drg_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_drg_final{% else %}_int_normalized_input_drg_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1113,9 +1135,10 @@ models:
   - name: normalized_input__int_place_of_service_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_place_of_service_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_place_of_service_normalize{% else %}_int_normalized_input_place_of_service_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1124,9 +1147,10 @@ models:
   - name: normalized_input__int_present_on_admit_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_present_on_admit_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_present_on_admit_final{% else %}_int_normalized_input_present_on_admit_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1135,9 +1159,10 @@ models:
   - name: normalized_input__int_present_on_admit_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_present_on_admit_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_present_on_admit_normalize{% else %}_int_normalized_input_present_on_admit_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1146,9 +1171,10 @@ models:
   - name: normalized_input__int_present_on_admit_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_present_on_admit_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_present_on_admit_voting{% else %}_int_normalized_input_present_on_admit_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1157,9 +1183,10 @@ models:
   - name: normalized_input__int_procedure_code_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_procedure_code_final{% else %}_int_normalized_input_procedure_code_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1168,9 +1195,10 @@ models:
   - name: normalized_input__int_procedure_code_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_procedure_code_normalize{% else %}_int_normalized_input_procedure_code_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1180,9 +1208,10 @@ models:
   - name: normalized_input__int_procedure_code_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_procedure_code_voting{% else %}_int_normalized_input_procedure_code_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1191,9 +1220,10 @@ models:
   - name: normalized_input__int_procedure_date_final
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_date_final
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_procedure_date_final{% else %}_int_normalized_input_procedure_date_final{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1203,9 +1233,10 @@ models:
   - name: normalized_input__int_procedure_date_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_date_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_procedure_date_normalize{% else %}_int_normalized_input_procedure_date_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1214,9 +1245,10 @@ models:
   - name: normalized_input__int_procedure_date_voting
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_date_voting
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_procedure_date_voting{% else %}_int_normalized_input_procedure_date_voting{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1225,9 +1257,10 @@ models:
   - name: normalized_input__int_revenue_center_normalize
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_revenue_center_normalize
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_revenue_center_normalize{% else %}_int_normalized_input_revenue_center_normalize{%- endif -%}
       materialized: table
       tags: 
         - normalized_input
@@ -1236,9 +1269,10 @@ models:
   - name: normalized_input__int_undetermined_claim_type
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_undetermined_claim_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING__int_normalized_input_undetermined_claim_type{% else %}_int_normalized_input_undetermined_claim_type{%- endif -%}
       materialized: table
       tags: 
         - normalized_input

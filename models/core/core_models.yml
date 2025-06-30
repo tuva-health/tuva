@@ -9,9 +9,10 @@ models:
       codes.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_condition{% else %}condition{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -87,9 +88,10 @@ models:
       and  supplemental insurance eligibility.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: eligibility
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_eligibility{% else %}eligibility{%- endif -%}
       tags: core
       materialized: table
     tests:
@@ -157,9 +159,10 @@ models:
       includes acute inpatient, emergency department, office  visits, SNF stays, etc.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_encounter{% else %}encounter{%- endif -%}
       tags:
       - core
       - encounters
@@ -289,9 +292,10 @@ models:
       including the LOINC code and description, units, reference range, and result.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: lab_result
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_lab_result{% else %}lab_result{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -387,9 +391,10 @@ models:
       patients receive medical care.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: location
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_location{% else %}location{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -433,9 +438,10 @@ models:
       to patients and billed by the provider to the insurer as claims.
     config:
       schema: | 
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: medical_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_medical_claim{% else %}medical_claim{%- endif -%}
       tags:
       - core
       - encounters
@@ -621,9 +627,10 @@ models:
       administered during a patient encounter.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: medication
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_medication{% else %}medication{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -703,9 +710,10 @@ models:
     description: Creates member months from eligibility data
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: member_months
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_member_months{% else %}member_months{%- endif -%}
       tags:
       - core
       materialized: table
@@ -760,9 +768,10 @@ models:
       tests e.g. blood pressure, height, and weight.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: observation
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_observation{% else %}observation{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -827,9 +836,10 @@ models:
       on patients.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_patient{% else %}patient{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -892,9 +902,10 @@ models:
       the input layer eligibility (claims) and patient (clinical).
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: person_id_crosswalk
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_person_id_crosswalk{% else %}person_id_crosswalk{%- endif -%}
       tags: core
       materialized: table
     tests:
@@ -926,9 +937,10 @@ models:
       that were filled and billed to the insurer.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: pharmacy_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_pharmacy_claim{% else %}pharmacy_claim{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -1015,9 +1027,10 @@ models:
       e.g. physicians, physicians assistants, etc.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: practitioner
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_practitioner{% else %}practitioner{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -1053,9 +1066,10 @@ models:
       patients in the dataset.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: procedure
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE_procedure{% else %}procedure{%- endif -%}
       tags: core
       materialized: table
     columns:
@@ -1140,9 +1154,10 @@ models:
     description: Staging core medical claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_medical_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_medical_claim{% else %}_stg_claims_medical_claim{%- endif -%}
       tags: 
         - core_stage_claims
         - encounters
@@ -1152,9 +1167,10 @@ models:
     description: Staging core claims encounters
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_encounter{% else %}_stg_claims_encounter{%- endif -%}
       tags: 
         - core_stage_claims
         - encounters
@@ -1164,9 +1180,10 @@ models:
     description: Staging core claims locations
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_location
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_location{% else %}_stg_claims_location{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1184,9 +1201,10 @@ models:
     description: Staging core claims patients
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_patient{% else %}_stg_claims_patient{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1194,9 +1212,10 @@ models:
     description: Staging core claims conditions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_condition{% else %}_stg_claims_condition{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1204,9 +1223,10 @@ models:
     description: Staging core claims procedures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_procedure
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_procedure{% else %}_stg_claims_procedure{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1214,9 +1234,10 @@ models:
     description: Staging core pharmacy claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_pharmacy_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_pharmacy_claim{% else %}_stg_claims_pharmacy_claim{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1224,9 +1245,10 @@ models:
     description: Staging core eligibility
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_eligibility
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_eligibility{% else %}_stg_claims_eligibility{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1234,9 +1256,10 @@ models:
     description: Staging core providers in the claims dataset
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_claims_practitioner
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_claims_practitioner{% else %}_stg_claims_practitioner{%- endif -%}
       tags: core_stage_claims
       materialized: table
 
@@ -1245,9 +1268,10 @@ models:
     description: Staging core clinical conditions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_condition{% else %}_stg_clinical_condition{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1255,9 +1279,10 @@ models:
     description: Staging core clinical encounters
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_encounter{% else %}_stg_clinical_encounter{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1265,9 +1290,10 @@ models:
     description: Staging core clinical lab results
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_lab_result
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_lab_result{% else %}_stg_clinical_lab_result{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1275,9 +1301,10 @@ models:
     description: Staging core clinical locations
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_location
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_location{% else %}_stg_clinical_location{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1285,9 +1312,10 @@ models:
     description: Staging core clinical medications
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_medication
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_medication{% else %}_stg_clinical_medication{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1295,9 +1323,10 @@ models:
     description: Staging core clinical observations
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_observation
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_observation{% else %}_stg_clinical_observation{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1305,9 +1334,10 @@ models:
     description: Staging core clinical patients
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_patient{% else %}_stg_clinical_patient{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1315,9 +1345,10 @@ models:
     description: Staging core clinical providers
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_practitioner
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_practitioner{% else %}_stg_clinical_practitioner{%- endif -%}
       tags: core_stage_clinical
       materialized: view
 
@@ -1325,8 +1356,9 @@ models:
     description: Staging core clinical procedures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
-        {% else %}core{%- endif -%}
-      alias: _stg_clinical_procedure
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CORE__stg_clinical_procedure{% else %}_stg_clinical_procedure{%- endif -%}
       tags: core_stage_clinical
       materialized: view

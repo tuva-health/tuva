@@ -6,9 +6,10 @@ models:
 - name: mart_review__claims_with_enrollment
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__claims_with_enrollment
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__claims_with_enrollment{% else %}mart_review__claims_with_enrollment{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -16,9 +17,10 @@ models:
 - name: mart_review__data_source
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__data_source
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__data_source{% else %}mart_review__data_source{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -26,9 +28,10 @@ models:
 - name: mart_review__ed_classification
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__ed_classification
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__ed_classification{% else %}mart_review__ed_classification{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -36,9 +39,10 @@ models:
 - name: mart_review__enrollment_change
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__enrollment_change
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__enrollment_change{% else %}mart_review__enrollment_change{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -46,9 +50,10 @@ models:
 - name: mart_review__inpatient
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__inpatient
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__inpatient{% else %}mart_review__inpatient{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -56,9 +61,10 @@ models:
 - name: mart_review__member_months
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__member_months
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__member_months{% else %}mart_review__member_months{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -66,9 +72,10 @@ models:
 - name: mart_review__members_with_claims
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__members_with_claims
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__members_with_claims{% else %}mart_review__members_with_claims{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -76,9 +83,10 @@ models:
 - name: mart_review__number_of_conditions
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__number_of_conditions
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__number_of_conditions{% else %}mart_review__number_of_conditions{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -86,9 +94,10 @@ models:
 - name: mart_review__patient
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__patient{% else %}mart_review__patient{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -96,9 +105,10 @@ models:
 - name: mart_review__patient_risk
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient_risk
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__patient_risk{% else %}mart_review__patient_risk{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -106,9 +116,10 @@ models:
 - name: mart_review__pharmacy
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__pharmacy
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__pharmacy{% else %}mart_review__pharmacy{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -116,9 +127,10 @@ models:
 - name: mart_review__pmpm
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__pmpm
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__pmpm{% else %}mart_review__pmpm{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -126,9 +138,10 @@ models:
 - name: mart_review__readmissions
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__readmissions
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__readmissions{% else %}mart_review__readmissions{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -136,9 +149,10 @@ models:
 - name: mart_review__tuva_chronic_conditions
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__tuva_chronic_conditions
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__tuva_chronic_conditions{% else %}mart_review__tuva_chronic_conditions{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -146,9 +160,10 @@ models:
 - name: mart_review__calendar_month
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__calendar_month
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__calendar_month{% else %}mart_review__calendar_month{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -156,9 +171,10 @@ models:
 - name: mart_review__patient_risk_scores
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient_risk_scores
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__patient_risk_scores{% else %}mart_review__patient_risk_scores{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -166,9 +182,10 @@ models:
 - name: mart_review__patient_risk_factors
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient_risk_factors
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__patient_risk_factors{% else %}mart_review__patient_risk_factors{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -176,9 +193,10 @@ models:
 - name: mart_review__quality_measures_summary_long
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__quality_measures_summary_long
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__quality_measures_summary_long{% else %}mart_review__quality_measures_summary_long{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -186,9 +204,10 @@ models:
 - name: mart_review__quality_measures_value_set
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__quality_measures_value_set
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__quality_measures_value_set{% else %}mart_review__quality_measures_value_set{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -196,9 +215,10 @@ models:
 - name: mart_review__generics
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__generics
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__generics{% else %}mart_review__generics{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -206,9 +226,10 @@ models:
 - name: mart_review__service_categories_long
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__service_categories_long
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__service_categories_long{% else %}mart_review__service_categories_long{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table  
@@ -219,9 +240,10 @@ models:
 - name: mart_review__stg_medical_claim
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__stg_medical_claim
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__stg_medical_claim{% else %}mart_review__stg_medical_claim{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -229,9 +251,10 @@ models:
 - name: mart_review__stg_pharmacy_claim
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__stg_pharmacy_claim
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__stg_pharmacy_claim{% else %}mart_review__stg_pharmacy_claim{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table
@@ -239,9 +262,10 @@ models:
 - name: mart_review__stg_member_month
   config:
     schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__stg_member_month
+      {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}{%- endif -%}
+    alias: |
+      {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY_mart_review__stg_member_month{% else %}mart_review__stg_member_month{%- endif -%}
     tags:
       - data_quality_mart_review
     materialized: table

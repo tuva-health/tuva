@@ -7,8 +7,9 @@ seeds:
       This was manually extracted from the User Guide PDF included with the DXCCSR SAS program.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
-      alias: _value_set_dxccsr_v2023_1_body_systems
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR__value_set_dxccsr_v2023_1_body_systems{% else %}_value_set_dxccsr_v2023_1_body_systems{%- endif -%}
       tags:
         - ccsr
       enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
@@ -34,8 +35,9 @@ seeds:
       For each ICD-10-CM code, the table contains up to six CCSR category codes and a default CCSR category code.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
-      alias: _value_set_dxccsr_v2023_1_cleaned_map
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR__value_set_dxccsr_v2023_1_cleaned_map{% else %}_value_set_dxccsr_v2023_1_cleaned_map{%- endif -%}
       tags:
         - ccsr
       enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"
@@ -122,8 +124,9 @@ seeds:
       The original CSV was not natively seedable, and the file was transformed with the coded included in the README.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}
-      alias: _value_set_prccsr_v2023_1_cleaned_map
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr{% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR__value_set_prccsr_v2023_1_cleaned_map{% else %}_value_set_prccsr_v2023_1_cleaned_map{%- endif -%}
       tags:
         - ccsr
       enabled: "{{ var('ccsr_enabled',var('tuva_marts_enabled',True)) }}"

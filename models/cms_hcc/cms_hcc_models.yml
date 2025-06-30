@@ -5,8 +5,9 @@ models:
   - name: cms_hcc__patient_risk_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: patient_risk_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC_patient_risk_factors{% else %}patient_risk_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -60,8 +61,9 @@ models:
   - name: cms_hcc__patient_risk_factors_monthly
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: patient_risk_factors_monthly
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC_patient_risk_factors_monthly{% else %}patient_risk_factors_monthly{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -109,8 +111,9 @@ models:
   - name: cms_hcc__patient_risk_scores
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: patient_risk_scores
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC_patient_risk_scores{% else %}patient_risk_scores{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -160,8 +163,9 @@ models:
   - name: cms_hcc__patient_risk_scores_monthly
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: patient_risk_scores_monthly
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC_patient_risk_scores_monthly{% else %}patient_risk_scores_monthly{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -222,8 +226,9 @@ models:
   - name: cms_hcc__int_demographic_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_demographic_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_demographic_factors{% else %}_int_demographic_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -291,8 +296,9 @@ models:
   - name: cms_hcc__int_disabled_interaction_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_disabled_interaction_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_disabled_interaction_factors{% else %}_int_disabled_interaction_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -321,8 +327,9 @@ models:
   - name: cms_hcc__int_disease_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_disease_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_disease_factors{% else %}_int_disease_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -354,8 +361,9 @@ models:
   - name: cms_hcc__int_disease_interaction_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_disease_interaction_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_disease_interaction_factors{% else %}_int_disease_interaction_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -389,8 +397,9 @@ models:
   - name: cms_hcc__int_eligible_conditions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_eligible_conditions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_eligible_conditions{% else %}_int_eligible_conditions{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -414,8 +423,9 @@ models:
   - name: cms_hcc__int_enrollment_interaction_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_enrollment_interaction_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_enrollment_interaction_factors{% else %}_int_enrollment_interaction_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -444,8 +454,9 @@ models:
   - name: cms_hcc__int_hcc_count_factors
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_hcc_count_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_hcc_count_factors{% else %}_int_hcc_count_factors{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -474,8 +485,9 @@ models:
   - name: cms_hcc__int_hcc_hierarchy
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_hcc_hierarchy
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_hcc_hierarchy{% else %}_int_hcc_hierarchy{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -497,8 +509,9 @@ models:
   - name: cms_hcc__int_hcc_mapping
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_hcc_mapping
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_hcc_mapping{% else %}_int_hcc_mapping{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -522,8 +535,9 @@ models:
   - name: cms_hcc__int_members
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_members
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_members{% else %}_int_members{%- endif -%}
       tags: cms_hcc
       materialized: table
     tests:
@@ -586,8 +600,9 @@ models:
   - name: cms_hcc__int_monthly_collection_dates
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _int_monthly_collection_dates
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__int_monthly_collection_dates{% else %}_int_monthly_collection_dates{%- endif -%}
       tags: cms_hcc
       materialized: table
     description: >
@@ -609,8 +624,9 @@ models:
   - name: cms_hcc__stg_core__condition
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _stg_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__stg_condition{% else %}_stg_condition{%- endif -%}
       tags: cms_hcc
       materialized: ephemeral
     description: Staging conditions from core.
@@ -631,8 +647,9 @@ models:
   - name: cms_hcc__stg_core__eligibility
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _stg_eligibility
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__stg_eligibility{% else %}_stg_eligibility{%- endif -%}
       tags: cms_hcc
       materialized: ephemeral
     description: Staging eligibility from core.
@@ -653,8 +670,9 @@ models:
   - name: cms_hcc__stg_core__medical_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _stg_medical_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__stg_medical_claim{% else %}_stg_medical_claim{%- endif -%}
       tags: cms_hcc
       materialized: ephemeral
     description: Staging medical claims from core.
@@ -682,8 +700,9 @@ models:
   - name: cms_hcc__stg_core__patient
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _stg_patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__stg_patient{% else %}_stg_patient{%- endif -%}
       tags: cms_hcc
       materialized: ephemeral
     description: Staging patient from core.
@@ -699,8 +718,9 @@ models:
   - name: cms_hcc__stg_core__member_months
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _stg_member_months
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__stg_member_months{% else %}_stg_member_months{%- endif -%}
       tags: cms_hcc
       materialized: ephemeral
     description: Staging member months from financial_pmpm

@@ -11,9 +11,10 @@ models:
       group.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: tuva_chronic_conditions_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS_tuva_chronic_conditions_long{% else %}tuva_chronic_conditions_long{%- endif -%}
       tags:
         - tuva_chronic_conditions
         - chronic_conditions
@@ -67,9 +68,10 @@ models:
       with a diagnosis that rolls up to that condition and a 0 if not.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: tuva_chronic_conditions_wide
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS_tuva_chronic_conditions_wide{% else %}tuva_chronic_conditions_wide{%- endif -%}
       tags:
         - tuva_chronic_conditions
         - chronic_conditions

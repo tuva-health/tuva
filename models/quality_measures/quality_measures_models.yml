@@ -5,8 +5,9 @@ models:
   - name: quality_measures__summary_counts
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: summary_counts
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES_summary_counts{% else %}summary_counts{%- endif -%}
       tags: quality_measures
       materialized: table
     description: Reporting measure counts with performance rates.
@@ -51,8 +52,9 @@ models:
   - name: quality_measures__summary_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: summary_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES_summary_long{% else %}summary_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -130,8 +132,9 @@ models:
   - name: quality_measures__summary_wide
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: summary_wide
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES_summary_wide{% else %}summary_wide{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -178,8 +181,9 @@ models:
   - name: quality_measures__int_shared_exclusions_frailty
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_shared_exclusions_frailty
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_shared_exclusions_frailty{% else %}_int_shared_exclusions_frailty{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -188,8 +192,9 @@ models:
   - name: quality_measures__int_shared_exclusions_advanced_illness
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_shared_exclusions_advanced_illness
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_shared_exclusions_advanced_illness{% else %}_int_shared_exclusions_advanced_illness{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -198,8 +203,9 @@ models:
   - name: quality_measures__int_shared_exclusions_dementia
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_shared_exclusions_dementia
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_shared_exclusions_dementia{% else %}_int_shared_exclusions_dementia{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -208,8 +214,9 @@ models:
   - name: quality_measures__int_shared_exclusions_hospice_palliative
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_shared_exclusions_hospice_palliative
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_shared_exclusions_hospice_palliative{% else %}_int_shared_exclusions_hospice_palliative{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -218,8 +225,9 @@ models:
   - name: quality_measures__int_shared_exclusions_institutional_snp
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_shared_exclusions_institutional_snp
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_shared_exclusions_institutional_snp{% else %}_int_shared_exclusions_institutional_snp{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -231,8 +239,9 @@ models:
   - name: quality_measures__int_cqm438__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438__performance_period{% else %}_int_cqm438__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -241,8 +250,9 @@ models:
   - name: quality_measures__int_cqm438_denominator_criteria1
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator_criteria1
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_denominator_criteria1{% else %}_int_cqm438_denominator_criteria1{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -266,8 +276,9 @@ models:
   - name: quality_measures__int_cqm438_denominator_criteria2
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator_criteria2
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_denominator_criteria2{% else %}_int_cqm438_denominator_criteria2{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -291,8 +302,9 @@ models:
   - name: quality_measures__int_cqm438_denominator_criteria3
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator_criteria3
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_denominator_criteria3{% else %}_int_cqm438_denominator_criteria3{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -316,8 +328,9 @@ models:
   - name: quality_measures__int_cqm438_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_denominator{% else %}_int_cqm438_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -347,8 +360,9 @@ models:
   - name: quality_measures__int_cqm438_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_exclusions{% else %}_int_cqm438_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -374,8 +388,9 @@ models:
   - name: quality_measures__int_cqm438_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_long{% else %}_int_cqm438_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -426,8 +441,9 @@ models:
   - name: quality_measures__int_cqm438_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm438_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm438_numerator{% else %}_int_cqm438_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -463,8 +479,9 @@ models:
   - name: quality_measures__int_cqm130__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm130__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm130__performance_period{% else %}_int_cqm130__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -473,8 +490,9 @@ models:
   - name: quality_measures__int_cqm130_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm130_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm130_denominator{% else %}_int_cqm130_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -508,8 +526,9 @@ models:
   - name: quality_measures__int_cqm130_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm130_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm130_exclusions{% else %}_int_cqm130_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -535,8 +554,9 @@ models:
   - name: quality_measures__int_cqm130_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm130_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm130_long{% else %}_int_cqm130_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -587,8 +607,9 @@ models:
   - name: quality_measures__int_cqm130_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_cqm130_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_cqm130_numerator{% else %}_int_cqm130_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -624,8 +645,9 @@ models:
   - name: quality_measures__int_nqf0420__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0420__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_nqf0420__performance_period{% else %}_int_nqf0420__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -634,8 +656,9 @@ models:
   - name: quality_measures__int_nqf0420_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0420_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_nqf0420_denominator{% else %}_int_nqf0420_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -665,8 +688,9 @@ models:
   - name: quality_measures__int_nqf0420_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0420_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_nqf0420_exclusions{% else %}_int_nqf0420_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -692,8 +716,9 @@ models:
   - name: quality_measures__int_nqf0420_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0420_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_nqf0420_long{% else %}_int_nqf0420_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -744,8 +769,9 @@ models:
   - name: quality_measures__int_nqf0420_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_nqf0420_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_nqf0420_numerator{% else %}_int_nqf0420_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -781,8 +807,9 @@ models:
   - name: quality_measures__int_adh_diabetes__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_diabetes__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_diabetes__performance_period{% else %}_int_adh_diabetes__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -791,8 +818,9 @@ models:
   - name: quality_measures__int_adh_diabetes_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_diabetes_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_diabetes_denominator{% else %}_int_adh_diabetes_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -830,8 +858,9 @@ models:
   - name: quality_measures__int_adh_diabetes_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_diabetes_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_diabetes_exclusions{% else %}_int_adh_diabetes_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -857,8 +886,9 @@ models:
   - name: quality_measures__int_adh_diabetes_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_diabetes_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_diabetes_long{% else %}_int_adh_diabetes_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -909,8 +939,9 @@ models:
   - name: quality_measures__int_adh_diabetes_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_diabetes_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_diabetes_numerator{% else %}_int_adh_diabetes_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -939,8 +970,9 @@ models:
   - name: quality_measures__int_adhras__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adhras__performance_period{% else %}_int_adhras__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -949,8 +981,9 @@ models:
   - name: quality_measures__int_adhras_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adhras_denominator{% else %}_int_adhras_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -986,8 +1019,9 @@ models:
   - name: quality_measures__int_adhras_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adhras_exclusions{% else %}_int_adhras_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1013,8 +1047,9 @@ models:
   - name: quality_measures__int_adhras_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adhras_long{% else %}_int_adhras_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1065,8 +1100,9 @@ models:
   - name: quality_measures__int_adhras_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adhras_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adhras_numerator{% else %}_int_adhras_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1095,8 +1131,9 @@ models:
   - name: quality_measures__int_supd__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_supd__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_supd__performance_period{% else %}_int_supd__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -1105,8 +1142,9 @@ models:
   - name: quality_measures__int_supd_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_supd_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_supd_denominator{% else %}_int_supd_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1136,8 +1174,9 @@ models:
   - name: quality_measures__int_supd_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_supd_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_supd_exclusions{% else %}_int_supd_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1163,8 +1202,9 @@ models:
   - name: quality_measures__int_supd_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_supd_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_supd_long{% else %}_int_supd_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1215,8 +1255,9 @@ models:
   - name: quality_measures__int_supd_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_supd_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_supd_numerator{% else %}_int_supd_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1242,8 +1283,9 @@ models:
   - name: quality_measures__int_adh_statins__performance_period
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_statins__performance_period
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_statins__performance_period{% else %}_int_adh_statins__performance_period{%- endif -%}
       tags: quality_measures
       materialized: view
     description: >
@@ -1252,8 +1294,9 @@ models:
   - name: quality_measures__int_adh_statins_denominator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_statins_denominator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_statins_denominator{% else %}_int_adh_statins_denominator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1289,8 +1332,9 @@ models:
   - name: quality_measures__int_adh_statins_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_statins_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_statins_exclusions{% else %}_int_adh_statins_exclusions{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1316,8 +1360,9 @@ models:
   - name: quality_measures__int_adh_statins_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_statins_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_statins_long{% else %}_int_adh_statins_long{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1368,8 +1413,9 @@ models:
   - name: quality_measures__int_adh_statins_numerator
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _int_adh_statins_numerator
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__int_adh_statins_numerator{% else %}_int_adh_statins_numerator{%- endif -%}
       tags: quality_measures
       materialized: table
     description: >
@@ -1398,8 +1444,9 @@ models:
   - name: quality_measures__stg_core__condition
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_condition{% else %}_stg_condition{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: Staging conditions from core.
@@ -1418,8 +1465,9 @@ models:
   - name: quality_measures__stg_core__encounter
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_encounter{% else %}_stg_encounter{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: >
@@ -1437,8 +1485,9 @@ models:
   - name: quality_measures__stg_core__medication
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_medication
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_medication{% else %}_stg_medication{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: >
@@ -1458,8 +1507,9 @@ models:
   - name: quality_measures__stg_core__observation
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_observation
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_observation{% else %}_stg_observation{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: >
@@ -1479,8 +1529,9 @@ models:
   - name: quality_measures__stg_core__patient
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_patient{% else %}_stg_patient{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: Staging eligibility from the input layer.
@@ -1506,8 +1557,9 @@ models:
   - name: quality_measures__stg_core__procedure
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_procedure
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_procedure{% else %}_stg_procedure{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: Staging procedures from core.
@@ -1531,8 +1583,9 @@ models:
   - name: quality_measures__stg_medical_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_medical_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_medical_claim{% else %}_stg_medical_claim{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: >
@@ -1554,8 +1607,9 @@ models:
   - name: quality_measures__stg_pharmacy_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_pharmacy_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_pharmacy_claim{% else %}_stg_pharmacy_claim{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: >
@@ -1573,8 +1627,9 @@ models:
   - name: quality_measures__stg_core__lab_result
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _stg_lab_result
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__stg_lab_result{% else %}_stg_lab_result{%- endif -%}
       tags: quality_measures
       materialized: ephemeral
     description: >

@@ -5,8 +5,9 @@ models:
   - name: hcc_suspecting__list
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: list
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING_list{% else %}list{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: >
@@ -43,8 +44,9 @@ models:
   - name: hcc_suspecting__list_rollup
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: list_rollup
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING_list_rollup{% else %}list_rollup{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: >
@@ -76,8 +78,9 @@ models:
   - name: hcc_suspecting__summary
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: summary
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING_summary{% else %}summary{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: >
@@ -102,8 +105,9 @@ models:
   - name: hcc_suspecting__int_all_conditions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_all_conditions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_all_conditions{% else %}_int_all_conditions{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: All historical conditions mapped to HCCs.
@@ -132,8 +136,9 @@ models:
   - name: hcc_suspecting__int_all_medications
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_all_medications
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_all_medications{% else %}_int_all_medications{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Union of medications and pharmacy claims.
@@ -156,8 +161,9 @@ models:
   - name: hcc_suspecting__int_comorbidity_suspects
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_comorbidity_suspects
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_comorbidity_suspects{% else %}_int_comorbidity_suspects{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Suspecting comorbidities.
@@ -205,8 +211,9 @@ models:
   - name: hcc_suspecting__int_lab_suspects
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_lab_suspects
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_lab_suspects{% else %}_int_lab_suspects{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Suspecting conditions based on labs.
@@ -249,8 +256,9 @@ models:
   - name: hcc_suspecting__int_medication_suspects
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_medication_suspects
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_medication_suspects{% else %}_int_medication_suspects{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Suspecting conditions based on medications.
@@ -291,8 +299,9 @@ models:
   - name: hcc_suspecting__int_observation_suspects
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_observation_suspects
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_observation_suspects{% else %}_int_observation_suspects{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Suspecting observation conditions.
@@ -339,8 +348,9 @@ models:
   - name: hcc_suspecting__int_patient_hcc_history
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_patient_hcc_history
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_patient_hcc_history{% else %}_int_patient_hcc_history{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: >
@@ -395,8 +405,9 @@ models:
   - name: hcc_suspecting__int_prep_conditions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_prep_conditions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_prep_conditions{% else %}_int_prep_conditions{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Preparing conditions; mapping snomed-ct conditions to icd-10-cm.
@@ -424,8 +435,9 @@ models:
   - name: hcc_suspecting__int_prep_egfr_labs
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _int_prep_egfr_labs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__int_prep_egfr_labs{% else %}_int_prep_egfr_labs{%- endif -%}
       tags: hcc_suspecting
       materialized: table
     description: Preparing eGFR labs with clean numeric results.
@@ -451,8 +463,9 @@ models:
   - name: hcc_suspecting__stg_core__condition
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _stg_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__stg_condition{% else %}_stg_condition{%- endif -%}
       tags: hcc_suspecting
       materialized: ephemeral
     description: Staging conditions from core.
@@ -468,8 +481,9 @@ models:
   - name: hcc_suspecting__stg_core__lab_result
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _stg_lab_result
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__stg_lab_result{% else %}_stg_lab_result{%- endif -%}
       tags: hcc_suspecting
       materialized: ephemeral
     description: Staging conditions from core.
@@ -486,8 +500,9 @@ models:
   - name: hcc_suspecting__stg_core__medication
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _stg_medication
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__stg_medication{% else %}_stg_medication{%- endif -%}
       tags: hcc_suspecting
       materialized: ephemeral
     description: Staging medications from core.
@@ -503,8 +518,9 @@ models:
   - name: hcc_suspecting__stg_core__observation
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _stg_observation
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__stg_observation{% else %}_stg_observation{%- endif -%}
       tags: hcc_suspecting
       materialized: ephemeral
     description: Staging observations from core.
@@ -519,8 +535,9 @@ models:
   - name: hcc_suspecting__stg_core__patient
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _stg_patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__stg_patient{% else %}_stg_patient{%- endif -%}
       tags: hcc_suspecting
       materialized: ephemeral
     description: Staging patients from core.
@@ -533,8 +550,9 @@ models:
   - name: hcc_suspecting__stg_core__pharmacy_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _stg_pharmacy_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__stg_pharmacy_claim{% else %}_stg_pharmacy_claim{%- endif -%}
       tags: hcc_suspecting
       materialized: ephemeral
     description: Staging pharmacy claims from core.

@@ -5,8 +5,9 @@ seeds:
     description: Measures to concepts crosswalk. List of concepts used in each reporting measure.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _value_set_concepts
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__value_set_concepts{% else %}_value_set_concepts{%- endif -%}
       tags: quality_measures
       enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -32,8 +33,9 @@ seeds:
     description: Overview of reporting measures.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _value_set_measures
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__value_set_measures{% else %}_value_set_measures{%- endif -%}
       tags: quality_measures
       enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -63,8 +65,9 @@ seeds:
     description: Concepts to value sets crosswalk. List of codes in each concept.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
-      alias: _value_set_codes
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES__value_sets{% else %}_value_sets{%- endif -%}
       tags: quality_measures
       enabled: "{{ var('quality_measures_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:

@@ -6,7 +6,9 @@ seeds:
       Heirarchy and ranking of Tuva service category logic
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing{% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_service_category__service_categories{% else %}service_category__service_categories{%- endif -%}
       column_types:
         service_category_1: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(50) {%- endif -%}

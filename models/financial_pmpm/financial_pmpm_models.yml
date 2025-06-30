@@ -6,9 +6,10 @@ models:
   - name: financial_pmpm__pmpm_prep
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: pmpm_prep
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM_pmpm_prep{% else %}pmpm_prep{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -171,9 +172,10 @@ models:
   - name: financial_pmpm__pmpm_payer_plan
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: pmpm_payer_plan
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM_pmpm_payer_plan{% else %}pmpm_payer_plan{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -302,9 +304,10 @@ models:
   - name: financial_pmpm__pmpm_payer
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: pmpm_payer
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM_pmpm_payer{% else %}pmpm_payer{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -447,9 +450,10 @@ models:
   - name: financial_pmpm__patient_spend_with_service_categories
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: _int_patient_spend_with_service_categories
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM__int_patient_spend_with_service_categories{% else %}_int_patient_spend_with_service_categories{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -459,9 +463,10 @@ models:
   - name: financial_pmpm__service_category_1_allowed_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: _int_service_category_1_allowed_pivot
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM__int_service_category_1_allowed_pivot{% else %}_int_service_category_1_allowed_pivot{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -471,9 +476,10 @@ models:
   - name: financial_pmpm__service_category_2_allowed_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: _int_service_category_2_allowed_pivot
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM__int_service_category_2_allowed_pivot{% else %}_int_service_category_2_allowed_pivot{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -483,9 +489,10 @@ models:
   - name: financial_pmpm__service_category_1_paid_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: _int_service_category_1_paid_pivot
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM__int_service_category_1_paid_pivot{% else %}_int_service_category_1_paid_pivot{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table
@@ -495,9 +502,10 @@ models:
   - name: financial_pmpm__service_category_2_paid_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
-        {% else %}financial_pmpm{%- endif -%}
-      alias: _int_service_category_2_paid_pivot
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_financial_pmpm
+        {% else %}financial_pmpm{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_FINANCIAL_PMPM__int_service_category_2_paid_pivot{% else %}_int_service_category_2_paid_pivot{%- endif -%}
       tags:
         - financial_pmpm
       materialized: table

@@ -5,8 +5,9 @@ seeds:
     description: brand rxcuis from rxnorm with some additional columns added in
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy{% else %}pharmacy{%- endif -%}
-      alias: rxnorm_generic_available
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy{% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY_rxnorm_generic_available{% else %}rxnorm_generic_available{%- endif -%}
       tags:
         - pharmacy
 

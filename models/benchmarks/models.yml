@@ -6,9 +6,10 @@ models:
         flat table for training ml models on 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: person_year
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_person_year{% else %}person_year{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_train
@@ -26,9 +27,10 @@ models:
         flat table for training ml models on 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: int_pivot_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_int_pivot_condition{% else %}int_pivot_condition{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_train
@@ -40,9 +42,10 @@ models:
         member_month grain table for data viz with expected values
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: predict_member_month
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_predict_member_month{% else %}predict_member_month{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_analysis
@@ -53,9 +56,10 @@ models:
         joining inpatient predicts to encounter table actuals
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: predict_inpatient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_predict_inpatient{% else %}predict_inpatient{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_analysis
@@ -67,9 +71,10 @@ models:
         unpivot for viz
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: benchmarks_inpatient_input
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_benchmarks_inpatient_input{% else %}benchmarks_inpatient_input{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_train
@@ -84,9 +89,10 @@ models:
         unpivot for viz
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: benchmarks_unpivot_inpatient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_benchmarks_unpivot_inpatient{% else %}benchmarks_unpivot_inpatient{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_analysis
@@ -97,9 +103,10 @@ models:
         unpivot for viz
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: benchmarks_unpivot_member_month
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_benchmarks_unpivot_member_month{% else %}benchmarks_unpivot_member_month{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_analysis
@@ -111,9 +118,10 @@ models:
         hcc_person_year
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: int_pivot_hcc
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_int_pivot_hcc{% else %}int_pivot_hcc{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_train
@@ -124,9 +132,10 @@ models:
         hcc_person_year
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-      alias: int_pivot_cms_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS_int_pivot_cms_condition{% else %}int_pivot_cms_condition{%- endif -%}
       materialized: table
       tags: 
         - benchmarks_train
@@ -141,9 +150,10 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
-  
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_core__condition{% else %}_stg_core__condition{%- endif -%}
 
   - name: benchmarks__stg_core__member_months
     description: Staging model for core member months data used in benchmarks
@@ -153,8 +163,10 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_core__member_months{% else %}_stg_core__member_months{%- endif -%}
 
   - name: benchmarks__stg_core__medical_claim
     description: Staging model for core medical claim data used in benchmarks
@@ -164,8 +176,10 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_core__medical_claim{% else %}_stg_core__medical_claim{%- endif -%}
 
   - name: benchmarks__stg_core__encounter
     description: Staging model for core encounter data used in benchmarks
@@ -175,8 +189,10 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_core__encounter{% else %}_stg_core__encounter{%- endif -%}
 
   - name: benchmarks__stg_core__patient
     description: Staging model for core patient data used in benchmarks
@@ -186,8 +202,10 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_core__patient{% else %}_stg_core__patient{%- endif -%}
 
   - name: benchmarks__stg_reference_data__calendar
     description: Staging model for reference calendar data used in benchmarks
@@ -197,8 +215,10 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_reference_data__calendar{% else %}_stg_reference_data__calendar{%- endif -%}
 
   - name: benchmarks__stg_cms_hcc__int_disease_factors
     description: Staging model for CMS HCC disease factors data used in benchmarks
@@ -208,5 +228,7 @@ models:
         - benchmarks_train
         - benchmarks      
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
-        {%- else -%}benchmarks{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}
+        {% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks{% else %}benchmarks{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_BENCHMARKS__stg_cms_hcc__int_disease_factors{% else %}_stg_cms_hcc__int_disease_factors{%- endif -%}

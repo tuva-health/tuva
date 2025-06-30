@@ -7,8 +7,9 @@ seeds:
       documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_adjustment_rates
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_adjustment_rates{% else %}_value_set_adjustment_rates{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -36,8 +37,9 @@ seeds:
       and cleaned version of code files on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_cpt_hcpcs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_cpt_hcpcs{% else %}_value_set_cpt_hcpcs{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -61,8 +63,9 @@ seeds:
       rate announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_demographic_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_demographic_factors{% else %}_value_set_demographic_factors{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -118,8 +121,9 @@ seeds:
       and risk segment. Extracted from rate announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_disabled_interaction_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_disabled_interaction_factors{% else %}_value_set_disabled_interaction_factors{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -163,8 +167,9 @@ seeds:
       announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_disease_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_disease_factors{% else %}_value_set_disease_factors{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -216,8 +221,9 @@ seeds:
       documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_disease_hierarchy
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_disease_hierarchy{% else %}_value_set_disease_hierarchy{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -245,8 +251,9 @@ seeds:
       from rate announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_disease_interaction_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_disease_interaction_factors{% else %}_value_set_disease_interaction_factors{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -306,8 +313,9 @@ seeds:
       Extracted from rate announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_enrollment_interaction_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_enrollment_interaction_factors{% else %}_value_set_enrollment_interaction_factors{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -355,8 +363,9 @@ seeds:
       cleaned version of code files on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_icd_10_cm_mappings
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_icd_10_cm_mappings{% else %}_value_set_icd_10_cm_mappings{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -394,8 +403,9 @@ seeds:
       from rate announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
-      alias: _value_set_payment_hcc_count_factors
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CMS_HCC__value_set_payment_hcc_count_factors{% else %}_value_set_payment_hcc_count_factors{%- endif -%}
       tags: cms_hcc
       enabled: "{{ var('cms_hcc_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:

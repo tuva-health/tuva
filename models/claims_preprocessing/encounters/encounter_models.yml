@@ -8,9 +8,10 @@ models:
     description: This table pulls together all the data needed to perform acute inpatient analytics into a single table.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: acute_inpatient__encounter_grain
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_acute_inpatient__encounter_grain{% else %}acute_inpatient__encounter_grain{%- endif -%}
       tags: 
         - acute_inpatient
         - claims_preprocessing
@@ -133,9 +134,10 @@ models:
     description: This table pulls together all the data needed to perform acute inpatient analytics into a single table.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: emergency_department__encounter_grain
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_emergency_department__encounter_grain{% else %}emergency_department__encounter_grain{%- endif -%}
       tags: 
         - emergency_department
         - claims_preprocessing
@@ -258,11 +260,10 @@ models:
     description: "Encounters for inpatient psych. One row per encounter."
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {%- else -%}
-          claims_preprocessing
-        {%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_psych__encounter_grain{% else %}inpatient_psych__encounter_grain{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -389,131 +390,8 @@ models:
           claims_preprocessing
         {%- endif -%}
       materialized: table
-      tags:
-        - claims_preprocessing
-        - encounters
-    columns:
-      - name: encounter_id
-        description: '{{ doc("encounter_id") }}'
-      - name: encounter_start_date
-        description: '{{ doc("encounter_start_date") }}'
-      - name: encounter_end_date
-        description: '{{ doc("encounter_end_date") }}'
-      - name: patient_data_source_id
-        description: '{{ doc("patient_data_source_id") }}'
-      - name: encounter_type
-        description: '{{ doc("encounter_type") }}'
-      - name: encounter_group
-        description: '{{ doc("encounter_group") }}'
-      - name: person_id
-        description: '{{ doc("person_id") }}'
-      - name: admit_age
-        description: '{{ doc("admit_age") }}'
-      - name: gender
-        description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
-      - name: race
-        description: '{{ doc("race") }}'
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__race.csv
-      - name: primary_diagnosis_code_type
-        description: '{{ doc("primary_diagnosis_code_type") }}'
-      - name: primary_diagnosis_code
-        description: '{{ doc("primary_diagnosis_code") }}'
-      - name: primary_diagnosis_description
-        description: '{{ doc("primary_diagnosis_description") }}'
-      - name: facility_id
-        description: '{{ doc("facility_id") }}'
-      - name: observation_flag
-        description: '{{ doc("observation_flag") }}'
-      - name: ed_flag
-        description: '{{ doc("ed_flag") }}'
-      - name: lab_flag
-        description: '{{ doc("lab_flag") }}'
-      - name: dme_flag
-        description: '{{ doc("dme_flag") }}'
-      - name: ambulance_flag
-        description: '{{ doc("ambulance_flag") }}'
-      - name: pharmacy_flag
-        description: '{{ doc("pharmacy_flag") }}'
-      - name: facility_name
-        description: '{{ doc("facility_name") }}'
-      - name: facility_type
-        description: '{{ doc("facility_type") }}'
-      - name: delivery_flag
-        description: '{{ doc("delivery_flag") }}'
-      - name: delivery_type
-        description: '{{ doc("delivery_type") }}'
-      - name: newborn_flag
-        description: '{{ doc("newborn_flag") }}'
-      - name: nicu_flag
-        description: '{{ doc("nicu_flag") }}'
-      - name: facility_npi
-        description: '{{ doc("facility_npi") }}'
-      - name: provider_first_name
-        description: '{{ doc("provider_first_name") }}'
-      - name: provider_last_name
-        description: '{{ doc("provider_last_name") }}'
-      - name: drg_code_type
-        description: '{{ doc("drg_code_type") }}'
-      - name: drg_code
-        description: '{{ doc("drg_code") }}'
-      - name: drg_description
-        description: '{{ doc("drg_description") }}'
-      - name: medical_surgical
-        description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
-      - name: admit_source_code
-        description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_source.csv
-      - name: admit_source_description
-        description: '{{ doc("admit_source_description") }}'
-      - name: admit_type_code
-        description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__admit_type.csv
-      - name: admit_type_description
-        description: '{{ doc("admit_type_description") }}'
-      - name: discharge_disposition_code
-        description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
-      - name: discharge_disposition_description
-        description: '{{ doc("discharge_disposition_description") }}'
-      - name: total_paid_amount
-        description: '{{ doc("total_paid_amount") }}'
-      - name: total_allowed_amount
-        description: '{{ doc("total_allowed_amount") }}'
-      - name: total_charge_amount
-        description: '{{ doc("total_charge_amount") }}'
-      - name: claim_count
-        description: '{{ doc("claim_count") }}'
-      - name: inst_claim_count
-        description: '{{ doc("inst_claim_count") }}'
-      - name: prof_claim_count
-        description: '{{ doc("prof_claim_count") }}'
-      - name: length_of_stay
-        description: '{{ doc("length_of_stay") }}'
-      - name: mortality_flag
-        description: '{{ doc("mortality_flag") }}'
-      - name: data_source
-        description: '{{ doc("data_source") }}'
-      - name: tuva_last_run
-        description: '{{ doc("tuva_last_run") }}'
-
-  - name: inpatient_long_term__encounter_grain
-    description: "Encounters for inpatient long term acute care. One row per encounter."
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {%- else -%}
-          claims_preprocessing
-        {%- endif -%}
-      materialized: table
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_rehab__encounter_grain{% else %}inpatient_rehab__encounter_grain{%- endif -%}
       tags:
         - claims_preprocessing
         - encounters
@@ -633,11 +511,10 @@ models:
     description: "Encounters for inpatient rehab. One row per encounter."
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {%- else -%}
-          claims_preprocessing
-        {%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_snf__encounter_grain{% else %}inpatient_snf__encounter_grain{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -758,11 +635,10 @@ models:
     description: "Encounters for inpatient rehab. One row per encounter."
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {%- else -%}
-          claims_preprocessing
-        {%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_substance_use__encounter_grain{% else %}inpatient_substance_use__encounter_grain{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -883,11 +759,10 @@ models:
     description: "Encounters for inpatient rehab. One row per encounter."
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{ var('tuva_schema_prefix') }}_claims_preprocessing
-        {%- else -%}
-          claims_preprocessing
-        {%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_hospice__encounter_grain{% else %}inpatient_hospice__encounter_grain{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -1008,8 +883,10 @@ models:
     description: all claim lines that belong to an encounter
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__combined_claim_line_crosswalk{% else %}encounters__combined_claim_line_crosswalk{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1130,8 +1007,10 @@ models:
     description: one row per urgent care encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_urgent_care__encounter_grain{% else %}urgent_care__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1252,8 +1131,10 @@ models:
     description: one row per outpatient psych encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_psych__encounter_grain{% else %}outpatient_psych__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1374,8 +1255,10 @@ models:
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_rehab__encounter_grain{% else %}outpatient_rehab__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1496,8 +1379,10 @@ models:
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospital_or_clinic__encounter_grain{% else %}outpatient_hospital_or_clinic__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1618,8 +1503,10 @@ models:
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_surgery__encounter_grain{% else %}outpatient_surgery__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1740,8 +1627,10 @@ models:
     description: one row per asc encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_asc__encounter_grain{% else %}asc__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1862,8 +1751,10 @@ models:
     description: one row per dialysis encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dialysis__encounter_grain{% else %}dialysis__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -1984,8 +1875,10 @@ models:
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospice__encounter_grain{% else %}outpatient_hospice__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2106,8 +1999,10 @@ models:
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_home_health__encounter_grain{% else %}home_health__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2228,8 +2123,10 @@ models:
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_injections__encounter_grain{% else %}outpatient_injections__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2350,8 +2247,10 @@ models:
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_substance_use__encounter_grain{% else %}outpatient_substance_use__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2472,8 +2371,10 @@ models:
     description: one row per outpatient hospice encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_ptotst__encounter_grain{% else %}outpatient_ptotst__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2594,8 +2495,10 @@ models:
     description: one row per outpatient radiology encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_radiology__encounter_grain{% else %}outpatient_radiology__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2716,8 +2619,10 @@ models:
     description: one row per outpatient office visit surgery encounter id summarizing encounter level metrics
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visit__encounter_grain{% else %}office_visit__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2838,8 +2743,10 @@ models:
     description: one row per lab encounter id summarizing encounter level metrics. labs will roll up to other encounters unless they appear on their own day with no other claims.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_lab__encounter_grain{% else %}lab__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -2960,8 +2867,10 @@ models:
     description: one row per dme encounter id summarizing encounter level metrics. dmes will roll up to other encounters unless they appear on their own day with no other claims.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dme__encounter_grain{% else %}dme__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3082,8 +2991,10 @@ models:
     description: one row per ambulance encounter id summarizing encounter level metrics. ambulances will roll up to other encounters unless they appear on their own day with no other claims.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_ambulance__encounter_grain{% else %}ambulance__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3205,8 +3116,10 @@ models:
     description: orphaned claims (usually professional claims) that don't roll up to an anchor event, get assigned their own encounter id for completeness. 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_orphaned_claim__encounter_grain{% else %}orphaned_claim__encounter_grain{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3332,8 +3245,10 @@ models:
     description: generate encounter id and stitch inpatient psych claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_acute_inpatient__generate_encounter_id{% else %}acute_inpatient__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3343,8 +3258,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_acute_inpatient__start_end_dates{% else %}acute_inpatient__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3354,8 +3271,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_acute_inpatient__prof_claims{% else %}acute_inpatient__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3366,8 +3285,10 @@ models:
     description: generate encounter id and stitch inpatient psych claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_emergency_department__generate_encounter_id{% else %}emergency_department__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3377,8 +3298,10 @@ models:
     description: generate encounter id and stitch inpatient psych claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_emergency_department__generate_encounter_id_pre_sort{% else %}emergency_department__generate_encounter_id_pre_sort{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3388,8 +3311,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_emergency_department__start_end_dates{% else %}emergency_department__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3399,8 +3324,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_emergency_department__prof_claims{% else %}emergency_department__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3411,8 +3338,10 @@ models:
     description: generate encounter id and stitch inpatient psych claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_psych__generate_encounter_id{% else %}inpatient_psych__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3422,8 +3351,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_psych__start_end_dates{% else %}inpatient_psych__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3433,8 +3364,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_psych__prof_claims{% else %}inpatient_psych__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3446,8 +3379,10 @@ models:
     description: generate encounter id and stitch inpatient rehab claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_rehab__generate_encounter_id{% else %}inpatient_rehab__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3457,8 +3392,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_rehab__start_end_dates{% else %}inpatient_rehab__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3468,8 +3405,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_rehab__prof_claims{% else %}inpatient_rehab__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3516,8 +3455,10 @@ models:
     description: generate encounter id and stitch inpatient snf claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_snf__generate_encounter_id{% else %}inpatient_snf__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3527,8 +3468,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_snf__start_end_dates{% else %}inpatient_snf__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3538,8 +3481,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_snf__prof_claims{% else %}inpatient_snf__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3550,8 +3495,10 @@ models:
     description: generate encounter id and stitch inpatient substance_use claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_substance_use__generate_encounter_id{% else %}inpatient_substance_use__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3561,8 +3508,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_substance_use__start_end_dates{% else %}inpatient_substance_use__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3572,8 +3521,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_substance_use__prof_claims{% else %}inpatient_substance_use__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3584,8 +3535,10 @@ models:
     description: generate encounter id and stitch inpatient hospice claims together
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_hospice__generate_encounter_id{% else %}inpatient_hospice__generate_encounter_id{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3595,8 +3548,10 @@ models:
     description: calculate start and end date of encounter 
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_hospice__start_end_dates{% else %}inpatient_hospice__start_end_dates{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3606,8 +3561,10 @@ models:
     description: match corresponding prof claims to institutional claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_inpatient_hospice__prof_claims{% else %}inpatient_hospice__prof_claims{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -3619,8 +3576,10 @@ models:
   - name: office_visits__int_office_visits_injections
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_injections{% else %}office_visits__int_office_visits_injections{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3629,8 +3588,10 @@ models:
   - name: office_visits__int_office_visits_ptotst
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_ptotst{% else %}office_visits__int_office_visits_ptotst{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3639,8 +3600,10 @@ models:
   - name: office_visits__int_office_visits_radiology
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_radiology{% else %}office_visits__int_office_visits_radiology{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3649,8 +3612,10 @@ models:
   - name: office_visits__int_office_visits_surgery
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_surgery{% else %}office_visits__int_office_visits_surgery{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3659,8 +3624,10 @@ models:
   - name: office_visits__int_office_visits_em
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_em{% else %}office_visits__int_office_visits_em{%- endif -%}
       materialized: table
       tags:
       - claims_preprocessing
@@ -3669,8 +3636,10 @@ models:
   - name: office_visits__int_office_visits_telehealth
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_telehealth{% else %}office_visits__int_office_visits_telehealth{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3679,8 +3648,10 @@ models:
   - name: office_visits__int_office_visits
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits{% else %}office_visits__int_office_visits{%- endif -%}
       materialized: table
       tags:
       - claims_preprocessing
@@ -3689,8 +3660,10 @@ models:
   - name: office_visits__int_detail_values
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_detail_values{% else %}office_visits__int_detail_values{%- endif -%}
       materialized: table
       tags:
       - claims_preprocessing
@@ -3699,8 +3672,10 @@ models:
   - name: office_visits__int_office_visits_encounter_ranking
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_encounter_ranking{% else %}office_visits__int_office_visits_encounter_ranking{%- endif -%}
       materialized: table
       tags:
       - claims_preprocessing
@@ -3709,8 +3684,10 @@ models:
   - name: office_visits__int_office_visits_claim_line
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_claim_line{% else %}office_visits__int_office_visits_claim_line{%- endif -%}
       materialized: table
       tags:
       - claims_preprocessing
@@ -3719,8 +3696,10 @@ models:
   - name: office_visits__int_office_visits_union
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_office_visits__int_office_visits_union{% else %}office_visits__int_office_visits_union{%- endif -%}
       materialized: table
       tags:
       - claims_preprocessing
@@ -3729,8 +3708,10 @@ models:
   - name: urgent_care__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_urgent_care__anchor_events{% else %}urgent_care__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3740,8 +3721,10 @@ models:
   - name: urgent_care__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_urgent_care__generate_encounter_id{% else %}urgent_care__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3751,8 +3734,10 @@ models:
   - name: urgent_care__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_urgent_care__match_claims_to_anchor{% else %}urgent_care__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3761,8 +3746,10 @@ models:
   - name: outpatient_psych__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_psych__anchor_events{% else %}outpatient_psych__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3772,8 +3759,10 @@ models:
   - name: outpatient_psych__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_psych__generate_encounter_id{% else %}outpatient_psych__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3783,8 +3772,10 @@ models:
   - name: outpatient_psych__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_psych__match_claims_to_anchor{% else %}outpatient_psych__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3794,8 +3785,10 @@ models:
   - name: outpatient_rehab__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_rehab__anchor_events{% else %}outpatient_rehab__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3805,8 +3798,10 @@ models:
   - name: outpatient_rehab__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_rehab__generate_encounter_id{% else %}outpatient_rehab__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3816,8 +3811,10 @@ models:
   - name: outpatient_rehab__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_rehab__match_claims_to_anchor{% else %}outpatient_rehab__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3827,8 +3824,10 @@ models:
   - name: outpatient_hospital_or_clinic__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospital_or_clinic__anchor_events{% else %}outpatient_hospital_or_clinic__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3838,8 +3837,10 @@ models:
   - name: outpatient_hospital_or_clinic__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospital_or_clinic__generate_encounter_id{% else %}outpatient_hospital_or_clinic__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3849,8 +3850,10 @@ models:
   - name: outpatient_hospital_or_clinic__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospital_or_clinic__match_claims_to_anchor{% else %}outpatient_hospital_or_clinic__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3861,8 +3864,10 @@ models:
   - name: asc__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_asc__anchor_events{% else %}asc__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3872,8 +3877,10 @@ models:
   - name: asc__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_asc__generate_encounter_id{% else %}asc__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3883,8 +3890,10 @@ models:
   - name: asc__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_asc__match_claims_to_anchor{% else %}asc__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3894,8 +3903,10 @@ models:
   - name: asc__start_end_dates
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dialysis__start_end_dates{% else %}dialysis__start_end_dates{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3905,8 +3916,10 @@ models:
   - name: dialysis__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dialysis__anchor_events{% else %}dialysis__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3916,8 +3929,10 @@ models:
   - name: dialysis__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dialysis__generate_encounter_id{% else %}dialysis__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3927,8 +3942,10 @@ models:
   - name: dialysis__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dialysis__match_claims_to_anchor{% else %}dialysis__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3938,8 +3955,10 @@ models:
   - name: outpatient_hospice__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospice__anchor_events{% else %}outpatient_hospice__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3949,8 +3968,10 @@ models:
   - name: outpatient_hospice__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospice__generate_encounter_id{% else %}outpatient_hospice__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3960,8 +3981,10 @@ models:
   - name: outpatient_hospice__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_hospice__match_claims_to_anchor{% else %}outpatient_hospice__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3971,8 +3994,10 @@ models:
   - name: home_health__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_home_health__anchor_events{% else %}home_health__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3982,8 +4007,10 @@ models:
   - name: home_health__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_home_health__generate_encounter_id{% else %}home_health__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -3993,8 +4020,10 @@ models:
   - name: home_health__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_home_health__match_claims_to_anchor{% else %}home_health__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4004,8 +4033,10 @@ models:
   - name: outpatient_injections__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_injections__anchor_events{% else %}outpatient_injections__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4015,8 +4046,10 @@ models:
   - name: outpatient_injections__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_injections__generate_encounter_id{% else %}outpatient_injections__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4026,8 +4059,10 @@ models:
   - name: outpatient_injections__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_injections__match_claims_to_anchor{% else %}outpatient_injections__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4038,8 +4073,10 @@ models:
   - name: outpatient_ptotst__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_ptotst__anchor_events{% else %}outpatient_ptotst__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4049,8 +4086,10 @@ models:
   - name: outpatient_ptotst__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_ptotst__generate_encounter_id{% else %}outpatient_ptotst__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4060,8 +4099,10 @@ models:
   - name: outpatient_ptotst__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_ptotst__match_claims_to_anchor{% else %}outpatient_ptotst__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4072,8 +4113,10 @@ models:
   - name: outpatient_substance_use__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_substance_use__anchor_events{% else %}outpatient_substance_use__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4083,8 +4126,10 @@ models:
   - name: outpatient_substance_use__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_substance_use__generate_encounter_id{% else %}outpatient_substance_use__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4094,8 +4139,10 @@ models:
   - name: outpatient_substance_use__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_substance_use__match_claims_to_anchor{% else %}outpatient_substance_use__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4105,8 +4152,10 @@ models:
   - name: outpatient_radiology__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_radiology__anchor_events{% else %}outpatient_radiology__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4116,8 +4165,10 @@ models:
   - name: outpatient_radiology__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_radiology__generate_encounter_id{% else %}outpatient_radiology__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4127,8 +4178,10 @@ models:
   - name: outpatient_radiology__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_radiology__match_claims_to_anchor{% else %}outpatient_radiology__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4138,8 +4191,10 @@ models:
   - name: lab__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_lab__anchor_events{% else %}lab__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4149,8 +4204,10 @@ models:
   - name: lab__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_lab__generate_encounter_id{% else %}lab__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4160,8 +4217,10 @@ models:
   - name: lab__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_lab__match_claims_to_anchor{% else %}lab__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4171,8 +4230,10 @@ models:
   - name: dme__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dme__anchor_events{% else %}dme__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4182,8 +4243,10 @@ models:
   - name: dme__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dme__generate_encounter_id{% else %}dme__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4193,8 +4256,10 @@ models:
   - name: dme__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_dme__match_claims_to_anchor{% else %}dme__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4205,8 +4270,10 @@ models:
   - name: ambulance__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_ambulance__anchor_events{% else %}ambulance__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4216,8 +4283,10 @@ models:
   - name: ambulance__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_ambulance__generate_encounter_id{% else %}ambulance__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4227,8 +4296,10 @@ models:
   - name: ambulance__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_ambulance__match_claims_to_anchor{% else %}ambulance__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4238,8 +4309,10 @@ models:
   - name: encounters__orphaned_claims
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__orphaned_claims{% else %}encounters__orphaned_claims{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4249,8 +4322,10 @@ models:
   - name: outpatient_surgery__anchor_events
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_surgery__anchor_events{% else %}outpatient_surgery__anchor_events{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4260,8 +4335,10 @@ models:
   - name: outpatient_surgery__generate_encounter_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_surgery__generate_encounter_id{% else %}outpatient_surgery__generate_encounter_id{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4271,8 +4348,10 @@ models:
   - name: outpatient_surgery__match_claims_to_anchor
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_outpatient_surgery__match_claims_to_anchor{% else %}outpatient_surgery__match_claims_to_anchor{%- endif -%}
       materialized: view
       tags:
       - claims_preprocessing
@@ -4284,19 +4363,10 @@ models:
     description: Staging med claims for encounter grouper
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
-      tags:
-        - claims_preprocessing
-        - encounters
-
-  - name: encounters__prof_and_lower_priority
-    description: adding in lower priority institutional claims in one location with professional for grouping to higher level encounters
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__stg_medical_claim{% else %}encounters__stg_medical_claim{%- endif -%}
       materialized: table 
       tags:
         - claims_preprocessing
@@ -4305,8 +4375,10 @@ models:
   - name: encounters__stg_inpatient_institutional
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__stg_inpatient_institutional{% else %}encounters__stg_inpatient_institutional{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -4315,8 +4387,10 @@ models:
   - name: encounters__stg_outpatient_institutional
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__stg_outpatient_institutional{% else %}encounters__stg_outpatient_institutional{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -4325,8 +4399,10 @@ models:
   - name: encounters__stg_professional
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__stg_professional{% else %}encounters__stg_professional{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -4335,8 +4411,10 @@ models:
   - name: encounters__stg_eligibility
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__stg_eligibility{% else %}encounters__stg_eligibility{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing
@@ -4345,8 +4423,10 @@ models:
   - name: encounters__patient_data_source_id
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
+        {% else %}claims_preprocessing{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_PREPROCESSING_encounters__patient_data_source_id{% else %}encounters__patient_data_source_id{%- endif -%}
       materialized: table
       tags:
         - claims_preprocessing

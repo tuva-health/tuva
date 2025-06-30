@@ -5,8 +5,9 @@ seeds:
     description: Acute diagnosis CCS categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_acute_diagnosis_ccs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_acute_diagnosis_ccs{% else %}_value_set_acute_diagnosis_ccs{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -24,8 +25,9 @@ seeds:
     description: Acute diagnosis ICD-10-CM codes for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_acute_diagnosis_icd_10_cm
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_acute_diagnosis_icd_10_cm{% else %}_value_set_acute_diagnosis_icd_10_cm{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -45,8 +47,9 @@ seeds:
     description: Always planned CCS diagnosis categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_always_planned_ccs_diagnosis_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_always_planned_ccs_diagnosis_category{% else %}_value_set_always_planned_ccs_diagnosis_category{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -64,8 +67,9 @@ seeds:
     description: Always planned CCS procedure categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_always_planned_ccs_procedure_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_always_planned_ccs_procedure_category{% else %}_value_set_always_planned_ccs_procedure_category{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -83,8 +87,9 @@ seeds:
     description: Exclusion CCS diagnosis categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_exclusion_ccs_diagnosis_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_exclusion_ccs_diagnosis_category{% else %}_value_set_exclusion_ccs_diagnosis_category{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -106,8 +111,9 @@ seeds:
     description: Mapping of ICD-10-CM codes to CCS diagnosis categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_icd_10_cm_to_ccs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_icd_10_cm_to_ccs{% else %}_value_set_icd_10_cm_to_ccs{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -135,8 +141,9 @@ seeds:
     description: Mapping of ICD-10-PCS codes to CCS procedure categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_icd_10_pcs_to_ccs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_icd_10_pcs_to_ccs{% else %}_value_set_icd_10_pcs_to_ccs{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -164,8 +171,9 @@ seeds:
     description: Potentially planned CCS procedure categories for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_potentially_planned_ccs_procedure_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_potentially_planned_ccs_procedure_category{% else %}_value_set_potentially_planned_ccs_procedure_category{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -183,8 +191,9 @@ seeds:
     description: Potentially planned ICD-10-PCS codes for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_potentially_planned_icd_10_pcs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_potentially_planned_icd_10_pcs{% else %}_value_set_potentially_planned_icd_10_pcs{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -204,8 +213,9 @@ seeds:
     description: Specialty cohorts for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_specialty_cohort
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_specialty_cohort{% else %}_value_set_specialty_cohort{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -231,8 +241,9 @@ seeds:
     description: Surgery and gynecology cohort for readmissions.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}
-      alias: _value_set_surgery_gynecology_cohort
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions{% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__value_set_surgery_gynecology_cohort{% else %}_value_set_surgery_gynecology_cohort{%- endif -%}
       tags: readmissions
       enabled: "{{ var('readmissions_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
