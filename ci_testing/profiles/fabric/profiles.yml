@@ -3,7 +3,7 @@ default:
   outputs:
     dev:
       type: fabric
-      host: 4v6dzozie2iuzdhpqal4mekzpa-dr5m5tv37drujeetnspeqzr3za.datawarehouse.fabric.microsoft.com
+      host: "{{ env_var('DBT_FABRIC_CI_HOST') }}"
       database: "{{ env_var('DBT_FABRIC_CI_DATABASE') }}"
       schema: "{{ env_var('DBT_FABRIC_CI_SCHEMA') }}"
       authentication: ServicePrincipal
