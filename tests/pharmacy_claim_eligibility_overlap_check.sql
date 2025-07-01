@@ -41,9 +41,9 @@ with eligibility as (
 , overlap_check as (
     select
         p.data_source
-        , count(*) as n_rows
+        , count(e.person_id) as n_rows
     from pharmacy_claims as p
-    inner join eligibility as e
+    left outer join eligibility as e
     on p.person_id = e.person_id
     and p.data_source = e.data_source
     group by p.data_source
