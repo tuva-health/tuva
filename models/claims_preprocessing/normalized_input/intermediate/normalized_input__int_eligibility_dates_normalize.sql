@@ -1,4 +1,3 @@
-
 select distinct
     surrogate_key
     , cal_dob.day_date as normalized_birth_date

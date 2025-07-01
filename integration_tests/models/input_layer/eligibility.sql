@@ -30,4 +30,4 @@ select
     , cast(file_name as {{ dbt.type_string() }}) as file_name
     , cast(file_date as date) as file_date
     , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
-from {{  ref('tuva_data_assets', 'eligibility') }}
+from {{ ref('tuva_data_assets', 'eligibility') }}

@@ -24,8 +24,6 @@ models:
             - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - payer
             - data_source
-          config:
-            severity: error
       - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
           name: eligibility_enrollment_start_date_is_before_end_date
           column_A: enrollment_end_date
@@ -246,18 +244,3 @@ models:
         description: ""
         tests:
           - not_null
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
-              name: is_valid_type__eligibility_ingest_datetime
-              column_type_list: [date, datetime, time, timestamp, timestamp_ntz, timestampntz,
-                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
-                    with time zone, timestamp without time zone, datetime2, datetimeoffset]
-
-  - name: input_layer__medical_claim
-    description: ""
-    config:
-      alias: verified_medical_claim
-
-  - name: input_layer__pharmacy_claim
-    description: ""
-    config:
-      alias: verified_pharmacy_claim

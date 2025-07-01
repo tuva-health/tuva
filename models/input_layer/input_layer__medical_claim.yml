@@ -1,0 +1,609 @@
+version: 2
+
+models:
+  - name: input_layer__medical_claim
+    description: >
+      Mapping check to make sure all columns are mapped appropriately into the input
+      layer.
+      The medical_claim table contains information on healthcare services and  supplies
+      provided to patients, billed by providers, and paid for by health  insurers.
+      It includes information on the provider who rendered the  service, the amount
+      paid for the service by the health insurer, and the  underlying reason for the
+      service (i.e. diagnosis).
+    config:
+      alias: verified_medical_claim
+      contract:
+        enforced: true
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          name: medical_claim_unique_key
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
+            - data_source
+      - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
+          name: medical_claim_start_date_is_before_end_date
+          column_A: claim_end_date
+          column_B: claim_start_date
+          or_equal: true
+          config:
+            severity: warn
+    columns:
+      - name: claim_id
+        data_type: string
+        description: '{{ doc("claim_id") }}'
+        tests:
+          - not_null
+      - name: claim_line_number
+        data_type: int
+        description: '{{ doc("claim_line_number") }}'
+        tests:
+          - not_null
+      - name: claim_type
+        data_type: string
+        description: '{{ doc("claim_type") }}'
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['professional', 'institutional', 'undetermined']
+          - dbt_expectations.expect_column_distinct_count_to_equal:
+              name: medical_claim_has_only_one_claim_type
+              value: 1
+              group_by: [claim_id]
+      - name: person_id
+        data_type: string
+        description: '{{ doc("person_id") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_distinct_count_to_equal:
+              value: 1
+              group_by: [claim_id]
+      - name: member_id
+        data_type: string
+        description: '{{ doc("member_id") }}'
+        tests:
+          - not_null
+      - name: payer
+        data_type: string
+        description: '{{ doc("payer") }}'
+      - name: plan
+        data_type: string
+        description: '{{ doc("plan") }}'
+      - name: claim_start_date
+        data_type: date
+        description: '{{ doc("claim_start_date") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_distinct_count_to_equal:
+              value: 1
+              group_by: [claim_id]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+      - name: claim_end_date
+        data_type: date
+        description: '{{ doc("claim_end_date") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_distinct_count_to_equal:
+              value: 1
+              group_by: [claim_id]
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+      - name: claim_line_start_date
+        data_type: date
+        description: '{{ doc("claim_line_start_date") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+      - name: claim_line_end_date
+        data_type: date
+        description: '{{ doc("claim_line_end_date") }}'
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+      - name: admission_date
+        data_type: date
+        description: '{{ doc("admission_date") }}'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+      - name: discharge_date
+        data_type: date
+        description: '{{ doc("discharge_date") }}'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+      - name: admit_source_code
+        data_type: string
+        description: '{{ doc("admit_source_code") }}'
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 1
+      - name: admit_type_code
+        data_type: string
+        description: '{{ doc("admit_type_code") }}'
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 1
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[0-59]$"
+      - name: discharge_disposition_code
+        data_type: string
+        description: '{{ doc("discharge_disposition_code") }}'
+      - name: place_of_service_code
+        data_type: string
+        description: '{{ doc("place_of_service_code") }}'
+        tests:
+          - not_null:
+                where: claim_type = 'professional'
+                meta:
+                  dqi_test_description: "If a claim is professional, it should have
+                    a place of service code via CMS-1500. "
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 2
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[0-9]{2}$"
+      - name: bill_type_code
+        data_type: string
+        description: '{{ doc("bill_type_code") }}'
+        tests:
+          - dbt_expectations.expect_column_unique_value_count_to_be_between:
+              min_value: 0
+              max_value: 1
+              group_by: [claim_id]
+              strictly: false
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 3
+              max_value: 4
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
+      - name: drg_code_type
+        data_type: string
+        description: '{{ doc("drg_code_type") }}'
+        tests:
+          - accepted_values:
+              values: ['ms-drg', 'apr-drg']
+      - name: drg_code
+        data_type: string
+        description: '{{ doc("drg_code") }}'
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 3
+      - name: revenue_center_code
+        data_type: string
+        description: '{{ doc("revenue_center_code") }}'
+        tests:
+          - not_null:
+                where: claim_type = 'institutional'
+          - dbt_expectations.expect_column_value_lengths_to_be_between:
+              min_value: 3
+              max_value: 4
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^(\\\\d{3}|[01239]\\\\d{3})$"
+      - name: service_unit_quantity
+        data_type: numeric(28, 6)
+        description: '{{ doc("service_unit_quantity") }}'
+      - name: hcpcs_code
+        data_type: string
+        description: '{{ doc("hcpcs_code") }}'
+        tests:
+          - not_null:
+                where: claim_type = 'professional'
+      - name: hcpcs_modifier_1
+        data_type: string
+        description: '{{ doc("hcpcs_modifier_1") }}'
+      - name: hcpcs_modifier_2
+        data_type: string
+        description: '{{ doc("hcpcs_modifier_2") }}'
+      - name: hcpcs_modifier_3
+        data_type: string
+        description: '{{ doc("hcpcs_modifier_3") }}'
+      - name: hcpcs_modifier_4
+        data_type: string
+        description: '{{ doc("hcpcs_modifier_4") }}'
+      - name: hcpcs_modifier_5
+        data_type: string
+        description: '{{ doc("hcpcs_modifier_5") }}'
+      - name: rendering_npi
+        data_type: string
+        description: >
+          Rendering NPI for the claim (typically represents the physician or  entity
+          providing services).
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 10
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[0-9]{10}$"
+      - name: rendering_tin
+        data_type: string
+        description: '{{ doc("rendering_tin") }}'
+      - name: billing_npi
+        data_type: string
+        description: >
+          Billing NPI for the claim (typically represents the organization billing the
+          claim).
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 10
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[0-9]{10}$"
+      - name: billing_tin
+        data_type: string
+        description: '{{ doc("billing_tin") }}'
+      - name: facility_npi
+        data_type: string
+        description: >
+          Facility NPI for the claim (typically represents the facility where services
+          were performed).
+        tests:
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              value: 10
+          - dbt_expectations.expect_column_values_to_match_regex:
+              regex: "^[0-9]{10}$"
+      - name: paid_date
+        data_type: date
+        description: '{{ doc("paid_date") }}'
+      - name: paid_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("paid_amount") }}'
+      - name: allowed_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("allowed_amount") }}'
+      - name: charge_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("charge_amount") }}'
+      - name: coinsurance_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("coinsurance_amount") }}'
+      - name: copayment_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("copayment_amount") }}'
+      - name: deductible_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("deductible_amount") }}'
+      - name: total_cost_amount
+        data_type: numeric(28, 6)
+        description: '{{ doc("total_cost_amount") }}'
+      - name: diagnosis_code_type
+        data_type: string
+        description: '{{ doc("diagnosis_code_type") }}'
+        tests:
+          - accepted_values:
+              values: ['icd-10-cm', 'icd-9-cm']
+      - name: diagnosis_code_1
+        data_type: string
+        description: 1st ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_2
+        data_type: string
+        description: 2nd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_3
+        data_type: string
+        description: 3rd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_4
+        data_type: string
+        description: 4th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_5
+        data_type: string
+        description: 5th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_6
+        data_type: string
+        description: 6th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_7
+        data_type: string
+        description: 7th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_8
+        data_type: string
+        description: 8th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_9
+        data_type: string
+        description: 9th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_10
+        data_type: string
+        description: 10th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_11
+        data_type: string
+        description: 11th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_12
+        data_type: string
+        description: 12th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_13
+        data_type: string
+        description: 13th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_14
+        data_type: string
+        description: 14th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_15
+        data_type: string
+        description: 15th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_16
+        data_type: string
+        description: 16th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_17
+        data_type: string
+        description: 17th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_18
+        data_type: string
+        description: 18th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_19
+        data_type: string
+        description: 19th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_20
+        data_type: string
+        description: 20th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_21
+        data_type: string
+        description: 21st ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_22
+        data_type: string
+        description: 22nd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_23
+        data_type: string
+        description: 23rd ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_24
+        data_type: string
+        description: 24th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_code_25
+        data_type: string
+        description: 25th ICD (9 or 10) CM diagnosis code on the claim.
+      - name: diagnosis_poa_1
+        data_type: string
+        description: Present on admission code for the 1st diagnosis on the claim.
+      - name: diagnosis_poa_2
+        data_type: string
+        description: Present on admission code for the 2nd diagnosis on the claim.
+      - name: diagnosis_poa_3
+        data_type: string
+        description: Present on admission code for the 3rd diagnosis on the claim.
+      - name: diagnosis_poa_4
+        data_type: string
+        description: Present on admission code for the 4th diagnosis on the claim.
+      - name: diagnosis_poa_5
+        data_type: string
+        description: Present on admission code for the 5th diagnosis on the claim.
+      - name: diagnosis_poa_6
+        data_type: string
+        description: Present on admission code for the 6th diagnosis on the claim.
+      - name: diagnosis_poa_7
+        data_type: string
+        description: Present on admission code for the 7th diagnosis on the claim.
+      - name: diagnosis_poa_8
+        data_type: string
+        description: Present on admission code for the 8th diagnosis on the claim.
+      - name: diagnosis_poa_9
+        data_type: string
+        description: Present on admission code for the 9th diagnosis on the claim.
+      - name: diagnosis_poa_10
+        data_type: string
+        description: Present on admission code for the 10th diagnosis on the claim.
+      - name: diagnosis_poa_11
+        data_type: string
+        description: Present on admission code for the 11th diagnosis on the claim.
+      - name: diagnosis_poa_12
+        data_type: string
+        description: Present on admission code for the 12th diagnosis on the claim.
+      - name: diagnosis_poa_13
+        data_type: string
+        description: Present on admission code for the 13th diagnosis on the claim.
+      - name: diagnosis_poa_14
+        data_type: string
+        description: Present on admission code for the 14th diagnosis on the claim.
+      - name: diagnosis_poa_15
+        data_type: string
+        description: Present on admission code for the 15th diagnosis on the claim.
+      - name: diagnosis_poa_16
+        data_type: string
+        description: Present on admission code for the 16th diagnosis on the claim.
+      - name: diagnosis_poa_17
+        data_type: string
+        description: Present on admission code for the 17th diagnosis on the claim.
+      - name: diagnosis_poa_18
+        data_type: string
+        description: Present on admission code for the 18th diagnosis on the claim.
+      - name: diagnosis_poa_19
+        data_type: string
+        description: Present on admission code for the 19th diagnosis on the claim.
+      - name: diagnosis_poa_20
+        data_type: string
+        description: Present on admission code for the 20th diagnosis on the claim.
+      - name: diagnosis_poa_21
+        data_type: string
+        description: Present on admission code for the 21st diagnosis on the claim.
+      - name: diagnosis_poa_22
+        data_type: string
+        description: Present on admission code for the 22nd diagnosis on the claim.
+      - name: diagnosis_poa_23
+        data_type: string
+        description: Present on admission code for the 23rd diagnosis on the claim.
+      - name: diagnosis_poa_24
+        data_type: string
+        description: Present on admission code for the 24th diagnosis on the claim.
+      - name: diagnosis_poa_25
+        data_type: string
+        description: Present on admission code for the 25th diagnosis on the claim.
+      - name: procedure_code_type
+        data_type: string
+        description: Indicates the type of procedure code (e.g. ICD-10-PCS).
+        tests:
+          - accepted_values:
+              values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
+      - name: procedure_code_1
+        data_type: string
+        description: 1st ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_2
+        data_type: string
+        description: 2nd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_3
+        data_type: string
+        description: 3rd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_4
+        data_type: string
+        description: 4th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_5
+        data_type: string
+        description: 5th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_6
+        data_type: string
+        description: 6th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_7
+        data_type: string
+        description: 7th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_8
+        data_type: string
+        description: 8th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_9
+        data_type: string
+        description: 9th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_10
+        data_type: string
+        description: 10th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_11
+        data_type: string
+        description: 11th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_12
+        data_type: string
+        description: 12th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_13
+        data_type: string
+        description: 13th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_14
+        data_type: string
+        description: 14th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_15
+        data_type: string
+        description: 15th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_16
+        data_type: string
+        description: 16th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_17
+        data_type: string
+        description: 17th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_18
+        data_type: string
+        description: 18th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_19
+        data_type: string
+        description: 19th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_20
+        data_type: string
+        description: 20th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_21
+        data_type: string
+        description: 21st ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_22
+        data_type: string
+        description: 22nd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_23
+        data_type: string
+        description: 23rd ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_24
+        data_type: string
+        description: 24th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_code_25
+        data_type: string
+        description: 25th ICD (9 or 10) procedure code on the claim.
+      - name: procedure_date_1
+        data_type: date
+        description: Date of the 1st procedure on the claim.
+      - name: procedure_date_2
+        data_type: date
+        description: Date of the 2nd procedure on the claim.
+      - name: procedure_date_3
+        data_type: date
+        description: Date of the 3rd procedure on the claim.
+      - name: procedure_date_4
+        data_type: date
+        description: Date of the 4th procedure on the claim.
+      - name: procedure_date_5
+        data_type: date
+        description: Date of the 5th procedure on the claim.
+      - name: procedure_date_6
+        data_type: date
+        description: Date of the 6th procedure on the claim.
+      - name: procedure_date_7
+        data_type: date
+        description: Date of the 7th procedure on the claim.
+      - name: procedure_date_8
+        data_type: date
+        description: Date of the 8th procedure on the claim.
+      - name: procedure_date_9
+        data_type: date
+        description: Date of the 9th procedure on the claim.
+      - name: procedure_date_10
+        data_type: date
+        description: Date of the 10th procedure on the claim.
+      - name: procedure_date_11
+        data_type: date
+        description: Date of the 11th procedure on the claim.
+      - name: procedure_date_12
+        data_type: date
+        description: Date of the 12th procedure on the claim.
+      - name: procedure_date_13
+        data_type: date
+        description: Date of the 13th procedure on the claim.
+      - name: procedure_date_14
+        data_type: date
+        description: Date of the 14th procedure on the claim.
+      - name: procedure_date_15
+        data_type: date
+        description: Date of the 15th procedure on the claim.
+      - name: procedure_date_16
+        data_type: date
+        description: Date of the 16th procedure on the claim.
+      - name: procedure_date_17
+        data_type: date
+        description: Date of the 17th procedure on the claim.
+      - name: procedure_date_18
+        data_type: date
+        description: Date of the 18th procedure on the claim.
+      - name: procedure_date_19
+        data_type: date
+        description: Date of the 19th procedure on the claim.
+      - name: procedure_date_20
+        data_type: date
+        description: Date of the 20th procedure on the claim.
+      - name: procedure_date_21
+        data_type: date
+        description: Date of the 21st procedure on the claim.
+      - name: procedure_date_22
+        data_type: date
+        description: Date of the 22nd procedure on the claim.
+      - name: procedure_date_23
+        data_type: date
+        description: Date of the 23rd procedure on the claim.
+      - name: procedure_date_24
+        data_type: date
+        description: Date of the 24th procedure on the claim.
+      - name: procedure_date_25
+        data_type: date
+        description: Date of the 25th procedure on the claim.
+      - name: in_network_flag
+        data_type: boolean
+        description: '{{ doc("in_network_flag") }}'
+      - name: data_source
+        data_type: string
+        description: '{{ doc("data_source") }}'
+        tests:
+          - not_null
+      - name: file_name
+        data_type: string
+        description: '{{ doc("file_name") }}'
+        tests:
+          - not_null
+      - name: file_date
+        data_type: date
+        description: '{{ doc("file_date") }}'
+        tests:
+          - not_null
+      - name: ingest_datetime
+        data_type: timestamp
+        description: '{{ doc("ingest_datetime") }}'
+        tests:
+          - not_null
