@@ -1,6 +1,25 @@
 version: 2
 
 seeds:
+  - name: terminology__act_site
+    description: 'This seed contains An anatomical location on a human which can be the focus of an act.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: act_site
+      tags:
+        - terminology
+      column_types:
+        body_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: body_code
+        description: 'The code representing the anatomical location.'
+      - name: description
+        description: 'A description of the anatomical location.'
+
   - name: terminology__admit_source
     description: 'NUBC Admit Sources'
     config:
@@ -116,6 +135,30 @@ seeds:
     columns:
       - name: claim_type
         description: 'The type of the claim.'
+
+  - name: terminology__cvx
+    description: 'Seed containing cvx codes and descriptions.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: cvx
+      tags:
+        - terminology
+        - data_profiling
+      column_types:
+        cvx : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        short_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        long_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: cvx
+        description: 'CVX code, which is a unique identifier for vaccines.'
+      - name: short_description
+        description: 'Short description of the vaccine.'
+      - name: long_description
+        description: 'Long description of the vaccine.'
 
   - name: terminology__discharge_disposition
     description: 'Seed containing NUBC discharge disposition codes and descriptions.'
@@ -392,6 +435,67 @@ seeds:
         description: 'The ICD-10-PCS code.'
       - name: description
         description: 'The description of the ICD-10-PCS code.'
+
+  - name: terminology__immunization_route_code
+    description: 'This seed contains the administrative routes used during vaccination.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: immunization_route_code
+      tags:
+        - terminology
+      column_types:
+        route_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: route_code
+        description: 'The code representing the route of administration for the immunization.'
+      - name: description
+        description: 'A description of the route of administration for the immunization.'
+
+  - name: terminology__immunization_status_reason
+    description: 'This seed describes the reason why a dose of vaccine was not administered.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: immunization_status_reason
+      tags:
+        - terminology
+      column_types:
+        reason_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        code_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: reason_code
+        description: 'The code representing the immunization status reason.'
+      - name: code_type
+        description: 'The type of the code representing the immunization status reason.'
+      - name: description
+        description: 'A description of the immunization status reason.'
+
+  - name: terminology__immunization_status
+    description: 'This seed contains the current status of the administered dose of vaccine.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: immunization_status
+      tags:
+        - terminology
+      column_types:
+        status_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: status_code
+        description: 'The code representing the immunization status.'
+      - name: status
+        description: 'The display of the immunization status.'
 
   - name: terminology__loinc
     description: 'Seed containing LOINC codes and descriptions.'
