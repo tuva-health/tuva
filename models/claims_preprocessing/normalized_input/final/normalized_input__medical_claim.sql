@@ -1,5 +1,6 @@
 select
-    surrogate_key
+    med.medical_claim_sk
+    , med.data_source
     , med.claim_id
     , med.claim_line_number
     , med.claim_type
@@ -29,13 +30,10 @@ select
     , med.hcpcs_modifier_4
     , med.hcpcs_modifier_5
     , med.rendering_npi
-    , rendering_prov.provider_name as rendering_name
     , med.rendering_tin
     , med.billing_npi
-    , billing_prov.provider_name as billing_name
     , med.billing_tin
     , med.facility_npi
-    , facility_prov.provider_name as facility_name
     , med.paid_date
     , med.paid_amount
     , med.allowed_amount
@@ -147,14 +145,7 @@ select
     , med.procedure_date_24
     , med.procedure_date_25
     , med.in_network_flag
-    , med.data_source
     , med.file_name
     , med.file_date
     , med.ingest_datetime
-from {{ ref('the_tuva_project', 'normalized_input__stg_medical_claim') }} as med
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as rendering_prov
-    on med.rendering_npi = rendering_prov.npi
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as billing_prov
-    on med.billing_npi = billing_prov.npi
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as facility_prov
-    on med.facility_npi = facility_prov.npi
+from {{ ref('the_tuva_project', 'normalized_input__stg_medical_claim') }}

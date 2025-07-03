@@ -11,8 +11,11 @@ models:
     claims_preprocessing:
       +schema: tuva_claims_preprocessing
     core:
-      +schema: tuva_core
-      +materialized: table
+      final:
+        +schema: tuva_core
+        +materialized: table
+      staging:
+        +schema: tuva_staging
     input_layer:
       +schema: tuva_input_layer
 

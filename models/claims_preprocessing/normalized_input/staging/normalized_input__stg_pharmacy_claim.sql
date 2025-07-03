@@ -1,5 +1,5 @@
 select
-    {{ dbt_utils.generate_surrogate_key(['data_source', 'claim_id', 'claim_line_number']) }} as surrogate_key
+    {{ dbt_utils.generate_surrogate_key(['data_source', 'claim_id', 'claim_line_number']) }} as pharmacy_claim_sk
     , claim_id
     , claim_line_number
     , person_id

@@ -1,0 +1,50 @@
+select
+    medical_claim_sk
+    , data_source
+    , claim_id
+    , claim_line_number
+    , claim_type
+    , person_id
+    , member_id
+    , payer
+    , plan
+    , claim_start_date
+    , claim_end_date
+    , claim_line_start_date
+    , claim_line_end_date
+    , admission_date
+    , discharge_date
+    , admit_source_code
+    , admit_type_code
+    , discharge_disposition_code
+    , place_of_service_code
+    , bill_type_code
+    , drg_code_type
+    , drg_code
+    , revenue_center_code
+    , service_unit_quantity
+    , hcpcs_code
+    , hcpcs_modifier_1
+    , hcpcs_modifier_2
+    , hcpcs_modifier_3
+    , hcpcs_modifier_4
+    , hcpcs_modifier_5
+    , rendering_npi
+    , rendering_name
+    , rendering_tin
+    , billing_npi
+    , billing_name
+    , billing_tin
+    , facility_npi
+    , facility_name
+    , paid_date
+    , paid_amount
+    , allowed_amount
+    , charge_amount
+    , coinsurance_amount
+    , copayment_amount
+    , deductible_amount
+    , total_cost_amount
+    , in_network_flag
+    , {{ current_timestamp() }} as tuva_last_run
+from {{ ref('the_tuva_project', 'core__stg_medical_claim') }}

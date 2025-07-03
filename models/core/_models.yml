@@ -1,9 +1,15 @@
 version: 2
 
 models:
+  - name: core__condition
+    description: >
+      A condition, problem, or diagnosis - usually an assessment or assertion of a patient's state of health. In billing
+      this is used for justification of reimbursement and determining other billing codes such as DRG.
+    config:
+      alias: condition
+
   - name: core__eligibility
     description: >
-      The eligibility table contains information on patient health plan
-      and  supplemental insurance eligibility.
+      Information on the members health plan and supplemental insurance eligibility.
     config:
       alias: eligibility

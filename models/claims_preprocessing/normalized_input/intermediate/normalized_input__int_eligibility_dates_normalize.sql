@@ -1,5 +1,5 @@
 select distinct
-    surrogate_key
+    eligibility_sk
     , cal_dob.day_date as normalized_birth_date
     , cal_death.day_date as normalized_death_date
     , cal_enroll_start.day_date as normalized_enrollment_start_date

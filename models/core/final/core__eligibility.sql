@@ -1,6 +1,6 @@
-
 select
-    surrogate_key as eligibility_id
+    eligibility_sk
+    , data_source
     , person_id
     , member_id
     , subscriber_id
@@ -17,6 +17,5 @@ select
     , subscriber_relation
     , group_id
     , group_name
-    , data_source
-    , cast('{{ current_timestamp() }}' as {{ dbt.type_string() }}) as tuva_last_run
+    , {{ current_timestamp() }} as tuva_last_run
 from {{ ref('the_tuva_project', 'normalized_input__eligibility') }}
