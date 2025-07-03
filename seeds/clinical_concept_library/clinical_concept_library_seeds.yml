@@ -4,8 +4,9 @@ seeds:
   - name: clinical_concept_library__clinical_concepts
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
-      alias: clinical_concepts
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLINICAL_CONCEPT_LIBRARY_clinical_concepts{% else %}clinical_concepts{%- endif -%}
       tags: clinical_concept_library
       column_types:
         concept_id: |
@@ -73,8 +74,9 @@ seeds:
   - name: clinical_concept_library__value_set_members
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
-      alias: value_set_members
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLINICAL_CONCEPT_LIBRARY_value_set_members{% else %}value_set_members{%- endif -%}
       tags: clinical_concept_library
       column_types:
         value_set_member_id: |
@@ -125,8 +127,9 @@ seeds:
   - name: clinical_concept_library__coding_systems
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}
-      alias: coding_systems
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_clinical_concept_library{% else %}clinical_concept_library{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLINICAL_CONCEPT_LIBRARY_coding_systems{% else %}coding_systems{%- endif -%}
       tags: clinical_concept_library
       column_types:
         coding_system_id: |

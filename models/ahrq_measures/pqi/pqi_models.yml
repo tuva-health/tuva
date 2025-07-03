@@ -6,8 +6,9 @@ models:
   - name: ahrq_measures__pqi_denom_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: pqi_denom_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_pqi_denom_long{% else %}pqi_denom_long{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -34,8 +35,9 @@ models:
   - name: ahrq_measures__pqi_exclusion_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: pqi_exclusion_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_pqi_exclusion_long{% else %}pqi_exclusion_long{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -64,8 +66,9 @@ models:
   - name: ahrq_measures__pqi_num_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: pqi_num_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_pqi_num_long{% else %}pqi_num_long{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -96,8 +99,9 @@ models:
   - name: ahrq_measures__pqi_rate
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: pqi_rate
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_pqi_rate{% else %}pqi_rate{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -128,8 +132,9 @@ models:
   - name: ahrq_measures__pqi_summary
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: pqi_summary
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_pqi_summary{% else %}pqi_summary{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -182,8 +187,9 @@ models:
   - name: ahrq_measures__int_pqi_01_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_01_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_01_denom{% else %}_int_pqi_01_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -194,8 +200,9 @@ models:
   - name: ahrq_measures__int_pqi_01_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_01_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_01_exclusions{% else %}_int_pqi_01_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -206,8 +213,9 @@ models:
   - name: ahrq_measures__int_pqi_01_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_01_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_01_num{% else %}_int_pqi_01_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -218,8 +226,9 @@ models:
   - name: ahrq_measures__int_pqi_03_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_03_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_03_denom{% else %}_int_pqi_03_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -230,8 +239,9 @@ models:
   - name: ahrq_measures__int_pqi_03_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_03_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_03_exclusions{% else %}_int_pqi_03_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -242,8 +252,9 @@ models:
   - name: ahrq_measures__int_pqi_03_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_03_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_03_num{% else %}_int_pqi_03_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -254,8 +265,9 @@ models:
   - name: ahrq_measures__int_pqi_05_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_05_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_05_denom{% else %}_int_pqi_05_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -266,8 +278,9 @@ models:
   - name: ahrq_measures__int_pqi_05_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_05_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_05_exclusions{% else %}_int_pqi_05_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -278,8 +291,9 @@ models:
   - name: ahrq_measures__int_pqi_05_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_05_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_05_num{% else %}_int_pqi_05_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -290,8 +304,9 @@ models:
   - name: ahrq_measures__int_pqi_07_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_07_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_07_denom{% else %}_int_pqi_07_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -302,8 +317,9 @@ models:
   - name: ahrq_measures__int_pqi_07_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_07_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_07_exclusions{% else %}_int_pqi_07_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -314,8 +330,9 @@ models:
   - name: ahrq_measures__int_pqi_07_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_07_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_07_num{% else %}_int_pqi_07_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -326,8 +343,9 @@ models:
   - name: ahrq_measures__int_pqi_08_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_08_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_08_denom{% else %}_int_pqi_08_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -338,8 +356,9 @@ models:
   - name: ahrq_measures__int_pqi_08_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_08_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_08_exclusions{% else %}_int_pqi_08_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -350,8 +369,9 @@ models:
   - name: ahrq_measures__int_pqi_08_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_08_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_08_num{% else %}_int_pqi_08_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -362,8 +382,9 @@ models:
   - name: ahrq_measures__int_pqi_11_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_11_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_11_denom{% else %}_int_pqi_11_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -374,8 +395,9 @@ models:
   - name: ahrq_measures__int_pqi_11_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_11_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_11_exclusions{% else %}_int_pqi_11_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -386,8 +408,9 @@ models:
   - name: ahrq_measures__int_pqi_11_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_11_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_11_num{% else %}_int_pqi_11_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -398,8 +421,9 @@ models:
   - name: ahrq_measures__int_pqi_12_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_12_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_12_denom{% else %}_int_pqi_12_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -410,8 +434,9 @@ models:
   - name: ahrq_measures__int_pqi_12_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_12_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_12_exclusions{% else %}_int_pqi_12_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -422,8 +447,9 @@ models:
   - name: ahrq_measures__int_pqi_12_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_12_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_12_num{% else %}_int_pqi_12_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -434,8 +460,9 @@ models:
   - name: ahrq_measures__int_pqi_14_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_14_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_14_denom{% else %}_int_pqi_14_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -446,8 +473,9 @@ models:
   - name: ahrq_measures__int_pqi_14_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_14_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_14_exclusions{% else %}_int_pqi_14_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -458,8 +486,9 @@ models:
   - name: ahrq_measures__int_pqi_14_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_14_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_14_num{% else %}_int_pqi_14_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -470,8 +499,9 @@ models:
   - name: ahrq_measures__int_pqi_15_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_15_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_15_denom{% else %}_int_pqi_15_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -482,8 +512,9 @@ models:
   - name: ahrq_measures__int_pqi_15_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_15_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_15_exclusions{% else %}_int_pqi_15_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -494,8 +525,9 @@ models:
   - name: ahrq_measures__int_pqi_15_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_15_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_15_num{% else %}_int_pqi_15_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -506,8 +538,9 @@ models:
   - name: ahrq_measures__int_pqi_16_denom
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_16_denom
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_16_denom{% else %}_int_pqi_16_denom{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -518,8 +551,9 @@ models:
   - name: ahrq_measures__int_pqi_16_exclusions
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_16_exclusions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_16_exclusions{% else %}_int_pqi_16_exclusions{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -530,8 +564,9 @@ models:
   - name: ahrq_measures__int_pqi_16_num
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_16_num
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_16_num{% else %}_int_pqi_16_num{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -542,8 +577,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_missing_age
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusions_missing_age
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusions_missing_age{% else %}_int_pqi_shared_exclusions_missing_age{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -554,8 +590,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_missing_dates
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusion_missing_dates
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusion_missing_dates{% else %}_int_pqi_shared_exclusion_missing_dates{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -566,8 +603,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_missing_gender
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusion_missing_gender
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusion_missing_gender{% else %}_int_pqi_shared_exclusion_missing_gender{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -578,8 +616,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_missing_primary_dx
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusion_missing_primary_dx
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusion_missing_primary_dx{% else %}_int_pqi_shared_exclusion_missing_primary_dx{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -590,8 +629,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_transfer
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusion_transfer
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusion_transfer{% else %}_int_pqi_shared_exclusion_transfer{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -602,8 +642,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_ungroupable_drg
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusion_ungroupable_drg
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusion_ungroupable_drg{% else %}_int_pqi_shared_exclusion_ungroupable_drg{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -614,8 +655,9 @@ models:
   - name: ahrq_measures__int_pqi_shared_exclusion_union
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _int_pqi_shared_exclusion_union
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_int_pqi_shared_exclusion_union{% else %}_int_pqi_shared_exclusion_union{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -628,8 +670,9 @@ models:
   - name: ahrq_measures__stg_pqi_inpatient_encounter
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _stg_pqi_inpatient_encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_stg_pqi_inpatient_encounter{% else %}_stg_pqi_inpatient_encounter{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -640,8 +683,9 @@ models:
   - name: ahrq_measures__stg_pqi_condition
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _stg_pqi_condition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_stg_pqi_condition{% else %}_stg_pqi_condition{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -652,8 +696,9 @@ models:
   - name: ahrq_measures__stg_pqi_member_months
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _stg_pqi_member_months
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_stg_pqi_member_months{% else %}_stg_pqi_member_months{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -664,8 +709,9 @@ models:
   - name: ahrq_measures__stg_pqi_patient
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _stg_pqi_patient
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_stg_pqi_patient{% else %}_stg_pqi_patient{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi
@@ -676,8 +722,9 @@ models:
   - name: ahrq_measures__stg_pqi_procedure
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}
-      alias: _stg_pqi_procedure
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ahrq_measures{% else %}ahrq_measures{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_AHRQ_MEASURES_stg_pqi_procedure{% else %}_stg_pqi_procedure{%- endif -%}
       tags: 
         - ahrq_measures
         - pqi

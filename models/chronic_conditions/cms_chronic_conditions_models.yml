@@ -5,9 +5,10 @@ models:
   - name: chronic_conditions__cms_chronic_conditions_wide
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: cms_chronic_conditions_wide
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS_cms_chronic_conditions_wide{% else %}cms_chronic_conditions_wide{%- endif -%}
       tags:
         - cms_chronic_conditions
         - chronic_conditions
@@ -255,9 +256,10 @@ models:
   - name: chronic_conditions__cms_chronic_conditions_long
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: cms_chronic_conditions_long
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS_cms_chronic_conditions_long{% else %}cms_chronic_conditions_long{%- endif -%}
       tags:
         - cms_chronic_conditions
         - chronic_conditions
@@ -327,9 +329,10 @@ models:
   - name: chronic_conditions__cms_chronic_conditions_all
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: _int_cms_chronic_condition_all
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS__int_cms_chronic_condition_all{% else %}_int_cms_chronic_condition_all{%- endif -%}
       tags:
         - cms_chronic_conditions
         - chronic_conditions
@@ -370,9 +373,10 @@ models:
   - name: chronic_conditions__cms_chronic_conditions_hiv_aids
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: _int_cms_chronic_condition_hiv_aids
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS__int_cms_chronic_condition_hiv_aids{% else %}_int_cms_chronic_condition_hiv_aids{%- endif -%}
       tags:
         - cms_chronic_conditions
         - chronic_conditions
@@ -414,9 +418,10 @@ models:
   - name: chronic_conditions__cms_chronic_conditions_oud
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
-        {% else %}chronic_conditions{%- endif -%}
-      alias: _int_cms_chronic_condition_oud
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions
+        {% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS__int_cms_chronic_condition_oud{% else %}_int_cms_chronic_condition_oud{%- endif -%}
       tags:
         - cms_chronic_conditions
         - chronic_conditions

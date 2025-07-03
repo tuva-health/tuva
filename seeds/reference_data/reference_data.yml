@@ -5,8 +5,9 @@ seeds:
     description: 'Seed containing ANSI FIPS state codes and names.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
-      alias: ansi_fips_state
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_REFERENCE_DATA_ansi_fips_state{% else %}ansi_fips_state{%- endif -%}
       tags:
         - terminology
         - medicare_cclf_connector
@@ -30,8 +31,9 @@ seeds:
     description: 'Seed containing calendar dates and related attributes.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
-      alias: calendar
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_REFERENCE_DATA_calendar{% else %}calendar{%- endif -%}
       tags:
         - terminology
         - pmpm
@@ -84,8 +86,9 @@ seeds:
     description: 'Seed containing code types.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
-      alias: code_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_REFERENCE_DATA_code_type{% else %}code_type{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -101,8 +104,9 @@ seeds:
     description: 'Seed containing FIPS county codes and names.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
-      alias: fips_county
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_REFERENCE_DATA_fips_county{% else %}fips_county{%- endif -%}
       tags:
         - terminology
         - reference_data
@@ -125,8 +129,9 @@ seeds:
     description: 'Seed containing SSA FIPS state codes and names.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}
-      alias: ssa_fips_state
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_reference_data{% else %}reference_data{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_REFERENCE_DATA_ssa_fips_state{% else %}ssa_fips_state{%- endif -%}
       tags:
         - terminology
         - reference_data
