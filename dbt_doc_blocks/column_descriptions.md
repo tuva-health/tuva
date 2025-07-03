@@ -223,7 +223,7 @@ A flag indicating if the patient has died.
 {% enddocs %}
 
 {% docs deductible_amount %}
-The total amount charged on the claim by the provider.
+The total deductible charged on the claim by the provider.
 {% enddocs %}
 
 {% docs default_ccsr_category_description_ip %}
@@ -1003,7 +1003,7 @@ Identifier that links a patient to a particular insurance product or health plan
 {% enddocs %}
 
 {% docs subscriber_relation %}
-Identifier that links a patient to a particular insurance product or health plan.
+The patient's relationship to the subscriber (e.g., self, spouse, child).
 {% enddocs %}
 
 {% docs total_allowed_amount %}
