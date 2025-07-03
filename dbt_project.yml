@@ -94,6 +94,10 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.16','fips_county.csv',compression=true,null_marker=true) }}"
       reference_data__ssa_fips_state:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.16','ssa_fips_state.csv',compression=true,null_marker=true) }}"
+      reference_data__svi_us_county:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/reference-data/SVI','SVI_US_county.csv',compression=true,null_marker=true) }}"
+      reference_data__svi_us:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/reference-data/SVI','SVI_US.csv',compression=true,null_marker=true) }}"
 
     terminology:
       terminology__admit_source:
