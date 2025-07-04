@@ -9,7 +9,7 @@ select
     , med.payer
     , med.{{ quote_column('plan') }}
     , med.claim_start_date
-    , med.claim_end_dateclaim_end_date
+    , med.claim_end_date
     , med.claim_line_start_date
     , med.claim_line_end_date
     , med.admission_date
