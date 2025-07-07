@@ -135,9 +135,9 @@ seeds:
       terminology__icd_9_pcs:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.16','icd_9_pcs.csv',compression=true,null_marker=true) }}"
       terminology__loinc:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.16','loinc.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.17','loinc.csv',compression=true,null_marker=true) }}"
       terminology__loinc_deprecated_mapping:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.16','loinc_deprecated_mapping.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.17','loinc_deprecated_mapping.csv',compression=true,null_marker=true) }}"
       terminology__mdc:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.16','mdc.csv',compression=true,null_marker=true) }}"
       terminology__medicare_dual_eligibility:
