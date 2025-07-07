@@ -14,6 +14,9 @@ select
     , med.claim_line_end_date
     , med.admission_date
     , med.discharge_date
+    , service_category.service_category_1
+    , service_category.service_category_2
+    , service_category.service_category_3
     , med.admit_source_code
     , med.admit_type_code
     , med.discharge_disposition_code
@@ -53,4 +56,7 @@ from {{ ref('the_tuva_project', 'normalized_input__medical_claim') }} as med
     on med.billing_npi = billing_prov.npi
     left outer join {{ ref('tuva_data_assets', 'npi') }} as facility_prov
     on med.facility_npi = facility_prov.npi
-    -- TODO: Get service category groupers and enrollment flag
+    left join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
+    on med.medical_claim_sk = service_category.medical_claim_sk
+    and service_category.priority = 1
+    -- TODO: Get enrollment flag

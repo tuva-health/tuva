@@ -7,9 +7,51 @@ models:
       this is used for justification of reimbursement and determining other billing codes such as DRG.
     config:
       alias: condition
+    columns:
+      - name: condition_sk
+        description: ""
+        tests:
+          - unique:
+              config:
+                severity: error
 
   - name: core__eligibility
     description: >
       Information on the members health plan and supplemental insurance eligibility.
     config:
       alias: eligibility
+    columns:
+      - name: eligibility_sk
+        description: ""
+        tests:
+          - unique:
+              config:
+                severity: error
+
+  - name: core__medical_claim
+    description: >
+      The medical claim table contains information on services rendered
+      to patients and billed by the provider to the insurer as claims.
+    config:
+      alias: medical_claim
+    columns:
+      - name: medical_claim_sk
+        description: ""
+        tests:
+          - unique:
+              config:
+                severity: error
+
+  - name: core__pharmacy_claim
+    description: >
+      The pharmacy claim table contains information on prescription drugs
+      that were filled and billed to the insurer.
+    config:
+      alias: pharmacy_claim
+    columns:
+      - name: pharmacy_claim_sk
+        description: ""
+        tests:
+          - unique:
+              config:
+                severity: error

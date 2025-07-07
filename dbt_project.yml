@@ -10,6 +10,9 @@ models:
     +materialized: view
     claims_preprocessing:
       +schema: tuva_claims_preprocessing
+      service_category:
+        final:
+          +materialized: table
     core:
       final:
         +schema: tuva_core
