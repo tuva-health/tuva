@@ -49,6 +49,8 @@ select
     , med.deductible_amount
     , med.total_cost_amount
     , in_network_flag
+    , case when member_month.member_month_sk is not null then True else False end as enrollment_flag
+    , member_month.member_month_sk
 from {{ ref('the_tuva_project', 'normalized_input__medical_claim') }} as med
     left outer join {{ ref('tuva_data_assets', 'npi') }} as rendering_prov
     on med.rendering_npi = rendering_prov.npi
@@ -59,4 +61,5 @@ from {{ ref('the_tuva_project', 'normalized_input__medical_claim') }} as med
     left join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
     on med.medical_claim_sk = service_category.medical_claim_sk
     and service_category.priority = 1
-    -- TODO: Get enrollment flag
+    left join {{ ref('the_tuva_project', 'enrollment__medical_claim_member_month') }} as member_month
+    on med.medical_claim_sk = member_month.medical_claim_sk

@@ -1,5 +1,5 @@
 select
-    {{ dbt_utils.generate_surrogate_key(['data_source', 'person_id', 'payer', 'plan', 'enrollment_start_date', 'enrollment_end_date']) }} as eligibility_sk
+    {{ dbt_utils.generate_surrogate_key(['data_source', 'member_id', 'payer', 'plan', 'enrollment_start_date', 'enrollment_end_date']) }} as eligibility_sk
     , person_id
     , member_id
     , subscriber_id

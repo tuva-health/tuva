@@ -22,8 +22,5 @@ select
     , copayment_amount
     , deductible_amount
     , in_network_flag
-    , file_name
-    , file_date
-    , ingest_datetime
     , {{ current_timestamp() }} as tuva_last_run
 from {{ ref('the_tuva_project', 'core__stg_pharmacy_claim') }}
