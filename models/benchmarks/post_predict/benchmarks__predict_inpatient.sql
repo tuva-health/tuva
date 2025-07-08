@@ -9,7 +9,6 @@ WITH inpatient_pred AS (
             p.encounter_id
           , p.length_of_stay_pred
           , p.readmission_pred
-          , p.discharge_location_pred
           , p.discharge_pred_proba_expired
           , p.discharge_pred_proba_home
           , p.discharge_pred_proba_home_health
@@ -41,7 +40,6 @@ select e.encounter_id
 , i.readmission_pred as expected_readmission
 , e.readmission_denominator
 , e.discharge_location as actual_discharge_location
-, i.discharge_location_pred as expected_discharge_location
 , ce.facility_id
 , ce.facility_name
 , case when ce.drg_code_type = 'ms-drg' then concat(ce.drg_code,' ',ce.drg_description) else null end as ms_drg_code
