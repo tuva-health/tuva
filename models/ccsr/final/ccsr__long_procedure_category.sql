@@ -33,5 +33,5 @@ select distinct
     , {{ var('prccsr_version') }} as prccsr_version
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from procedures
-left outer join ccsr__procedure_category_map
+inner join ccsr__procedure_category_map
     on procedures.normalized_code = ccsr__procedure_category_map.code

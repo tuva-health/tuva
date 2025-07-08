@@ -7,7 +7,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
-        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         person_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -36,6 +36,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         medicare_status_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        group_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        group_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         first_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         last_name: |
@@ -56,6 +60,11 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_date: date
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: lab_result_seed
     config:
@@ -63,7 +72,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
-        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         lab_result_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -117,6 +126,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
         tuva_last_run: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
 
@@ -126,7 +139,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
-        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -157,9 +170,9 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         bill_type_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        ms_drg_code: |
+        drg_code_type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        apr_drg_code: |
+        drg_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         revenue_center_code: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -178,18 +191,29 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         rendering_npi: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        rendering_tin: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         billing_npi: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        billing_tin: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         facility_npi: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         paid_date: date
-        paid_amount: float
-        allowed_amount: float
-        charge_amount: float
-        coinsurance_amount: float
-        copayment_amount: float
-        deductible_amount: float
-        total_cost_amount: float
+        paid_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        allowed_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        charge_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        coinsurance_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        copayment_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        deductible_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        total_cost_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
         diagnosis_code_type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         diagnosis_code_1: |
@@ -369,8 +393,14 @@ seeds:
         procedure_date_23: date
         procedure_date_24: date
         procedure_date_25: date
+        in_network_flag: integer
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_date: date
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: observation_seed
     config:
@@ -378,7 +408,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
-        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         observation_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -421,6 +451,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: pharmacy_claim_seed
     config:
@@ -428,7 +462,7 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
-        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         claim_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -452,10 +486,20 @@ seeds:
         days_supply: integer
         refills: integer
         paid_date: date
-        paid_amount: float
-        allowed_amount: float
+        paid_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        allowed_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        charge_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        in_network_flag: integer
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        file_date: date
+        ingest_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: provider_attribution_seed
     config:
@@ -463,9 +507,11 @@ seeds:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}_tuva_synthetic
         {% else %}_tuva_synthetic{%- endif -%}
       enabled: |
-        {% if var('test_data_override') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
+        {% if var('use_synthetic_data') == true -%} {{ true|as_bool }} {%- else -%} {{ false|as_bool }} {%- endif -%}
       column_types:
         person_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        patient_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         year_month: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -491,4 +537,3 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         custom_attributed_provider_lob: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-

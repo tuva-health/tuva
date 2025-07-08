@@ -265,14 +265,14 @@ models:
       alias: _int_encounter_overlap
       tags: readmissions
       materialized: view
-    description: "This model lists all pairs of encounters that have some date overlap."
+    description: "This model lists and labels encounters that overlap to identify the best one out of the group."
     columns:
       - name: person_id
         description: "The unique identifier for the patient"
-      - name: encounter_id_A
-        description: "Unique identifier for one of the overlapping encounters"
-      - name: encounter_id_B
-        description: "Unique identifier for the other overlapping encounter"
+      - name: is_best_encounter
+        description: "Flag that identifies the best encounter that has overlapping dates between encounters for the same patient."
+      - name: selection_reason
+        description: "Reason why or why not a particular encounter is selected as best for overlapping dates"
 
   - name: readmissions__encounter_specialty_cohort
     config:

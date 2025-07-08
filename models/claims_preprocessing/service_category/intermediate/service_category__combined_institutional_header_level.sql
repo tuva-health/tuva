@@ -23,6 +23,7 @@ with combine_header_models as (
       ref('service_category__urgent_care_institutional'),
       ref('service_category__inpatient_psychiatric_institutional'),
       ref('service_category__inpatient_rehab_institutional'),
+      ref('service_category__inpatient_long_term_institutional'),
       ref('service_category__outpatient_rehab_institutional'),
       ref('service_category__outpatient_substance_use_institutional'),
       ref('service_category__outpatient_skilled_nursing_institutional'),
@@ -34,6 +35,7 @@ with combine_header_models as (
 
 select
   h.claim_id
+  , h.data_source
   , h.service_category_1
   , h.service_category_2
   , h.service_category_3

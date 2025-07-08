@@ -16,6 +16,3 @@ select * from {{ ref('provider_attribution_seed') }}
 select * from {{ source('source_input', 'provider_attribution') }}
 
 {%- endif %}
-
-
-

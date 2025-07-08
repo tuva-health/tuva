@@ -5,11 +5,30 @@
 
 select distinct
   claim_id
-, 'inpatient' as service_category_1
-, 'skilled nursing' as service_category_2
-, 'skilled nursing' as service_category_3
-, '{{ this.name }}' as source_model_name
-, '{{ var('tuva_last_run') }}' as tuva_last_run
+  , data_source
+  , 'inpatient' as service_category_1
+  , 'skilled nursing' as service_category_2
+  , 'inpatient part A' as service_category_3
+  , '{{ this.name }}' as source_model_name
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('service_category__stg_medical_claim') }}
 where claim_type = 'institutional'
-  and substring(bill_type_code, 1, 2) in ('21', '22')
+  and substring(bill_type_code, 1, 2) in ('21')
+
+{% if target.type == 'fabric' %}
+union
+{% else %}
+union distinct
+{% endif %}
+
+select distinct
+  claim_id
+  , data_source
+  , 'inpatient' as service_category_1
+  , 'skilled nursing' as service_category_2
+  , 'inpatient part B' as service_category_3
+  , '{{ this.name }}' as source_model_name
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('service_category__stg_medical_claim') }}
+where claim_type = 'institutional'
+  and substring(bill_type_code, 1, 2) in ('22')
