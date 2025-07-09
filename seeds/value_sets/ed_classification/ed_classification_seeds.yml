@@ -5,8 +5,9 @@ seeds:
     description: A mapping of ED Classifications to human-readable names
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
-      alias: _value_set_categories
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION__value_set_categories{% else %}_value_set_categories{%- endif -%}
       tags: ed_classification
       enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -32,8 +33,9 @@ seeds:
     description: A mapping of ICD-10-CM codes to CCS categories
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
-      alias: _value_set_icd_10_cm_to_ccs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION__value_set_icd_10_cm_to_ccs{% else %}_value_set_icd_10_cm_to_ccs{%- endif -%}
       tags: ed_classification
       enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -63,8 +65,9 @@ seeds:
     description: A probabilistic mapping of ICD-9 codes to ED classification categories
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
-      alias: _value_set_johnston_icd9
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION__value_set_johnston_icd9{% else %}_value_set_johnston_icd9{%- endif -%}
       tags: ed_classification
       enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -115,8 +118,9 @@ seeds:
     description: A probabilistic mapping of ICD-10 codes to ED classification categories
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}
-      alias: _value_set_johnston_icd10
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification{% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION__value_set_johnston_icd10{% else %}_value_set_johnston_icd10{%- endif -%}
       tags: ed_classification
       enabled: "{{ var('ed_classification_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:

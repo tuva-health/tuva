@@ -8,3 +8,5 @@ models:
         {% else %}claims_expanded{%- endif -%}
       materialized: table
       tags: claims_expanded
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CLAIMS_EXPANDED_medical_claim_expanded{% else %}medical_claim_expanded{%- endif -%}

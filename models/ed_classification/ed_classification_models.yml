@@ -7,9 +7,10 @@ models:
   - name: ed_classification__summary
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: summary
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION_summary{% else %}summary{%- endif -%}
       tags: ed_classification
       materialized: table
     description: |
@@ -86,9 +87,10 @@ models:
   - name: ed_classification__int_filter_encounter_with_classification
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_filter_encounter_with_classification
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION__int_filter_encounter_with_classification{% else %}_int_filter_encounter_with_classification{%- endif -%}
       tags: ed_classification
       materialized: table
     description: Filter out ED visits that were not classified
@@ -97,9 +99,10 @@ models:
   - name: ed_classification__int_map_primary_dx
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
-      alias: _int_by_provider_parent_organization
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION__int_by_provider_parent_organization{% else %}_int_by_provider_parent_organization{%- endif -%}
       tags: ed_classification
       materialized: table
     description: Map ED encounter primary dx to classification
@@ -110,16 +113,20 @@ models:
   - name: ed_classification__stg_encounter
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION_ed_classification__stg_encounter{% else %}ed_classification__stg_encounter{%- endif -%}
       tags: ed_classification
       materialized: ephemeral
 
   - name: ed_classification__stg_patient
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
-        {% else %}ed_classification{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ed_classification
+        {% else %}ed_classification{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_ED_CLASSIFICATION_ed_classification__stg_patient{% else %}ed_classification__stg_patient{%- endif -%}
       tags: ed_classification
       materialized: ephemeral
 

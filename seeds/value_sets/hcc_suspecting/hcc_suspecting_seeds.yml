@@ -5,8 +5,9 @@ seeds:
     description: Value sets for clinical concepts.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _value_set_clinical_concepts
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__value_set_clinical_concepts{% else %}_value_set_clinical_concepts{%- endif -%}
       tags: hcc_suspecting
       enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -34,8 +35,9 @@ seeds:
       announcement documents on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _value_set_hcc_descriptions
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__value_set_hcc_descriptions{% else %}_value_set_hcc_descriptions{%- endif -%}
       tags: hcc_suspecting
       enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -55,8 +57,9 @@ seeds:
       cleaned version of code files on cms.gov.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
-      alias: _value_set_icd_10_cm_mappings
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_HCC_SUSPECTING__value_set_icd_10_cm_mappings{% else %}_value_set_icd_10_cm_mappings{%- endif -%}
       tags: hcc_suspecting
       enabled: "{{ var('hcc_suspecting_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:

@@ -5,8 +5,9 @@ seeds:
     description: 'NUBC Admit Sources'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: admit_source
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_admit_source{% else %}admit_source{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -30,8 +31,9 @@ seeds:
     description: 'Seed containing NUBC admission types and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: admit_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_admit_type{% else %}admit_type{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -51,8 +53,9 @@ seeds:
     description: 'Seed containing All Patient Refined Diagnosis Related Groups (APR-DRG) codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: apr_drg
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_apr_drg{% else %}apr_drg{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -79,8 +82,9 @@ seeds:
     description: 'Seed containing NUBC billing types and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: bill_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_bill_type{% else %}bill_type{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -105,8 +109,9 @@ seeds:
     description: 'Seed containing claim types.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: claim_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_claim_type{% else %}claim_type{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -121,8 +126,9 @@ seeds:
     description: 'Seed containing NUBC discharge disposition codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: discharge_disposition
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_discharge_disposition{% else %}discharge_disposition{%- endif -%}
       column_types:
         discharge_disposition_code : |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -138,8 +144,9 @@ seeds:
     description: 'Seed containing Tuva maintained encounter types.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: encounter_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_encounter_type{% else %}encounter_type{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -158,8 +165,9 @@ seeds:
     description: 'Seed containing ethnicity codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: ethnicity
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_ethnicity{% else %}ethnicity{%- endif -%}
       tags: terminology
       column_types:
         code : |
@@ -176,8 +184,9 @@ seeds:
     description: 'Seed containing gender codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: gender
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_gender{% else %}gender{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -192,8 +201,9 @@ seeds:
     description: 'Seed containing HCPCS Level II codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: hcpcs_level_2
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_hcpcs_level_2{% else %}hcpcs_level_2{%- endif -%}
       tags: terminology
       column_types:
         hcpcs : |
@@ -222,8 +232,9 @@ seeds:
     description: HCPCS to RBCS crosswalk.
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: hcpcs_to_rbcs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_hcpcs_to_rbcs{% else %}hcpcs_to_rbcs{%- endif -%}
       tags: terminology
       enabled: "{{ var('claims_preprocessing_enabled',var('tuva_marts_enabled',True)) }}"
       column_types:
@@ -293,8 +304,9 @@ seeds:
     description: 'Seed containing ICD-9-CM codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: icd_9_cm
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_icd_9_cm{% else %}icd_9_cm{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -319,8 +331,9 @@ seeds:
     description: 'Seed containing ICD-9-PCS codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: icd_9_pcs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_icd_9_pcs{% else %}icd_9_pcs{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -346,8 +359,9 @@ seeds:
     description: 'Seed containing ICD-10-CM codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: icd_10_cm
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_icd_10_cm{% else %}icd_10_cm{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -376,8 +390,9 @@ seeds:
     description: 'Seed containing ICD-10-PCS codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: icd_10_pcs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_icd_10_pcs{% else %}icd_10_pcs{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -397,8 +412,9 @@ seeds:
     description: 'Seed containing LOINC codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: loinc
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_loinc{% else %}loinc{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -482,8 +498,9 @@ seeds:
     description: 'Seed containing deprecated LOINC codes and their replacements.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: loinc_deprecated_mapping
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_loinc_deprecated_mapping{% else %}loinc_deprecated_mapping{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -517,8 +534,9 @@ seeds:
     description: 'Seed containing Major Diagnostic Categories (MDC) codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: mdc
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_mdc{% else %}mdc{%- endif -%}
       tags: terminology
       column_types:
         mdc_code : |
@@ -535,8 +553,9 @@ seeds:
     description: 'Seed containing Medicare dual eligibility status codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: medicare_dual_eligibility
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_medicare_dual_eligibility{% else %}medicare_dual_eligibility{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -556,8 +575,9 @@ seeds:
     description: 'Seed containing Medicare original reason for entitlement (OREC) codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: medicare_orec
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_medicare_orec{% else %}medicare_orec{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -577,10 +597,9 @@ seeds:
     description: 'Seed containing Medicare status codes and descriptions.'
     config:
       schema: |
-        {%- if var('terminology_schema',None) != None -%}{{var('terminology_schema')}}
-        {%- elif var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology
-        {% else %}terminology{%- endif -%}
-      alias: medicare_status
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_medicare_status{% else %}medicare_status{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -600,8 +619,9 @@ seeds:
     description: 'Seed containing Medicare Severity Diagnosis Related Groups (MS-DRG) weights and benchmark length of stay values from CMS.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: ms_drg_weights_los
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_ms_drg_weights_los{% else %}ms_drg_weights_los{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -653,8 +673,9 @@ seeds:
     description: 'Seed containing Medicare Severity Diagnosis Related Groups (MS-DRG) codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: ms_drg
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_ms_drg{% else %}ms_drg{%- endif -%}
       tags:
         - terminology
         - readmissions
@@ -689,8 +710,9 @@ seeds:
     description: 'This file collects all NDCs collected by the FDA and RxNorm, and compiles them into one list. The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: ndc
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_ndc{% else %}ndc{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -716,11 +738,12 @@ seeds:
     description: 'Seed containing other provider taxonomy codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
-      alias: other_provider_taxonomy
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_other_provider_taxonomy{% else %}other_provider_taxonomy{%- endif -%}
       column_types:
         npi: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
@@ -747,8 +770,9 @@ seeds:
     description: 'Seed containing payer types.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: payer_type
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_payer_type{% else %}payer_type{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -763,8 +787,9 @@ seeds:
     description: 'Seed containing place of service codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: place_of_service
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_place_of_service{% else %}place_of_service{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -784,8 +809,9 @@ seeds:
     description: 'Seed containing present on admission (POA) indicator codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: present_on_admission
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_present_on_admission{% else %}present_on_admission{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -805,11 +831,12 @@ seeds:
     description: 'Seed containing provider information.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
-      alias: provider
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_provider{% else %}provider{%- endif -%}
       column_types:
         npi: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(35) {%- endif -%}
@@ -903,8 +930,9 @@ seeds:
     description: 'Seed containing race codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: race
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_race{% else %}race{%- endif -%}
       tags:
         - terminology
         - data_profiling
@@ -923,8 +951,9 @@ seeds:
     description: 'Seed containing revenue center codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: revenue_center
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_revenue_center{% else %}revenue_center{%- endif -%}
       tags:
         - terminology
         - claims_preprocessing
@@ -944,8 +973,9 @@ seeds:
     description: 'This file maps ATC classes to RxCUI. The file is maintained by [CodeRX](https://coderx.io/) in partnership with Tuva Health.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: rxnorm_to_atc
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_rxnorm_to_atc{% else %}rxnorm_to_atc{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -996,8 +1026,9 @@ seeds:
     description: 'Seed containing mappings between SNOMED CT and ICD-10 codes.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: snomed_icd_10_map
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_snomed_icd_10_map{% else %}snomed_icd_10_map{%- endif -%}
       tags:
         - terminology
         - hcc_suspecting
@@ -1072,8 +1103,9 @@ seeds:
     description: 'Seed containing SNOMED CT codes and descriptions.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: snomed_ct
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_snomed_ct{% else %}snomed_ct{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -1102,8 +1134,9 @@ seeds:
     description: 'Seed containing SNOMED CT transitive closures.'
     config:
       schema: |
-        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
-      alias: snomed_ct_transitive_closures
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_snomed_ct_transitive_closures{% else %}snomed_ct_transitive_closures{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -1129,8 +1162,9 @@ seeds:
   - name: terminology__rxnorm_brand_generic
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: rxnorm_brand_generic
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_rxnorm_brand_generic{% else %}rxnorm_brand_generic{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -1164,8 +1198,9 @@ seeds:
   - name: terminology__ccs_services_procedures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: ccs_services_procedures
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_ccs_services_procedures{% else %}ccs_services_procedures{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -1179,8 +1214,9 @@ seeds:
   - name: terminology__nitos
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: nitos
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_nitos{% else %}nitos{%- endif -%}
       tags:
         - terminology
       column_types:
@@ -1205,8 +1241,9 @@ seeds:
       which can be tabularized using Python.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}{{ var('tuva_schema_prefix') }}_terminology{% else %}terminology{%- endif -%}
-      alias: icd10_pcs_cms_ontology
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_TERMINOLOGY_icd10_pcs_cms_ontology{% else %}icd10_pcs_cms_ontology{%- endif -%}
       tags:
         - terminology
       column_types:

@@ -26,7 +26,9 @@ models:
             enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_INPUT_LAYER_input_layer__provider_attribution{% else %}input_layer__provider_attribution{%- endif -%}
       tags: input_layer
       materialized: view
     columns:
