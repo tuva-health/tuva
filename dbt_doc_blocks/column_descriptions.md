@@ -598,8 +598,16 @@ The normalized code.
 The normalized type of code.
 {% enddocs %}
 
-{% docs normalized_component %}
-The normalized component.
+{% docs normalized_component_code %}
+The normalized code for the component.
+{% enddocs %}
+
+{% docs normalized_component_description %}
+Normalized description of the code for the component.
+{% enddocs %}
+
+{% docs normalized_component_type %}
+The normalized type of code for the component.
 {% enddocs %}
 
 {% docs normalized_description %}
@@ -942,8 +950,16 @@ The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
 The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
 {% enddocs %}
 
-{% docs source_component %}
+{% docs source_component_code %}
 The description for the component of the test from the source system.
+{% enddocs %}
+
+{% docs source_component_type %}
+The type of code for the component reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+{% enddocs %}
+
+{% docs source_component_description %}
+Description of the source code for the component in the source system.
 {% enddocs %}
 
 {% docs source_description %}

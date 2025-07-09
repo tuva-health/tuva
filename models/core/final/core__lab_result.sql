@@ -13,29 +13,57 @@ select
     , labs.patient_id
     , labs.encounter_id
     , labs.accession_number
-    , labs.source_code_type
-    , labs.source_code
-    , labs.source_description
-    , labs.source_component
+    , labs.source_order_type
+    , labs.source_order_code
+    , labs.source_order_description
+    , labs.source_component_type
+    , labs.source_component_code
+    , labs.source_component_description
     , case
-        when labs.normalized_code_type is not null then labs.normalized_code_type
+        when labs.normalized_order_type is not null then labs.normalized_order_type
         when loinc.loinc is not null then 'loinc'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
-        else null end as normalized_code_type
+        else null end as normalized_order_type
     , coalesce(
-        labs.normalized_code
+        labs.normalized_order_code
         , loinc.loinc
         , snomed_ct.snomed_ct
-        ) as normalized_code
+        ) as normalized_order_code
     , coalesce(
-        labs.normalized_description
+        labs.normalized_order_description
         , loinc.long_common_name
         , snomed_ct.description
-        ) as normalized_description
-    , case when coalesce(labs.normalized_code, labs.normalized_description) is not null then 'manual'
-         when coalesce(loinc.loinc, snomed_ct.snomed_ct) is not null then 'automatic'
-         end as mapping_method
-    , labs.normalized_component
+        ) as normalized_order_description
+    , case
+        when labs.source_component_type is not null then labs.source_component_type
+        when loinc_component.loinc is not null then 'loinc'
+        when snomed_ct_component.snomed_ct is not null then 'snomed-ct'
+        else null end as source_component_type
+    , coalesce(
+        labs.normalized_component_code
+        , loinc_component.loinc
+        , snomed_ct_component.snomed_ct
+        ) as normalized_component_code
+    , coalesce(
+        labs.normalized_component_description
+        , loinc_component.long_common_name
+        , snomed_ct_component.description
+        ) as normalized_component_description
+    , case
+        when coalesce(
+              labs.normalized_order_code
+            , labs.normalized_order_description
+            , labs.normalized_component_code
+            , labs.normalized_component_description
+        ) is not null then 'manual'
+        when coalesce(
+              loinc.loinc
+            , snomed_ct.snomed_ct
+            , loinc_component.loinc
+            , snomed_ct_component.snomed_ct
+        ) is not null then 'automatic'
+      end as mapping_method
+    , labs.normalized_component_code
     , labs.status
     , labs.result
     , labs.result_date
@@ -53,12 +81,18 @@ select
     , labs.data_source
     , labs.tuva_last_run
 from {{ ref('core__stg_clinical_lab_result') }} as labs
-left outer join {{ ref('terminology__loinc') }} as loinc
-    on labs.source_code_type = 'loinc'
-        and labs.source_code = loinc.loinc
-left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
-    on labs.source_code_type = 'snomed-ct'
-        and labs.source_code = snomed_ct.snomed_ct
+    left outer join {{ ref('terminology__loinc') }} as loinc
+        on labs.source_order_type = 'loinc'
+        and labs.source_order_code = loinc.loinc
+    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
+        on labs.source_order_type = 'snomed-ct'
+        and labs.source_order_code = snomed_ct.snomed_ct
+    left outer join {{ ref('terminology__loinc') }} as loinc_component
+        on labs.source_component_type = 'loinc'
+        and labs.source_component_code = loinc_component.loinc
+    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
+        on labs.source_component_type = 'snomed-ct'
+        and labs.source_component_code = snomed_ct_component.snomed_ct
 
  {% else %}
 
@@ -68,33 +102,35 @@ select
     , labs.patient_id
     , labs.encounter_id
     , labs.accession_number
-    , labs.source_code_type
-    , labs.source_code
-    , labs.source_description
-    , labs.source_component
+    , labs.source_order_type
+    , labs.source_order_code
+    , labs.source_order_description
+    , labs.source_component_type
+    , labs.source_component_code
+    , labs.source_component_description
     , case
-        when labs.normalized_code_type is not null then labs.normalized_code_type
+        when labs.normalized_order_type is not null then labs.normalized_order_type
         when loinc.loinc is not null then 'loinc'
         when snomed_ct.snomed_ct is not null then 'snomed-ct'
-        else custom_mapped.normalized_code_type end as normalized_code_type
+        else custom_mapped.normalized_order_type end as normalized_order_type
     , coalesce(
-        labs.normalized_code
+        labs.normalized_order_code
         , loinc.loinc
         , snomed_ct.snomed_ct
-        , custom_mapped.normalized_code
-        ) as normalized_code
+        , custom_mapped.normalized_order_code
+        ) as normalized_order_code
     , coalesce(
-        labs.normalized_description
+        labs.normalized_order_description
         , loinc.long_common_name
         , snomed_ct.description
-        , custom_mapped.normalized_description
-        ) normalized_description
-  , case  when coalesce(labs.normalized_code, labs.normalized_description) is not null then 'manual'
+        , custom_mapped.normalized_order_description
+        ) normalized_order_description
+  , case  when coalesce(labs.normalized_order_code, labs.normalized_order_description) is not null then 'manual'
         when coalesce(loinc.loinc,snomed_ct.snomed_ct) is not null then 'automatic'
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
-        when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
+        when coalesce(custom_mapped.normalized_order_code,custom_mapped.normalized_order_description) is not null then 'custom'
         end as mapping_method
-    , labs.normalized_component
+    , labs.normalized_component_code
     , labs.status
     , labs.result
     , labs.result_date
@@ -112,21 +148,38 @@ select
     , labs.data_source
     , labs.tuva_last_run
 From  {{ ref('core__stg_clinical_lab_result') }} as labs
-left join {{ ref('terminology__loinc') }} loinc
-    on labs.source_code_type = 'loinc'
-        and labs.source_code = loinc.loinc
-left join {{ ref('terminology__snomed_ct') }} snomed_ct
-    on labs.source_code_type = 'snomed-ct'
-        and labs.source_code = snomed_ct.snomed_ct
-left join {{ ref('custom_mapped') }} custom_mapped
-    on  ( lower(labs.source_code_type) = lower(custom_mapped.source_code_type)
-        or ( labs.source_code_type is null and custom_mapped.source_code_type is null)
+    left join {{ ref('terminology__loinc') }} loinc
+        on labs.source_order_type = 'loinc'
+        and labs.source_order_code = loinc.loinc
+    left join {{ ref('terminology__snomed_ct') }} snomed_ct
+        on labs.source_order_type = 'snomed-ct'
+        and labs.source_order_code = snomed_ct.snomed_ct
+    left outer join {{ ref('terminology__loinc') }} as loinc_component
+        on labs.source_component_type = 'loinc'
+        and labs.source_component_code = loinc_component.loinc
+    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
+        on labs.source_component_type = 'snomed-ct'
+        and labs.source_component_code = snomed_ct_component.snomed_ct
+
+    left join {{ ref('custom_mapped') }} custom_mapped
+        on  ( lower(labs.source_order_type) = lower(custom_mapped.source_order_type)
+            or ( labs.source_order_type is null and custom_mapped.source_order_type is null)
         )
-    and (labs.source_code = custom_mapped.source_code
-        or ( labs.source_code is null and custom_mapped.source_code is null)
+        and (labs.source_order_code = custom_mapped.source_order_code
+            or ( labs.source_order_code is null and custom_mapped.source_order_code is null)
         )
-    and (labs.source_description = custom_mapped.source_description
-        or ( labs.source_description is null and custom_mapped.source_description is null)
+        and (labs.source_order_description = custom_mapped.source_order_description
+            or ( labs.source_order_description is null and custom_mapped.source_order_description is null)
         )
-    and not (labs.source_code is null and labs.source_description is null)
+        and ( lower(labs.source_component_type) = lower(custom_mapped.source_component_type)
+            or ( labs.source_component_type is null and custom_mapped.source_component_type is null)
+        )
+        and (labs.source_component_code = custom_mapped.source_component_code
+            or ( labs.source_component_code is null and custom_mapped.source_component_code is null)
+        )
+        and (labs.source_component_description = custom_mapped.source_component_description
+            or ( labs.source_component_description is null and custom_mapped.source_component_description is null)
+        )
+        and not (labs.source_order_code is null and labs.source_order_description is null)
+        and not (labs.source_component_code is null and labs.source_component_description is null)
 {% endif %}

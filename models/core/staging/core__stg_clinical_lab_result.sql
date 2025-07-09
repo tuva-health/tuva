@@ -9,14 +9,18 @@ select
     , cast(patient_id as {{ dbt.type_string() }}) as patient_id
     , cast(encounter_id as {{ dbt.type_string() }}) as encounter_id
     , cast(accession_number as {{ dbt.type_string() }}) as accession_number
-    , cast(source_code_type as {{ dbt.type_string() }}) as source_code_type
-    , cast(source_code as {{ dbt.type_string() }}) as source_code
-    , cast(source_description as {{ dbt.type_string() }}) as source_description
-    , cast(source_component as {{ dbt.type_string() }}) as source_component
-    , cast(normalized_code_type as {{ dbt.type_string() }}) as normalized_code_type
-    , cast(normalized_code as {{ dbt.type_string() }}) as normalized_code
-    , cast(normalized_description as {{ dbt.type_string() }}) as normalized_description
-    , cast(normalized_component as {{ dbt.type_string() }}) as normalized_component
+    , cast(source_order_type as {{ dbt.type_string() }}) as source_order_type
+    , cast(source_order_code as {{ dbt.type_string() }}) as source_order_code
+    , cast(source_order_description as {{ dbt.type_string() }}) as source_order_description
+    , cast(source_component_type as {{ dbt.type_string() }}) as source_component_type
+    , cast(source_component_code as {{ dbt.type_string() }}) as source_component_code
+    , cast(source_component_description as {{ dbt.type_string() }}) as source_component_description
+    , cast(normalized_order_type as {{ dbt.type_string() }}) as normalized_order_type
+    , cast(normalized_order_code as {{ dbt.type_string() }}) as normalized_order_code
+    , cast(normalized_order_description as {{ dbt.type_string() }}) as normalized_order_description
+    , cast(normalized_component_type as {{ dbt.type_string() }}) as normalized_component_type
+    , cast(normalized_component_code as {{ dbt.type_string() }}) as normalized_component_code
+    , cast(normalized_component_description as {{ dbt.type_string() }}) as normalized_component_description
     , cast(status as {{ dbt.type_string() }}) as status
     , cast(result as {{ dbt.type_string() }}) as result
     , {{ try_to_cast_date('result_date', 'YYYY-MM-DD') }} as result_date
