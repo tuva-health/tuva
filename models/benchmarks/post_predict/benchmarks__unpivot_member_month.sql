@@ -100,12 +100,12 @@ with unpivoted as (
         , payer
         , {{ quote_column('plan') }}
         , data_source
-        , metric
+        , lower(metric) as metric
         , value
         -- Determine the metric type from the original metric name
         , case 
-            when metric like 'actual%' then 'actual'
-            when metric like 'expected%' then 'expected'
+            when lower(metric) like 'actual%' then 'actual'
+            when lower(metric) like 'expected%' then 'expected'
             else null
         end as metric_type
     from unpivoted

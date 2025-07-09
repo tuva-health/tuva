@@ -34,11 +34,11 @@ with expected_member_month as (
         , p.emergency_department_paid_amount_pred
         , p.home_health_paid_amount_pred
         , p.inpatient_hospice_paid_amount_pred
-        , 0 as inpatient_long_term_acute_care_paid_amount_pred  -- Column not in predictions table
+        , 0 as inpatient_long_term_acute_care_paid_amount_pred  -- place holder
         , p.inpatient_psych_paid_amount_pred
         , p.inpatient_rehabilitation_paid_amount_pred
         , p.inpatient_skilled_nursing_paid_amount_pred
-        , 0 as inpatient_substance_use_paid_amount_pred         -- Column not in predictions table
+        , 0 as inpatient_substance_use_paid_amount_pred         -- place holder
         , p.lab_orphaned_paid_amount_pred
         , p.office_visit_paid_amount_pred
         , p.office_visit_other_paid_amount_pred
@@ -54,7 +54,7 @@ with expected_member_month as (
         , p.outpatient_pt_ot_st_paid_amount_pred
         , p.outpatient_radiology_paid_amount_pred
         , p.outpatient_rehabilitation_paid_amount_pred
-        , 0 as outpatient_substance_use_paid_amount_pred        -- Column not in predictions table
+        , 0 as outpatient_substance_use_paid_amount_pred        -- place holder
         , p.outpatient_surgery_paid_amount_pred
         , p.telehealth_paid_amount_pred
         , p.urgent_care_paid_amount_pred
@@ -71,12 +71,12 @@ with expected_member_month as (
         , p.emergency_department_count_pred as ed_encounter_count_pred -- original alias
         , p.home_health_count_pred as home_health_encounter_count_pred
         , p.inpatient_hospice_count_pred as inpatient_hospice_encounter_count_pred
-        , 0 as inpatient_long_term_acute_care_encounter_count_pred  -- Column not in predictions table
+        , 0 as inpatient_long_term_acute_care_encounter_count_pred  -- place holder
         , p.inpatient_psych_count_pred as inpatient_psych_encounter_count_pred
         , p.inpatient_rehabilitation_count_pred as inpatient_rehabilitation_encounter_count_pred
         , p.inpatient_skilled_nursing_count_pred as inpatient_skilled_nursing_encounter_count_pred
         , p.inpatient_skilled_nursing_count_pred as snf_encounter_count_pred -- original alias
-        , 0 as inpatient_substance_use_encounter_count_pred         -- Column not in predictions table
+        , 0 as inpatient_substance_use_encounter_count_pred         -- place holder
         , p.lab_orphaned_count_pred as lab_orphaned_encounter_count_pred
         , p.office_visit_count_pred as office_visit_encounter_count_pred
         , p.office_visit_other_count_pred as office_visit_other_encounter_count_pred
@@ -92,7 +92,7 @@ with expected_member_month as (
         , p.outpatient_pt_ot_st_count_pred as outpatient_pt_ot_st_encounter_count_pred
         , p.outpatient_radiology_count_pred as outpatient_radiology_encounter_count_pred
         , p.outpatient_rehabilitation_count_pred as outpatient_rehabilitation_encounter_count_pred
-        , 0 as outpatient_substance_use_encounter_count_pred        -- Column not in predictions table
+        , 0 as outpatient_substance_use_encounter_count_pred        -- place holder
         , p.outpatient_surgery_count_pred as outpatient_surgery_encounter_count_pred
         , p.telehealth_count_pred as telehealth_encounter_count_pred
         , p.urgent_care_count_pred as urgent_care_encounter_count_pred
