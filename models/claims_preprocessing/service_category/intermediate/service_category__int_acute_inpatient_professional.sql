@@ -1,9 +1,9 @@
 /*
  * Determines claim line service categories for acute inpatient.
  */
-with service_category__stg_medical_claim as (
+with service_category__stg_professional as (
     select *
-    from {{ ref('the_tuva_project', 'service_category__stg_medical_claim') }}
+    from {{ ref('the_tuva_project', 'service_category__stg_professional') }}
 )
 select
     medical_claim_sk
@@ -14,6 +14,5 @@ select
         when hcpcs_code in ('59510', '59514', '59515', '59618', '59620', '59622') then 'l/d - cesarean delivery'
         else 'acute inpatient - other'
     end as service_category_3
-from service_category__stg_medical_claim
-where claim_type = 'professional'
-    and place_of_service_code = '21'
+from service_category__stg_professional
+where place_of_service_code = '21'

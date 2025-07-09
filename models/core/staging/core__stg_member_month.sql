@@ -1,9 +1,9 @@
 with enrollment__member_month as (
     select *
-    from from {{ ref('enrollment__member_month') }}
+    from {{ ref('enrollment__member_month') }}
 )
 select
-    member_month_key
+    member_month_sk
     , data_source
     , member_id
     , payer

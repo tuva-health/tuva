@@ -12,4 +12,4 @@ select
         end as service_category_3
 from service_category__stg_medical_claim
 where claim_type = 'institutional'
-  and bill_type_code in ('21', '22')
+    and bill_type_code in ('21', '22')

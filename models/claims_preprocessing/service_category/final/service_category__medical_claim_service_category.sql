@@ -4,7 +4,7 @@ with service_category__stg_medical_claim as (
 ),
 combined_service_categories as (
     select *
-    from {{ ref('service_category__int_all_unioned') }}
+    from {{ ref('the_tuva_project', 'service_category__int_all_unioned') }}
 ),
 service_category as (
     select *

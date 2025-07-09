@@ -1,5 +1,5 @@
 select
-    member_month_key
+    member_month_sk
     , data_source
     , member_id
     , payer

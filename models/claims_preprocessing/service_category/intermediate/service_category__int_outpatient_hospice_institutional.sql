@@ -1,8 +1,4 @@
-with service_category__stg_medical_claim as (
-    select *
-    from {{ ref('the_tuva_project', 'service_category__stg_medical_claim') }}
-),
-service_category__stg_outpatient_institutional as (
+with service_category__stg_outpatient_institutional as (
     select *
     from {{ ref('the_tuva_project', 'service_category__stg_outpatient_institutional') }}
 ),
@@ -15,9 +11,7 @@ select
     , 'outpatient' as service_category_1
     , 'outpatient hospice' as service_category_2
     , 'outpatient hospice' as service_category_3
-from service_category__stg_medical_claim as med
-    inner join service_category__stg_outpatient_institutional as outpatient
-    on med.medical_claim_sk = outpatient.medical_claim_sk
+from service_category__stg_outpatient_institutional as med
     left join service_category__home_health_institutional as home
     on med.medical_claim_sk = home.medical_claim_sk
 where

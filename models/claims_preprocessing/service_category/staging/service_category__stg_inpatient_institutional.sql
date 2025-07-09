@@ -13,31 +13,21 @@ ms_drg as (
 apr_drg as (
     select *
     from {{ ref('tuva_data_assets', 'apr_drg') }}
-),
-drg_requirement as (
-    select
-        med.medical_claim_sk
-        , med.drg_code_type
-        , med.drg_code
-        , med.bill_type_code
-    from service_category__stg_medical_claim as med
-        inner join ms_drg
-        on med.drg_code_type = 'ms-drg'
-        and med.drg_code = ms_drg.ms_drg_code
-        inner join apr_drg
-        on med.drg_code_type = 'apr-drg'
-        and med.drg_code = apr_drg.apr_drg_code
-    where med.claim_type = 'institutional'
-),
-bill_type_requirement as (
-    select
-        medical_claim_sk
-        , drg_code_type
-        , drg_code
-        , bill_type_code
-    from service_category__stg_medical_claim
-    where claim_type = 'institutional'
-        and substring(bill_type_code, 1, 2) in (
+)
+select
+    med.*
+    , ms_drg.mdc_code
+from service_category__stg_medical_claim as med
+    left outer join ms_drg
+    on med.drg_code_type = 'ms-drg'
+    and med.drg_code = ms_drg.ms_drg_code
+    left outer join apr_drg
+    on med.drg_code_type = 'apr-drg'
+    and med.drg_code = apr_drg.apr_drg_code
+where med.claim_type = 'institutional'
+    and (
+        (ms_drg.ms_drg_code is not null or apr_drg.apr_drg_code is not null)
+        or bill_type_code in (
             '11'  -- Hospital Inpatient (Part A)
             , '12'  -- Hospital Inpatient (Part B)
             , '21'  -- Skilled Nursing Facility (SNF) Inpatient (Part A)
@@ -65,19 +55,4 @@ bill_type_requirement as (
             , '67'  -- Intermediate Care Subacute Inpatient
             , '68'  -- Intermediate Care Swing Beds
         )
-)
-select
-    medical_claim_sk
-    , 'inpatient' as service_type
-    , drg_code_type
-    , drg_code
-    , bill_type_code
-from bill_type_requirement
-union
-select
-    medical_claim_sk
-    , 'inpatient' as service_type
-    , drg_code_type
-    , drg_code
-    , bill_type_code
-from drg_requirement
+        )

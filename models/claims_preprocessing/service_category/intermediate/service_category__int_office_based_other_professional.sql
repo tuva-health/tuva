@@ -1,4 +1,4 @@
-with service_category__stg_medical_claim as (
+with service_category__stg_office_based as (
     select *
     from {{ ref('the_tuva_project', 'service_category__stg_office_based') }}
 ),
