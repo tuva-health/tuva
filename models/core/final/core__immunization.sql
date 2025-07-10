@@ -18,20 +18,17 @@ select
     , case
         when immune.normalized_code_type is not null then immune.normalized_code_type
         when cvx.cvx is not null then 'cvx'
-        when snomed_ct.snomed_ct is not null then 'snomed-ct'
         else null end as normalized_code_type
     , coalesce(
         immune.normalized_code
         , cvx.cvx
-        , snomed_ct.snomed_ct
         ) as normalized_code
     , coalesce(
         immune.normalized_description
         , cvx.long_description
-        , snomed_ct.description
         ) as normalized_description
     , case when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'
-         when coalesce(cvx.cvx, snomed_ct.snomed_ct) is not null then 'automatic'
+         when cvx.cvx is not null then 'automatic'
          end as mapping_method
     , coalesce(immunization_status.status, immune.status) as status
     , coalesce(immunization_status_reason.description ,immune.status_reason) as status_reason
@@ -49,9 +46,6 @@ from {{ ref('core__stg_clinical_immunization') }} as immune
 left join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
         and immune.source_code = cvx.cvx
-left join {{ ref('terminology__snomed_ct') }} as snomed_ct
-    on immune.source_code_type = 'snomed-ct'
-        and immune.source_code = snomed_ct.snomed_ct
 left join {{ ref('terminology__immunization_status') }} as immunization_status
     on immune.status = immunization_status.status_code
 left join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason
@@ -78,22 +72,19 @@ select
     , case
         when immune.normalized_code_type is not null then immune.normalized_code_type
         when cvx.cvx is not null then 'cvx'
-        when snomed_ct.snomed_ct is not null then 'snomed-ct'
         else custom_mapped.normalized_code_type end as normalized_code_type
     , coalesce(
         immune.normalized_code
         , cvx.cvx
-        , snomed_ct.snomed_ct
         , custom_mapped.normalized_code
         ) as normalized_code
     , coalesce(
         immune.normalized_description
         , cvx.long_description
-        , snomed_ct.description
         , custom_mapped.normalized_description
         ) normalized_description
   , case  when coalesce(immune.normalized_code, immune.normalized_description) is not null then 'manual'
-        when coalesce(cvx.cvx,snomed_ct.snomed_ct) is not null then 'automatic'
+        when cvx.cvx is not null then 'automatic'
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
         when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
         end as mapping_method
@@ -113,9 +104,6 @@ From  {{ ref('core__stg_clinical_immunization') }} as immune
 left join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
         and immune.source_code = cvx.cvx
-left join {{ ref('terminology__snomed_ct') }} as snomed_ct
-    on immune.source_code_type = 'snomed-ct'
-        and immune.source_code = snomed_ct.snomed_ct
 left join {{ ref('terminology__immunization_status') }} as immunization_status
     on immune.status = immunization_status.status_code
 left join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason

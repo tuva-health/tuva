@@ -1,25 +1,25 @@
 select
-    cast(null as {{ dbt.type_string() }}) as immunization_id
-    , cast(null as {{ dbt.type_string() }}) as person_id
-    , cast(null as {{ dbt.type_string() }}) as patient_id
-    , cast(null as {{ dbt.type_string() }}) as encounter_id
-    , cast(null as {{ dbt.type_string() }}) as source_code_type
-    , cast(null as {{ dbt.type_string() }}) as source_code
-    , cast(null as {{ dbt.type_string() }}) as source_description
-    , cast(null as {{ dbt.type_string() }}) as normalized_code_type
-    , cast(null as {{ dbt.type_string() }}) as normalized_code
-    , cast(null as {{ dbt.type_string() }}) as normalized_description
-    , cast(null as {{ dbt.type_string() }}) as status
-    , cast(null as {{ dbt.type_string() }}) as status_reason
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as occurrence_date
-    , cast(null as {{ dbt.type_string() }}) as source_dose
-    , cast(null as {{ dbt.type_string() }}) as normalized_dose
-    , cast(null as {{ dbt.type_string() }}) as lot_number
-    , cast(null as {{ dbt.type_string() }}) as body_site
-    , cast(null as {{ dbt.type_string() }}) as route
-    , cast(null as {{ dbt.type_string() }}) as location_id
-    , cast(null as {{ dbt.type_string() }}) as practitioner_id
-    , cast(null as {{ dbt.type_string() }}) as data_source
-    , cast(null as {{ dbt.type_string() }}) as file_name
-    , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
-limit 0
+    immunization_id
+    , person_id
+    , patient_id
+    , encounter_id
+    , source_code_type
+    , source_code
+    , source_description
+    , normalized_code_type
+    , normalized_code
+    , normalized_description
+    , status
+    , status_reason
+    , occurrence_date
+    , source_dose
+    , normalized_dose
+    , lot_number
+    , body_site
+    , route
+    , location_id
+    , practitioner_id
+    , data_source
+    , file_name
+    , ingest_datetime
+from {{ ref('immunization_seed') }}

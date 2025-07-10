@@ -57,7 +57,7 @@ models:
       materialized: table
       
   - name: immunization
-    description: Created using empty table logic.
+    description: Created from seed or source data depending on use_synthetic_data variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
