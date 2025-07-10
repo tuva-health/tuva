@@ -959,38 +959,46 @@ models:
         description: '{{ doc("encounter_id") }}'
       - name: accession_number
         description: '{{ doc("accession_number") }}'
-      - name: source_code_type
+      - name: source_order_type
         description: '{{ doc("source_code_type") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
-      - name: source_code
+      - name: source_order_code
         description: '{{ doc("source_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: source_description
+      - name: source_order_description
         description: '{{ doc("source_description") }}'
-      - name: source_component
-        description: '{{ doc("source_component") }}'
+      - name: source_component_type
+        description: '{{ doc("source_component_type") }}'
+      - name: source_component_code
+        description: '{{ doc("source_component_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: normalized_code_type
+      - name: source_component_description
+        description: '{{ doc("source_component_description") }}'
+      - name: normalized_order_type
         description: '{{ doc("normalized_code_type") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__code_type.csv
-      - name: normalized_code
+      - name: normalized_order_code
         description: '{{ doc("normalized_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: normalized_description
+      - name: normalized_order_description
         description: '{{ doc("normalized_description") }}'
-      - name: normalized_component
-        description: '{{ doc("normalized_component") }}'
+      - name: normalized_component_type
+        description: '{{ doc("normalized_component_type") }}'
+      - name: normalized_component_code
+        description: '{{ doc("normalized_component_code") }}'
         meta:
           terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__loinc.csv
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: normalized_component_description
+        description: '{{ doc("normalized_component_description") }}'
       - name: status
         description: '{{ doc("status") }}'
       - name: result
