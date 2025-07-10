@@ -54,7 +54,7 @@ with lab_result as (
         , code_type
         , code
         , result_date
-        , cast(result as {{ dbt.type_numeric() }}) as result
+        , try_cast(result as {{ dbt.type_numeric() }}) as result
     from egfr_labs
    {% if target.type == 'fabric' %}
         WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
@@ -74,7 +74,7 @@ with lab_result as (
         , code
         , result_date
         , result
-        , cast(case
+        , try_cast(case
             when lower(result) like '%unsatisfactory specimen%' then null
             when result like '%>%' then null
             when result like '%<%' then null
