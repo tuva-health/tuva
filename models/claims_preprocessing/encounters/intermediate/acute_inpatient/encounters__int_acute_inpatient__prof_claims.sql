@@ -6,8 +6,12 @@
 -- gets assigned to the encounter whose date range contains the claim's start date.
 
 -- Step 1: Get encounter date ranges with patient information
--- We only need one row per encounter, so filter to the first claim and join dates
-with encounters_with_dates as (
+-- We only need one row per encounter, so get encounter grain
+with encounters__prof_and_lower_priority as (
+    select *
+    from {{ ref('encounters__prof_and_lower_priority') }}
+),
+encounters as (
     select distinct
         gei.encounter_id
         , gei.member_id
@@ -23,19 +27,19 @@ with encounters_with_dates as (
 -- 2. Claim start date falls within encounter date range (inclusive)
 -- 3. Claim is professional or lower priority type
 select plp.medical_claim_sk
+    , plp.data_source
     , plp.claim_id
     , plp.claim_line_number
-    , plp.data_source
-    , ewd.encounter_id
+    , enc.encounter_id
     , -- Handle edge case: if a professional claim overlaps multiple encounters,
       -- prioritize by encounter_id (lowest wins) to ensure deterministic attribution
     row_number() over (
         partition by plp.medical_claim_sk
-        order by ewd.encounter_id
+        order by enc.encounter_id
     ) as claim_attribution_number
-from {{ ref('encounters__prof_and_lower_priority') }} as plp
+from encounters__prof_and_lower_priority as plp
     -- Match claims to encounters based on patient and date overlap
-    inner join encounters_with_dates ewd
-        on plp.data_source = ewd.data_source
-        and plp.member_id = ewd.member_id
-        and plp.start_date between ewd.encounter_start_date and ewd.encounter_end_date
+    inner join encounters as enc
+        on plp.data_source = enc.data_source
+        and plp.member_id = enc.member_id
+        and plp.start_date between enc.encounter_start_date and enc.encounter_end_date

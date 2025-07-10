@@ -1,3 +1,11 @@
+with npi as (
+    select *
+    from {{ ref('the_tuva_project', 'core__stg_npi') }}
+),
+normalized_input__pharmacy_claim as (
+    select *
+    from {{ ref('the_tuva_project', 'normalized_input__pharmacy_claim') }}
+)
 select
     pharm.pharmacy_claim_sk
     , pharm.data_source
@@ -28,8 +36,8 @@ select
     , pharm.file_name
     , pharm.file_date
     , pharm.ingest_datetime
-from {{ ref('the_tuva_project', 'normalized_input__pharmacy_claim') }} as pharm
-left outer join {{ ref('tuva_data_assets', 'npi') }} as pres
-      on pharm.prescribing_provider_npi = pres.npi
-left outer join {{ ref('tuva_data_assets', 'npi') }} as disp
-      on pharm.dispensing_provider_npi = disp.npi
+from normalized_input__pharmacy_claim as pharm
+    left outer join npi as pres
+    on pharm.prescribing_provider_npi = pres.npi
+    left outer join npi as disp
+    on pharm.dispensing_provider_npi = disp.npi

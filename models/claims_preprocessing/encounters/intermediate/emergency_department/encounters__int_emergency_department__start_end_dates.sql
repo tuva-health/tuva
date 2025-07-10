@@ -1,6 +1,5 @@
-select
+select distinct
     encounter_id
-    , min(start_date) as encounter_start_date
-    , max(end_date) as encounter_end_date
+    , encounter_start_date
+    , encounter_end_date
 from {{ ref('encounters__int_emergency_department__generate_encounter_id') }}
-group by encounter_id

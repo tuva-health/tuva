@@ -1,3 +1,19 @@
+with npi as (
+    select *
+    from {{ ref('the_tuva_project', 'core__stg_npi') }}
+),
+normalized_input__medical_claim as (
+    select *
+    from {{ ref('the_tuva_project', 'normalized_input__medical_claim') }}
+),
+service_category__medical_claim_service_category as (
+    select *
+    from {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }}
+),
+enrollment__medical_claim_member_month as (
+    select *
+    from {{ ref('the_tuva_project', 'enrollment__medical_claim_member_month') }}
+)
 select
     med.medical_claim_sk
     , med.data_source
@@ -51,15 +67,15 @@ select
     , in_network_flag
     , case when member_month.member_month_sk is not null then True else False end as enrollment_flag
     , member_month.member_month_sk
-from {{ ref('the_tuva_project', 'normalized_input__medical_claim') }} as med
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as rendering_prov
+from normalized_input__medical_claim as med
+    left outer join npi as rendering_prov
     on med.rendering_npi = rendering_prov.npi
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as billing_prov
+    left outer join npi as billing_prov
     on med.billing_npi = billing_prov.npi
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as facility_prov
+    left outer join npi as facility_prov
     on med.facility_npi = facility_prov.npi
-    left join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
+    left join service_category__medical_claim_service_category as service_category
     on med.medical_claim_sk = service_category.medical_claim_sk
     and service_category.priority = 1
-    left join {{ ref('the_tuva_project', 'enrollment__medical_claim_member_month') }} as member_month
+    left join enrollment__medical_claim_member_month as member_month
     on med.medical_claim_sk = member_month.medical_claim_sk

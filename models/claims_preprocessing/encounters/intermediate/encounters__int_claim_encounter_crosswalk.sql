@@ -87,11 +87,11 @@ with encounter_claims_union as (
     
     -- Ambulance - Orphaned (Priority 1,000,002)
     select medical_claim_sk
-        , old_encounter_id
+        , encounter_id
         , 'ambulance - orphaned' as encounter_type
         , 'other' as encounter_group
         , 1000002 as priority_number
-    from {{ ref('encounters__int_ambulance__match_claims_to_anchor') }}
+    from {{ ref('encounters__int_ambulance__generate_encounter_id') }}
 )
 
 -- ============================================================================
@@ -101,12 +101,12 @@ with encounter_claims_union as (
 -- (lowest priority_number) and assign sequential encounter IDs
 
 select medical_claim_sk
-    , encounter_id as old_encounter_id
-    , -- Create new sequential encounter IDs grouped by type and original ID
-    dense_rank() over (order by encounter_type, encounter_id) as encounter_id
+    , encounter_id
+    , -- Create new sequential encounter IDs grouped by type and original ID TODO: Change to a hash
+    dense_rank() over (order by encounter_type, encounter_id) as encounter_sk
     , encounter_type
     , encounter_group
     , priority_number
     , -- Assign attribution number based on priority (1 = highest priority assignment)
-    row_number() over (partition by medical_claim_sk order by priority_number) as claim_line_attribution_number
+    row_number() over (partition by medical_claim_sk order by priority_number) as encounter_type_priority
 from encounter_claims_union

@@ -43,24 +43,30 @@ claims_sequenced as (
 ),
 
 -- Step 4: Identify which claims should be merged based on business rules
--- Three merge scenarios:
+-- Four merge scenarios:
 -- 1. Same end date + same facility (concurrent claims)
--- 2. Adjacent dates (1 day apart) + same facility + transfer discharge (code 30)
--- 3. Overlapping dates + same facility
+-- 2. Adjacent dates (1 day apart) + same facility + still a patient (code 30)
+-- 3. Same start date + same facility + still a patient (code 30)
+-- 4. Overlapping dates + same facility
 merge_candidates as (
     select a.row_num as row_num_a
         , b.row_num as row_num_b
         , case
-            -- Scenario 1: Concurrent claims at same facility
+            -- Scenario 1: Concurrent claims (Catches duplicates/corrections)
             when a.end_date = b.end_date
                 and a.facility_npi = b.facility_npi then 1
 
-            -- Scenario 2: Adjacent transfer (next day admission after transfer discharge)
+            -- Scenario 2: Consecutive Stay with Transfer (Catches month-end billing)
             when {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='a.end_date') }} = b.start_date
                 and a.facility_npi = b.facility_npi
                 and a.discharge_disposition_code = '30' then 1
 
-            -- Scenario 3: Overlapping stays at same facility
+            -- Scenario 3: Same-Day Start / Superseded Claim
+            when a.start_date = b.start_date
+                and a.facility_npi = b.facility_npi
+                and a.discharge_disposition_code = '30' then 1
+
+            -- Scenario 4: General Overlapping Stay
             when a.end_date != b.end_date
                 and a.end_date > b.start_date
                 and a.facility_npi = b.facility_npi then 1
@@ -146,7 +152,7 @@ encounters_with_ids as (
         , ea.discharge_disposition_code
         , ea.start_date
         , ea.end_date
-        , -- The encounter_id is the row_num of the closing claim
+        , -- The encounter_group_id is the row_num of the closing claim
         ea.encounter_closing_row as encounter_id
     from encounter_assignments ea
     left join closing_claims cc

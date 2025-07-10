@@ -15,6 +15,20 @@ models:
               config:
                 severity: error
 
+  - name: core__encounter
+    description: >
+      The encounter table contains information about patients visits (i.e.  encounters).  This
+      includes acute inpatient, emergency department, office visits, SNF stays, etc.
+    config:
+      alias: encounter
+    columns:
+      - name: encounter_sk
+        description: ""
+        tests:
+          - unique:
+              config:
+                severity: error
+
   - name: core__eligibility
     description: >
       Information on the members health plan and supplemental insurance eligibility.

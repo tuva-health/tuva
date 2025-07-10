@@ -26,7 +26,7 @@ from normalized_input__medical_claim as med
     left outer join {{ ref('tuva_data_assets', 'hcpcs_ccs') }} as ccs
     on med.hcpcs_code = ccs.hcpcs_code
     left outer join {{ ref('tuva_data_assets', 'icd_10_cm_ccsr') }} as ccsr
-    on med.diagnosis_code_1 = ccsr.icd_10_cm_code
+    on med.diagnosis_code_1 = ccsr.icd_10_cm
     left outer join {{ ref('tuva_data_assets', 'npi') }} as fac
     on med.facility_npi = fac.npi
     left outer join {{ ref('tuva_data_assets', 'npi') }} as ren
