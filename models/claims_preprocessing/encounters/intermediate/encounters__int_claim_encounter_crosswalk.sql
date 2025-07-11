@@ -83,7 +83,31 @@ with encounter_claims_union as (
     where claim_attribution_number = 1
     
     union all
+    /*
+    Priority of sub office-based types from office based group are set
+    within office_visits__int_office_visits_union model
+    */
+    -- Office-Based Radiology (Priority 7)
+    select medical_claim_sk
+        , encounter_id
+        , encounter_type
+        , 'office based' as encounter_group
+        , 7 as priority_number
+    from {{ ref('encounters__int_office_visits__rank') }}
+    where encounter_type = 'office visit radiology'
 
+    union all
+
+    -- Office-Based non-radiology (Priority 8)
+    select medical_claim_sk
+        , encounter_id
+        , encounter_type
+        , 'office based' as encounter_group
+        , 8 as priority_number
+    from {{ ref('encounters__int_office_visits__rank') }}
+    where encounter_type <> 'office visit radiology'
+
+    union all
     
     -- Ambulance - Orphaned (Priority 1,000,002)
     select medical_claim_sk

@@ -6,29 +6,30 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__int_claim_encounter_crosswalk') }}
 )
-, encounters__int_ambulance__start_end_dates as (
+, encounters__int_office_visits__start_end_dates as (
     select *
-    from {{ ref('encounters__int_ambulance__start_end_dates') }}
+    from {{ ref('encounters__int_office_visits__start_end_dates') }}
 )
 , encounters__stg_patient as (
     select *
     from {{ ref('encounters__stg_patient') }}
 )
 , base_claims as (
-    select stg.*
+    select
+        stg.*
         , cex.encounter_sk
         , cex.encounter_type
         , cex.encounter_group
         , dts.encounter_start_date
         , dts.encounter_end_date
         , row_number() over (partition by cex.encounter_sk
-            order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
+            order by stg.claim_type, stg.start_date) as encounter_row_number
     from encounters__stg_medical_claim as stg
         inner join encounters__int_claim_encounter_crosswalk as cex
-        on stg.medical_claim_sk = cex.medical_claim_sk
-        and cex.encounter_type = 'ambulance - orphaned'
+        on cex.medical_claim_sk = stg.medical_claim_sk
+        and cex.encounter_group = 'office based'
         and cex.encounter_type_priority = 1
-        inner join encounters__int_ambulance__start_end_dates as dts
+        inner join encounters__int_office_visits__start_end_dates as dts
         on cex.encounter_id = dts.encounter_id
 )
 
@@ -63,18 +64,35 @@ with encounters__stg_medical_claim as (
         , facility_type
 )
 
-, highest_paid_pos as (
-    select encounter_sk
-        , place_of_service_code
+, highest_paid_physician as (
+    select 
+        encounter_sk
+        , billing_npi
         , row_number() over (partition by encounter_sk order by sum(paid_amount) desc) as paid_order
         , sum(paid_amount) as paid_amount
     from base_claims
-    where place_of_service_code is not null
+    where billing_npi is not null
     group by
         encounter_sk
-        , place_of_service_code
+        , billing_npi
 )
 
+, highest_paid_hcpc as (
+    select 
+        encounter_sk
+        , hcpcs_code
+        , ccs_category
+        , ccs_category_description
+        , row_number() over (partition by encounter_sk order by sum(paid_amount) desc) as paid_order
+        , sum(paid_amount) as paid_amount
+    from base_claims
+    where hcpcs_code is not null
+    group by
+        encounter_sk
+        , hcpcs_code
+        , ccs_category
+        , ccs_category_description
+)
 , service_category_flags as (
     select
         encounter_sk
@@ -152,22 +170,27 @@ select
     , tot.inst_claim_count
     , tot.prof_claim_count
     , {{ calculate_age("p.birth_date","a.encounter_start_date") }} as admit_age
---    , p.gender
---    , p.race
+--    , phy.billing_npi
+--    , hcpc.hcpcs_code
+--    , hcpc.ccs_category
+--    , hcpc.ccs_category_description
 from base_claims as a
-    inner join total_amounts as tot
+    inner join total_amounts as tot 
     on a.encounter_sk = tot.encounter_sk
-    inner join service_category_flags as sc
+    inner join service_category_flags as sc 
     on a.encounter_sk = sc.encounter_sk
-    left outer join highest_paid_diagnosis as hp
+    left outer join highest_paid_diagnosis as hp 
     on a.encounter_sk = hp.encounter_sk
     and hp.paid_order = 1
-    left outer join highest_paid_facility as hf
+    left outer join highest_paid_facility as hf 
     on a.encounter_sk = hf.encounter_sk
     and hf.paid_order = 1
-    left outer join highest_paid_pos as pos
-    on a.encounter_sk = pos.encounter_sk
-    and pos.paid_order = 1
+    left outer join highest_paid_physician as phy 
+    on a.encounter_sk = phy.encounter_sk
+    and phy.paid_order = 1
+    left outer join highest_paid_hcpc as hcpc 
+    on a.encounter_sk = hcpc.encounter_sk
+    and hcpc.paid_order = 1
     left outer join encounters__stg_patient as p
     on a.patient_sk = p.patient_sk
 where a.encounter_row_number = 1

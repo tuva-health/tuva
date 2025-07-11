@@ -11,7 +11,7 @@ encounters__stg_outpatient_institutional as (
 encounters as (
     select distinct
         gei.encounter_id
-        , gei.member_id
+        , gei.patient_sk
         , gei.data_source
         , gei.encounter_start_date
         , gei.encounter_end_date
@@ -24,14 +24,13 @@ encounters as (
         , med.data_source
         , med.claim_id
         , med.claim_line_number
-        , med.member_id
+        , med.patient_sk
         , enc.encounter_id
         , enc.encounter_start_date
         , enc.encounter_end_date
     from encounters__prof_and_lower_priority as med
         inner join encounters as enc
-        on med.data_source = enc.data_source
-        and med.member_id = enc.member_id
+        on med.patient_sk = enc.patient_sk
         and med.start_date between enc.encounter_start_date and enc.encounter_end_date
 
     union all
@@ -40,14 +39,13 @@ encounters as (
         , med.data_source
         , med.claim_id
         , med.claim_line_number
-        , med.member_id
+        , med.patient_sk
         , enc.encounter_id
         , enc.encounter_start_date
         , enc.encounter_end_date
     from encounters__stg_outpatient_institutional as med
         inner join encounters as enc
-        on med.data_source = enc.data_source
-        and med.member_id = enc.member_id
+        on med.patient_sk = enc.patient_sk
         and med.start_date between enc.encounter_start_date and enc.encounter_end_date
 --        and med.claim_id <> enc.claim_id
 )
@@ -56,7 +54,7 @@ select medical_claim_sk
     , data_source
     , claim_id
     , claim_line_number
-    , member_id
+    , patient_sk
     , encounter_id
     , encounter_start_date
     , encounter_end_date

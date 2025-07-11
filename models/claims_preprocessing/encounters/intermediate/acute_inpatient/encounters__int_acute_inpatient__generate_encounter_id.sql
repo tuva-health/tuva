@@ -12,7 +12,7 @@
 with base_claims as (
     select data_source
         , claim_id
-        , member_id
+        , patient_sk
         , max(facility_npi) as facility_npi
         , max(discharge_disposition_code) as discharge_disposition_code
         , min(start_date) as start_date
@@ -22,7 +22,7 @@ with base_claims as (
         and enc.claim_type = 'institutional'
     group by data_source
         , claim_id
-        , member_id
+        , patient_sk
 ),
 
 -- Step 3: Add sequence numbers to order claims chronologically
@@ -30,13 +30,13 @@ with base_claims as (
 claims_sequenced as (
     select data_source
         , claim_id
-        , member_id
+        , patient_sk
         , facility_npi
         , discharge_disposition_code
         , start_date
         , end_date
         , row_number() over (
-            partition by data_source, member_id
+            partition by patient_sk
             order by end_date, start_date, claim_id
         ) as row_num
     from base_claims
@@ -74,16 +74,14 @@ merge_candidates as (
         end as should_merge
     from claims_sequenced a
         inner join claims_sequenced b
-        on a.data_source = b.data_source
-        and a.member_id = b.member_id
+        on a.patient_sk = b.patient_sk
         and a.row_num < b.row_num  -- Only compare earlier claims to later ones
         and a.claim_id != b.claim_id
 ),
 
 -- Step 5: Get confirmed merges (only pairs that should merge)
 confirmed_merges as (
-    select data_source
-        , member_id
+    select patient_sk
         , row_num_a
         , row_num_b
     from merge_candidates
@@ -95,7 +93,7 @@ confirmed_merges as (
 closing_claims as (
     select c.data_source
         , c.claim_id
-        , c.member_id
+        , c.patient_sk
         , c.facility_npi
         , c.discharge_disposition_code
         , c.start_date
@@ -112,8 +110,7 @@ closing_claims as (
                 select 1 from confirmed_merges m2
                 where m2.row_num_a < c.row_num
                     and m2.row_num_b > c.row_num
-                    and m2.data_source = c.data_source
-                    and m2.member_id = c.member_id
+                    and m2.patient_sk = c.patient_sk
             ) then 1
             else 0
         end as is_closing_claim
@@ -125,7 +122,7 @@ closing_claims as (
 encounter_assignments as (
     select c.data_source
         , c.claim_id
-        , c.member_id
+        , c.patient_sk
         , c.facility_npi
         , c.discharge_disposition_code
         , c.start_date
@@ -135,8 +132,7 @@ encounter_assignments as (
         , -- Find the minimum closing row number that comes at or after this claim
         (select min(closer.row_num)
          from closing_claims closer
-         where closer.data_source = c.data_source
-            and closer.member_id = c.member_id
+         where closer.patient_sk = c.patient_sk
             and closer.row_num >= c.row_num
             and closer.is_closing_claim = 1
         ) as encounter_closing_row
@@ -147,7 +143,7 @@ encounter_assignments as (
 encounters_with_ids as (
     select ea.data_source
         , ea.claim_id
-        , ea.member_id
+        , ea.patient_sk
         , ea.facility_npi
         , ea.discharge_disposition_code
         , ea.start_date
@@ -156,15 +152,14 @@ encounters_with_ids as (
         ea.encounter_closing_row as encounter_id
     from encounter_assignments ea
     left join closing_claims cc
-        on ea.data_source = cc.data_source
-        and ea.member_id = cc.member_id
+        on ea.patient_sk = cc.patient_sk
         and ea.encounter_closing_row = cc.row_num
 )
 
 -- Final output: Claims mapped to a derived encounter
 select data_source
     , claim_id
-    , member_id
+    , patient_sk
     , encounter_id
     , facility_npi
     , discharge_disposition_code

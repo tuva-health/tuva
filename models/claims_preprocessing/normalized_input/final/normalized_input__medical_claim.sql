@@ -8,12 +8,12 @@ select
     , member_id
     , payer
     , {{ quote_column('plan') }}
-    , min(claim_start_date) over(partition by claim_id) as claim_start_date
-    , max(claim_end_date) over(partition by claim_id) as claim_end_date
+    , min(claim_start_date) over(partition by data_source, claim_id) as claim_start_date
+    , max(claim_end_date) over(partition by data_source, claim_id) as claim_end_date
     , claim_line_start_date
     , claim_line_end_date
-    , min(admission_date) over(partition by claim_id) as admission_date
-    , max(discharge_date) over(partition by claim_id) as discharge_date
+    , min(admission_date) over(partition by data_source, claim_id) as admission_date
+    , max(discharge_date) over(partition by data_source, claim_id) as discharge_date
     , admit_source_code
     , admit_type_code
     , discharge_disposition_code

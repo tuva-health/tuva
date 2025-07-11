@@ -7,7 +7,7 @@ select
     , data_source
     , claim_id
     , claim_line_number
-    , member_id
+    , patient_sk
     , start_date
 from {{ ref('encounters__stg_medical_claim') }}
 where claim_type = 'professional'
@@ -17,7 +17,7 @@ select
     , data_source
     , claim_id
     , claim_line_number
-    , member_id
+    , patient_sk
     , start_date
 from {{ ref('encounters__stg_medical_claim') }}
 where service_category_2 in ('lab', 'durable medical equipment', 'ambulance')

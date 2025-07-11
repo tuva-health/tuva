@@ -10,9 +10,9 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__int_acute_inpatient__start_end_dates') }}
 )
-, encounters__stg_eligibility as (
+, encounters__stg_patient as (
     select *
-    from {{ ref('encounters__stg_eligibility') }}
+    from {{ ref('encounters__stg_patient') }}
 )
 , base_claims as (
     select
@@ -31,18 +31,11 @@ with encounters__stg_medical_claim as (
         on cex.encounter_id = dts.encounter_id
 )
 
-, patient as (
-    select data_source
-        , member_id
-        , birth_date
-        , gender
-        , race
-    from encounters__stg_eligibility
-)
-
 , encounter as (
     select distinct
         encounter_sk
+        , member_id
+        , patient_sk
         , encounter_type
         , encounter_group
         , encounter_start_date
@@ -63,6 +56,7 @@ with encounters__stg_medical_claim as (
         c.data_source
         , c.encounter_sk
         , c.member_id
+        , c.patient_sk
         , f.primary_diagnosis_code
         , f.primary_diagnosis_code_type
         , f.primary_diagnosis_description
@@ -122,7 +116,8 @@ with encounters__stg_medical_claim as (
 select
     cast('tuva' as {{ dbt.type_string() }}) as data_source
     , x.encounter_sk
-    , c.member_id
+    , x.member_id
+    , x.patient_sk
     , x.encounter_type
     , x.encounter_group
     , x.encounter_start_date
@@ -164,9 +159,6 @@ select
     , tot.inst_claim_count
     , tot.prof_claim_count
     , {{ calculate_age("p.birth_date","x.encounter_start_date") }} as admit_age
---    , p.gender
---    , p.race
---    , c.medical_surgical
 from encounter as x
     inner join total_amounts as tot
     on x.encounter_sk = tot.encounter_sk
@@ -174,6 +166,5 @@ from encounter as x
     on x.encounter_sk = sc.encounter_sk
     inner join institutional_claim_details as c
     on x.encounter_sk = c.encounter_sk
-    left outer join patient as p
-    on c.member_id = p.member_id
-    and c.data_source = p.data_source
+    left outer join encounters__stg_patient as p
+    on c.patient_sk = p.patient_sk

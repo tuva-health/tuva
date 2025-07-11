@@ -14,8 +14,7 @@ with encounters__prof_and_lower_priority as (
 encounters as (
     select distinct
         gei.encounter_id
-        , gei.member_id
-        , gei.data_source
+        , gei.patient_sk
         , gei.encounter_start_date
         , gei.encounter_end_date
     from {{ ref('encounters__int_acute_inpatient__generate_encounter_id') }} gei
@@ -40,6 +39,5 @@ select plp.medical_claim_sk
 from encounters__prof_and_lower_priority as plp
     -- Match claims to encounters based on patient and date overlap
     inner join encounters as enc
-        on plp.data_source = enc.data_source
-        and plp.member_id = enc.member_id
+        on plp.patient_sk = enc.patient_sk
         and plp.start_date between enc.encounter_start_date and enc.encounter_end_date

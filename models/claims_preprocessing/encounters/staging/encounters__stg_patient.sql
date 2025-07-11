@@ -4,8 +4,7 @@ with normalized_input__eligibility as (
 ),
 sorted_patient as (
     select
-        eligibility_sk
-        , data_source
+        data_source
         , member_id
         , birth_date
         , gender
@@ -13,8 +12,8 @@ sorted_patient as (
         , row_number() over (partition by data_source, member_id order by e.enrollment_start_date desc) as patient_row_num
     from normalized_input__eligibility as e
 )
-select data_source
-    , member_id
+select
+    {{ dbt_utils.generate_surrogate_key(['data_source', 'member_id']) }} as patient_sk
     , birth_date
     , gender
     , race

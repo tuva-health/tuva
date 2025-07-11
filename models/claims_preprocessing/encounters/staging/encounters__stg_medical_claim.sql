@@ -10,8 +10,8 @@ with normalized_input__medical_claim as (
 select
     med.medical_claim_sk
     , med.data_source
-    , pat_id.member_data_source_sk as patient_data_source_id --TODO: Does this work better?
     , med.member_id
+    , {{ dbt_utils.generate_surrogate_key(['med.data_source', 'med.member_id']) }} as patient_sk
     , med.claim_id
     , med.claim_line_number
     , med.claim_type
@@ -73,12 +73,6 @@ from {{ ref('normalized_input__medical_claim') }} as med
     left join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
     on med.medical_claim_sk = service_category.medical_claim_sk
     and service_category.priority = 1
-    left join {{ ref('the_tuva_project', 'enrollment__medical_claim_member_month') }} as member_month
-    on med.medical_claim_sk = member_month.medical_claim_sk
-
-    left join {{ ref('the_tuva_project', 'encounters__patient_data_source_id') }} as pat_id
-    on med.member_id = pat_id.member_id
-    and med.data_source = pat_id.data_source
     
     left outer join {{ ref('tuva_data_assets', 'bill_type') }} as bt
     on med.bill_type_code = bt.bill_type_code
