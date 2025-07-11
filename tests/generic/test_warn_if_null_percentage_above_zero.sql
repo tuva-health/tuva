@@ -19,7 +19,7 @@ WITH validation AS (
 
     SELECT
         COUNT(*) AS total_rows,
-        SUM(CASE WHEN {{ column_name }} IS NULL THEN 1 ELSE 0 END) AS null_rows
+        SUM(CASE WHEN {% if is_fabric() %}{{ adapter.quote(column_name) }}{% else %}{{ column_name }}{% endif %} IS NULL THEN 1 ELSE 0 END) AS null_rows
     FROM {{ model }}
 
 ),

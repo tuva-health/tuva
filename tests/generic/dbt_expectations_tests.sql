@@ -209,13 +209,12 @@
     {% if column_name == 'bill_type_code' %}
     WHERE NOT (
       (LEN({{ column_name }}) = 3 AND PATINDEX('{{ pattern_1 }}', {{ column_name }}) = 1) OR
-      (LEN({{ column_name }}) = 4 AND PATINDEX('{{ pattern_2 }}', {{ column_name }} = 1))
+      (LEN({{ column_name }}) = 4 AND PATINDEX('{{ pattern_2 }}', {{ column_name }}) = 1)
     )
     {% elif column_name == 'revenue_center_code' %}
     WHERE NOT (
-      (LEN({{ column_name }}) = 3 AND PATINDEX('{{ pattern_1 }}', {{ column_name }})) = 1 OR
-      (LEN({{ column_name }}) = 4 AND PATINDEX('{{ pattern_2 }}', {{ column_name }}) = 1
-      )
+      (LEN({{ column_name }}) = 3 AND PATINDEX('{{ pattern_1 }}', {{ column_name }}) = 1) OR
+      (LEN({{ column_name }}) = 4 AND PATINDEX('{{ pattern_2 }}', {{ column_name }}) = 1)
     )
     {% else %} --for admit_type_code, place_of_service_code, rendering_npi, billing_npi, facility_npi
     WHERE NOT PATINDEX('{{ pattern1 }}', {{ column_name }}) = 1
