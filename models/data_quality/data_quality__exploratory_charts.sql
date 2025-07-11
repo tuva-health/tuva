@@ -778,61 +778,27 @@ with medical_paid_amount_vs_end_date_matrix as (
          {% if target.type == 'bigquery' %}
          , cast(date_trunc(ilmc.claim_start_date, MONTH) as STRING) as x_axis
          , cast(date_trunc(ilmc.claim_start_date, YEAR) as STRING) as chart_filter
-         , CAST(
-             COUNT(DISTINCT CASE WHEN EXISTS (
-                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
-                 WHERE ile.person_id = ilmc.person_id
-             ) THEN ilmc.claim_id END) * 100.0 /
-             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
-             as NUMERIC
-           ) as value
          {% elif target.type in ('postgres', 'duckdb') %}
          , cast(date_trunc('month', ilmc.claim_start_date) as VARCHAR) as x_axis
          , cast(date_trunc('year', ilmc.claim_start_date) as VARCHAR) as chart_filter
-         , CAST(
-             COUNT(DISTINCT CASE WHEN EXISTS (
-                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
-                 WHERE ile.person_id = ilmc.person_id
-             ) THEN ilmc.claim_id END) * 100.0 /
-             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
-             as NUMERIC
-           ) as value
-         {% elif target.type == 'databricks' %}
+         {% else %} -- for databricks, athena, snowflake
          , cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
          , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
-         , cast(
-             COUNT(DISTINCT CASE WHEN EXISTS (
-                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
-                 WHERE ile.person_id = ilmc.person_id
-             ) THEN ilmc.claim_id END) * 100.0 /
-             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
-             as DOUBLE
-           ) as value
-         {% elif target.type == 'athena' %}
-         , cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
-         , cast(
-             COUNT(DISTINCT CASE WHEN EXISTS (
-                 SELECT 1 FROM {{ ref('input_layer__eligibility') }} ile
-                 WHERE ile.person_id = ilmc.person_id
-             ) THEN ilmc.claim_id END) * 100.0 /
-             NULLIF(COUNT(DISTINCT ilmc.claim_id), 0)
-             as DECIMAL
-           ) as value
-         {% else %} -- snowflake and redshift
-         , cast(date_trunc('MONTH', ilmc.claim_start_date) as VARCHAR) as x_axis
-         , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
-         , cast(
-             count(distinct case when exists (
-                 select 1 from {{ ref('input_layer__eligibility') }} as ile
-                 where ile.person_id = ilmc.person_id
-             ) then ilmc.claim_id end) * 100.0 /
-             nullif(count(distinct ilmc.claim_id), 0)
-             as NUMERIC
-           ) as value
+         {% endif %}
+         {% if target.type in ('bigquery', 'postgres', 'duckdb', 'snowflake', 'redshift') %}
+         , CAST(COUNT(DISTINCT CASE WHEN ile.person_id IS NOT NULL THEN ilmc.claim_id END) * 100.0 /
+         NULLIF(COUNT(DISTINCT ilmc.claim_id), 0) as NUMERIC) as value
+         {% elif target.type in ('databricks') %}
+         , CAST(COUNT(DISTINCT CASE WHEN ile.person_id IS NOT NULL THEN ilmc.claim_id END) * 100.0 /
+         NULLIF(COUNT(DISTINCT ilmc.claim_id), 0) as DOUBLE) as value
+         {% else %} -- for athena
+         , CAST(COUNT(DISTINCT CASE WHEN ile.person_id IS NOT NULL THEN ilmc.claim_id END) * 100.0 /
+         NULLIF(COUNT(DISTINCT ilmc.claim_id), 0) as DECIMAL) as value
          {% endif %}
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
+    left join {{ ref('input_layer__eligibility') }} ile
+        on ile.person_id = ilmc.person_id
 
     group by {% if target.type == 'bigquery' %}
            cast(date_trunc(ilmc.claim_start_date, MONTH) as STRING)

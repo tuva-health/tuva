@@ -275,7 +275,6 @@ models:
           tags: ['tuva_dqi_sev_5', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
     - name: source_model
       description: '{{ doc("source_model") }}'
     - name: encounter_source_type

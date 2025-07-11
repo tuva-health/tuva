@@ -13,7 +13,7 @@
 -#}
 
 {% set table_name = model.alias if model.alias else model.name %}
-{% set query_to_find_nulls = "SELECT * FROM " ~ model ~ " WHERE " ~ column_name ~ " IS NULL;" %}
+{% set query_to_find_nulls = "SELECT * FROM " ~ model ~ " WHERE " ~ adapter.quote(column_name) ~ " IS NULL;" %}
 
 WITH validation AS (
 

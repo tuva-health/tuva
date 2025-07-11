@@ -194,7 +194,7 @@
   {% endif %}
 {% endtest %}
 
-{% test expect_column_values_to_match_regex(model, column_name, regex, row_condition=None, is_raw=False, flags=N) %}
+{% test expect_column_values_to_match_regex(model, column_name, regex, pattern1, pattern2, row_condition=None, is_raw=False, flags=N) %}
   {% if is_fabric() %}
     WITH filtered_data AS (
       SELECT *
@@ -206,7 +206,20 @@
 
     SELECT COUNT(*) as failures
     FROM filtered_data
-    WHERE NOT REGEXP_LIKE({{ column_name }}, {{ regex }})
+    {% if column_name == 'bill_type_code' %}
+    WHERE NOT (
+      (LEN({{ column_name }}) = 3 AND PATINDEX('{{ pattern_1 }}', {{ column_name }}) = 1) OR
+      (LEN({{ column_name }}) = 4 AND PATINDEX('{{ pattern_2 }}', {{ column_name }} = 1))
+    )
+    {% elif column_name == 'revenue_center_code' %}
+    WHERE NOT (
+      (LEN({{ column_name }}) = 3 AND PATINDEX('{{ pattern_1 }}', {{ column_name }})) = 1 OR
+      (LEN({{ column_name }}) = 4 AND PATINDEX('{{ pattern_2 }}', {{ column_name }}) = 1
+      )
+    )
+    {% else %} --for admit_type_code, place_of_service_code, rendering_npi, billing_npi, facility_npi
+    WHERE NOT PATINDEX('{{ pattern1 }}', {{ column_name }}) = 1
+    {% endif %}
   {% else %}
     {{ dbt_expectations.test_expect_column_values_to_match_regex(model, column_name, regex, row_condition, is_raw, flags) }}
   {% endif %}
@@ -222,14 +235,42 @@
       {% endif %}
     )
 
-    SELECT COUNT(*) as failures
-    FROM filtered_data
-    {% for regex in regex_list %}
-    WHERE NOT REGEXP_LIKE({{ column_name }}, {{ regex }})
-    {% if not loop.last %} AND NOT REGEXP_LIKE({{ column_name }}, {{ regex }}){% endif %}
+    {% for col in adapter.get_columns_in_relation(model) %}
+      {% if column_name == col.name and 'diagnosis_code' in col.name %} 
+        SELECT COUNT(*) as failures
+        FROM filtered_data
+        WHERE NOT (
+          (LEN({{ column_name }}) BETWEEN 3 AND 8 AND PATINDEX('[A-Z][0-9A-Z][0-9A-Z]%', {{ column_name }}) = 1 AND {{ column_name }} NOT LIKE '%[^0-9A-Z]%') 
+          OR
+          (
+            PATINDEX('%[0-9][.]%', {{ column_name }}) = 1 AND (SUBSTRING({{ column_name }}, 0, CHARINDEX('.', {{ column_name }})) LIKE '[A-Z][0-9]'
+            OR SUBSTRING({{ column_name }}, 0, CHARINDEX('.', {{ column_name }})) LIKE '[A-Z][0-9][0-9]') AND SUBSTRING({{ column_name }}, CHARINDEX('.', {{ column_name }})+1,LEN({{ column_name }})) NOT LIKE '%[^0-9A-Z]%'
+          ) 
+          OR 
+          (
+            PATINDEX('[0-9][0-9][0-9]%', {{ column_name }}) = 1 AND (({{ column_name }} NOT LIKE '%.%' AND LEN({{ column_name }}) = 3) OR 
+          {{ column_name }} LIKE '%.%' AND (SUBSTRING({{ column_name }}, CHARINDEX('.', {{ column_name }})+1,LEN({{ column_name }})) like '[0-9]' OR SUBSTRING({{ column_name }}, CHARINDEX('.', {{ column_name }})+1,LEN({{ column_name }})) like '[0-9][0-9]')
+            )
+          )
+          OR
+          (
+            PATINDEX('[0-9][0-9][0-9]%', {{ column_name }}) = 1 AND {{ column_name }} NOT LIKE '%[^0-9]%' AND LEN({{ column_name }}) BETWEEN 3 AND 5
+          )
+          OR
+          (
+            PATINDEX('[VE][0-9][0-9][0-9]%', {{ column_name }}) = 1 AND (({{ column_name }} NOT LIKE '%.%' AND LEN({{ column_name }}) = 4) 
+            OR ({{ column_name }} LIKE '%.%' AND SUBSTRING({{ column_name }}, CHARINDEX('.', {{ column_name }})+1,LEN({{ column_name }})) like '[0-9]')
+          )
+          )
+          OR
+          (
+            PATINDEX('[VE][0-9][0-9]%', {{ column_name }}) = 1 AND (SUBSTRING({{ column_name }}, CHARINDEX('V', {{ column_name }})+1,LEN({{ column_name }})) not like '%[^0-9]%' OR SUBSTRING({{ column_name }}, CHARINDEX('E', {{ column_name }})+1,LEN({{ column_name }})) not like '%[^0-9]%')
+            AND PATINDEX('[VE][0-9][0-9]%', {{ column_name }}) = 1 AND len({{ column_name }}) between 3 and 5
+          )
+        )
+      {% endif %}
     {% endfor %}
-
   {% else %}
     {{ dbt_expectations.test_expect_column_values_to_match_regex_list(model, column_name, regex_list, match_on, row_condition, is_raw, flags) }}
   {% endif %}
-{% endtest %}
+{% endtest %}    

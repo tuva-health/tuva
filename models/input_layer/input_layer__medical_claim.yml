@@ -420,6 +420,7 @@ models:
           - the_tuva_project.expect_column_values_to_match_regex:
               description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               regex: "^[0-59]$"
+              pattern1: "[0123459]"
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
@@ -468,6 +469,7 @@ models:
           - the_tuva_project.expect_column_values_to_match_regex:
               description: https://resdac.org/cms-data/variables/claim-inpatient-admission-type-code-ffs
               regex: "^[0-9]{2}$"
+              pattern1: "[0-9][0-9]"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
@@ -505,6 +507,8 @@ models:
           - the_tuva_project.expect_column_values_to_match_regex:
               description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
               regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
+              pattern1: "[0-9][0-9][0-9A-Za-z]"
+              pattern2: "0[0-9][0-9][0-9A-Za-z]"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions']
               config:
                 severity: warn
@@ -585,6 +589,8 @@ models:
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_match_regex:
               regex: "^(\\\\d{3}|0\\\\d{3})$"
+              pattern1: "[0-9][0-9][0-9]"
+              pattern2: "0[0-9][0-9][0-9]"
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
@@ -675,6 +681,7 @@ models:
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_match_regex:
               regex: "^[0-9]{10}$"
+              pattern1: "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -716,6 +723,7 @@ models:
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_match_regex:
               regex: "^[0-9]{10}$"
+              pattern1: "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -757,6 +765,7 @@ models:
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_match_regex:
               regex: "^[0-9]{10}$"
+              pattern1: "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -919,7 +928,7 @@ models:
           - the_tuva_project.expect_column_values_to_match_regex_list:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ccsr', 'dqi_tuva_chronic_conditions',
                 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_readmission']
-              regex_list: ["^[A-TV-Z][0-9A-Z]{2,7}$", "^[A-TV-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
+              regex_list: ["^[A-Z][0-9A-Z]{2,7}$", "^[A-Z][0-9]{1,2}[.][0-9A-Z]{1,7}$",
                 "^[0-9]{3}([.][0-9]{1,2})?$", "^[0-9]{3,5}$", "^[VE][0-9]{3}([.][0-9]{1})?$",
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
@@ -952,7 +961,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_2 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -973,7 +982,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_3 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -994,7 +1003,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_4 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1015,7 +1024,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_5 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1036,7 +1045,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_6 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1057,7 +1066,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_7 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1078,7 +1087,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_8 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1099,7 +1108,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_9 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1120,7 +1129,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_10 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1141,7 +1150,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_11 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1162,7 +1171,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_12 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1183,7 +1192,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_13 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1204,7 +1213,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_14 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1225,7 +1234,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_15 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1246,7 +1255,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_16 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1267,7 +1276,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_17 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1288,7 +1297,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_18 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1309,7 +1318,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_19 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1330,7 +1339,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_20 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1351,7 +1360,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_21 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1372,7 +1381,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_22 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1393,7 +1402,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_23 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1414,7 +1423,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_24 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -1435,7 +1444,7 @@ models:
                 "^[VE][0-9]{2,4}$"                    # ICD-9 V/E codes without period
 ]
               match_on: any
-              row_condition: "diagnosis_code_1 is not null"
+              row_condition: "diagnosis_code_25 is not null"
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
