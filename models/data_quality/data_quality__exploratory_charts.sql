@@ -786,18 +786,18 @@ with medical_paid_amount_vs_end_date_matrix as (
          , cast(date_trunc('YEAR', ilmc.claim_start_date) as VARCHAR) as chart_filter
          {% endif %}
          {% if target.type in ('bigquery', 'postgres', 'duckdb', 'snowflake', 'redshift') %}
-         , CAST(COUNT(DISTINCT CASE WHEN ile.person_id IS NOT NULL THEN ilmc.claim_id END) * 100.0 /
-         NULLIF(COUNT(DISTINCT ilmc.claim_id), 0) as NUMERIC) as value
+         , cast(count(distinct case when ile.person_id is not null then ilmc.claim_id end) * 100.0 /
+         nullif(count(distinct ilmc.claim_id), 0) as NUMERIC) as value
          {% elif target.type in ('databricks') %}
-         , CAST(COUNT(DISTINCT CASE WHEN ile.person_id IS NOT NULL THEN ilmc.claim_id END) * 100.0 /
-         NULLIF(COUNT(DISTINCT ilmc.claim_id), 0) as DOUBLE) as value
+         , cast(count(distinct case when ile.person_id is not null then ilmc.claim_id end) * 100.0 /
+         nullif(count(distinct ilmc.claim_id), 0) as DOUBLE) as value
          {% else %} -- for athena
-         , CAST(COUNT(DISTINCT CASE WHEN ile.person_id IS NOT NULL THEN ilmc.claim_id END) * 100.0 /
-         NULLIF(COUNT(DISTINCT ilmc.claim_id), 0) as DECIMAL) as value
+         , cast(count(distinct case when ile.person_id is not null then ilmc.claim_id end) * 100.0 /
+         nullif(count(distinct ilmc.claim_id), 0) as DECIMAL) as value
          {% endif %}
 
     from {{ ref('input_layer__medical_claim') }} as ilmc
-    left join {{ ref('input_layer__eligibility') }} ile
+    left outer join {{ ref('input_layer__eligibility') }} as ile
         on ile.person_id = ilmc.person_id
 
     group by {% if target.type == 'bigquery' %}
