@@ -60,14 +60,14 @@ models:
       Each row represents the results a measure per patient. A null for the  denominator
       indicates that the patient was not eligible for that measure.
     tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-# description: This is a check in one of the final downstream marts to see if quality_measures__summary_long is populated. If this is flagging, please check other areas further upstream on the input layer.
+      - the_tuva_project.expect_table_row_count_to_be_between:
+          description: This is a check in one of the final downstream marts to see if quality_measures__summary_long is populated. If this is flagging, please check other areas further upstream on the input layer.
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures', 'dqi_usability']
           min_value: 1
-          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          strictly: false
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+            enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
             meta:
               dqi_test_description: "This is a check in one of the final downstream
