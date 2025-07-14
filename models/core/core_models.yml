@@ -270,13 +270,12 @@ models:
       - the_tuva_project.expect_column_values_to_be_between:
           description: "Inpatient encounter missing professional claim"
           min_value: 1
-          row_condition: ["encounter_type = 'acute inpatient'", 
-                          "encounter_source_type = 'claim'"]
-          #needed so that the clinical enabled Snowflake CI test does not fail.
+          row_condition: "encounter_type = 'acute inpatient'"
           strictly: false
           tags: ['tuva_dqi_sev_5', 'dqi']
           config:
             severity: warn
+            enabled: "{{ (var('claims_enabled', true)) | as_bool }}"
     - name: source_model
       description: '{{ doc("source_model") }}'
     - name: encounter_source_type

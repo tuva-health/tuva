@@ -13,10 +13,12 @@
 
     SELECT row_count
     FROM filtered_data
-    WHERE
-      {% if min_value is not none %}NOT (row_count {{ min_operator }} {{ min_value }}){% endif %}
-      {% if min_value is not none and max_value is not none %}OR{% endif %}
-      {% if max_value is not none %}NOT (row_count {{ max_operator }} {{ max_value }}){% endif %}
+    WHERE NOT (
+      {% if min_value is not none %} row_count {{ min_operator }} {{ min_value }} {% endif %}
+      {% if min_value is not none and max_value is not none %}AND{% endif %}
+      {% if max_value is not none %} row_count {{ max_operator }} {{ max_value }} {% endif %}
+      )
+
   {% else %}
     {{ dbt_expectations.test_expect_table_row_count_to_be_between(model, min_value, max_value, group_by, strictly, row_condition) }}
   {% endif %}
@@ -102,10 +104,11 @@
 
     SELECT COUNT(*) as failures
     FROM filtered_data
-    WHERE
-      {% if min_value is not none %}NOT ({{ column_name }} {{ min_operator }} {{ min_value }}){% endif %}
-      {% if min_value is not none and max_value is not none %}OR{% endif %}
-      {% if max_value is not none %}NOT ({{ column_name }} {{ max_operator }} {{ max_value }}){% endif %}
+    WHERE NOT (
+      {% if min_value is not none %} {{ column_name }} {{ min_operator }} {{ min_value }} {% endif %}
+      {% if min_value is not none and max_value is not none %}AND{% endif %}
+      {% if max_value is not none %} {{ column_name }} {{ max_operator }} {{ max_value }} {% endif %}
+    )
   {% else %}
     {{ dbt_expectations.test_expect_column_values_to_be_between(model, column_name, min_value, max_value, strictly, row_condition) }}
   {% endif %}
@@ -144,10 +147,11 @@
 
     SELECT COUNT(*) as failures
     FROM filtered_data
-    WHERE
-      {% if min_value is not none %}NOT (LEN({{ column_name }}) {{ min_operator }} {{ min_value }}){% endif %}
-      {% if min_value is not none and max_value is not none %}OR{% endif %}
-      {% if max_value is not none %}NOT (LEN({{ column_name }}) {{ max_operator }} {{ max_value }}){% endif %}
+    WHERE NOT (
+      {% if min_value is not none %} LEN({{ column_name }}) {{ min_operator }} {{ min_value }}{% endif %}
+      {% if min_value is not none and max_value is not none %}AND{% endif %}
+      {% if max_value is not none %} LEN({{ column_name }}) {{ max_operator }} {{ max_value }}{% endif %}
+    )
   {% else %}
     {{ dbt_expectations.test_expect_column_value_lengths_to_be_between(model, column_name, min_value, max_value, strictly, row_condition) }}
   {% endif %}
@@ -185,10 +189,11 @@
 
     SELECT COUNT(*) as failures
     FROM unique_values
-    WHERE
-      {% if min_value is not none %}NOT (unique_value_count {{ min_operator }} {{ min_value }}){% endif %}
-      {% if min_value is not none and max_value is not none %}OR{% endif %}
-      {% if max_value is not none %}NOT (unique_value_count {{ max_operator }} {{ max_value }}){% endif %}
+    WHERE NOT (
+      {% if min_value is not none %} unique_value_count {{ min_operator }} {{ min_value }}{% endif %}
+      {% if min_value is not none and max_value is not none %}AND{% endif %}
+      {% if max_value is not none %} unique_value_count {{ max_operator }} {{ max_value }}{% endif %}
+    )
   {% else %}
     {{ dbt_expectations.test_expect_column_unique_value_count_to_be_between(model, column_name, min_value, max_value, group_by, strictly, row_condition) }}
   {% endif %}
