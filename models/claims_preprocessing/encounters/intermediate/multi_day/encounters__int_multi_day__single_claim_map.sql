@@ -15,9 +15,10 @@ encounters as (
     select distinct
         gei.encounter_id
         , gei.patient_sk
+        , gei.encounter_type
         , gei.encounter_start_date
         , gei.encounter_end_date
-    from {{ ref('encounters__int_acute_inpatient__generate_encounter_id') }} gei
+    from {{ ref('encounters__int_multi_day__multi_claim_map') }} gei
 )
 
 -- Step 2: Attribution logic - match professional claims to encounters
@@ -28,18 +29,18 @@ encounters as (
 select plp.medical_claim_sk
     , plp.data_source
     , plp.claim_id
---    , plp.claim_line_number
+    , enc.encounter_type
     , enc.encounter_id
     , enc.encounter_start_date
     , enc.encounter_end_date
     , -- Handle edge case: if a professional claim overlaps multiple encounters,
       -- prioritize by encounter_id (lowest wins) to ensure deterministic attribution
+      -- TODO: Probably should prioritize by the service category priority?
     row_number() over (
         partition by plp.medical_claim_sk
         order by enc.encounter_id
-    ) as claim_attribution_number
+    ) as claim_priority
 from encounters__prof_and_lower_priority as plp
-    -- Match claims to encounters based on patient and date overlap
     inner join encounters as enc
         on plp.patient_sk = enc.patient_sk
         and plp.start_date between enc.encounter_start_date and enc.encounter_end_date

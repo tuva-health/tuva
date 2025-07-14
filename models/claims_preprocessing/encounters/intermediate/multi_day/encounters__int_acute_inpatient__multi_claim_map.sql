@@ -1,14 +1,15 @@
+{{ config(enabled=False)}}
+-- TODO: Left this to preserve the original "split" logic. Remove once the converged logic is validated.
 -- ============================================================================
--- ENCOUNTER MERGING LOGIC
+-- ACUTE INPATIENT ENCOUNTER MERGING LOGIC
 -- ============================================================================
--- This query merges acute inpatient institutional claims into logical encounters
--- based on overlapping dates, adjacent transfers, and same-facility criteria.
--- The output groups related claims under a single encounter_id.
+-- This query merges acute inpatient claims into logical encounters based on
+-- overlapping dates, adjacent transfers, and same-facility criteria. The logic
+-- is similar to acute inpatient merging but specific to ED encounters.
 
--- Step 1: Filter to acute inpatient institutional claims only
--- This is our target population for encounter merging
--- Step 2: Aggregate useful attributes
--- This handles cases where a single claim might have multiple rows with different values
+-- Step 1: Filter to acute inpatient claims only (both institutional and professional)
+-- Aggregate claim dates at the claim + patient + source level. This handles cases
+-- where a single claim might have multiple rows with different dates
 with base_claims as (
     select data_source
         , claim_id
@@ -17,15 +18,14 @@ with base_claims as (
         , max(discharge_disposition_code) as discharge_disposition_code
         , min(start_date) as start_date
         , max(end_date) as end_date
-    from {{ ref('encounters__stg_medical_claim') }} enc
-    where enc.service_category_2 = 'acute inpatient'
-        and enc.claim_type = 'institutional'
+    from {{ ref('encounters__stg_medical_claim') }}
+    where service_category_2 = 'acute inpatient'
     group by data_source
         , claim_id
         , patient_sk
 ),
 
--- Step 3: Add sequence numbers to order claims chronologically
+-- Step 2: Add sequence numbers to order claims chronologically
 -- Later claims (higher end_date) get higher row numbers
 claims_sequenced as (
     select data_source
@@ -42,7 +42,7 @@ claims_sequenced as (
     from base_claims
 ),
 
--- Step 4: Identify which claims should be merged based on business rules
+-- Step 3: Identify which claims should be merged based on business rules
 -- Four merge scenarios:
 -- 1. Same end date + same facility (concurrent claims)
 -- 2. Adjacent dates (1 day apart) + same facility + still a patient (code 30)
@@ -74,11 +74,12 @@ merge_candidates as (
         end as should_merge
     from claims_sequenced a
         inner join claims_sequenced b
-        on a.patient_sk = b.patient_sk -- Same patient
+        on a.patient_sk = b.patient_sk
         and a.row_num < b.row_num  -- Only compare earlier claims to later ones
+        and a.claim_id != b.claim_id
 ),
 
--- Step 5: Get confirmed merges (only pairs that should merge)
+-- Step 4: Get confirmed merges (only pairs that should merge)
 confirmed_merges as (
     select patient_sk
         , row_num_a
@@ -87,7 +88,7 @@ confirmed_merges as (
     where should_merge = 1
 ),
 
--- Step 6: Identify "closing" claims (claims that don't merge with any later claims)
+-- Step 5: Identify "closing" claims (claims that don't merge with any later claims)
 -- These will become the encounter_id for their group
 closing_claims as (
     select c.data_source
@@ -117,7 +118,7 @@ closing_claims as (
     from claims_sequenced c
 ),
 
--- Step 7: For each claim, find the earliest closing claim that comes after it
+-- Step 6: For each claim, find the earliest closing claim that comes after it
 -- This determines which encounter group the claim belongs to
 encounter_assignments as (
     select c.data_source
@@ -139,7 +140,7 @@ encounter_assignments as (
     from closing_claims c
 ),
 
--- Step 8: Assign encounter_id by linking to the closing claim
+-- Step 7: Assign encounter_id by linking to the closing claim
 encounters_with_ids as (
     select ea.data_source
         , ea.claim_id
