@@ -1,16 +1,17 @@
-with unioned_claims_encounters as (
+with all_encounters as (
     {{ dbt_utils.union_relations(
         relations=[
             ref('encounters__multi_day__encounter')
             , ref('encounters__office_visit__encounter')
             , ref('encounters__single_day__encounter')
         ],
-        exclude=["_loaded_at"]
+        exclude=[""]
     ) }}
 )
 select
     data_source
     , encounter_sk
+    , patient_sk
     , member_id
     , encounter_type
     , encounter_group
@@ -50,4 +51,4 @@ select
     , claim_count
     , inst_claim_count
     , prof_claim_count
-from unioned_claims_encounters
+from all_encounters

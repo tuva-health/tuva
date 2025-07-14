@@ -2,9 +2,9 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__stg_medical_claim') }}
 )
-, encounters__int_claim_encounter_crosswalk as (
+, encounters__int_crosswalk__claim_encounter as (
     select *
-    from {{ ref('encounters__int_claim_encounter_crosswalk') }}
+    from {{ ref('encounters__int_crosswalk__claim_encounter') }}
 )
 , encounters__stg_patient as (
     select *
@@ -21,7 +21,7 @@ with encounters__stg_medical_claim as (
         , row_number() over (partition by cex.encounter_sk
             order by stg.claim_type, stg.start_date) as encounter_row_number
     from encounters__stg_medical_claim as stg
-        inner join encounters__int_claim_encounter_crosswalk as cex
+        inner join encounters__int_crosswalk__claim_encounter as cex
         on cex.medical_claim_sk = stg.medical_claim_sk
         and cex.encounter_group = 'office based'
         and cex.encounter_type_priority = 1

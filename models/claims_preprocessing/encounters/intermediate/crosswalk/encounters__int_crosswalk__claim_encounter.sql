@@ -38,6 +38,7 @@ encounter_claims_union as (
         , 0 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
+        and encounter_type = 'acute inpatient'
     
     union all
     
@@ -49,10 +50,11 @@ encounter_claims_union as (
         , 'acute inpatient' as encounter_type
         , 'inpatient' as encounter_group
         , 0 as priority_number
-    from {{ ref('encounters__int_acute_inpatient__multi_claim_map') }} as enc
+    from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
         and enc.claim_id = med.claim_id
+    where encounter_type = 'acute inpatient'
 
     union all
     
@@ -66,8 +68,9 @@ encounter_claims_union as (
         , 'emergency department' as encounter_type
         , 'outpatient' as encounter_group
         , 1 as priority_number
-    from {{ ref('encounters__int_acute_inpatient__single_claim_map') }}
+    from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
+        and encounter_type = 'acute inpatient'
 
     union all
 
@@ -79,8 +82,9 @@ encounter_claims_union as (
         , 'emergency department' as encounter_type
         , 'outpatient' as encounter_group
         , 1 as priority_number
-    from {{ ref('encounters__int_emergency_department__single_claim_map') }}
+    from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
+        and encounter_type = 'emergency department'
 
     union all
     
@@ -92,10 +96,11 @@ encounter_claims_union as (
         , 'emergency department' as encounter_type
         , 'outpatient' as encounter_group
         , 1 as priority_number
-    from {{ ref('encounters__int_emergency_department__multi_claim_map') }} enc
+    from {{ ref('encounters__int_multi_day__multi_claim_map') }} enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
         and enc.claim_id = med.claim_id
+    where encounter_type = 'emergency department'
 
     union all
 
