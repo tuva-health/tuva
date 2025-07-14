@@ -10,12 +10,7 @@ models:
     +materialized: view
     claims_preprocessing:
       +schema: tuva_claims_preprocessing
-      encounters:
-        final:
-          +materialized: table
-      service_category:
-        final:
-          +materialized: table
+      +materialized: table
     core:
       final:
         +schema: tuva_core

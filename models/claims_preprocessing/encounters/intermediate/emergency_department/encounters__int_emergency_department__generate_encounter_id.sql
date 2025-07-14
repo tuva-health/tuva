@@ -4,11 +4,6 @@
 -- This query merges emergency department claims into logical encounters based on
 -- overlapping dates, adjacent transfers, and same-facility criteria. The logic
 -- is similar to acute inpatient merging but specific to ED encounters.
---
--- MERGE SCENARIOS:
--- 1. Same end date + same facility (concurrent claims)
--- 2. Adjacent dates (1 day apart) + same facility + transfer discharge (code 30)
--- 3. Overlapping dates + same facility (>= overlap, not strict >)
 
 -- Step 1: Filter to emergency department claims only (both institutional and professional)
 -- This is our target population for ED encounter merging
@@ -85,8 +80,7 @@ merge_candidates as (
 
 -- Step 5: Get confirmed merges (only pairs that should merge)
 confirmed_merges as (
-    select data_source
-        , patient_sk
+    select patient_sk
         , row_num_a
         , row_num_b
     from merge_candidates
@@ -111,6 +105,7 @@ closing_claims as (
             when not exists (
                 select 1 from confirmed_merges m1
                 where m1.row_num_a = c.row_num
+                    and m1.patient_sk = c.patient_sk
             ) and not exists (
                 select 1 from confirmed_merges m2
                 where m2.row_num_a < c.row_num
@@ -149,12 +144,9 @@ encounters_with_ids as (
     select ea.data_source
         , ea.claim_id
         , ea.patient_sk
-        , ea.facility_npi
-        , ea.discharge_disposition_code
         , ea.start_date
         , ea.end_date
-        , -- The encounter_group_id is the row_num of the closing claim
-        ea.encounter_closing_row as encounter_id
+        , {{ dbt_utils.generate_surrogate_key(['cc.data_source', 'cc.claim_id']) }} as encounter_id
     from encounter_assignments ea
     left join closing_claims cc
         on ea.patient_sk = cc.patient_sk
@@ -166,8 +158,6 @@ select data_source
     , claim_id
     , patient_sk
     , encounter_id
-    , facility_npi
-    , discharge_disposition_code
     , min(start_date) over (partition by encounter_id) as encounter_start_date
     , max(end_date) over (partition by encounter_id) as encounter_end_date
 from encounters_with_ids

@@ -8,4 +8,4 @@ select
     , start_date as encounter_start_date
     , end_date as encounter_end_date
 from encounters__stg_medical_claim
-where service_category_2 = 'ambulance' --both inst and prof
+where service_category_2 = 'ambulatory surgery center' --both inst and prof

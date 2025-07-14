@@ -1,4 +1,4 @@
-with normalized_input__medical_claim as (
+with normalized_input__pharmacy_claim as (
     select *
     from {{ ref('the_tuva_project', 'normalized_input__pharmacy_claim') }}
 )

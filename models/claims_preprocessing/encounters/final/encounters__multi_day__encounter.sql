@@ -6,10 +6,6 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__int_claim_encounter_crosswalk') }}
 )
-, encounters__int_emergency_department__start_end_dates as (
-    select *
-    from {{ ref('encounters__int_emergency_department__start_end_dates') }}
-)
 , encounters__stg_patient as (
     select *
     from {{ ref('encounters__stg_patient') }}
@@ -20,15 +16,23 @@ with encounters__stg_medical_claim as (
         , cex.encounter_sk
         , cex.encounter_type
         , cex.encounter_group
-        , dts.encounter_start_date
-        , dts.encounter_end_date
+        , cex.encounter_start_date
+        , cex.encounter_end_date
     from encounters__stg_medical_claim as stg
         inner join encounters__int_claim_encounter_crosswalk as cex
         on cex.medical_claim_sk = stg.medical_claim_sk
-        and cex.encounter_type = 'emergency department'
+        and cex.encounter_type in  (
+            'acute inpatient'
+            , 'ambulatory surgery center'
+            , 'emergency department'
+            , 'inpatient hospice'
+            , 'inpatient long term acute care'
+            , 'inpatient psych'
+            , 'inpatient rehabilitation'
+            , 'inpatient skilled nursing'
+            , 'inpatient substance use'
+            )
         and cex.encounter_type_priority = 1
-        inner join encounters__int_emergency_department__start_end_dates as dts
-        on cex.encounter_id = dts.encounter_id
 )
 
 , encounter as (
@@ -159,9 +163,6 @@ select
     , tot.inst_claim_count
     , tot.prof_claim_count
     , {{ calculate_age("p.birth_date","x.encounter_start_date") }} as admit_age
---    , p.gender
---    , p.race
---    , c.medical_surgical
 from encounter as x
     inner join total_amounts as tot
     on x.encounter_sk = tot.encounter_sk

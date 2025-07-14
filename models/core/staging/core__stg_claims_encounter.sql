@@ -1,9 +1,9 @@
 with unioned_claims_encounters as (
     {{ dbt_utils.union_relations(
         relations=[
-            ref('encounters__acute_inpatient__encounter')
-            , ref('encounters__emergency_department__encounter')
-            , ref('encounters__ambulance__encounter')
+            ref('encounters__multi_day__encounter')
+            , ref('encounters__office_visit__encounter')
+            , ref('encounters__single_day__encounter')
         ],
         exclude=["_loaded_at"]
     ) }}

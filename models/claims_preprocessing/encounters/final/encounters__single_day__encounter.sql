@@ -6,10 +6,6 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__int_claim_encounter_crosswalk') }}
 )
-, encounters__int_ambulance__start_end_dates as (
-    select *
-    from {{ ref('encounters__int_ambulance__start_end_dates') }}
-)
 , encounters__stg_patient as (
     select *
     from {{ ref('encounters__stg_patient') }}
@@ -19,17 +15,22 @@ with encounters__stg_medical_claim as (
         , cex.encounter_sk
         , cex.encounter_type
         , cex.encounter_group
-        , dts.encounter_start_date
-        , dts.encounter_end_date
+        , cex.encounter_start_date
+        , cex.encounter_end_date
         , row_number() over (partition by cex.encounter_sk
             order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
     from encounters__stg_medical_claim as stg
         inner join encounters__int_claim_encounter_crosswalk as cex
         on stg.medical_claim_sk = cex.medical_claim_sk
-        and cex.encounter_type = 'ambulance - orphaned'
+        and cex.encounter_type in (
+            'ambulatory surgery center'
+            , 'ambulance - orphaned'
+            , 'dialysis'
+            , 'dme - orphaned'
+            , 'home health'
+            , 'lab - orphaned'
+            )
         and cex.encounter_type_priority = 1
-        inner join encounters__int_ambulance__start_end_dates as dts
-        on cex.encounter_id = dts.encounter_id
 )
 
 , highest_paid_diagnosis as (

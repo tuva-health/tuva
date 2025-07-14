@@ -2,7 +2,7 @@
 -- We only need one row per encounter, so get encounter grain
 with encounters__prof_and_lower_priority as (
     select *
-    from {{ ref('encounters__prof_and_lower_priority') }}
+    from {{ ref('encounters__stg_prof_and_lower_priority') }}
 ),
 encounters__stg_outpatient_institutional as (
     select *
@@ -53,7 +53,7 @@ encounters as (
 select medical_claim_sk
     , data_source
     , claim_id
-    , claim_line_number
+--    , claim_line_number
     , patient_sk
     , encounter_id
     , encounter_start_date
