@@ -12,7 +12,10 @@ select
     , obs.encounter_id
     , obs.panel_id
     , obs.observation_date
-    , obs.observation_type
+    , case
+        when ot.observation_type is not null then ot.observation_type
+        else obs.observation_type
+      end as observation_type
     , obs.source_code_type
     , obs.source_code
     , obs.source_description
@@ -88,6 +91,8 @@ left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
 left outer join {{ ref('terminology__loinc') }} as loinc
     on obs.source_code_type = 'loinc'
         and obs.source_code = loinc.loinc
+left join {{ ref('terminology__observation_type') }} as ot
+    on lower(obs.observation_type) = ot.observation_type
 
 {% else %}
 
@@ -98,7 +103,10 @@ select
     , obs.encounter_id
     , obs.panel_id
     , obs.observation_date
-    , obs.observation_type
+    , case
+        when ot.observation_type is not null then ot.observation_type
+        else obs.observation_type
+      end as observation_type
     , obs.source_code_type
     , obs.source_code
     , obs.source_description
@@ -178,6 +186,8 @@ left join {{ ref('terminology__snomed_ct') }} snomed_ct
 left join {{ ref('terminology__loinc') }} loinc
     on obs.source_code_type = 'loinc'
         and obs.source_code = loinc.loinc
+left join {{ ref('terminology__observation_type') }} as ot
+    on lower(obs.observation_type) = ot.observation_type
 left join {{ ref('custom_mapped') }} custom_mapped
     on  ( lower(obs.source_code_type) = lower(custom_mapped.source_code_type)
         or ( obs.source_code_type is null and custom_mapped.source_code_type is null)
