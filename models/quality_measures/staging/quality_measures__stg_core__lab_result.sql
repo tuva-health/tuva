@@ -5,57 +5,105 @@
 
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select
+with lab_order as (
+
+    select
+          person_id
+        , result
+        , result_date
+        , collection_date
+        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
+        , coalesce(normalized_order_code, source_order_code) as code
+    from {{ ref('core__lab_result') }}
+
+)
+
+, lab_component as (
+
+    select
+          person_id
+        , result
+        , result_date
+        , collection_date
+        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
+        , coalesce(normalized_order_code, source_order_code) as code
+    from {{ ref('core__lab_result') }}
+    where coalesce(normalized_component_code, source_component_code) is not null
+
+)
+
+, unioned as (
+
+    select * from lab_order
+    union all
+    select * from lab_component
+
+)
+
+select distinct
       person_id
     , result
     , result_date
     , collection_date
-    , source_code_type
-    , source_code
-    , normalized_code_type
-    , normalized_code
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('core__lab_result') }}
+    , code_type
+    , code
+from unioned
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-select
+with lab_order as (
+
+    select
+          person_id
+        , result
+        , result_date
+        , collection_date
+        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
+        , coalesce(normalized_order_code, source_order_code) as code
+    from {{ ref('core__lab_result') }}
+
+)
+
+, lab_component as (
+
+    select
+          person_id
+        , result
+        , result_date
+        , collection_date
+        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
+        , coalesce(normalized_order_code, source_order_code) as code
+    from {{ ref('core__lab_result') }}
+    where coalesce(normalized_component_code, source_component_code) is not null
+
+)
+
+, unioned as (
+
+    select * from lab_order
+    union all
+    select * from lab_component
+
+)
+
+select distinct
       person_id
     , result
     , result_date
     , collection_date
-    , source_code_type
-    , source_code
-    , normalized_code_type
-    , normalized_code
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('core__lab_result') }}
+    , code_type
+    , code
+from unioned
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-{% if target.type == 'fabric' %}
-    select top 0
+select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
       cast(null as {{ dbt.type_string() }} ) as person_id
     , cast(null as {{ dbt.type_string() }} ) as result
     , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
-    ,  {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date
-    , cast(null as {{ dbt.type_string() }} ) as source_code_type
-    , cast(null as {{ dbt.type_string() }} ) as source_code
-    , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
-    , cast(null as {{ dbt.type_string() }} ) as normalized_code
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
-{% else %}
-    select
-      cast(null as {{ dbt.type_string() }} ) as person_id
-    , cast(null as {{ dbt.type_string() }} ) as result
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
-    ,  {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date
-    , cast(null as {{ dbt.type_string() }} ) as source_code_type
-    , cast(null as {{ dbt.type_string() }} ) as source_code
-    , cast(null as {{ dbt.type_string() }} ) as normalized_code_type
-    , cast(null as {{ dbt.type_string() }} ) as normalized_code
-    , cast(null as {{ dbt.type_timestamp() }} ) as tuva_last_run
-    limit 0
-{%- endif %}
+    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as collection_date
+    , cast(null as {{ dbt.type_string() }} ) as code_type
+    , cast(null as {{ dbt.type_string() }} ) as code
+{{ limit_zero()}}
 
 {%- endif %}
