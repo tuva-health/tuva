@@ -35,10 +35,10 @@ select
         , snomed_ct.description
         ) as normalized_order_description
     , case
-        when labs.source_component_type is not null then labs.source_component_type
+        when labs.normalized_component_type is not null then labs.normalized_component_type
         when loinc_component.loinc is not null then 'loinc'
         when snomed_ct_component.snomed_ct is not null then 'snomed-ct'
-        else null end as source_component_type
+        else null end as normalized_component_type
     , coalesce(
         labs.normalized_component_code
         , loinc_component.loinc
@@ -63,7 +63,6 @@ select
             , snomed_ct_component.snomed_ct
         ) is not null then 'automatic'
       end as mapping_method
-    , labs.normalized_component_code
     , labs.status
     , labs.result
     , labs.result_date
@@ -130,7 +129,6 @@ select
         when custom_mapped.not_mapped is not null then custom_mapped.not_mapped
         when coalesce(custom_mapped.normalized_order_code,custom_mapped.normalized_order_description) is not null then 'custom'
         end as mapping_method
-    , labs.normalized_component_code
     , labs.status
     , labs.result
     , labs.result_date
