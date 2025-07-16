@@ -951,7 +951,7 @@ The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc
 {% enddocs %}
 
 {% docs source_component_code %}
-The description for the component of the test from the source system.
+The code for the component in the source system (e.g., the ICD-10 code, NDC, lab, etc)
 {% enddocs %}
 
 {% docs source_component_type %}
