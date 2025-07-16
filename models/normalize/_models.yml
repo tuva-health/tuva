@@ -3,8 +3,7 @@ version: 2
 models:
 
   - name: normalize__all_unmapped
-    description: >
-      unmapped condition codes
+    description: all unmapped codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -14,8 +13,7 @@ models:
       materialized: table
 
   - name: normalize__all_codes
-    description: >
-      unmapped condition codes
+    description: all codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -24,10 +22,8 @@ models:
       tags: normalized
       materialized: view
 
-
   - name: normalize__unmapped_condition
-    description: >
-      unmapped condition codes
+    description: unmapped condition codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -37,8 +33,7 @@ models:
       materialized: table
 
   - name: normalize__unmapped_procedure
-    description: >
-      unmapped procedure codes
+    description: unmapped procedure codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -48,8 +43,7 @@ models:
       materialized: table
 
   - name: normalize__unmapped_lab_result
-    description: >
-      unmapped procedure codes
+    description: unmapped lab result order and component codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -59,8 +53,7 @@ models:
       materialized: table
 
   - name: normalize__unmapped_medication
-    description: >
-      unmapped procedure codes
+    description: unmapped medication codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -70,8 +63,7 @@ models:
       materialized: table
 
   - name: normalize__unmapped_observation
-    description: >
-      unmapped procedure codes
+    description: unmapped observation codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -79,42 +71,39 @@ models:
       alias: unmapped_observation
       tags: normalized
       materialized: table
-      
-
-
-
 
   - name: normalize__stg_unmapped_condition
-    description: >
-      unmapped condition codes
+    description: unmapped condition codes
     config:
       tags: normalized
       materialized: ephemeral
 
   - name: normalize__stg_unmapped_procedure
-    description: >
-      unmapped procedure codes
+    description: unmapped procedure codes
     config:
       tags: normalized
       materialized: ephemeral
 
-  - name: normalize__stg_unmapped_lab_result
-    description: >
-      unmapped procedure codes
+  - name: normalize__stg_unmapped_lab_result_component
+    description: unmapped lab result component codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_lab_result_order
+    description: unmapped lab result order codes
     config:
       tags: normalized
       materialized: ephemeral
 
   - name: normalize__stg_unmapped_medication
-    description: >
-      unmapped procedure codes
+    description: unmapped medication codes
     config:
       tags: normalized
       materialized: ephemeral
 
   - name: normalize__stg_unmapped_observation
-    description: >
-      unmapped procedure codes
+    description: unmapped observation codes
     config:
       tags: normalized
       materialized: ephemeral
