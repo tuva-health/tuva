@@ -1846,12 +1846,22 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_component
+  - name: data_quality__lab_result_normalized_component_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_component
+      alias: lab_result_normalized_component_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__lab_result_normalized_component_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_normalized_component_type
       tags:
         - data_quality
       materialized: table
@@ -1879,7 +1889,7 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_source_code_type
+  - name: data_quality__lab_result_source_order_type
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -1890,7 +1900,7 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_description
+  - name: data_quality__lab_result_normalized_order_description
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -1923,18 +1933,18 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_code
+  - name: data_quality__lab_result_normalized_order_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_code
+      alias: lab_result_normalized_order_code
       tags:
         - data_quality
       materialized: table
 
 
-  - name: data_quality__lab_result_source_description
+  - name: data_quality__lab_result_source_order_description
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -2011,7 +2021,7 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_code_type
+  - name: data_quality__lab_result_normalized_order_type
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -2033,7 +2043,7 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_source_code
+  - name: data_quality__lab_result_source_order_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
@@ -2055,12 +2065,34 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_source_component
+  - name: data_quality__lab_result_source_component_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_source_component
+      alias: lab_result_source_component_code
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__lab_result_source_component_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_source_component_description
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__lab_result_source_component_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_source_component_type
       tags:
         - data_quality
       materialized: table

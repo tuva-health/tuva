@@ -348,7 +348,11 @@ select * from {{ ref('data_quality__lab_result_collection_date') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_normalized_component') }}
+select * from {{ ref('data_quality__lab_result_normalized_component_code') }}
+
+union all
+
+select * from {{ ref('data_quality__lab_result_normalized_component_type') }}
 
 union all
 
@@ -360,11 +364,11 @@ select * from {{ ref('data_quality__lab_result_result') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_source_code_type') }}
+select * from {{ ref('data_quality__lab_result_source_order_type') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_normalized_description') }}
+select * from {{ ref('data_quality__lab_result_normalized_order_description') }}
 
 union all
 
@@ -376,11 +380,11 @@ select * from {{ ref('data_quality__lab_result_normalized_reference_range_high')
 
 union all
 
-select * from {{ ref('data_quality__lab_result_normalized_code') }}
+select * from {{ ref('data_quality__lab_result_normalized_order_code') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_source_description') }}
+select * from {{ ref('data_quality__lab_result_source_order_description') }}
 
 union all
 
@@ -408,7 +412,7 @@ select * from {{ ref('data_quality__lab_result_normalized_units') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_normalized_code_type') }}
+select * from {{ ref('data_quality__lab_result_normalized_order_type') }}
 
 union all
 
@@ -416,7 +420,7 @@ select * from {{ ref('data_quality__lab_result_source_reference_range_high') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_source_code') }}
+select * from {{ ref('data_quality__lab_result_source_order_code') }}
 
 union all
 
@@ -424,7 +428,15 @@ select * from {{ ref('data_quality__lab_result_patient_id') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_source_component') }}
+select * from {{ ref('data_quality__lab_result_source_component_code') }}
+
+union all
+
+select * from {{ ref('data_quality__lab_result_source_component_description') }}
+
+union all
+
+select * from {{ ref('data_quality__lab_result_source_component_type') }}
 
 union all
 
