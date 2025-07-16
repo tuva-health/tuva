@@ -21,11 +21,11 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - DATA_QUALITY_CATEGORY
-            - GRAPH_NAME
-            - LEVEL_OF_DETAIL
-            - Y_AXIS
-            - X_AXIS
+            - data_quality_category
+            - graph_name
+            - level_of_detail
+            - y_axis
+            - x_axis
           config:
             severity: error
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"

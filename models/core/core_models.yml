@@ -275,7 +275,7 @@ models:
           tags: ['tuva_dqi_sev_5', 'dqi']
           config:
             severity: warn
-            enabled: "{{ (var('claims_enabled', true)) | as_bool }}"
+            enabled: "{{ (var('claims_enabled', false)) | as_bool }}"
     - name: source_model
       description: '{{ doc("source_model") }}'
     - name: encounter_source_type
