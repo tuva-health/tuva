@@ -25,8 +25,8 @@ with lab_order as (
         , result
         , result_date
         , collection_date
-        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
-        , coalesce(normalized_order_code, source_order_code) as code
+        , lower(coalesce(normalized_component_type, source_component_type)) as code_type
+        , coalesce(normalized_component_code, source_component_code) as code
     from {{ ref('core__lab_result') }}
     where coalesce(normalized_component_code, source_component_code) is not null
 
@@ -71,8 +71,8 @@ with lab_order as (
         , result
         , result_date
         , collection_date
-        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
-        , coalesce(normalized_order_code, source_order_code) as code
+        , lower(coalesce(normalized_component_type, source_component_type)) as code_type
+        , coalesce(normalized_component_code, source_component_code) as code
     from {{ ref('core__lab_result') }}
     where coalesce(normalized_component_code, source_component_code) is not null
 

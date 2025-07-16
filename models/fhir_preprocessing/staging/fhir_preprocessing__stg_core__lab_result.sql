@@ -14,7 +14,7 @@ with lab_order as (
         , status
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
-        , coalesce(normalized_description, source_description) as description
+        , coalesce(normalized_order_description, source_order_description) as description
         , result_date
         , result
         , coalesce(normalized_units, source_units) as units
@@ -30,9 +30,9 @@ with lab_order as (
         , person_id
         , encounter_id
         , status
-        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
-        , coalesce(normalized_order_code, source_order_code) as code
-        , coalesce(normalized_description, source_description) as description
+        , lower(coalesce(normalized_component_type, source_component_type)) as code_type
+        , coalesce(normalized_component_code, source_component_code) as code
+        , coalesce(normalized_component_description, source_component_description) as description
         , result_date
         , result
         , coalesce(normalized_units, source_units) as units
@@ -75,7 +75,7 @@ with lab_order as (
         , status
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
-        , coalesce(normalized_description, source_description) as description
+        , coalesce(normalized_order_description, source_order_description) as description
         , result_date
         , result
         , coalesce(normalized_units, source_units) as units
@@ -91,9 +91,9 @@ with lab_order as (
         , person_id
         , encounter_id
         , status
-        , lower(coalesce(normalized_order_type, source_order_type)) as code_type
-        , coalesce(normalized_order_code, source_order_code) as code
-        , coalesce(normalized_description, source_description) as description
+        , lower(coalesce(normalized_component_type, source_component_type)) as code_type
+        , coalesce(normalized_component_code, source_component_code) as code
+        , coalesce(normalized_component_description, source_component_description) as description
         , result_date
         , result
         , coalesce(normalized_units, source_units) as units
