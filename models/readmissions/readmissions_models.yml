@@ -5,9 +5,10 @@ models:
   - name: readmissions__encounter_augmented
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: encounter_augmented
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS_encounter_augmented{% else %}encounter_augmented{%- endif -%}
       tags: readmissions
       materialized: table
     description: "This model includes all encounters from the stg_encounter model, and for each encounter_id we add fields relevant for the encounter."
@@ -100,9 +101,10 @@ models:
   - name: readmissions__readmission_summary
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: readmission_summary
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS_readmission_summary{% else %}readmission_summary{%- endif -%}
       tags: readmissions
       materialized: table
     description: "This model includes all rows from the encounter_augmented model where disqualified_encounter_flag = 0 (all rows for encounters that are not disqualified for data quality issues). For each of these encounters we add fields to indicate whether it had a readmission and, when a readmission was present, to show relevant fields for the readmission."
@@ -223,9 +225,10 @@ models:
   - name: readmissions__encounter_data_quality
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_encounter_data_quality
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_encounter_data_quality{% else %}_int_encounter_data_quality{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model has the same number of rows as the stg_encounter model. Here we have one row for every unique encounter in the stg_encounter model, and for each encounter we have a flag (disqualified_encounter_flag) to indicte if the encounter is disqualified from being useful for readmission measures. We also have other flags to indicate which specific data quality issues this encounter has that may disqualify it from being used in readmission measures."
@@ -260,9 +263,10 @@ models:
   - name: readmissions__encounter_overlap
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_encounter_overlap
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_encounter_overlap{% else %}_int_encounter_overlap{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists and labels encounters that overlap to identify the best one out of the group."
@@ -277,9 +281,10 @@ models:
   - name: readmissions__encounter_specialty_cohort
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_encounter_specialty_cohort
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_encounter_specialty_cohort{% else %}_int_encounter_specialty_cohort{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists the specialty cohort associated with each inpatient encounter. All encounters in the stg_encounter model are present here, and each gets a specialty cohort assigned from the following list of 5 options: Surgery/Gynecology, Medicine, Cardiorespiratory, Cardiovascular, Neurology. Encounters that don't have a specialty cohort get 'Medicine' assigned by default."
@@ -292,18 +297,20 @@ models:
   - name: readmissions__encounter_with_ccs
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_encounter_with_ccs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_encounter_with_ccs{% else %}_int_encounter_with_ccs{%- endif -%}
       tags: readmissions
       materialized: view
 
   - name: readmissions__exclusion
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_exclusion
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_exclusion{% else %}_int_exclusion{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists all encounters that are excluded from being index admissions because they belong to one of the exclusion categories."
@@ -314,9 +321,10 @@ models:
   - name: readmissions__index_admission
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_index_admission
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_index_admission{% else %}_int_index_admission{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists all index admissions for the hospital wide readmissions measure. These represent encounter_ids that meet the requirements to be an index admission for the HWR measure."
@@ -327,9 +335,10 @@ models:
   - name: readmissions__index_discharge_requirement
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_index_discharge_requirement
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_index_discharge_requirement{% else %}_int_index_discharge_requirement{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists all encounters that meet the discharge disposition requirement to be an index admission."
@@ -340,9 +349,10 @@ models:
   - name: readmissions__index_time_requirement
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_index_time_requirement
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_index_time_requirement{% else %}_int_index_time_requirement{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists all encounters that meet the time requirement to be an index admission."
@@ -353,9 +363,10 @@ models:
   - name: readmissions__planned_encounter
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_planned_encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_planned_encounter{% else %}_int_planned_encounter{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model gives a list of all encounter_ids that were planned encounters."
@@ -366,9 +377,10 @@ models:
   - name: readmissions__procedure_ccs
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_procedure_ccs
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_procedure_ccs{% else %}_int_procedure_ccs{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model includes all procedures from the stg_procedure model and adds a valid_icd_10_pcs_flag to indicate if the ICD-10-PCS code for this procedure is valid. We also add the CCS procedure category associated with the procedure"
@@ -385,9 +397,10 @@ models:
   - name: readmissions__readmission_crude
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_readmission_crude
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_readmission_crude{% else %}_int_readmission_crude{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This model lists all encounters and whether they had a 'crude' readmission, meaning that the encounter had a hospitalization after discharge, without regard to all CMS readmission logic."
@@ -409,9 +422,10 @@ models:
   - name: readmissions__encounter
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
-        {% else %}readmissions{%- endif -%}
-      alias: _int_encounter
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_readmissions
+        {% else %}readmissions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_READMISSIONS__int_encounter{% else %}_int_encounter{%- endif -%}
       tags: readmissions
       materialized: view
     description: "This is a staging table for the input layer. Each row represents a unique acute inpatient encounter."

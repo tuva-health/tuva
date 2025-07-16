@@ -5,8 +5,9 @@ seeds:
     description: A list of the diagnoses codes and their long and short names along with grouping logic classifying each code into a condition group and a condition family group.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}
-      alias: _value_set_tuva_chronic_conditions_hierarchy
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_chronic_conditions{% else %}chronic_conditions{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CHRONIC_CONDITIONS__value_set_tuva_chronic_conditions_hierarchy{% else %}_value_set_tuva_chronic_conditions_hierarchy{%- endif -%}
       tags:
         - tuva_chronic_conditions
         - chronic_conditions

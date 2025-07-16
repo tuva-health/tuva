@@ -7,9 +7,10 @@ models:
   - name: ccsr__long_condition_category
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
-        {% else %}ccsr{%- endif -%}
-      alias: long_condition_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
+        {% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR_long_condition_category{% else %}long_condition_category{%- endif -%}
       tags:
         - ccsr
       materialized: table
@@ -86,9 +87,10 @@ models:
   - name: ccsr__singular_condition_category
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
-        {% else %}ccsr{%- endif -%}
-      alias: singular_condition_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
+        {% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR_singular_condition_category{% else %}singular_condition_category{%- endif -%}
       tags:
         - ccsr
       materialized: table
@@ -149,9 +151,10 @@ models:
       equivalent to the CCSR's Output Option 1 - Vertical File Output.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
-        {% else %}ccsr{%- endif -%}
-      alias: long_procedure_category
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
+        {% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR_long_procedure_category{% else %}long_procedure_category{%- endif -%}
       tags:
         - ccsr
       materialized: table
@@ -197,9 +200,10 @@ models:
   - name: ccsr__procedure_summary
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
-        {% else %}ccsr{%- endif -%}
-      alias: procedure_summary
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
+        {% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR_procedure_summary{% else %}procedure_summary{%- endif -%}
       tags:
         - ccsr
       materialized: table
@@ -226,9 +230,10 @@ models:
   - name: ccsr__dx_vertical_pivot
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
-        {% else %}ccsr{%- endif -%}
-      alias: dx_vertical_pivot
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
+        {% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR_dx_vertical_pivot{% else %}dx_vertical_pivot{%- endif -%}
       tags:
         - ccsr
       materialized: table
@@ -285,9 +290,10 @@ models:
   - name: ccsr__procedure_category_map
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
-        {% else %}ccsr{%- endif -%}
-      alias: procedure_category_map
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_ccsr
+        {% else %}ccsr{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_CCSR_procedure_category_map{% else %}procedure_category_map{%- endif -%}
       tags:
         - ccsr
       materialized: table

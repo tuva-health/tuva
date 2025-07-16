@@ -6,12 +6,10 @@ models:
   - name: pharmacy__brand_generic_opportunity
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: brand_generic_opportunity
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY_brand_generic_opportunity{% else %}brand_generic_opportunity{%- endif -%}
       tags: 
         - pharmacy
       materialized: table
@@ -61,12 +59,10 @@ models:
   - name: pharmacy__generic_available_list
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: generic_available_list
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY_generic_available_list{% else %}generic_available_list{%- endif -%}
       tags: 
         - pharmacy
       materialized: table
@@ -113,12 +109,10 @@ models:
   - name: pharmacy__pharmacy_claim_expanded
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: pharmacy_claim_expanded
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY_pharmacy_claim_expanded{% else %}pharmacy_claim_expanded{%- endif -%}
       tags: 
         - pharmacy
       materialized: table
@@ -207,12 +201,10 @@ models:
   - name: pharmacy__int_brand_with_generic_available
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: _int_brand_with_generic_available
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY__int_brand_with_generic_available{% else %}_int_brand_with_generic_available{%- endif -%}
       tags: 
         - pharmacy
       materialized: view
@@ -222,12 +214,10 @@ models:
   - name: pharmacy__int_claims_current_cost
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: _int_claims_current_cost
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY__int_claims_current_cost{% else %}_int_claims_current_cost{%- endif -%}
       tags: 
         - pharmacy
       materialized: view
@@ -237,12 +227,10 @@ models:
   - name: pharmacy__int_generic_cost
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: _int_generic_cost
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY__int_generic_cost{% else %}_int_generic_cost{%- endif -%}
       tags: 
         - pharmacy
       materialized: view
@@ -252,12 +240,10 @@ models:
   - name: pharmacy__int_generic_cost_by_ndc
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: _int_generic_cost_by_ndc
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY__int_generic_cost_by_ndc{% else %}_int_generic_cost_by_ndc{%- endif -%}
       tags: 
         - pharmacy
       materialized: view
@@ -269,12 +255,10 @@ models:
   - name: pharmacy__stg_pharmacy_claim
     config:
       schema: |
-        {%- if var('tuva_schema_prefix', None) != None -%}
-          {{var('tuva_schema_prefix')}}_pharmacy
-        {%- else -%}
-          pharmacy
-        {%- endif -%}
-      alias: stg_pharmacy_claim
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_pharmacy
+        {% else %}pharmacy{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_PHARMACY_stg_pharmacy_claim{% else %}stg_pharmacy_claim{%- endif -%}
       tags: 
         - pharmacy
       materialized: ephemeral

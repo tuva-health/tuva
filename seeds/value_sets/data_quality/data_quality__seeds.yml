@@ -6,9 +6,10 @@ seeds:
       Target thresholds at the field level determining red, yellow, and green values in the Data Quality dashboard.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _value_set_crosswalk_field_info
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY__value_set_crosswalk_field_info{% else %}_value_set_crosswalk_field_info{%- endif -%}
       column_types:
         input_layer_table_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -30,9 +31,10 @@ seeds:
       Crosswalk table that defines which fields impact the ability for marts to run.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _value_set_crosswalk_field_to_mart
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY__value_set_crosswalk_field_to_mart{% else %}_value_set_crosswalk_field_to_mart{%- endif -%}
       column_types:
         input_layer_table_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -50,9 +52,10 @@ seeds:
       Crosswalk table that defines which marts impact which outcome measures.
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _value_set_crosswalk_mart_to_outcome_measure
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY__value_set_crosswalk_mart_to_outcome_measure{% else %}_value_set_crosswalk_mart_to_outcome_measure{%- endif -%}
       column_types:
         mart_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -64,9 +67,10 @@ seeds:
       Crosswalk table that sets reasonable ranges for outcome measures
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _value_set_crosswalk_measure_reasonable_ranges
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY__value_set_crosswalk_measure_reasonable_ranges{% else %}_value_set_crosswalk_measure_reasonable_ranges{%- endif -%}
       column_types:
         measure_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -82,9 +86,10 @@ seeds:
       reference values for analytics checks from various benchmark sources
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: _value_set_reference_mart_analytics
+        {%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}{%- endif -%}
+      alias: |
+        {%- if var('tuva_schema_override',None) != None -%}TUVA_DATA_QUALITY__value_set_reference_mart_analytics{% else %}_value_set_reference_mart_analytics{%- endif -%}
       column_types:
         analytics_concept: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}

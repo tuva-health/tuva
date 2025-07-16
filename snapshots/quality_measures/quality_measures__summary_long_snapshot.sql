@@ -1,7 +1,11 @@
 {% snapshot quality_measures__summary_long_snapshot %}
 
 {% set schema_var %}
-{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+{%- if var('tuva_schema_override',None) != None -%}{{var('tuva_schema_override')}}{% else %}{%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}{%- endif -%}
+{% endset %}
+
+{% set alias_var %}
+{%- if var('tuva_schema_override',None) != None -%}TUVA_QUALITY_MEASURES_summary_long_snapshot{% else %}summary_long_snapshot{%- endif -%}
 {% endset %}
 
 {{
