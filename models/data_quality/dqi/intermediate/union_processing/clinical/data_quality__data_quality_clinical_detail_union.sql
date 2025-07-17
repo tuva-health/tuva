@@ -344,7 +344,7 @@ select * from {{ ref('data_quality__lab_result_lab_result_id') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_collection_date') }}
+select * from {{ ref('data_quality__lab_result_collection_datetime') }}
 
 union all
 
@@ -396,7 +396,7 @@ select * from {{ ref('data_quality__lab_result_accession_number') }}
 
 union all
 
-select * from {{ ref('data_quality__lab_result_result_date') }}
+select * from {{ ref('data_quality__lab_result_result_datetime') }}
 
 union all
 

@@ -198,30 +198,34 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: result_date
-        description: '{{ doc("result_date") }}'
+      - name: result_datetime
+        description: '{{ doc("result_datetime") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: date
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
+                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
+                  with time zone, timestamp without time zone, datetime2, datetimeoffset ]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: collection_date
-        description: '{{ doc("collection_date") }}'
+      - name: collection_datetime
+        description: '{{ doc("collection_datetime") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: date
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
+                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
+                  with time zone, timestamp without time zone, datetime2, datetimeoffset ]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn

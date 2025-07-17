@@ -23,8 +23,8 @@ select
     , cast(normalized_component_description as {{ dbt.type_string() }}) as normalized_component_description
     , cast(status as {{ dbt.type_string() }}) as status
     , cast(result as {{ dbt.type_string() }}) as result
-    , {{ try_to_cast_date('result_date', 'YYYY-MM-DD') }} as result_date
-    , {{ try_to_cast_date('collection_date', 'YYYY-MM-DD') }} as collection_date
+    , {{ try_to_cast_datetime('result_datetime') }} as result_datetime
+    , {{ try_to_cast_datetime('collection_datetime') }} as collection_datetime
     , cast(source_units as {{ dbt.type_string() }}) as source_units
     , cast(normalized_units as {{ dbt.type_string() }}) as normalized_units
     , cast(source_reference_range_low as {{ dbt.type_string() }}) as source_reference_range_low

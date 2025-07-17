@@ -112,8 +112,10 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         result: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
-        result_date: date
-        collection_date: date
+        result_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+        collection_datetime: |
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
         source_units: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_units: |

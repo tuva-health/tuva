@@ -18,8 +18,8 @@ select
     , cast(null as {{ dbt.type_string() }} ) as normalized_component_description
     , cast(null as {{ dbt.type_string() }} ) as status
     , cast(null as {{ dbt.type_string() }} ) as result
-    , cast(null as date) as result_date
-    , cast(null as date) as collection_date
+    , cast(null as {{ dbt.type_timestamp() }}) as result_datetime
+    , cast(null as {{ dbt.type_timestamp() }}) as collection_datetime
     , cast(null as {{ dbt.type_string() }} ) as source_units
     , cast(null as {{ dbt.type_string() }} ) as normalized_units
     , cast(null as {{ dbt.type_string() }} ) as source_reference_range_low

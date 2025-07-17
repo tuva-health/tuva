@@ -15,11 +15,12 @@ with lab_order as (
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
         , coalesce(normalized_order_description, source_order_description) as description
-        , result_date
+        , result_datetime
         , result
         , coalesce(normalized_units, source_units) as units
         , data_source
     from {{ ref('core__lab_result') }}
+    where coalesce(normalized_component_code, source_component_code) is null
 
 )
 
@@ -33,7 +34,7 @@ with lab_order as (
         , lower(coalesce(normalized_component_type, source_component_type)) as code_type
         , coalesce(normalized_component_code, source_component_code) as code
         , coalesce(normalized_component_description, source_component_description) as description
-        , result_date
+        , result_datetime
         , result
         , coalesce(normalized_units, source_units) as units
         , data_source
@@ -58,7 +59,7 @@ select distinct
     , code_type
     , code
     , description
-    , result_date
+    , result_datetime
     , result
     , units
     , data_source
@@ -76,11 +77,12 @@ with lab_order as (
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
         , coalesce(normalized_order_description, source_order_description) as description
-        , result_date
+        , result_datetime
         , result
         , coalesce(normalized_units, source_units) as units
         , data_source
     from {{ ref('core__lab_result') }}
+    where coalesce(normalized_component_code, source_component_code) is null
 
 )
 
@@ -94,7 +96,7 @@ with lab_order as (
         , lower(coalesce(normalized_component_type, source_component_type)) as code_type
         , coalesce(normalized_component_code, source_component_code) as code
         , coalesce(normalized_component_description, source_component_description) as description
-        , result_date
+        , result_datetime
         , result
         , coalesce(normalized_units, source_units) as units
         , data_source
@@ -119,7 +121,7 @@ select distinct
     , code_type
     , code
     , description
-    , result_date
+    , result_datetime
     , result
     , units
     , data_source
@@ -135,7 +137,7 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
     , cast(null as {{ dbt.type_string() }} ) as code_type
     , cast(null as {{ dbt.type_string() }} ) as code
     , cast(null as {{ dbt.type_string() }} ) as description
-    , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as result_date
+    , {{ try_to_cast_datetime('null') }} as result_datetime
     , cast(null as {{ dbt.type_string() }} ) as result
     , cast(null as {{ dbt.type_string() }} ) as units
     , cast(null as {{ dbt.type_string() }} ) as data_source

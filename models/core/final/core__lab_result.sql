@@ -65,8 +65,8 @@ select
       end as mapping_method
     , labs.status
     , labs.result
-    , labs.result_date
-    , labs.collection_date
+    , labs.result_datetime
+    , labs.collection_datetime
     , labs.source_units
     , labs.normalized_units
     , labs.source_reference_range_low
@@ -131,8 +131,8 @@ select
         end as mapping_method
     , labs.status
     , labs.result
-    , labs.result_date
-    , labs.collection_date
+    , labs.result_datetime
+    , labs.collection_datetime
     , labs.source_units
     , labs.normalized_units
     , labs.source_reference_range_low

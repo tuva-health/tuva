@@ -17,7 +17,7 @@ select
     , cast(upper(code_type) as {{ dbt.type_string() }} ) as observation_code_system
     , cast(code as {{ dbt.type_string() }} ) as observation_code
     , cast(description as {{ dbt.type_string() }} ) as observation_code_text
-    , cast(result_date as {{ dbt.type_timestamp() }} ) as observation_datetime
+    , cast(result_datetime as {{ dbt.type_timestamp() }} ) as observation_datetime
     , cast(result as {{ dbt.type_string() }} ) as observation_value
     , cast(units as {{ dbt.type_string() }} ) as observation_value_units
     , cast(data_source as {{ dbt.type_string() }} ) as data_source

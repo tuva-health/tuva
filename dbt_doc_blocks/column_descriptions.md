@@ -170,6 +170,10 @@ The total coinsurance charged on the claim by the provider.
 Date the test was collected.
 {% enddocs %}
 
+{% docs collection_datetime %}
+Datetime the specimen was collected.
+{% enddocs %}
+
 {% docs condition_id %}
 Unique identifier for each condition in the table.
 {% enddocs %}
@@ -884,6 +888,10 @@ The result of the record (e.g., lab test, observation, etc).
 
 {% docs result_date %}
 Date of the test result.
+{% enddocs %}
+
+{% docs result_datetime %}
+Datetime of the test result.
 {% enddocs %}
 
 {% docs revenue_center_code %}
