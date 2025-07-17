@@ -170,6 +170,10 @@ The total coinsurance charged on the claim by the provider.
 Date the test was collected.
 {% enddocs %}
 
+{% docs collection_datetime %}
+Datetime the specimen was collected.
+{% enddocs %}
+
 {% docs condition_id %}
 Unique identifier for each condition in the table.
 {% enddocs %}
@@ -598,8 +602,16 @@ The normalized code.
 The normalized type of code.
 {% enddocs %}
 
-{% docs normalized_component %}
-The normalized component.
+{% docs normalized_component_code %}
+The normalized code for the component.
+{% enddocs %}
+
+{% docs normalized_component_description %}
+Normalized description of the code for the component.
+{% enddocs %}
+
+{% docs normalized_component_type %}
+The normalized type of code for the component.
 {% enddocs %}
 
 {% docs normalized_description %}
@@ -878,6 +890,10 @@ The result of the record (e.g., lab test, observation, etc).
 Date of the test result.
 {% enddocs %}
 
+{% docs result_datetime %}
+Datetime of the test result.
+{% enddocs %}
+
 {% docs revenue_center_code %}
 Revenue center code for the claim line (institutional only and typically multiple codes per claim).
 {% enddocs %}
@@ -942,8 +958,16 @@ The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
 The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
 {% enddocs %}
 
-{% docs source_component %}
-The description for the component of the test from the source system.
+{% docs source_component_code %}
+The code for the component in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+{% enddocs %}
+
+{% docs source_component_type %}
+The type of code for the component reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+{% enddocs %}
+
+{% docs source_component_description %}
+Description of the source code for the component in the source system.
 {% enddocs %}
 
 {% docs source_description %}

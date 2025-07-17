@@ -5,7 +5,7 @@
 
 select
       m.data_source
-    , coalesce(m.result_date,cast('1900-01-01' as date)) as source_date
+    , coalesce(m.result_datetime,cast('1900-01-01 00:00:00' as {{ dbt.type_timestamp() }} )) as source_date
     , 'LAB_RESULT' as table_name
     , 'Lab Result ID' as drill_down_key
     , coalesce(lab_result_id, 'NULL') as drill_down_value
