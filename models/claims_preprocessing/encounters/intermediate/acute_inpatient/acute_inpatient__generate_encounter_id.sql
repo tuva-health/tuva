@@ -52,7 +52,7 @@ order by end_date, start_date, claim_id) as row_num
     , bb.row_num as row_num_b
     , case
       -- Condition 1: Exact End Date Match (Catches duplicates/corrections)
-      when aa.end_date = bb.end_date 
+      when aa.end_date = bb.end_date
         and aa.facility_id = bb.facility_id then 1
 
       -- Condition 2: Consecutive Stay with Transfer (Catches month-end billing)
@@ -69,7 +69,6 @@ order by end_date, start_date, claim_id) as row_num
       when aa.end_date <> bb.end_date
         and aa.end_date > bb.start_date
         and aa.facility_id = bb.facility_id then 1
-      
       else 0
     end as merge_flag
   from add_row_num as aa
