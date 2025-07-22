@@ -15,9 +15,9 @@ models:
       - dbt_utils.unique_combination_of_columns:
           name: pharmacy_claim_unique_key
           combination_of_columns:
+            - data_source
             - claim_id
             - claim_line_number
-            - data_source
           config:
             severity: error
     columns:
@@ -50,14 +50,26 @@ models:
       - name: prescribing_provider_npi
         data_type: string
         description: >
-          NPI for the provider that wrote the prescription (e.g. priamry care  physician).
+          NPI for the provider that wrote the prescription (e.g. primary care physician).
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              name: expect_column_values_to_match_regex__pharmacy_claim_prescribing_provider_npi
+              regex: "^[0-9]{10}$"
       - name: dispensing_provider_npi
         data_type: string
         description: >
           NPI for the provider that dispensed the prescription (e.g. pharmacy).
+        tests:
+          - dbt_expectations.expect_column_values_to_match_regex:
+              name: expect_column_values_to_match_regex__pharmacy_claim_dispensing_provider_npi
+              regex: "^[0-9]{10}$"
       - name: dispensing_date
         data_type: date
         description: '{{ doc("dispensing_date") }}'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
       - name: ndc_code
         data_type: string
         description: '{{ doc("ndc_code") }}'
@@ -70,7 +82,8 @@ models:
         data_type: int
         description: '{{ doc("days_supply") }}'
         tests:
-          - not_null
+          - not_null:
+              tags: tuva_dqi_sev_4
       - name: refills
         data_type: int
         description: '{{ doc("refills") }}'

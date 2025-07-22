@@ -1,5 +1,5 @@
 name: 'the_tuva_project'
-version: '0.14.12'
+version: '1.0.0'
 config-version: 2
 require-dbt-version: ">=1.5.0"
 
@@ -23,6 +23,14 @@ models:
 seeds:
   the_tuva_project:
     +materialized: table
+
+vars:
+  enable_tuva_run_log: true # TODO: Remove on commit
+
+on-run-start: |
+  {% if var('enable_tuva_run_log', false) %}
+  {{ log_invocation_start() }}
+  {% endif %}
 
 # Default dbt settings
 model-paths: ["models"]
