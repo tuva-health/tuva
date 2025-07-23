@@ -116,6 +116,7 @@ select
     , a.encounter_group
     , a.encounter_start_date
     , a.encounter_end_date
+    , cast(null as {{ dbt.type_int() }}) as admit_age
     , cast(null as {{ dbt.type_string() }}) as admit_source_code
     , cast(null as {{ dbt.type_string() }}) as admit_source_description
     , cast(null as {{ dbt.type_string() }}) as admit_type_code
@@ -152,9 +153,6 @@ select
     , tot.claim_count
     , tot.inst_claim_count
     , tot.prof_claim_count
-    , {{ calculate_age("p.birth_date","a.encounter_start_date") }} as admit_age
---    , p.gender
---    , p.race
 from base_claims as a
     inner join total_amounts as tot
     on a.encounter_sk = tot.encounter_sk

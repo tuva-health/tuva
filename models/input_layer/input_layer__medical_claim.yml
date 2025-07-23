@@ -29,6 +29,12 @@ models:
           config:
             severity: warn
     columns:
+      - name: data_source
+        data_type: string
+        description: '{{ doc("data_source") }}'
+        tests:
+          - not_null:
+              tags: tuva_dqi_sev_1
       - name: claim_id
         data_type: string
         description: '{{ doc("claim_id") }}'
@@ -39,7 +45,8 @@ models:
         data_type: int
         description: '{{ doc("claim_line_number") }}'
         tests:
-          - not_null
+          - not_null:
+              tags: tuva_dqi_sev_1
       - name: claim_type
         data_type: string
         description: '{{ doc("claim_type") }}'
@@ -69,9 +76,9 @@ models:
         description: '{{ doc("member_id") }}'
         tests:
           - not_null:
-              tags: tuva_dqi_sev_2
+              tags: tuva_dqi_sev_1
           - dbt_expectations.expect_column_distinct_count_to_equal:
-              tags: tuva_dqi_sev_2
+              tags: tuva_dqi_sev_1
               value: 1
               group_by: [claim_id]
       - name: payer
@@ -466,6 +473,7 @@ models:
         description: Indicates the type of procedure code (e.g. ICD-10-PCS).
         tests:
           - accepted_values:
+              tags: ['tuva_dqi_sev_2']
               values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
       - name: procedure_code_1
         data_type: string
@@ -620,11 +628,6 @@ models:
       - name: in_network_flag
         data_type: boolean
         description: '{{ doc("in_network_flag") }}'
-      - name: data_source
-        data_type: string
-        description: '{{ doc("data_source") }}'
-        tests:
-          - not_null
       - name: file_name
         data_type: string
         description: '{{ doc("file_name") }}'

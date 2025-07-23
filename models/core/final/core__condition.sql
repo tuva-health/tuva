@@ -1,7 +1,7 @@
 select
     condition_sk
-    , medical_claim_sk
     , data_source
+    , medical_claim_sk
     , claim_id
     , member_id
     , recorded_date

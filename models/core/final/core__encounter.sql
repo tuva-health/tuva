@@ -1,7 +1,6 @@
-
 select
-    data_source
-    , encounter_sk
+    encounter_sk
+    , data_source
     , patient_sk
     , member_id
     , encounter_type

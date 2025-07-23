@@ -126,6 +126,7 @@ select
     , x.encounter_group
     , x.encounter_start_date
     , x.encounter_end_date
+    , {{ calculate_age("p.birth_date","x.encounter_start_date") }} as admit_age
     , c.admit_source_code
     , c.admit_source_description
     , c.admit_type_code
@@ -162,7 +163,6 @@ select
     , tot.claim_count
     , tot.inst_claim_count
     , tot.prof_claim_count
-    , {{ calculate_age("p.birth_date","x.encounter_start_date") }} as admit_age
 from encounter as x
     inner join total_amounts as tot
     on x.encounter_sk = tot.encounter_sk

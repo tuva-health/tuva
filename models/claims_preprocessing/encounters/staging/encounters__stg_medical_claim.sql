@@ -38,12 +38,12 @@ select
     , ccs.ccs_category_description
     , med.drg_code_type
     , med.drg_code
-    , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
-    , coalesce(msdrg.medical_surgical, aprdrg.medical_surgical) as medical_surgical
+    , coalesce(ms_drg.ms_drg_description, apr_drg.apr_drg_description) as drg_description
+    , coalesce(ms_drg.medical_surgical, apr_drg.medical_surgical) as medical_surgical
     , med.admit_source_code
-    , adsrc.admit_source_description
+    , ad_src.admit_source_description
     , med.admit_type_code
-    , adtyp.admit_type_description
+    , ad_typ.admit_type_description
     , med.place_of_service_code
     , pos.place_of_service_description
     , med.revenue_center_code
@@ -51,16 +51,8 @@ select
     , med.diagnosis_code_type as primary_diagnosis_code_type
     , med.diagnosis_code_1 as primary_diagnosis_code
     , coalesce(icd10cm.long_description, icd9cm.long_description) as primary_diagnosis_description
-    --  , dx.default_ccsr_category_ip
-    --  , dx.default_ccsr_category_op
-    --  , dx.default_ccsr_category_description_ip
-    --  , dx.default_ccsr_category_description_op
-    --  , p.primary_taxonomy_code
-    --  , p.primary_specialty_description
-    --  , n.modality
     , med.billing_npi
     , med.rendering_npi
-    --  , rend.primary_specialty_description as rend_primary_specialty_description
     , med.facility_npi
     , fac.provider_organization_name as facility_name
     , fac.primary_specialty_description as facility_type
@@ -73,7 +65,6 @@ from {{ ref('normalized_input__medical_claim') }} as med
     left join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
     on med.medical_claim_sk = service_category.medical_claim_sk
     and service_category.priority = 1
-    
     left outer join {{ ref('tuva_data_assets', 'bill_type') }} as bt
     on med.bill_type_code = bt.bill_type_code
     left outer join {{ ref('tuva_data_assets', 'hcpcs_ccs') }} as ccs
@@ -84,23 +75,18 @@ from {{ ref('normalized_input__medical_claim') }} as med
     on med.revenue_center_code = rev.revenue_center_code
     left outer join {{ ref('tuva_data_assets', 'npi') }} as fac
     on med.facility_npi = fac.npi
-    left outer join {{ ref('tuva_data_assets', 'npi') }} as ren
-    on med.rendering_npi = ren.npi
-    left outer join {{ ref('tuva_data_assets', 'hcpcs_nitos') }} as n
-    on med.hcpcs_code = n.hcpcs_code
-
     left outer join {{ ref('tuva_data_assets', 'discharge_disposition') }} as dd
     on med.discharge_disposition_code = dd.discharge_disposition_code
-    left outer join {{ ref('tuva_data_assets', 'admit_source') }} as adsrc
-    on med.admit_source_code = adsrc.admit_source_code
-    left outer join {{ ref('tuva_data_assets', 'admit_type') }} as adtyp
-    on med.admit_type_code = adtyp.admit_type_code
-    left outer join {{ ref('tuva_data_assets', 'ms_drg') }} as msdrg
+    left outer join {{ ref('tuva_data_assets', 'admit_source') }} as ad_src
+    on med.admit_source_code = ad_src.admit_source_code
+    left outer join {{ ref('tuva_data_assets', 'admit_type') }} as ad_typ
+    on med.admit_type_code = ad_typ.admit_type_code
+    left outer join {{ ref('tuva_data_assets', 'ms_drg') }} as ms_drg
     on med.drg_code_type = 'ms-drg'
-    and med.drg_code = msdrg.ms_drg_code
-    left outer join {{ ref('tuva_data_assets', 'apr_drg') }} as aprdrg
+    and med.drg_code = ms_drg.ms_drg_code
+    left outer join {{ ref('tuva_data_assets', 'apr_drg') }} as apr_drg
     on med.drg_code_type = 'apr-drg'
-    and med.drg_code = aprdrg.apr_drg_code
+    and med.drg_code = apr_drg.apr_drg_code
     left outer join {{ ref('tuva_data_assets', 'icd_10_cm') }} as icd10cm
     on med.diagnosis_code_1 = icd10cm.icd_10_cm
     and med.diagnosis_code_type = 'icd-10-cm'

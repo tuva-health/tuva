@@ -1,6 +1,6 @@
 with enrollment__member_month as (
     select *
-    from {{ ref('enrollment__member_month') }}
+    from {{ ref('the_tuva_project', 'enrollment__member_month') }}
 )
 select
     member_month_sk

@@ -1,9 +1,9 @@
 with all_encounters as (
     {{ dbt_utils.union_relations(
         relations=[
-            ref('encounters__multi_day__encounter')
-            , ref('encounters__office_visit__encounter')
-            , ref('encounters__single_day__encounter')
+            ref('the_tuva_project', 'encounters__multi_day__encounter')
+            , ref('the_tuva_project', 'encounters__office_visit__encounter')
+            , ref('the_tuva_project', 'encounters__single_day__encounter')
         ],
         exclude=[""]
     ) }}

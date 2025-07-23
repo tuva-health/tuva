@@ -10,7 +10,7 @@ encounters__stg_inpatient_institutional as (
     select *
     from {{ ref('the_tuva_project', 'encounters__stg_inpatient_institutional') }}
 )
-select *
+select med.*
 from encounters__stg_medical_claim as med
     left outer join encounters__stg_inpatient_institutional as i
     on med.medical_claim_sk = i.medical_claim_sk

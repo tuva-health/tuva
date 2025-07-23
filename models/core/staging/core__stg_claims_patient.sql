@@ -1,17 +1,15 @@
-with normalized_input__eligibility as (
+with enrollment__patient as (
     select *
-    from {{ ref('normalized_input__eligibility') }}
+    from {{ ref('the_tuva_project', 'enrollment__patient') }}
 )
 select
-    eligibility_sk
+    patient_sk
     , data_source
     , member_id
-    , payer
-    , {{ quote_column('plan') }}
-    , enrollment_start_date
-    , enrollment_end_date
     , first_name
+    , middle_name
     , last_name
+    , suffix
     , gender
     , race
     , birth_date
@@ -23,4 +21,5 @@ select
     , state
     , zip_code
     , phone
-from normalized_input__eligibility
+    , email
+from enrollment__patient

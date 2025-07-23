@@ -11,9 +11,8 @@ models:
       - name: condition_sk
         description: ""
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
 
   - name: core__encounter
     description: >
@@ -25,9 +24,8 @@ models:
       - name: encounter_sk
         description: ""
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
 
   - name: core__eligibility
     description: >
@@ -38,9 +36,8 @@ models:
       - name: eligibility_sk
         description: ""
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
 
   - name: core__medical_claim
     description: >
@@ -52,9 +49,33 @@ models:
       - name: medical_claim_sk
         description: ""
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
+
+  - name: core__member_month
+    description: >
+      Need member_month description.
+    config:
+      alias: member_month
+    columns:
+      - name: member_month_sk
+        description: ""
+        tests:
+          - unique
+          - not_null
+
+  - name: core__patient
+    description: >
+      The procedure table contains information on procedures that were performed on
+      patients in the dataset.
+    config:
+      alias: patient
+    columns:
+      - name: patient_sk
+        description: ""
+        tests:
+          - unique
+          - not_null
 
   - name: core__pharmacy_claim
     description: >
@@ -66,6 +87,18 @@ models:
       - name: pharmacy_claim_sk
         description: ""
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
+
+  - name: core__procedure
+    description: >
+      The procedure table contains information on procedures that were performed on
+      patients in the dataset.
+    config:
+      alias: procedure
+    columns:
+      - name: procedure_sk
+        description: ""
+        tests:
+          - unique
+          - not_null
