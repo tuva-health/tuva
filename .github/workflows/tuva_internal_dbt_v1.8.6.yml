@@ -4,6 +4,10 @@ on:
   pull_request:
     branches:
       - main
+      - '*release*'
+  push:
+    branches:
+      - '*release*'  # any branch with release in the name
 
 concurrency:
   # Group by workflow and ref, cancel ongoing runs for the same PR/branch
