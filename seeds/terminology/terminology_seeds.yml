@@ -716,6 +716,20 @@ seeds:
       - name: fda_description
         description: 'The FDA description of the drug.'
 
+  - name: terminology__observation_type
+    description: 'Seed containing observation types used by HEDIS/FHIR US Core, with an other category. https://terminology.hl7.org/1.0.0/CodeSystem-observation-category.html'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      tags:
+        - terminology
+      column_types:
+        observation_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: observation_type
+        description: The type of observation.
+
   - name: terminology__other_provider_taxonomy
     description: 'Seed containing other provider taxonomy codes and descriptions.'
     config:
