@@ -1,10 +1,15 @@
 name: tuva_internal_dbt_v1.8.6
 on:
-  pull_request:  # run for all PRs
+  pull_request:
+    branches:
+      - main
+      - 'minor-release*'
+      - 'release*'
   push:  # run when code is pushed to a release branch
     branches:
-      - 'main'
-      - '*release*'  # any branch with release in the name
+      - main
+      - 'minor-release*'
+      - 'release*'
   workflow_dispatch:  # for manual triggering
 
 concurrency:
