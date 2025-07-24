@@ -147,4 +147,8 @@ select
     , cast(file_name as {{ dbt.type_string() }}) as file_name
     , cast(file_date as date) as file_date
     , cast(ingest_datetime as {{ dbt.type_timestamp() }}) as ingest_datetime
+{% if var('use_synthetic_data', false) == true -%}
 from {{ ref('tuva_data_assets', 'medical_claim') }}
+{%- else -%}
+from {{ source('input', 'medical_claim') }}
+{%- endif %}

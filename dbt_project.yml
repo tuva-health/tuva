@@ -24,9 +24,6 @@ seeds:
   the_tuva_project:
     +materialized: table
 
-vars:
-  enable_tuva_run_log: true # TODO: Remove on commit
-
 on-run-start: |
   {% if var('enable_tuva_run_log', false) %}
   {{ log_invocation_start() }}

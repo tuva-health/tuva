@@ -10,6 +10,12 @@ models:
     input_layer:
       +schema: tuva_input_layer
       +materialized: view
+vars:
+  use_synthetic_data: false # if true, will use synthetic data from tuva_data_assets instead of the source below.
+  source_database: tuva_test
+  source_schema: test
+
+  enable_tuva_run_log: false # if true, will create metadata.tuva_invocations and log details about each run/test.
 
 # Default dbt settings
 model-paths: ["models"]

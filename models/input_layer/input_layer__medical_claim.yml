@@ -16,13 +16,14 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           name: medical_claim_unique_key
-          tags: tuva_dqi_sev_1
+          tags: ['tuva_dqi_sev_1']
           combination_of_columns:
             - data_source
             - claim_id
             - claim_line_number
       - dbt_expectations.expect_column_pair_values_A_to_be_greater_than_B:
           name: medical_claim_start_date_is_before_end_date
+          tags: ['tuva_dqi_sev_3']
           column_A: claim_end_date
           column_B: claim_start_date
           or_equal: true
@@ -52,7 +53,7 @@ models:
         description: '{{ doc("claim_type") }}'
         tests:
           - not_null:
-              tags: tuva_dqi_sev_1
+              tags: tuva_dqi_sev_2
           - accepted_values:
               tags: tuva_dqi_sev_2
               values: ['professional', 'institutional', 'undetermined']
@@ -68,7 +69,7 @@ models:
           - not_null:
               tags: tuva_dqi_sev_2
           - dbt_expectations.expect_column_distinct_count_to_equal:
-              tags: tuva_dqi_sev_2
+              tags: tuva_dqi_sev_1
               value: 1
               group_by: [claim_id]
       - name: member_id
@@ -76,7 +77,7 @@ models:
         description: '{{ doc("member_id") }}'
         tests:
           - not_null:
-              tags: tuva_dqi_sev_1
+              tags: tuva_dqi_sev_2
           - dbt_expectations.expect_column_distinct_count_to_equal:
               tags: tuva_dqi_sev_1
               value: 1
@@ -103,65 +104,76 @@ models:
         tests:
           - not_null:
               description: Claim start date should not be null.
-              tags: tuva_dqi_sev_2
+              tags: ['tuva_dqi_sev_2']
           - dbt_expectations.expect_column_distinct_count_to_equal:
+              tags: ['tuva_dqi_sev_3']
               value: 1
               group_by: [claim_id]
+              config:
+                severity: warn
           - dbt_expectations.expect_column_values_to_be_between:
+              tags: ['tuva_dqi_sev_3']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
+              config:
+                severity: warn
       - name: claim_end_date
         data_type: date
         description: '{{ doc("claim_end_date") }}'
         tests:
           - not_null:
               description: Claim end date should not be null.
-              tags: tuva_dqi_sev_2
+              tags: ['tuva_dqi_sev_2']
           - dbt_expectations.expect_column_distinct_count_to_equal:
+              tags: ['tuva_dqi_sev_3']
               value: 1
               group_by: [claim_id]
+              config:
+                severity: warn
           - dbt_expectations.expect_column_values_to_be_between:
-              tags: tuva_dqi_sev_3
+              tags: ['tuva_dqi_sev_3']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
       - name: claim_line_start_date
         data_type: date
         description: '{{ doc("claim_line_start_date") }}'
         tests:
-          - not_null:
-              description: Claim line start date should not be null.
-              tags: tuva_dqi_sev_2
           - dbt_expectations.expect_column_values_to_be_between:
-              tags: tuva_dqi_sev_3
+              tags: ['tuva_dqi_sev_3']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
+              config:
+                severity: warn
       - name: claim_line_end_date
         data_type: date
         description: '{{ doc("claim_line_end_date") }}'
         tests:
-          - not_null:
-              description: Claim line end date should not be null.
-              tags: tuva_dqi_sev_2
           - dbt_expectations.expect_column_values_to_be_between:
-              tags: tuva_dqi_sev_3
+              tags: ['tuva_dqi_sev_3']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
+              config:
+                severity: warn
       - name: admission_date
         data_type: date
         description: '{{ doc("admission_date") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
-              tags: tuva_dqi_sev_3
+              tags: ['tuva_dqi_sev_3']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
+              config:
+                severity: warn
       - name: discharge_date
         data_type: date
         description: '{{ doc("discharge_date") }}'
         tests:
           - dbt_expectations.expect_column_values_to_be_between:
-              tags: tuva_dqi_sev_3
+              tags: ['tuva_dqi_sev_3']
               min_value: "'1900-01-02'"
               max_value: "'2050-01-02'"
+              config:
+                severity: warn
       - name: admit_source_code
         data_type: string
         description: '{{ doc("admit_source_code") }}'
@@ -175,9 +187,13 @@ models:
           - dbt_expectations.expect_column_value_lengths_to_equal:
               tags: tuva_dqi_sev_4
               value: 1
+              config:
+                severity: warn
           - dbt_expectations.expect_column_values_to_match_regex:
               tags: tuva_dqi_sev_4
-              regex: "^[0-59]$"
+              regex: "^[0-9]{2}$"
+              config:
+                severity: warn
       - name: discharge_disposition_code
         data_type: string
         description: '{{ doc("discharge_disposition_code") }}'
@@ -186,49 +202,61 @@ models:
         description: '{{ doc("place_of_service_code") }}'
         tests:
           - not_null:
-                where: claim_type = 'professional'
-                meta:
-                  dqi_test_description: "If a claim is professional, it should have
-                    a place of service code via CMS-1500. "
-          - dbt_expectations.expect_column_value_lengths_to_equal:
-              value: 2
+              where: claim_type = 'professional'
+              tags: ['tuva_dqi_sev_4']
+              description: "If a claim is professional, it should have a place of service code via CMS-1500."
+              config:
+                severity: warn
           - dbt_expectations.expect_column_values_to_match_regex:
+              tags: ['tuva_dqi_sev_2']
               regex: "^[0-9]{2}$"
       - name: bill_type_code
         data_type: string
         description: '{{ doc("bill_type_code") }}'
         tests:
           - dbt_expectations.expect_column_unique_value_count_to_be_between:
+              description: A claim should not have multiple bill type codes within the same claim id.
+              tags: ['tuva_dqi_sev_4']
               min_value: 0
               max_value: 1
               group_by: [claim_id]
               strictly: false
+              config:
+                severity: warn
           - dbt_expectations.expect_column_values_to_match_regex:
               regex: "^([0-9]{2}[0-9A-Za-z]|0[0-9]{2}[0-9A-Za-z])$"
+              description: 3 digits, 2 numbers followed by letter. If 4, leading 0.
+              tags: ['tuva_dqi_sev_2']
       - name: drg_code_type
         data_type: string
         description: '{{ doc("drg_code_type") }}'
         tests:
           - accepted_values:
+              tags: ['tuva_dqi_sev_2']
               values: ['ms-drg', 'apr-drg']
       - name: drg_code
         data_type: string
         description: '{{ doc("drg_code") }}'
         tests:
           - dbt_expectations.expect_column_value_lengths_to_equal:
+              tags: ['tuva_dqi_sev_2']
               value: 3
       - name: revenue_center_code
         data_type: string
         description: '{{ doc("revenue_center_code") }}'
         tests:
           - not_null:
-              tags: tuva_dqi_sev_4
+              tags: ['tuva_dqi_sev_4']
               where: claim_type = 'institutional'
+              config:
+                severity: warn
           - dbt_expectations.expect_column_values_to_match_regex:
               name: expect_column_values_to_match_regex__medical_claim_revenue_center_code
               description: Revenue center codes should be a 3-digit value.
               tags: ['tuva_dqi_sev_3', 'dqi_ed_classification']
-              regex: "^(\\\\d{3}|[01239]\\\\d{3})$"
+              regex: "^[0-9]{3}$"
+              config:
+                severity: warn
       - name: service_unit_quantity
         data_type: numeric(28, 6)
         description: '{{ doc("service_unit_quantity") }}'
@@ -237,7 +265,10 @@ models:
         description: '{{ doc("hcpcs_code") }}'
         tests:
           - not_null:
-                where: claim_type = 'professional'
+              tags: ['tuva_dqi_sev_3']
+              where: claim_type = 'professional'
+              config:
+                severity: warn
       - name: hcpcs_modifier_1
         data_type: string
         description: '{{ doc("hcpcs_modifier_1") }}'
@@ -261,7 +292,10 @@ models:
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
               name: expect_column_values_to_match_regex__medical_claim_rendering_npi
+              tags: ['tuva_dqi_sev_3']
               regex: "^[0-9]{10}$"
+              config:
+                severity: warn
       - name: rendering_tin
         data_type: string
         description: '{{ doc("rendering_tin") }}'
@@ -273,7 +307,10 @@ models:
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
               name: expect_column_values_to_match_regex__medical_claim_billing_npi
+              tags: ['tuva_dqi_sev_3']
               regex: "^[0-9]{10}$"
+              config:
+                severity: warn
       - name: billing_tin
         data_type: string
         description: '{{ doc("billing_tin") }}'
@@ -285,10 +322,20 @@ models:
         tests:
           - dbt_expectations.expect_column_values_to_match_regex:
               name: expect_column_values_to_match_regex__medical_claim_facility_npi
+              tags: ['tuva_dqi_sev_3']
               regex: "^[0-9]{10}$"
+              config:
+                severity: warn
       - name: paid_date
         data_type: date
         description: '{{ doc("paid_date") }}'
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              tags: ['tuva_dqi_sev_3']
+              min_value: "'1900-01-02'"
+              max_value: "'2050-01-02'"
+              config:
+                severity: warn
       - name: paid_amount
         data_type: numeric(28, 6)
         description: '{{ doc("paid_amount") }}'

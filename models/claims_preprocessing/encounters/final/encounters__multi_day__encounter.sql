@@ -23,7 +23,6 @@ with encounters__stg_medical_claim as (
         on cex.medical_claim_sk = stg.medical_claim_sk
         and cex.encounter_type in  (
             'acute inpatient'
-            , 'ambulatory surgery center'
             , 'emergency department'
             , 'inpatient hospice'
             , 'inpatient long term acute care'
