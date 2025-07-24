@@ -4,10 +4,10 @@ on:
   pull_request:
     branches:
       - main
-      - '*release*'
+      - minor-release-v0.15
   push:
     branches:
-      - '*release*'  # any branch with release in the name
+      - minor-release-v0.15
 
 concurrency:
   # Group by workflow and ref, cancel ongoing runs for the same PR/branch
