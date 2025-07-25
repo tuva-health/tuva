@@ -4,8 +4,10 @@
    )
 }}
 
+-- Define the range of diagnosis columns to pivot (e.g., diagnosis_code_1 to diagnosis_code_25)
 {% set diagnosis_cols = range(1, 26) %}
 
+-- Pivot diagnosis columns into a long format
 with pivot_diagnosis as (
     {% for i in diagnosis_cols %}
     select
@@ -21,6 +23,7 @@ with pivot_diagnosis as (
     {% endfor %}
 )
 
+-- Final output: distinct pivoted diagnosis records
 select distinct
     claim_id
     , data_source

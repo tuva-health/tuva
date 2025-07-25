@@ -14,7 +14,6 @@ select
     {% endfor %}
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__int_diagnosis_code_intermediate') }}
-{# from {{ ref('normalized_input__int_diagnosis_code_voting') }} #}
 group by
     claim_id
     , data_source
