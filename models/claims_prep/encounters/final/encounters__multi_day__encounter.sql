@@ -2,9 +2,9 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__stg_medical_claim') }}
 )
-, encounters__int_crosswalk__claim_encounter as (
+, encounters__crosswalk__claim_encounter as (
     select *
-    from {{ ref('encounters__int_crosswalk__claim_encounter') }}
+    from {{ ref('encounters__crosswalk__claim_encounter') }}
 )
 , encounters__stg_patient as (
     select *
@@ -19,10 +19,11 @@ with encounters__stg_medical_claim as (
         , cex.encounter_start_date
         , cex.encounter_end_date
     from encounters__stg_medical_claim as stg
-        inner join encounters__int_crosswalk__claim_encounter as cex
+        inner join encounters__crosswalk__claim_encounter as cex
         on cex.medical_claim_sk = stg.medical_claim_sk
         and cex.encounter_type in  (
             'acute inpatient'
+            , 'ambulatory surgery center'
             , 'emergency department'
             , 'inpatient hospice'
             , 'inpatient long term acute care'
@@ -48,10 +49,9 @@ with encounters__stg_medical_claim as (
 
 , claims_sequenced as (
     select *
-        , row_number() over (partition by encounter_sk order by encounter_start_date, claim_id) as first_num
-        , row_number() over (partition by encounter_sk order by encounter_end_date desc, claim_id) as last_num
+        , row_number() over (partition by encounter_sk order by encounter_start_date, claim_type, claim_id) as first_num
+        , row_number() over (partition by encounter_sk order by encounter_end_date desc, claim_type, claim_id) as last_num
     from base_claims
-    where claim_type = 'institutional'
 )
 
 , institutional_claim_details as (

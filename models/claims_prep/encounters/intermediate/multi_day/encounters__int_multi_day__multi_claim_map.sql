@@ -1,11 +1,10 @@
 -- ============================================================================
--- inpatient psych ENCOUNTER MERGING LOGIC
+-- ENCOUNTER MERGING LOGIC
 -- ============================================================================
--- This query merges inpatient psych claims into logical encounters based on
--- overlapping dates, adjacent transfers, and same-facility criteria. The logic
--- is similar to acute inpatient merging but specific to ED encounters.
+-- This query merges claims into logical encounters based on
+-- overlapping dates, adjacent transfers, and same-facility criteria.
 
--- Step 1: Filter to inpatient psych claims only (both institutional and professional)
+-- Step 1: Filter to the specific services that fit this scenario.
 -- Aggregate claim dates at the claim + patient + source level. This handles cases
 -- where a single claim might have multiple rows with different dates
 with base_claims as (
@@ -20,6 +19,7 @@ with base_claims as (
     from {{ ref('encounters__stg_medical_claim') }}
     where service_category_2 in (
         'acute inpatient'
+        , 'ambulatory surgery center'
         , 'emergency department'
         , 'inpatient hospice'
         , 'inpatient long term acute care'
@@ -42,7 +42,8 @@ claims_sequenced as (
         , claim_id
         , patient_sk
         , encounter_type
-        , facility_npi
+        , -- facility_npi can often be null. in this case, we'd still want rows to merge so we put in a dummy value.
+        coalesce(facility_npi, '') as facility_npi
         , discharge_disposition_code
         , start_date
         , end_date

@@ -2,9 +2,9 @@ with encounters__stg_medical_claim as (
     select *
     from {{ ref('encounters__stg_medical_claim') }}
 )
-, encounters__int_crosswalk__claim_encounter as (
+, encounters__crosswalk__claim_encounter as (
     select *
-    from {{ ref('encounters__int_crosswalk__claim_encounter') }}
+    from {{ ref('encounters__crosswalk__claim_encounter') }}
 )
 , encounters__stg_patient as (
     select *
@@ -18,19 +18,30 @@ with encounters__stg_medical_claim as (
         , cex.encounter_start_date
         , cex.encounter_end_date
         , row_number() over (partition by cex.encounter_sk
-            order by stg.claim_type, stg.start_date) as encounter_row_number --institutional then professional
+            order by cex.priority_number, cex.encounter_start_date) as encounter_row_number
     from encounters__stg_medical_claim as stg
-        inner join encounters__int_crosswalk__claim_encounter as cex
+        inner join encounters__crosswalk__claim_encounter as cex
         on stg.medical_claim_sk = cex.medical_claim_sk
         and cex.encounter_type in (
-            'ambulatory surgery center'
-            , 'ambulance - orphaned'
+            'ambulance - orphaned'
             , 'dialysis'
             , 'dme - orphaned'
             , 'home health'
             , 'lab - orphaned'
+            , 'outpatient hospice'
+            , 'outpatient hospital or clinic'
+            , 'observation'
+            , 'orphaned claim'
+            , 'outpatient psychiatric'
+            , 'outpatient pt/ot/st'
+            , 'outpatient radiology'
+            , 'outpatient rehabilitation'
+            , 'outpatient substance use'
+            , 'outpatient surgery'
+            , 'urgent care'
             )
         and cex.encounter_type_priority = 1
+        -- TODO: handle outpatient injections substring(med.hcpcs_code, 1, 1) = 'J'
 )
 
 , highest_paid_diagnosis as (

@@ -20,4 +20,4 @@ select
     , patient_sk
     , start_date
 from {{ ref('encounters__stg_medical_claim') }}
-where service_category_2 in ('lab', 'durable medical equipment', 'ambulance')
+where service_category_1 = 'ancillary' -- labs, DME, ambulace

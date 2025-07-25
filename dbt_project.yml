@@ -8,9 +8,12 @@ profile: tuva_v1
 models:
   the_tuva_project:
     +materialized: view
-    claims_preprocessing:
-      +schema: tuva_claims_preprocessing
-      +materialized: table
+    claims_prep:
+      +schema: tuva_claims_prep
+      encounters:
+        +materialized: table
+      service_category:
+        +materialized: table
     core:
       final:
         +schema: tuva_core
@@ -19,10 +22,15 @@ models:
         +schema: tuva_staging
     input_layer:
       +schema: tuva_input_layer
+    marts:
+      financial_pmpm:
+        +schema: tuva_financial_pmpm
+        final:
+          +materialized: table
 
 seeds:
   the_tuva_project:
-    +materialized: table
+    +materialized: seed
 
 on-run-start: |
   {% if var('enable_tuva_run_log', false) %}

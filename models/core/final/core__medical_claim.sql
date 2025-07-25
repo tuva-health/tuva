@@ -15,10 +15,15 @@ select
     , admission_date
     , discharge_date
     , admit_source_code
+    , admit_source_description
     , admit_type_code
+    , admit_type_description
     , discharge_disposition_code
+    , discharge_disposition_description
     , place_of_service_code
+    , place_of_service_description
     , bill_type_code
+    , bill_type_description
     , drg_code_type
     , drg_code
     , revenue_center_code
@@ -46,5 +51,11 @@ select
     , deductible_amount
     , total_cost_amount
     , in_network_flag
+    , enrollment_flag
+    , member_month_sk
+    , service_category_1
+    , service_category_2
+    , service_category_3
+    , encounter_sk
     , {{ current_timestamp() }} as tuva_last_run
 from {{ ref('the_tuva_project', 'core__stg_medical_claim') }}

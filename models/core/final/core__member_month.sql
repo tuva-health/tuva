@@ -2,6 +2,7 @@ select
     member_month_sk
     , data_source
     , member_id
+    , member_id as person_id
     , payer
     , {{ quote_column('plan') }}
     , year_month

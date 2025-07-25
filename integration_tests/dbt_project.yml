@@ -17,6 +17,9 @@ vars:
 
   enable_tuva_run_log: false # if true, will create metadata.tuva_invocations and log details about each run/test.
 
+  pqi_enabled: true
+  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+
 # Default dbt settings
 model-paths: ["models"]
 analysis-paths: ["analyses"]

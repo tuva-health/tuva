@@ -5,12 +5,17 @@ with npi as (
 normalized_input__pharmacy_claim as (
     select *
     from {{ ref('the_tuva_project', 'normalized_input__pharmacy_claim') }}
+),
+enrollment__pharmacy_claim_member_month as (
+    select *
+    from {{ ref('the_tuva_project', 'enrollment__pharmacy_claim_member_month') }}
 )
 select
     pharm.pharmacy_claim_sk
     , pharm.data_source
     , pharm.claim_id
     , pharm.claim_line_number
+    , member_month.patient_sk
     , pharm.person_id
     , pharm.member_id
     , pharm.payer
@@ -37,6 +42,8 @@ select
     , pharm.file_date
     , pharm.ingest_datetime
 from normalized_input__pharmacy_claim as pharm
+    left outer join enrollment__pharmacy_claim_member_month as member_month
+    on pharm.pharmacy_claim_sk = member_month.pharmacy_claim_sk
     left outer join npi as pres
     on pharm.prescribing_provider_npi = pres.npi
     left outer join npi as disp

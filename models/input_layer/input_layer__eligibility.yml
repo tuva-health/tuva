@@ -141,10 +141,10 @@ models:
       - name: payer_type
         data_type: varchar
         description: ""
-#        tests:
-#          - relationships:
-#              to: ref('terminology__payer_type')
-#              field: payer_type
+        tests:
+          - relationships:
+              to: ref('tuva_data_assets', 'payer_type')
+              field: payer_type
 
       - name: plan
         data_type: varchar
