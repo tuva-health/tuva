@@ -1,5 +1,5 @@
 with encounters__stg_medical_claim as (
-    select *
+    select *, 'single-day' as method
     from {{ ref('encounters__stg_medical_claim') }}
 )
 select
@@ -8,7 +8,8 @@ select
         when substring(hcpcs_code, 1, 1) = 'J' then 'outpatient injections'
         else service_category_2 end as encounter_type
     , claim_type
-    , {{ dbt_utils.generate_surrogate_key(['patient_sk', 'start_date', 'facility_npi']) }} as encounter_id
+    , -- Generated ID = method, patient, date, facility
+    {{ dbt_utils.generate_surrogate_key(['method', 'patient_sk', 'start_date', 'facility_npi']) }} as encounter_id
     , start_date as encounter_start_date
     , end_date as encounter_end_date
     , 1 as claim_priority

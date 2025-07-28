@@ -5,8 +5,6 @@
 -- based on date overlap. Each claim gets assigned to
 -- the encounter whose date range contains the claim's start date.
 
--- Step 1: Get encounter date ranges with patient information
--- We only need one row per encounter, so get encounter grain
 with encounters__stg_prof_and_ancillary as (
     select *
     from {{ ref('encounters__stg_prof_and_ancillary') }}
@@ -16,6 +14,8 @@ encounters__stg_outpatient_institutional as (
     from {{ ref('encounters__stg_outpatient_institutional') }}
 ),
 encounters as (
+-- Step 1: Get encounter date ranges with patient information
+-- We only need one row per encounter, so get encounter grain
     select distinct
         gei.encounter_id
         , gei.patient_sk
@@ -29,7 +29,7 @@ encounters as (
 -- Overlapping claims are attributed to encounters when:
 -- 1. Same patient (patient_sk)
 -- 2. Claim start date falls within encounter date range (inclusive)
--- 3. Claim is professional or outpatient institutional or service is lab, DME, ambulance.
+-- 3. Claim is professional or outpatient institutional or service is ancillary.
 select plp.medical_claim_sk
     , plp.data_source
     , plp.claim_id
@@ -39,7 +39,6 @@ select plp.medical_claim_sk
     , enc.encounter_end_date
     , -- Handle edge case: if a professional claim overlaps multiple encounters,
       -- prioritize by encounter_id (lowest wins) to ensure deterministic attribution
-      -- TODO: Probably should prioritize by encounter_type priority? Ordering by encounter_id seems arbitrary.
     row_number() over (
         partition by plp.medical_claim_sk
         order by enc.encounter_id

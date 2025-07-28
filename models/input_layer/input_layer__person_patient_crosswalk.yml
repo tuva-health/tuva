@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: input_layer__person_patient_crosswalk
+    description: >
+      Mapping check to make sure all columns are mapped appropriately into the input
+      layer.
+    config:
+      alias: verified_person_patient_crosswalk
+      contract:
+        enforced: true
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          name: person_patient_crosswalk_unique_key
+          tags: ['tuva_dqi_sev_1']
+          combination_of_columns:
+            - person_id
+            - data_source
+            - source_person_id
+    columns:
+      - name: person_id
+        data_type: string
+        description: '{{ doc("person_id") }}'
+        tests:
+          - not_null:
+              tags: tuva_dqi_sev_1
+      - name: data_source
+        data_type: string
+        description: '{{ doc("data_source") }}'
+        tests:
+          - not_null:
+              tags: tuva_dqi_sev_1
+      - name: source_person_id
+        data_type: string
+        description: ''
+        tests:
+          - not_null:
+              tags: tuva_dqi_sev_1
+      - name: source_person_id_description
+        data_type: string
+        description: ''
+      - name: file_name
+        data_type: string
+        description: '{{ doc("file_name") }}'
+        tests:
+          - not_null
+      - name: file_date
+        data_type: date
+        description: '{{ doc("file_date") }}'
+        tests:
+          - not_null
+      - name: ingest_datetime
+        data_type: timestamp
+        description: '{{ doc("ingest_datetime") }}'
+        tests:
+          - not_null

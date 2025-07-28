@@ -62,7 +62,7 @@ select
     , med.charge_amount
     , med.allowed_amount
 from {{ ref('normalized_input__medical_claim') }} as med
-    left join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
+    left outer join {{ ref('the_tuva_project', 'service_category__medical_claim_service_category') }} as service_category
     on med.medical_claim_sk = service_category.medical_claim_sk
     and service_category.priority = 1
     left outer join {{ ref('tuva_data_assets', 'bill_type') }} as bt

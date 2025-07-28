@@ -1,0 +1,38 @@
+version: 2
+
+seeds:
+  - name: pqi__value_sets
+    description: Value sets from AHRQ for each of the published PQI measures
+    config:
+      schema: tuva_value_sets
+      tags:
+        - pqi
+      column_types:
+        code: varchar
+        value_set_name: varchar
+        pqi_number: varchar
+    columns:
+      - name: code
+        description: Code associated with the PQI measure
+      - name: value_set_name
+        description: Name of the value set
+      - name: pqi_number
+        description: Number of the PQI measure
+
+  - name: pqi__measures
+    description: Names and descriptions of each of the PQI measures
+    config:
+      schema: tuva_value_sets
+      tags:
+        - pqi
+      column_types:
+        pqi_number: varchar
+        pqi_name: varchar
+        pqi_description: varchar
+    columns:
+      - name: pqi_number
+        description: Number of the PQI measure
+      - name: pqi_name
+        description: Name of the PQI measure
+      - name: pqi_description
+        description: Description of the PQI measure

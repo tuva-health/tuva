@@ -169,7 +169,8 @@ encounters_with_ids as (
         , ea.encounter_type
         , ea.start_date
         , ea.end_date
-        , {{ dbt_utils.generate_surrogate_key(['cc.data_source', 'cc.claim_id']) }} as encounter_id
+        , -- Generated ID = closing claim identifier as this is unique in this case
+        {{ dbt_utils.generate_surrogate_key(['cc.data_source', 'cc.claim_id']) }} as encounter_id
     from encounter_assignments ea
     left join closing_claims cc
         on ea.patient_sk = cc.patient_sk
