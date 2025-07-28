@@ -120,6 +120,6 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
     , cast(null as {{ dbt.type_string() }} ) as result
     , {{ try_to_cast_datetime('null') }} as result_date
     , cast(null as {{ dbt.type_string() }} ) as data_source
-{{ limit_zero()}}
+{{ limit_zero() }}
 
 {%- endif %}

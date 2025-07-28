@@ -141,6 +141,6 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
     , cast(null as {{ dbt.type_string() }} ) as result
     , cast(null as {{ dbt.type_string() }} ) as units
     , cast(null as {{ dbt.type_string() }} ) as data_source
-{{ limit_zero()}}
+{{ limit_zero() }}
 
 {%- endif %}

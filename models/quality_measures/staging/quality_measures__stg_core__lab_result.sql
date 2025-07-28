@@ -106,6 +106,6 @@ select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
     , {{ try_to_cast_datetime('null') }} as collection_date
     , cast(null as {{ dbt.type_string() }} ) as code_type
     , cast(null as {{ dbt.type_string() }} ) as code
-{{ limit_zero()}}
+{{ limit_zero() }}
 
 {%- endif %}
