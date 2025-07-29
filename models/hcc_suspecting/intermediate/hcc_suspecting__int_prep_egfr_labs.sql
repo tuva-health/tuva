@@ -54,7 +54,11 @@ with lab_result as (
         , code_type
         , code
         , result_date
-        , cast(result as {{ dbt.type_numeric() }}) as result
+        {% if target.type == 'bigquery' %}
+         , safe_cast(result AS {{ dbt.type_numeric() }}) AS result
+        {% else %}
+        , try_cast(result as {{ dbt.type_numeric() }}) as result
+        {% endif %}
     from egfr_labs
    {% if target.type == 'fabric' %}
         WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
@@ -74,7 +78,8 @@ with lab_result as (
         , code
         , result_date
         , result
-        , cast(case
+        {% if target.type == 'bigquery' %}
+         , safe_cast(case
             when lower(result) like '%unsatisfactory specimen%' then null
             when result like '%>%' then null
             when result like '%<%' then null
@@ -82,6 +87,16 @@ with lab_result as (
             when result like '%mL/min/1.73m2%' then trim(replace(result, 'mL/min/1.73m2', ''))
             else null
           end as {{ dbt.type_numeric() }}) as clean_result
+        {% else %}
+        , try_cast(case
+            when lower(result) like '%unsatisfactory specimen%' then null
+            when result like '%>%' then null
+            when result like '%<%' then null
+            when result like '%@%' then trim(replace(result, '@', ''))
+            when result like '%mL/min/1.73m2%' then trim(replace(result, 'mL/min/1.73m2', ''))
+            else null
+          end as {{ dbt.type_numeric() }}) as clean_result
+        {% endif %}
     from egfr_labs
     {% if target.type == 'fabric' %}
         WHERE NOT (result LIKE '%.%' OR result LIKE '%[0-9]%'
