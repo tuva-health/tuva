@@ -26,7 +26,7 @@ with valid_conditions as (
 , random_sample as (
     select
         data_source
-        , source_date
+        , cast(source_date as date) as source_date /* converting to date for union in data_quality__unique_value_examples */
         , table_name
         , drill_down_key
         , drill_down_value
@@ -44,7 +44,7 @@ order by drill_down_key) as row_number_value
 , duplicates_summary as (
     select
         a.data_source
-        , a.source_date
+        , cast(a.source_date as date) as source_date /* converting to date for union in data_quality__unique_value_examples */
         , a.table_name
         , a.drill_down_key
         , a.drill_down_value
