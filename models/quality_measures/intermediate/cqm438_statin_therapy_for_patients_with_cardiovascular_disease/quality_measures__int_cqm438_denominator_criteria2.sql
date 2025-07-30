@@ -84,10 +84,8 @@ with cholesterol_codes as (
         , result
         , result_date
         , collection_date
-        , source_code_type
-        , source_code
-        , normalized_code_type
-        , normalized_code
+        , code_type
+        , code
     from {{ ref('quality_measures__stg_core__lab_result') }}
 
 )
@@ -104,8 +102,8 @@ with cholesterol_codes as (
                         , result_date desc) as rn
     from labs
     inner join cholesterol_codes
-      on coalesce(labs.normalized_code, labs.source_code) = cholesterol_codes.code
-        and coalesce(labs.normalized_code_type, labs.source_code_type) = cholesterol_codes.code_system
+      on labs.code = cholesterol_codes.code
+        and labs.code_type = cholesterol_codes.code_system
    {% if target.type == 'fabric' %}
         WHERE result LIKE '%.%' OR result LIKE '%[0-9]%'
         AND result NOT LIKE '%[^0-9.]%'
