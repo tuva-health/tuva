@@ -8,8 +8,9 @@ on:
   workflow_dispatch:  # for manual triggering
 
 concurrency:
-  # Group by workflow and ref, cancel ongoing runs for the same PR/branch
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
+  group: ci-testing-${{ github.event.pull_request.number || github.ref }}
+  # Ensure newer runs for the same PR replace older ones
   cancel-in-progress: true
 
 env:

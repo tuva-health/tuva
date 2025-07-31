@@ -8,8 +8,10 @@ on:
         required: true
 
 concurrency:
-  group: ci-testing
-  cancel-in-progress: false
+  # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
+  group: ci-testing-${{ github.event.pull_request.number || github.ref }}
+  # Ensure newer runs for the same PR replace older ones
+  cancel-in-progress: true
 
 env:
   PYTHON_VERSION: '3.9'
