@@ -593,6 +593,14 @@ models:
                 meta:
                   dqi_test_description: "Procedure code should not be null on professional
                     claims. "
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_financial_pmpm',
+                'dqi_quality_measures']
+              value: 5
+              config:
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                meta:
+                  dqi_test_description: "If not null, procedure code should be five characters in length."
       - name: hcpcs_modifier_1
         description: '{{ doc("hcpcs_modifier_1") }}'
         tests:
