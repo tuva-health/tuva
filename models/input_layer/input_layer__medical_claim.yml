@@ -1781,7 +1781,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
-              values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
+              values: ['icd-10-pcs', 'icd-9-pcs']
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
@@ -2361,7 +2361,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: file_date
-        description: ''
+        description: '{{ doc("file_date") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
