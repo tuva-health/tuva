@@ -10,7 +10,6 @@
      severity = 'warn'
    )
 }}
-
 select 
       (coalesce(med.paid_amount, 0) +
        coalesce(med.coinsurance_amount, 0) +
@@ -23,7 +22,6 @@ select
     , med.deductible_amount as deductible_amount_check
     , med.allowed_amount as allowed_amount_check
     , med.*
-
 from {{ ref('medical_claim') }} med
 where abs(
     (coalesce(med.paid_amount, 0) +
