@@ -10,6 +10,7 @@
      severity = 'warn'
    )
 }}
+
 select 
       (coalesce(rx.paid_amount, 0) +
        coalesce(rx.coinsurance_amount, 0) +
