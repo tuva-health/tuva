@@ -22,7 +22,7 @@ select
     , rx.deductible_amount as deductible_amount_check
     , rx.allowed_amount as allowed_amount_check
     , rx.*
-from {{ ref('pharmacy_claim') }} med
+from {{ ref('pharmacy_claim') }} as rx
 where abs(
     (coalesce(rx.paid_amount, 0) +
      coalesce(rx.coinsurance_amount, 0) +
