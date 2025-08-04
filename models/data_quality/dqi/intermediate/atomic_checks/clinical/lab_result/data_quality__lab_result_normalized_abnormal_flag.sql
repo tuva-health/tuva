@@ -5,7 +5,7 @@
 
 select
       m.data_source
-    , coalesce(m.result_date,cast('1900-01-01' as date)) as source_date
+    , coalesce(cast(m.result_datetime as date),cast('1900-01-01' as date)) as source_date
     , 'LAB_RESULT' as table_name
     , 'Lab Result ID' as drill_down_key
     , coalesce(lab_result_id, 'NULL') as drill_down_value

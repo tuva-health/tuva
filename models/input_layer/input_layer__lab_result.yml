@@ -76,7 +76,7 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: source_code_type
+      - name: source_order_type
         description: '{{ doc("source_code_type") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -89,7 +89,7 @@ models:
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
-      - name: source_code
+      - name: source_order_code
         description: '{{ doc("source_code") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -97,7 +97,7 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: source_description
+      - name: source_order_description
         description: '{{ doc("source_description") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -105,15 +105,36 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: source_component
-        description: '{{ doc("source_component") }}'
+      - name: source_component_type
+        description: '{{ doc("source_component_type") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - accepted_values:
+              values: [ 'loinc', 'snomed-ct', 'dqi_quality_measures' ]
+              tags: [ 'tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs' ]
+              config:
+                severity: warn
+      - name: source_component_code
+        description: '{{ doc("source_component_code") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: normalized_code_type
+      - name: source_component_description
+        description: '{{ doc("source_component_description") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: [ 'tuva_dqi_sev_1', 'dqi' ]
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: normalized_order_type
         description: '{{ doc("normalized_code_type") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -121,7 +142,7 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: normalized_code
+      - name: normalized_order_code
         description: '{{ doc("normalized_code") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -129,7 +150,7 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: normalized_description
+      - name: normalized_order_description
         description: '{{ doc("normalized_description") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
@@ -137,11 +158,27 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: normalized_component
-        description: '{{ doc("normalized_component") }}'
+      - name: normalized_component_type
+        description: '{{ doc("normalized_component_type") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: normalized_component_code
+        description: '{{ doc("normalized_component_code") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: normalized_component_description
+        description: '{{ doc("normalized_component_description") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: [ 'tuva_dqi_sev_1', 'dqi' ]
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
@@ -161,30 +198,34 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: result_date
-        description: '{{ doc("result_date") }}'
+      - name: result_datetime
+        description: '{{ doc("result_datetime") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: date
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
+                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
+                  with time zone, timestamp without time zone, datetime2, datetimeoffset ]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: collection_date
-        description: '{{ doc("collection_date") }}'
+      - name: collection_datetime
+        description: '{{ doc("collection_datetime") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_of_type:
-              column_type: date
+          - dbt_expectations.expect_column_values_to_be_in_type_list:
+              column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
+                timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
+                  with time zone, timestamp without time zone, datetime2, datetimeoffset ]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_quality_measures']
               config:
                 severity: warn

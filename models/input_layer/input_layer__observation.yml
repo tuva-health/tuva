@@ -98,6 +98,11 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - accepted_values:
+              values: ['social-history', 'vital-signs', 'imaging', 'laboratory', 'procedure', 'survey', 'exam', 'therapy', 'activity', 'other']
+              tags: ['tuva_dqi_sev_2', 'dqi']
+              config:
+                severity: warn
       - name: source_code_type
         description: '{{ doc("source_code_type") }}'
         tests:
