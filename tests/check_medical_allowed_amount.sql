@@ -12,23 +12,23 @@
 }}
 
 select 
-      (coalesce(paid_amount, 0) + 
-       coalesce(coinsurance_amount, 0) + 
-       coalesce(copayment_amount, 0) + 
-       coalesce(deductible_amount, 0)) - 
-       coalesce(allowed_amount, 0) as diff    
-    , paid_amount as paid_amount_check
-    , coinsurance_amount as coinsurance_amount_check
-    , copayment_amount as copayment_amount_check
-    , deductible_amount as deductible_amount_check
-    , allowed_amount as allowed_amount_check
+      (coalesce(med.paid_amount, 0) +
+       coalesce(med.coinsurance_amount, 0) +
+       coalesce(med.copayment_amount, 0) +
+       coalesce(med.deductible_amount, 0)) -
+       coalesce(med.allowed_amount, 0) as diff
+    , med.paid_amount as paid_amount_check
+    , med.coinsurance_amount as coinsurance_amount_check
+    , med.copayment_amount as copayment_amount_check
+    , med.deductible_amount as deductible_amount_check
+    , med.allowed_amount as allowed_amount_check
     , med.*
 
 from {{ ref('medical_claim') }} med
 where abs(
-    (coalesce(paid_amount, 0) + 
-     coalesce(coinsurance_amount, 0) + 
-     coalesce(copayment_amount, 0) + 
-     coalesce(deductible_amount, 0)) - 
-    coalesce(allowed_amount, 0)
+    (coalesce(med.paid_amount, 0) +
+     coalesce(med.coinsurance_amount, 0) +
+     coalesce(med.copayment_amount, 0) +
+     coalesce(med.deductible_amount, 0)) -
+    coalesce(med.allowed_amount, 0)
 ) < 0.01  -- Allow for small rounding differences
