@@ -598,7 +598,7 @@ models:
                 'dqi_quality_measures']
               value: 5
               config:
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "If not null, procedure code should be five characters in length."
       - name: hcpcs_modifier_1
