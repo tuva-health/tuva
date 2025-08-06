@@ -19,5 +19,5 @@ group by
     payer
     , data_source
     , {{ quote_column('plan') }}
-having avg_paid_pmpm > 10000
-and member_months >= 100
+having avg(total_paid) > 10000
+and count(year_month) >= 100
