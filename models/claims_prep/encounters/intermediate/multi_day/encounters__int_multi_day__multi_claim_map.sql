@@ -17,7 +17,8 @@ with base_claims as (
         , min(start_date) as start_date
         , max(end_date) as end_date
     from {{ ref('encounters__stg_medical_claim') }}
-    where service_category_2 in (
+    where claim_type = 'institutional'
+    and service_category_2 in (
         'acute inpatient'
         , 'ambulatory surgery center'
         , 'emergency department'

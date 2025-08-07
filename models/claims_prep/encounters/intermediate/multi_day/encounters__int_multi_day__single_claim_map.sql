@@ -38,7 +38,7 @@ select plp.medical_claim_sk
     , enc.encounter_start_date
     , enc.encounter_end_date
     , -- Handle edge case: if a professional claim overlaps multiple encounters,
-      -- prioritize by encounter_id (lowest wins) to ensure deterministic attribution
+      -- prioritize institutional over professional, earliest claim, encounter_id (lowest wins) to ensure deterministic attribution
     row_number() over (
         partition by plp.medical_claim_sk
         order by enc.encounter_id
