@@ -1,5 +1,5 @@
 with encounters__stg_medical_claim as (
-    select *, 'single-day' as method
+    select *, 'single-day' as method -- this is added to separate different types of encounters
     from {{ ref('encounters__stg_medical_claim') }}
 )
 select

@@ -6,11 +6,11 @@
 -- numbers determine the final assignment (lower number = higher priority).
 --
 -- PRIORITY HIERARCHY:
--- 0: Acute Inpatient (highest priority)
--- 1: Emergency Department
--- 2-9: Inpatient
--- 10-19: Office Based
--- 20-29: Outpatient
+-- 0-1: Acute Inpatient (highest priority)
+-- 2-4: Emergency Department
+-- 5-19: Inpatient (various)
+-- 20-39: Office Based
+-- 40-59: Outpatient
 -- 999: Outpatient Hospital/Clinic (catch-all)
 -- 1000+: Orphaned encounters (lab, DME, ambulance)
 
@@ -45,7 +45,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'acute inpatient' as encounter_type
         , 'inpatient' as encounter_group
-        , 0 as priority_number
+        , 1 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -63,7 +63,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'emergency department' as encounter_type
         , 'outpatient' as encounter_group
-        , 1 as priority_number
+        , 2 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'acute inpatient'
@@ -77,7 +77,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'emergency department' as encounter_type
         , 'outpatient' as encounter_group
-        , 1 as priority_number
+        , 3 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'emergency department'
@@ -91,7 +91,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'emergency department' as encounter_type
         , 'outpatient' as encounter_group
-        , 1 as priority_number
+        , 4 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -107,7 +107,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'inpatient hospice' as encounter_type
         , 'inpatient' as encounter_group
-        , 2 as priority_number
+        , 5 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'inpatient hospice'
@@ -121,7 +121,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'inpatient hospice' as encounter_type
         , 'inpatient' as encounter_group
-        , 2 as priority_number
+        , 6 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -137,7 +137,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'inpatient psych' as encounter_type
         , 'inpatient' as encounter_group
-        , 3 as priority_number
+        , 7 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'inpatient psych'
@@ -151,7 +151,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'inpatient psych' as encounter_type
         , 'inpatient' as encounter_group
-        , 3 as priority_number
+        , 8 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -167,7 +167,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'inpatient rehabilitation' as encounter_type
         , 'inpatient' as encounter_group
-        , 4 as priority_number
+        , 9 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'inpatient rehabilitation'
@@ -181,7 +181,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'inpatient rehabilitation' as encounter_type
         , 'inpatient' as encounter_group
-        , 4 as priority_number
+        , 10 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -197,7 +197,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'inpatient long term acute care' as encounter_type
         , 'inpatient' as encounter_group
-        , 5 as priority_number
+        , 11 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'inpatient long term acute care'
@@ -211,7 +211,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'inpatient long term acute care' as encounter_type
         , 'inpatient' as encounter_group
-        , 5 as priority_number
+        , 12 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -228,7 +228,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'inpatient skilled nursing' as encounter_type
         , 'inpatient' as encounter_group
-        , 6 as priority_number
+        , 13 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'inpatient skilled nursing'
@@ -242,7 +242,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'inpatient skilled nursing' as encounter_type
         , 'inpatient' as encounter_group
-        , 6 as priority_number
+        , 14 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -258,7 +258,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'inpatient substance use' as encounter_type
         , 'inpatient' as encounter_group
-        , 7 as priority_number
+        , 15 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'inpatient substance use'
@@ -272,7 +272,7 @@ encounter_claims_union as (
         , enc.encounter_end_date
         , 'inpatient substance use' as encounter_type
         , 'inpatient' as encounter_group
-        , 7 as priority_number
+        , 16 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -309,7 +309,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'urgent care' as encounter_type
         , 'outpatient' as encounter_group
-        , 20 as priority_number
+        , 40 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'urgent care'
 
@@ -322,7 +322,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'outpatient psych' as encounter_type
         , 'outpatient' as encounter_group
-        , 21 as priority_number
+        , 41 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient psych'
 
@@ -335,7 +335,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'outpatient rehabilitation' as encounter_type
         , 'outpatient' as encounter_group
-        , 22 as priority_number
+        , 42 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient rehabilitation'
 
@@ -348,7 +348,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'ambulatory surgery center' as encounter_type
         , 'outpatient' as encounter_group
-        , 23 as priority_number
+        , 43 as priority_number
     from {{ ref('encounters__int_multi_day__single_claim_map') }}
     where claim_priority = 1
         and encounter_type = 'ambulatory surgery center'
@@ -361,7 +361,7 @@ encounter_claims_union as (
         , encounter_end_date
         , 'ambulatory surgery center' as encounter_type
         , 'outpatient' as encounter_group
-        , 23 as priority_number
+        , 44 as priority_number
     from {{ ref('encounters__int_multi_day__multi_claim_map') }} as enc
         inner join encounters__stg_medical_claim as med
         on enc.data_source = med.data_source
@@ -377,7 +377,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 24 as priority_number
+        , 45 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where  encounter_type = 'dialysis'
 
@@ -390,7 +390,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 25 as priority_number
+        , 46 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where  encounter_type = 'outpatient hospice'
 
@@ -403,7 +403,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 26 as priority_number
+        , 47 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where  encounter_type = 'home health'
 
@@ -416,7 +416,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 27 as priority_number
+        , 48 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient surgery'
 
@@ -430,7 +430,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 28 as priority_number
+        , 49 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient injections'
 
@@ -443,7 +443,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 29 as priority_number
+        , 50 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient pt/ot/st'
 
@@ -456,7 +456,7 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 30 as priority_number
+        , 51 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient substance use'
 
@@ -469,11 +469,16 @@ encounter_claims_union as (
         , encounter_end_date
         , encounter_type
         , 'outpatient' as encounter_group
-        , 31 as priority_number
+        , 52 as priority_number
     from {{ ref('encounters__int_single_day__single_claim_map') }}
     where encounter_type = 'outpatient radiology'
 
     union all
+
+    -- ========================================================================
+    -- CATCH ALL
+    -- Anything that doesn't fit above.
+    -- ========================================================================
 
     -- Observation and Other Outpatient
     select medical_claim_sk

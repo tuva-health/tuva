@@ -1,5 +1,5 @@
 with encounters__stg_office_based as (
-    select *, 'office-based' as method
+    select *, 'office-based' as method -- this is added to separate different types of encounters
     from {{ ref('encounters__stg_office_based') }}
 )
 select *
