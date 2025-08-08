@@ -2355,6 +2355,8 @@ models:
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
+          - not_null:
+              tags: ['tuva_dqi_sev_1', 'dqi']
           - dbt_expectations.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
