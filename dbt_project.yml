@@ -85,7 +85,7 @@ seeds:
 
     reference_data:
       reference_data__code_type:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','code_type.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','code_type.csv',compression=true,null_marker=true) }}"
       reference_data__ansi_fips_state:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','ansi_fips_state.csv',compression=true,null_marker=true) }}"
       reference_data__calendar:
@@ -104,6 +104,12 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','admit_source.csv',compression=true,null_marker=true) }}"
       terminology__admit_type:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','admit_type.csv',compression=true,null_marker=true) }}"
+      terminology__appointment_cancellation_reason:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','appointment_cancellation_reason.csv',compression=true,null_marker=true) }}"
+      terminology__appointment_status:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','appointment_status.csv',compression=true,null_marker=true) }}"
+      terminology__appointment_type:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','appointment_type.csv',compression=true,null_marker=true) }}"
       terminology__apr_drg:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','apr_drg.csv',compression=true,null_marker=true) }}"
       terminology__bill_type:

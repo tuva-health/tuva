@@ -47,6 +47,59 @@ seeds:
       - name: admit_type_description
         description: 'A description of the admission type.'
 
+  - name: terminology__appointment_cancellation_reason
+    description: 'The coded reason for the appointment being cancelled.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: appointment_cancellation_reason
+      tags:
+        - terminology
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code for the cancellation reason.'
+      - name: description
+        description: 'The description of the cancellation reason code.'
+
+  - name: terminology__appointment_status
+    description: 'The coded status for the appointment.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: appointment_status
+      tags:
+        - terminology
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code for the appointment status.'
+
+  - name: terminology__appointment_type
+    description: 'Appointment type code.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: appointment_type
+      tags:
+        - terminology
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code for the appointment type.'
+      - name: description
+        description: 'The description of the appointment type code.'
+
   - name: terminology__apr_drg
     description: 'Seed containing All Patient Refined Diagnosis Related Groups (APR-DRG) codes and descriptions.'
     config:
