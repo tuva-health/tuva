@@ -47,6 +47,7 @@ select
        end as int) as enrollment_flag
        , enroll.member_month_key
        , cast(pharm.data_source as {{ dbt.type_string() }}) as data_source
+       , {{ try_to_cast_date('pharm.file_date', 'YYYY-MM-DD') }} as file_date
        , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__pharmacy_claim') }} as pharm
 left outer join {{ ref('claims_enrollment__flag_rx_claims_with_enrollment') }} as enroll
