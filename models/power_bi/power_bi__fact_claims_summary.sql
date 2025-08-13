@@ -22,7 +22,7 @@ select
     , person_id
     , patient_source_key
     , sum(paid_amount) as paid_amount
-from {{ ref('aco_analytics__fact_claims') }}
+from {{ ref('power_bi__fact_claims') }}
 group by
     year_month
     , service_category_sk

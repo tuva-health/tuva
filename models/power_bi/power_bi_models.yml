@@ -227,6 +227,17 @@ models:
     tags: power_bi
     materialized: table
 
+- name: power_bi__fact_expected_values
+  description: >
+    Claims expected values fact table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_power_bi
+      {% else %}power_bi{%- endif -%}
+    alias: fact_expected_values
+    tags: power_bi
+    materialized: table
+
   # - name: core__stg_claims_procedure
   #   description: Staging core claims procedures
   #   config:
