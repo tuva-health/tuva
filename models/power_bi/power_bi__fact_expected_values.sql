@@ -3,7 +3,7 @@ select
     ,py.year_nbr
     ,py.person_id
     ,py.payer
-    ,py.[plan]
+    ,py.plan
     ,py.data_source
     ,paid_amount_pred
     ,outpatient_paid_amount_pred

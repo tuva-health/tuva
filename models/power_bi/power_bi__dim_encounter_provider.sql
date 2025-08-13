@@ -10,7 +10,7 @@ with claim_provider_data as (
             order by sum(c.paid_amount) desc
         ) as rn
     from {{ ref('core__medical_claim') }} as c
-    inner join {{ ref('aco_analytics__dim_data_source') }} ds on c.data_source = ds.data_source
+    inner join {{ ref('power_bi__dim_data_source') }} ds on c.data_source = ds.data_source
     left join {{ ref('core__practitioner') }} as p
         on c.rendering_id = p.npi
     group BY
