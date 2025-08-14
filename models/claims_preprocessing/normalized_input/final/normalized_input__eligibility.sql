@@ -32,14 +32,14 @@ select
   , cast(elig.city as {{ dbt.type_string() }}) as city
   , cast(elig.state as {{ dbt.type_string() }}) as state
   , cast(elig.zip_code as {{ dbt.type_string() }}) as zip_code
-  , cast(ansi.ansi_fips_state_code as {{ dbt.type_string() }}) as fips_state_code
-  , cast(ansi.ansi_fips_state_name as {{ dbt.type_string() }}) as normalized_state_name
-  , cast(ansi.ansi_fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation
+  , cast(ansi.fips_state_code as {{ dbt.type_string() }}) as fips_state_code
+  , cast(ansi.normalized_state_name as {{ dbt.type_string() }}) as normalized_state_name
+  , cast(ansi.fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation
   , cast(elig.phone as {{ dbt.type_string() }}) as phone
   , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_string() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_eligibility') }} as elig
 left outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm
   on elig.person_id_key = date_norm.person_id_key
-left outer join {{ ref('reference_data__ansi_fips_state') }} as ansi
-  on trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_name))
+left outer join {{ ref('normalized_input__int_eligibility_state_normalize') }} as ansi
+  on elig.person_id_key = ansi.person_id_key
