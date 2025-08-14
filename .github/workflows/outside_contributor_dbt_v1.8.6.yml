@@ -8,7 +8,9 @@ on:
         required: true
 
 concurrency:
+  # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
   group: ci-testing
+  # Don't cancel in-progress runs automatically
   cancel-in-progress: false
 
 env:
