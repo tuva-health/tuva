@@ -440,15 +440,11 @@ models:
       - core
       - encounters
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - medical_claim_id
-            - data_source
     columns:
     - name: medical_claim_id
       description: '{{ doc("medical_claim_id") }}'
       tests:
+        - unique
         - not_null
     - name: claim_id
       description: '{{ doc("claim_id") }}'
@@ -940,15 +936,11 @@ models:
       alias: pharmacy_claim
       tags: core
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - pharmacy_claim_id
-            - data_source
     columns:
       - name: pharmacy_claim_id
         description: '{{ doc("pharmacy_claim_id") }}'
         tests:
+          - unique
           - not_null
       - name: claim_id
         description: '{{ doc("claim_id") }}'
