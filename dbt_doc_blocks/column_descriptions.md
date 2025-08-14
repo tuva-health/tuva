@@ -106,7 +106,7 @@ Billing provider tax identification number (TIN).
 The birth date of the patient.
 {% enddocs %}
 
-{% cancellation_reason %}
+{% docs cancellation_reason %}
 Free text reason why the appointment was cancelled.
 {% enddocs %}
 
