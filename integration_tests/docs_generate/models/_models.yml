@@ -792,6 +792,114 @@ models:
         description: '{{ doc("data_source") }}'
 
 # Clinical input
+  - name: appointment
+    config:
+      database: tuva
+      schema: input_layer
+      tags: input_layer
+      materialized: table
+    description: >
+      The appointment table contains information related to appointments at a 
+      healthcare facility. This table may include cancelled, completed, 
+      or scheduled events.
+    columns:
+      - name: appointment_id
+        description: '{{ doc("appointment_id") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: source_appointment_type_code
+        description: '{{ doc("source_appointment_type_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: source_appointment_type_description
+        description: '{{ doc("source_appointment_type_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: normalized_appointment_type_code
+        description: '{{ doc("normalized_appointment_type_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: normalized_appointment_type_description
+        description: '{{ doc("normalized_appointment_type_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: start_datetime
+        description: '{{ doc("start_datetime") }}'
+      - name: end_datetime
+        description: '{{ doc("end_datetime") }}'
+      - name: duration
+        description: '{{ doc("duration") }}'
+      - name: location_id
+        description: '{{ doc("location_id") }}'
+      - name: practitioner_id
+        description: '{{ doc("practitioner_id") }}'
+      - name: status
+        description: '{{ doc("status") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-status
+      - name: appointment_specialty
+        description: '{{ doc("appointment_specialty") }}'
+      - name: reason
+        description: '{{ doc("reason") }}'
+      - name: source_reason_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_reason_code
+        description: '{{ doc("source_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: source_reason_description
+        description: '{{ doc("source_reason_description") }}'
+      - name: normalized_reason_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_reason_code
+        description: '{{ doc("normalized_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: normalized_reason_description
+        description: '{{ doc("normalized_reason_description") }}'
+      - name: cancellation_reason
+        description: '{{ doc("cancellation_reason") }}'
+      - name: source_cancellation_reason_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_cancellation_reason_code
+        description: '{{ doc("source_cancellation_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: source_cancellation_reason_description
+        description: '{{ doc("source_cancellation_reason_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: normalized_cancellation_reason_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_cancellation_reason_code
+        description: '{{ doc("normalized_cancellation_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: normalized_cancellation_reason_description
+        description: '{{ doc("normalized_cancellation_reason_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: file_name
+        description: '{{ doc("file_name") }}'
+      - name: ingest_datetime
+        description: '{{ doc("ingest_datetime") }}'
+
   - name: condition
     config:
       database: tuva
