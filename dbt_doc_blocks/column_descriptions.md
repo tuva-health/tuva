@@ -46,6 +46,14 @@ The total amount allowed (includes amount paid by the insurer and patient).
 Indicates whether ambulance services were utilized during the encounter (1 for yes, 0 for no).
 {% enddocs %}
 
+{% docs appointment_id %}
+Unique identifier for the appointment.
+{% enddocs %}
+
+{% docs appointment_specialty %}
+Specialty of a practitioner that would be required to perform the service requested in this appointment.
+{% enddocs %}
+
 {% docs apr_drg_code %}
 APR-DRG for the claim (inpatient claims only).
 {% enddocs %}
@@ -96,6 +104,10 @@ Billing provider tax identification number (TIN).
 
 {% docs birth_date %}
 The birth date of the patient.
+{% enddocs %}
+
+{% cancellation_reason %}
+Free text reason why the appointment was cancelled.
 {% enddocs %}
 
 {% docs ccs_category %}
@@ -322,6 +334,10 @@ Indicates whether the patient is dually eligible for Medicare and Medicaid.
 A number assigned to duplicate rows for identification purposes.
 {% enddocs %}
 
+{% docs duration %}
+Number of minutes that the appointment or service is to take.
+{% enddocs %}
+
 {% docs ed_flag %}
 Indicates whether the encounter involved an emergency department visit (1 for yes, 0 for no).
 {% enddocs %}
@@ -364,6 +380,10 @@ Indicates the type of encounter e.g. acute inpatient, emergency department, etc.
 
 {% docs end_date %}
 The end date of the service or claim period.
+{% enddocs %}
+
+{% docs end_datetime %}
+The end date/time of the appointment or service.
 {% enddocs %}
 
 {% docs enrollment_end_date %}
@@ -594,6 +614,26 @@ Indicates whether the newborn was admitted to the Neonatal Intensive Care Unit (
 Normalized abnormal flag.
 {% enddocs %}
 
+{% docs normalized_appointment_type_code %}
+Normalized appointment type code.
+{% enddocs %}
+
+{% docs normalized_appointment_type_description %}
+Normalized appointment type description.
+{% enddocs %}
+
+{% docs normalized_cancellation_reason_code_type %}
+The normalized type of code for the cancellation reason (e.g., appointment-cancellation-reason).
+{% enddocs %}
+
+{% docs normalized_cancellation_reason_code %}
+The normalized code for the cancellation reason.
+{% enddocs %}
+
+{% docs normalized_cancellation_reason_description %}
+Normalized description of the code for the cancellation reason.
+{% enddocs %}
+
 {% docs normalized_code %}
 The normalized code.
 {% enddocs %}
@@ -616,6 +656,18 @@ The normalized type of code for the component.
 
 {% docs normalized_description %}
 Normalized description of the code.
+{% enddocs %}
+
+{% docs normalized_reason_code_type %}
+The normalized type of code for the appointment reason (e.g., icd-10-cm).
+{% enddocs %}
+
+{% docs normalized_reason_code %}
+The normalized code for the appointment reason (e.g., ICD-10 code).
+{% enddocs %}
+
+{% docs normalized_reason_description %}
+Normalized description of the code for the appointment reason (e.g., ICD-10 description).
 {% enddocs %}
 
 {% docs normalized_reference_range_high %}
@@ -850,6 +902,10 @@ The units for the quantity.
 The patient's race.
 {% enddocs %}
 
+{% docs reason %}
+Free text reason for the appointment or service.
+{% enddocs %}
+
 {% docs recorded_date %}
 Date when the condition was recorded.
 {% enddocs %}
@@ -950,6 +1006,26 @@ The social security number of the patient.
 Indicates whether the result is abnormal or normal.
 {% enddocs %}
 
+{% docs source_appointment_type_code %}
+Appointment type code from the source.
+{% enddocs %}
+
+{% docs source_appointment_type_description %}
+Appointment type description from the source.
+{% enddocs %}
+
+{% docs source_cancellation_reason_code_type %}
+The type of code reported in the source system for the cancellation reason (e.g., appointment-cancellation-reason).
+{% enddocs %}
+
+{% docs source_cancellation_reason_code %}
+The code in the source system for the cancellation reason.
+{% enddocs %}
+
+{% docs source_cancellation_reason_description %}
+Description of the source code for the cancellation reason in the source system.
+{% enddocs %}
+
 {% docs source_code %}
 The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
 {% enddocs %}
@@ -982,6 +1058,18 @@ Indicates the DBT source relation name from which data is derived.
 The name of the source data model.
 {% enddocs %}
 
+{% docs source_reason_code_type %}
+The type of code reported in the source system for the appointment reason; typically a Condition (e.g., icd-10-cm).
+{% enddocs %}
+
+{% docs source_reason_code %}
+The code in the source system for the appointment reason (e.g., ICD-10 code).
+{% enddocs %}
+
+{% docs source_reason_description %}
+Description of the source code for the appointment reason in the source system (e.g., ICD-10 description).
+{% enddocs %}
+
 {% docs source_reference_range_high %}
 The high end of the reference range from the source system.
 {% enddocs %}
@@ -1006,12 +1094,16 @@ The type of specimen e.g. blood, plasma, urine.
 The start date of the service or claim period.
 {% enddocs %}
 
+{% docs start_datetime %}
+The start date/time of the appointment or service.
+{% enddocs %}
+
 {% docs state %}
 The state of the record (e.g., facility location, patient, etc).
 {% enddocs %}
 
 {% docs status %}
-Status of the record (e.g., condition, test, etc).
+Status of the record (e.g., appointment, condition, test, etc).
 {% enddocs %}
 
 {% docs strength %}
