@@ -492,6 +492,12 @@ seeds:
           {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
         charge_amount: |
           {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        coinsurance_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        copayment_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
+        deductible_amount: |
+          {%- if target.type in ("athena") -%} real {%- else -%} float {%- endif -%}
         in_network_flag: integer
         data_source: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
