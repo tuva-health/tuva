@@ -61,6 +61,8 @@ dispatch:
 
 seeds:
   ci_testing:
+    appointment_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','appointment.csv',headers=true) }}"
     eligibility_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','eligibility.csv',headers=true) }}"
     lab_result_seed:
