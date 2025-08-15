@@ -453,13 +453,16 @@ models:
     - name: medical_claim_id
       description: '{{ doc("medical_claim_id") }}'
       tests:
-        - unique:
-            config:
-              severity: error
+        - unique
+        - not_null
     - name: claim_id
       description: '{{ doc("claim_id") }}'
+      tests:
+        - not_null
     - name: claim_line_number
       description: '{{ doc("claim_line_number") }}'
+      tests:
+        - not_null
       data_type: integer
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
@@ -621,6 +624,8 @@ models:
       description: '{{ doc("member_month_key") }}'
     - name: data_source
       description: '{{ doc("data_source") }}'
+      tests:
+        - not_null
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
@@ -944,13 +949,16 @@ models:
       - name: pharmacy_claim_id
         description: '{{ doc("pharmacy_claim_id") }}'
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
       - name: claim_id
         description: '{{ doc("claim_id") }}'
+        tests:
+          - not_null
       - name: claim_line_number
         description: '{{ doc("claim_line_number") }}'
+        tests:
+          - not_null
         data_type: integer
       - name: person_id
         description: '{{ doc("person_id") }}'
@@ -1015,6 +1023,8 @@ models:
         description: '{{ doc("member_month_key") }}'
       - name: data_source
         description: '{{ doc("data_source") }}'
+        tests:
+          - not_null
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
