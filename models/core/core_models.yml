@@ -286,7 +286,8 @@ models:
   - name: core__lab_result
     description: >
       The lab result table contains information about lab test results,
-      including the LOINC code and description, units, reference range, and result.
+      including the LOINC code and description, units, reference range, 
+      and result.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -311,48 +312,56 @@ models:
       description: '{{ doc("encounter_id") }}'
     - name: accession_number
       description: '{{ doc("accession_number") }}'
-    - name: source_code_type
+    - name: source_order_type
       description: '{{ doc("source_code_type") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/code-type
-    - name: source_code
+    - name: source_order_code
       description: '{{ doc("source_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-    - name: source_description
+    - name: source_order_description
       description: '{{ doc("source_description") }}'
-    - name: source_component
-      description: '{{ doc("source_component") }}'
+    - name: source_component_type
+      description: '{{ doc("source_component_type") }}'
+    - name: source_component_code
+      description: '{{ doc("source_component_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-    - name: normalized_code_type
+    - name: source_component_description
+      description: '{{ doc("source_component_description") }}'
+    - name: normalized_order_type
       description: '{{ doc("normalized_code_type") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/code-type
-    - name: normalized_code
+    - name: normalized_order_code
       description: '{{ doc("normalized_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-    - name: normalized_description
+    - name: normalized_order_description
       description: '{{ doc("normalized_description") }}'
     - name: mapping_method
       description: '{{ doc("mapping_method") }}'
-    - name: normalized_component
-      description: '{{ doc("normalized_component") }}'
+    - name: normalized_component_type
+      description: '{{ doc("normalized_component_type") }}'
+    - name: normalized_component_code
+      description: '{{ doc("normalized_component_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+    - name: normalized_component_description
+      description: '{{ doc("normalized_component_description") }}'
     - name: status
       description: '{{ doc("status") }}'
     - name: result
       description: '{{ doc("result") }}'
-    - name: result_date
-      description: '{{ doc("result_date") }}'
-    - name: collection_date
-      description: '{{ doc("collection_date") }}'
+    - name: result_datetime
+      description: '{{ doc("result_datetime") }}'
+    - name: collection_datetime
+      description: '{{ doc("collection_datetime") }}'
     - name: source_units
       description: '{{ doc("source_units") }}'
     - name: normalized_units
@@ -444,13 +453,16 @@ models:
     - name: medical_claim_id
       description: '{{ doc("medical_claim_id") }}'
       tests:
-        - unique:
-            config:
-              severity: error
+        - unique
+        - not_null
     - name: claim_id
       description: '{{ doc("claim_id") }}'
+      tests:
+        - not_null
     - name: claim_line_number
       description: '{{ doc("claim_line_number") }}'
+      tests:
+        - not_null
       data_type: integer
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
@@ -612,6 +624,8 @@ models:
       description: '{{ doc("member_month_key") }}'
     - name: data_source
       description: '{{ doc("data_source") }}'
+      tests:
+        - not_null
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
@@ -935,13 +949,16 @@ models:
       - name: pharmacy_claim_id
         description: '{{ doc("pharmacy_claim_id") }}'
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
       - name: claim_id
         description: '{{ doc("claim_id") }}'
+        tests:
+          - not_null
       - name: claim_line_number
         description: '{{ doc("claim_line_number") }}'
+        tests:
+          - not_null
         data_type: integer
       - name: person_id
         description: '{{ doc("person_id") }}'
@@ -1006,6 +1023,8 @@ models:
         description: '{{ doc("member_month_key") }}'
       - name: data_source
         description: '{{ doc("data_source") }}'
+        tests:
+          - not_null
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
