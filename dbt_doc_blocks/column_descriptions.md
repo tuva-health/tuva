@@ -678,6 +678,10 @@ The normalized high end of the reference range.
 The normalized low end of the reference range.
 {% enddocs %}
 
+{% docs normalized_status %}
+The normalized status of the appointment.
+{% enddocs %}
+
 {% docs normalized_units %}
 Normalized units of the lab test.
 {% enddocs %}
@@ -1078,6 +1082,10 @@ The high end of the reference range from the source system.
 The low end of the reference range from the source system.
 {% enddocs %}
 
+{% docs source_status %}
+Status of the appointment from the source system.
+{% enddocs %}
+
 {% docs source_units %}
 Source units of the lab test.
 {% enddocs %}
@@ -1103,7 +1111,7 @@ The state of the record (e.g., facility location, patient, etc).
 {% enddocs %}
 
 {% docs status %}
-Status of the record (e.g., appointment, condition, test, etc).
+Status of the record (e.g., condition, test, etc).
 {% enddocs %}
 
 {% docs strength %}

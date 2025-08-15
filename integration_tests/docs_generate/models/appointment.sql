@@ -12,7 +12,8 @@ select
     , cast(null as {{ dbt.type_int() }} ) as duration
     , cast(null as {{ dbt.type_string() }} ) as location_id
     , cast(null as {{ dbt.type_string() }} ) as practitioner_id
-    , cast(null as {{ dbt.type_string() }} ) as status
+    , cast(null as {{ dbt.type_string() }} ) as source_status
+    , cast(null as {{ dbt.type_string() }} ) as normalized_status
     , cast(null as {{ dbt.type_string() }} ) as appointment_specialty
     , cast(null as {{ dbt.type_string() }} ) as reason
     , cast(null as {{ dbt.type_string() }} ) as source_reason_code_type

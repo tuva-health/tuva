@@ -167,8 +167,8 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-      - name: status
-        description: '{{ doc("status") }}'
+      - name: source_status
+        description: '{{ doc("source_status") }}'
         tests:
           - dbt_expectations.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
@@ -180,6 +180,14 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: normalized_status
+        description: '{{ doc("normalized_status") }}'
+        tests:
+          - dbt_expectations.expect_column_to_exist:
+              tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: appointment_specialty
         description: '{{ doc("appointment_specialty") }}'
         tests:

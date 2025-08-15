@@ -837,8 +837,12 @@ models:
         description: '{{ doc("location_id") }}'
       - name: practitioner_id
         description: '{{ doc("practitioner_id") }}'
-      - name: status
-        description: '{{ doc("status") }}'
+      - name: source_status
+        description: '{{ doc("source_status") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-status
+      - name: normalized_status
+        description: '{{ doc("normalized_status") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/appointment-status
       - name: appointment_specialty
