@@ -1061,3 +1061,15 @@ Unique year-month of in the dataset computed from eligibility.
 {% docs zip_code %}
 The zip code of the record (e.g., facility location, patient, etc).
 {% enddocs %}
+
+{% docs name_suffix %}
+The name suffixes (e.g., Sr., Jr.)
+{% enddocs %}
+
+{% docs middle_name %}
+The middle name of the healthcare provider.
+{% enddocs %}
+
+{% docs email%}
+The email for the patient
+{% enddocs %}
