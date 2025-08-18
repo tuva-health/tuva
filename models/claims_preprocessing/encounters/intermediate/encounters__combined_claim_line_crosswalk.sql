@@ -420,5 +420,6 @@ order by encounter_type, encounter_id) as encounter_id
 , priority_number
 , anchor_claim_id
 , row_number() over (partition by claim_id, claim_line_number
-order by priority_number ) as claim_line_attribution_number
+order by priority_number, case when claim_id = anchor_claim_id then 1 else 99 end ) as claim_line_attribution_number
 from cte
+ 
