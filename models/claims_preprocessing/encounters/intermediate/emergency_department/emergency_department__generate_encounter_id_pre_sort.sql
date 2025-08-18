@@ -50,13 +50,20 @@ order by end_date, start_date, claim_id) as row_num
     , aa.row_num as row_num_a
     , bb.row_num as row_num_b
     , case
-      when aa.end_date = bb.end_date and aa.facility_id = bb.facility_id then 1
+      -- Condition 1: exact end-date match at the same facility (handles duplicates/corrections)
+      when aa.end_date = bb.end_date
+        and aa.facility_id = bb.facility_id then 1
+
+      -- Condition 2: consecutive stay with transfer (end_date + 1 day == next start_date and discharge '30')
       when {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
         and aa.facility_id = bb.facility_id
         and aa.discharge_disposition_code = '30' then 1
+
+      -- Condition 3: general overlap (including same-day overlap) at the same facility
       when aa.end_date <> bb.end_date
         and aa.end_date >= bb.start_date
         and aa.facility_id = bb.facility_id then 1
+
       else 0
     end as merge_flag
   from add_row_num as aa
@@ -65,6 +72,7 @@ order by end_date, start_date, claim_id) as row_num
     and aa.row_num < bb.row_num
     and aa.claim_id <> bb.claim_id
 )
+
 
 , merges_with_larger_row_num as (
   select
