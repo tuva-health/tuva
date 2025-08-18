@@ -11,7 +11,7 @@ Only use with JSON files you generated yourself from dbt.
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tuva Data Quality Dashboard</title>
+    <title>Tuva Data Quality Assessment</title>
     <style>
         * {
             margin: 0;
@@ -111,36 +111,73 @@ Only use with JSON files you generated yourself from dbt.
             background: transparent;
             border: none;
             border-radius: 0;
-            padding: 0;
             margin: 0 0 50px 0;
+            overflow: visible;
             box-shadow: none;
         }
 
-        .instructions h3 {
+        .instructions-header {
+            padding: 20px 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
             color: #1e293b;
-            margin-bottom: 20px;
-            font-weight: 700;
-            font-size: 1.4rem;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        .instructions ol {
+        .instructions-header:hover {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+
+        .instructions-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions-content {
+            display: none;
+            padding: 30px 0;
+            color: #475569;
+        }
+
+        .instructions-content.open {
+            display: block;
+        }
+
+        .instructions-content ol {
             color: #475569;
             margin-left: 24px;
             line-height: 1.7;
             font-size: 1rem;
         }
 
-        .instructions li {
+        .instructions-content li {
             margin-bottom: 8px;
         }
 
-        .instructions code {
+        .instructions-content code {
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 0.9rem;
             font-weight: 600;
+        }
+
+        .instructions-toggle-arrow {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .instructions-toggle-arrow.open {
+            transform: rotate(180deg);
         }
 
         .help-section {
@@ -793,18 +830,27 @@ Only use with JSON files you generated yourself from dbt.
         <div class="header">
             <div class="header-content">
                 <h2><img src="assets/tuva_logo.png" alt="Tuva Logo" class="header-logo">TUVA Health</h2>
-                <h1>Data Quality Results Dashboard</h1>
+                <h1>Input Layer Data Quality Assessment</h1>
+                <p>Assess the data quality of the input layer and how it will affect The Tuva Project.</p>
             </div>
         </div>
 
         <div class="instructions">
-            <h3>📋 How to Use This Dashboard</h3>
-            <ol>
-                <li>Run your dbt tests: <code>dbt test</code></li>
-                <li>Locate your dbt project's <code>target/</code> folder</li>
-                <li>Drag and drop <code>run_results.json</code> and <code>manifest.json</code> files below</li>
-                <li>View detailed test results, failures, and model documentation</li>
-            </ol>
+            <div class="instructions-header" onclick="toggleInstructions()">
+                <div class="instructions-title">
+                    <span>📋</span>
+                    <span>How to Use This Application</span>
+                </div>
+                <span class="instructions-toggle-arrow" id="instructionsArrow">▼</span>
+            </div>
+            <div class="instructions-content" id="instructionsContent">
+                <ol>
+                    <li>Run your dbt tests: <code>dbt test</code></li>
+                    <li>Locate your dbt project's <code>target/</code> folder</li>
+                    <li>Drag and drop <code>run_results.json</code> and <code>manifest.json</code> files below</li>
+                    <li>View detailed test results, failures, and model documentation</li>
+                </ol>
+            </div>
         </div>
 
         <div class="help-section">
@@ -1459,6 +1505,19 @@ Only use with JSON files you generated yourself from dbt.
         function toggleHelp() {
             const content = document.getElementById('helpContent');
             const arrow = document.getElementById('helpArrow');
+
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                arrow.classList.remove('open');
+            } else {
+                content.classList.add('open');
+                arrow.classList.add('open');
+            }
+        }
+
+        function toggleInstructions() {
+            const content = document.getElementById('instructionsContent');
+            const arrow = document.getElementById('instructionsArrow');
 
             if (content.classList.contains('open')) {
                 content.classList.remove('open');
