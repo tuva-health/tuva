@@ -5,73 +5,83 @@
 
 with claim_start_end as (
   select
-    claim_id
+      claim_id
     , patient_data_source_id
     , min(start_date) as start_date
-    , max(end_date) as end_date
+    , max(end_date)   as end_date
   from {{ ref('encounters__stg_medical_claim') }}
   group by claim_id, patient_data_source_id
 )
 
 , base as (
   select distinct
-    enc.claim_id
+      enc.claim_id
     , enc.patient_data_source_id
     , c.start_date
     , c.end_date
     , enc.facility_id
     , enc.discharge_disposition_code
+    , enc.claim_type  -- 'institutional' | 'professional'
   from {{ ref('encounters__stg_medical_claim') }} as enc
   inner join claim_start_end as c
     on enc.claim_id = c.claim_id
-    and c.patient_data_source_id = enc.patient_data_source_id
-  where
-    enc.service_category_2 = 'emergency department' --both inst and prof
+   and c.patient_data_source_id = enc.patient_data_source_id
+  where enc.service_category_2 = 'emergency department' -- both inst and prof
 )
 
 , add_row_num as (
   select
-    patient_data_source_id
+      patient_data_source_id
     , claim_id
     , start_date
     , end_date
     , discharge_disposition_code
     , facility_id
-    , row_number() over (partition by patient_data_source_id
-order by end_date, start_date, claim_id) as row_num
+    , claim_type
+    , case when claim_type = 'professional' then 1 else 0 end as is_professional
+    , row_number() over (
+        partition by patient_data_source_id
+        order by end_date, start_date, claim_id
+      ) as row_num
   from base
 )
 
 , check_for_merges_with_larger_row_num as (
   select
-    aa.patient_data_source_id
+      aa.patient_data_source_id
     , aa.claim_id as claim_id_a
     , bb.claim_id as claim_id_b
-    , aa.row_num as row_num_a
-    , bb.row_num as row_num_b
+    , aa.row_num  as row_num_a
+    , bb.row_num  as row_num_b
     , case
-      -- Condition 1: exact end-date match at the same facility (handles duplicates/corrections)
-      when aa.end_date = bb.end_date
-        and aa.facility_id = bb.facility_id then 1
+        -- 1) exact end-date match at the same facility (dups/corrections)
+        when aa.end_date = bb.end_date
+         and aa.facility_id = bb.facility_id then 1
 
-      -- Condition 2: consecutive stay with transfer (end_date + 1 day == next start_date and discharge '30')
-      when {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
-        and aa.facility_id = bb.facility_id
-        and aa.discharge_disposition_code = '30' then 1
+        -- 2) consecutive stay with transfer (end_date + 1 day == next start_date and discharge '30')
+        when {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
+         and aa.facility_id = bb.facility_id
+         and aa.discharge_disposition_code = '30' then 1
 
-      -- Condition 3: general overlap (including same-day overlap) at the same facility
-      when aa.end_date <> bb.end_date
-        and aa.end_date >= bb.start_date
-        and aa.facility_id = bb.facility_id then 1
+        -- 3) general overlap at the same facility
+        when aa.end_date <> bb.end_date
+         and aa.end_date >= bb.start_date
+         and aa.facility_id = bb.facility_id then 1
 
-      else 0
-    end as merge_flag
+        -- 4) liberal rule when at least one is PROFESSIONAL:
+        -- overlap OR 1-day gap; ignore facility/discharge as professional doesn't have these fields.
+        when (aa.is_professional = 1 or bb.is_professional = 1)
+         and {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} >= bb.start_date then 1
+
+        else 0
+      end as merge_flag
   from add_row_num as aa
   inner join add_row_num as bb
     on aa.patient_data_source_id = bb.patient_data_source_id
-    and aa.row_num < bb.row_num
-    and aa.claim_id <> bb.claim_id
+   and aa.row_num < bb.row_num
+   and aa.claim_id <> bb.claim_id
 )
+
 
 
 , merges_with_larger_row_num as (
