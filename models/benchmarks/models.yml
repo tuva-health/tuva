@@ -13,6 +13,7 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+        - concurrent
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -20,6 +21,27 @@ models:
             - payer
             - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - year_nbr      
+
+  - name: benchmarks__person_year_prospective
+    description: |
+        flat table for training ml models on for prospective_models
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: person_year
+      materialized: table
+      tags: 
+        - benchmarks_train
+        - benchmarks
+        - prospective
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
+            - year_nbr    
 
   - name: benchmarks__pivot_condition
     description: |
