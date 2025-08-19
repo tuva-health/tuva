@@ -44,6 +44,7 @@ select
     , zip_code
     , phone
     , email
+    , ethnicity
     , data_source
     , file_name
     , file_date

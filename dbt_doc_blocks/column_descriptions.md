@@ -1073,3 +1073,7 @@ The middle name of the healthcare provider.
 {% docs email%}
 The email for the patient
 {% enddocs %}
+
+{% docs ethnicity %}
+The ethnicity of the patient
+{% enddocs %}

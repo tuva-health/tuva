@@ -36,6 +36,7 @@ select
   , cast(elig.zip_code as {{ dbt.type_string() }}) as zip_code
   , cast(elig.phone as {{ dbt.type_string() }}) as phone
   , cast(elig.email as {{ dbt.type_string() }}) as email
+  , cast(elig.ethnicity as {{ dbt.type_string() }}) as ethnicity
   , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_string() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_eligibility') }} as elig
