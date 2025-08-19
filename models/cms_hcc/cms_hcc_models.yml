@@ -634,7 +634,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
       alias: _stg_eligibility
       tags: cms_hcc
-      materialized: ephemeral
+      materialized: ephemeral 
     description: Staging eligibility from core.
     columns:
       - name: person_id

@@ -42,7 +42,7 @@ incomplete_overlap as (
         in_medical_claim,
         in_eligibility
     from plan_counts
-    where not (in_pharmacy_claim > 0 and in_medical_claim > 0 and in_eligibility > 0)
+    where in_eligibility > 0 and not (in_pharmacy_claim > 0 and in_medical_claim > 0)
 )
 
 select * from incomplete_overlap
