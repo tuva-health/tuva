@@ -11,7 +11,7 @@
 with claim_type_cte as (
     select
         data_source
-        , min(claim_type = 'undetermined') as has_only_undetermined_claim_types
+        , min(case when claim_type = 'undetermined' then 1 else 0 end) as has_only_undetermined_claim_types
         , count(*) as count_records
     from {{ ref('input_layer__medical_claim') }}
     group by data_source
@@ -20,4 +20,4 @@ with claim_type_cte as (
 select
     *
 from claim_type_cte
-where has_only_undetermined_claim_types
+where has_only_undetermined_claim_types = 1
