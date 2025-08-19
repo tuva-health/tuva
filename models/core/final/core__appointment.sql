@@ -171,6 +171,8 @@ select
 from {{ ref('core__stg_clinical_appointment') }} as appts
     left outer join {{ ref('terminology__appointment_cancellation_reason') }} as appointment_cancellation_reason
         on appts.source_cancellation_reason_code = appointment_cancellation_reason.code
+    left outer join {{ ref('terminology__appointment_status') }} as appointment_status
+        on appts.source_status = appointment_status.code
     left outer join {{ ref('terminology__appointment_type') }} as appointment_type
         on appts.source_appointment_type_code = appointment_type.code
     left outer join {{ ref('terminology__icd_10_cm') }} as icd10
