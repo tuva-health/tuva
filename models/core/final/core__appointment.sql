@@ -75,6 +75,22 @@ select
           appointment_cancellation_reason.description
         , appts.normalized_cancellation_reason_description
       ) as normalized_cancellation_reason_description
+    , case
+        when coalesce(
+              appts.normalized_appointment_type_code
+            , appts.normalized_status
+            , appts.normalized_cancellation_reason_code
+            , appts.normalized_reason_code
+        ) is not null then 'manual'
+        when coalesce(
+              appointment_type.code
+            , appointment_status.code
+            , appointment_cancellation_reason.code
+            , icd10.icd_10_cm
+            , icd9.icd_9_cm
+            , snomed_ct.snomed_ct
+        ) is not null then 'automatic'
+      end as mapping_method
     , appts.data_source
     , appts.tuva_last_run
 from {{ ref('core__stg_clinical_appointment') }} as appts
@@ -166,6 +182,28 @@ select
         , appts.normalized_cancellation_reason_description
         , custom_mapped_cancellation_reason_code.normalized_description
       ) as normalized_cancellation_reason_description
+    , case
+        when coalesce(
+              appts.normalized_appointment_type_code
+            , appts.normalized_status
+            , appts.normalized_cancellation_reason_code
+            , appts.normalized_reason_code
+        ) is not null then 'manual'
+        when coalesce(
+              appointment_type.code
+            , appointment_status.code
+            , appointment_cancellation_reason.code
+            , icd10.icd_10_cm
+            , icd9.icd_9_cm
+            , snomed_ct.snomed_ct
+        ) is not null then 'automatic'
+        when coalesce(
+              custom_mapped_appointment_type.normalized_code
+            , custom_mapped_appointment_status.normalized_code
+            , custom_mapped_cancellation_reason_code.normalized_code
+            , custom_mapped_reason_code.normalized_code
+        ) is not null then 'custom'
+      end as mapping_method
     , appts.data_source
     , appts.tuva_last_run
 from {{ ref('core__stg_clinical_appointment') }} as appts
