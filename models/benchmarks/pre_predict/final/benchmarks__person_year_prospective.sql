@@ -1,4 +1,4 @@
-{# --- dynamic groups from source relation --- #}
+{# ---To avoid listing each feature and target dynamically, based on person year table --- #}
 {% set src = ref('benchmarks__person_year') %}
 {% set cols = adapter.get_columns_in_relation(src) %}
 
@@ -49,18 +49,16 @@ select
        else coalesce(py_diag.paid_amount,0)/py_diag.member_month_count
   end                                       as lag_pmpm_paid_amount
 
-{# --- lag raw paid amounts and their PMPM normalizations --- #}
+{# --- lag PMPM normalizations --- #}
 {% for col in paid_cols %}
-, coalesce(py_diag.{{ col }}, 0)            as lag_{{ col }}
 , case when coalesce(py_diag.member_month_count,0)=0
        then 0
        else coalesce(py_diag.{{ col }}, 0)/py_diag.member_month_count
   end                                       as lag_pmpm_{{ col }}
 {% endfor %}
 
-{# --- lag raw counts and their PMPC normalizations --- #}
+{# --- lag PMPC normalizations --- #}
 {% for col in count_cols %}
-, coalesce(py_diag.{{ col }}, 0)            as lag_{{ col }}
 , case when coalesce(py_diag.member_month_count,0)=0
        then 0
        else coalesce(py_diag.{{ col }}, 0)/py_diag.member_month_count
