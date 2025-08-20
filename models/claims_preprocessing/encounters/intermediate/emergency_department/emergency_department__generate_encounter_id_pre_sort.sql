@@ -8,7 +8,7 @@ with claim_start_end as (
       claim_id
     , patient_data_source_id
     , min(start_date) as start_date
-    , max(end_date)   as end_date
+    , max(end_date) as end_date
   from {{ ref('encounters__stg_medical_claim') }}
   group by claim_id, patient_data_source_id
 )
@@ -51,8 +51,8 @@ with claim_start_end as (
       aa.patient_data_source_id
     , aa.claim_id as claim_id_a
     , bb.claim_id as claim_id_b
-    , aa.row_num  as row_num_a
-    , bb.row_num  as row_num_b
+    , aa.row_num as row_num_a
+    , bb.row_num as row_num_b
     , case
         -- 1) exact end-date match at the same facility (dups/corrections)
         when aa.end_date = bb.end_date
