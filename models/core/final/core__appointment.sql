@@ -85,11 +85,11 @@ from {{ ref('core__stg_clinical_appointment') }} as appts
     left outer join {{ ref('terminology__appointment_type') }} as appointment_type
         on appts.source_appointment_type_code = appointment_type.code
     left outer join {{ ref('terminology__icd_10_cm') }} as icd10
-        on replace(appts.normalized_reason_code, '.', '') = icd10.icd_10_cm
+        on replace(appts.source_reason_code, '.', '') = icd10.icd_10_cm
     left outer join {{ ref('terminology__icd_9_cm') }} as icd9
-        on replace(appts.normalized_reason_code, '.', '') = icd9.icd_9_cm
+        on replace(appts.source_reason_code, '.', '') = icd9.icd_9_cm
     left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
-        on appts.normalized_reason_code = snomed_ct.snomed_ct
+        on appts.source_reason_code = snomed_ct.snomed_ct
 
  {% else %}
 
@@ -176,11 +176,11 @@ from {{ ref('core__stg_clinical_appointment') }} as appts
     left outer join {{ ref('terminology__appointment_type') }} as appointment_type
         on appts.source_appointment_type_code = appointment_type.code
     left outer join {{ ref('terminology__icd_10_cm') }} as icd10
-        on replace(appts.normalized_reason_code, '.', '') = icd10.icd_10_cm
+        on replace(appts.source_reason_code, '.', '') = icd10.icd_10_cm
     left outer join {{ ref('terminology__icd_9_cm') }} as icd9
-        on replace(appts.normalized_reason_code, '.', '') = icd9.icd_9_cm
+        on replace(appts.source_reason_code, '.', '') = icd9.icd_9_cm
     left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
-        on appts.normalized_reason_code = snomed_ct.snomed_ct
+        on appts.source_reason_code = snomed_ct.snomed_ct
     left outer join {{ ref('custom_mapped') }} as custom_mapped_appointment_status
         on lower(custom_mapped_appointment_status.source_code_type) = 'appointment_status'
         and custom_mapped_appointment_status.source_code = appts.source_status
