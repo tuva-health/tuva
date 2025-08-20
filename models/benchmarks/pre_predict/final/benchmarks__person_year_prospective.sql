@@ -1,4 +1,4 @@
-{# --- build dynamic column groups from the source relation --- #}
+{# --- dynamic groups from source relation --- #}
 {% set src = ref('benchmarks__person_year') %}
 {% set cols = adapter.get_columns_in_relation(src) %}
 
@@ -32,22 +32,22 @@ select
 , py.year_nbr                               as prediction_year
 , py_diag.year_nbr                          as diagnosis_year
 
-, py.paid_amount                            as person_year_paid_amount
-, py.member_month_count                     as person_year_member_months
+, py.paid_amount                            as prediction_year_paid_amount
+, py.member_month_count                     as prediction_year_member_months
+
+, py.age_at_year_start                      as prediction_year_age_at_year_start
+, py.sex                                    as prediction_year_sex
+, py.race                                   as prediction_year_race
+, py.state                                  as prediction_year_state
 
 , case when py_diag.person_id is null then 1 else 0 end as lag_missing
 , coalesce(py_diag.member_month_count, 0)   as lag_member_months
 
-, coalesce(py_diag.paid_amount, 0)          as diagnosis_year_paid_amount
+, coalesce(py_diag.paid_amount, 0)          as lag_paid_amount
 , case when coalesce(py_diag.member_month_count,0)=0
        then 0
        else coalesce(py_diag.paid_amount,0)/py_diag.member_month_count
   end                                       as lag_pmpm_paid_amount
-
-, py.age_at_year_start                      as age_t
-, py.sex                                    as sex_t
-, py.race                                   as race_t
-, py.state                                  as state_t
 
 {# --- lag raw paid amounts and their PMPM normalizations --- #}
 {% for col in paid_cols %}
