@@ -36,7 +36,6 @@ cast(null as {{ dbt.type_string() }}) as encounter_id
 , cast(null as {{ dbt.type_string() }}) as data_source
 , cast(null as {{ dbt.type_string() }}) as file_name
 , cast(null as {{ dbt.type_timestamp() }}) as ingest_datetime
-, cast(null as {{ dbt.type_timestamp() }}) as tuva_last_run
 {{ limit_zero() }}
 
 {%- else -%}

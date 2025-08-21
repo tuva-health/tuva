@@ -4,6 +4,130 @@
 }}
 
 with cte as (
+select * from {{ ref('data_quality__appointment_appointment_id') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_appointment_specialty') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_cancellation_reason') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_data_source') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_duration') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_encounter_id') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_end_datetime') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_location_id') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_appointment_type_code') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_appointment_type_description') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_cancellation_reason_code') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_cancellation_reason_code_type') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_cancellation_reason_description') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_reason_code') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_reason_code_type') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_reason_description') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_normalized_status') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_patient_id') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_person_id') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_practitioner_id') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_reason') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_appointment_type_code') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_appointment_type_description') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_cancellation_reason_code') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_cancellation_reason_code_type') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_cancellation_reason_description') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_reason_code') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_reason_code_type') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_reason_description') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_source_status') }}
+
+union all
+
+select * from {{ ref('data_quality__appointment_start_datetime') }}
+
+union all
+
 select * from {{ ref('data_quality__condition_claim_id') }}
 
 union all

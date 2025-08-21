@@ -1316,7 +1316,318 @@ models:
       materialized: table
 
 #### Atomic Checks
-## Clinical condition
+## Clinical appointment
+  - name: data_quality__appointment_appointment_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_appointment_id
+      tags:
+        - data_quality
+      materialized: table  
+
+  - name: data_quality__appointment_appointment_specialty
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_appointment_specialty
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_cancellation_reason
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_cancellation_reason
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_data_source
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_data_source
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_duration
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_duration
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_encounter_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_end_datetime
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_end_datetime
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_location_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_location_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_appointment_type_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_appointment_type_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_appointment_type_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_appointment_type_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_cancellation_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_cancellation_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_cancellation_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_cancellation_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_cancellation_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_cancellation_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_status
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_status
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_patient_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_patient_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_person_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_practitioner_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_practitioner_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_reason
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_reason
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_appointment_type_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_appointment_type_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_appointment_type_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_appointment_type_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_cancellation_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_cancellation_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_cancellation_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_cancellation_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_cancellation_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_cancellation_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_status
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_status
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_start_datetime
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_start_datetime
+      tags:
+        - data_quality
+      materialized: table
+
+  ## Clinical condition
   - name: data_quality__condition_claim_id
     config:
       schema: |
@@ -3367,6 +3678,17 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: unique_value_examples
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__primary_keys_appointment_appointment_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: primary_keys_appointment_appointment_id
       tags:
         - data_quality
       materialized: table
