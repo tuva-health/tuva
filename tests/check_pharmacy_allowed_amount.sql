@@ -1,4 +1,4 @@
-/* This is taken from the claims mapping guide, which says, 
+/* This is taken from the claims mapping guide, which says,
 "The expectation is that the sum of paid_amount, coinsurance_amount, copayment_amount, and deductible_amount will be equivalent to allowed_amount."
 */
 {{ config(
@@ -11,7 +11,7 @@
    )
 }}
 
-select 
+select
       (coalesce(rx.paid_amount, 0) +
        coalesce(rx.coinsurance_amount, 0) +
        coalesce(rx.copayment_amount, 0) +
