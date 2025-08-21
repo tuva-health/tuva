@@ -20,6 +20,7 @@ with lab_result as (
         , normalized_order_type as normalized_code_type
         , normalized_order_code as normalized_code
         , normalized_order_description as normalized_description
+        , data_source
     from lab_result
 
 )
@@ -33,6 +34,7 @@ with lab_result as (
         , normalized_component_type as normalized_code_type
         , normalized_component_code as normalized_code
         , normalized_component_description as normalized_description
+        , data_source
     from lab_result
 
 )

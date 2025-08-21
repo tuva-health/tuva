@@ -173,10 +173,10 @@ select
     , labs.data_source
     , labs.tuva_last_run
 From  {{ ref('core__stg_clinical_lab_result') }} as labs
-    left join {{ ref('terminology__loinc') }} loinc
+    left outer join {{ ref('terminology__loinc') }} as loinc
         on labs.source_order_type = 'loinc'
         and labs.source_order_code = loinc.loinc
-    left join {{ ref('terminology__snomed_ct') }} snomed_ct
+    left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct
         on labs.source_order_type = 'snomed-ct'
         and labs.source_order_code = snomed_ct.snomed_ct
     left outer join {{ ref('terminology__loinc') }} as loinc_component
@@ -185,10 +185,10 @@ From  {{ ref('core__stg_clinical_lab_result') }} as labs
     left outer join {{ ref('terminology__snomed_ct') }} as snomed_ct_component
         on labs.source_component_type = 'snomed-ct'
         and labs.source_component_code = snomed_ct_component.snomed_ct
-    left join {{ ref('custom_mapped') }} as custom_mapped_order
-        on (lower(labs.source_order_type) = lower(custom_mapped_order.source_code_type)
-        and (labs.source_order_code = custom_mapped_order.source_code
-    left join {{ ref('custom_mapped') }} as custom_mapped_component
-        on (lower(labs.source_component_type) = lower(custom_mapped_component.source_code_type)
-        and (labs.source_component_code = custom_mapped_component.source_code
+    left outer join {{ ref('custom_mapped') }} as custom_mapped_order
+        on lower(labs.source_order_type) = lower(custom_mapped_order.source_code_type)
+        and labs.source_order_code = custom_mapped_order.source_code
+    left outer join {{ ref('custom_mapped') }} as custom_mapped_component
+        on lower(labs.source_component_type) = lower(custom_mapped_component.source_code_type)
+        and labs.source_component_code = custom_mapped_component.source_code
 {% endif %}
