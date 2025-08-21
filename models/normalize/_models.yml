@@ -42,6 +42,16 @@ models:
       tags: normalized
       materialized: table
 
+  - name: normalize__unmapped_immunization
+    description: unmapped immunization codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_immunization
+      tags: normalize
+      materialized: table
+
   - name: normalize__unmapped_lab_result
     description: unmapped lab result order and component codes
     config:
@@ -92,6 +102,12 @@ models:
 
   - name: normalize__stg_unmapped_condition
     description: unmapped condition codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_immunization
+    description: unmapped immunization codes
     config:
       tags: normalized
       materialized: ephemeral

@@ -296,6 +296,78 @@ select * from {{ ref('data_quality__encounter_primary_diagnosis_description') }}
 
 union all
 
+select * from {{ ref('data_quality__immunization_body_site') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_data_source') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_encounter_id') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_immunization_id') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_location_id') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_lot_number') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_normalized_code') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_normalized_code_type') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_normalized_description') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_normalized_dose') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_occurrence_date') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_patient_id') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_person_id') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_practitioner_id') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_source_code') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_source_code_type') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_source_description') }}
+
+union all
+
+select * from {{ ref('data_quality__immunization_source_dose') }}
+
+union all
+
 select * from {{ ref('data_quality__practitioner_practice_affiliation') }}
 
 union all

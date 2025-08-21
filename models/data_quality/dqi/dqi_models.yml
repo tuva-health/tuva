@@ -2089,6 +2089,204 @@ models:
         - data_quality
       materialized: table
 
+## Clinical immunization
+  - name: data_quality__immunization_body_site
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_body_site
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_data_source
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_data_source
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_encounter_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_immunization_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_immunization_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_location_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_location_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_lot_number
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_lot_number
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_code
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_code_type
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_description
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_dose
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_dose
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_occurrence_date
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_occurrence_date
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_patient_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_patient_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_person_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_practitioner_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_practitioner_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_code
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_code_type
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_description
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_dose
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_dose
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
 
 ## Clinical lab result
   - name: data_quality__lab_result_source_abnormal_flag
@@ -3516,7 +3714,17 @@ models:
       tags:
         - data_quality
       materialized: table
-
+  
+  - name: data_quality__primary_keys_immunization_immunization_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: primary_keys_immunization_immunization_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
 
   - name: data_quality__primary_keys_lab_result_lab_result_id
     config:
@@ -3695,6 +3903,13 @@ models:
     config:
       tags:
         - data_quality
+      materialized: ephemeral
+
+  - name: data_quality__stg_immunization
+    config:
+      tags:
+        - data_quality
+        - dqi_immunization
       materialized: ephemeral
 
   - name: data_quality__stg_institutional_inpatient

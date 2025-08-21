@@ -100,6 +100,8 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/reference-data/SVI','SVI_US.csv',compression=true,null_marker=true) }}"
 
     terminology:
+      terminology__act_site:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','act_site.csv',compression=true,null_marker=true) }}"
       terminology__admit_source:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','admit_source.csv',compression=true,null_marker=true) }}"
       terminology__admit_type:
@@ -116,6 +118,8 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','bill_type.csv',compression=true,null_marker=true) }}"
       terminology__claim_type:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','claim_type.csv',compression=true,null_marker=true) }}"
+      terminology__cvx:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','cvx.csv',compression=true,null_marker=true) }}"
       terminology__ccs_services_procedures:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','ccs_services_procedures.csv',compression=true,null_marker=true) }}"
       terminology__discharge_disposition:
@@ -140,6 +144,12 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','icd_9_cm.csv',compression=true,null_marker=true) }}"
       terminology__icd_9_pcs:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','icd_9_pcs.csv',compression=true,null_marker=true) }}"
+      terminology__immunization_route_code:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','immunization_route_code.csv',compression=true,null_marker=true) }}"
+      terminology__immunization_status_reason:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','immunization_status_reason.csv',compression=true,null_marker=true) }}"
+      terminology__immunization_status:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.0','immunization_status.csv',compression=true,null_marker=true) }}"
       terminology__loinc:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.14.18','loinc.csv',compression=true,null_marker=true) }}"
       terminology__loinc_deprecated_mapping:
