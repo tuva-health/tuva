@@ -1,6 +1,6 @@
 {{ config(
      enabled = ( ( var('enable_normalize_engine', False) == True  or  var('enable_normalize_engine', False) == "unmapped") and
-                   var('clinical_enabled', var('tuva_marts_enabled', False)))
+                   var('clinical_enabled', var('tuva_marts_enabled', False))
                ) | as_bool
    )
 }}
