@@ -4,13 +4,6 @@
                ) | as_bool
    )
 }}
-with unioned as (
-
-    select * from {{ref('normalize__stg_unmapped_lab_result_component')}}
-    union all
-    select * from {{ref('normalize__stg_unmapped_lab_result_order')}}
-
-)
 
 select distinct
       i.source_code_type
@@ -28,7 +21,7 @@ select distinct
     , cast( null as {{ dbt.type_string() }} ) as reviewed_by
     , cast( null as {{ dbt.type_string() }} ) as reviewed_date
     , cast( null as {{ dbt.type_string() }} ) as notes
-from unioned i
+from {{ ref('normalize__stg_unmapped_lab_result') }} as i
 group by
       i.source_code_type
     , i.source_code
