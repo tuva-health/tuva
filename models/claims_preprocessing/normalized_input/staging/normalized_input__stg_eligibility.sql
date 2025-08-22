@@ -33,7 +33,9 @@ select
     , medicare_status_code
     , group_id
     , group_name
+    , name_suffix
     , first_name
+    , middle_name
     , last_name
     , social_security_number
     , address
@@ -41,6 +43,8 @@ select
     , state
     , zip_code
     , phone
+    , email
+    , ethnicity
     , data_source
     , file_name
     , file_date

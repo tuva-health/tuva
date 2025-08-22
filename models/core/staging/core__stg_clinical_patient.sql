@@ -10,7 +10,9 @@ with tuva_last_run as (
 )
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id
+    , cast(name_suffix as {{ dbt.type_string() }}) as name_suffix
     , cast(first_name as {{ dbt.type_string() }}) as first_name
+    , cast(middle_name as {{ dbt.type_string() }}) as middle_name
     , cast(last_name as {{ dbt.type_string() }}) as last_name
     , cast(sex as {{ dbt.type_string() }}) as sex
     , cast(race as {{ dbt.type_string() }}) as race
@@ -26,6 +28,8 @@ select
     , cast(latitude as {{ dbt.type_float() }}) as latitude
     , cast(longitude as {{ dbt.type_float() }}) as longitude
     , cast(phone as {{ dbt.type_string() }}) as phone
+    , cast(email as {{ dbt.type_string() }}) as email
+    , cast(ethnicity as {{ dbt.type_string() }}) as ethnicity
     , cast(data_source as {{ dbt.type_string() }}) as data_source
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }}) as age
     , cast(
