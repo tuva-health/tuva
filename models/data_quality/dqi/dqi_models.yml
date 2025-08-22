@@ -316,12 +316,34 @@ models:
       materialized: table
 
 
+  - name: data_quality__eligibility_name_suffix
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_name_suffix
+      tags:
+        - data_quality
+      materialized: table
+
+
   - name: data_quality__eligibility_first_name
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: eligibility_first_name
+      tags:
+        - data_quality
+      materialized: table
+
+  
+  - name: data_quality__eligibility_middle_name
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_middle_name
       tags:
         - data_quality
       materialized: table
@@ -424,7 +446,29 @@ models:
       tags:
         - data_quality
       materialized: table
+    
 
+  - name: data_quality__eligibility_email
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_email
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__eligibility_ethnicity
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_ethnicity
+      tags:
+        - data_quality
+      materialized: table
+      
 
   - name: data_quality__eligibility_plan
     config:
@@ -2712,6 +2756,25 @@ models:
         - data_quality
       materialized: table
 
+  - name: data_quality__patient_email
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_email
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__patient_ethnicity
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_ethnicity
+      tags:
+        - data_quality
+      materialized: table
 
   - name: data_quality__patient_state
     config:
@@ -2811,6 +2874,15 @@ models:
         - data_quality
       materialized: table
 
+  - name: data_quality__patient_name_suffix
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_name_suffix
+      tags:
+        - data_quality
+      materialized: table
 
   - name: data_quality__patient_first_name
     config:
@@ -2822,6 +2894,15 @@ models:
         - data_quality
       materialized: table
 
+  - name: data_quality__patient_middle_name
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_middle_name
+      tags:
+        - data_quality
+      materialized: table
 
   - name: data_quality__patient_last_name
     config:
