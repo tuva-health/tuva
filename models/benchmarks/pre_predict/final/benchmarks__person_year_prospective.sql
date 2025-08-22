@@ -43,27 +43,46 @@ select
 , case when py_diag.person_id is null then 1 else 0 end as lag_missing
 , coalesce(py_diag.member_month_count, 0)   as lag_member_months
 
-, coalesce(py_diag.paid_amount, 0)          as lag_paid_amount
-, case when coalesce(py_diag.member_month_count,0)=0
-       then 0
-       else coalesce(py_diag.paid_amount,0)/py_diag.member_month_count
-  end                                       as lag_pmpm_paid_amount
+, case when coalesce(py_diag.member_month_count,0)=0 or py_diag.person_id is null
+       then 1 else 0 end                    as cold_start
 
-{# --- lag PMPM normalizations --- #}
+{# --- prediction-year RAW targets (amounts & counts) ---
 {% for col in paid_cols %}
-, case when coalesce(py_diag.member_month_count,0)=0
-       then 0
-       else coalesce(py_diag.{{ col }}, 0)/py_diag.member_month_count
-  end                                       as lag_pmpm_{{ col }}
+  {% if col != 'paid_amount' %}
+, coalesce(py.{{ col }}, 0)                    as prediction_year_{{ col }}
+  {% endif %}
 {% endfor %}
 
-{# --- lag PMPC normalizations --- #}
 {% for col in count_cols %}
-, case when coalesce(py_diag.member_month_count,0)=0
+  {% if col != 'member_month_count' %}
+, coalesce(py.{{ col }}, 0)                    as prediction_year_{{ col }}
+  {% endif %}
+{% endfor %} #}
+
+{# --- prediction-year PMPM/PMPC --- #}
+, case when coalesce(py.member_month_count,0)=0
        then 0
-       else coalesce(py_diag.{{ col }}, 0)/py_diag.member_month_count
-  end                                       as lag_pmpc_{{ col }}
+       else coalesce(py.paid_amount,0)/py.member_month_count
+  end                                          as prediction_year_pmpm_paid_amount
+
+{% for col in paid_cols %}
+  {% if col != 'paid_amount' %}
+, case when coalesce(py.member_month_count,0)=0
+       then 0
+       else coalesce(py.{{ col }}, 0)/py.member_month_count
+  end                                          as prediction_year_pmpm_{{ col }}
+  {% endif %}
 {% endfor %}
+
+{% for col in count_cols %}
+  {% if col != 'member_month_count' %}
+, case when coalesce(py.member_month_count,0)=0
+       then 0
+       else coalesce(py.{{ col }}, 0)/py.member_month_count
+  end                                          as prediction_year_pmpc_{{ col }}
+  {% endif %}
+{% endfor %}
+
 
 {# --- lag condition flags --- #}
 {% for col in cond_cols %}
@@ -79,6 +98,8 @@ select
 {% for col in hcc_cols %}
 , coalesce(py_diag.{{ col }}, 0)            as lag_{{ col }}
 {% endfor %}
+
+
 
 from {{ ref('benchmarks__person_year') }} py
 left join {{ ref('benchmarks__person_year') }} py_diag
