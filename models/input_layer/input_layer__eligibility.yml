@@ -384,7 +384,7 @@ models:
                 meta:
                   dqi_test_description: "https://resdac.org/cms-data/variables/medicare-status-code-january"
       - name: group_id
-        description: '{{ doc("first_name") }}'
+        description: '{{ doc("group_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
@@ -392,7 +392,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: group_name
-        description: '{{ doc("first_name") }}'
+        description: '{{ doc("group_name") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
@@ -538,7 +538,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: file_date
-        description: '{{ doc("file_name") }}'
+        description: '{{ doc("file_date") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']

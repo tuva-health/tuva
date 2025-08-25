@@ -1,14 +1,17 @@
 name: tuva_internal_dbt_v1.9.4
 on:
-  workflow_dispatch:
   pull_request:
     branches:
       - main
+      - 'minor-release*'
+      - 'release*'
+  workflow_dispatch:  # for manual triggering
 
 concurrency:
-  # Group by workflow and ref, cancel ongoing runs for the same PR/branch
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Ensure only one instance of this workflow runs across all PRs to prevent database conflicts
+  group: ci-testing
+  # Don't cancel in-progress runs automatically
+  cancel-in-progress: false
 
 env:
   PYTHON_VERSION: '3.11'

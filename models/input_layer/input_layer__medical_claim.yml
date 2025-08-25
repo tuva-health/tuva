@@ -4,10 +4,10 @@ models:
     description: >
       Mapping check to make sure all columns are mapped appropriately into the input
       layer.
-      The medical_claim table contains information on healthcare services and  supplies
-      provided to patients, billed by providers, and paid for by health  insurers.
-      It includes information on the provider who rendered the  service, the amount
-      paid for the service by the health insurer, and the  underlying reason for the
+      The medical_claim table contains information on healthcare services and supplies
+      provided to patients, billed by providers, and paid for by health insurers.
+      It includes information on the provider who rendered the service, the amount
+      paid for the service by the health insurer, and the underlying reason for the
       service (i.e. diagnosis).
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -107,7 +107,7 @@ models:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
           - accepted_values:
-              values: ['professional', 'institutional', 'undetermined']
+              values: ['professional', 'institutional', 'vision', 'dental', 'undetermined']
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
               config:
                 severity: warn
@@ -623,6 +623,15 @@ models:
                 meta:
                   dqi_test_description: "Procedure code should not be null on professional
                     claims. "
+          - dbt_expectations.expect_column_value_lengths_to_equal:
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_financial_pmpm',
+                'dqi_quality_measures']
+              value: 5
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                meta:
+                  dqi_test_description: "If not null, procedure code should be five characters in length."
       - name: hcpcs_modifier_1
         description: '{{ doc("hcpcs_modifier_1") }}'
         tests:
@@ -798,7 +807,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ed_classification', 'dqi_financial_pmpm']
               config:
@@ -819,7 +828,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ed_classification', 'dqi_financial_pmpm']
               config:
@@ -834,7 +843,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_ed_classification']
               config:
@@ -849,7 +858,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -864,7 +873,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -879,7 +888,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -894,7 +903,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -1857,7 +1866,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
-              values: ['icd-10-pcs', 'icd-9-pcs', 'hcpcs_level_2']
+              values: ['icd-10-pcs', 'icd-9-pcs']
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
                 severity: warn
@@ -2449,7 +2458,7 @@ models:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: file_date
-        description: ''
+        description: '{{ doc("file_date") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
