@@ -25,7 +25,8 @@
 {% endfor %}
 
 select
-  py.person_id
+  py.benchmark_key
+, py.person_id
 , py.payer
 , py.plan
 , py.data_source
