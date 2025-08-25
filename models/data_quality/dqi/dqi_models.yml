@@ -3,35 +3,6 @@ models:
 
 #### Data Quality
 ## Final
-
-  - name: data_quality__testing_summary
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: testing_summary
-      tags:
-        - data_quality
-  - name: data_quality__exploratory_charts
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: exploratory_charts
-      tags:
-        - data_quality
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - DATA_QUALITY_CATEGORY
-            - GRAPH_NAME
-            - LEVEL_OF_DETAIL
-            - Y_AXIS
-            - X_AXIS
-          config:
-            severity: error
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-
   - name: data_quality__data_quality_detail
     config:
       schema: |
