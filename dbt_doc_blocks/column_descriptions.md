@@ -98,6 +98,10 @@ Billing provider tax identification number (TIN).
 The birth date of the patient.
 {% enddocs %}
 
+{% docs body_site %}
+The body site where the vaccine was administered.
+{% enddocs %}
+
 {% docs ccs_category %}
 The Clinical Classifications Software (CCS) category code for the diagnosis or procedure.
 {% enddocs %}
@@ -442,6 +446,10 @@ The CPT or HCPCS code representing the procedure or service provided. These code
 5th modifier for HCPCS code.
 {% enddocs %}
 
+{% docs immunization_id %}
+Unique identifier for each immunization.
+{% enddocs %}
+
 {% docs in_network_flag %}
 Flag indicating if the claim was in or out of network.
 {% enddocs %}
@@ -496,6 +504,10 @@ Unique identifier for each location.
 
 {% docs longitude %}
 The longitude of the record (e.g., facility location, patient, etc).
+{% enddocs %}
+
+{% docs lot_number %}
+Lot number of the vaccine product.
 {% enddocs %}
 
 {% docs mapping_method %}
@@ -618,6 +630,10 @@ The normalized type of code for the component.
 Normalized description of the code.
 {% enddocs %}
 
+{% docs normalized_dose %}
+Normalized quantity of vaccine product that was administered.
+{% enddocs %}
+
 {% docs normalized_reference_range_high %}
 The normalized high end of the reference range.
 {% enddocs %}
@@ -648,6 +664,10 @@ Unique identifier for each observation in the dataset.
 
 {% docs observation_type %}
 Type of observation.
+{% enddocs %}
+
+{% docs occurrence_date %}
+Date the event occured or was to be occured.
 {% enddocs %}
 
 {% docs old_encounter_id %}
@@ -903,7 +923,7 @@ Revenue center description.
 {% enddocs %}
 
 {% docs route %}
-The route used to administer the medication.
+The route used to administer the medication and/or vaccine.
 {% enddocs %}
 
 {% docs rxnorm_code %}
@@ -974,6 +994,10 @@ Description of the source code for the component in the source system.
 Description of the source code in the source system.
 {% enddocs %}
 
+{% docs source_dose %}
+The quantity of vaccine product that was administered.
+{% enddocs %}
+
 {% docs source_model %}
 Indicates the DBT source relation name from which data is derived.
 {% enddocs %}
@@ -1012,6 +1036,10 @@ The state of the record (e.g., facility location, patient, etc).
 
 {% docs status %}
 Status of the record (e.g., condition, test, etc).
+{% enddocs %}
+
+{% docs status_reason %}
+Indicates reason the event was not performed. (e.g., condition, test, immunization etc).
 {% enddocs %}
 
 {% docs strength %}
