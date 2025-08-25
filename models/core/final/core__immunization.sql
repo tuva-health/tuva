@@ -31,32 +31,32 @@ select
          when cvx.cvx is not null then 'automatic'
          end as mapping_method
     , coalesce(immunization_status.status, immune.status) as status
-    , coalesce(immunization_status_reason.description ,immune.status_reason) as status_reason
+    , coalesce(immunization_status_reason.description, immune.status_reason) as status_reason
     , immune.occurrence_date
     , immune.source_dose
     , immune.normalized_dose
     , immune.lot_number
-    , coalesce(act_site.description,immune.body_site) as body_site
-    , coalesce(immunization_route.description,immune.route) as route
+    , coalesce(act_site.description, immune.body_site) as body_site
+    , coalesce(immunization_route.description, immune.route) as route
     , immune.location_id
     , immune.practitioner_id
     , immune.data_source
     , immune.tuva_last_run
 from {{ ref('core__stg_clinical_immunization') }} as immune
-left join {{ ref('terminology__cvx') }} as cvx
+left outer join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
         and immune.source_code = cvx.cvx
-left join {{ ref('terminology__immunization_status') }} as immunization_status
+left outer join {{ ref('terminology__immunization_status') }} as immunization_status
     on immune.status = immunization_status.status_code
-left join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason
+left outer join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason
     on immune.status_reason = immunization_status_reason.reason_code
         and (
         immunization_status_reason.code_type = 'actreason' or
         immunization_status_reason.code_type = 'snomed-ct'
         )
-left join {{ ref('terminology__act_site') }} as act_site
+left outer join {{ ref('terminology__act_site') }} as act_site
     on immune.body_site = act_site.body_code
-left join {{ ref('terminology__immunization_route_code') }} as immunization_route
+left outer join {{ ref('terminology__immunization_route_code') }} as immunization_route
     on immune.route = immunization_route.route_code
 
  {% else %}
@@ -89,34 +89,34 @@ select
         when coalesce(custom_mapped.normalized_code,custom_mapped.normalized_description) is not null then 'custom'
         end as mapping_method
     , coalesce(immunization_status.status, immune.status) as status
-    , coalesce(immunization_status_reason.description ,immune.status_reason) as status_reason
+    , coalesce(immunization_status_reason.description, immune.status_reason) as status_reason
     , immune.occurrence_date
     , immune.source_dose
     , immune.normalized_dose
     , immune.lot_number
-    , coalesce(act_site.description,immune.body_site) as body_site
-    , coalesce(immunization_route.description,immune.route) as route
+    , coalesce(act_site.description, immune.body_site) as body_site
+    , coalesce(immunization_route.description, immune.route) as route
     , immune.location_id
     , immune.practitioner_id
     , immune.data_source
     , immune.tuva_last_run
 From  {{ ref('core__stg_clinical_immunization') }} as immune
-left join {{ ref('terminology__cvx') }} as cvx
+left outer join {{ ref('terminology__cvx') }} as cvx
     on immune.source_code_type = 'cvx'
         and immune.source_code = cvx.cvx
-left join {{ ref('terminology__immunization_status') }} as immunization_status
+left outer join {{ ref('terminology__immunization_status') }} as immunization_status
     on immune.status = immunization_status.status_code
-left join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason
+left outer join {{ ref('terminology__immunization_status_reason') }} as immunization_status_reason
     on immune.status_reason = immunization_status_reason.reason_code
         and (
         immunization_status_reason.code_type = 'actreason' or
         immunization_status_reason.code_type = 'snomed-ct'
         )
-left join {{ ref('terminology__act_site') }} as act_site
+left outer join {{ ref('terminology__act_site') }} as act_site
     on immune.body_site = act_site.body_code
-left join {{ ref('terminology__immunization_route_code') }} as immunization_route
+left outer join {{ ref('terminology__immunization_route_code') }} as immunization_route
     on immune.route = immunization_route.route_code
-left join {{ ref('custom_mapped') }} custom_mapped
+left outer join {{ ref('custom_mapped') }} custom_mapped
     on  ( lower(immune.source_code_type) = lower(custom_mapped.source_code_type)
         or ( immune.source_code_type is null and custom_mapped.source_code_type is null)
         )
