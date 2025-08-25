@@ -3,7 +3,7 @@ version: 2
 models:
 # claim input models
   - name: eligibility
-    description: Created from seed or source data depending on test_data_override variable.
+    description: Created from seed or source data depending on use_synthetic_data variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
@@ -12,7 +12,7 @@ models:
       materialized: table
 
   - name: medical_claim
-    description: Created from seed or source data depending on test_data_override variable.
+    description: Created from seed or source data depending on use_synthetic_data variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
@@ -21,7 +21,7 @@ models:
       materialized: table
 
   - name: pharmacy_claim
-    description: Created from seed or source data depending on test_data_override variable.
+    description: Created from seed or source data depending on use_synthetic_data variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
@@ -30,7 +30,7 @@ models:
       materialized: table
 
   - name: provider_attribution
-    description: Created from seed or source data depending on test_data_override variable.
+    description: Created from seed or source data depending on use_synthetic_data variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
@@ -40,6 +40,14 @@ models:
 
 
 # clinical input models
+  - name: appointment
+    description: Created from seed or source data depending on test_data_override variable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
+        {% else %}input_layer{%- endif -%}
+      materialized: table
+
   - name: condition
     description: Created using empty table logic.
     config:
@@ -55,9 +63,17 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
       materialized: table
+      
+  - name: immunization
+    description: Created from seed or source data depending on use_synthetic_data variable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
+        {% else %}input_layer{%- endif -%}
+      materialized: table
 
   - name: lab_result
-    description: Created from seed or source data depending on test_data_override variable.
+    description: Created from seed or source data depending on use_synthetic_data variable.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
