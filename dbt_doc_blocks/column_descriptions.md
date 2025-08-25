@@ -1195,9 +1195,8 @@ The name suffixes (e.g., Sr., Jr.)
 {% enddocs %}
 
 {% docs middle_name %}
-The middle name of the healthcare provider.
+The middle name of the patient.
 {% enddocs %}
-
 {% docs email%}
 The email for the patient
 {% enddocs %}
