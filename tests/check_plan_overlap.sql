@@ -10,37 +10,37 @@
 }}
 
 with plan_counts as (
-    select 
-        plan,
-        sum(case when source_table = 'pharmacy_claim' then 1 else 0 end) as in_pharmacy_claim,
-        sum(case when source_table = 'medical_claim' then 1 else 0 end) as in_medical_claim,
-        sum(case when source_table = 'eligibility' then 1 else 0 end) as in_eligibility
+    select
+        plan
+        , sum(case when source_table = 'pharmacy_claim' then 1 else 0 end) as in_pharmacy_claim
+        , sum(case when source_table = 'medical_claim' then 1 else 0 end) as in_medical_claim
+        , sum(case when source_table = 'eligibility' then 1 else 0 end) as in_eligibility
     from (
         select distinct plan, 'pharmacy_claim' as source_table
         from {{ ref('pharmacy_claim') }}
         where plan is not null
-        
+
         union all
-        
+
         select distinct plan, 'medical_claim' as source_table
         from {{ ref('medical_claim') }}
         where plan is not null
-        
+
         union all
-        
+
         select distinct plan, 'eligibility' as source_table
         from {{ ref('eligibility') }}
         where plan is not null
-    ) all_plans
+    ) as all_plans
     group by plan
-),
+)
 
-incomplete_overlap as (
-    select 
-        plan,
-        in_pharmacy_claim,
-        in_medical_claim,
-        in_eligibility
+, incomplete_overlap as (
+    select
+        plan
+        , in_pharmacy_claim
+        , in_medical_claim
+        , in_eligibility
     from plan_counts
     where in_eligibility > 0 and not (in_pharmacy_claim > 0 and in_medical_claim > 0)
 )
