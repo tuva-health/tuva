@@ -181,6 +181,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+          - relationships:
+              to: ref('reference_data__ansi_fips_state')
+              field: ANSI_FIPS_STATE_ABBREVIATION
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: zip_code
         description: '{{ doc("zip_code") }}'
         tests:
