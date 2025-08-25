@@ -7,8 +7,7 @@
 with agg_cte as (
     {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
     select * From {{ref('normalize__stg_unmapped_appointment')}} union all
-    select * From {{ref('normalize__stg_unmapped_lab_result_component')}} union all
-    select * From {{ref('normalize__stg_unmapped_lab_result_order')}} union all
+    select * From {{ref('normalize__stg_unmapped_lab_result')}} union all
     select * From {{ref('normalize__stg_unmapped_medication')}} union all
     select * From {{ref('normalize__stg_unmapped_observation')}} union all
     {%- endif %}
