@@ -40,6 +40,14 @@ models:
 
 
 # clinical input models
+  - name: appointment
+    description: Created from seed or source data depending on test_data_override variable.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
+        {% else %}input_layer{%- endif -%}
+      materialized: table
+
   - name: condition
     description: Created using empty table logic.
     config:
