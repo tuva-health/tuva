@@ -21,4 +21,8 @@ select distinct
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__stg_eligibility') }} as elig
 left outer join {{ ref('reference_data__ansi_fips_state') }} as ansi
-  on trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_code))
+  on (
+       trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_abbreviation))
+    or trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_code))
+    or trim(lower(elig.state)) = trim(lower(ansi.ansi_fips_state_name))
+  )
