@@ -399,8 +399,24 @@ models:
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: name_suffix
+        description: '{{ doc("name_suffix") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
       - name: first_name
         description: '{{ doc("first_name") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: middle_name
+        description: '{{ doc("middle_name") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi']
@@ -485,6 +501,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - relationships:
+              to: ref('reference_data__ansi_fips_state')
+              field: ansi_fips_state_abbreviation
+              tags: ['tuva_dqi_sev_5', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: zip_code
         description: '{{ doc("zip_code") }}'
         tests:
@@ -514,18 +537,34 @@ models:
               tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: email
+        description: '{{ doc("email") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: ethnicity
+        description: '{{ doc("ethnicity") }}'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi']
+              config:
+                severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
+              tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm' ]
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - the_tuva_project.warn_if_null_percentage_above_zero:
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
+              tags: [ 'tuva_dqi_sev_5', 'dqi' ]
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"

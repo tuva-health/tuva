@@ -46,6 +46,14 @@ The total amount allowed (includes amount paid by the insurer and patient).
 Indicates whether ambulance services were utilized during the encounter (1 for yes, 0 for no).
 {% enddocs %}
 
+{% docs appointment_id %}
+Unique identifier for the appointment.
+{% enddocs %}
+
+{% docs appointment_specialty %}
+Specialty of a practitioner that would be required to perform the service requested in this appointment.
+{% enddocs %}
+
 {% docs apr_drg_code %}
 APR-DRG for the claim (inpatient claims only).
 {% enddocs %}
@@ -96,6 +104,14 @@ Billing provider tax identification number (TIN).
 
 {% docs birth_date %}
 The birth date of the patient.
+{% enddocs %}
+
+{% docs body_site %}
+The body site where the vaccine was administered.
+{% enddocs %}
+
+{% docs cancellation_reason %}
+Free text reason why the appointment was cancelled.
 {% enddocs %}
 
 {% docs ccs_category %}
@@ -168,6 +184,10 @@ The total coinsurance charged on the claim by the provider.
 
 {% docs collection_date %}
 Date the test was collected.
+{% enddocs %}
+
+{% docs collection_datetime %}
+Datetime the specimen was collected.
 {% enddocs %}
 
 {% docs condition_id %}
@@ -318,12 +338,20 @@ Indicates whether the patient is dually eligible for Medicare and Medicaid.
 A number assigned to duplicate rows for identification purposes.
 {% enddocs %}
 
+{% docs duration %}
+Number of minutes that the appointment or service is to take.
+{% enddocs %}
+
 {% docs ed_flag %}
 Indicates whether the encounter involved an emergency department visit (1 for yes, 0 for no).
 {% enddocs %}
 
 {% docs eligibility_id %}
 Unique identifier for each eligibility row in the table.
+{% enddocs %}
+
+{% docs email %}
+The email for the patient
 {% enddocs %}
 
 {% docs encounter_claim_number %}
@@ -362,6 +390,10 @@ Indicates the type of encounter e.g. acute inpatient, emergency department, etc.
 The end date of the service or claim period.
 {% enddocs %}
 
+{% docs end_datetime %}
+The end date/time of the appointment or service.
+{% enddocs %}
+
 {% docs enrollment_end_date %}
 Date the patient's insurance eligibility ended.
 {% enddocs %}
@@ -372,6 +404,10 @@ Flag indicating if the claim has corresponding enrollment during the same time p
 
 {% docs enrollment_start_date %}
 Date the patient's insurance eligibility began.
+{% enddocs %}
+
+{% docs ethnicity %}
+The ethnicity of the patient
 {% enddocs %}
 
 {% docs facility_id %}
@@ -438,6 +474,10 @@ The CPT or HCPCS code representing the procedure or service provided. These code
 5th modifier for HCPCS code.
 {% enddocs %}
 
+{% docs immunization_id %}
+Unique identifier for each immunization.
+{% enddocs %}
+
 {% docs in_network_flag %}
 Flag indicating if the claim was in or out of network.
 {% enddocs %}
@@ -494,6 +534,10 @@ Unique identifier for each location.
 The longitude of the record (e.g., facility location, patient, etc).
 {% enddocs %}
 
+{% docs lot_number %}
+Lot number of the vaccine product.
+{% enddocs %}
+
 {% docs mapping_method %}
 mapping method used to populate the normalized codes and descriptions.  Can be manual (fields were populated in input layer), automatic (dictionary codes matching the source code were found and was automatically populated) or custom (populated by normalization engine)
 {% enddocs %}
@@ -520,6 +564,10 @@ Identifier that links a patient to a particular insurance product or health plan
 
 {% docs member_month_key %}
 The unique combination of person_id, year_month, payer, plan, and data source.
+{% enddocs %}
+
+{% docs middle_name %}
+The middle name of the patient.
 {% enddocs %}
 
 {% docs min_closing_row %}
@@ -566,6 +614,10 @@ Description of the ms_drg_code.
 The name of the location.
 {% enddocs %}
 
+{% docs name_suffix %}
+The name suffixes (e.g., Sr., Jr., III.)
+{% enddocs %}
+
 {% docs ndc_code %}
 National drug code associated with the medication.
 {% enddocs %}
@@ -590,6 +642,26 @@ Indicates whether the newborn was admitted to the Neonatal Intensive Care Unit (
 Normalized abnormal flag.
 {% enddocs %}
 
+{% docs normalized_appointment_type_code %}
+Normalized appointment type code.
+{% enddocs %}
+
+{% docs normalized_appointment_type_description %}
+Normalized appointment type description.
+{% enddocs %}
+
+{% docs normalized_cancellation_reason_code_type %}
+The normalized type of code for the cancellation reason (e.g., appointment-cancellation-reason).
+{% enddocs %}
+
+{% docs normalized_cancellation_reason_code %}
+The normalized code for the cancellation reason.
+{% enddocs %}
+
+{% docs normalized_cancellation_reason_description %}
+Normalized description of the code for the cancellation reason.
+{% enddocs %}
+
 {% docs normalized_code %}
 The normalized code.
 {% enddocs %}
@@ -598,12 +670,36 @@ The normalized code.
 The normalized type of code.
 {% enddocs %}
 
-{% docs normalized_component %}
-The normalized component.
+{% docs normalized_component_code %}
+The normalized code for the component.
+{% enddocs %}
+
+{% docs normalized_component_description %}
+Normalized description of the code for the component.
+{% enddocs %}
+
+{% docs normalized_component_type %}
+The normalized type of code for the component.
 {% enddocs %}
 
 {% docs normalized_description %}
 Normalized description of the code.
+{% enddocs %}
+
+{% docs normalized_dose %}
+Normalized quantity of vaccine product that was administered.
+{% enddocs %}
+
+{% docs normalized_reason_code_type %}
+The normalized type of code for the appointment reason (e.g., icd-10-cm).
+{% enddocs %}
+
+{% docs normalized_reason_code %}
+The normalized code for the appointment reason (e.g., ICD-10 code).
+{% enddocs %}
+
+{% docs normalized_reason_description %}
+Normalized description of the code for the appointment reason (e.g., ICD-10 description).
 {% enddocs %}
 
 {% docs normalized_reference_range_high %}
@@ -612,6 +708,10 @@ The normalized high end of the reference range.
 
 {% docs normalized_reference_range_low %}
 The normalized low end of the reference range.
+{% enddocs %}
+
+{% docs normalized_status %}
+The normalized status of the appointment.
 {% enddocs %}
 
 {% docs normalized_units %}
@@ -636,6 +736,10 @@ Unique identifier for each observation in the dataset.
 
 {% docs observation_type %}
 Type of observation.
+{% enddocs %}
+
+{% docs occurrence_date %}
+Date the event occured or was to be occured.
 {% enddocs %}
 
 {% docs old_encounter_id %}
@@ -838,6 +942,10 @@ The units for the quantity.
 The patient's race.
 {% enddocs %}
 
+{% docs reason %}
+Free text reason for the appointment or service.
+{% enddocs %}
+
 {% docs recorded_date %}
 Date when the condition was recorded.
 {% enddocs %}
@@ -878,6 +986,10 @@ The result of the record (e.g., lab test, observation, etc).
 Date of the test result.
 {% enddocs %}
 
+{% docs result_datetime %}
+Datetime of the test result.
+{% enddocs %}
+
 {% docs revenue_center_code %}
 Revenue center code for the claim line (institutional only and typically multiple codes per claim).
 {% enddocs %}
@@ -887,7 +999,7 @@ Revenue center description.
 {% enddocs %}
 
 {% docs route %}
-The route used to administer the medication.
+The route used to administer the medication and/or vaccine.
 {% enddocs %}
 
 {% docs rxnorm_code %}
@@ -934,6 +1046,26 @@ The social security number of the patient.
 Indicates whether the result is abnormal or normal.
 {% enddocs %}
 
+{% docs source_appointment_type_code %}
+Appointment type code from the source.
+{% enddocs %}
+
+{% docs source_appointment_type_description %}
+Appointment type description from the source.
+{% enddocs %}
+
+{% docs source_cancellation_reason_code_type %}
+The type of code reported in the source system for the cancellation reason (e.g., appointment-cancellation-reason).
+{% enddocs %}
+
+{% docs source_cancellation_reason_code %}
+The code in the source system for the cancellation reason.
+{% enddocs %}
+
+{% docs source_cancellation_reason_description %}
+Description of the source code for the cancellation reason in the source system.
+{% enddocs %}
+
 {% docs source_code %}
 The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
 {% enddocs %}
@@ -942,12 +1074,24 @@ The code in the source system (e.g., the ICD-10 code, NDC, lab, etc)
 The type of code reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
 {% enddocs %}
 
-{% docs source_component %}
-The description for the component of the test from the source system.
+{% docs source_component_code %}
+The code for the component in the source system (e.g., the ICD-10 code, NDC, lab, etc)
+{% enddocs %}
+
+{% docs source_component_type %}
+The type of code for the component reported in the source system (e.g., ICD-10 code, NDC, lab, etc)
+{% enddocs %}
+
+{% docs source_component_description %}
+Description of the source code for the component in the source system.
 {% enddocs %}
 
 {% docs source_description %}
 Description of the source code in the source system.
+{% enddocs %}
+
+{% docs source_dose %}
+The quantity of vaccine product that was administered.
 {% enddocs %}
 
 {% docs source_model %}
@@ -958,12 +1102,28 @@ Indicates the DBT source relation name from which data is derived.
 The name of the source data model.
 {% enddocs %}
 
+{% docs source_reason_code_type %}
+The type of code reported in the source system for the appointment reason; typically a Condition (e.g., icd-10-cm).
+{% enddocs %}
+
+{% docs source_reason_code %}
+The code in the source system for the appointment reason (e.g., ICD-10 code).
+{% enddocs %}
+
+{% docs source_reason_description %}
+Description of the source code for the appointment reason in the source system (e.g., ICD-10 description).
+{% enddocs %}
+
 {% docs source_reference_range_high %}
 The high end of the reference range from the source system.
 {% enddocs %}
 
 {% docs source_reference_range_low %}
 The low end of the reference range from the source system.
+{% enddocs %}
+
+{% docs source_status %}
+Status of the appointment from the source system.
 {% enddocs %}
 
 {% docs source_units %}
@@ -982,12 +1142,20 @@ The type of specimen e.g. blood, plasma, urine.
 The start date of the service or claim period.
 {% enddocs %}
 
+{% docs start_datetime %}
+The start date/time of the appointment or service.
+{% enddocs %}
+
 {% docs state %}
 The state of the record (e.g., facility location, patient, etc).
 {% enddocs %}
 
 {% docs status %}
 Status of the record (e.g., condition, test, etc).
+{% enddocs %}
+
+{% docs status_reason %}
+Indicates reason the event was not performed. (e.g., condition, test, immunization etc).
 {% enddocs %}
 
 {% docs strength %}
@@ -1037,3 +1205,16 @@ Unique year-month of in the dataset computed from eligibility.
 {% docs zip_code %}
 The zip code of the record (e.g., facility location, patient, etc).
 {% enddocs %}
+
+{% docs fips_state_code %}
+FIPS code for the state the patient lives in (most recent known address).
+{% enddocs %}
+
+{% docs normalized_state_name %}
+State for the patient (most recent known address).
+{% enddocs%}
+
+{% docs fips_state_abbreviation %}
+Abbreviated form of the state for the patient (most recient known address).
+{% enddocs%}
+

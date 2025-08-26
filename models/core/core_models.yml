@@ -2,6 +2,126 @@ version: 2
 
 models:
 ## Final
+  - name: core__appointment
+    description: >
+      The core appointment table contains information related to appointments at 
+      a healthcare facility. This table may include canceled, completed, 
+      or scheduled events.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: appointment
+      tags: core
+      materialized: table
+    columns:
+      - name: appointment_id
+        description: '{{ doc("appointment_id") }}'
+        tests:
+          - unique:
+              config:
+                severity: warn
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+        tests:
+          - not_null
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: source_appointment_type_code
+        description: '{{ doc("source_appointment_type_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: source_appointment_type_description
+        description: '{{ doc("source_appointment_type_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: normalized_appointment_type_code
+        description: '{{ doc("normalized_appointment_type_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: normalized_appointment_type_description
+        description: '{{ doc("normalized_appointment_type_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: start_datetime
+        description: '{{ doc("start_datetime") }}'
+      - name: end_datetime
+        description: '{{ doc("end_datetime") }}'
+      - name: duration
+        description: '{{ doc("duration") }}'
+      - name: location_id
+        description: '{{ doc("location_id") }}'
+      - name: practitioner_id
+        description: '{{ doc("practitioner_id") }}'
+      - name: source_status
+        description: '{{ doc("source_status") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-status
+      - name: normalized_status
+        description: '{{ doc("normalized_status") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-status
+      - name: appointment_specialty
+        description: '{{ doc("appointment_specialty") }}'
+      - name: reason
+        description: '{{ doc("reason") }}'
+      - name: source_reason_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_reason_code
+        description: '{{ doc("source_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: source_reason_description
+        description: '{{ doc("source_reason_description") }}'
+      - name: normalized_reason_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_reason_code
+        description: '{{ doc("normalized_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: normalized_reason_description
+        description: '{{ doc("normalized_reason_description") }}'
+      - name: cancellation_reason
+        description: '{{ doc("cancellation_reason") }}'
+      - name: source_cancellation_reason_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_cancellation_reason_code
+        description: '{{ doc("source_cancellation_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: source_cancellation_reason_description
+        description: '{{ doc("source_cancellation_reason_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: normalized_cancellation_reason_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_cancellation_reason_code
+        description: '{{ doc("normalized_cancellation_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: normalized_cancellation_reason_description
+        description: '{{ doc("normalized_cancellation_reason_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: mapping_method
+        description: '{{ doc("mapping_method") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
+
   - name: core__condition
     description: >
       The core condition table contains information related to medical  conditions
@@ -138,6 +258,12 @@ models:
       description: '{{ doc("medicare_status_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/medicare-status
+    - name: fips_state_code
+      description: '{{ doc("fips_state_code") }}'
+    - name: normalized_state_name
+      description: '{{ doc("normalized_state_name") }}'
+    - name: fips_state_abbreviation
+      description: '{{ doc("fips_state_abbreviation") }}'
     - name: subscriber_relation
       description: '{{ doc("subscriber_relation") }}'
     - name: group_id
@@ -163,8 +289,8 @@ models:
         {% else %}core{%- endif -%}
       alias: encounter
       tags:
-      - core
-      - encounters
+        - core
+        - encounters
       materialized: table
     columns:
     - name: encounter_id
@@ -295,10 +421,86 @@ models:
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
+  - name: core__immunization
+    description: >
+      The immunization table contains information on immunizations administered to patients,
+      including the vaccine code, description, and administration date.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: immunization
+      tags: core
+      materialized: table
+    columns:
+    - name: immunization_id
+      description: '{{ doc("immunization_id") }}'
+      tests:
+        - unique:
+            config:
+              severity: warn
+    - name: person_id
+      description: '{{ doc("person_id") }}'
+      tests:
+        - not_null
+    - name: patient_id
+      description: '{{ doc("patient_id") }}'
+    - name: encounter_id
+      description: '{{ doc("encounter_id") }}'
+    - name: source_code_type
+      description: '{{ doc("source_code_type") }}'
+      meta:
+        terminology: https://thetuvaproject.com/terminology/code-type
+    - name: source_code
+      description: '{{ doc("source_code") }}'
+      meta:
+        terminology: https://thetuvaproject.com/terminology/cvx
+        terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+    - name: source_description
+      description: '{{ doc("source_description") }}'
+    - name: normalized_code_type
+      description: '{{ doc("normalized_code_type") }}'
+      meta:
+        terminology: https://thetuvaproject.com/terminology/code-type
+    - name: normalized_code
+      description: '{{ doc("normalized_code") }}'
+      meta:
+        terminology: https://thetuvaproject.com/terminology/cvx
+        terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+    - name: normalized_description
+      description: '{{ doc("normalized_description") }}'
+    - name: mapping_method
+      description: '{{ doc("mapping_method") }}'
+    - name: status
+      description: '{{ doc("status") }}'
+    - name: status_reason
+      description: '{{ doc("status_reason") }}'
+    - name: occurrence_date
+      description: '{{ doc("occurrence_date") }}'
+    - name: source_dose
+      description: '{{ doc("source_dose") }}'
+    - name: normalized_dose
+      description: '{{ doc("normalized_dose") }}'
+    - name: lot_number
+      description: '{{ doc("lot_number") }}'
+    - name: body_site
+      description: '{{ doc("body_site") }}'
+    - name: route
+      description: '{{ doc("route") }}'
+    - name: location_id
+      description: '{{ doc("location_id") }}'
+    - name: practitioner_id
+      description: '{{ doc("practitioner_id") }}'
+    - name: data_source
+      description: '{{ doc("data_source") }}'
+    - name: tuva_last_run
+      description: '{{ doc("tuva_last_run") }}'
+
   - name: core__lab_result
     description: >
       The lab result table contains information about lab test results,
-      including the LOINC code and description, units, reference range, and result.
+      including the LOINC code and description, units, reference range, 
+      and result.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
@@ -323,48 +525,56 @@ models:
       description: '{{ doc("encounter_id") }}'
     - name: accession_number
       description: '{{ doc("accession_number") }}'
-    - name: source_code_type
+    - name: source_order_type
       description: '{{ doc("source_code_type") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/code-type
-    - name: source_code
+    - name: source_order_code
       description: '{{ doc("source_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-    - name: source_description
+    - name: source_order_description
       description: '{{ doc("source_description") }}'
-    - name: source_component
-      description: '{{ doc("source_component") }}'
+    - name: source_component_type
+      description: '{{ doc("source_component_type") }}'
+    - name: source_component_code
+      description: '{{ doc("source_component_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-    - name: normalized_code_type
+    - name: source_component_description
+      description: '{{ doc("source_component_description") }}'
+    - name: normalized_order_type
       description: '{{ doc("normalized_code_type") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/code-type
-    - name: normalized_code
+    - name: normalized_order_code
       description: '{{ doc("normalized_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
-    - name: normalized_description
+    - name: normalized_order_description
       description: '{{ doc("normalized_description") }}'
     - name: mapping_method
       description: '{{ doc("mapping_method") }}'
-    - name: normalized_component
-      description: '{{ doc("normalized_component") }}'
+    - name: normalized_component_type
+      description: '{{ doc("normalized_component_type") }}'
+    - name: normalized_component_code
+      description: '{{ doc("normalized_component_code") }}'
       meta:
         terminology: https://thetuvaproject.com/terminology/loinc
         terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+    - name: normalized_component_description
+      description: '{{ doc("normalized_component_description") }}'
     - name: status
       description: '{{ doc("status") }}'
     - name: result
       description: '{{ doc("result") }}'
-    - name: result_date
-      description: '{{ doc("result_date") }}'
-    - name: collection_date
-      description: '{{ doc("collection_date") }}'
+    - name: result_datetime
+      description: '{{ doc("result_datetime") }}'
+    - name: collection_datetime
+      description: '{{ doc("collection_datetime") }}'
     - name: source_units
       description: '{{ doc("source_units") }}'
     - name: normalized_units
@@ -449,20 +659,23 @@ models:
         {% else %}core{%- endif -%}
       alias: medical_claim
       tags:
-      - core
-      - encounters
+        - core
+        - encounters
       materialized: table
     columns:
     - name: medical_claim_id
       description: '{{ doc("medical_claim_id") }}'
       tests:
-        - unique:
-            config:
-              severity: error
+        - unique
+        - not_null
     - name: claim_id
       description: '{{ doc("claim_id") }}'
+      tests:
+        - not_null
     - name: claim_line_number
       description: '{{ doc("claim_line_number") }}'
+      tests:
+        - not_null
       data_type: integer
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
@@ -626,6 +839,10 @@ models:
       description: '{{ doc("data_source") }}'
     - name: file_date
       description: '{{ doc("file_date") }}'
+      tests:
+        - not_null
+    - name: file_date
+      description: '{{ doc("file_date") }}'
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
@@ -720,8 +937,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: member_months
-      tags:
-      - core
+      tags: core
       materialized: table
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -869,8 +1085,12 @@ models:
       - name: death_flag
         description: '{{ doc("death_flag") }}'
         data_type: integer
+      - name: name_suffix
+        description: '{{ doc("name_suffix") }}'
       - name: first_name
         description: '{{ doc("first_name") }}'
+      - name: middle_name
+        description: '{{ doc("middle_name") }}'
       - name: last_name
         description: '{{ doc("last_name") }}'
       - name: social_security_number
@@ -891,6 +1111,12 @@ models:
         description: '{{ doc("longitude") }}'
       - name: phone
         description: '{{ doc("phone") }}'
+      - name: email
+        description: '{{ doc("email") }}'
+      - name: ethnicity
+        description: '{{ doc("ethnicity") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/ethnicity
       - name: age
         description: '{{ doc("age") }}'
       - name: age_group
@@ -949,13 +1175,16 @@ models:
       - name: pharmacy_claim_id
         description: '{{ doc("pharmacy_claim_id") }}'
         tests:
-          - unique:
-              config:
-                severity: error
+          - unique
+          - not_null
       - name: claim_id
         description: '{{ doc("claim_id") }}'
+        tests:
+          - not_null
       - name: claim_line_number
         description: '{{ doc("claim_line_number") }}'
+        tests:
+          - not_null
         data_type: integer
       - name: person_id
         description: '{{ doc("person_id") }}'
@@ -1020,6 +1249,10 @@ models:
         description: '{{ doc("member_month_key") }}'
       - name: data_source
         description: '{{ doc("data_source") }}'
+      - name: file_date
+        description: '{{ doc("file_date") }}'
+        tests:
+          - not_null
       - name: file_date
         description: '{{ doc("file_date") }}'
       - name: tuva_last_run
@@ -1160,6 +1393,7 @@ models:
         {% else %}core{%- endif -%}
       alias: _stg_claims_medical_claim
       tags: 
+        - core
         - core_stage_claims
         - encounters
       materialized: table
@@ -1171,7 +1405,8 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_encounter
-      tags: 
+      tags:
+        - core
         - core_stage_claims
         - encounters
       materialized: table
@@ -1183,7 +1418,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_location
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: table
 
   - name: core__stg_claims_member_months
@@ -1193,7 +1430,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_member_months
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: view
   
   - name: core__stg_claims_patient
@@ -1203,7 +1442,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_patient
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: table
 
   - name: core__stg_claims_condition
@@ -1213,7 +1454,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_condition
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: table
 
   - name: core__stg_claims_procedure
@@ -1223,7 +1466,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_procedure
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_ stage_claims
       materialized: table
 
   - name: core__stg_claims_pharmacy_claim
@@ -1233,7 +1478,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_pharmacy_claim
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: table
 
   - name: core__stg_claims_eligibility
@@ -1243,7 +1490,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_eligibility
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: table
 
   - name: core__stg_claims_practitioner
@@ -1253,10 +1502,24 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_claims_practitioner
-      tags: core_stage_claims
+      tags:
+        - core
+        - core_stage_claims
       materialized: table
 
 ## Staging - Clinical
+  - name: core__stg_clinical_appointment
+    description: Staging core clinical appointments
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _stg_clinical_appointment
+      tags:
+        - core
+        - core_stage_clinical
+      materialized: view
+
   - name: core__stg_clinical_condition
     description: Staging core clinical conditions
     config:
@@ -1264,7 +1527,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_condition
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_encounter
@@ -1274,6 +1539,18 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_encounter
+      tags:
+        - core
+        - core_stage_clinical
+      materialized: view
+
+  - name: core__stg_clinical_immunization
+    description: Staging core clinical immunization
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
+        {% else %}core{%- endif -%}
+      alias: _stg_clinical_immunization
       tags: core_stage_clinical
       materialized: view
 
@@ -1284,7 +1561,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_lab_result
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_location
@@ -1294,7 +1573,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_location
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_medication
@@ -1304,7 +1585,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_medication
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_observation
@@ -1314,7 +1597,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_observation
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_patient
@@ -1324,7 +1609,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_patient
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_practitioner
@@ -1334,7 +1621,9 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_practitioner
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
 
   - name: core__stg_clinical_procedure
@@ -1344,5 +1633,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_core
         {% else %}core{%- endif -%}
       alias: _stg_clinical_procedure
-      tags: core_stage_clinical
+      tags:
+        - core
+        - core_stage_clinical
       materialized: view
