@@ -15,7 +15,7 @@ models:
       - name: appointment_id
         description: '{{ doc("appointment_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: error
@@ -33,7 +33,7 @@ models:
       - name: person_id
         description: '{{ doc("person_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -46,7 +46,7 @@ models:
       - name: patient_id
         description: '{{ doc("patient_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi' ]
               config:
                 severity: warn
@@ -59,7 +59,7 @@ models:
       - name: encounter_id
         description: '{{ doc("encounter_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -67,7 +67,7 @@ models:
       - name: source_appointment_type_code
         description: '{{ doc("source_appointment_type_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -80,7 +80,7 @@ models:
       - name: source_appointment_type_description
         description: '{{ doc("source_appointment_type_description") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -93,7 +93,7 @@ models:
       - name: normalized_appointment_type_code
         description: '{{ doc("normalized_appointment_type_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -101,7 +101,7 @@ models:
       - name: normalized_appointment_type_description
         description: '{{ doc("normalized_appointment_type_description") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -109,7 +109,7 @@ models:
       - name: start_datetime
         description: '{{ doc("start_datetime") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -119,7 +119,7 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
+          - the_tuva_project.expect_column_values_to_be_in_type_list:
               column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
                 timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
                   with time zone, timestamp without time zone, datetime2, datetimeoffset ]
@@ -130,12 +130,12 @@ models:
       - name: end_datetime
         description: '{{ doc("end_datetime") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
+          - the_tuva_project.expect_column_values_to_be_in_type_list:
               column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
                 timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
                   with time zone, timestamp without time zone, datetime2, datetimeoffset ]
@@ -146,7 +146,7 @@ models:
       - name: duration
         description: '{{ doc("duration") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -154,7 +154,7 @@ models:
       - name: location_id
         description: '{{ doc("location_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -162,7 +162,7 @@ models:
       - name: practitioner_id
         description: '{{ doc("practitioner_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -170,7 +170,7 @@ models:
       - name: source_status
         description: '{{ doc("source_status") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -183,7 +183,7 @@ models:
       - name: normalized_status
         description: '{{ doc("normalized_status") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -191,7 +191,7 @@ models:
       - name: appointment_specialty
         description: '{{ doc("appointment_specialty") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -199,7 +199,7 @@ models:
       - name: reason
         description: '{{ doc("reason") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -207,7 +207,7 @@ models:
       - name: source_reason_code_type
         description: '{{ doc("source_code_type") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -220,7 +220,7 @@ models:
       - name: source_reason_code
         description: '{{ doc("source_reason_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -228,7 +228,7 @@ models:
       - name: source_reason_description
         description: '{{ doc("source_reason_description") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -236,7 +236,7 @@ models:
       - name: normalized_reason_code_type
         description: '{{ doc("normalized_code_type") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -249,7 +249,7 @@ models:
       - name: normalized_reason_code
         description: '{{ doc("normalized_reason_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -257,7 +257,7 @@ models:
       - name: normalized_reason_description
         description: '{{ doc("normalized_reason_description") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -265,7 +265,7 @@ models:
       - name: cancellation_reason
         description: '{{ doc("cancellation_reason") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -273,7 +273,7 @@ models:
       - name: source_cancellation_reason_code_type
         description: '{{ doc("source_code_type") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -286,7 +286,7 @@ models:
       - name: source_cancellation_reason_code
         description: '{{ doc("source_cancellation_reason_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -294,7 +294,7 @@ models:
       - name: source_cancellation_reason_description
         description: '{{ doc("source_cancellation_reason_description") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -302,7 +302,7 @@ models:
       - name: normalized_cancellation_reason_code_type
         description: '{{ doc("normalized_code_type") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -315,7 +315,7 @@ models:
       - name: normalized_cancellation_reason_code
         description: '{{ doc("normalized_cancellation_reason_code") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -323,7 +323,7 @@ models:
       - name: normalized_cancellation_reason_description
         description: '{{ doc("normalized_cancellation_reason_description") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -331,7 +331,7 @@ models:
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -339,7 +339,7 @@ models:
       - name: file_name
         description: '{{ doc("file_name") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
@@ -347,12 +347,12 @@ models:
       - name: ingest_datetime
         description: '{{ doc("ingest_datetime") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: [ 'tuva_dqi_sev_1', 'dqi', 'dqi_quality_measures' ]
               config:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
-          - dbt_expectations.expect_column_values_to_be_in_type_list:
+          - the_tuva_project.expect_column_values_to_be_in_type_list:
               column_type_list: [ date, datetime, time, timestamp, timestamp_ntz, timestampntz,
                 timestamp_ltz, timestampltz, timestamp_tz, timestamptz, timestamp
                   with time zone, timestamp without time zone, datetime2, datetimeoffset ]
