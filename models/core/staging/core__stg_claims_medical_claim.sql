@@ -105,6 +105,7 @@ select
     end as int) as enrollment_flag
     , enroll.member_month_key
     , cast(med.data_source as {{ dbt.type_string() }}) as data_source
+    , {{ try_to_cast_date('med.file_date', 'YYYY-MM-DD') }} as file_date
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('normalized_input__medical_claim') }} as med
 inner join {{ ref('service_category__service_category_grouper') }} as srv_group

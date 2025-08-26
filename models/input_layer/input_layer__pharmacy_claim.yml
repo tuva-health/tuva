@@ -4,8 +4,8 @@ models:
     description: >
       Mapping check to make sure all columns are mapped appropriately into the input
       layer.
-      The pharmacy_claim table includes information about retail and specialty  drug
-      prescriptions that have been filled by a patient, billed by a  pharmacy, and
+      The pharmacy_claim table includes information about retail and specialty drug
+      prescriptions that have been filled by a patient, billed by a pharmacy, and
       paid by an insurer.
     tests:
       - dbt_utils.unique_combination_of_columns:
@@ -199,7 +199,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
@@ -214,7 +214,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
@@ -229,7 +229,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
               config:
@@ -244,7 +244,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -259,7 +259,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:
@@ -274,7 +274,7 @@ models:
                 severity: warn
                 enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
           - dbt_expectations.expect_column_values_to_be_in_type_list:
-              column_type_list: [date, datetime, number, decimal, numeric, float,
+              column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
               config:

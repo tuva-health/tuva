@@ -37,6 +37,7 @@ select
   , cast(ansi.fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation
   , cast(elig.phone as {{ dbt.type_string() }}) as phone
   , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
+  , {{ try_to_cast_date('elig.file_date', 'YYYY-MM-DD') }} as file_date
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_string() }}) as tuva_last_run
 from {{ ref('normalized_input__stg_eligibility') }} as elig
 left outer join {{ ref('normalized_input__int_eligibility_dates_normalize') }} as date_norm

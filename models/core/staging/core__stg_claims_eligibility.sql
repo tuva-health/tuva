@@ -47,5 +47,6 @@ select
        , cast(fips_state_code as {{ dbt.type_string() }}) as fips_state_code
        , cast(fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation
        , cast(data_source as {{ dbt.type_string() }}) as data_source
+       , {{ try_to_cast_date('file_date', 'YYYY-MM-DD') }} as file_date
        , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('normalized_input__eligibility') }}
