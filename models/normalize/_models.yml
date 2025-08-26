@@ -22,6 +22,16 @@ models:
       tags: normalized
       materialized: view
 
+  - name: normalize__unmapped_appointment
+    description: unmapped appointment codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_appointment
+      tags: normalized
+      materialized: table
+
   - name: normalize__unmapped_condition
     description: unmapped condition codes
     config:
@@ -29,16 +39,16 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
         {% else %}normalize{%- endif -%}
       alias: unmapped_condition
-      tags: normalize
+      tags: normalized
       materialized: table
 
-  - name: normalize__unmapped_procedure
-    description: unmapped procedure codes
+  - name: normalize__unmapped_immunization
+    description: unmapped immunization codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
         {% else %}normalize{%- endif -%}
-      alias: unmapped_procedure
+      alias: unmapped_immunization
       tags: normalize
       materialized: table
 
@@ -72,26 +82,38 @@ models:
       tags: normalized
       materialized: table
 
+  - name: normalize__unmapped_procedure
+    description: unmapped procedure codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_procedure
+      tags: normalized
+      materialized: table
+
+# staging
+
+  - name: normalize__stg_unmapped_appointment
+    description: unmapped appointment codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
   - name: normalize__stg_unmapped_condition
     description: unmapped condition codes
     config:
       tags: normalized
       materialized: ephemeral
 
-  - name: normalize__stg_unmapped_procedure
-    description: unmapped procedure codes
+  - name: normalize__stg_unmapped_immunization
+    description: unmapped immunization codes
     config:
       tags: normalized
       materialized: ephemeral
 
-  - name: normalize__stg_unmapped_lab_result_component
-    description: unmapped lab result component codes
-    config:
-      tags: normalized
-      materialized: ephemeral
-
-  - name: normalize__stg_unmapped_lab_result_order
-    description: unmapped lab result order codes
+  - name: normalize__stg_unmapped_lab_result
+    description: unmapped lab result order and component codes
     config:
       tags: normalized
       materialized: ephemeral
@@ -104,6 +126,12 @@ models:
 
   - name: normalize__stg_unmapped_observation
     description: unmapped observation codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_procedure
+    description: unmapped procedure codes
     config:
       tags: normalized
       materialized: ephemeral
