@@ -6,7 +6,7 @@ select distinct
     m.data_source
     ,coalesce(cast(m.enrollment_start_date as {{ dbt.type_string() }}),cast('1900-01-01' as {{ dbt.type_string() }})) as source_date
     ,'ELIGIBILITY' as table_name
-    ,'Member ID | Enrollment Start Date' as drill_down_key
+    ,'Member ID' as drill_down_key
     ,coalesce(m.member_id, 'NULL') as drill_down_value
     ,'ELIGIBILITY' as claim_type
     ,'EMAIL' as field_name
