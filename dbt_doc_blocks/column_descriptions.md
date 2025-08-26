@@ -1198,10 +1198,23 @@ The name suffixes (e.g., Sr., Jr.)
 The middle name of the healthcare provider.
 {% enddocs %}
 
-{% docs email%}
+{% docs email %}
 The email for the patient
 {% enddocs %}
 
 {% docs ethnicity %}
 The ethnicity of the patient
 {% enddocs %}
+
+
+{% docs fips_state_code %}
+FIPS code for the state the patient lives in (most recent known address).
+{% enddocs %}
+
+{% docs normalized_state_name %}
+State for the patient (most recent known address).
+{% enddocs%}
+
+{% docs fips_state_abbreviation %}
+Abbreviated form of the state for the patient (most recient known address).
+{% enddocs%}
