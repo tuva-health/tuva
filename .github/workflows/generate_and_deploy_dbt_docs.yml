@@ -88,7 +88,7 @@ jobs:
         run: dbt debug --profiles-dir .dbt
 
       - name: dbt-build
-        run: dbt build --profiles-dir .dbt
+        run: dbt build --full-refresh --profiles-dir .dbt
 
       - name: dbt-docs-generate
         run: dbt docs generate --profiles-dir .dbt
