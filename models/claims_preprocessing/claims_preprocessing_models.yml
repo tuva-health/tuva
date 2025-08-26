@@ -172,8 +172,12 @@ models:
         description: '{{ doc("group_id") }}'
       - name: group_name
         description: '{{ doc("group_name") }}'
+      - name: name_suffix
+        description: Patient's name suffix (e.g. Jr., Sr., III, etc).
       - name: first_name
         description: Patient's first name.
+      - name: middle_name
+        description: Patient's middle name.
       - name: last_name
         description: Patient's last name.
       - name: social_security_number
@@ -196,6 +200,10 @@ models:
         description: Abbreviated form of the state for the patient (most recent known address).
       - name: phone
         description: Patient's phone number.
+      - name: email
+        description: Patient's email address.
+      - name: ethnicity
+        description: Patient's ethnicity
       - name: data_source
         description: >
           User-configured field that indicates the data source (e.g. typically 

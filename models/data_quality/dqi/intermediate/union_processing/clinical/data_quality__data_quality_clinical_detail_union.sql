@@ -680,7 +680,23 @@ select * from {{ ref('data_quality__patient_zip_code') }}
 
 union all
 
+select * from {{ ref('data_quality__patient_email') }}
+
+union all
+
+select * from {{ ref('data_quality__patient_ethnicity') }}
+
+union all
+
+select * from {{ ref('data_quality__patient_name_suffix') }}
+
+union all
+
 select * from {{ ref('data_quality__patient_first_name') }}
+
+union all
+
+select * from {{ ref('data_quality__patient_middle_name') }}
 
 union all
 

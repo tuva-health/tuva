@@ -350,6 +350,10 @@ Indicates whether the encounter involved an emergency department visit (1 for ye
 Unique identifier for each eligibility row in the table.
 {% enddocs %}
 
+{% docs email %}
+The email for the patient
+{% enddocs %}
+
 {% docs encounter_claim_number %}
 A unique identifier for the encounter or claim.
 {% enddocs %}
@@ -400,6 +404,10 @@ Flag indicating if the claim has corresponding enrollment during the same time p
 
 {% docs enrollment_start_date %}
 Date the patient's insurance eligibility began.
+{% enddocs %}
+
+{% docs ethnicity %}
+The ethnicity of the patient
 {% enddocs %}
 
 {% docs facility_id %}
@@ -558,6 +566,10 @@ Identifier that links a patient to a particular insurance product or health plan
 The unique combination of person_id, year_month, payer, plan, and data source.
 {% enddocs %}
 
+{% docs middle_name %}
+The middle name of the patient.
+{% enddocs %}
+
 {% docs min_closing_row %}
 The minimum row number for closing entries in the dataset.
 {% enddocs %}
@@ -600,6 +612,10 @@ Description of the ms_drg_code.
 
 {% docs name %}
 The name of the location.
+{% enddocs %}
+
+{% docs name_suffix %}
+The name suffixes (e.g., Sr., Jr., III.)
 {% enddocs %}
 
 {% docs ndc_code %}
@@ -1201,3 +1217,4 @@ State for the patient (most recent known address).
 {% docs fips_state_abbreviation %}
 Abbreviated form of the state for the patient (most recient known address).
 {% enddocs%}
+

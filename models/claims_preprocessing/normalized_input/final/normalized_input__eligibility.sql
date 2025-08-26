@@ -24,7 +24,9 @@ select
   , cast(elig.medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code
   , cast(elig.group_id as {{ dbt.type_string() }}) as group_id
   , cast(elig.group_name as {{ dbt.type_string() }}) as group_name
+  , cast(elig.name_suffix as {{ dbt.type_string() }}) as name_suffix
   , cast(elig.first_name as {{ dbt.type_string() }}) as first_name
+  , cast(elig.middle_name as {{ dbt.type_string() }}) as middle_name
   , cast(elig.last_name as {{ dbt.type_string() }}) as last_name
   , cast(elig.social_security_number as {{ dbt.type_string() }}) as social_security_number
   , cast(elig.subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation
@@ -36,6 +38,8 @@ select
   , cast(ansi.normalized_state_name as {{ dbt.type_string() }}) as normalized_state_name
   , cast(ansi.fips_state_abbreviation as {{ dbt.type_string() }}) as fips_state_abbreviation
   , cast(elig.phone as {{ dbt.type_string() }}) as phone
+  , cast(elig.email as {{ dbt.type_string() }}) as email
+  , cast(elig.ethnicity as {{ dbt.type_string() }}) as ethnicity
   , cast(elig.data_source as {{ dbt.type_string() }}) as data_source
   , {{ try_to_cast_date('elig.file_date', 'YYYY-MM-DD') }} as file_date
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_string() }}) as tuva_last_run
