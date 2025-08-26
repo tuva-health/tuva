@@ -1160,24 +1160,12 @@ models:
         - normalized_input
         - claims_preprocessing
 
-  - name: normalized_input__int_procedure_code_normalize
+  - name: normalized_input__int_procedure_code_intermediate
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_normalize
-      materialized: table
-      tags: 
-        - normalized_input
-        - claims_preprocessing
-
-
-  - name: normalized_input__int_procedure_code_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_voting
+      alias: _int_normalized_input_procedure_code_intermediate
       materialized: table
       tags: 
         - normalized_input
