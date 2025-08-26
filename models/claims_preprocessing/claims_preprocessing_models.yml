@@ -188,6 +188,12 @@ models:
         description: State the patient lives in (most recent known address)
       - name: zip_code
         description: Zip code the patient lives in (most recent known address).
+      - name: fips_state_code
+        description: FIPS code for the state the patient lives in (most recent known address).
+      - name: normalized_state_name
+        description: State for the patient (most recent known address).
+      - name: fips_state_abbreviation
+        description: Abbreviated form of the state for the patient (most recent known address).
       - name: phone
         description: Patient's phone number.
       - name: data_source
@@ -997,23 +1003,12 @@ models:
         - claims_preprocessing
 
 
-  - name: normalized_input__int_diagnosis_code_normalize
+  - name: normalized_input__int_diagnosis_code_intermediate
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_diagnosis_code_normalize
-      materialized: table
-      tags: 
-        - normalized_input
-        - claims_preprocessing
-
-  - name: normalized_input__int_diagnosis_code_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_diagnosis_code_voting
+      alias: _int_normalized_input_diagnosis_code_intermediate
       materialized: table
       tags: 
         - normalized_input
@@ -1165,24 +1160,12 @@ models:
         - normalized_input
         - claims_preprocessing
 
-  - name: normalized_input__int_procedure_code_normalize
+  - name: normalized_input__int_procedure_code_intermediate
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_normalize
-      materialized: table
-      tags: 
-        - normalized_input
-        - claims_preprocessing
-
-
-  - name: normalized_input__int_procedure_code_voting
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
-        {%- else -%}claims_preprocessing{%- endif -%}
-      alias: _int_normalized_input_procedure_code_voting
+      alias: _int_normalized_input_procedure_code_intermediate
       materialized: table
       tags: 
         - normalized_input
@@ -1262,6 +1245,14 @@ models:
   - name: normalized_input__stg_pharmacy_claim
     config:
       materialized: ephemeral
-      tags: 
+      tags:
+        - normalized_input
+        - claims_preprocessing
+
+
+  - name: normalized_input__int_eligibility_state_normalize
+    config:
+      materialized: ephemeral
+      tags:
         - normalized_input
         - claims_preprocessing

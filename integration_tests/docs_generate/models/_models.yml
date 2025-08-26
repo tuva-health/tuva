@@ -792,6 +792,118 @@ models:
         description: '{{ doc("data_source") }}'
 
 # Clinical input
+  - name: appointment
+    config:
+      database: tuva
+      schema: input_layer
+      tags: input_layer
+      materialized: table
+    description: >
+      The appointment table contains information related to appointments at a 
+      healthcare facility. This table may include canceled, completed, 
+      or scheduled events.
+    columns:
+      - name: appointment_id
+        description: '{{ doc("appointment_id") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: source_appointment_type_code
+        description: '{{ doc("source_appointment_type_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: source_appointment_type_description
+        description: '{{ doc("source_appointment_type_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: normalized_appointment_type_code
+        description: '{{ doc("normalized_appointment_type_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: normalized_appointment_type_description
+        description: '{{ doc("normalized_appointment_type_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-type
+      - name: start_datetime
+        description: '{{ doc("start_datetime") }}'
+      - name: end_datetime
+        description: '{{ doc("end_datetime") }}'
+      - name: duration
+        description: '{{ doc("duration") }}'
+      - name: location_id
+        description: '{{ doc("location_id") }}'
+      - name: practitioner_id
+        description: '{{ doc("practitioner_id") }}'
+      - name: source_status
+        description: '{{ doc("source_status") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-status
+      - name: normalized_status
+        description: '{{ doc("normalized_status") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-status
+      - name: appointment_specialty
+        description: '{{ doc("appointment_specialty") }}'
+      - name: reason
+        description: '{{ doc("reason") }}'
+      - name: source_reason_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_reason_code
+        description: '{{ doc("source_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: source_reason_description
+        description: '{{ doc("source_reason_description") }}'
+      - name: normalized_reason_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_reason_code
+        description: '{{ doc("normalized_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+          terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: normalized_reason_description
+        description: '{{ doc("normalized_reason_description") }}'
+      - name: cancellation_reason
+        description: '{{ doc("cancellation_reason") }}'
+      - name: source_cancellation_reason_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_cancellation_reason_code
+        description: '{{ doc("source_cancellation_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: source_cancellation_reason_description
+        description: '{{ doc("source_cancellation_reason_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: normalized_cancellation_reason_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_cancellation_reason_code
+        description: '{{ doc("normalized_cancellation_reason_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: normalized_cancellation_reason_description
+        description: '{{ doc("normalized_cancellation_reason_description") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/appointment-cancellation-reason
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: file_name
+        description: '{{ doc("file_name") }}'
+      - name: ingest_datetime
+        description: '{{ doc("ingest_datetime") }}'
+
   - name: condition
     config:
       database: tuva
@@ -948,6 +1060,75 @@ models:
       - name: ingest_datetime
         description: '{{ doc("ingest_datetime") }}'
 
+  - name: immunization
+    config:
+      database: tuva
+      schema: input_layer
+      tags: input_layer
+      materialized: table
+    description: >
+      The immunization table contains information on immunizations administered to patients,
+      including the vaccine code, description, and administration date.
+    columns:
+      - name: immunization_id
+        description: '{{ doc("immunization_id") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: patient_id
+        description: '{{ doc("patient_id") }}'
+      - name: encounter_id
+        description: '{{ doc("encounter_id") }}'
+      - name: source_code_type
+        description: '{{ doc("source_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: source_code
+        description: '{{ doc("source_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/cvx
+          terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+      - name: source_description
+        description: '{{ doc("source_description") }}'
+      - name: normalized_code_type
+        description: '{{ doc("normalized_code_type") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/code-type
+      - name: normalized_code
+        description: '{{ doc("normalized_code") }}'
+        meta:
+          terminology: https://thetuvaproject.com/terminology/cvx
+          terminology_note: '**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters.'
+      - name: normalized_description
+        description: '{{ doc("normalized_description") }}'
+      - name: mapping_method
+        description: '{{ doc("mapping_method") }}'
+      - name: status
+        description: '{{ doc("status") }}'
+      - name: status_reason
+        description: '{{ doc("status_reason") }}'
+      - name: occurrence_date
+        description: '{{ doc("occurrence_date") }}'
+      - name: source_dose
+        description: '{{ doc("source_dose") }}'
+      - name: normalized_dose
+        description: '{{ doc("normalized_dose") }}'
+      - name: lot_number
+        description: '{{ doc("lot_number") }}'
+      - name: body_site
+        description: '{{ doc("body_site") }}'
+      - name: route
+        description: '{{ doc("route") }}'
+      - name: location_id
+        description: '{{ doc("location_id") }}'
+      - name: practitioner_id
+        description: '{{ doc("practitioner_id") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: file_name
+        description: '{{ doc("file_name") }}'
+      - name: ingest_datetime
+        description: '{{ doc("ingest_datetime") }}'
+
   - name: lab_result
     config:
       database: tuva
@@ -969,46 +1150,54 @@ models:
         description: '{{ doc("encounter_id") }}'
       - name: accession_number
         description: '{{ doc("accession_number") }}'
-      - name: source_code_type
+      - name: source_order_type
         description: '{{ doc("source_code_type") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/code-type
-      - name: source_code
+      - name: source_order_code
         description: '{{ doc("source_code") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/loinc
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: source_description
+      - name: source_order_description
         description: '{{ doc("source_description") }}'
-      - name: source_component
-        description: '{{ doc("source_component") }}'
+      - name: source_component_type
+        description: '{{ doc("source_component_type") }}'
+      - name: source_component_code
+        description: '{{ doc("source_component_code") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/loinc
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: normalized_code_type
+      - name: source_component_description
+        description: '{{ doc("source_component_description") }}'
+      - name: normalized_order_type
         description: '{{ doc("normalized_code_type") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/code-type
-      - name: normalized_code
+      - name: normalized_order_code
         description: '{{ doc("normalized_code") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/loinc
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
-      - name: normalized_description
+      - name: normalized_order_description
         description: '{{ doc("normalized_description") }}'
-      - name: normalized_component
-        description: '{{ doc("normalized_component") }}'
+      - name: normalized_component_type
+        description: '{{ doc("normalized_component_type") }}'
+      - name: normalized_component_code
+        description: '{{ doc("normalized_component_code") }}'
         meta:
           terminology: https://thetuvaproject.com/terminology/loinc
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
+      - name: normalized_component_description
+        description: '{{ doc("normalized_component_description") }}'
       - name: status
         description: '{{ doc("status") }}'
       - name: result
         description: '{{ doc("result") }}'
-      - name: result_date
-        description: '{{ doc("result_date") }}'
-      - name: collection_date
-        description: '{{ doc("collection_date") }}'
+      - name: result_datetime
+        description: '{{ doc("result_datetime") }}'
+      - name: collection_datetime
+        description: '{{ doc("collection_datetime") }}'
       - name: source_units
         description: '{{ doc("source_units") }}'
       - name: normalized_units
