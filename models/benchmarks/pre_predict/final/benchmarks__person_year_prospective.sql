@@ -106,6 +106,6 @@ from {{ ref('benchmarks__person_year') }} py
 left join {{ ref('benchmarks__person_year') }} py_diag
   on py.person_id   = py_diag.person_id
  and py.payer       = py_diag.payer
- and py.plan        = py_diag.plan
+ and py.{{ quote_column('plan') }}        = py_diag.{{ quote_column('plan') }}
  and py.data_source = py_diag.data_source
  and py.year_nbr - 1 = py_diag.year_nbr
