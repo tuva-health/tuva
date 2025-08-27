@@ -38,10 +38,7 @@ models:
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - person_id
-            - payer
-            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
-            - year_nbr    
+            - benchmark_key  
 
   - name: benchmarks__pivot_condition
     description: |
