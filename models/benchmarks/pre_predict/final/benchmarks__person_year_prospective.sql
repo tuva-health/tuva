@@ -28,7 +28,7 @@ select
   py.benchmark_key
 , py.person_id
 , py.payer
-, py.plan
+, py.{{ quote_column('plan') }}
 , py.data_source
 , py.year_nbr                               as prediction_year
 , py_diag.year_nbr                          as diagnosis_year
