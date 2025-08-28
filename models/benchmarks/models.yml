@@ -75,7 +75,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
         {%- else -%}benchmarks{%- endif -%}
-      alias: predict_member_month
+      alias: predict_member_month_prospective
       materialized: table
       tags: 
         - benchmarks_analysis
