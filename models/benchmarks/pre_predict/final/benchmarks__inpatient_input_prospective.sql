@@ -1,6 +1,10 @@
-{{ config(materialized='table') }}
+{{
+    config(
+        enabled = var('benchmarks_train', False) | as_bool
+    )
+}}
 
-{% set cols = adapter.get_columns_in_relation(src) %}
+{% set cols = adapter.get_columns_in_relation( ref('benchmarks__inpatient_input') ) %}
 
 {# collect column names (lowercased) #}
 {% set col_names = [] %}
