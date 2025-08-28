@@ -1,3 +1,9 @@
+{{
+    config(
+        enabled = var('benchmarks_already_created', false) | as_bool
+    )
+}}
+
 {#-- 1. Get all column objects from the upstream model --#}
 {%- set columns = adapter.get_columns_in_relation(ref('benchmarks__predict_member_month')) -%}
 
