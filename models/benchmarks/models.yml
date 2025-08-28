@@ -108,10 +108,29 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+        - concurrent
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - encounter_id             
+
+  - name: benchmarks__inpatient_input_prospective
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_inpatient_input_prospective
+      materialized: table
+      tags: 
+        - benchmarks_train
+        - benchmarks
+        - prospective
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - encounter_id    
 
   - name: benchmarks__unpivot_inpatient
     description: |
