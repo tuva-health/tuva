@@ -81,7 +81,7 @@ select
 
   -- encounter context / potential targets
   , pred.length_of_stay
-  , pred.discharge_disposition_code
+  , pred.discharge_location
   , pred.ms_drg_code
   , pred.ccsr_cat
   , pred.readmission_numerator
