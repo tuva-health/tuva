@@ -36,6 +36,7 @@ select
  ,mm.actual_outpatient_encounter_count
  ,mm.actual_office_based_encounter_count
  ,mm.actual_other_encounter_count
+ ,pred.pred_pmpm_overall as expected_paid_amount
  ,pred.pred_pmpm_outpatient as expected_outpatient_paid_amount
  ,pred.pred_pmpm_inpatient as expected_inpatient_paid_amount
  ,pred.pred_pmpm_other as expected_other_paid_amount
