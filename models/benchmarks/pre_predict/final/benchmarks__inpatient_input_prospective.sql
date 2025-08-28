@@ -27,7 +27,7 @@
 {% endfor %}
 
 with ip as (
-  select * from ref('benchmarks__inpatient_input')
+  select * from {{ ref('benchmarks__inpatient_input') }}
 ),
 
 /* Demographics per person-year (aggregate even if upstream is stable) */
