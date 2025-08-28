@@ -19,37 +19,30 @@
 
 
 select
-   pmm.year_month
- , pmm.first_day_of_month
- , pmm.person_id
- , pmm.payer
- , pmm.{{ quote_column('plan') }}
- , pmm.data_source
- , pmm.benchmark_key
-
- ,
-    -- ==== ACTUAL paid amounts ====
-    {%- for col in amount_cols %}
-    {{ col }}{% if not loop.last %}, {% endif %}
-    {%- endfor %}
-
- ,
-    -- ==== ACTUAL encounter counts ====
-    {%- for col in count_cols %}
-    {{ col }}{% if not loop.last %}, {% endif %}
-    {%- endfor %}
-
-  --pmpm predictions
-    ,pred_pmpm_overall
-    ,pred_pmpm_outpatient
-    ,pred_pmpm_inpatient
-    ,pred_pmpm_other
-    ,pred_pmpm_office_based
-
---pmpc predictions
-    ,pred_pmpc_outpatient
-    ,pred_pmpc_other
-    ,pred_pmpc_office_based
-    ,pred_pmpc_inpatient
-from {{ ref('benchmarks__predict_member_month') }} pmm
-inner join {{ var('predictions_person_year_prospective') }} pyp on pmm.benchmark_key = pyp.benchmark_key
+   mm.benchmark_key
+ ,mm.first_day_of_month
+ ,mm.year_month
+ ,mm.person_id
+ ,mm.payer
+ , mm.{{ quote_column('plan') }}
+ ,mm.data_source
+ ,pred.prediction_year
+ ,mm.actual_paid_amount
+ ,mm.actual_inpatient_paid_amount
+ ,mm.actual_outpatient_paid_amount
+ ,mm.actual_office_based_paid_amount
+ ,mm.actual_other_paid_amount
+ ,mm.actual_inpatient_encounter_count
+ ,mm.actual_outpatient_encounter_count
+ ,mm.actual_office_based_encounter_count
+ ,mm.actual_other_encounter_count
+ ,pred.pred_pmpm_outpatient as expected_outpatient_paid_amount
+ ,pred.pred_pmpm_inpatient as expected_inpatient_paid_amount
+ ,pred.pred_pmpm_other as expected_other_paid_amount
+ ,pred.pred_pmpm_office_based as expected_office_based_paid_amount
+ ,pred.pred_pmpc_outpatient as expected_outpatient_encounter_count
+ ,pred.pred_pmpc_other as expected_other_encounter_count
+ ,pred.pred_pmpc_office_based as expected_office_based_encounter_count
+ ,pred.pred_pmpc_inpatient as expected_inpatient_encounter_count
+from {{ ref('benchmarks__predict_member_month') }} mm
+inner join {{ var('predictions_person_year_prospective') }} pred on pred.benchmark_key = mm.benchmark_key

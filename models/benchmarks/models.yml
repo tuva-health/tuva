@@ -66,6 +66,21 @@ models:
       tags: 
         - benchmarks_analysis
         - benchmarks
+        - concurrent
+
+  - name: benchmarks__predict_member_month_prospective
+    description: |
+        member_month grain table for data viz with expected values
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_member_month
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
 
   - name: benchmarks__predict_inpatient
     description: |
