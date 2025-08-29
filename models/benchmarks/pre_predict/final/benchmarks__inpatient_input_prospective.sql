@@ -119,7 +119,7 @@ select
   {% endfor %}
 
   -- run metadata stamp
-  , '{{ var(''tuva_last_run'') }}' as tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 
 from ip as pred
 left join demos_py d
