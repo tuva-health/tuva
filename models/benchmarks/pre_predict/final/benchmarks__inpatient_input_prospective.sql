@@ -27,10 +27,7 @@
 {% endfor %}
 
 with ip as (
-  select b.*
-  ,e.person_id
-  from {{ ref('benchmarks__inpatient_input') }} b
-  left join {{ ref('core__encounter') }} e on b.encounter_id = e.encounter_id
+  select * from ref('benchmarks__inpatient_input')
 ),
 
 /* Demographics per person-year (aggregate even if upstream is stable) */
@@ -44,7 +41,7 @@ demos_py as (
     , min(state)               as lag_state
     , avg(age_at_admit)        as lag_age_at_admit
   from ip
-  group by person_id
+  group by       person_id
     , data_source
     , year_nbr
 ),
@@ -65,9 +62,18 @@ conds_py as (
     , max({{ col }})           as lag_{{ col }}
     {% endfor %}
   from ip
-  group by person_id
+  group by       person_id
     , data_source
     , year_nbr
+),
+
+/* Average age fallback per data source to impute missing lag ages */
+handle_missing_age as (
+  select
+      data_source
+    , avg(lag_age_at_admit) as avg_age_at_admit
+  from demos_py
+  group by data_source
 )
 
 select
@@ -85,7 +91,7 @@ select
 
   -- encounter context / potential targets
   , pred.length_of_stay
-  , pred.discharge_location
+  , pred.discharge_disposition_code
   , pred.ms_drg_code
   , pred.ccsr_cat
   , pred.readmission_numerator
@@ -99,7 +105,7 @@ select
   , d.lag_sex
   , d.lag_race
   , d.lag_state
-  , d.lag_age_at_admit
+  , coalesce(d.lag_age_at_admit, h.avg_age_at_admit) as lag_age_at_admit
 
   -- lagged conditions (prior person-year)
   {% for col in cond_cols %}
@@ -112,6 +118,9 @@ select
   , coalesce(c.lag_{{ col }}, 0)                       as lag_{{ col }}
   {% endfor %}
 
+  -- run metadata stamp
+  , '{{ var(''tuva_last_run'') }}' as tuva_last_run
+
 from ip as pred
 left join demos_py d
   on pred.person_id    = d.person_id
@@ -121,3 +130,5 @@ left join conds_py c
   on pred.person_id    = c.person_id
  and pred.data_source  = c.data_source
  and pred.year_nbr - 1 = c.year_nbr
+left join handle_missing_age h
+  on pred.data_source  = h.data_source
