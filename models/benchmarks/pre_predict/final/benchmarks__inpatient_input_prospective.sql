@@ -27,9 +27,13 @@
 {% endfor %}
 
 with ip as (
-  select * from {{ ref('benchmarks__inpatient_input') }}
-),
+  select b.*
+  ,e.person_id
+  from {{ ref('benchmarks__inpatient_input') }} b
+  left join {{ ref('core__encounter') }} e on b.encounter_id = e.encounter_id
+)
 
+,
 /* Demographics per person-year (aggregate even if upstream is stable) */
 demos_py as (
   select
@@ -91,7 +95,7 @@ select
 
   -- encounter context / potential targets
   , pred.length_of_stay
-  , pred.discharge_disposition_code
+  , pred.discharge_location
   , pred.ms_drg_code
   , pred.ccsr_cat
   , pred.readmission_numerator
