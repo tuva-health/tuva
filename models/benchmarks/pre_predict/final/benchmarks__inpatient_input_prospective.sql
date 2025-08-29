@@ -44,7 +44,9 @@ demos_py as (
     , min(state)               as lag_state
     , avg(age_at_admit)        as lag_age_at_admit
   from ip
-  group by 1,2,3
+  group by person_id
+    , data_source
+    , year_nbr
 ),
 
 /* Condition flags per person-year (binary → MAX) */
@@ -63,7 +65,9 @@ conds_py as (
     , max({{ col }})           as lag_{{ col }}
     {% endfor %}
   from ip
-  group by 1,2,3
+  group by person_id
+    , data_source
+    , year_nbr
 )
 
 select
