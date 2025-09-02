@@ -17,7 +17,7 @@ WITH inpatient_pred AS (
           , p.discharge_pred_proba_other
           , p.discharge_pred_proba_snf
           , p.discharge_pred_proba_transfer_other_facility
-    FROM {{ var('predictions_inpatient') }} p 
+    FROM {{ var('predictions_inpatient_prospective') }} p 
     
 )
 
