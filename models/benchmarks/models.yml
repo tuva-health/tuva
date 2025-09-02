@@ -158,6 +158,20 @@ models:
         - benchmarks_analysis
         - benchmarks
 
+  - name: benchmarks__unpivot_member_month_prospective
+    description: |
+        unpivot for viz (prospective predictions)
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_unpivot_member_month_prospective
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
+
 
   - name: benchmarks__pivot_hcc
     description: |
