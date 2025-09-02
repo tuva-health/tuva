@@ -94,7 +94,22 @@ models:
       tags: 
         - benchmarks_analysis
         - benchmarks
-   
+        - concurrent
+
+  - name: benchmarks__predict_inpatient_prospective
+    description: |
+        joining inpatient predicts to encounter table actuals
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_inpatient_prospective
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
+
 
   - name: benchmarks__inpatient_input
     description: |
