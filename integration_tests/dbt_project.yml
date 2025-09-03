@@ -73,8 +73,12 @@ dispatch:
 
 seeds:
   integration_tests:
+    appointment_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','appointment.csv',headers=true) }}"
     eligibility_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','eligibility.csv',headers=true) }}"
+    immunization_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','immunization.csv',headers=true) }}"
     lab_result_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','lab_result.csv',headers=true) }}"
     medical_claim_seed:

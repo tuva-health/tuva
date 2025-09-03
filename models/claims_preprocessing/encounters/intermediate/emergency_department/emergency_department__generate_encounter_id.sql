@@ -19,4 +19,5 @@ order by start_date desc, end_date desc, claim_id desc) as encounter_claim_numbe
   , min_closing_row
   , dense_rank() over (
 order by encounter_id) as encounter_id
+  , encounter_id as original_anchor_claim
 from {{ ref('emergency_department__generate_encounter_id_pre_sort') }}

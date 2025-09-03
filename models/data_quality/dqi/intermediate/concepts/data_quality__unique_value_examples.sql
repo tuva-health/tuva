@@ -3,11 +3,19 @@
    )
 }}
 
+select * from {{ ref('data_quality__primary_keys_appointment_appointment_id') }}
+
+union all
+
 select * from {{ ref('data_quality__primary_keys_condition_condition_id') }}
 
 union all
 
 select * from {{ ref('data_quality__primary_keys_encounter_encounter_id') }}
+
+union all
+
+select * from {{ ref('data_quality__primary_keys_immunization_immunization_id') }}
 
 union all
 
