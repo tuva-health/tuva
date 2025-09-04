@@ -41,12 +41,8 @@ select
 , py.race                                   as prediction_year_race
 , py.state                                  as prediction_year_state
 
--- lag presence and months from pivot tables at person-year grain
-, case when pc.person_id is null or pcms.person_id is null or phcc.person_id is null then 1 else 0 end as lag_missing
-, coalesce(pc.member_month_count, 0)        as lag_member_months
-
-, case when coalesce(pc.member_month_count,0)=0 or pc.person_id is null
-       then 1 else 0 end                    as cold_start
+-- if person not in any condition table, create cold_start indicator
+, case when pc.person_id is null and pcms.person_id is null and phcc.person_id is null then 1 else 0 end as cold_start
 
 {# --- prediction-year PMPM/PMPC --- #}
 , case when coalesce(py.member_month_count,0)=0
