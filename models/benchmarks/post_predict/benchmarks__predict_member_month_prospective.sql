@@ -15,27 +15,32 @@
   {%- endif -%}
 {%- endfor -%}
 
-{# Build dynamic lists from actual_* columns for both groups and types #}
-{%- set paid_pairs = [] -%}  {# list of [pred_key, output_alias] #}
-{%- set count_pairs = [] -%} {# list of [pred_key, output_alias] #}
-{%- set pred_exclude = [] -%}
+{# Build dynamic expected pairs directly from the predictions relation columns #}
+{%- set pred_str = var('predictions_person_year_prospective') -%}
+{%- set clean = pred_str | replace('`','') | replace('[','') | replace(']','') | replace('"','') -%}
+{%- set parts = clean.split('.') -%}
+{%- if parts | length == 3 -%}
+  {%- set pred_rel = adapter.get_relation(database=parts[0], schema=parts[1], identifier=parts[2]) -%}
+{%- elif parts | length == 2 -%}
+  {%- set pred_rel = adapter.get_relation(database=target.database, schema=parts[0], identifier=parts[1]) -%}
+{%- else -%}
+  {%- set pred_rel = none -%}
+{%- endif -%}
 
-{%- for c in actual_cols -%}
-  {%- set n = c | lower -%}
-  {%- if n.endswith('_paid_amount') -%}
-    {%- set base = n | replace('actual_','') | replace('_paid_amount','') -%}
-    {%- set pred_key = base if base != '' else 'overall' -%}
-    {%- set out_alias = 'expected_paid_amount' if base == '' else 'expected_' ~ base ~ '_paid_amount' -%}
-    {%- if pred_key not in pred_exclude -%}
-      {%- do paid_pairs.append([pred_key, out_alias]) -%}
-    {%- endif -%}
-  {%- elif n.endswith('_encounter_count') -%}
-    {%- set base = n | replace('actual_','') | replace('_encounter_count','') -%}
-    {%- set pred_key = base -%}
+{%- set pred_cols = adapter.get_columns_in_relation(pred_rel) if pred_rel else [] -%}
+{%- set paid_pairs = [] -%}  {# list of [base, output_alias] #}
+{%- set count_pairs = [] -%} {# list of [base, output_alias] #}
+
+{%- for col in pred_cols -%}
+  {%- set n = col.name | lower -%}
+  {%- if n.startswith('pred_pmpm_') -%}
+    {%- set base = n | replace('pred_pmpm_','') -%}
+    {%- set out_alias = 'expected_paid_amount' if base == 'overall' else 'expected_' ~ base ~ '_paid_amount' -%}
+    {%- do paid_pairs.append([base, out_alias]) -%}
+  {%- elif n.startswith('pred_pmpc_') -%}
+    {%- set base = n | replace('pred_pmpc_','') -%}
     {%- set out_alias = 'expected_' ~ base ~ '_encounter_count' -%}
-    {%- if pred_key not in pred_exclude -%}
-      {%- do count_pairs.append([pred_key, out_alias]) -%}
-    {%- endif -%}
+    {%- do count_pairs.append([base, out_alias]) -%}
   {%- endif -%}
 {%- endfor -%}
 
@@ -55,13 +60,13 @@ select
 {% endfor %}
 
  {# Expected paid amounts from prospective predictions (PMPM), groups + types #}
-{% for pred_key, out_col in paid_pairs %}
- , pred.pred_pmpm_{{ pred_key }} as {{ out_col }}
+{% for base, out_col in paid_pairs %}
+ , pred.pred_pmpm_{{ base }} as {{ out_col }}
 {% endfor %}
 
  {# Expected encounter counts from prospective predictions (PMPC), groups + types #}
-{% for pred_key, out_col in count_pairs %}
- , pred.pred_pmpc_{{ pred_key }} as {{ out_col }}
+{% for base, out_col in count_pairs %}
+ , pred.pred_pmpc_{{ base }} as {{ out_col }}
 {% endfor %}
 
 from {{ ref('benchmarks__predict_member_month') }} as mm
