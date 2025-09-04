@@ -31,7 +31,7 @@ select
 , py.{{ quote_column('plan') }}
 , py.data_source
 , py.year_nbr                               as prediction_year
-, py_diag.year_nbr                          as diagnosis_year
+, (py.year_nbr - 1)                         as diagnosis_year
 
 , py.paid_amount                            as prediction_year_paid_amount
 , py.member_month_count                     as prediction_year_member_months
@@ -41,24 +41,12 @@ select
 , py.race                                   as prediction_year_race
 , py.state                                  as prediction_year_state
 
-, case when py_diag.person_id is null then 1 else 0 end as lag_missing
-, coalesce(py_diag.member_month_count, 0)   as lag_member_months
+-- lag presence and months from pivot tables at person-year grain
+, case when pc.person_id is null or pcms.person_id is null or phcc.person_id is null then 1 else 0 end as lag_missing
+, coalesce(pc.member_month_count, 0)        as lag_member_months
 
-, case when coalesce(py_diag.member_month_count,0)=0 or py_diag.person_id is null
+, case when coalesce(pc.member_month_count,0)=0 or pc.person_id is null
        then 1 else 0 end                    as cold_start
-
-{# --- prediction-year RAW targets (amounts & counts) ---
-{% for col in paid_cols %}
-  {% if col != 'paid_amount' %}
-, coalesce(py.{{ col }}, 0)                    as prediction_year_{{ col }}
-  {% endif %}
-{% endfor %}
-
-{% for col in count_cols %}
-  {% if col != 'member_month_count' %}
-, coalesce(py.{{ col }}, 0)                    as prediction_year_{{ col }}
-  {% endif %}
-{% endfor %} #}
 
 {# --- prediction-year PMPM/PMPC --- #}
 , case when coalesce(py.member_month_count,0)=0
@@ -85,27 +73,28 @@ select
 {% endfor %}
 
 
-{# --- lag condition flags --- #}
+{# --- lag condition flags from pivot_condition (prior year) --- #}
 {% for col in cond_cols %}
-, coalesce(py_diag.{{ col }}, 0)            as lag_{{ col }}
+  {% set base = col | replace('cond_', '') %}
+, coalesce(pc.{{ base }}, 0)                 as lag_{{ col }}
 {% endfor %}
 
-{# --- lag cms flags --- #}
+{# --- lag cms flags from pivot_cms_condition (prior year) --- #}
 {% for col in cms_cols %}
-, coalesce(py_diag.{{ col }}, 0)            as lag_{{ col }}
+, coalesce(pcms.{{ col }}, 0)                as lag_{{ col }}
 {% endfor %}
 
-{# --- lag hcc flags --- #}
+{# --- lag hcc flags from pivot_hcc (prior year) --- #}
 {% for col in hcc_cols %}
-, coalesce(py_diag.{{ col }}, 0)            as lag_{{ col }}
+, coalesce(phcc.{{ col }}, 0)                as lag_{{ col }}
 {% endfor %}
 
 
 
 from {{ ref('benchmarks__person_year') }} py
-left join {{ ref('benchmarks__person_year') }} py_diag
-  on py.person_id   = py_diag.person_id
- and py.payer       = py_diag.payer
- and py.{{ quote_column('plan') }}        = py_diag.{{ quote_column('plan') }}
- and py.data_source = py_diag.data_source
- and py.year_nbr - 1 = py_diag.year_nbr
+left join {{ ref('benchmarks__pivot_condition') }} as pc
+  on py.person_id = pc.person_id and (py.year_nbr - 1) = pc.year_nbr
+left join {{ ref('benchmarks__pivot_cms_condition') }} as pcms
+  on py.person_id = pcms.person_id and (py.year_nbr - 1) = pcms.year_nbr
+left join {{ ref('benchmarks__pivot_hcc') }} as phcc
+  on py.person_id = phcc.person_id and (py.year_nbr - 1) = phcc.year_nbr
