@@ -13,15 +13,6 @@ left outer join {{ ref('benchmarks__stg_reference_data__calendar') }} as c on i.
 where hcc_code is not null
 )
 
-, member_month as (
-    select mm.person_id
-    , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
-    , count(year_month) as member_month_count
-    from {{ ref('benchmarks__stg_core__member_months') }} as mm
-    group by mm.person_id
-    , cast(left(year_month, 4) as {{ dbt.type_int() }})
-)
-
 , condition_flags as (
 select
  person_id as condition_person_id
@@ -120,8 +111,8 @@ person_id
 )
 
 select
-mm.person_id
-, mm.year_nbr
+f.condition_person_id as person_id
+, f.condition_year_nbr as year_nbr
 , coalesce(hcc_1, 0) as hcc_1
 , coalesce(hcc_2, 0) as hcc_2
 , coalesce(hcc_6, 0) as hcc_6
@@ -208,7 +199,4 @@ mm.person_id
 , coalesce(hcc_186, 0) as hcc_186
 , coalesce(hcc_188, 0) as hcc_188
 , coalesce(hcc_189, 0) as hcc_189
-from member_month as mm
-left outer join condition_flags as f on mm.person_id = f.condition_person_id
-and
-mm.year_nbr = f.condition_year_nbr
+from condition_flags as f
