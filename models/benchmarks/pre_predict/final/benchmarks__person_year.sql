@@ -496,13 +496,13 @@ and
 fl.year_nbr = mm.year_nbr
 left outer join {{ ref('reference_data__ansi_fips_state') }} as st_ab on p.state = st_ab.ansi_fips_state_abbreviation
 left outer join {{ ref('reference_data__ansi_fips_state') }} as st_full on p.state = st_full.ansi_fips_state_name
-inner join {{ ref('benchmarks__pivot_condition') }} as pc on mm.person_id = pc.person_id
+left join {{ ref('benchmarks__pivot_condition') }} as pc on mm.person_id = pc.person_id
   and
   pc.year_nbr = mm.year_nbr
-inner join {{ ref('benchmarks__pivot_cms_condition') }} as pcms on mm.person_id = pcms.person_id
+left join {{ ref('benchmarks__pivot_cms_condition') }} as pcms on mm.person_id = pcms.person_id
   and
   pcms.year_nbr = mm.year_nbr
-inner join {{ ref('benchmarks__pivot_hcc') }} as phcc on mm.person_id = phcc.person_id
+left join {{ ref('benchmarks__pivot_hcc') }} as phcc on mm.person_id = phcc.person_id
   and
   phcc.year_nbr = mm.year_nbr
 left outer join encounters as e
