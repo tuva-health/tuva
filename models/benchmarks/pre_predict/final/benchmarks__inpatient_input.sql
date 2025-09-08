@@ -325,13 +325,13 @@ select
 from {{ ref('benchmarks__stg_core__encounter') }} as e
 inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as c on e.encounter_start_date = c.full_date
 inner join {{ ref('benchmarks__stg_core__patient') }} as p on e.person_id = p.person_id
-inner join {{ ref('benchmarks__pivot_condition') }} as pc on e.person_id = pc.person_id
+left join {{ ref('benchmarks__pivot_condition') }} as pc on e.person_id = pc.person_id
   and
   c.year = pc.year_nbr
-inner join {{ ref('benchmarks__pivot_cms_condition') }} as pcms on e.person_id = pcms.person_id
+left join {{ ref('benchmarks__pivot_cms_condition') }} as pcms on e.person_id = pcms.person_id
   and
   c.year = pcms.year_nbr
-inner join {{ ref('benchmarks__pivot_hcc') }} as phcc on e.person_id = phcc.person_id
+left join {{ ref('benchmarks__pivot_hcc') }} as phcc on e.person_id = phcc.person_id
   and
   c.year = phcc.year_nbr
 inner join enrollment_row as er on e.encounter_id = er.encounter_id
