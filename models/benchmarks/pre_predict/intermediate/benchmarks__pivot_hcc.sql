@@ -5,7 +5,7 @@
 }}
 
 with cte as (
-    select distinct person_id
+select distinct person_id
 , hcc_code
 , c.year as year_nbr
 from {{ ref('benchmarks__stg_cms_hcc__int_disease_factors') }} as i

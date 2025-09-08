@@ -187,6 +187,4 @@ f.condition_person_id as person_id
 , coalesce(cms_pressure_and_chronic_ulcers, 0) as cms_pressure_and_chronic_ulcers
 , coalesce(cms_schizophrenia_and_other_psychotic_disorders, 0) as cms_schizophrenia_and_other_psychotic_disorders
 , coalesce(cms_traumatic_brain_injury_and_nonpsychotic_mental_disorders_due_to_brain_damage, 0) as cms_traumatic_brain_injury_and_nonpsychotic_mental_disorders_due_to_brain_damage
-
-
 from condition_flags as f
