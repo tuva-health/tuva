@@ -185,10 +185,7 @@
   -- Compute standard deviation of monthly totals across the lookback months
   select
       person_id, data_source, payer, {{ quote_column('plan') }}, year_nbr
-    , {{
-        /* Prefer stddev_samp if available; many adapters support it. */
-        'stddev_samp(total_paid_month)'
-      }} as stdev_cost_monthly_12m
+    , stddev_samp(total_paid_month) as stdev_cost_monthly_12m
   from monthly_totals
   group by person_id, data_source, payer, {{ quote_column('plan') }}, year_nbr
 )
