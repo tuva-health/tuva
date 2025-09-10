@@ -7,6 +7,8 @@
 select
     full_date
     , year
+    , month
     , year_month_int
     , first_day_of_month
+    , last_day_of_month
 from {{ ref('reference_data__calendar') }}

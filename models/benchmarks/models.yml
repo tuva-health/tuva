@@ -34,11 +34,33 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
-        - prospective
+      - prospective
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - benchmark_key  
+
+  - name: risk_strat_features
+    description: |
+      Risk stratification features at person-year grain (12m lookback),
+      including costs, utilization, recency, and fragmentation.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: risk_strat_features
+      materialized: table
+      tags:
+        - benchmarks_train
+        - benchmarks
+        - risk_stratification
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
+            - year_nbr
 
   - name: benchmarks__pivot_condition
     description: |
