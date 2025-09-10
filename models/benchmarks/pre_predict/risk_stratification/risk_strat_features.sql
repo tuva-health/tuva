@@ -58,22 +58,22 @@ with subset_persons as (
     , cal.year as year_nbr
     -- Paid amounts
     , sum(coalesce(mc.paid_amount,0)) as cost_total_12m
-    , sum(case when e.encounter_group = 'inpatient' then coalesce(mc.paid_amount,0) else 0 end) as cost_ip_12m
+    , sum(case when e.encounter_type = 'acute inpatient' then coalesce(mc.paid_amount,0) else 0 end) as cost_ip_12m
     , sum(case when e.encounter_type = 'emergency department' then coalesce(mc.paid_amount,0) else 0 end) as cost_ed_12m
     -- Encounter counts (12/9/6/3 months within year)
-    , count(distinct case when e.encounter_group = 'inpatient' then e.encounter_id end) as ip_encounter_count_12m
+    , count(distinct case when e.encounter_type = 'acute inpatient' then e.encounter_id end) as ip_encounter_count_12m
     , count(distinct case when e.encounter_type = 'emergency department' then e.encounter_id end) as ed_encounter_count_12m
-    , count(distinct case when e.encounter_group = 'inpatient' and cal.month >= 4 then e.encounter_id end) as ip_encounter_count_9m
+    , count(distinct case when e.encounter_type = 'acute inpatient' and cal.month >= 4 then e.encounter_id end) as ip_encounter_count_9m
     , count(distinct case when e.encounter_type = 'emergency department' and cal.month >= 4 then e.encounter_id end) as ed_encounter_count_9m
-    , count(distinct case when e.encounter_group = 'inpatient' and cal.month >= 7 then e.encounter_id end) as ip_encounter_count_6m
+    , count(distinct case when e.encounter_type = 'acute inpatient' and cal.month >= 7 then e.encounter_id end) as ip_encounter_count_6m
     , count(distinct case when e.encounter_type = 'emergency department' and cal.month >= 7 then e.encounter_id end) as ed_encounter_count_6m
-    , count(distinct case when e.encounter_group = 'inpatient' and cal.month >= 10 then e.encounter_id end) as ip_encounter_count_3m
+    , count(distinct case when e.encounter_type = 'acute inpatient' and cal.month >= 10 then e.encounter_id end) as ip_encounter_count_3m
     , count(distinct case when e.encounter_type = 'emergency department' and cal.month >= 10 then e.encounter_id end) as ed_encounter_count_3m
     -- Fragmentation
     , count(distinct mc.billing_id)  as distinct_providers_12m
     , count(distinct mc.facility_id) as distinct_facilities_12m
     -- Recency dates
-    , max(case when e.encounter_group = 'inpatient' then e.encounter_start_date end) as last_ip_date
+    , max(case when e.encounter_type = 'acute inpatient' then e.encounter_start_date end) as last_ip_date
     , max(case when e.encounter_type = 'emergency department' then e.encounter_start_date end) as last_ed_date
   from {{ ref('benchmarks__stg_core__medical_claim') }} as mc
   inner join subset_persons sp on mc.person_id = sp.person_id
@@ -110,6 +110,21 @@ with subset_persons as (
    and pc.{{ quote_column('plan') }} = mm.{{ quote_column('plan') }}
    and cal.year_month_int = mm.year_month
   group by pc.person_id, pc.data_source, pc.payer, pc.{{ quote_column('plan') }}, cal.year
+)
+
+, enrolled_months as (
+  -- Base set of enrolled member-months to ensure zero-cost months are included
+  select
+      mm.person_id
+    , mm.data_source
+    , mm.payer
+    , mm.{{ quote_column('plan') }}
+    , cal.year as year_nbr
+    , mm.year_month
+  from {{ ref('benchmarks__stg_core__member_months') }} as mm
+  inner join subset_persons sp on mm.person_id = sp.person_id
+  inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
+    on mm.year_month = cal.year_month_int
 )
 
 , monthly_med as (
@@ -152,22 +167,30 @@ with subset_persons as (
 )
 
 , monthly_totals as (
+  -- Drive monthly totals from enrolled months to include zero-cost months
   select
-      coalesce(med.person_id, rx.person_id) as person_id
-    , coalesce(med.data_source, rx.data_source) as data_source
-    , coalesce(med.payer, rx.payer) as payer
-    , coalesce(med.{{ quote_column('plan') }}, rx.{{ quote_column('plan') }}) as {{ quote_column('plan') }}
-    , coalesce(med.year_nbr, rx.year_nbr) as year_nbr
-    , coalesce(med.year_month, rx.year_month) as year_month
+      b.person_id
+    , b.data_source
+    , b.payer
+    , b.{{ quote_column('plan') }}
+    , b.year_nbr
+    , b.year_month
     , coalesce(med.med_paid_month, 0) + coalesce(rx.rx_paid_month, 0) as total_paid_month
-  from monthly_med med
-  full outer join monthly_rx rx
-    on med.person_id = rx.person_id
-   and med.data_source = rx.data_source
-   and med.payer = rx.payer
-   and med.{{ quote_column('plan') }} = rx.{{ quote_column('plan') }}
-   and med.year_nbr = rx.year_nbr
-   and med.year_month = rx.year_month
+  from enrolled_months b
+  left join monthly_med med
+    on b.person_id = med.person_id
+   and b.data_source = med.data_source
+   and b.payer = med.payer
+   and b.{{ quote_column('plan') }} = med.{{ quote_column('plan') }}
+   and b.year_nbr = med.year_nbr
+   and b.year_month = med.year_month
+  left join monthly_rx rx
+    on b.person_id = rx.person_id
+   and b.data_source = rx.data_source
+   and b.payer = rx.payer
+   and b.{{ quote_column('plan') }} = rx.{{ quote_column('plan') }}
+   and b.year_nbr = rx.year_nbr
+   and b.year_month = rx.year_month
 )
 
 , monthly_rollups as (
