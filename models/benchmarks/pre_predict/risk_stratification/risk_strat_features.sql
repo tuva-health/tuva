@@ -20,9 +20,21 @@
 #}
 
 {%- set highcost_threshold = var('risk_strat_high_cost_threshold', 5000) -%}
+{%- set person_limit = var('risk_strat_person_limit', none) -%}
 
-with py as (
-  select * from {{ ref('benchmarks__person_year') }}
+-- Optional subset of persons to accelerate dev/test runs
+, subset_persons as (
+  select p.person_id
+  from {{ ref('core__patient') }} p
+  {% if person_limit is not none %}
+  limit {{ person_limit }}
+  {% endif %}
+)
+
+, py as (
+  select py.*
+  from {{ ref('benchmarks__person_year') }} py
+  inner join subset_persons sp on py.person_id = sp.person_id
 )
 
 , idx as (
@@ -64,6 +76,7 @@ with py as (
     , max(case when e.encounter_group = 'inpatient' then e.encounter_start_date end) as last_ip_date
     , max(case when e.encounter_type = 'emergency department' then e.encounter_start_date end) as last_ed_date
   from {{ ref('benchmarks__stg_core__medical_claim') }} as mc
+  inner join subset_persons sp on mc.person_id = sp.person_id
   inner join {{ ref('benchmarks__stg_core__encounter') }} as e
     on e.encounter_id = mc.encounter_id
   inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
@@ -87,6 +100,7 @@ with py as (
     , cal.year as year_nbr
     , sum(coalesce(pc.paid_amount,0)) as cost_rx_12m
   from {{ ref('core__pharmacy_claim') }} as pc
+  inner join subset_persons sp on pc.person_id = sp.person_id
   inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
     on coalesce(pc.paid_date, pc.dispensing_date) = cal.full_date
   inner join {{ ref('benchmarks__stg_core__member_months') }} as mm
@@ -106,6 +120,7 @@ with py as (
     , cal.year_month_int as year_month
     , sum(coalesce(mc.paid_amount,0)) as med_paid_month
   from {{ ref('benchmarks__stg_core__medical_claim') }} as mc
+  inner join subset_persons sp on mc.person_id = sp.person_id
   inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
     on coalesce(mc.claim_end_date, mc.claim_start_date) = cal.full_date
   inner join {{ ref('benchmarks__stg_core__member_months') }} as mm
@@ -124,6 +139,7 @@ with py as (
     , cal.year_month_int as year_month
     , sum(coalesce(pc.paid_amount,0)) as rx_paid_month
   from {{ ref('core__pharmacy_claim') }} as pc
+  inner join subset_persons sp on pc.person_id = sp.person_id
   inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
     on coalesce(pc.paid_date, pc.dispensing_date) = cal.full_date
   inner join {{ ref('benchmarks__stg_core__member_months') }} as mm
