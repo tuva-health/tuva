@@ -23,7 +23,7 @@
 {%- set person_limit = var('risk_strat_person_limit', none) -%}
 
 -- Optional subset of persons to accelerate dev/test runs
-, subset_persons as (
+with subset_persons as (
   select p.person_id
   from {{ ref('core__patient') }} p
   {% if person_limit is not none %}
