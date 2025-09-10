@@ -5,15 +5,14 @@
 }}
 
 {#
-  Risk stratification features built on top of the flat `benchmarks__person_year` table.
+  Risk stratification features built on top of the prospective person-year table.
 
   Design:
-  - One row per person-year (same grain as person_year), with an explicit index_month at Dec of year_nbr
-  - 12m lookback features are aligned to the calendar year of `year_nbr` (Jan..Dec)
-  - Enrollment-guarded joins replicate person_year style using member_months + calendar
-  - Encounter counts sourced from core encounter (joined to medical_claim for payer/plan/data_source)
-  - Distinct providers/facilities from core medical claim
-  - Pharmacy costs from core pharmacy claims (paid_date fallback to dispensing_date)
+  - Keep all prior feature engineering (encounter counts, costs, fragmentation,
+    recency, monthly rollups) and layer it on top of the base prospective table.
+  - Use the prospective table's diagnosis_year as the lookback `year_nbr` for
+    alignment with the 12m feature window; index month set to Dec of that year.
+  - Enrollment-guarded joins replicate person_year style using member_months + calendar.
 
   Tunables:
   - High-cost monthly threshold: var('risk_strat_high_cost_threshold', 5000)
@@ -33,16 +32,42 @@ with subset_persons as (
 
 , py as (
   select py.*
-  from {{ ref('benchmarks__person_year') }} py
+  from {{ ref('benchmarks__person_year_prospective') }} py
   inner join subset_persons sp on py.person_id = sp.person_id
 )
 
 , idx as (
   select
-      py.*
-    , cast(concat(py.year_nbr, '-12-01') as date)           as index_month
-    , cast(concat(py.year_nbr, '12') as {{ dbt.type_int() }}) as index_year_month
-    , cast(concat(py.year_nbr, '-12-31') as date)            as index_month_end_date
+      py.person_id
+    , py.data_source
+    , py.payer
+    , py.{{ quote_column('plan') }}
+    -- Keying by prediction year, but computing features over diagnosis year
+    , cast(py.prediction_year as {{ dbt.type_int() }})            as year_nbr
+    , cast(py.prediction_year as {{ dbt.type_int() }})            as prediction_year
+    , cast(py.diagnosis_year  as {{ dbt.type_int() }})            as diagnosis_year
+    , cast(concat(py.diagnosis_year, '-12-01') as date)           as index_month
+    , cast(concat(py.diagnosis_year, '12') as {{ dbt.type_int() }}) as index_year_month
+    , cast(concat(py.diagnosis_year, '-12-31') as date)           as index_month_end_date
+    -- Demographics (prior-year age; stable attrs direct)
+    , case when py.prediction_year_age_at_year_start is not null
+           then py.prediction_year_age_at_year_start - 1
+           else null end                                          as age_at_year_start
+    , py.prediction_year_sex                                      as sex
+    , py.prediction_year_race                                     as race
+    , py.prediction_year_state                                    as state
+    -- Cold start
+    , py.cold_start
+    -- Lagged features only from prospective table
+    {% set cols = adapter.get_columns_in_relation(ref('benchmarks__person_year_prospective')) %}
+    {% for c in cols %}
+      {% set n = c.name | lower %}
+      {% if n.startswith('lag_') %}
+    , py.{{ c.name }}
+      {% endif %}
+    {% endfor %}
+    -- Target: future 12m paid amount
+    , py.prediction_year_paid_amount                              as target_12m_paid_amount
   from py
 )
 
@@ -213,7 +238,22 @@ with subset_persons as (
   group by person_id, data_source, payer, {{ quote_column('plan') }}, year_nbr
 )
 
-
+, rolling_spend as (
+  -- Rolling totals over the last 3/6/9 months of the diagnosis year
+  select
+      t.person_id
+    , t.data_source
+    , t.payer
+    , t.{{ quote_column('plan') }}
+    , t.year_nbr
+    , sum(case when cal.month >= 10 then t.total_paid_month else 0 end) as total_paid_3m
+    , sum(case when cal.month >= 7  then t.total_paid_month else 0 end) as total_paid_6m
+    , sum(case when cal.month >= 4  then t.total_paid_month else 0 end) as total_paid_9m
+  from monthly_totals t
+  inner join {{ ref('benchmarks__stg_reference_data__calendar') }} as cal
+    on t.year_month = cal.year_month_int
+  group by t.person_id, t.data_source, t.payer, t.{{ quote_column('plan') }}, t.year_nbr
+)
 
 , recency_highcost as (
   -- Last day of the last high-cost month in the lookback window
@@ -228,80 +268,74 @@ with subset_persons as (
 
 select
   i.*
-  -- Counts
-  , coalesce(mca.ip_encounter_count_12m, 0) as ip_encounter_count_12m
-  , coalesce(mca.ed_encounter_count_12m, 0) as ed_encounter_count_12m
-  , coalesce(mca.ip_encounter_count_9m, 0)  as ip_encounter_count_9m
-  , coalesce(mca.ed_encounter_count_9m, 0)  as ed_encounter_count_9m
-  , coalesce(mca.ip_encounter_count_6m, 0)  as ip_encounter_count_6m
-  , coalesce(mca.ed_encounter_count_6m, 0)  as ed_encounter_count_6m
-  , coalesce(mca.ip_encounter_count_3m, 0)  as ip_encounter_count_3m
-  , coalesce(mca.ed_encounter_count_3m, 0)  as ed_encounter_count_3m
-  -- Costs
-  , coalesce(mca.cost_total_12m, 0) as cost_total_12m
-  , coalesce(mca.cost_ip_12m, 0)    as cost_ip_12m
-  , coalesce(mca.cost_ed_12m, 0)    as cost_ed_12m
-  , coalesce(rx.cost_rx_12m, 0)    as cost_rx_12m
-  , coalesce(ms.stdev_cost_monthly_12m, 0) as stdev_cost_monthly_12m
-  , coalesce(mr.highcost_month_count_12m, 0) as highcost_month_count_12m
-  -- Fragmentation
-  , coalesce(mca.distinct_providers_12m, 0)  as distinct_providers_12m
-  , coalesce(mca.distinct_facilities_12m, 0) as distinct_facilities_12m
-  -- Recency in days to index_month_end_date
+  -- Lookback encounter counts
+  , coalesce(mca.ip_encounter_count_12m, 0) as lookback_ip_encounter_count_12m
+  , coalesce(mca.ed_encounter_count_12m, 0) as lookback_ed_encounter_count_12m
+  , coalesce(mca.ip_encounter_count_9m, 0)  as lookback_ip_encounter_count_9m
+  , coalesce(mca.ed_encounter_count_9m, 0)  as lookback_ed_encounter_count_9m
+  , coalesce(mca.ip_encounter_count_6m, 0)  as lookback_ip_encounter_count_6m
+  , coalesce(mca.ed_encounter_count_6m, 0)  as lookback_ed_encounter_count_6m
+  , coalesce(mca.ip_encounter_count_3m, 0)  as lookback_ip_encounter_count_3m
+  , coalesce(mca.ed_encounter_count_3m, 0)  as lookback_ed_encounter_count_3m
+  -- Lookback costs
+  , coalesce(mca.cost_total_12m, 0) as lookback_med_cost_12m
+  , coalesce(mca.cost_ip_12m, 0)    as lookback_med_ip_cost_12m
+  , coalesce(mca.cost_ed_12m, 0)    as lookback_med_ed_cost_12m
+  , coalesce(rx.cost_rx_12m, 0)     as lookback_rx_cost_12m
+  , coalesce(ms.stdev_cost_monthly_12m, 0) as lookback_stdev_cost_monthly_12m
+  , coalesce(mr.highcost_month_count_12m, 0) as lookback_highcost_month_count_12m
+  -- Lookback rolling total spend over diagnosis year months (med+rx)
+  , coalesce(rs.total_paid_3m, 0) as lookback_total_paid_3m
+  , coalesce(rs.total_paid_6m, 0) as lookback_total_paid_6m
+  , coalesce(rs.total_paid_9m, 0) as lookback_total_paid_9m
+  , coalesce(mr.total_paid_12m, 0) as lookback_total_paid_12m
+  -- Lookback fragmentation
+  , coalesce(mca.distinct_providers_12m, 0)  as lookback_distinct_providers_12m
+  , coalesce(mca.distinct_facilities_12m, 0) as lookback_distinct_facilities_12m
+  -- Lookback recency in days to index_month_end_date
   , case
       when mca.last_ip_date is not null then {{ datediff('mca.last_ip_date', 'i.index_month_end_date', 'day') }}
-      else null end as days_since_last_ip
+      else null end as lookback_days_since_last_ip
   , case
       when mca.last_ed_date is not null then {{ datediff('mca.last_ed_date', 'i.index_month_end_date', 'day') }}
-      else null end as days_since_last_ed
+      else null end as lookback_days_since_last_ed
   , case when rh.last_highcost_date is not null
          then {{ datediff('rh.last_highcost_date', 'i.index_month_end_date', 'day') }}
-         else null end as days_since_last_highcost
+         else null end as lookback_days_since_last_highcost
 from idx i
 left join mc_year_agg mca
   on i.person_id = mca.person_id
  and i.data_source = mca.data_source
  and i.payer = mca.payer
  and i.{{ quote_column('plan') }} = mca.{{ quote_column('plan') }}
- and i.year_nbr = mca.year_nbr
+ and i.diagnosis_year = mca.year_nbr
 left join rx_costs rx
   on i.person_id = rx.person_id
  and i.data_source = rx.data_source
  and i.payer = rx.payer
  and i.{{ quote_column('plan') }} = rx.{{ quote_column('plan') }}
- and i.year_nbr = rx.year_nbr
+ and i.diagnosis_year = rx.year_nbr
 left join monthly_rollups mr
   on i.person_id = mr.person_id
  and i.data_source = mr.data_source
  and i.payer = mr.payer
  and i.{{ quote_column('plan') }} = mr.{{ quote_column('plan') }}
- and i.year_nbr = mr.year_nbr
+ and i.diagnosis_year = mr.year_nbr
 left join monthly_std ms
   on i.person_id = ms.person_id
  and i.data_source = ms.data_source
  and i.payer = ms.payer
  and i.{{ quote_column('plan') }} = ms.{{ quote_column('plan') }}
- and i.year_nbr = ms.year_nbr
+ and i.diagnosis_year = ms.year_nbr
+left join rolling_spend rs
+  on i.person_id = rs.person_id
+ and i.data_source = rs.data_source
+ and i.payer = rs.payer
+ and i.{{ quote_column('plan') }} = rs.{{ quote_column('plan') }}
+ and i.diagnosis_year = rs.year_nbr
 left join recency_highcost rh
   on i.person_id = rh.person_id
  and i.data_source = rh.data_source
  and i.payer = rh.payer
  and i.{{ quote_column('plan') }} = rh.{{ quote_column('plan') }}
- and i.year_nbr = rh.year_nbr
-
-
-/*  guidance
-You want 12-month lookback features and 12-month future outcomes.
-
-With data spanning Jan-2023 → Dec-2024, the only index month that fits 12m lookback + 12m future entirely inside the data is Dec-2023 (lookback: Jan-2023→Dec-2023; future: Jan-2024→Dec-2024).
-→ That gives you one row per member for the 12→12 setup. the person year table is already set up at this grain. we just need to add a index_month column.
-
-
- want to add these features for risk stratification models
-Costs: cost_total_*m, cost_ip_*m, cost_ed_*m, cost_rx_*m, stdev_cost_monthly_*m, highcost_month_count_*m (>$X)
-
-Recency: days_since_last_ip, days_since_last_ed, days_since_last_highcost
-
-Fragmentation: distinct_providers_12m, distinct_facilities_12m
-
-*/
+ and i.diagnosis_year = rh.year_nbr
