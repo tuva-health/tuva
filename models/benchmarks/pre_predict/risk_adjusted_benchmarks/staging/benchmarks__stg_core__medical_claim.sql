@@ -11,8 +11,11 @@ select
     , data_source
     , payer
     , {{ quote_column('plan') }}
+    , claim_start_date
     , claim_end_date
     , encounter_type
     , encounter_group
     , enrollment_flag
+    , billing_id
+    , facility_id
 from {{ ref('core__medical_claim') }}
