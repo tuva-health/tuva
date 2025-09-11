@@ -24,15 +24,6 @@ with cte as (
 )
 
 
-, member_month as (
-    select mm.person_id
-    , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
-    , count(year_month) as member_month_count
-    from {{ ref('benchmarks__stg_core__member_months') }} as mm
-    group by mm.person_id
-    , cast(left(year_month, 4) as {{ dbt.type_int() }})
-)
-
 /* top 25 by pmpm and top 50 prevelance in CMS data */
 , condition_flags as (
 select
@@ -116,8 +107,8 @@ from cte
 )
 
 select
-mm.person_id
-, mm.year_nbr
+f.condition_person_id as person_id
+, f.condition_year_nbr as year_nbr
 , coalesce(hip_fracture, 0) as hip_fracture
 , coalesce(type_1_diabetes_mellitus, 0) as type_1_diabetes_mellitus
 , coalesce(no_chronic_conditions, 0) as no_chronic_conditions
@@ -191,7 +182,4 @@ mm.person_id
 , coalesce(abdominal_aortic_aneurysm, 0) as abdominal_aortic_aneurysm
 , coalesce(gastroesophageal_reflux, 0) as gastroesophageal_reflux
 
-from member_month as mm
-left outer join condition_flags as f on mm.person_id = f.condition_person_id
-and
-mm.year_nbr = f.condition_year_nbr
+from condition_flags as f

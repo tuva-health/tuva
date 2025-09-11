@@ -22,15 +22,6 @@ with cte as (
         on a.recorded_date = cal.full_date
 )
 
-, member_month as (
-    select mm.person_id
-    , cast(left(year_month, 4) as {{ dbt.type_int() }}) as year_nbr
-    , count(year_month) as member_month_count
-    from {{ ref('benchmarks__stg_core__member_months') }} as mm
-    group by mm.person_id
-    , cast(left(year_month, 4) as {{ dbt.type_int() }})
-)
-
 , condition_flags as (
 select
  person_id as condition_person_id
@@ -119,8 +110,8 @@ person_id
 )
 
 select
-mm.person_id
-, mm.year_nbr
+f.condition_person_id as person_id
+, f.condition_year_nbr as year_nbr
 , coalesce(cms_acute_myocardial_infarction, 0) as cms_acute_myocardial_infarction
 , coalesce(cms_adhd_conduct_disorders_and_hyperkinetic_syndrome, 0) as cms_adhd_conduct_disorders_and_hyperkinetic_syndrome
 , coalesce(cms_alcohol_use_disorders, 0) as cms_alcohol_use_disorders
@@ -196,9 +187,4 @@ mm.person_id
 , coalesce(cms_pressure_and_chronic_ulcers, 0) as cms_pressure_and_chronic_ulcers
 , coalesce(cms_schizophrenia_and_other_psychotic_disorders, 0) as cms_schizophrenia_and_other_psychotic_disorders
 , coalesce(cms_traumatic_brain_injury_and_nonpsychotic_mental_disorders_due_to_brain_damage, 0) as cms_traumatic_brain_injury_and_nonpsychotic_mental_disorders_due_to_brain_damage
-
-
-from member_month as mm
-left outer join condition_flags as f on mm.person_id = f.condition_person_id
-and
-mm.year_nbr = f.condition_year_nbr
+from condition_flags as f
