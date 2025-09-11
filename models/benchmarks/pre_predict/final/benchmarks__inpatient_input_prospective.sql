@@ -50,12 +50,12 @@ with base as (
       ii.encounter_id
     , ce.person_id
     , ii.data_source
-    , ii.year_nbr                         as prediction_year
-    , ii.year_nbr - 1                     as diagnosis_year
-    , ii.sex                              as prediction_year_sex
-    , ii.race                             as prediction_year_race
-    , ii.state                            as prediction_year_state
-    , ii.age_at_admit                     as prediction_year_age_at_admit
+    , ii.year_nbr as prediction_year
+    , ii.year_nbr - 1 as diagnosis_year
+    , ii.sex as prediction_year_sex
+    , ii.race as prediction_year_race
+    , ii.state as prediction_year_state
+    , ii.age_at_admit as prediction_year_age_at_admit
     , ii.length_of_stay
     , ii.discharge_location
     , ii.ms_drg_code
@@ -106,10 +106,10 @@ select
   -- run metadata stamp
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 
-from base b
-left join {{ ref('benchmarks__pivot_condition') }} as pc
+from base as b
+left outer join {{ ref('benchmarks__pivot_condition') }} as pc
   on b.person_id = pc.person_id and b.diagnosis_year = pc.year_nbr
-left join {{ ref('benchmarks__pivot_cms_condition') }} as pcms
+left outer join {{ ref('benchmarks__pivot_cms_condition') }} as pcms
   on b.person_id = pcms.person_id and b.diagnosis_year = pcms.year_nbr
-left join {{ ref('benchmarks__pivot_hcc') }} as phcc
+left outer join {{ ref('benchmarks__pivot_hcc') }} as phcc
   on b.person_id = phcc.person_id and b.diagnosis_year = phcc.year_nbr
