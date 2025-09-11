@@ -1,8 +1,8 @@
-{# {{
+{{
     config(
         enabled = var('benchmarks_train', False) | as_bool
     )
-}} #}
+}}
 
 with first_last as (
   select person_id

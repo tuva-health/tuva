@@ -1,8 +1,8 @@
-{# {{
+{{
     config(
         enabled = var('benchmarks_train', False) | as_bool
     )
-}} #}
+}}
 
 with subset as (
   select distinct person_id
