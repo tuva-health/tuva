@@ -20,7 +20,6 @@ with base_claims as (
     where service_category_2 in (
         'acute inpatient'
         , 'ambulatory surgery center'
-        , 'emergency department'
         , 'inpatient hospice'
         , 'inpatient long term acute care'
         , 'inpatient psych'

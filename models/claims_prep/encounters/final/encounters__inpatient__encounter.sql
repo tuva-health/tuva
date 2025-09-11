@@ -24,7 +24,6 @@ with encounters__stg_medical_claim as (
         and cex.encounter_type in  (
             'acute inpatient'
             , 'ambulatory surgery center'
-            , 'emergency department'
             , 'inpatient hospice'
             , 'inpatient long term acute care'
             , 'inpatient psych'

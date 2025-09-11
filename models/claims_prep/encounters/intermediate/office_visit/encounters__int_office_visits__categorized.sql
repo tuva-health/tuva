@@ -1,8 +1,11 @@
 with encounters__stg_office_based as (
-    select *, 'office-based' as method -- this is added to separate different types of encounters
+    select *, 'office-based' as method -- this is added to distinguish these from "other" encounters
     from {{ ref('encounters__stg_office_based') }}
 )
-select *
+select
+    medical_claim_sk
+    , start_date
+    , end_date
     , -- Generated ID = method, patient, date, facility
     {{ dbt_utils.generate_surrogate_key(['method', 'patient_sk', 'start_date', 'facility_npi']) }} as encounter_id
     , case when service_category_2 = 'office-based visit' then 1 else 0 end as em_flag

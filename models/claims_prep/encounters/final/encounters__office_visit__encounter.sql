@@ -164,10 +164,6 @@ select
     , tot.claim_count
     , tot.inst_claim_count
     , tot.prof_claim_count
---    , phy.billing_npi
---    , hcpc.hcpcs_code
---    , hcpc.ccs_category
---    , hcpc.ccs_category_description
 from base_claims as a
     inner join total_amounts as tot 
     on a.encounter_sk = tot.encounter_sk

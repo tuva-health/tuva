@@ -43,31 +43,31 @@ select
     , deductible_amount
     , total_cost_amount
     , diagnosis_code_type
-    , diagnosis_code_1
-    , diagnosis_code_2
-    , diagnosis_code_3
-    , diagnosis_code_4
-    , diagnosis_code_5
-    , diagnosis_code_6
-    , diagnosis_code_7
-    , diagnosis_code_8
-    , diagnosis_code_9
-    , diagnosis_code_10
-    , diagnosis_code_11
-    , diagnosis_code_12
-    , diagnosis_code_13
-    , diagnosis_code_14
-    , diagnosis_code_15
-    , diagnosis_code_16
-    , diagnosis_code_17
-    , diagnosis_code_18
-    , diagnosis_code_19
-    , diagnosis_code_20
-    , diagnosis_code_21
-    , diagnosis_code_22
-    , diagnosis_code_23
-    , diagnosis_code_24
-    , diagnosis_code_25
+    , replace(diagnosis_code_1,'.','') as diagnosis_code_1
+    , replace(diagnosis_code_2,'.','') as diagnosis_code_2
+    , replace(diagnosis_code_3,'.','') as diagnosis_code_3
+    , replace(diagnosis_code_4,'.','') as diagnosis_code_4
+    , replace(diagnosis_code_5,'.','') as diagnosis_code_5
+    , replace(diagnosis_code_6,'.','') as diagnosis_code_6
+    , replace(diagnosis_code_7,'.','') as diagnosis_code_7
+    , replace(diagnosis_code_8,'.','') as diagnosis_code_8
+    , replace(diagnosis_code_9,'.','') as diagnosis_code_9
+    , replace(diagnosis_code_10,'.','') as diagnosis_code_10
+    , replace(diagnosis_code_11,'.','') as diagnosis_code_11
+    , replace(diagnosis_code_12,'.','') as diagnosis_code_12
+    , replace(diagnosis_code_13,'.','') as diagnosis_code_13
+    , replace(diagnosis_code_14,'.','') as diagnosis_code_14
+    , replace(diagnosis_code_15,'.','') as diagnosis_code_15
+    , replace(diagnosis_code_16,'.','') as diagnosis_code_16
+    , replace(diagnosis_code_17,'.','') as diagnosis_code_17
+    , replace(diagnosis_code_18,'.','') as diagnosis_code_18
+    , replace(diagnosis_code_19,'.','') as diagnosis_code_19
+    , replace(diagnosis_code_20,'.','') as diagnosis_code_20
+    , replace(diagnosis_code_21,'.','') as diagnosis_code_21
+    , replace(diagnosis_code_22,'.','') as diagnosis_code_22
+    , replace(diagnosis_code_23,'.','') as diagnosis_code_23
+    , replace(diagnosis_code_24,'.','') as diagnosis_code_24
+    , replace(diagnosis_code_25,'.','') as diagnosis_code_25
     , diagnosis_poa_1
     , diagnosis_poa_2
     , diagnosis_poa_3
@@ -94,31 +94,31 @@ select
     , diagnosis_poa_24
     , diagnosis_poa_25
     , procedure_code_type
-    , procedure_code_1
-    , procedure_code_2
-    , procedure_code_3
-    , procedure_code_4
-    , procedure_code_5
-    , procedure_code_6
-    , procedure_code_7
-    , procedure_code_8
-    , procedure_code_9
-    , procedure_code_10
-    , procedure_code_11
-    , procedure_code_12
-    , procedure_code_13
-    , procedure_code_14
-    , procedure_code_15
-    , procedure_code_16
-    , procedure_code_17
-    , procedure_code_18
-    , procedure_code_19
-    , procedure_code_20
-    , procedure_code_21
-    , procedure_code_22
-    , procedure_code_23
-    , procedure_code_24
-    , procedure_code_25
+    , replace(procedure_code_1,'.','') as procedure_code_1
+    , replace(procedure_code_2,'.','') as procedure_code_2
+    , replace(procedure_code_3,'.','') as procedure_code_3
+    , replace(procedure_code_4,'.','') as procedure_code_4
+    , replace(procedure_code_5,'.','') as procedure_code_5
+    , replace(procedure_code_6,'.','') as procedure_code_6
+    , replace(procedure_code_7,'.','') as procedure_code_7
+    , replace(procedure_code_8,'.','') as procedure_code_8
+    , replace(procedure_code_9,'.','') as procedure_code_9
+    , replace(procedure_code_10,'.','') as procedure_code_10
+    , replace(procedure_code_11,'.','') as procedure_code_11
+    , replace(procedure_code_12,'.','') as procedure_code_12
+    , replace(procedure_code_13,'.','') as procedure_code_13
+    , replace(procedure_code_14,'.','') as procedure_code_14
+    , replace(procedure_code_15,'.','') as procedure_code_15
+    , replace(procedure_code_16,'.','') as procedure_code_16
+    , replace(procedure_code_17,'.','') as procedure_code_17
+    , replace(procedure_code_18,'.','') as procedure_code_18
+    , replace(procedure_code_19,'.','') as procedure_code_19
+    , replace(procedure_code_20,'.','') as procedure_code_20
+    , replace(procedure_code_21,'.','') as procedure_code_21
+    , replace(procedure_code_22,'.','') as procedure_code_22
+    , replace(procedure_code_23,'.','') as procedure_code_23
+    , replace(procedure_code_24,'.','') as procedure_code_24
+    , replace(procedure_code_25,'.','') as procedure_code_25
     , procedure_date_1
     , procedure_date_2
     , procedure_date_3

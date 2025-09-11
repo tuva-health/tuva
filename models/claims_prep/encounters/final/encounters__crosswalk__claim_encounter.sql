@@ -15,7 +15,7 @@ select medical_claim_sk
     , encounter_id
     , encounter_start_date
     , encounter_end_date
-    , -- Create new sequential encounter IDs TODO: Change to a hash for a consistent value
+    , -- Create new sequential encounter IDs TODO: Change to a hash for a consistent value, and to support incremental processing
     dense_rank() over (order by encounter_id) as encounter_sk
     , encounter_type
     , encounter_group

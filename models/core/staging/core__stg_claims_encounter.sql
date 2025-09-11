@@ -1,7 +1,8 @@
 with all_encounters as (
     {{ dbt_utils.union_relations(
         relations=[
-            ref('the_tuva_project', 'encounters__multi_day__encounter')
+            ref('the_tuva_project', 'encounters__emergency__encounter')
+            , ref('the_tuva_project', 'encounters__inpatient__encounter')
             , ref('the_tuva_project', 'encounters__office_visit__encounter')
             , ref('the_tuva_project', 'encounters__single_day__encounter')
         ],

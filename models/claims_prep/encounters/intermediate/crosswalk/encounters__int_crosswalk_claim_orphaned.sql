@@ -14,10 +14,9 @@ encounters__int_crosswalk_claim_assigned as (
 -- Produce an encounter for claims that did not get grouped.
 select
     med.medical_claim_sk
-    , claim_id as encounter_id
     , claim_start_date as encounter_start_date
     , claim_end_date as encounter_end_date
-    , {{ dbt_utils.generate_surrogate_key(['patient_sk', 'start_date', 'facility_npi']) }} as encounter_sk
+    , {{ dbt_utils.generate_surrogate_key(['patient_sk', 'start_date', 'facility_npi']) }} as encounter_id
     , 'orphaned claim' as encounter_type
     , 'other' as encounter_group
     , 9999 as priority_number

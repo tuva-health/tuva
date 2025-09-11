@@ -1,5 +1,5 @@
 with encounters__stg_medical_claim as (
-    select *, 'single-day' as method -- this is added to separate different types of encounters
+    select *, 'other' as method -- this is added to distinguish these from office visit encounters
     from {{ ref('encounters__stg_medical_claim') }}
 )
 select

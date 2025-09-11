@@ -22,7 +22,7 @@ encounters as (
         , gei.encounter_type
         , gei.encounter_start_date
         , gei.encounter_end_date
-    from {{ ref('encounters__int_multi_day__multi_claim_map') }} gei
+    from {{ ref('encounters__int_emergency__multi_claim_map') }} gei
 )
 
 -- Step 2: Attribution logic - match overlapping claims to encounters
