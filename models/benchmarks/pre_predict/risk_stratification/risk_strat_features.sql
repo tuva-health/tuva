@@ -68,6 +68,17 @@ with subset_persons as (
     {% endfor %}
     -- Target: future 12m paid amount
     , py.prediction_year_paid_amount                              as target_12m_paid_amount
+    -- Targets: future 12m encounter counts
+    , cast(
+        coalesce(py.prediction_year_pmpc_emergency_department_count, 0)
+        * coalesce(py.prediction_year_member_months, 0)
+        as {{ dbt.type_int() }}
+      )                                                           as target_12m_ed_encounter_count
+    , cast(
+        coalesce(py.prediction_year_pmpc_acute_inpatient_count, 0)
+        * coalesce(py.prediction_year_member_months, 0)
+        as {{ dbt.type_int() }}
+      )                                                           as target_12m_acute_inpatient_encounter_count
   from py
 )
 
