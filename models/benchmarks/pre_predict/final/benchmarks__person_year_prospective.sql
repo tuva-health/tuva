@@ -1,8 +1,8 @@
-{{
+{# {{
     config(
         enabled = var('benchmarks_train', False) | as_bool
     )
-}}
+}} #}
 
 {# ---To avoid listing each feature and target dynamically, based on person year table --- #}
 {% set src = ref('benchmarks__person_year') %}
