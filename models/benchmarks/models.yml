@@ -13,6 +13,7 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+        - concurrent
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -20,6 +21,24 @@ models:
             - payer
             - "{{ '\"plan\"' if (target.type == 'fabric') else 'plan' }}"
             - year_nbr      
+
+  - name: benchmarks__person_year_prospective
+    description: |
+        flat table for training ml models on for prospective_models
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: person_year_prospective
+      materialized: table
+      tags: 
+        - benchmarks_train
+        - benchmarks
+        - prospective
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - benchmark_key  
 
   - name: benchmarks__pivot_condition
     description: |
@@ -47,6 +66,21 @@ models:
       tags: 
         - benchmarks_analysis
         - benchmarks
+        - concurrent
+
+  - name: benchmarks__predict_member_month_prospective
+    description: |
+        member_month grain table for data viz with expected values
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_member_month_prospective
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
 
   - name: benchmarks__predict_inpatient
     description: |
@@ -60,7 +94,22 @@ models:
       tags: 
         - benchmarks_analysis
         - benchmarks
-   
+        - concurrent
+
+  - name: benchmarks__predict_inpatient_prospective
+    description: |
+        joining inpatient predicts to encounter table actuals
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: predict_inpatient_prospective
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
+
 
   - name: benchmarks__inpatient_input
     description: |
@@ -74,10 +123,29 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+        - concurrent
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - encounter_id             
+
+  - name: benchmarks__inpatient_input_prospective
+    description: |
+        unpivot for viz
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_inpatient_input_prospective
+      materialized: table
+      tags: 
+        - benchmarks_train
+        - benchmarks
+        - prospective
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - encounter_id    
 
   - name: benchmarks__unpivot_inpatient
     description: |
@@ -104,6 +172,34 @@ models:
       tags: 
         - benchmarks_analysis
         - benchmarks
+
+  - name: benchmarks__unpivot_inpatient_prospective
+    description: |
+        unpivot for viz (prospective predictions)
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_unpivot_inpatient_prospective
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
+
+  - name: benchmarks__unpivot_member_month_prospective
+    description: |
+        unpivot for viz (prospective predictions)
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: benchmarks_unpivot_member_month_prospective
+      materialized: table
+      tags: 
+        - benchmarks_analysis
+        - benchmarks
+        - prospective
 
 
   - name: benchmarks__pivot_hcc
