@@ -1580,3 +1580,110 @@ models:
         description: '{{ doc("file_name") }}'
       - name: ingest_datetime
         description: '{{ doc("ingest_datetime") }}'
+
+  # optional mart data
+  - name: hedis_cql_engine_log
+    config:
+      database: tuva
+      schema: input_layer
+      tags: input_layer
+      materialized: table
+    description:  | 
+      Optional mart input. This table contains a detailed log of computations 
+      of the CQL produced from HEDIS Digital Quality Measures (dQM).
+    columns:
+      - name: measure
+        description: '{{ doc("hedis_measure_id") }}'
+      - name: measure_year
+        description: '{{ doc("hedis_measure_year") }}'
+      - name: patient
+        description: '{{ doc("person_id") }}'
+      - name: key
+        description: '{{ doc("hedis_cql_key") }}'
+      - name: value
+        description: '{{ doc("hedis_cql_value") }}'
+
+  - name: hedis_measure_report
+    config:
+      database: tuva
+      schema: input_layer
+      tags: input_layer
+      materialized: table
+    description: |
+      Optional mart input. This table contains quality measure report data from 
+      HEDIS Digital Quality Measures (dQM).
+    columns:
+      - name: id
+        description: '{{ doc("hedis_execution_id") }}'
+      - name: measure
+        description: '{{ doc("hedis_measure_id") }}'
+      - name: status
+        description: '{{ doc("hedis_status") }}'
+      - name: type
+        description: '{{ doc("hedis_type") }}'
+      - name: period_start
+        description: '{{ doc("period_start") }}'
+      - name: period_end
+        description: '{{ doc("period_end") }}'
+      - name: patient
+        description: '{{ doc("person_id") }}'
+      - name: rate_1_id
+        description: '{{ doc("hedis_rate_id") }}'
+      - name: rate_1_population_type_0
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_0
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_1
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_1
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_2
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_2
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_3
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_3
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_4
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_4
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_5
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_5
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_6
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_6
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_id
+        description: '{{ doc("hedis_rate_id") }}'
+      - name: rate_2_population_type_0
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_0
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_1
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_1
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_2
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_2
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_3
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_3
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_4
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_4
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_5
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_5
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_6
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_6
+        description: '{{ doc("hedis_population_count") }}'
