@@ -1,0 +1,49 @@
+name: DQI Severity Level Check
+
+on:
+  push:
+    branches: [ main, 'minor-release*', 'release*' ]
+  pull_request:
+    branches: [ main, 'minor-release*', 'release*' ]
+
+jobs:
+  dqi-severity-check:
+    runs-on: ubuntu-latest
+    name: Check DQI Severity Levels
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Run DQI Severity Check
+        id: dqi_check
+        run: |
+          python scripts/check_dqi_severity.py 
+        continue-on-error: true
+
+      - name: Comment on PR (if violations found)
+        if: failure() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ## DQI Severity Level Violations Found
+            
+            Tests with `tuva_dqi_sev_1` tags should have `severity: error`, not `severity: warn`.
+            To fix, change `severity:warn` to `severity: error` for all tests tagged with `tuva_dqi_sev_1`.
+            
+      - name: Fail job if violations found
+        if: failure()
+        run: |
+          echo "DQI severity violations found. Please fix isssues above."
+          exit 1
