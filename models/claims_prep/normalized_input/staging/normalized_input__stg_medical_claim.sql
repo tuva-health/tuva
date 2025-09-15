@@ -1,3 +1,7 @@
+with input_layer__medical_claim as (
+    select *
+    from {{ ref('the_tuva_project', 'input_layer__medical_claim') }}
+)
 select
     {{ dbt_utils.generate_surrogate_key(['data_source', 'claim_id', 'claim_line_number']) }} as medical_claim_sk
     , claim_id
@@ -148,4 +152,4 @@ select
     , file_name
     , file_date
     , ingest_datetime
-from {{ ref('the_tuva_project', 'input_layer__medical_claim') }}
+from input_layer__medical_claim

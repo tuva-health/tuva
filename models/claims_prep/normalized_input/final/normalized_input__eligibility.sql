@@ -1,3 +1,7 @@
+with normalized_input__stg_eligibility as (
+    select *
+    from {{ ref('the_tuva_project', 'normalized_input__stg_eligibility') }}
+)
 select
     elig.eligibility_sk
     , elig.data_source
@@ -6,11 +10,11 @@ select
     , elig.subscriber_id
     , elig.gender
     , elig.race
-    , date_norm.normalized_birth_date as birth_date
-    , date_norm.normalized_death_date as death_date
+    , elig.birth_date
+    , elig.death_date
     , elig.death_flag
-    , date_norm.normalized_enrollment_start_date as enrollment_start_date
-    , date_norm.normalized_enrollment_end_date as enrollment_end_date
+    , elig.enrollment_start_date
+    , elig.enrollment_end_date
     , elig.payer
     , elig.payer_type
     , elig.{{ quote_column('plan') }}
@@ -31,6 +35,4 @@ select
     , elig.file_name
     , elig.file_date
     , elig.ingest_datetime
-from {{ ref('the_tuva_project', 'normalized_input__stg_eligibility') }} as elig
-left outer join {{ ref('the_tuva_project', 'normalized_input__int_eligibility_dates_normalize') }} as date_norm
-    on elig.eligibility_sk = date_norm.eligibility_sk
+from normalized_input__stg_eligibility as elig

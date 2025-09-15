@@ -1,3 +1,7 @@
+with input_layer__eligibility as (
+    select *
+    from {{ ref('the_tuva_project', 'input_layer__eligibility') }}
+)
 select
     {{ dbt_utils.generate_surrogate_key(['data_source', 'member_id', 'payer', 'plan', 'enrollment_start_date', 'enrollment_end_date']) }} as eligibility_sk
     , person_id
@@ -31,4 +35,4 @@ select
     , file_name
     , file_date
     , ingest_datetime
-from {{ ref('the_tuva_project', 'input_layer__eligibility') }}
+from input_layer__eligibility
