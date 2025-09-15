@@ -28,7 +28,7 @@ jobs:
       - name: Run DQI Severity Check
         id: dqi_check
         run: |
-          python scripts/check_dqi_severity.py 
+          python check_dqi_severity.py 
         continue-on-error: true
 
       - name: Comment on PR (if violations found)
