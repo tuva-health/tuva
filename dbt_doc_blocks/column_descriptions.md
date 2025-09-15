@@ -1218,3 +1218,50 @@ State for the patient (most recent known address).
 Abbreviated form of the state for the patient (most recient known address).
 {% enddocs%}
 
+{% docs hedis_measure_id %}
+Measure name and unique identifier.
+{% enddocs%}
+
+{% docs hedis_measure_year %}
+Year indicating the definition used.
+{% enddocs%}
+
+{% docs hedis_cql_key %}
+CQL concept key.
+{% enddocs%}
+
+{% docs hedis_cql_value %}
+CQL concept value.
+{% enddocs%}
+
+{% docs hedis_execution_id %}
+Unique identifier for the measure, execution, and patient.
+{% enddocs%}
+
+{% docs hedis_status %}
+Execution status.
+{% enddocs%}
+
+{% docs hedis_type %}
+Execution type.
+{% enddocs%}
+
+{% docs hedis_rate_id %}
+Identifier for "rate-1" or "rate-2". Some HEDIS measures report two rates for different outcomes (e.g., (GSD) Glycemic Status Assessment) or follow-up care (e.g., (DSF-E) Depression Screening and Follow-up). Refer to HEDIS measure documentation.
+{% enddocs%}
+
+{% docs hedis_population_type %}
+Population type description for the pivoted values ("initial-population", "denominator", "denominator-exclusion", "denominator-exclusion-medicare", "denominator-medicare", "numerator").
+{% enddocs%}
+
+{% docs hedis_population_count %}
+Boolean value for the pivoted values.
+{% enddocs%}
+
+{% docs period_start %}
+Starting date of the performance or measurement period.
+{% enddocs%}
+
+{% docs period_end %}
+Ending date of the performance or measurement period.
+{% enddocs%}
