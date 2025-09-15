@@ -32,7 +32,7 @@ jobs:
         continue-on-error: true
 
       - name: Comment on PR (if violations found)
-        if: failure() && github.event_name == 'pull_request'
+        if: steps.dqi_check.outcome == 'failure' && github.event_name == 'pull_request'
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
