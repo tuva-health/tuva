@@ -199,6 +199,14 @@ def main():
     
     # Print results
     print_violations(violations)
+
+    # Print summary count at the end
+    print("=" * 40)
+    if violations:
+        print(f"SUMMARY: {len(violations)} tests with incorrect severity found")
+        print("   These tests are tagged 'tuva_dqi_sev_1' but have 'severity: warn' instead of 'severity: error'")
+    else:
+        print("SUMMARY: All severity level 1 tests are correctly configured")
     
     # Exit with appropriate code
     if violations:
