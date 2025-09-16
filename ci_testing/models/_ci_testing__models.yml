@@ -8,7 +8,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
-      tags: claims
+      tags:
+        - claims
+        - input_layer
       materialized: table
 
   - name: medical_claim
@@ -17,7 +19,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
-      tags: claims
+      tags:
+        - claims
+        - input_layer
       materialized: table
 
   - name: pharmacy_claim
@@ -26,7 +30,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
-      tags: claims
+      tags:
+        - claims
+        - input_layer
       materialized: table
 
   - name: provider_attribution
@@ -35,7 +41,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
-      tags: attribution
+      tags:
+        - attribution
+        - input_layer
       materialized: table
 
 
@@ -46,6 +54,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: condition
@@ -54,6 +65,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: encounter
@@ -62,6 +76,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
       
   - name: immunization
@@ -70,6 +87,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: lab_result
@@ -78,6 +98,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: location
@@ -86,6 +109,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: medication
@@ -94,6 +120,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: observation
@@ -102,6 +131,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: patient
@@ -110,6 +142,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: practitioner
@@ -118,6 +153,9 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
       materialized: table
 
   - name: procedure
@@ -126,4 +164,36 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
         {% else %}input_layer{%- endif -%}
+      tags:
+        - clinical
+        - input_layer
+      materialized: table
+
+# optional mart data
+  - name: hedis_cql_engine_log
+    description: | 
+      Optional mart input. This table contains a detailed log of computations 
+      of the CQL produced from HEDIS Digital Quality Measures (dQM).
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
+        {% else %}input_layer{%- endif -%}
+      tags:
+        - hedis
+        - quality_measures
+        - input_layer
+      materialized: table
+
+  - name: hedis_measure_report
+    description: |
+      Optional mart input. This table contains quality measure report data from 
+      HEDIS Digital Quality Measures (dQM).
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}_{{var('tuva_schema_prefix')}}input_layer
+        {% else %}input_layer{%- endif -%}
+      tags:
+        - hedis
+        - quality_measures
+        - input_layer
       materialized: table
