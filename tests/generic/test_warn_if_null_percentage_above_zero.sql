@@ -55,11 +55,11 @@ validation_errors AS (
         {% if target.type == 'bigquery' %}
             CAST(ROUND(null_percentage_raw, 2) AS STRING) AS null_percentage_formatted
         {% elif target.type == 'fabric' %}
-            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS VARCHAR) AS null_percentage_formatted
+            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS {{ varchar() }}) AS null_percentage_formatted
         {% elif target.type in ('databricks', 'duckdb', 'athena') %}
             CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS STRING) AS null_percentage_formatted
         {% else %}
-            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS VARCHAR) AS null_percentage_formatted
+            CAST(CAST(ROUND(null_percentage_raw, 2) AS DECIMAL(5, 2)) AS {{ varchar() }}) AS null_percentage_formatted
         {% endif %}
     FROM calculation
 )
@@ -69,11 +69,11 @@ SELECT
     {% if target.type == 'bigquery' %}
         CONCAT('Column `{{ column_name }}` in model `{{ table_name }}` has ', null_percentage_formatted, '% NULL values (', CAST(null_rows AS STRING), '/', CAST(total_rows AS STRING), ' rows).') AS error_description,
     {% elif target.type == 'fabric' %}
-        CONCAT('Column `{{ column_name }}` in model `{{ table_name }}` has ', null_percentage_formatted, '% NULL values (', CAST(null_rows AS VARCHAR), '/', CAST(total_rows AS VARCHAR), ' rows).') AS error_description,
+        CONCAT('Column `{{ column_name }}` in model `{{ table_name }}` has ', null_percentage_formatted, '% NULL values (', CAST(null_rows AS {{ varchar() }}), '/', CAST(total_rows AS {{ varchar() }}), ' rows).') AS error_description,
     {% elif target.type in ('databricks', 'duckdb', 'athena', 'snowflake', 'redshift') %}
-        'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS VARCHAR) || '/' || CAST(total_rows AS VARCHAR) || ' rows).' AS error_description,
+        'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS {{ varchar() }}) || '/' || CAST(total_rows AS {{ varchar() }}) || ' rows).' AS error_description,
     {% else %}
-        'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS VARCHAR) || '/' || CAST(total_rows AS VARCHAR) || ' rows).' AS error_description,
+        'Column `{{ column_name }}` in model `{{ table_name }}` has ' || null_percentage_formatted || '% NULL values (' || CAST(null_rows AS {{ varchar() }}) || '/' || CAST(total_rows AS {{ varchar() }}) || ' rows).' AS error_description,
     {% endif %}
     '{{ query_to_find_nulls }}' AS query_to_find_nulls
 FROM validation_errors
