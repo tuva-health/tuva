@@ -34,7 +34,6 @@ with conditions as (
     select
           person_id
         , observation_date
-        {# {% if target.type == 'fabric' or target.type == 'duckdb' %} #}
         {% if target.type in ['fabric', 'duckdb', 'databricks'] %}
          , TRY_CAST(result AS {{ dbt.type_numeric() }}) AS result
         {% else %}
