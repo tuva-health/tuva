@@ -159,11 +159,20 @@ copy  {{ this }}
 {% set sql %}
 copy into {{ this }}
     from s3://{{ uri }}
-    file_format = (type = CSV
-    {% if compression == true %} compression = 'GZIP' {% else %} compression = 'none' {% endif %}
-    {% if headers == true %} skip_header = 1 {% else %} {% endif %}
-    empty_field_as_null = true
-    field_optionally_enclosed_by = '"'
+    file_format = (
+      type = CSV
+      {% if compression == true %} compression = 'GZIP' {% else %} compression = 'none' {% endif %}
+      {% if headers == true %} skip_header = 1
+      {% endif %}
+      empty_field_as_null = true
+      field_optionally_enclosed_by = '"'
+      /* Crucial: also treat quoted empties "" as NULL */
+      {% if null_marker == true %}
+      null_if = ('', '""', 'NULL', '\N')
+      {% else %}
+      /* At minimum, handle both empty and quoted-empty */
+      null_if = ('', '""')
+      {% endif %}
 )
 pattern = '.*\/{{pattern}}.*';
 {% endset %}
