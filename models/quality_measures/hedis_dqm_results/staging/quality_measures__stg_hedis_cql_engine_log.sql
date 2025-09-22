@@ -8,5 +8,7 @@ select
     , patient
     , cql_key
     , cql_value
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , data_source
+    , file_name
+    , file_date
 from {{ ref('hedis_cql_engine_log') }}
