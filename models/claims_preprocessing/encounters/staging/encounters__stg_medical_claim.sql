@@ -7,9 +7,9 @@ with ccs_release_year as (
   select
     max(release_year) as max_release_year
   from {{ ref('terminology__ccs_services_procedures') }}
-),
+)
 
-final as (
+, final as (
   select
       m.person_id
     , d.patient_data_source_id

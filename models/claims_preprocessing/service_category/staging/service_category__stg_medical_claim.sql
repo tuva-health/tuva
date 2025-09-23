@@ -6,9 +6,9 @@ with ccs_release_year as (
   select
     max(release_year) as max_release_year
   from {{ ref('terminology__ccs_services_procedures') }}
-),
+)
 
-final as (
+, final as (
   select
       m.claim_id
     , m.claim_line_number
