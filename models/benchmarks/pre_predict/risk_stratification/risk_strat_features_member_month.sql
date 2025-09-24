@@ -120,25 +120,25 @@ with subset_persons as (
 
 , mc_monthly as (
   select
-      person_id
-    , data_source
-    , payer
-    , {{ quote_column('plan') }}
-    , year_month
-    , month_start
-    , month_end
-    , sum(paid_amount) as med_paid_month
-    , sum(case when encounter_type = 'acute inpatient' then paid_amount else 0 end) as med_ip_paid_month
-    , sum(case when encounter_type = 'emergency department' then paid_amount else 0 end) as med_ed_paid_month
-    , count(distinct case when encounter_type = 'acute inpatient' then encounter_id end) as ip_encounter_count_month
-    , count(distinct case when encounter_type = 'emergency department' then encounter_id end) as ed_encounter_count_month
-    , count(distinct case when billing_id is not null then billing_id end) as provider_count_month
-    , count(distinct case when facility_id is not null then facility_id end) as facility_count_month
-    , max(case when encounter_type = 'acute inpatient' then encounter_start_date end) as last_ip_date_in_month
-    , max(case when encounter_type = 'emergency department' then encounter_start_date end) as last_ed_date_in_month
-  from mc_enriched
+      mc.person_id
+    , mc.data_source
+    , mc.payer
+    , mc.{{ quote_column('plan') }}
+    , mc.year_month
+    , mc.month_start
+    , mc.month_end
+    , sum(mc.paid_amount) as med_paid_month
+    , sum(case when mc.encounter_type = 'acute inpatient' then mc.paid_amount else 0 end) as med_ip_paid_month
+    , sum(case when mc.encounter_type = 'emergency department' then mc.paid_amount else 0 end) as med_ed_paid_month
+    , count(distinct case when mc.encounter_type = 'acute inpatient' then mc.encounter_id end) as ip_encounter_count_month
+    , count(distinct case when mc.encounter_type = 'emergency department' then mc.encounter_id end) as ed_encounter_count_month
+    , count(distinct case when mc.billing_id is not null then mc.billing_id end) as provider_count_month
+    , count(distinct case when mc.facility_id is not null then mc.facility_id end) as facility_count_month
+    , max(case when mc.encounter_type = 'acute inpatient' then mc.encounter_start_date end) as last_ip_date_in_month
+    , max(case when mc.encounter_type = 'emergency department' then mc.encounter_start_date end) as last_ed_date_in_month
+  from mc_enriched mc
   inner join subset_persons sp on mc.person_id = sp.person_id
-  group by person_id, data_source, payer, {{ quote_column('plan') }}, year_month, month_start, month_end
+  group by mc.person_id, mc.data_source, mc.payer, mc.{{ quote_column('plan') }}, mc.year_month, mc.month_start, mc.month_end
 )
 
 , rx_monthly as (
