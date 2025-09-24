@@ -1,6 +1,8 @@
 select
        id
      , measure
+     , measure_id
+     , measure_year
      , status
      , type
      , period_start
@@ -36,4 +38,7 @@ select
      , rate_2_population_count_5
      , rate_2_population_type_6
      , rate_2_population_count_6
+     , data_source
+     , file_name
+     , file_date
 from {{ ref('hedis_measure_report_seed') }}
