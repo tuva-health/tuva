@@ -68,14 +68,12 @@ with expected_member_month as (
         , p.dialysis_count_pred as dialysis_encounter_count_pred
         , p.dme_orphaned_count_pred as dme_orphaned_encounter_count_pred
         , p.emergency_department_count_pred as emergency_department_encounter_count_pred
-        , p.emergency_department_count_pred as ed_encounter_count_pred -- original alias
         , p.home_health_count_pred as home_health_encounter_count_pred
         , p.inpatient_hospice_count_pred as inpatient_hospice_encounter_count_pred
         , 0 as inpatient_long_term_acute_care_encounter_count_pred  -- place holder
         , p.inpatient_psych_count_pred as inpatient_psych_encounter_count_pred
         , p.inpatient_rehabilitation_count_pred as inpatient_rehabilitation_encounter_count_pred
         , p.inpatient_skilled_nursing_count_pred as inpatient_skilled_nursing_encounter_count_pred
-        , p.inpatient_skilled_nursing_count_pred as snf_encounter_count_pred -- original alias
         , 0 as inpatient_substance_use_encounter_count_pred         -- place holder
         , p.lab_orphaned_count_pred as lab_orphaned_encounter_count_pred
         , p.office_visit_count_pred as office_visit_encounter_count_pred
@@ -188,14 +186,12 @@ with expected_member_month as (
       , count(distinct case when e.encounter_type = 'dialysis' then e.encounter_id else null end) as dialysis_encounter_count
       , count(distinct case when e.encounter_type = 'dme - orphaned' then e.encounter_id else null end) as dme_orphaned_encounter_count
       , count(distinct case when e.encounter_type = 'emergency department' then e.encounter_id else null end) as emergency_department_encounter_count
-      , count(distinct case when e.encounter_type = 'emergency department' then e.encounter_id else null end) as ed_encounter_count -- original alias
       , count(distinct case when e.encounter_type = 'home health' then e.encounter_id else null end) as home_health_encounter_count
       , count(distinct case when e.encounter_type = 'inpatient hospice' then e.encounter_id else null end) as inpatient_hospice_encounter_count
       , count(distinct case when e.encounter_type = 'inpatient long term acute care' then e.encounter_id else null end) as inpatient_long_term_acute_care_encounter_count
       , count(distinct case when e.encounter_type = 'inpatient psych' then e.encounter_id else null end) as inpatient_psych_encounter_count
       , count(distinct case when e.encounter_type = 'inpatient rehabilitation' then e.encounter_id else null end) as inpatient_rehabilitation_encounter_count
       , count(distinct case when e.encounter_type = 'inpatient skilled nursing' then e.encounter_id else null end) as inpatient_skilled_nursing_encounter_count
-      , count(distinct case when e.encounter_type = 'inpatient skilled nursing' then e.encounter_id else null end) as snf_encounter_count -- original alias
       , count(distinct case when e.encounter_type = 'inpatient substance use' then e.encounter_id else null end) as inpatient_substance_use_encounter_count
       , count(distinct case when e.encounter_type = 'lab - orphaned' then e.encounter_id else null end) as lab_orphaned_encounter_count
       , count(distinct case when e.encounter_type = 'office visit' then e.encounter_id else null end) as office_visit_encounter_count
@@ -371,14 +367,12 @@ select
  , coalesce(enc.dialysis_encounter_count, 0) as actual_dialysis_encounter_count
  , coalesce(enc.dme_orphaned_encounter_count, 0) as actual_dme_orphaned_encounter_count
  , coalesce(enc.emergency_department_encounter_count, 0) as actual_emergency_department_encounter_count
- , coalesce(enc.ed_encounter_count, 0) as actual_ed_encounter_count
  , coalesce(enc.home_health_encounter_count, 0) as actual_home_health_encounter_count
  , coalesce(enc.inpatient_hospice_encounter_count, 0) as actual_inpatient_hospice_encounter_count
  , coalesce(enc.inpatient_long_term_acute_care_encounter_count, 0) as actual_inpatient_long_term_acute_care_encounter_count
  , coalesce(enc.inpatient_psych_encounter_count, 0) as actual_inpatient_psych_encounter_count
  , coalesce(enc.inpatient_rehabilitation_encounter_count, 0) as actual_inpatient_rehabilitation_encounter_count
  , coalesce(enc.inpatient_skilled_nursing_encounter_count, 0) as actual_inpatient_skilled_nursing_encounter_count
- , coalesce(enc.snf_encounter_count, 0) as actual_snf_encounter_count
  , coalesce(enc.inpatient_substance_use_encounter_count, 0) as actual_inpatient_substance_use_encounter_count
  , coalesce(enc.lab_orphaned_encounter_count, 0) as actual_lab_orphaned_encounter_count
  , coalesce(enc.office_visit_encounter_count, 0) as actual_office_visit_encounter_count
@@ -407,14 +401,12 @@ select
  , coalesce(emm.dialysis_encounter_count_pred, 0) as expected_dialysis_encounter_count
  , coalesce(emm.dme_orphaned_encounter_count_pred, 0) as expected_dme_orphaned_encounter_count
  , coalesce(emm.emergency_department_encounter_count_pred, 0) as expected_emergency_department_encounter_count
- , coalesce(emm.ed_encounter_count_pred, 0) as expected_ed_encounter_count
  , coalesce(emm.home_health_encounter_count_pred, 0) as expected_home_health_encounter_count
  , coalesce(emm.inpatient_hospice_encounter_count_pred, 0) as expected_inpatient_hospice_encounter_count
  , coalesce(emm.inpatient_long_term_acute_care_encounter_count_pred, 0) as expected_inpatient_long_term_acute_care_encounter_count
  , coalesce(emm.inpatient_psych_encounter_count_pred, 0) as expected_inpatient_psych_encounter_count
  , coalesce(emm.inpatient_rehabilitation_encounter_count_pred, 0) as expected_inpatient_rehabilitation_encounter_count
  , coalesce(emm.inpatient_skilled_nursing_encounter_count_pred, 0) as expected_inpatient_skilled_nursing_encounter_count
- , coalesce(emm.snf_encounter_count_pred, 0) as expected_snf_encounter_count
  , coalesce(emm.inpatient_substance_use_encounter_count_pred, 0) as expected_inpatient_substance_use_encounter_count
  , coalesce(emm.lab_orphaned_encounter_count_pred, 0) as expected_lab_orphaned_encounter_count
  , coalesce(emm.office_visit_encounter_count_pred, 0) as expected_office_visit_encounter_count
