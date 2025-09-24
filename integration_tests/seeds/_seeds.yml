@@ -727,6 +727,8 @@ seeds:
       column_types:
         measure: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
+        measure_id: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         measure_year: |
           {%- if target.type in ("bigquery", "databricks") -%} integer {%- else -%} varchar(255) {%- endif -%}
         patient: |

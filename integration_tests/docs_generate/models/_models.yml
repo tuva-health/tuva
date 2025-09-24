@@ -1593,6 +1593,8 @@ models:
       of the CQL produced from HEDIS Digital Quality Measures (dQM).
     columns:
       - name: measure
+        description: '{{ doc("hedis_measure_name") }}'
+      - name: measure_id
         description: '{{ doc("hedis_measure_id") }}'
       - name: measure_year
         description: '{{ doc("hedis_measure_year") }}'
@@ -1623,7 +1625,7 @@ models:
       - name: id
         description: '{{ doc("hedis_execution_id") }}'
       - name: measure
-        description: '{{ doc("hedis_measure_id") }}'
+        description: '{{ doc("hedis_measure_name") }}'
       - name: measure_id
         description: '{{ doc("hedis_measure_id") }}'
       - name: measure_year
