@@ -5,6 +5,8 @@
 select
       id
     , measure
+    , measure_id
+    , measure_year
     , status
     , type
     , period_start

@@ -4,6 +4,7 @@
 }}
 select
       measure
+    , measure_id
     , measure_year
     , patient
     , cql_key
