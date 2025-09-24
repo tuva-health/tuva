@@ -1219,7 +1219,11 @@ Abbreviated form of the state for the patient (most recient known address).
 {% enddocs%}
 
 {% docs hedis_measure_id %}
-Measure name and unique identifier.
+Measure unique identifier.
+{% enddocs%}
+
+{% docs hedis_measure_name %}
+Measure name.
 {% enddocs%}
 
 {% docs hedis_measure_year %}
