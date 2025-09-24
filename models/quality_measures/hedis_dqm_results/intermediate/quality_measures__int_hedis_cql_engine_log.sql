@@ -5,15 +5,7 @@
 
 with stage as (
 
-    select
-          measure
-        , measure_year
-        , patient
-        , cql_key
-        , cql_value
-        , data_source
-        , file_name
-        , file_date
+    select *
     from {{ ref('quality_measures__stg_hedis_cql_engine_log') }}
 
 )

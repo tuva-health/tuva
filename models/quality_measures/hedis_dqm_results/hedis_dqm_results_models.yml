@@ -16,10 +16,26 @@ models:
         - quality_measures
       materialized: table
 
+  - name: quality_measures__hedis_summary_counts
+    description: |
+      Final model with deduplicated quality measure results from external 
+      source for HEDIS Digital Quality Measures (dQM). This model sums the 
+      results on a data source/measure level.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: hedis_summary_counts
+      tags:
+        - hedis
+        - quality_measures
+      materialized: table
+
   - name: quality_measures__hedis_summary_long
     description: |
       Final model with deduplicated quality measure results from external 
-      source for HEDIS Digital Quality Measures (dQM).
+      source for HEDIS Digital Quality Measures (dQM). Each row represents the 
+      results per patient/measure. A null for the denominator
+      indicates that the patient was not eligible for that measure.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
@@ -53,6 +69,19 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _int_hedis_measure_report
+      tags:
+        - hedis
+        - quality_measures
+      materialized: table
+
+  - name: quality_measures__int_hedis_measure_normalize
+    description: |
+      Intermediate model transforming quality measure report data from external 
+      source for HEDIS Digital Quality Measures (dQM). Normalizes rates.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
+      alias: _int_hedis_measure_normalize
       tags:
         - hedis
         - quality_measures

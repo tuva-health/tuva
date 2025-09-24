@@ -3,31 +3,36 @@
    )
 }}
 
-with intermediate as (
+with dedupe as (
 
-    select
-          patient
-        , measure
-        , measure_year
-        , cql_key
-        , cql_value
-        , data_source
-        , file_name
-        , file_date
-        , row_num
+    select *
     from {{ ref('quality_measures__int_hedis_cql_engine_log') }}
+    where row_num = 1
 
 )
 
+, add_data_types as (
+
+    select
+          cast(patient as {{ dbt.type_string() }}) as person_id
+        , cast({{ string_extract('measure', start_delim='(', end_delim=')') }} as {{ dbt.type_string() }}) as measure_id
+        , cast(measure as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_year as {{ dbt.type_string() }}) as measure_version
+        , cast(cql_key as {{ dbt.type_string() }}) as cql_concept_key
+        , cast(cql_value as {{ dbt.type_string() }}) as cql_concept_value
+        , cast(data_source as {{ dbt.type_string() }}) as data_source
+    from dedupe
+
+)
+
+
 select
-      patient as person_id
-    , {{ string_extract('measure', start_delim='(', end_delim=')') }} as measure_id
-    , measure as measure_name
-    , measure_year as measure_version
-    , cql_key as cql_concept_key
-    , cql_value as cql_concept_value
+      person_id
+    , measure_id
+    , measure_name
+    , measure_version
+    , cql_concept_key
+    , cql_concept_value
     , data_source
-    , file_date
     , '{{ var('tuva_last_run') }}' as tuva_last_run
-from intermediate
-where row_num = 1
+from add_data_types
