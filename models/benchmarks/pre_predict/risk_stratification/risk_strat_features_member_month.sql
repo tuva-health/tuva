@@ -32,7 +32,7 @@
 {% endfor %}
 
 with subset_persons as (
-  select p.person_id
+  select distinct p.person_id
   from {{ ref('core__patient') }} p
   {% if person_limit is not none %}
   limit {{ person_limit }}
@@ -83,6 +83,7 @@ with subset_persons as (
         else null
       end as age_at_year_start
   from member_months mm
+  inner join subset_persons sp on mm.person_id = sp.person_id
   left join {{ ref('benchmarks__stg_core__patient') }} p
     on mm.person_id = p.person_id
 )
@@ -136,6 +137,7 @@ with subset_persons as (
     , max(case when encounter_type = 'acute inpatient' then encounter_start_date end) as last_ip_date_in_month
     , max(case when encounter_type = 'emergency department' then encounter_start_date end) as last_ed_date_in_month
   from mc_enriched
+  inner join subset_persons sp on mc.person_id = sp.person_id
   group by person_id, data_source, payer, {{ quote_column('plan') }}, year_month, month_start, month_end
 )
 
@@ -183,6 +185,7 @@ with subset_persons as (
     , mc.last_ed_date_in_month
     , coalesce(mc.med_paid_month, 0) + coalesce(rx.rx_paid_month, 0) as total_paid_month
   from idx
+  inner join subset_persons sp on idx.person_id = sp.person_id
   left join mc_monthly mc
     on idx.person_id = mc.person_id
    and idx.data_source = mc.data_source
@@ -229,6 +232,7 @@ with subset_persons as (
     , sum(case when hist.month_start > cur.month_start and hist.month_start <= {{ dateadd('month', 12, 'cur.month_start') }} then hist.ed_encounter_count_month else 0 end) as target_12m_ed_encounter_count
     , sum(case when hist.month_start > cur.month_start and hist.month_start <= {{ dateadd('month', 12, 'cur.month_start') }} then hist.ip_encounter_count_month else 0 end) as target_12m_acute_inpatient_encounter_count
   from monthly_totals cur
+  inner join subset_persons sp on cur.person_id = sp.person_id
   left join monthly_totals hist
     on cur.person_id = hist.person_id
    and cur.data_source = hist.data_source
@@ -247,6 +251,7 @@ with subset_persons as (
     , me.billing_id
     , me.encounter_start_date as event_date
   from mc_enriched me
+  inner join subset_persons sp on me.person_id = sp.person_id
   where me.billing_id is not null
 )
 
@@ -259,6 +264,7 @@ with subset_persons as (
     , me.facility_id
     , me.encounter_start_date as event_date
   from mc_enriched me
+  inner join subset_persons sp on me.person_id = sp.person_id
   where me.facility_id is not null
 )
 
@@ -271,6 +277,7 @@ with subset_persons as (
     , idx.index_year_month
     , count(distinct pe.billing_id) as lookback_distinct_providers_12m
   from idx
+  inner join subset_persons sp on idx.person_id = sp.person_id
   left join provider_events pe
     on idx.person_id = pe.person_id
    and idx.data_source = pe.data_source
@@ -289,6 +296,7 @@ with subset_persons as (
     , idx.index_year_month
     , count(distinct fe.facility_id) as lookback_distinct_facilities_12m
   from idx
+  inner join subset_persons sp on idx.person_id = sp.person_id
   left join facility_events fe
     on idx.person_id = fe.person_id
    and idx.data_source = fe.data_source
