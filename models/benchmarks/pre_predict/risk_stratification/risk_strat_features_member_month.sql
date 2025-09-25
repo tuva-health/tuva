@@ -39,6 +39,14 @@ with subset_persons as (
   {% endif %}
 )
 
+,cal as (
+  select distinct year_month_int
+  ,year
+  ,first_day_of_month
+  ,last_day_of_month
+  from {{ ref('benchmarks__stg_reference_data__calendar') }}
+)
+
 , member_months as (
   select
       mm.person_id
@@ -56,7 +64,7 @@ with subset_persons as (
     , cal.year + 1 as prediction_year
   from {{ ref('benchmarks__stg_core__member_months') }} mm
   inner join subset_persons sp on mm.person_id = sp.person_id
-  inner join {{ ref('benchmarks__stg_reference_data__calendar') }} cal
+  inner join cal
     on mm.year_month = cal.year_month_int
 )
 
