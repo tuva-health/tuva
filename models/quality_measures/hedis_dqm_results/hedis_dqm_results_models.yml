@@ -15,6 +15,23 @@ models:
         - hedis
         - quality_measures
       materialized: table
+    columns:
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: measure_id
+        description: '{{ doc("hedis_measure_id") }}'
+      - name: measure_name
+        description: '{{ doc("hedis_measure_name") }}'
+      - name: measure_version
+        description: '{{ doc("hedis_measure_year") }}'
+      - name: cql_concept_key
+        description: '{{ doc("hedis_cql_key") }}'
+      - name: cql_concept_value
+        description: '{{ doc("hedis_cql_value") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: quality_measures__hedis_summary_counts
     description: |
@@ -29,6 +46,59 @@ models:
         - hedis
         - quality_measures
       materialized: table
+    columns:
+      - name: measure_id
+        description: '{{ doc("hedis_measure_id") }}'
+        meta:
+          terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+      - name: measure_name
+        description: '{{ doc("hedis_measure_name") }}'
+        meta:
+          terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+      - name: measure_version
+        description: '{{ doc("hedis_measure_year") }}'
+        meta:
+          terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+      - name: performance_period_begin
+        description: '{{ doc("period_start") }}'
+      - name: performance_period_end
+        description: '{{ doc("period_end") }}'
+      - name: rate_1_denominator_sum
+        description: '{{ doc("denominator") }}'
+      - name: rate_1_numerator_sum
+        description: '{{ doc("numerator") }}'
+      - name: rate_1_exclusion_sum
+        description: '{{ doc("exclusion") }}'
+      - name: rate_1_performance_rate
+        description: '{{ doc("performance_rate") }}'
+      - name: rate_1_medicare_denominator_sum
+        description: '{{ doc("denominator") }}'
+      - name: rate_1_medicare_numerator_sum
+        description: '{{ doc("numerator") }}'
+      - name: rate_1_medicare_exclusion_sum
+        description: '{{ doc("exclusion") }}'
+      - name: rate_1_medicare_performance_rate
+        description: '{{ doc("performance_rate") }}'
+      - name: rate_2_denominator_sum
+        description: '{{ doc("denominator") }}'
+      - name: rate_2_numerator_sum
+        description: '{{ doc("numerator") }}'
+      - name: rate_2_exclusion_sum
+        description: '{{ doc("exclusion") }}'
+      - name: rate_2_performance_rate
+        description: '{{ doc("performance_rate") }}'
+      - name: rate_2_medicare_denominator_sum
+        description: '{{ doc("denominator") }}'
+      - name: rate_2_medicare_numerator_sum
+        description: '{{ doc("numerator") }}'
+      - name: rate_2_medicare_exclusion_sum
+        description: '{{ doc("exclusion") }}'
+      - name: rate_2_medicare_performance_rate
+        description: '{{ doc("performance_rate") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: quality_measures__hedis_summary_long
     description: |
@@ -44,6 +114,57 @@ models:
         - hedis
         - quality_measures
       materialized: table
+    columns:
+      - name: person_id
+        description: '{{ doc("person_id") }}'
+      - name: rate_1_denominator_flag
+        description: '{{ doc("denominator") }}'
+      - name: rate_1_numerator_flag
+        description: '{{ doc("numerator") }}'
+      - name: rate_1_exclusion_flag
+        description: '{{ doc("exclusion") }}'
+      - name: rate_1_medicare_denominator_flag
+        description: '{{ doc("denominator") }}'
+      - name: rate_1_medicare_exclusion_flag
+        description: '{{ doc("exclusion") }}'
+      - name: rate_1_performance_flag
+        description: '{{ doc("performance_rate") }}'
+      - name: rate_1_medicare_performance_flag
+        description: '{{ doc("performance_rate") }}'
+      - name: rate_2_denominator_flag
+        description: '{{ doc("denominator") }}'
+      - name: rate_2_numerator_flag
+        description: '{{ doc("numerator") }}'
+      - name: rate_2_exclusion_flag
+        description: '{{ doc("exclusion") }}'
+      - name: rate_2_medicare_denominator_flag
+        description: '{{ doc("denominator") }}'
+      - name: rate_2_medicare_exclusion_flag
+        description: '{{ doc("exclusion") }}'
+      - name: rate_2_performance_flag
+        description: '{{ doc("performance_rate") }}'
+      - name: rate_2_medicare_performance_flag
+        description: '{{ doc("performance_rate") }}'
+      - name: performance_period_begin
+        description: '{{ doc("period_start") }}'
+      - name: performance_period_end
+        description: '{{ doc("period_end") }}'
+      - name: measure_id
+        description: '{{ doc("hedis_measure_id") }}'
+        meta:
+          terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+      - name: measure_name
+        description: '{{ doc("hedis_measure_name") }}'
+        meta:
+          terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+      - name: measure_version
+        description: '{{ doc("hedis_measure_year") }}'
+        meta:
+          terminology: https://thetuvaproject.com/value-sets/quality-measures#measures
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: tuva_last_run
+        description: '{{ doc("tuva_last_run") }}'
 
 ## Intermediate
   - name: quality_measures__int_hedis_cql_engine_log
@@ -59,6 +180,29 @@ models:
         - hedis
         - quality_measures
       materialized: table
+    columns:
+      - name: patient
+        description: '{{ doc("person_id") }}'
+      - name: measure
+        description: '{{ doc("hedis_measure_name") }}'
+      - name: measure_id
+        description: '{{ doc("hedis_measure_id") }}'
+      - name: measure_year
+        description: '{{ doc("hedis_measure_year") }}'
+      - name: cql_key
+        description: '{{ doc("hedis_cql_key") }}'
+      - name: cql_value
+        description: '{{ doc("hedis_cql_value") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: file_name
+        description: '{{ doc("file_name") }}'
+      - name: file_date
+        description: '{{ doc("ingest_datetime") }}'
+      - name: row_num
+        description: |
+          Row number used to sort rows from previous executions for the
+          same measure, year, patient, and key.
 
   - name: quality_measures__int_hedis_measure_report
     description: |
@@ -73,6 +217,95 @@ models:
         - hedis
         - quality_measures
       materialized: table
+    columns:
+      - name: id
+        description: '{{ doc("hedis_execution_id") }}'
+      - name: measure
+        description: '{{ doc("hedis_measure_name") }}'
+      - name: measure_id
+        description: '{{ doc("hedis_measure_id") }}'
+      - name: measure_year
+        description: '{{ doc("hedis_measure_year") }}'
+      - name: status
+        description: '{{ doc("hedis_status") }}'
+      - name: type
+        description: '{{ doc("hedis_type") }}'
+      - name: period_start
+        description: '{{ doc("period_start") }}'
+      - name: period_end
+        description: '{{ doc("period_end") }}'
+      - name: patient
+        description: '{{ doc("person_id") }}'
+      - name: rate_1_id
+        description: '{{ doc("hedis_rate_id") }}'
+      - name: rate_1_population_type_0
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_0
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_1
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_1
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_2
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_2
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_3
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_3
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_4
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_4
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_5
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_5
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_1_population_type_6
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_1_population_count_6
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_id
+        description: '{{ doc("hedis_rate_id") }}'
+      - name: rate_2_population_type_0
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_0
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_1
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_1
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_2
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_2
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_3
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_3
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_4
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_4
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_5
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_5
+        description: '{{ doc("hedis_population_count") }}'
+      - name: rate_2_population_type_6
+        description: '{{ doc("hedis_population_type") }}'
+      - name: rate_2_population_count_6
+        description: '{{ doc("hedis_population_count") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: file_name
+        description: '{{ doc("file_name") }}'
+      - name: file_date
+        description: '{{ doc("ingest_datetime") }}'
+      - name: row_num
+        description: |
+          Row number used to sort rows from previous executions for the
+          same measure, year, and patient.
 
   - name: quality_measures__int_hedis_measure_normalize
     description: |
@@ -86,6 +319,87 @@ models:
         - hedis
         - quality_measures
       materialized: table
+    columns:
+      - name: id
+        description: '{{ doc("hedis_execution_id") }}'
+      - name: measure
+        description: '{{ doc("hedis_measure_name") }}'
+      - name: measure_id
+        description: '{{ doc("hedis_measure_id") }}'
+      - name: measure_year
+        description: '{{ doc("hedis_measure_year") }}'
+      - name: status
+        description: '{{ doc("hedis_status") }}'
+      - name: type
+        description: '{{ doc("hedis_type") }}'
+      - name: period_start
+        description: '{{ doc("period_start") }}'
+      - name: period_end
+        description: '{{ doc("period_end") }}'
+      - name: patient
+        description: '{{ doc("person_id") }}'
+      - name: rate_1_initial_population_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "initial population".
+      - name: rate_1_denominator_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "denominator".
+      - name: rate_1_exclusion_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "exclusion".
+      - name: rate_1_medicare_denominator_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "medicare denominator".
+      - name: rate_1_medicare_exclusion_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "medicare exclusion".
+      - name: rate_1_numerator_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "numerator".
+      - name: rate_2_initial_population_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "initial population".
+      - name: rate_2_denominator_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "denominator".
+      - name: rate_2_exclusion_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "exclusion".
+      - name: rate_2_medicare_denominator_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "medicare denominator".
+      - name: rate_2_medicare_exclusion_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "medicare exclusion".
+      - name: rate_2_numerator_flag
+        description: |
+          Normalized flag using population_type to map to the expected flag
+          for measure concept "numerator".
+      - name: rate_1_performance_flag
+        description: '{{ doc("performance_flag") }}'
+      - name: rate_1_medicare_performance_flag
+        description: '{{ doc("performance_flag") }}'
+      - name: rate_2_performance_flag
+        description: '{{ doc("performance_flag") }}'
+      - name: rate_2_medicare_performance_flag
+        description: '{{ doc("performance_flag") }}'
+      - name: data_source
+        description: '{{ doc("data_source") }}'
+      - name: file_name
+        description: '{{ doc("file_name") }}'
+      - name: file_date
+        description: '{{ doc("ingest_datetime") }}'
 
 ## Staging
   - name: quality_measures__stg_hedis_cql_engine_log

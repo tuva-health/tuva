@@ -158,6 +158,7 @@ with summary_long as (
         , calculate_medicare_performance_rate_2.rate_2_medicare_numerator_sum
         , calculate_medicare_performance_rate_2.rate_2_medicare_exclusion_sum
         , calculate_medicare_performance_rate_2.rate_2_medicare_performance_rate
+        , calculate_performance_rate_1.data_source
     from calculate_performance_rate_1
         left outer join calculate_medicare_performance_rate_1
             on calculate_performance_rate_1.measure_id = calculate_medicare_performance_rate_1.measure_id
@@ -207,6 +208,7 @@ with summary_long as (
         , cast(rate_2_medicare_numerator_sum as integer) as rate_2_medicare_numerator_sum
         , cast(rate_2_medicare_exclusion_sum as integer) as rate_2_medicare_exclusion_sum
         , round(cast(rate_2_medicare_performance_rate as {{ dbt.type_numeric() }}), 3) as rate_2_medicare_performance_rate
+        , cast(data_source as {{ dbt.type_string() }}) as data_source
     from joined
 
 )
@@ -233,5 +235,6 @@ select
     , rate_2_medicare_numerator_sum
     , rate_2_medicare_exclusion_sum
     , rate_2_medicare_performance_rate
+    , data_source
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types

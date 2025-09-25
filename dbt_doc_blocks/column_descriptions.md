@@ -1212,60 +1212,80 @@ FIPS code for the state the patient lives in (most recent known address).
 
 {% docs normalized_state_name %}
 State for the patient (most recent known address).
-{% enddocs%}
+{% enddocs %}
 
 {% docs fips_state_abbreviation %}
 Abbreviated form of the state for the patient (most recient known address).
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_measure_id %}
 Measure unique identifier.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_measure_name %}
 Measure name.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_measure_year %}
 Year indicating the definition used.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_cql_key %}
 CQL concept key.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_cql_value %}
 CQL concept value.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_execution_id %}
 Unique identifier for the measure, execution, and patient.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_status %}
 Execution status.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_type %}
 Execution type.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_rate_id %}
 Identifier for "rate-1" or "rate-2". Some HEDIS measures report two rates for different outcomes (e.g., (GSD) Glycemic Status Assessment) or follow-up care (e.g., (DSF-E) Depression Screening and Follow-up). Refer to HEDIS measure documentation.
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_population_type %}
 Population type description for the pivoted values ("initial-population", "denominator", "denominator-exclusion", "denominator-exclusion-medicare", "denominator-medicare", "numerator").
-{% enddocs%}
+{% enddocs %}
 
 {% docs hedis_population_count %}
 Boolean value for the pivoted values.
-{% enddocs%}
+{% enddocs %}
 
 {% docs period_start %}
 Starting date of the performance or measurement period.
-{% enddocs%}
+{% enddocs %}
 
 {% docs period_end %}
 Ending date of the performance or measurement period.
-{% enddocs%}
+{% enddocs %}
+
+{% docs performance_flag %}
+Performance flag calculated by using exclusion, numerator, and denominator flags. When excluded from a measure the flag is null.
+{% enddocs %}
+
+{% docs denominator %}
+The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+{% enddocs %}
+
+{% docs numerator %}
+The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved with exclusion logic applied.
+{% enddocs %}
+
+{% docs exclusion %}
+Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+{% enddocs %}
+
+{% docs performance_rate %}
+Calculated performance rate. The performance flag sum divided by the performance flag count multiplied by 100.
+{% enddocs %}
