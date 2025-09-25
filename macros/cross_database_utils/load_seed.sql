@@ -168,7 +168,7 @@ copy into {{ this }}
       field_optionally_enclosed_by = '"'
       /* Crucial: also treat quoted empties "" as NULL */
       {% if null_marker == true %}
-      null_if = ('', '""', 'NULL', '\N')
+      null_if = ('', '""', 'NULL', '\\N')
       {% else %}
       /* At minimum, handle both empty and quoted-empty */
       null_if = ('', '""')
