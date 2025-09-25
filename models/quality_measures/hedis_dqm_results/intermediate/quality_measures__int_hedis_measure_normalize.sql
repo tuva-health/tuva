@@ -7,6 +7,7 @@ with dedupe as (
     select
           id
         , measure
+        , measure_id
         , measure_year
         , status
         , type
@@ -53,7 +54,8 @@ with dedupe as (
 )
 
 /*
-    normalize population types to expected flags:
+    Due to the JSON format these flags may appear in a different order
+    per measure, so we use the population_type to map to the expected flags.
         - denominator
         - denominator-exclusion
         - denominator-exclusion-medicare
@@ -66,6 +68,7 @@ with dedupe as (
     select
           id
         , measure
+        , measure_id
         , measure_year
         , status
         , type
@@ -214,6 +217,7 @@ with dedupe as (
     select
           id
         , measure
+        , measure_id
         , measure_year
         , status
         , type
@@ -270,6 +274,7 @@ with dedupe as (
 select
       id
     , measure
+    , measure_id
     , measure_year
     , status
     , type

@@ -10,6 +10,14 @@ with normalized as (
 
 )
 
+, measure_name as (
+
+    select *
+    from {{ ref('quality_measures__measures') }}
+
+)
+
+/* add clean measure name */
 , add_data_types as (
 
     select
@@ -30,11 +38,14 @@ with normalized as (
         , cast(rate_2_medicare_performance_flag as integer) as rate_2_medicare_performance_flag
         , cast(period_start as date) as performance_period_begin
         , cast(period_end as date) as performance_period_end
-        , cast(measure as {{ dbt.type_string() }}) as measure_id -- todo: add clean id
-        , cast(measure as {{ dbt.type_string() }}) as measure_name -- todo: add clean id
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name.name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_year as {{ dbt.type_string() }}) as measure_version
         , cast(data_source as {{ dbt.type_string() }}) as data_source
     from normalized
+        left outer join measure_name
+            on normalized.measure_id = measure_name.id
+            and normalized.measure_year = measure_name.version
 
 )
 

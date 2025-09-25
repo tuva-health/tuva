@@ -42,8 +42,8 @@ with summary_long as (
         , sum(rate_1_denominator_flag) as rate_1_denominator_sum
         , sum(rate_1_numerator_flag) as rate_1_numerator_sum
         , sum(rate_1_exclusion_flag) as rate_1_exclusion_sum
-        , (cast(sum(rate_1_performance_flag) as {{ dbt.type_numeric() }}) /
-            (cast(count(rate_1_performance_flag) as {{ dbt.type_numeric() }}))
+        , (cast(sum(coalesce(rate_1_performance_flag,0)) as {{ dbt.type_numeric() }}) /
+            (cast(count(coalesce(rate_1_performance_flag,0)) as {{ dbt.type_numeric() }}))
           ) * 100 as rate_1_performance_rate
     from summary_long
     group by
@@ -68,8 +68,8 @@ with summary_long as (
         , sum(rate_1_medicare_denominator_flag) as rate_1_medicare_denominator_sum
         , sum(rate_1_numerator_flag) as rate_1_medicare_numerator_sum
         , sum(rate_1_medicare_exclusion_flag) as rate_1_medicare_exclusion_sum
-        , (cast(sum(rate_1_medicare_performance_flag) as {{ dbt.type_numeric() }}) /
-            (cast(count(rate_1_medicare_performance_flag) as {{ dbt.type_numeric() }}))
+        , (cast(sum(coalesce(rate_1_medicare_performance_flag,0)) as {{ dbt.type_numeric() }}) /
+            (cast(count(coalesce(rate_1_medicare_performance_flag,0)) as {{ dbt.type_numeric() }}))
           ) * 100 as rate_1_medicare_performance_rate
     from summary_long
     group by
@@ -94,10 +94,9 @@ with summary_long as (
         , sum(rate_2_denominator_flag) as rate_2_denominator_sum
         , sum(rate_2_numerator_flag) as rate_2_numerator_sum
         , sum(rate_2_exclusion_flag) as rate_2_exclusion_sum
-        , (
-                cast(sum(rate_2_performance_flag) as {{ dbt.type_numeric() }}) /
-                    (cast(count(rate_2_performance_flag) as {{ dbt.type_numeric() }}))
-              ) * 100 as rate_2_performance_rate
+        , (cast(sum(coalesce(rate_2_performance_flag,0)) as {{ dbt.type_numeric() }}) /
+            (cast(count(coalesce(rate_2_performance_flag,0)) as {{ dbt.type_numeric() }}))
+          ) * 100 as rate_2_performance_rate
     from summary_long
     group by
           measure_id
@@ -121,8 +120,8 @@ with summary_long as (
         , sum(rate_2_medicare_denominator_flag) as rate_2_medicare_denominator_sum
         , sum(rate_2_numerator_flag) as rate_2_medicare_numerator_sum
         , sum(rate_2_medicare_exclusion_flag) as rate_2_medicare_exclusion_sum
-        , (cast(sum(rate_2_medicare_performance_flag) as {{ dbt.type_numeric() }}) /
-            (cast(count(rate_2_medicare_performance_flag) as {{ dbt.type_numeric() }}))
+        , (cast(sum(coalesce(rate_2_medicare_performance_flag,0)) as {{ dbt.type_numeric() }}) /
+            (cast(count(coalesce(rate_2_medicare_performance_flag,0)) as {{ dbt.type_numeric() }}))
           ) * 100 as rate_2_medicare_performance_rate
     from summary_long
     group by

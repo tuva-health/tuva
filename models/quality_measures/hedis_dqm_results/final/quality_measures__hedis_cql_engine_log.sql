@@ -11,17 +11,28 @@ with dedupe as (
 
 )
 
+, measure_name as (
+
+    select *
+    from {{ ref('quality_measures__measures') }}
+
+)
+
+/* add clean measure name */
 , add_data_types as (
 
     select
           cast(patient as {{ dbt.type_string() }}) as person_id
-        , cast({{ string_extract('measure', start_delim='(', end_delim=')') }} as {{ dbt.type_string() }}) as measure_id
-        , cast(measure as {{ dbt.type_string() }}) as measure_name
+        , cast(measure_id as {{ dbt.type_string() }}) as measure_id
+        , cast(measure_name.name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_year as {{ dbt.type_string() }}) as measure_version
         , cast(cql_key as {{ dbt.type_string() }}) as cql_concept_key
         , cast(cql_value as {{ dbt.type_string() }}) as cql_concept_value
         , cast(data_source as {{ dbt.type_string() }}) as data_source
     from dedupe
+        left outer join measure_name
+            on dedupe.measure_id = measure_name.id
+            and dedupe.measure_year = measure_name.version
 
 )
 

@@ -18,6 +18,7 @@ with stage as (
 
     select
           measure
+        , measure_id
         , measure_year
         , patient
         , cql_key
@@ -42,6 +43,7 @@ with stage as (
 select
       patient
     , measure
+    , measure_id
     , measure_year
     , cql_key
     , cql_value

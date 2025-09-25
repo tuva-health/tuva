@@ -14,7 +14,8 @@ with stage as (
     select
           id
         , measure
-        , {{ date_part('year', 'period_start') }} as measure_year
+        , measure_id
+        , measure_year
         , status
         , type
         , period_start
@@ -66,6 +67,7 @@ with stage as (
     select
           id
         , measure
+        , measure_id
         , measure_year
         , status
         , type
@@ -121,6 +123,7 @@ with stage as (
 select
       id
     , measure
+    , measure_id
     , measure_year
     , status
     , type
