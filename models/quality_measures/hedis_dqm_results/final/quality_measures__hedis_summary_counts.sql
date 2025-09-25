@@ -209,6 +209,7 @@ with summary_long as (
         , cast(rate_2_medicare_exclusion_sum as integer) as rate_2_medicare_exclusion_sum
         , round(cast(rate_2_medicare_performance_rate as {{ dbt.type_numeric() }}), 3) as rate_2_medicare_performance_rate
         , cast(data_source as {{ dbt.type_string() }}) as data_source
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     from joined
 
 )
@@ -236,5 +237,5 @@ select
     , rate_2_medicare_exclusion_sum
     , rate_2_medicare_performance_rate
     , data_source
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , tuva_last_run
 from add_data_types

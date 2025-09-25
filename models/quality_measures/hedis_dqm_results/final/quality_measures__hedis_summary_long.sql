@@ -42,6 +42,7 @@ with normalized as (
         , cast(measure_name.name as {{ dbt.type_string() }}) as measure_name
         , cast(measure_year as {{ dbt.type_string() }}) as measure_version
         , cast(data_source as {{ dbt.type_string() }}) as data_source
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     from normalized
         left outer join measure_name
             on normalized.measure_id = measure_name.id
@@ -71,5 +72,5 @@ select
     , measure_name
     , measure_version
     , data_source
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , tuva_last_run
 from add_data_types

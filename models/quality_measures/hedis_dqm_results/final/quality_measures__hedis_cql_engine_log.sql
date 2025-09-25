@@ -29,6 +29,7 @@ with dedupe as (
         , cast(cql_key as {{ dbt.type_string() }}) as cql_concept_key
         , cast(cql_value as {{ dbt.type_string() }}) as cql_concept_value
         , cast(data_source as {{ dbt.type_string() }}) as data_source
+        , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
     from dedupe
         left outer join measure_name
             on dedupe.measure_id = measure_name.id
@@ -45,5 +46,5 @@ select
     , cql_concept_key
     , cql_concept_value
     , data_source
-    , '{{ var('tuva_last_run') }}' as tuva_last_run
+    , tuva_last_run
 from add_data_types
