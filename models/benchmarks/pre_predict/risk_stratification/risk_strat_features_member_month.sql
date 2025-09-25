@@ -211,11 +211,12 @@ with subset_persons as (
 , lookback_future_metrics as (
   select
       cur.person_id
-    , cur.data_source
-    , cur.payer
-    , cur.{{ quote_column('plan') }}
-    , cur.year_month
-    , sum(case when hist.month_start between {{ dateadd('month', -11, 'cur.month_start') }} and cur.month_start then hist.ip_encounter_count_month else 0 end) as lookback_ip_encounter_count_12m
+  , cur.data_source
+  , cur.payer
+  , cur.{{ quote_column('plan') }}
+  , cur.year_month
+  , count(distinct case when hist.month_start between {{ dateadd('month', -11, 'cur.month_start') }} and cur.month_start then hist.year_month end) as member_months_in_lookback
+  , sum(case when hist.month_start between {{ dateadd('month', -11, 'cur.month_start') }} and cur.month_start then hist.ip_encounter_count_month else 0 end) as lookback_ip_encounter_count_12m
     , sum(case when hist.month_start between {{ dateadd('month', -11, 'cur.month_start') }} and cur.month_start then hist.ed_encounter_count_month else 0 end) as lookback_ed_encounter_count_12m
     , sum(case when hist.month_start between {{ dateadd('month', -8, 'cur.month_start') }} and cur.month_start then hist.ip_encounter_count_month else 0 end) as lookback_ip_encounter_count_9m
     , sum(case when hist.month_start between {{ dateadd('month', -8, 'cur.month_start') }} and cur.month_start then hist.ed_encounter_count_month else 0 end) as lookback_ed_encounter_count_9m
@@ -329,7 +330,11 @@ select
   , idx.sex
   , idx.race
   , idx.state
-  , case when pc.person_id is null and pcms.person_id is null and phcc.person_id is null then 1 else 0 end as cold_start
+  , case
+      when coalesce(lfm.member_months_in_lookback, 0) = 0 then 1
+      when pc.person_id is null and pcms.person_id is null and phcc.person_id is null then 1
+      else 0
+    end as cold_start
 {% for col in cond_cols %}
   {% set base = col | replace('cond_', '') %}
   , coalesce(pc.{{ base }}, 0) as lag_{{ col }}
@@ -345,6 +350,7 @@ select
   , cast(coalesce(lfm.target_12m_acute_inpatient_encounter_count, 0) as {{ dbt.type_int() }}) as target_12m_acute_inpatient_encounter_count
   , cast(coalesce(lfm.lookback_ip_encounter_count_12m, 0) as {{ dbt.type_int() }}) as lookback_ip_encounter_count_12m
   , cast(coalesce(lfm.lookback_ed_encounter_count_12m, 0) as {{ dbt.type_int() }}) as lookback_ed_encounter_count_12m
+  , cast(coalesce(lfm.member_months_in_lookback, 0) as {{ dbt.type_int() }}) as member_months_in_lookback
   , cast(coalesce(lfm.lookback_ip_encounter_count_9m, 0) as {{ dbt.type_int() }}) as lookback_ip_encounter_count_9m
   , cast(coalesce(lfm.lookback_ed_encounter_count_9m, 0) as {{ dbt.type_int() }}) as lookback_ed_encounter_count_9m
   , cast(coalesce(lfm.lookback_ip_encounter_count_6m, 0) as {{ dbt.type_int() }}) as lookback_ip_encounter_count_6m
@@ -391,12 +397,12 @@ left join facility_agg fa
  and idx.payer = fa.payer
  and idx.{{ quote_column('plan') }} = fa.{{ quote_column('plan') }}
  and idx.index_year_month = fa.index_year_month
-left join {{ ref('benchmarks__pivot_condition') }} pc
+left join {{ ref('benchmarks__pivot_condition_member_month') }} pc
   on idx.person_id = pc.person_id
- and idx.diagnosis_year = pc.year_nbr
-left join {{ ref('benchmarks__pivot_cms_condition') }} pcms
+ and idx.index_year_month = pc.year_month
+left join {{ ref('benchmarks__pivot_cms_condition_member_month') }} pcms
   on idx.person_id = pcms.person_id
- and idx.diagnosis_year = pcms.year_nbr
-left join {{ ref('benchmarks__pivot_hcc') }} phcc
+ and idx.index_year_month = pcms.year_month
+left join {{ ref('benchmarks__pivot_hcc_member_month') }} phcc
   on idx.person_id = phcc.person_id
- and idx.diagnosis_year = phcc.year_nbr
+ and idx.index_year_month = phcc.year_month
