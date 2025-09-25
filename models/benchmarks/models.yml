@@ -76,6 +76,7 @@ models:
         - benchmarks_train
         - benchmarks
         - risk_stratification
+        - risk_strat_member_month
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
@@ -98,6 +99,22 @@ models:
         - benchmarks
 
 
+  - name: benchmarks__pivot_condition_member_month
+    description: |
+      Member-month grain condition flags aligned to monthly eligibility for
+      risk stratification lookback windows.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: int_pivot_condition_member_month
+      materialized: table
+      tags:
+        - benchmarks_train
+        - benchmarks
+        - risk_strat_member_month
+
+  
   - name: benchmarks__predict_member_month
     description: |
         member_month grain table for data viz with expected values
@@ -259,6 +276,21 @@ models:
         - benchmarks_train
         - benchmarks
 
+  - name: benchmarks__pivot_hcc_member_month
+    description: |
+      Member-month grain HCC indicators aligned to rolling lookbacks for
+      risk stratification modeling.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: int_pivot_hcc_member_month
+      materialized: table
+      tags:
+        - benchmarks_train
+        - benchmarks
+        - risk_strat_member_month
+
   - name: benchmarks__pivot_cms_condition
     description: |
         hcc_person_year
@@ -271,6 +303,21 @@ models:
       tags: 
         - benchmarks_train
         - benchmarks
+
+  - name: benchmarks__pivot_cms_condition_member_month
+    description: |
+      Member-month CMS chronic-condition hierarchy flags for monthly
+      risk stratification features.
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_benchmarks
+        {%- else -%}benchmarks{%- endif -%}
+      alias: int_pivot_cms_condition_member_month
+      materialized: table
+      tags:
+        - benchmarks_train
+        - benchmarks
+        - risk_strat_member_month
 
   # Staging models
   - name: benchmarks__stg_core__condition
