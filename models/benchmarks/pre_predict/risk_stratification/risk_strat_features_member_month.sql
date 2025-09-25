@@ -13,20 +13,37 @@
 {% set highcost_threshold = var('risk_strat_high_cost_threshold', 5000) %}
 {% set person_limit = var('risk_strat_person_limit', none) %}
 
-{% set src = ref('benchmarks__person_year_prospective') %}
-{% set cols = adapter.get_columns_in_relation(src) %}
+{% set rel_cond = ref('benchmarks__pivot_condition_member_month') %}
+{% set rel_cms = ref('benchmarks__pivot_cms_condition_member_month') %}
+{% set rel_hcc = ref('benchmarks__pivot_hcc_member_month') %}
+
+{% set cond_source_cols = adapter.get_columns_in_relation(rel_cond) %}
+{% set cms_source_cols = adapter.get_columns_in_relation(rel_cms) %}
+{% set hcc_source_cols = adapter.get_columns_in_relation(rel_hcc) %}
 
 {% set cond_cols = [] %}
 {% set cms_cols = [] %}
 {% set hcc_cols = [] %}
 
-{% for c in cols %}
+{% set excluded_cond_cols = ['person_id', 'year_month', 'year_nbr'] %}
+
+{% for c in cond_source_cols %}
   {% set n = c.name | lower %}
-  {% if n.startswith('cond_') %}
+  {% if n not in excluded_cond_cols %}
     {% do cond_cols.append(n) %}
-  {% elif n.startswith('cms_') %}
+  {% endif %}
+{% endfor %}
+
+{% for c in cms_source_cols %}
+  {% set n = c.name | lower %}
+  {% if n.startswith('cms_') %}
     {% do cms_cols.append(n) %}
-  {% elif n.startswith('hcc_') %}
+  {% endif %}
+{% endfor %}
+
+{% for c in hcc_source_cols %}
+  {% set n = c.name | lower %}
+  {% if n.startswith('hcc_') %}
     {% do hcc_cols.append(n) %}
   {% endif %}
 {% endfor %}
@@ -320,6 +337,7 @@ select
   , idx.data_source
   , idx.payer
   , idx.{{ quote_column('plan') }}
+  , cast(coalesce(lfm.member_months_in_lookback, 0) as {{ dbt.type_int() }}) as member_months_in_lookback
   , idx.year_nbr
   , idx.diagnosis_year
   , idx.prediction_year
@@ -336,8 +354,7 @@ select
       else 0
     end as cold_start
 {% for col in cond_cols %}
-  {% set base = col | replace('cond_', '') %}
-  , coalesce(pc.{{ base }}, 0) as lag_{{ col }}
+  , coalesce(pc.{{ col }}, 0) as lag_cond_{{ col }}
 {% endfor %}
 {% for col in cms_cols %}
   , coalesce(pcms.{{ col }}, 0) as lag_{{ col }}
@@ -350,7 +367,7 @@ select
   , cast(coalesce(lfm.target_12m_acute_inpatient_encounter_count, 0) as {{ dbt.type_int() }}) as target_12m_acute_inpatient_encounter_count
   , cast(coalesce(lfm.lookback_ip_encounter_count_12m, 0) as {{ dbt.type_int() }}) as lookback_ip_encounter_count_12m
   , cast(coalesce(lfm.lookback_ed_encounter_count_12m, 0) as {{ dbt.type_int() }}) as lookback_ed_encounter_count_12m
-  , cast(coalesce(lfm.member_months_in_lookback, 0) as {{ dbt.type_int() }}) as member_months_in_lookback
+  
   , cast(coalesce(lfm.lookback_ip_encounter_count_9m, 0) as {{ dbt.type_int() }}) as lookback_ip_encounter_count_9m
   , cast(coalesce(lfm.lookback_ed_encounter_count_9m, 0) as {{ dbt.type_int() }}) as lookback_ed_encounter_count_9m
   , cast(coalesce(lfm.lookback_ip_encounter_count_6m, 0) as {{ dbt.type_int() }}) as lookback_ip_encounter_count_6m
@@ -378,6 +395,7 @@ select
   , case when lfm.last_highcost_month_end is not null
          then {{ datediff('lfm.last_highcost_month_end', 'idx.index_month_end_date', 'day') }}
          else null end as lookback_days_since_last_highcost
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from idx
 left join lookback_future_metrics lfm
   on idx.person_id = lfm.person_id
