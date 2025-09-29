@@ -11,7 +11,7 @@
     , "tags": ["quality_measures", "hedis"]
     , "strategy": "timestamp"
     , "updated_at": "tuva_last_run"
-    , "unique_key": "person_id||measure_id||measure_name||measure_version||cql_concept_key||cql_concept_value||data_source||tuva_last_run"
+    , "unique_key": "person_id||measure_id||measure_name||measure_version||cql_concept_key||cql_concept_value||data_source"
     , "enabled": var('snapshots_enabled',False) == true and var('hedis_enabled',False) == true | as_bool
   })
 }}

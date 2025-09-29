@@ -11,11 +11,11 @@
     , "tags": ["quality_measures", "hedis"]
     , "strategy": "timestamp"
     , "updated_at": "tuva_last_run"
-    , "unique_key": "person_id||rate_1_denominator_flag||rate_1_numerator_flag||rate_1_exclusion_flag||rate_1_medicare_denominator_flag||rate_1_medicare_exclusion_flag||rate_1_performance_flag||rate_1_medicare_performance_flag||rate_2_denominator_flag||rate_2_numerator_flag||rate_2_exclusion_flag||rate_2_medicare_denominator_flag||rate_2_medicare_exclusion_flag||rate_2_performance_flag||rate_2_medicare_performance_flag||performance_period_begin||performance_period_end||measure_id||measure_name||measure_version||data_source||tuva_last_run"
+    , "unique_key": "person_id||rate_1_denominator_flag||rate_1_numerator_flag||rate_1_exclusion_flag||rate_1_medicare_denominator_flag||rate_1_medicare_exclusion_flag||rate_1_performance_flag||rate_1_medicare_performance_flag||rate_2_denominator_flag||rate_2_numerator_flag||rate_2_exclusion_flag||rate_2_medicare_denominator_flag||rate_2_medicare_exclusion_flag||rate_2_performance_flag||rate_2_medicare_performance_flag||performance_period_begin||performance_period_end||measure_id||measure_name||measure_version||data_source"
     , "enabled": var('snapshots_enabled',False) == true and var('hedis_enabled',False) == true | as_bool
   })
 }}
 
 select * from {{ ref('quality_measures__hedis_summary_long') }}
 
-{% endsnapshot %})
+{% endsnapshot %}

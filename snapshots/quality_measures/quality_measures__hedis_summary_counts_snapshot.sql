@@ -11,7 +11,7 @@
     , "tags": ["quality_measures", "hedis"]
     , "strategy": "timestamp"
     , "updated_at": "tuva_last_run"
-    , "unique_key": "measure_id||measure_name||measure_version||performance_period_begin||performance_period_end||rate_1_denominator_sum||rate_1_numerator_sum||rate_1_exclusion_sum||rate_1_performance_rate||rate_1_medicare_denominator_sum||rate_1_medicare_numerator_sum||rate_1_medicare_exclusion_sum||rate_1_medicare_performance_rate||rate_2_denominator_sum||rate_2_numerator_sum||rate_2_exclusion_sum||rate_2_performance_rate||rate_2_medicare_denominator_sum||rate_2_medicare_numerator_sum||rate_2_medicare_exclusion_sum||rate_2_medicare_performance_rate||data_source||tuva_last_run"
+    , "unique_key": "measure_id||measure_name||measure_version||performance_period_begin||performance_period_end||rate_1_denominator_sum||rate_1_numerator_sum||rate_1_exclusion_sum||rate_1_performance_rate||rate_1_medicare_denominator_sum||rate_1_medicare_numerator_sum||rate_1_medicare_exclusion_sum||rate_1_medicare_performance_rate||rate_2_denominator_sum||rate_2_numerator_sum||rate_2_exclusion_sum||rate_2_performance_rate||rate_2_medicare_denominator_sum||rate_2_medicare_numerator_sum||rate_2_medicare_exclusion_sum||rate_2_medicare_performance_rate||data_source"
     , "enabled": var('snapshots_enabled',False) == true and var('hedis_enabled',False) == true | as_bool
   })
 }}
