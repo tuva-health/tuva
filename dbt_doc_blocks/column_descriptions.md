@@ -1,3 +1,7 @@
+{% docs _dbt_source_relation %}
+dbt utils metadata column to indicate the source table from unioning tables together.
+{% enddocs %}
+
 {% docs accession_number %}
 The lab order number from the source system.
 {% enddocs %}
@@ -1036,6 +1040,10 @@ The number of units for the particular revenue center code.
 
 {% docs sex %}
 The gender of the patient.
+{% enddocs %}
+
+{% docs snf_part_b_flag %}
+Indicates whether the inpatient medical service for Medicare covers under Part B or not. (1 for yes and 0 for no)
 {% enddocs %}
 
 {% docs social_security_number %}
