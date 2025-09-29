@@ -1,5 +1,5 @@
 {% docs _dbt_source_relation %}
-Indicates if the encounter is claim or clinical.
+dbt utils metadata column to indicate the source table from unioning tables together.
 {% enddocs %}
 
 {% docs accession_number %}
