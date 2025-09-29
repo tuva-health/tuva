@@ -1,0 +1,238 @@
+version: 2
+
+models:
+
+- name: semantic_layer__dim_condition
+  description: >
+    Condition dimension table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_condition
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__dim_data_source
+  description: >
+    Data source dimension table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_data_source
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__dim_date
+  description: >
+    Date dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_date
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__dim_encounter_group
+  description: >
+    Unique encounter group dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_encounter_group
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: encounter_group_sk
+    description: SK for unique encounter groups
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__dim_encounter_provider
+  description: >
+    Unique primary provider dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_encounter_provider
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: encounter_id
+    description: ID for unique encounters
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__dim_encounter_type
+  description: >
+    Unique encounter type dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_encounter_type
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: encounter_type_sk
+    description: SK for unique encounter types
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__dim_member
+  description: >
+    Member dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_member
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: patient_source_key
+    description: Unique key of patient id and data source
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__dim_service_category
+  description: >
+    Unique service categories dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_service_category
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: service_category_sk
+    description: SK for unique combination of service categories
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__dim_year
+  description: >
+    Year dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_year
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_claims_summary
+  description: >
+    Claims summary fact table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_claims_summary
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_claims
+  description: >
+    Claim line level fact for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_claims
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: medical_claim_id
+    description: Unique claim line id
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__fact_encounter_service_bridge
+  description: >
+    Bridge table for encounters and service categories for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_encounter_service_bridge
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_encounters
+  description: >
+    Encounter level fact for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_encounters
+    tags: semantic_layer
+    materialized: table
+  columns:
+  - name: encounter_id
+    description: Unique encounter id
+    tests:
+    - unique:
+        config:
+          severity: error
+
+- name: semantic_layer__fact_expected_values
+  description: >
+    Claims expected values fact table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_expected_values
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_member_condition_bridge
+  description: >
+    Member to condition bridge table table for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_member_condition_bridge
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_member_months
+  description: >
+    Member months fact for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_member_months
+    tags: semantic_layer
+    materialized: table
+  data_tests:
+  - dbt_utils.unique_combination_of_columns:
+      combination_of_columns:
+        - person_id
+        - data_source
+        - year_month
+        - "[plan]"
+  columns:
+  - name: patient_source_key
+    description: Unique combination of patient id and data source
