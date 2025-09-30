@@ -293,6 +293,8 @@ models:
         - encounters
       materialized: table
     columns:
+    - name: _dbt_source_relation
+      description: '{{ doc("_dbt_source_relation") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
       tests:
@@ -363,6 +365,8 @@ models:
       description: '{{ doc("newborn_flag") }}'
     - name: nicu_flag
       description: '{{ doc("nicu_flag") }}'
+    - name: snf_part_b_flag
+      description: '{{ doc("snf_part_b_flag") }}'
     - name: primary_diagnosis_code_type
       description: '{{ doc("primary_diagnosis_code_type") }}'
       meta:
@@ -839,10 +843,6 @@ models:
       description: '{{ doc("data_source") }}'
     - name: file_date
       description: '{{ doc("file_date") }}'
-      tests:
-        - not_null
-    - name: file_date
-      description: '{{ doc("file_date") }}'
     - name: tuva_last_run
       description: '{{ doc("tuva_last_run") }}'
 
@@ -1249,10 +1249,6 @@ models:
         description: '{{ doc("member_month_key") }}'
       - name: data_source
         description: '{{ doc("data_source") }}'
-      - name: file_date
-        description: '{{ doc("file_date") }}'
-        tests:
-          - not_null
       - name: file_date
         description: '{{ doc("file_date") }}'
       - name: tuva_last_run

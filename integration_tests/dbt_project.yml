@@ -51,6 +51,7 @@ vars:
   # quality_measures_enabled: false
   # readmissions_enabled: true
   # fhir_preprocessing_enabled: true # defaults to false
+  # hedis_enabled: true # defaults to false
 
 
 model-paths: ["models"]
@@ -89,6 +90,11 @@ seeds:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','pharmacy_claim.csv',headers=true) }}"
     provider_attribution_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','provider_attribution.csv',headers=true) }}"
+    # optional mart data
+    hedis_cql_engine_log_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','hedis_cql_engine_log.csv',headers=true) }}"
+    hedis_measure_report_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','hedis_measure_report.csv',headers=true) }}"
 
 models:
   integration_tests:
