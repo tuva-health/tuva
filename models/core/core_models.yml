@@ -293,6 +293,8 @@ models:
         - encounters
       materialized: table
     columns:
+    - name: _dbt_source_relation
+      description: '{{ doc("_dbt_source_relation") }}'
     - name: encounter_id
       description: '{{ doc("encounter_id") }}'
       tests:
@@ -363,6 +365,8 @@ models:
       description: '{{ doc("newborn_flag") }}'
     - name: nicu_flag
       description: '{{ doc("nicu_flag") }}'
+    - name: snf_part_b_flag
+      description: '{{ doc("snf_part_b_flag") }}'
     - name: primary_diagnosis_code_type
       description: '{{ doc("primary_diagnosis_code_type") }}'
       meta:
