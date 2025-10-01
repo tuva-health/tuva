@@ -36,7 +36,7 @@ with stg_eligibility as (
     from {{ ref('cms_hcc__stg_core__eligibility') }} as elig
     inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
         /* filter to members with eligibility in collection or payment year */
-        on elig.enrollment_start_date <= cast({{ concat_custom(['dates.payment_year', "'-12-31'"]) }} as date)
+        on elig.enrollment_start_date <= dates.collection_end_date
         and elig.enrollment_end_date >= dates.collection_start_date
 
 )
@@ -113,7 +113,7 @@ with stg_eligibility as (
         , payment_year
         , collection_end_date
         , case
-            when coverage_months < collection_months then 'New'
+            when coverage_months < collection_months and collection_end_date <= proxy_enrollment_end_date then 'New'
             else 'Continuing'
           end as enrollment_status
     from calculate_prior_coverage
