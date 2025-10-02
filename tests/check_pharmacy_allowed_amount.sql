@@ -30,4 +30,4 @@ where abs(
      coalesce(rx.copayment_amount, 0) +
      coalesce(rx.deductible_amount, 0)) -
     coalesce(rx.allowed_amount, 0)
-) < 0.01  -- Allow for small rounding differences
+) > 0.01  -- Allow for small rounding differences
