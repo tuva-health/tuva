@@ -120,9 +120,9 @@ with denominator_ranked as (
         , denominator.measure_name
         , denominator.measure_version
     from denominator
-        left join numerator
+        left outer join numerator
             on denominator.person_id = numerator.person_id
-        left join exclusions
+        left outer join exclusions
             on denominator.person_id = exclusions.person_id
 
 )
