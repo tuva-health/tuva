@@ -57,7 +57,7 @@ with medical_claims as (
 
 )
 
-, /*
+/*
     Clamp payment_year for CPT/HCPCS eligibility to nearest seed year.
     Use case: enable in‑year HCC tracking when the upcoming payment year's
     CPT/HCPCS list is not yet published by CMS; use earliest if below range
