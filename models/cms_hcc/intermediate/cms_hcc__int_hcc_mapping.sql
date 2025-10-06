@@ -36,7 +36,7 @@ with conditions as (
 
 )
 
-, /*
+/*
     Clamp payment_year to nearest available in terminology.
     Use case: CMS posts ICD→HCC crosswalk for a payment year after the
     collection year; we allow in‑year HCC flagging by using the earliest
