@@ -36,6 +36,21 @@ with conditions as (
 
 )
 
+, /*
+    Clamp payment_year to nearest available in terminology.
+    Use case: CMS posts ICD→HCC crosswalk for a payment year after the
+    collection year; we allow in‑year HCC flagging by using the earliest
+    available year when below range and the latest when above.
+*/
+, seed_meta as (
+
+    select
+          min(payment_year) as min_payment_year
+        , max(payment_year) as max_payment_year
+    from seed_hcc_mapping
+
+)
+
 /* casting hcc_code to avoid formatting changes during union */
 , v24_mapped as (
 
@@ -48,9 +63,14 @@ with conditions as (
         , 'CMS-HCC-V24' as model_version
         , cast(seed_hcc_mapping.cms_hcc_v24 as {{ dbt.type_string() }}) as hcc_code
     from conditions
+        inner join seed_meta on 1=1
         inner join seed_hcc_mapping
             on conditions.condition_code = seed_hcc_mapping.diagnosis_code
-            and conditions.payment_year = seed_hcc_mapping.payment_year
+            and seed_hcc_mapping.payment_year = case
+                when conditions.payment_year < seed_meta.min_payment_year then seed_meta.min_payment_year
+                when conditions.payment_year > seed_meta.max_payment_year then seed_meta.max_payment_year
+                else conditions.payment_year
+            end
     where cms_hcc_v24_flag = 'Yes'
 
 )
@@ -66,9 +86,14 @@ with conditions as (
         , 'CMS-HCC-V28' as model_version
         , cast(seed_hcc_mapping.cms_hcc_v28 as {{ dbt.type_string() }}) as hcc_code
     from conditions
+        inner join seed_meta on 1=1
         inner join seed_hcc_mapping
             on conditions.condition_code = seed_hcc_mapping.diagnosis_code
-            and conditions.payment_year = seed_hcc_mapping.payment_year
+            and seed_hcc_mapping.payment_year = case
+                when conditions.payment_year < seed_meta.min_payment_year then seed_meta.min_payment_year
+                when conditions.payment_year > seed_meta.max_payment_year then seed_meta.max_payment_year
+                else conditions.payment_year
+            end
     where cms_hcc_v28_flag = 'Yes'
 
 )

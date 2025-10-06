@@ -13,6 +13,20 @@ with seed_adjustment_rates as (
 
 )
 
+, seed_adjustment_meta as (
+    /*
+        Clamp payment_year for normalization/MA coding adjustment factors
+        to the nearest available year. Use case: allow scoring for payment
+        years before CMS publishes the new adjustment table by using the
+        earliest if below range and the latest if above.
+    */
+    select
+          min(payment_year) as min_payment_year
+        , max(payment_year) as max_payment_year
+    from seed_adjustment_rates
+
+)
+
 , risk_factors as (
 
     select
@@ -142,8 +156,13 @@ with seed_adjustment_rates as (
         , blended.collection_start_date
         , blended.collection_end_date
     from blended
+        left outer join seed_adjustment_meta on 1=1
         left outer join seed_adjustment_rates
-            on blended.payment_year = seed_adjustment_rates.payment_year
+            on seed_adjustment_rates.payment_year = case
+                when blended.payment_year < seed_adjustment_meta.min_payment_year then seed_adjustment_meta.min_payment_year
+                when blended.payment_year > seed_adjustment_meta.max_payment_year then seed_adjustment_meta.max_payment_year
+                else blended.payment_year
+            end
 
 )
 
@@ -160,8 +179,13 @@ with seed_adjustment_rates as (
         , normalized.collection_start_date
         , normalized.collection_end_date
     from normalized
+        left outer join seed_adjustment_meta on 1=1
         left outer join seed_adjustment_rates
-            on normalized.payment_year = seed_adjustment_rates.payment_year
+            on seed_adjustment_rates.payment_year = case
+                when normalized.payment_year < seed_adjustment_meta.min_payment_year then seed_adjustment_meta.min_payment_year
+                when normalized.payment_year > seed_adjustment_meta.max_payment_year then seed_adjustment_meta.max_payment_year
+                else normalized.payment_year
+            end
 
 )
 

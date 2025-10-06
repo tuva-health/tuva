@@ -57,6 +57,21 @@ with medical_claims as (
 
 )
 
+, /*
+    Clamp payment_year for CPT/HCPCS eligibility to nearest seed year.
+    Use case: enable in‑year HCC tracking when the upcoming payment year's
+    CPT/HCPCS list is not yet published by CMS; use earliest if below range
+    and latest if above.
+*/
+, cpt_meta as (
+
+    select
+          min(payment_year) as min_payment_year
+        , max(payment_year) as max_payment_year
+    from {{ ref('cms_hcc__cpt_hcpcs') }}
+
+)
+
 , professional_claims as (
 
     select
@@ -76,8 +91,13 @@ with medical_claims as (
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+        inner join cpt_meta on 1=1
     where claim_type = 'professional'
+        and cpt_hcpcs_list.payment_year = case
+            when dates.payment_year < cpt_meta.min_payment_year then cpt_meta.min_payment_year
+            when dates.payment_year > cpt_meta.max_payment_year then cpt_meta.max_payment_year
+            else dates.payment_year
+        end
 
 )
 
@@ -122,9 +142,14 @@ with medical_claims as (
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+        inner join cpt_meta on 1=1
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
+        and cpt_hcpcs_list.payment_year = case
+            when dates.payment_year < cpt_meta.min_payment_year then cpt_meta.min_payment_year
+            when dates.payment_year > cpt_meta.max_payment_year then cpt_meta.max_payment_year
+            else dates.payment_year
+        end
 
 )
 
