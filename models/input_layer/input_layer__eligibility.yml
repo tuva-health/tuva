@@ -374,6 +374,20 @@ models:
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: medicare_part_b_enrollment_start_date
+        description: 'Date Medicare Part B entitlement began, if provided by source.'
+        tests:
+          - the_tuva_project.expect_column_to_exist:
+              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_cms_hccs']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+          - the_tuva_project.expect_column_values_to_be_of_type:
+              column_type: date
+              tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - accepted_values:
               description: https://resdac.org/cms-data/variables/medicare-status-code-january
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_cms_hccs']

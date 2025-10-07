@@ -40,6 +40,7 @@ select
        , cast(original_reason_entitlement_code as {{ dbt.type_string() }}) as original_reason_entitlement_code
        , cast(dual_status_code as {{ dbt.type_string() }}) as dual_status_code
        , cast(medicare_status_code as {{ dbt.type_string() }}) as medicare_status_code
+       , cast(medicare_part_b_enrollment_start_date as date) as medicare_part_b_enrollment_start_date
        , cast(subscriber_relation as {{ dbt.type_string() }}) as subscriber_relation
        , cast(group_id as {{ dbt.type_string() }}) as group_id
        , cast(group_name as {{ dbt.type_string() }}) as group_name

@@ -6,6 +6,7 @@ select
       person_id
     , enrollment_start_date
     , enrollment_end_date
+    , medicare_part_b_enrollment_start_date
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code

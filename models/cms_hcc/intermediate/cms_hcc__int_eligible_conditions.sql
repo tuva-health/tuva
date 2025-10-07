@@ -91,6 +91,9 @@ with medical_claims as (
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
+        /* CMS Ch.7 p.11: anchor eligibility to Part B entitlement start */
+        left outer join {{ ref('cms_hcc__int_medicare_enrollment_start') }} as start
+            on medical_claims.person_id = start.person_id
         inner join cpt_meta on 1=1
     where claim_type = 'professional'
         and cpt_hcpcs_list.payment_year = case
@@ -98,6 +101,7 @@ with medical_claims as (
             when dates.payment_year > cpt_meta.max_payment_year then cpt_meta.max_payment_year
             else dates.payment_year
         end
+        and (start.final_start is null or medical_claims.claim_end_date >= start.final_start)
 
 )
 
@@ -118,8 +122,12 @@ with medical_claims as (
     from medical_claims
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
+        /* CMS Ch.7 p.11: anchor eligibility to Part B entitlement start */
+        left outer join {{ ref('cms_hcc__int_medicare_enrollment_start') }} as start
+            on medical_claims.person_id = start.person_id
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('11', '41')
+        and (start.final_start is null or medical_claims.claim_end_date >= start.final_start)
 
 )
 
@@ -142,6 +150,9 @@ with medical_claims as (
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
+        /* CMS Ch.7 p.11: anchor eligibility to Part B entitlement start */
+        left outer join {{ ref('cms_hcc__int_medicare_enrollment_start') }} as start
+            on medical_claims.person_id = start.person_id
         inner join cpt_meta on 1=1
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
@@ -150,6 +161,7 @@ with medical_claims as (
             when dates.payment_year > cpt_meta.max_payment_year then cpt_meta.max_payment_year
             else dates.payment_year
         end
+        and (start.final_start is null or medical_claims.claim_end_date >= start.final_start)
 
 )
 

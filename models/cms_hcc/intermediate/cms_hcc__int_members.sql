@@ -4,7 +4,8 @@
 }}
 /*
 Steps for transforming eligibility data into member demographics:
-    1) Determine enrollment status using eligibility from the collection year.
+    1) Determine enrollment status using Medicare Part B entitlement months
+       within the collection year (CMS Medicare Managed Care Manual, Ch.7 p.11).
     2) Roll up to latest eligibility record for enrollment statuses.
     3) Add age groups based on the payment year.
     4) Determine other statuses.
@@ -64,6 +65,19 @@ with stg_eligibility as (
 
 )
 
+, start as (
+
+    /*
+        CMS source: Chapter 7, page 11.
+        "Operationally, CMS identifies new enrollees as those beneficiaries with less than
+        12 months of Medicare Part B entitlement during the data collection year."
+        We bring in the person-level Part B start (actual or inferred) to compute
+        Part B months during the collection year for new vs continuing.
+    */
+    select person_id, final_start
+    from {{ ref('cms_hcc__int_medicare_enrollment_start') }}
+)
+
 /* create proxy enrollment dates if outside of the collection year */
 , cap_collection_start_end_dates as (
 
@@ -80,8 +94,8 @@ with stg_eligibility as (
             else enrollment_start_date
           end as proxy_enrollment_start_date
         , case
-            when enrollment_end_date > {{ try_to_cast_date('payment_year_end_date', 'YYYY-MM-DD') }}
-            then {{ try_to_cast_date('payment_year_end_date', 'YYYY-MM-DD') }}
+            when enrollment_end_date > {{ try_to_cast_date('collection_end_date', 'YYYY-MM-DD') }}
+            then {{ try_to_cast_date('collection_end_date', 'YYYY-MM-DD') }}
             else enrollment_end_date
           end as proxy_enrollment_end_date
     from stg_eligibility
@@ -90,15 +104,31 @@ with stg_eligibility as (
 
 , calculate_prior_coverage as (
 
-    select person_id
-        , payment_year
-        , collection_end_date
-        , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
-        , min({{ datediff('collection_start_date', 'collection_end_date', 'month') }} + 1) as collection_months
-    from cap_collection_start_end_dates
-    group by person_id
-        , payment_year
-        , collection_end_date
+    /*
+        Compute Part B entitlement months in the collection year using
+        Medicare Part B start. If Part B start is after the collection end,
+        coverage_months = 0. Otherwise count months inclusively between
+        max(PartBStart, collection_start_date) and collection_end_date.
+    */
+    select
+          c.person_id
+        , c.payment_year
+        , c.collection_end_date
+        , case
+            when s.final_start is null then 0
+            when s.final_start > c.collection_end_date then 0
+            else ( {{ datediff(
+                        'case when s.final_start > c.collection_start_date then s.final_start else c.collection_start_date end',
+                        'c.collection_end_date',
+                        'month') }} + 1 )
+          end as coverage_months
+        , ( {{ datediff('c.collection_start_date', 'c.collection_end_date', 'month') }} + 1 ) as collection_months
+    from (
+        select distinct person_id, payment_year, collection_start_date, collection_end_date
+        from stg_eligibility
+    ) c
+    left join start s
+        on c.person_id = s.person_id
 
 )
 
