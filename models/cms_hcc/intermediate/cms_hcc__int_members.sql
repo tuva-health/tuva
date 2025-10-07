@@ -27,6 +27,13 @@ with persons as (
 
 )
 
+, patient_death as (
+
+    select person_id, death_date
+    from {{ ref('cms_hcc__stg_core__patient') }}
+
+)
+
 , person_months as (
 
     select
@@ -38,6 +45,9 @@ with persons as (
         , {{ concat_custom(['d.payment_year', "'-12-31'"]) }} as payment_year_end_date
     from persons p
     cross join {{ ref('cms_hcc__int_monthly_collection_dates') }} as d
+    left join patient_death pd
+        on p.person_id = pd.person_id
+    where pd.death_date is null or d.collection_end_date <= pd.death_date
 
 )
 
@@ -181,7 +191,7 @@ with persons as (
 
 )
 
- , latest_eligibility as (
+, latest_eligibility as (
 
     select
           pm.person_id
@@ -224,6 +234,73 @@ with persons as (
         left outer join stg_patient
             on pm.person_id = stg_patient.person_id
             and pm.payment_year = stg_patient.payment_year
+
+)
+
+, elig_month_bounds as (
+
+    /* First and last month where an eligibility record exists */
+    select
+          person_id
+        , min(collection_end_date) as first_elig_month
+        , max(collection_end_date) as last_elig_month
+    from (
+        select person_id, collection_end_date
+        from stg_eligibility
+        where enrollment_start_date is not null
+          and row_num = 1
+    ) x
+    group by person_id
+
+)
+
+, elig_statuses as (
+
+    /* Derive statuses only for months with an eligibility record */
+    select
+          le.person_id
+        , le.collection_end_date
+        , case
+            when le.dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
+            else 'No'
+          end as medicaid_status
+        , case
+            when le.dual_status_code in ('02', '04', '08') then 'Full'
+            when le.dual_status_code in ('01', '03', '05', '06') then 'Partial'
+            else 'Non'
+          end as dual_status
+        , case
+            when le.original_reason_entitlement_code in ('0', '2') then 'Aged'
+            when le.original_reason_entitlement_code in ('1', '3') then 'Disabled'
+            when le.original_reason_entitlement_code is null and le.medicare_status_code in ('10', '11', '31') then 'Aged'
+            when le.original_reason_entitlement_code is null and le.medicare_status_code in ('20', '21') then 'Disabled'
+            when coalesce(le.original_reason_entitlement_code, le.medicare_status_code) is null then 'Aged'
+          end as orec
+        , cast('No' as {{ dbt.type_string() }}) as institutional_status
+    from latest_eligibility le
+    where le.original_reason_entitlement_code is not null
+       or le.dual_status_code is not null
+       or le.medicare_status_code is not null
+
+)
+
+, first_known as (
+
+    select s.person_id, s.medicaid_status, s.dual_status, s.orec, s.institutional_status
+    from elig_statuses s
+    inner join elig_month_bounds b
+        on s.person_id = b.person_id
+        and s.collection_end_date = b.first_elig_month
+
+)
+
+, last_known as (
+
+    select s.person_id, s.medicaid_status, s.dual_status, s.orec, s.institutional_status
+    from elig_statuses s
+    inner join elig_month_bounds b
+        on s.person_id = b.person_id
+        and s.collection_end_date = b.last_elig_month
 
 )
 
@@ -291,11 +368,15 @@ with persons as (
         , age_group
         , case
             when dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
+            when b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.medicaid_status
+            when b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.medicaid_status
             else 'No'
           end as medicaid_status
         , case
             when dual_status_code in ('02', '04', '08') then 'Full'
             when dual_status_code in ('01', '03', '05', '06') then 'Partial'
+            when b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.dual_status
+            when b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.dual_status
             else 'Non'
           end as dual_status
         /*
@@ -308,41 +389,82 @@ with persons as (
             when original_reason_entitlement_code in ('1', '3') then 'Disabled'
             when original_reason_entitlement_code is null and medicare_status_code in ('10', '11', '31') then 'Aged'
             when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') then 'Disabled'
-            when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
+            when coalesce(original_reason_entitlement_code, medicare_status_code) is null and b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.orec
+            when coalesce(original_reason_entitlement_code, medicare_status_code) is null and b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.orec
+            else 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
-        , cast('No' as {{ dbt.type_string() }}) as institutional_status
+        , case
+            when b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.institutional_status
+            when b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.institutional_status
+            else cast('No' as {{ dbt.type_string() }})
+          end as institutional_status
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
-                when dual_status_code is null then 1
-                else 0
+                when dual_status_code is null and (
+                    not (
+                        (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+                        or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                    )
+                ) then 1 else 0
             {% else %}
-                when dual_status_code is null then true
-                else false
+                when dual_status_code is null and (
+                    not (
+                        (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+                        or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                    )
+                ) then true else false
             {% endif %}
           end as medicaid_dual_status_default
         /* Setting default true when OREC or Medicare Status is ESRD, or null */
         , case
             {% if target.type == 'fabric' %}
+                when (
+                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                ) then 0
                 when original_reason_entitlement_code in ('2') then 1
                 when original_reason_entitlement_code is null and medicare_status_code in ('31') then 1
                 when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 1
                 else 0
             {% else %}
+                when (
+                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                ) then false
                 when original_reason_entitlement_code in ('2') then true
                 when original_reason_entitlement_code is null and medicare_status_code in ('31') then true
                 when coalesce(original_reason_entitlement_code, medicare_status_code) is null then true
                 else false
             {% endif %}
           end as orec_default
-        /* Setting default true until institutional logic is added */
+        /* Institutional default: set to 0 when imputed, else true until logic is added */
         {% if target.type == 'fabric' %}
-            , 1 as institutional_status_default
+            , case
+                when (
+                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                ) then 0
+                else 1
+              end as institutional_status_default
         {% else %}
-            , true as institutional_status_default
+            , case
+                when (
+                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                ) then false
+                else true
+              end as institutional_status_default
         {% endif %}
+        , case
+            when (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
+              or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+            then 1 else 0 end as eligibility_imputed_int
     from add_age_group
+        left join elig_month_bounds b on add_age_group.person_id = b.person_id
+        left join first_known fk on add_age_group.person_id = fk.person_id
+        left join last_known lk on add_age_group.person_id = lk.person_id
 
 )
 
@@ -362,11 +484,13 @@ with persons as (
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
             , cast(orec_default as bit) as orec_default
             , cast(institutional_status_default as bit) as institutional_status_default
+            , cast(eligibility_imputed_int as bit) as eligibility_imputed
         {% else %}
             , cast(enrollment_status_default as boolean) as enrollment_status_default
             , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
             , cast(orec_default as boolean) as orec_default
             , cast(institutional_status_default as boolean) as institutional_status_default
+            , cast(case when eligibility_imputed_int = 1 then true else false end as boolean) as eligibility_imputed
         {% endif %}
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
@@ -388,6 +512,7 @@ select
     , medicaid_dual_status_default
     , orec_default
     , institutional_status_default
+    , eligibility_imputed
     , payment_year
     , collection_start_date
     , collection_end_date

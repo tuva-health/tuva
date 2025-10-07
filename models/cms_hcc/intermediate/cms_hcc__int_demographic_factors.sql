@@ -18,6 +18,7 @@ with members as (
         , medicaid_dual_status_default
         , orec_default
         , institutional_status_default
+        , eligibility_imputed
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -58,6 +59,7 @@ with members as (
         , members.medicaid_dual_status_default
         , members.orec_default
         , members.institutional_status_default
+        , members.eligibility_imputed
         , members.payment_year
         , members.collection_start_date
         , members.collection_end_date
@@ -91,6 +93,7 @@ with members as (
         , members.medicaid_dual_status_default
         , members.orec_default
         , members.institutional_status_default
+        , members.eligibility_imputed
         , members.payment_year
         , members.collection_start_date
         , members.collection_end_date
@@ -127,6 +130,7 @@ with members as (
         , members.medicaid_dual_status_default
         , members.orec_default
         , members.institutional_status_default
+        , members.eligibility_imputed
         , members.payment_year
         , members.collection_start_date
         , members.collection_end_date
@@ -160,6 +164,7 @@ with members as (
         , members.medicaid_dual_status_default
         , members.orec_default
         , members.institutional_status_default
+        , members.eligibility_imputed
         , members.payment_year
         , members.collection_start_date
         , members.collection_end_date
@@ -209,11 +214,13 @@ with members as (
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
             , cast(orec_default as bit) as orec_default
             , cast(institutional_status_default as bit) as institutional_status_default
+            , cast(eligibility_imputed as bit) as eligibility_imputed
         {% else %}
             , cast(enrollment_status_default as boolean) as enrollment_status_default
             , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
             , cast(orec_default as boolean) as orec_default
             , cast(institutional_status_default as boolean) as institutional_status_default
+            , cast(eligibility_imputed as boolean) as eligibility_imputed
         {% endif %}
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -238,6 +245,7 @@ select
     , medicaid_dual_status_default
     , orec_default
     , institutional_status_default
+    , eligibility_imputed
     , coefficient
     , factor_type
     , model_version

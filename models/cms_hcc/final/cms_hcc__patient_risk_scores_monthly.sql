@@ -42,14 +42,15 @@ with seed_adjustment_rates as (
 
 , member_months as (
 
-    select
-        person_id
-        , cast({{ substring('year_month', 1, 4) }} as integer) as eligible_year
-        , count(1) as member_months
-    from {{ ref('cms_hcc__stg_core__member_months') }}
-    group by
-        person_id
-        , cast({{ substring('year_month', 1, 4) }} as integer)
+    /* Monthly membership flag: 1 when member in that specific month */
+    select distinct
+        mm.person_id
+        , cast(cal.last_day_of_month as date) as collection_end_date
+        , 1 as member_months
+    from {{ ref('cms_hcc__stg_core__member_months') }} mm
+    inner join {{ ref('reference_data__calendar') }} cal
+        on cal.year = cast({{ substring('mm.year_month', 1, 4) }} as integer)
+        and cal.month = cast({{ substring('mm.year_month', 6, 2) }} as integer)
 )
 , raw_score as (
 
@@ -206,7 +207,7 @@ with seed_adjustment_rates as (
     from payment
     left outer join member_months
             on payment.person_id = member_months.person_id
-            and payment.payment_year = member_months.eligible_year
+            and payment.collection_end_date = member_months.collection_end_date
 )
 
 , weighted_score as (

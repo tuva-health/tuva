@@ -9,6 +9,7 @@ select
     , medicaid_dual_status_default
     , orec_default
     , institutional_status_default
+    , eligibility_imputed
     , factor_type
     , risk_factor_description
     , coefficient

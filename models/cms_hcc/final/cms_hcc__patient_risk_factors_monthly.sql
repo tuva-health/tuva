@@ -54,6 +54,7 @@ with demographic_factors as (
         , medicaid_dual_status_default
         , orec_default
         , institutional_status_default
+        , eligibility_imputed
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -167,6 +168,7 @@ with demographic_factors as (
         , unioned.payment_year
         , unioned.collection_start_date
         , unioned.collection_end_date
+        , demographic_defaults.eligibility_imputed
     from unioned
         left outer join demographic_defaults
             on unioned.person_id = demographic_defaults.person_id
@@ -185,11 +187,13 @@ with demographic_factors as (
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
             , cast(orec_default as bit) as orec_default
             , cast(institutional_status_default as bit) as institutional_status_default
+            , cast(eligibility_imputed as bit) as eligibility_imputed
         {% else %}
             , cast(enrollment_status_default as boolean) as enrollment_status_default
             , cast(medicaid_dual_status_default as boolean) as medicaid_dual_status_default
             , cast(orec_default as boolean) as orec_default
             , cast(institutional_status_default as boolean) as institutional_status_default
+            , cast(eligibility_imputed as boolean) as eligibility_imputed
         {% endif %}
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(risk_factor_description as {{ dbt.type_string() }}) as risk_factor_description
@@ -215,5 +219,6 @@ select
     , payment_year
     , collection_start_date
     , collection_end_date
+    , eligibility_imputed
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from add_data_types
