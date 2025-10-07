@@ -161,13 +161,15 @@ models:
           Months in the payment year between Medicare enrollment start and
           death/year-end, when Medicare start is known.
       - name: member_months_source
-        description: Source used for weighting: 'core_member_months' or 'medicare_enrollment'.
+        description: >
+          Source used for weighting: core_member_months or medicare_enrollment.
       - name: enrollment_projection_used
         description: >
           True when core member months were unavailable and Medicare-based
           months were used as a projection for weighting.
       - name: start_source
-        description: Provenance of Medicare enrollment start: 'actual' or 'inferred_from_claims'.
+        description: >
+          Provenance of Medicare enrollment start: actual or inferred_from_claims.
       - name: payment_year
         description: >
           The payment year the HCC and risk scores are being calculated for.
