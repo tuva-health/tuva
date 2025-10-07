@@ -355,28 +355,28 @@ with persons as (
 , add_status_logic as (
 
     select
-          person_id
-        , payment_year
-        , collection_start_date
-        , collection_end_date
-        , enrollment_status
+          ag.person_id
+        , ag.payment_year
+        , ag.collection_start_date
+        , ag.collection_end_date
+        , ag.enrollment_status
         , case
-            when gender = 'female' then 'Female'
-            when gender = 'male' then 'Male'
+            when ag.gender = 'female' then 'Female'
+            when ag.gender = 'male' then 'Male'
             else null
           end as gender
-        , age_group
+        , ag.age_group
         , case
-            when dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
-            when b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.medicaid_status
-            when b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.medicaid_status
+            when ag.dual_status_code in ('01', '02', '03', '04', '05', '06', '08') then 'Yes'
+            when b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month then fk.medicaid_status
+            when b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month then lk.medicaid_status
             else 'No'
           end as medicaid_status
         , case
-            when dual_status_code in ('02', '04', '08') then 'Full'
-            when dual_status_code in ('01', '03', '05', '06') then 'Partial'
-            when b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.dual_status
-            when b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.dual_status
+            when ag.dual_status_code in ('02', '04', '08') then 'Full'
+            when ag.dual_status_code in ('01', '03', '05', '06') then 'Partial'
+            when b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month then fk.dual_status
+            when b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month then lk.dual_status
             else 'Non'
           end as dual_status
         /*
@@ -385,34 +385,34 @@ with persons as (
            used, if available.
         */
         , case
-            when original_reason_entitlement_code in ('0', '2') then 'Aged'
-            when original_reason_entitlement_code in ('1', '3') then 'Disabled'
-            when original_reason_entitlement_code is null and medicare_status_code in ('10', '11', '31') then 'Aged'
-            when original_reason_entitlement_code is null and medicare_status_code in ('20', '21') then 'Disabled'
-            when coalesce(original_reason_entitlement_code, medicare_status_code) is null and b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.orec
-            when coalesce(original_reason_entitlement_code, medicare_status_code) is null and b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.orec
+            when ag.original_reason_entitlement_code in ('0', '2') then 'Aged'
+            when ag.original_reason_entitlement_code in ('1', '3') then 'Disabled'
+            when ag.original_reason_entitlement_code is null and ag.medicare_status_code in ('10', '11', '31') then 'Aged'
+            when ag.original_reason_entitlement_code is null and ag.medicare_status_code in ('20', '21') then 'Disabled'
+            when coalesce(ag.original_reason_entitlement_code, ag.medicare_status_code) is null and b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month then fk.orec
+            when coalesce(ag.original_reason_entitlement_code, ag.medicare_status_code) is null and b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month then lk.orec
             else 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
         , case
-            when b.first_elig_month is not null and collection_end_date < b.first_elig_month then fk.institutional_status
-            when b.last_elig_month is not null and collection_end_date > b.last_elig_month then lk.institutional_status
+            when b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month then fk.institutional_status
+            when b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month then lk.institutional_status
             else cast('No' as {{ dbt.type_string() }})
           end as institutional_status
-        , enrollment_status_default
+        , ag.enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
-                when dual_status_code is null and (
+                when ag.dual_status_code is null and (
                     not (
-                        (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-                        or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                        (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+                        or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
                     )
                 ) then 1 else 0
             {% else %}
-                when dual_status_code is null and (
+                when ag.dual_status_code is null and (
                     not (
-                        (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-                        or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                        (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+                        or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
                     )
                 ) then true else false
             {% endif %}
@@ -421,21 +421,21 @@ with persons as (
         , case
             {% if target.type == 'fabric' %}
                 when (
-                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                    (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
                 ) then 0
-                when original_reason_entitlement_code in ('2') then 1
-                when original_reason_entitlement_code is null and medicare_status_code in ('31') then 1
-                when coalesce(original_reason_entitlement_code,medicare_status_code) is null then 1
+                when ag.original_reason_entitlement_code in ('2') then 1
+                when ag.original_reason_entitlement_code is null and ag.medicare_status_code in ('31') then 1
+                when coalesce(ag.original_reason_entitlement_code,ag.medicare_status_code) is null then 1
                 else 0
             {% else %}
                 when (
-                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                    (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
                 ) then false
-                when original_reason_entitlement_code in ('2') then true
-                when original_reason_entitlement_code is null and medicare_status_code in ('31') then true
-                when coalesce(original_reason_entitlement_code, medicare_status_code) is null then true
+                when ag.original_reason_entitlement_code in ('2') then true
+                when ag.original_reason_entitlement_code is null and ag.medicare_status_code in ('31') then true
+                when coalesce(ag.original_reason_entitlement_code, ag.medicare_status_code) is null then true
                 else false
             {% endif %}
           end as orec_default
@@ -443,28 +443,28 @@ with persons as (
         {% if target.type == 'fabric' %}
             , case
                 when (
-                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                    (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
                 ) then 0
                 else 1
               end as institutional_status_default
         {% else %}
             , case
                 when (
-                    (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-                    or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+                    (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+                    or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
                 ) then false
                 else true
               end as institutional_status_default
         {% endif %}
         , case
-            when (b.first_elig_month is not null and collection_end_date < b.first_elig_month)
-              or (b.last_elig_month is not null and collection_end_date > b.last_elig_month)
+            when (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
+              or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
             then 1 else 0 end as eligibility_imputed_int
-    from add_age_group
-        left join elig_month_bounds b on add_age_group.person_id = b.person_id
-        left join first_known fk on add_age_group.person_id = fk.person_id
-        left join last_known lk on add_age_group.person_id = lk.person_id
+    from add_age_group as ag
+        left join elig_month_bounds b on ag.person_id = b.person_id
+        left join first_known fk on ag.person_id = fk.person_id
+        left join last_known lk on ag.person_id = lk.person_id
 
 )
 
