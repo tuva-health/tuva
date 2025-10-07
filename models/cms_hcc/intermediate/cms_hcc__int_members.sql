@@ -45,9 +45,20 @@ with persons as (
         , {{ concat_custom(['d.payment_year', "'-12-31'"]) }} as payment_year_end_date
     from persons p
     cross join {{ ref('cms_hcc__int_monthly_collection_dates') }} as d
+    left join {{ ref('reference_data__calendar') }} as cal
+        on cast(cal.last_day_of_month as date) = d.collection_end_date
+    /*
+        Cap months at the beneficiary's Medicare Part B enrollment start.
+        If start is unknown, retain all months (existing default logic applies).
+        Include the start month (use month end >= final_start), similar to death-month inclusion.
+    */
+    left join {{ ref('cms_hcc__int_medicare_enrollment_start') }} as start_cap
+        on p.person_id = start_cap.person_id
     left join patient_death pd
         on p.person_id = pd.person_id
-    where pd.death_date is null or d.collection_end_date <= pd.death_date
+    /* include the death month; drop months strictly after death */
+    where (pd.death_date is null or cal.first_day_of_month <= pd.death_date)
+      and (start_cap.final_start is null or cal.last_day_of_month >= start_cap.final_start)
 
 )
 
@@ -439,23 +450,11 @@ with persons as (
                 else false
             {% endif %}
           end as orec_default
-        /* Institutional default: set to 0 when imputed, else true until logic is added */
+        /* Institutional default: no source data yet; always default */
         {% if target.type == 'fabric' %}
-            , case
-                when (
-                    (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
-                    or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
-                ) then 0
-                else 1
-              end as institutional_status_default
+            , 1 as institutional_status_default
         {% else %}
-            , case
-                when (
-                    (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
-                    or (b.last_elig_month is not null and ag.collection_end_date > b.last_elig_month)
-                ) then false
-                else true
-              end as institutional_status_default
+            , true as institutional_status_default
         {% endif %}
         , case
             when (b.first_elig_month is not null and ag.collection_end_date < b.first_elig_month)
