@@ -49,8 +49,7 @@ with seed_adjustment_rates as (
         , 1 as member_months
     from {{ ref('cms_hcc__stg_core__member_months') }} mm
     inner join {{ ref('reference_data__calendar') }} cal
-        on cal.year = cast({{ substring('mm.year_month', 1, 4) }} as integer)
-        and cal.month = cast({{ substring('mm.year_month', 6, 2) }} as integer)
+        on cast(cal.year_month_int as {{ dbt.type_string() }}) = cast(mm.year_month as {{ dbt.type_string() }})
 )
 , raw_score as (
 
