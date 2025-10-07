@@ -51,26 +51,6 @@ with seed_adjustment_rates as (
         person_id
         , cast({{ substring('year_month', 1, 4) }} as integer)
 )
-
-, start as (
-
-    select
-          person_id
-        , final_start
-        , start_source
-    from {{ ref('cms_hcc__int_medicare_enrollment_start') }}
-
-)
-
-, patient as (
-
-    select
-          person_id
-        , death_date
-    from {{ ref('cms_hcc__stg_core__patient') }}
-
-)
-
 , raw_score as (
 
     select
@@ -209,6 +189,7 @@ with seed_adjustment_rates as (
 )
 
 
+
 , weighted_base as (
 
     select
@@ -218,16 +199,7 @@ with seed_adjustment_rates as (
         , payment.blended_risk_score
         , payment.normalized_risk_score
         , payment.payment_risk_score
-        , member_months.member_months as member_months_core
-        , start.final_start
-        , start.start_source
-        , patient.death_date
-        , cast({{ concat_custom(['payment.payment_year', "'-01-01'"]) }} as date) as year_start_date
-        , cast({{ concat_custom(['payment.payment_year', "'-12-31'"]) }} as date) as year_end_date
-        , case when start.final_start is not null and start.final_start > cast({{ concat_custom(['payment.payment_year', "'-01-01'"]) }} as date)
-               then start.final_start else cast({{ concat_custom(['payment.payment_year', "'-01-01'"]) }} as date) end as start_in_year
-        , case when patient.death_date is not null and patient.death_date < cast({{ concat_custom(['payment.payment_year', "'-12-31'"]) }} as date)
-               then patient.death_date else cast({{ concat_custom(['payment.payment_year', "'-12-31'"]) }} as date) end as end_in_year
+        , member_months.member_months as member_months
         , payment.payment_year
         , payment.collection_start_date
         , payment.collection_end_date
@@ -235,10 +207,6 @@ with seed_adjustment_rates as (
     left outer join member_months
             on payment.person_id = member_months.person_id
             and payment.payment_year = member_months.eligible_year
-    left outer join start
-            on payment.person_id = start.person_id
-    left outer join patient
-            on payment.person_id = patient.person_id
 )
 
 , weighted_score as (
@@ -250,38 +218,8 @@ with seed_adjustment_rates as (
         , wb.blended_risk_score
         , wb.normalized_risk_score
         , wb.payment_risk_score
-        , wb.member_months_core
-        , wb.year_start_date
-        , wb.year_end_date
-        , wb.start_in_year
-        , wb.end_in_year
-        , case
-            when wb.final_start is null then null
-            when wb.final_start > cast({{ concat_custom(['wb.payment_year', "'-12-31'"]) }} as date) then 0
-            else ( {{ datediff('wb.start_in_year', 'wb.end_in_year', 'month') }} + 1 )
-          end as member_months_medicare
-        , coalesce(wb.member_months_core,
-                   case
-                     when wb.final_start is null then null
-                     when wb.final_start > cast({{ concat_custom(['wb.payment_year', "'-12-31'"]) }} as date) then 0
-                     else ( {{ datediff('wb.start_in_year', 'wb.end_in_year', 'month') }} + 1 )
-                   end
-          ) as member_months
-        , case
-            when wb.member_months_core is not null then 'core_member_months'
-            when wb.final_start is not null then 'medicare_enrollment'
-            else null
-          end as member_months_source
-        , case when wb.start_source = 'inferred_from_claims' and wb.member_months_core is null and wb.final_start is not null then 1 else 0 end as enrollment_projection_used_int
-        , wb.start_source
-        , wb.payment_risk_score * coalesce(
-              wb.member_months_core,
-              case
-                when wb.final_start is null then null
-                when wb.final_start > cast({{ concat_custom(['wb.payment_year', "'-12-31'"]) }} as date) then 0
-                else ( {{ datediff('wb.start_in_year', 'wb.end_in_year', 'month') }} + 1 )
-              end
-          ) as payment_risk_score_weighted_by_months
+        , coalesce(wb.member_months, 0) as member_months
+        , wb.payment_risk_score * coalesce(wb.member_months, 0) as payment_risk_score_weighted_by_months
         , wb.payment_year
         , wb.collection_start_date
         , wb.collection_end_date
@@ -299,15 +237,6 @@ with seed_adjustment_rates as (
         , round(cast(payment_risk_score as {{ dbt.type_numeric() }}), 3) as payment_risk_score
         , round(cast(payment_risk_score_weighted_by_months as {{ dbt.type_numeric() }}), 3) as payment_risk_score_weighted_by_months
         , cast(member_months as integer) as member_months
-        , cast(member_months_core as integer) as member_months_core
-        , cast(member_months_medicare as integer) as member_months_medicare
-        , cast(member_months_source as {{ dbt.type_string() }}) as member_months_source
-        {% if target.type == 'fabric' %}
-            , cast(enrollment_projection_used_int as bit) as enrollment_projection_used
-        {% else %}
-            , cast(case when enrollment_projection_used_int = 1 then true else false end as boolean) as enrollment_projection_used
-        {% endif %}
-        , cast(start_source as {{ dbt.type_string() }}) as start_source
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
         , cast(collection_end_date as date) as collection_end_date
@@ -324,11 +253,6 @@ select
     , payment_risk_score
     , payment_risk_score_weighted_by_months
     , member_months
-    , member_months_core
-    , member_months_medicare
-    , member_months_source
-    , enrollment_projection_used
-    , start_source
     , payment_year
     , collection_start_date
     , collection_end_date

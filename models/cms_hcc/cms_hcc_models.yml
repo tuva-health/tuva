@@ -149,27 +149,8 @@ models:
           Payment risk score multiplied by member_months used for weighting.
       - name: member_months
         description: >
-          Months used for weighting. Defaults to core member months by
-          payment year; if unavailable, falls back to months derived from
-          Medicare enrollment start within the payment year.
-      - name: member_months_core
-        description: >
-          Core member months derived from the financial_pmpm mart using
-          payment year eligibility (plan/ACO attribution).
-      - name: member_months_medicare
-        description: >
-          Months in the payment year between Medicare enrollment start and
-          death/year-end, when Medicare start is known.
-      - name: member_months_source
-        description: >
-          Source used for weighting: core_member_months or medicare_enrollment.
-      - name: enrollment_projection_used
-        description: >
-          True when core member months were unavailable and Medicare-based
-          months were used as a projection for weighting.
-      - name: start_source
-        description: >
-          Provenance of Medicare enrollment start: actual or inferred_from_claims.
+          Months used for weighting derived from the financial_pmpm mart
+          using payment year attribution (plan/ACO membership).
       - name: payment_year
         description: >
           The payment year the HCC and risk scores are being calculated for.
@@ -223,7 +204,7 @@ models:
           Payment risk score multiplied by member_months.
       - name: member_months
         description: >
-          Member months derived from the finanicial_pmpm mart utilizing 
+          Member months derived from the financial_pmpm mart utilizing 
           payment year eligibility.
       - name: payment_year
         description: >
