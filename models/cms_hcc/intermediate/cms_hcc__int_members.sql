@@ -167,13 +167,17 @@ with persons as (
 
 )
 
-, calculate_prior_coverage as (
+ , calculate_prior_coverage as (
 
     /*
-        Compute Part B entitlement months in the collection year using
-        Medicare Part B start. If Part B start is after the collection end,
-        coverage_months = 0. Otherwise count months inclusively between
-        max(PartBStart, collection_start_date) and collection_end_date.
+        Compute Part B entitlement months across the full collection year
+        (Jan 1 – Dec 31 of the collection year). This aligns with CMS guidance
+        that identifies new enrollees as those with < 12 months of Part B
+        entitlement during the data collection year.
+
+        For each person and each month row, we compute coverage relative to the
+        entire collection year to ensure the "New" vs "Continuing" status is
+        consistent for the payment year.
     */
     select
           c.person_id
@@ -181,16 +185,18 @@ with persons as (
         , c.collection_end_date
         , case
             when s.final_start is null then 0
-            when s.final_start > c.collection_end_date then 0
+            /* If Part B starts after the end of the collection year, no coverage */
+            when s.final_start > cast({{ concat_custom(['c.payment_year - 1', "'-12-31'"]) }} as date) then 0
+            /* Count inclusive months between max(PartBStart, Jan 1 of collection year) and Dec 31 of collection year */
             else ( {{ datediff(
-                        'case when s.final_start > c.collection_start_date then s.final_start else c.collection_start_date end',
-                        'c.collection_end_date',
+                        'case when s.final_start > cast(' ~ concat_custom(['c.payment_year - 1', "'-01-01'"]) ~ ' as date) then s.final_start else cast(' ~ concat_custom(['c.payment_year - 1', "'-01-01'"]) ~ ' as date) end',
+                        'cast(' ~ concat_custom(['c.payment_year - 1', "'-12-31'"]) ~ ' as date)',
                         'month') }} + 1 )
           end as coverage_months
-        , ( {{ datediff('c.collection_start_date', 'c.collection_end_date', 'month') }} + 1 ) as collection_months
+        , 12 as collection_months
     from (
         /* use full person-month grid to allow pre-eligibility months */
-        select distinct person_id, payment_year, collection_start_date, collection_end_date
+        select distinct person_id, payment_year, collection_end_date
         from person_months
     ) c
     left join start s
