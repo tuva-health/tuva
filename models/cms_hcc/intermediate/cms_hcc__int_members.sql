@@ -16,29 +16,59 @@ Jinja is used to set payment year variable.
  - The collection year is one year prior to the payment year.
 */
 
-with stg_eligibility as (
+with persons as (
+
+    /*
+        Build the person set from claims to ensure we create
+        person-month rows even before plan eligibility begins.
+    */
+    select distinct person_id
+    from {{ ref('cms_hcc__stg_core__medical_claim') }}
+
+)
+
+, person_months as (
 
     select
-          elig.person_id
+          p.person_id
+        , d.collection_year
+        , d.payment_year
+        , d.collection_start_date
+        , d.collection_end_date
+        , {{ concat_custom(['d.payment_year', "'-12-31'"]) }} as payment_year_end_date
+    from persons p
+    cross join {{ ref('cms_hcc__int_monthly_collection_dates') }} as d
+
+)
+
+, stg_eligibility as (
+
+    /*
+        Join eligibility to person-months so months without plan
+        eligibility are retained and filled via defaults.
+    */
+    select
+          pm.person_id
         , elig.enrollment_start_date
         , elig.enrollment_end_date
         , elig.original_reason_entitlement_code
         , elig.dual_status_code
         , elig.medicare_status_code
-        , dates.collection_year
-        , dates.payment_year
-        , dates.collection_start_date
-        , dates.collection_end_date
-        , {{ concat_custom(['dates.payment_year', "'-12-31'"]) }} as payment_year_end_date
+        , pm.collection_year
+        , pm.payment_year
+        , pm.collection_start_date
+        , pm.collection_end_date
+        , pm.payment_year_end_date
         , row_number() over (
-            partition by elig.person_id, dates.collection_end_date
+            partition by pm.person_id, pm.collection_end_date
             order by elig.enrollment_end_date desc
         ) as row_num /* used to dedupe eligibility */
-    from {{ ref('cms_hcc__stg_core__eligibility') }} as elig
-    inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-        /* filter to members with eligibility in collection or payment year */
-        on elig.enrollment_start_date <= cast({{ concat_custom(['dates.payment_year', "'-12-31'"]) }} as date)
-        and elig.enrollment_end_date >= dates.collection_start_date
+    from person_months pm
+    left join {{ ref('cms_hcc__stg_core__eligibility') }} as elig
+        /* filter to eligibility spans overlapping the collection period */
+        on pm.person_id = elig.person_id
+        and elig.enrollment_start_date <= cast(pm.payment_year_end_date as date)
+        and elig.enrollment_end_date >= pm.collection_start_date
 
 )
 
@@ -124,8 +154,9 @@ with stg_eligibility as (
           end as coverage_months
         , ( {{ datediff('c.collection_start_date', 'c.collection_end_date', 'month') }} + 1 ) as collection_months
     from (
+        /* use full person-month grid to allow pre-eligibility months */
         select distinct person_id, payment_year, collection_start_date, collection_end_date
-        from stg_eligibility
+        from person_months
     ) c
     left join start s
         on c.person_id = s.person_id
@@ -150,18 +181,18 @@ with stg_eligibility as (
 
 )
 
-, latest_eligibility as (
+ , latest_eligibility as (
 
     select
-          stg_eligibility.person_id
-        , stg_eligibility.payment_year
-        , stg_eligibility.collection_start_date
-        , stg_eligibility.collection_end_date
+          pm.person_id
+        , pm.payment_year
+        , pm.collection_start_date
+        , pm.collection_end_date
         , stg_patient.sex as gender
         , stg_patient.payment_year_age
-        , stg_eligibility.original_reason_entitlement_code
-        , stg_eligibility.dual_status_code
-        , stg_eligibility.medicare_status_code
+        , elig.original_reason_entitlement_code
+        , elig.dual_status_code
+        , elig.medicare_status_code
         /* Defaulting to "New" enrollment status when missing */
         , case
             when add_enrollment.enrollment_status is null then 'New'
@@ -178,15 +209,21 @@ with stg_eligibility as (
                 else false
               end as enrollment_status_default
         {% endif %}
-    from stg_eligibility
+    from person_months pm
+        left join (
+            select *
+            from stg_eligibility
+            where row_num = 1
+        ) as elig
+            on pm.person_id = elig.person_id
+            and pm.collection_end_date = elig.collection_end_date
         left outer join add_enrollment
-            on stg_eligibility.person_id = add_enrollment.person_id
-            and stg_eligibility.payment_year = add_enrollment.payment_year
-            and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
+            on pm.person_id = add_enrollment.person_id
+            and pm.payment_year = add_enrollment.payment_year
+            and pm.collection_end_date = add_enrollment.collection_end_date
         left outer join stg_patient
-            on stg_eligibility.person_id = stg_patient.person_id
-            and stg_eligibility.payment_year = stg_patient.payment_year
-    where stg_eligibility.row_num = 1
+            on pm.person_id = stg_patient.person_id
+            and pm.payment_year = stg_patient.payment_year
 
 )
 
