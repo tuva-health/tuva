@@ -18,13 +18,6 @@ with stg_eligibility as (
   from {{ ref('normalized_input__eligibility') }} as elig
 )
 
-, enrollment_start_and_end_dates as (
-    select
-        min(enrollment_start_date) as date_lower_bound
-        , max(enrollment_end_date) as date_upper_bound
-    from stg_eligibility
-)
-
 , month_start_and_end_dates as (
   select
     {{ concat_custom(["year",
@@ -32,13 +25,11 @@ with stg_eligibility as (
     , min(full_date) as month_start_date
     , max(full_date) as month_end_date
   from {{ ref('reference_data__calendar') }} as c
-  inner join enrollment_start_and_end_dates as d
-    on c.full_date between d.date_lower_bound and d.date_upper_bound
   group by year, month, year_month
 )
 
-, deduplicated as (
-select distinct
+, joined as (
+select
   a.person_id
   , a.member_id
   , b.year_month
@@ -62,4 +53,4 @@ select
     , data_source
     ) as member_month_key
 , *
-from deduplicated
+from joined
