@@ -34,6 +34,19 @@ with persons as (
 
 )
 
+, cal_months as (
+
+    /*
+        Create a unique month dimension from the daily calendar to avoid
+        many-to-one joins that duplicate person-month rows.
+    */
+    select distinct
+          cast(first_day_of_month as date) as first_day_of_month
+        , cast(last_day_of_month as date) as last_day_of_month
+    from {{ ref('reference_data__calendar') }}
+
+)
+
 , person_months as (
 
     select
@@ -45,8 +58,9 @@ with persons as (
         , {{ concat_custom(['d.payment_year', "'-12-31'"]) }} as payment_year_end_date
     from persons p
     cross join {{ ref('cms_hcc__int_monthly_collection_dates') }} as d
-    left join {{ ref('reference_data__calendar') }} as cal
-        on cast(cal.last_day_of_month as date) = d.collection_end_date
+    /* Use unique month-level calendar rows to reference first/last day */
+    left join cal_months cal
+        on cal.last_day_of_month = d.collection_end_date
     /*
         Cap months at the beneficiary's Medicare Part B enrollment start.
         If start is unknown, retain all months (existing default logic applies).
