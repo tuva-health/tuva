@@ -5,13 +5,21 @@
 
 select
       person_id
+    , demographic_key
+    , demographic_enrollment_status
+    , demographic_gender
+    , demographic_age_group
+    , demographic_medicaid_status
+    , demographic_dual_status
+    , demographic_orec
+    , demographic_institutional_status
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default
     , institutional_status_default
     , eligibility_imputed
     , factor_type
-    , risk_factor_description
+    , risk_factor_key
     , coefficient
     , model_version
     , payment_year

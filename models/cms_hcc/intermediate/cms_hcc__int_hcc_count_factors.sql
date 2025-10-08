@@ -114,6 +114,7 @@ with demographics as (
         , hcc_counts_normalized.collection_start_date
         , hcc_counts_normalized.collection_end_date
         , seed_payment_hcc_count_factors.factor_type
+        , seed_payment_hcc_count_factors.payment_hcc_count
         , seed_payment_hcc_count_factors.description
         , seed_payment_hcc_count_factors.coefficient
     from hcc_counts_normalized
@@ -132,6 +133,7 @@ with demographics as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payment_hcc_count as {{ dbt.type_string() }}) as payment_hcc_count
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -145,6 +147,7 @@ with demographics as (
 
 select
       person_id
+    , payment_hcc_count
     , description
     , coefficient
     , factor_type

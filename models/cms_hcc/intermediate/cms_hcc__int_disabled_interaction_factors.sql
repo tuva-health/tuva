@@ -74,6 +74,7 @@ with demographics as (
         , demographics_with_hccs.collection_start_date
         , demographics_with_hccs.collection_end_date
         , seed_interaction_factors.factor_type
+        , seed_interaction_factors.hcc_code
         , seed_interaction_factors.description
         , seed_interaction_factors.coefficient
     from demographics_with_hccs
@@ -89,6 +90,7 @@ with demographics as (
 
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id
+    , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
     , cast(description as {{ dbt.type_string() }}) as description
     , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
     , cast(factor_type as {{ dbt.type_string() }}) as factor_type
@@ -102,6 +104,7 @@ from interactions
 
 select
       person_id
+    , hcc_code
     , description
     , coefficient
     , factor_type
