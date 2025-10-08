@@ -203,16 +203,23 @@ with demographic_factors as (
         , demographic_defaults.medicaid_dual_status_default
         , demographic_defaults.orec_default
         , demographic_defaults.institutional_status_default
-        , {{ cms_hcc_demographic_key(
-              'unioned.model_version',
-              'demographic_lookup.enrollment_status',
-              'demographic_lookup.gender',
-              'demographic_lookup.age_group',
-              'demographic_lookup.medicaid_status',
-              'demographic_lookup.dual_status',
-              'demographic_lookup.orec',
-              'demographic_lookup.institutional_status'
-          ) }} as demographic_key
+        , {{ concat_custom([
+              "unioned.model_version",
+              "'|'",
+              "demographic_lookup.enrollment_status",
+              "'|'",
+              "demographic_lookup.gender",
+              "'|'",
+              "demographic_lookup.age_group",
+              "'|'",
+              "demographic_lookup.medicaid_status",
+              "'|'",
+              "demographic_lookup.dual_status",
+              "'|'",
+              "demographic_lookup.orec",
+              "'|'",
+              "demographic_lookup.institutional_status"
+          ]) }} as demographic_key
         , demographic_lookup.enrollment_status as demographic_enrollment_status
         , demographic_lookup.gender as demographic_gender
         , demographic_lookup.age_group as demographic_age_group
@@ -223,16 +230,23 @@ with demographic_factors as (
         , case
             when unioned.factor_type = 'Demographic' then {{ concat_custom([
                   "'DEM|'",
-                  cms_hcc_demographic_key(
-                  'unioned.model_version',
-                  'demographic_lookup.enrollment_status',
-                  'demographic_lookup.gender',
-                  'demographic_lookup.age_group',
-                  'demographic_lookup.medicaid_status',
-                  'demographic_lookup.dual_status',
-                  'demographic_lookup.orec',
-                  'demographic_lookup.institutional_status'
-                  )
+                  concat_custom([
+                      "unioned.model_version",
+                      "'|'",
+                      "demographic_lookup.enrollment_status",
+                      "'|'",
+                      "demographic_lookup.gender",
+                      "'|'",
+                      "demographic_lookup.age_group",
+                      "'|'",
+                      "demographic_lookup.medicaid_status",
+                      "'|'",
+                      "demographic_lookup.dual_status",
+                      "'|'",
+                      "demographic_lookup.orec",
+                      "'|'",
+                      "demographic_lookup.institutional_status"
+                  ])
               ]) }}
             when unioned.hcc_code_1 is not null then {{ concat_custom([
                   "unioned.model_version",
