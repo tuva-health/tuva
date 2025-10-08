@@ -33,10 +33,30 @@ exported from your warehouse (CSV). Do not deploy publicly.
     .percent-text { font-weight: 600; color: #111827; }
     .grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     .footer { margin-top: 24px; color: #6b7280; font-size: 0.85rem; text-align: center; }
+    .sql { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background:#0b1020; color:#d1e7ff; padding:12px; border-radius:8px; font-size:0.85rem; white-space:pre-wrap; }
+    .small { font-size: 0.85rem; color:#6b7280; }
+    .error { background:#fee2e2; border:1px solid #ef4444; color:#991b1b; padding:12px 14px; border-radius:8px; }
+    .info { background:#eff6ff; border:1px solid #3b82f6; color:#1e40af; padding:12px 14px; border-radius:8px; }
   </style>
   <script>
     let metrics = [];
     let filtered = [];
+    let byDataSource = new Map();
+
+    function showError(message) {
+      const box = byId('errorBox');
+      if (!box) return;
+      box.className = 'error';
+      box.innerText = message;
+      box.style.display = '';
+    }
+
+    function clearError() {
+      const box = byId('errorBox');
+      if (!box) return;
+      box.style.display = 'none';
+      box.innerText = '';
+    }
 
     function byId(id) { return document.getElementById(id); }
 
@@ -51,18 +71,29 @@ exported from your warehouse (CSV). Do not deploy publicly.
 
     function readFile(file) {
       const reader = new FileReader();
-      reader.onload = (e) => { try { loadCSV(e.target.result); } catch (err) { alert('Error parsing CSV: ' + err.message); } };
+      reader.onload = (e) => { try { loadCSV(e.target.result); clearError(); } catch (err) { console.error(err); showError('Error parsing CSV: ' + err.message); } };
       reader.readAsText(file);
     }
 
     function loadCSV(csvText) {
-      metrics = parseCSV(csvText);
-      populateMetricSelector();
+      metrics = parseCSV(csvText).map(canonicalizeRow).filter(r => r.metric_id && r.data_source);
+      if (!metrics.length) {
+        showError('No rows parsed from CSV. Confirm headers like data_source, metric_id, metric_name, valid_n, denominator_n exist and that the file uses commas as delimiters.');
+        return;
+      }
+      clearError();
+      byDataSource = new Map();
+      metrics.forEach(m => {
+        const key = String(m.data_source || '').trim();
+        if (!byDataSource.has(key)) byDataSource.set(key, []);
+        byDataSource.get(key).push(m);
+      });
+      populateDataSourceSelector();
       render();
     }
 
     function parseCSV(csvText) {
-      const lines = csvText.trim().split('\n');
+      const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n');
       if (!lines.length) return [];
       const headers = parseCSVLine(lines[0]).map(h => h.replace(/\"/g, '"').replace(/"/g, '').trim());
       const rows = [];
@@ -71,16 +102,50 @@ exported from your warehouse (CSV). Do not deploy publicly.
         const values = parseCSVLine(line).map(v => v.replace(/\"/g, '"').replace(/"/g, '').trim());
         const row = {};
         headers.forEach((h, idx) => row[h] = values[idx] ?? '');
-
-        // Coerce numeric/boolean fields
-        ['denominator_n','valid_n','invalid_n','null_n','multiple_n'].forEach(k => { if (row[k] !== '') row[k] = Number(row[k]); });
-        if (row['valid_pct'] !== '') row['valid_pct'] = Number(row['valid_pct']);
-        if (row['threshold'] !== '') row['threshold'] = Number(row['threshold']);
-        if (typeof row['pass_flag'] === 'string') row['pass_flag'] = row['pass_flag'].toLowerCase() === 'true' || row['pass_flag'] === '1';
-
         rows.push(row);
       }
       return rows;
+    }
+
+    function canonicalizeRow(row) {
+      const get = (keys, def='') => {
+        for (const k of keys) {
+          for (const variant of [k, k.toLowerCase(), k.toUpperCase()]) {
+            if (row.hasOwnProperty(variant)) return row[variant];
+          }
+        }
+        return def;
+      };
+      const num = (v) => {
+        if (v === null || v === undefined || v === '') return 0;
+        const s = String(v).replace(/,/g,'').trim();
+        const n = Number(s); return isNaN(n) ? 0 : n;
+      };
+      const pct = (v) => {
+        if (v === null || v === undefined || v === '') return null;
+        const s = String(v).replace(/,/g,'').trim();
+        const n = Number(s); return isNaN(n) ? null : n;
+      };
+      const out = {
+        data_source: get(['data_source','datasource']),
+        metric_id: get(['metric_id','metric']),
+        metric_name: get(['metric_name','metriclabel','name']),
+        claim_scope: get(['claim_scope','scope']),
+        denominator_n: num(get(['denominator_n','denominator','denom'], '0')),
+        valid_n: num(get(['valid_n','valid'], '0')),
+        invalid_n: num(get(['invalid_n','invalid'], '0')),
+        null_n: num(get(['null_n','nulls','null'], '0')),
+        multiple_n: num(get(['multiple_n','multiple'], '0')),
+        valid_pct: pct(get(['valid_pct','valid_percent','pct_valid'], '')),
+        threshold: pct(get(['threshold','min_valid_pct'], '')),
+        pass_flag: (v => {
+          const s = String(v).toLowerCase();
+          return s === 'true' || s === '1' || s === 't' || s === 'yes';
+        })(get(['pass_flag','pass'] , 'true')),
+        denominator_desc: get(['denominator_desc','denominator_description']),
+        tuva_last_run: get(['tuva_last_run','last_run'])
+      };
+      return out;
     }
 
     function parseCSVLine(line) {
@@ -98,24 +163,23 @@ exported from your warehouse (CSV). Do not deploy publicly.
       return result;
     }
 
-    function populateMetricSelector() {
-      const sel = byId('metric');
+    function populateDataSourceSelector() {
+      const sel = byId('dataSource');
       sel.innerHTML = '';
-      const unique = Array.from(new Map(metrics.map(m => [m.metric_id, m])).values());
-      unique.sort((a,b) => a.metric_name.localeCompare(b.metric_name));
-      unique.forEach(m => {
+      const keys = Array.from(byDataSource.keys()).sort();
+      keys.forEach(k => {
         const opt = document.createElement('option');
-        opt.value = m.metric_id; opt.textContent = `${m.metric_name} — ${m.claim_scope}`;
+        opt.value = k; opt.textContent = k || '—';
         sel.appendChild(opt);
       });
-      if (unique.length) sel.value = unique[0].metric_id;
+      if (keys.length) sel.value = keys[0];
     }
 
     function render() {
-      const metricId = byId('metric').value;
-      const search = byId('search').value.toLowerCase();
-      filtered = metrics.filter(m => m.metric_id === metricId && (!search || (m.data_source||'').toLowerCase().includes(search)));
-      // sort poorest first
+      const ds = byId('dataSource').value || '';
+      const search = (byId('searchMetric').value || '').toLowerCase();
+      const rows = byDataSource.get(ds) || [];
+      filtered = rows.filter(m => !search || (m.metric_name||'').toLowerCase().includes(search) || (m.metric_id||'').toLowerCase().includes(search));
       filtered.sort((a,b) => (a.valid_pct ?? 0) - (b.valid_pct ?? 0));
       renderTable();
     }
@@ -125,10 +189,11 @@ exported from your warehouse (CSV). Do not deploy publicly.
     function renderTable() {
       const tbody = byId('tbody');
       tbody.innerHTML = '';
-      filtered.forEach(row => {
+      filtered.forEach((row, idx) => {
         const tr = document.createElement('tr');
-
-        const tdDs = document.createElement('td'); tdDs.textContent = row.data_source || '—'; tr.appendChild(tdDs);
+        const tdMetric = document.createElement('td');
+        tdMetric.innerHTML = `<div style="font-weight:600;">${row.metric_name || row.metric_id}</div><div class="small">${row.metric_id} · ${row.claim_scope||''}</div>`;
+        tr.appendChild(tdMetric);
 
         const tdPct = document.createElement('td');
         const pctWrap = document.createElement('div'); pctWrap.style.display = 'flex'; pctWrap.style.alignItems = 'center'; pctWrap.style.gap = '8px';
@@ -155,9 +220,69 @@ exported from your warehouse (CSV). Do not deploy publicly.
         const badge = document.createElement('span'); badge.className = 'badge ' + ((row.pass_flag ?? true) ? 'pass' : 'fail');
         badge.textContent = (row.pass_flag ?? true) ? 'PASS' : 'FAIL';
         tdPass.appendChild(badge); tr.appendChild(tdPass);
+        const tdSql = document.createElement('td');
+        const btn = document.createElement('button'); btn.textContent = 'View SQL'; btn.onclick = () => toggleSQL(idx);
+        tdSql.appendChild(btn); tr.appendChild(tdSql);
 
         tbody.appendChild(tr);
+
+        const trSql = document.createElement('tr'); trSql.id = `sql-${idx}`; trSql.style.display = 'none';
+        const tdSqlFull = document.createElement('td'); tdSqlFull.colSpan = 10; tdSqlFull.className = 'sql';
+        tdSqlFull.textContent = buildOffendersSQL(row, (byId('schemaPrefix')?.value||'data_quality').trim(), (byId('dataSource')?.value||'').trim());
+        trSql.appendChild(tdSqlFull); tbody.appendChild(trSql);
       });
+    }
+
+    function toggleSQL(idx) {
+      const row = byId(`sql-${idx}`); if (!row) return;
+      row.style.display = row.style.display === 'none' ? '' : 'none';
+    }
+
+    function buildOffendersSQL(row, schemaPrefix, selectedDataSource) {
+      const map = {
+        'claims:institutional_inpatient:DRG_CODE': { model:'data_quality__institutional_drg_code' },
+        'claims:institutional:REVENUE_CENTER_CODE': { model:'data_quality__institutional_revenue_center_code' },
+        'claims:institutional:BILL_TYPE_CODE': { model:'data_quality__institutional_bill_type_code' },
+        'claims:professional:HCPCS_CODE': { model:'data_quality__claim_hcpcs_code', where:"claim_type = 'professional'" },
+        'claims:institutional_outpatient:HCPCS_CODE': { model:'data_quality__claim_hcpcs_code', where:"claim_type = 'institutional' and substr(bill_type_code,1,2) != '11'" },
+        'claims:professional:PLACE_OF_SERVICE_CODE': { model:'data_quality__professional_place_of_service_code' },
+        'claims:medical:CLAIM_TYPE': { model:'data_quality__claim_claim_type' },
+        'claims:professional:BILLING_NPI': { model:'data_quality__professional_billing_npi' },
+        'claims:professional:RENDERING_NPI': { model:'data_quality__professional_rendering_npi' },
+        'claims:professional:FACILITY_NPI': { model:'data_quality__professional_facility_npi' },
+        'claims:institutional:BILLING_NPI': { model:'data_quality__institutional_billing_npi' },
+        'claims:institutional:RENDERING_NPI': { model:'data_quality__institutional_rendering_npi' },
+        'claims:institutional:FACILITY_NPI': { model:'data_quality__institutional_facility_npi' },
+        'claims:professional:DIAGNOSIS_CODE_1': { model:'data_quality__professional_diagnosis_code_1' },
+        'claims:professional:DIAGNOSIS_CODE_2': { model:'data_quality__professional_diagnosis_code_2' },
+        'claims:professional:DIAGNOSIS_CODE_3': { model:'data_quality__professional_diagnosis_code_3' },
+        'claims:institutional:DIAGNOSIS_CODE_1': { model:'data_quality__institutional_diagnosis_code_1' },
+        'claims:institutional:DIAGNOSIS_CODE_2': { model:'data_quality__institutional_diagnosis_code_2' },
+        'claims:institutional:DIAGNOSIS_CODE_3': { model:'data_quality__institutional_diagnosis_code_3' },
+        'claims:institutional_inpatient:PROCEDURE_CODE_1': { model:'data_quality__institutional_procedure_code_1' },
+        'claims:institutional_inpatient:PROCEDURE_CODE_2': { model:'data_quality__institutional_procedure_code_2' },
+        'claims:institutional_inpatient:PROCEDURE_CODE_3': { model:'data_quality__institutional_procedure_code_3' },
+        'claims:institutional:ADMIT_SOURCE_CODE': { model:'data_quality__institutional_admit_source_code' },
+        'claims:institutional:ADMIT_TYPE_CODE': { model:'data_quality__institutional_admit_type_code' },
+        'claims:institutional:DISCHARGE_DISPOSITION_CODE': { model:'data_quality__institutional_discharge_disposition_code' },
+        'claims:pharmacy:NDC_CODE': { model:'data_quality__pharmacy_ndc_code' },
+        'claims:pharmacy:DISPENSING_PROVIDER_NPI': { model:'data_quality__pharmacy_dispensing_provider_npi' },
+        'claims:pharmacy:PRESCRIBING_PROVIDER_NPI': { model:'data_quality__pharmacy_prescribing_provider_npi' },
+        'claims:eligibility:GENDER': { model:'data_quality__eligibility_gender' },
+        'claims:eligibility:RACE': { model:'data_quality__eligibility_race' },
+        'claims:eligibility:PAYER_TYPE': { model:'data_quality__eligibility_payer_type' },
+        'claims:eligibility:MEDICARE_STATUS_CODE': { model:'data_quality__eligibility_medicare_status_code' },
+        'claims:eligibility:DUAL_STATUS_CODE': { model:'data_quality__eligibility_dual_status_code' },
+        'claims:eligibility:ORIGINAL_REASON_ENTITLEMENT_CODE': { model:'data_quality__eligibility_original_reason_entitlement_code' }
+      };
+      const entry = map[row.metric_id] || { model: null };
+      const prefix = (schemaPrefix && schemaPrefix.trim()) ? schemaPrefix.trim() : 'data_quality';
+      const model = entry.model || '<model_not_mapped>';
+      const offenders = ["'invalid'", "'multiple'", "'null'"];
+      const extraWhere = entry.where ? `\n  and ${entry.where}` : '';
+      const ds = selectedDataSource || row.data_source || '';
+      const sql = `-- Top offenders for ${row.metric_name || row.metric_id} (${row.claim_scope || ''})\n-- Update the schema prefix if needed (e.g., dev_brad.data_quality)\nwith base as (\n  select *\n  from ${prefix}.${model}\n  where bucket_name in (${offenders.join(', ')})\n    and data_source = '${ds.replace(/'/g, "''")}'${extraWhere}\n)\nselect drill_down_value, count(*) as offender_rows\nfrom base\nwhere drill_down_value is not null\ngroup by drill_down_value\norder by offender_rows desc\nlimit 100;\n\n-- Details\nselect data_source, source_date, table_name, drill_down_key, drill_down_value, field_name, bucket_name, invalid_reason, field_value\nfrom ${prefix}.${model}\nwhere bucket_name in (${offenders.join(', ')})\n  and data_source = '${ds.replace(/'/g, "''")}'${extraWhere}\norder by bucket_name desc, source_date desc\nlimit 1000;`;
+      return sql;
     }
 
     function loadSample() {
@@ -179,11 +304,15 @@ exported from your warehouse (CSV). Do not deploy publicly.
         <input id="file" type="file" accept=".csv" style="display:none" onchange="handleFile(event)" />
       </div>
 
+      <div id="errorBox" class="error" style="display:none; margin: 12px 0;"></div>
+
       <div class="controls">
-        <label>Metric</label>
-        <select id="metric" onchange="render()"></select>
-        <label>Search data_source</label>
-        <input id="search" placeholder="e.g. payer_a" oninput="render()" style="padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px;" />
+        <label>Schema Prefix</label>
+        <input id="schemaPrefix" placeholder="e.g. dev_brad.data_quality" oninput="render()" />
+        <label>data_source</label>
+        <select id="dataSource" onchange="render()"></select>
+        <label>Search metric</label>
+        <input id="searchMetric" placeholder="e.g. HCPCS or DRG" oninput="render()" />
         <button class="primary" onclick="loadSample()">Load Sample Data</button>
       </div>
 
@@ -192,7 +321,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
           <table class="table">
             <thead>
               <tr>
-                <th>data_source</th>
+                <th>metric</th>
                 <th>valid %</th>
                 <th>denominator</th>
                 <th>valid</th>
@@ -201,6 +330,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
                 <th>multiple</th>
                 <th>threshold</th>
                 <th>status</th>
+                <th>offenders</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -208,9 +338,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
         </div>
       </div>
 
-      <div class="footer">No PHI leaves the warehouse: export an aggregated CSV of metrics from your database and load it here.</div>
+      <div class="footer">No PHI leaves the warehouse: export an aggregated CSV of metrics from your database and load it here. Set Schema Prefix to generate ready-to-run SQL snippets.</div>
     </div>
   </div>
 </body>
 </html>
-

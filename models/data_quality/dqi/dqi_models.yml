@@ -32,6 +32,45 @@ models:
             severity: error
             enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
 
+  - name: data_quality__terminology_metrics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: terminology_metrics
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: data_source
+        description: Per-source aggregation key
+      - name: metric_id
+        description: Unique metric identifier (e.g., claims:professional:HCPCS_CODE)
+      - name: metric_name
+        description: Human-friendly label of the metric
+      - name: claim_scope
+        description: Scope for denominator (e.g., professional, institutional_inpatient)
+      - name: denominator_n
+        description: Denominator rows for the metric and data_source
+      - name: valid_n
+        description: Rows with valid value in terminology
+      - name: invalid_n
+        description: Rows with non-null value not in terminology
+      - name: null_n
+        description: Rows with null value
+      - name: multiple_n
+        description: Rows with multiple values detected in atomic check (claim-level)
+      - name: valid_pct
+        description: valid_n / denominator_n
+      - name: threshold
+        description: Default threshold for pass (0.97 general, 0.80 inst outpatient HCPCS)
+      - name: pass_flag
+        description: True if valid_pct >= threshold and multiple_n = 0
+      - name: denominator_desc
+        description: Description of denominator scope
+      - name: tuva_last_run
+        description: The last run timestamp
+
   - name: data_quality__data_quality_detail
     config:
       schema: |
