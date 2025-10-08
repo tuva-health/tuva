@@ -28,12 +28,6 @@ models:
     columns:
       - name: person_id
         description: Unique ID for the patient.
-      - name: demographic_key
-        description: >
-          Deterministic key for the member's demographic context in the
-          CMS HCC model version and period. Built from model version,
-          enrollment status, gender, age group, Medicaid status, dual status,
-          OREC, and institutional status.
       - name: demographic_enrollment_status
         description: Demographic enrollment status (New vs Continuing) for the period.
       - name: demographic_gender
@@ -100,10 +94,6 @@ models:
     columns:
       - name: person_id
         description: Unique ID for the patient.
-      - name: demographic_key
-        description: >
-          Deterministic key for the member's demographic context in the
-          CMS HCC model version and collection period.
       - name: demographic_enrollment_status
         description: Demographic enrollment status (New vs Continuing) for the collection period.
       - name: demographic_gender
@@ -177,6 +167,9 @@ models:
         tests:
           - not_null
           - unique
+      - name: risk_factor_key
+        description: >
+          Key aligned to fact tables for demographic rows (prefixed 'DEM|').
       - name: model_version
         description: CMS HCC model version.
       - name: factor_type

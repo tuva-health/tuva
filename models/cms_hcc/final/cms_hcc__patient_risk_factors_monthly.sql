@@ -203,23 +203,6 @@ with demographic_factors as (
         , demographic_defaults.medicaid_dual_status_default
         , demographic_defaults.orec_default
         , demographic_defaults.institutional_status_default
-        , {{ concat_custom([
-              "unioned.model_version",
-              "'|'",
-              "demographic_lookup.enrollment_status",
-              "'|'",
-              "demographic_lookup.gender",
-              "'|'",
-              "demographic_lookup.age_group",
-              "'|'",
-              "demographic_lookup.medicaid_status",
-              "'|'",
-              "demographic_lookup.dual_status",
-              "'|'",
-              "demographic_lookup.orec",
-              "'|'",
-              "demographic_lookup.institutional_status"
-          ]) }} as demographic_key
         , demographic_lookup.enrollment_status as demographic_enrollment_status
         , demographic_lookup.gender as demographic_gender
         , demographic_lookup.age_group as demographic_age_group
@@ -343,7 +326,6 @@ with demographic_factors as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
-        , cast(demographic_key as {{ dbt.type_string() }}) as demographic_key
         , cast(demographic_enrollment_status as {{ dbt.type_string() }}) as demographic_enrollment_status
         , cast(demographic_gender as {{ dbt.type_string() }}) as demographic_gender
         , cast(demographic_age_group as {{ dbt.type_string() }}) as demographic_age_group
@@ -377,7 +359,6 @@ with demographic_factors as (
 
 select
       person_id
-    , demographic_key
     , demographic_enrollment_status
     , demographic_gender
     , demographic_age_group

@@ -5,7 +5,6 @@
 
 select
       person_id
-    , demographic_key
     , demographic_enrollment_status
     , demographic_gender
     , demographic_age_group

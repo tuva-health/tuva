@@ -75,6 +75,10 @@ with src as (
 
 select
       demographic_key
+    , {{ concat_custom([
+          "'DEM|'",
+          "demographic_key"
+      ]) }} as risk_factor_key
     , model_version
     , factor_type
     , demographic_enrollment_status
