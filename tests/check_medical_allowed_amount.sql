@@ -30,4 +30,4 @@ where abs(
      coalesce(med.copayment_amount, 0) +
      coalesce(med.deductible_amount, 0)) -
     coalesce(med.allowed_amount, 0)
-) < 0.01  -- Allow for small rounding differences
+) > 0.01  -- Allow for small rounding differences
