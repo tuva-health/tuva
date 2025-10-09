@@ -3,7 +3,7 @@ version: '1.0.0'
 config-version: 2
 
 profile: default
-  
+
 vars:
   error_empty_seeds: true
   ## Use this variable to run the project with synthetic data loaded as seeds
@@ -60,8 +60,6 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
@@ -69,7 +67,7 @@ clean-targets:
 
 dispatch:
   - macro_namespace: 'the_tuva_project'
-    search_order: ['integration_tests','the_tuva_project']
+    search_order: ['integration_tests', 'the_tuva_project']
 
 
 seeds:
@@ -99,3 +97,5 @@ seeds:
 models:
   integration_tests:
     +materialized: ephemeral
+flags:
+  require_generic_test_arguments_property: true
