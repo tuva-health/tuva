@@ -376,6 +376,38 @@ unioned as (
     union all select * from elig_medicare_status
     union all select * from elig_dual_status
     union all select * from elig_orec
+    -- DRG Code Type (Institutional)
+    union all
+    select
+        m.data_source, m.payer, {{ quote_column('plan') }} as plan,
+        'claims:institutional:DRG_CODE_TYPE' as metric_id,
+        'institutional' as claim_scope,
+        case when term.code_type is not null then 'valid' else 'invalid' end as bucket_name,
+        concat(m.drg_code_type,'|') as field_value
+    from {{ ref('medical_claim') }} m
+    left join {{ ref('reference_data__code_type') }} term on m.drg_code_type = term.code_type
+    where m.claim_type = 'institutional' and m.drg_code_type is not null
+    -- Diagnosis Code Type (Professional/Institutional)
+    union all
+    select
+        m.data_source, m.payer, {{ quote_column('plan') }} as plan,
+        'claims:professional:DIAGNOSIS_CODE_TYPE' as metric_id,
+        'professional' as claim_scope,
+        case when term.code_type is not null then 'valid' else 'invalid' end as bucket_name,
+        concat(m.diagnosis_code_type,'|') as field_value
+    from {{ ref('medical_claim') }} m
+    left join {{ ref('reference_data__code_type') }} term on m.diagnosis_code_type = term.code_type
+    where m.claim_type = 'professional' and m.diagnosis_code_type is not null
+    union all
+    select
+        m.data_source, m.payer, {{ quote_column('plan') }} as plan,
+        'claims:institutional:DIAGNOSIS_CODE_TYPE' as metric_id,
+        'institutional' as claim_scope,
+        case when term.code_type is not null then 'valid' else 'invalid' end as bucket_name,
+        concat(m.diagnosis_code_type,'|') as field_value
+    from {{ ref('medical_claim') }} m
+    left join {{ ref('reference_data__code_type') }} term on m.diagnosis_code_type = term.code_type
+    where m.claim_type = 'institutional' and m.diagnosis_code_type is not null
     -- NPIs (Professional)
     union all
     select

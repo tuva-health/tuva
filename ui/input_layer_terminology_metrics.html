@@ -537,21 +537,16 @@ exported from your warehouse (CSV). Do not deploy publicly.
       const base = byDataSource.get(ds) || [];
       // Build initial UI if needed
       buildFilterUI();
-      // Reset selections to All based on DS
-      selectedFilters.payer = new Set(uniqueValues(base, 'payer'));
-      selectedFilters.plan = new Set(uniqueValues(base, 'plan'));
-      selectedFilters.scope = new Set(uniqueValues(base, 'claim_scope'));
-      // Set options
-      setOptions('payer', Array.from(selectedFilters.payer));
-      // Cascade: plan limited by selected payers
-      const rowsPlan = base.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
-      const planVals = uniqueValues(rowsPlan, 'plan');
-      selectedFilters.plan = new Set(planVals);
+      // Reset selections to All (empty set means ALL in our logic)
+      selectedFilters.payer = new Set();
+      selectedFilters.plan = new Set();
+      selectedFilters.scope = new Set();
+      // Populate options but keep selections empty to represent ALL
+      const payerVals = uniqueValues(base, 'payer');
+      setOptions('payer', payerVals);
+      const planVals = uniqueValues(base, 'plan');
       setOptions('plan', planVals);
-      // Cascade: scope limited by selected payers+plans
-      const rowsScope = rowsPlan.filter(r => !selectedFilters.plan.size || selectedFilters.plan.has(r.plan || ''));
-      const scopeVals = uniqueValues(rowsScope, 'claim_scope');
-      selectedFilters.scope = new Set(scopeVals);
+      const scopeVals = uniqueValues(base, 'claim_scope');
       setOptions('scope', scopeVals);
     }
 
@@ -629,8 +624,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
       return rows.filter(m =>
         (!search || (m.metric_name||'').toLowerCase().includes(search) || (m.metric_id||'').toLowerCase().includes(search)) &&
         (!scopes.length || scopes.includes(m.claim_scope || '')) &&
-        (!selPayers.length || selPayers.includes(m.payer || '')) &&
-        (!selPlans.length || selPlans.includes(m.plan || ''))
+        (!selPayers.length || selPayers.includes(m.payer || '') || m.payer === null || m.payer === undefined || m.payer === '') &&
+        (!selPlans.length || selPlans.includes(m.plan || '') || m.plan === null || m.plan === undefined || m.plan === '')
       );
     }
 
@@ -1035,9 +1030,12 @@ exported from your warehouse (CSV). Do not deploy publicly.
         'claims:institutional_inpatient:PROCEDURE_CODE_1': { model:'data_quality__institutional_procedure_code_1' },
         'claims:institutional_inpatient:PROCEDURE_CODE_2': { model:'data_quality__institutional_procedure_code_2' },
         'claims:institutional_inpatient:PROCEDURE_CODE_3': { model:'data_quality__institutional_procedure_code_3' },
+        'claims:institutional:DRG_CODE_TYPE': { model:'data_quality__claim_drg_code_type', where:"claim_type = 'institutional'" },
         'claims:institutional:ADMIT_SOURCE_CODE': { model:'data_quality__institutional_admit_source_code' },
         'claims:institutional:ADMIT_TYPE_CODE': { model:'data_quality__institutional_admit_type_code' },
         'claims:institutional:DISCHARGE_DISPOSITION_CODE': { model:'data_quality__institutional_discharge_disposition_code' },
+        'claims:professional:DIAGNOSIS_CODE_TYPE': { model:'data_quality__claim_diagnosis_code_type', where:"claim_type = 'professional'" },
+        'claims:institutional:DIAGNOSIS_CODE_TYPE': { model:'data_quality__claim_diagnosis_code_type', where:"claim_type = 'institutional'" },
         'claims:pharmacy:NDC_CODE': { model:'data_quality__pharmacy_ndc_code' },
         'claims:pharmacy:DISPENSING_PROVIDER_NPI': { model:'data_quality__pharmacy_dispensing_provider_npi' },
         'claims:pharmacy:PRESCRIBING_PROVIDER_NPI': { model:'data_quality__pharmacy_prescribing_provider_npi' },
