@@ -39,6 +39,19 @@ exported from your warehouse (CSV). Do not deploy publicly.
     .info { background:#eff6ff; border:1px solid #3b82f6; color:#1e40af; padding:12px 14px; border-radius:8px; }
     .sortable { cursor: pointer; user-select: none; }
     .sort-indicator { color:#64748b; font-size:0.9em; margin-left:4px; }
+    .group-row { background:#f3f4f6; font-weight:600; }
+    .subgroup-row { background:#f9fafb; font-weight:600; }
+    .caret { display:inline-block; width:1em; color:#6b7280; }
+    /* Modal styles */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
+    .modal { background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.25); width: min(980px, 95vw); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+    .modal-header { padding: 14px 16px; border-bottom: 1px solid #e5e7eb; display:flex; align-items:center; justify-content: space-between; }
+    .modal-title { font-weight: 600; }
+    .modal-close { background: transparent; border: none; font-size: 20px; cursor: pointer; color:#374151; }
+    .modal-body { padding: 16px; overflow: auto; }
+    .btn { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; }
+    .btn.primary { background: #2563eb; color: #fff; border: none; }
+    .subtle { color:#64748b; }
   </style>
   <script>
     let metrics = [];
@@ -48,6 +61,9 @@ exported from your warehouse (CSV). Do not deploy publicly.
     let detailsIdx = new Map();
     let sortKey = 'valid_pct';
     let sortAsc = true; // ascending by default
+    let viewMode = 'table';
+    const collapsedTop = new Set();
+    const collapsedSub = new Set();
 
     function showError(message) {
       const box = byId('errorBox');
@@ -186,11 +202,21 @@ exported from your warehouse (CSV). Do not deploy publicly.
         const parts = fv.split('|'); code = parts[0].trim(); desc = (parts[1]||'').trim();
       }
       const claimScopeRaw = get(['claim_scope','scope','claim_type']);
+      const claimScope = String(claimScopeRaw || '').trim().toLowerCase();
       // try to build metric_id if missing
       const fieldName = get(['field_name','field','metric_field','dimension']);
       let metricId = get(['metric_id','metric']);
-      if (!metricId && claimScopeRaw && fieldName) {
-        metricId = `claims:${String(claimScopeRaw).trim()}:${String(fieldName).trim().toUpperCase()}`;
+      // normalize an existing metric_id (claims:<scope>:<FIELD>)
+      if (metricId && typeof metricId === 'string' && metricId.startsWith('claims:')) {
+        const parts = metricId.split(':');
+        if (parts.length === 3) {
+          parts[1] = String(parts[1] || '').toLowerCase();
+          parts[2] = String(parts[2] || '').toUpperCase();
+          metricId = parts.join(':');
+        }
+      }
+      if (!metricId && claimScope && fieldName) {
+        metricId = `claims:${claimScope}:${String(fieldName).trim().toUpperCase()}`;
       }
       // choose frequency: use provided numeric, else default to 1 when a value is present
       let freq = num(get(['frequency','count','freq','offender_rows','rows'], ''));
@@ -200,8 +226,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
         payer: get(['payer']),
         plan: get(['plan']),
         metric_id: metricId,
-        claim_scope: claimScopeRaw,
-        bucket_name: get(['bucket_name','bucket']),
+        claim_scope: claimScope,
+        bucket_name: String(get(['bucket_name','bucket'])).trim().toLowerCase(),
         value_code: code,
         value_desc: get(['value_desc','description','drill_down_desc','desc'], desc),
         frequency: freq
@@ -357,40 +383,198 @@ exported from your warehouse (CSV). Do not deploy publicly.
       });
     }
 
-    function render() {
+    function getFilteredRows() {
       const ds = byId('dataSource').value || '';
       const search = (byId('searchMetric').value || '').toLowerCase();
       const rows = byDataSource.get(ds) || [];
       const scopes = getSelectedScopes();
       const selPayers = getSelectedMulti('payerSelect');
       const selPlans = getSelectedMulti('planSelect');
-      filtered = rows.filter(m =>
+      return rows.filter(m =>
         (!search || (m.metric_name||'').toLowerCase().includes(search) || (m.metric_id||'').toLowerCase().includes(search)) &&
         (!scopes.length || scopes.includes(m.claim_scope || '')) &&
         (!selPayers.length || selPayers.includes(m.payer || '')) &&
         (!selPlans.length || selPlans.includes(m.plan || ''))
       );
-      const cmp = (a,b) => {
-        const nv = v => (v === null || v === undefined ? -Infinity : v);
-        switch (sortKey) {
-          case 'metric': {
-            const an = (a.metric_name || a.metric_id || '').toLowerCase();
-            const bn = (b.metric_name || b.metric_id || '').toLowerCase();
-            return an.localeCompare(bn);
+    }
+
+    function render() {
+      filtered = getFilteredRows();
+      if (viewMode === 'pivot') {
+        renderPivot();
+      } else {
+        const cmp = (a,b) => {
+          const nv = v => (v === null || v === undefined ? -Infinity : v);
+          switch (sortKey) {
+            case 'metric': {
+              const an = (a.metric_name || a.metric_id || '').toLowerCase();
+              const bn = (b.metric_name || b.metric_id || '').toLowerCase();
+              return an.localeCompare(bn);
+            }
+            case 'valid_pct': return nv(a.valid_pct) - nv(b.valid_pct);
+            case 'denominator_n': return nv(a.denominator_n) - nv(b.denominator_n);
+            case 'valid_n': return nv(a.valid_n) - nv(b.valid_n);
+            case 'invalid_n': return nv(a.invalid_n) - nv(b.invalid_n);
+            case 'null_n': return nv(a.null_n) - nv(b.null_n);
+            case 'multiple_n': return nv(a.multiple_n) - nv(b.multiple_n);
+            case 'threshold': return nv(a.threshold) - nv(b.threshold);
+            case 'pass_flag': return (a.pass_flag?1:0) - (b.pass_flag?1:0);
+            default: return 0;
           }
-          case 'valid_pct': return nv(a.valid_pct) - nv(b.valid_pct);
-          case 'denominator_n': return nv(a.denominator_n) - nv(b.denominator_n);
-          case 'valid_n': return nv(a.valid_n) - nv(b.valid_n);
-          case 'invalid_n': return nv(a.invalid_n) - nv(b.invalid_n);
-          case 'null_n': return nv(a.null_n) - nv(b.null_n);
-          case 'multiple_n': return nv(a.multiple_n) - nv(b.multiple_n);
-          case 'threshold': return nv(a.threshold) - nv(b.threshold);
-          case 'pass_flag': return (a.pass_flag?1:0) - (b.pass_flag?1:0); // fail first if descending
-          default: return 0;
+        };
+        filtered.sort((a,b) => sortAsc ? cmp(a,b) : -cmp(a,b));
+        renderTable();
+      }
+    }
+
+    function deriveTopGroup(scope) {
+      const s = String(scope || '').toLowerCase();
+      if (!s) return 'other';
+      if (s === 'pharmacy') return 'pharmacy';
+      if (s === 'eligibility') return 'eligibility';
+      if (s.startsWith('institutional') || s.startsWith('professional') || s === 'medical') return 'medical';
+      return s;
+    }
+    function deriveSubGroup(scope) {
+      const s = String(scope || '').toLowerCase();
+      if (s.startsWith('professional')) return 'professional';
+      if (s.startsWith('institutional')) return 'institutional';
+      if (s === 'medical') return 'medical (all)';
+      return null;
+    }
+
+    function sumAgg(rows) {
+      const agg = { denominator_n:0, valid_n:0, invalid_n:0, null_n:0, multiple_n:0 };
+      rows.forEach(r => {
+        agg.denominator_n += (r.denominator_n||0);
+        agg.valid_n += (r.valid_n||0);
+        agg.invalid_n += (r.invalid_n||0);
+        agg.null_n += (r.null_n||0);
+        agg.multiple_n += (r.multiple_n||0);
+      });
+      agg.valid_pct = agg.denominator_n > 0 ? agg.valid_n/agg.denominator_n : null;
+      return agg;
+    }
+
+    function renderPivot() {
+      const tbody = byId('tbody');
+      tbody.innerHTML = '';
+      // Group by top -> sub -> rows
+      const groups = new Map();
+      filtered.forEach(r => {
+        const top = deriveTopGroup(r.claim_scope);
+        const sub = deriveSubGroup(r.claim_scope);
+        if (!groups.has(top)) groups.set(top, new Map());
+        const subMap = groups.get(top);
+        const subKey = sub || '__nosub__';
+        if (!subMap.has(subKey)) subMap.set(subKey, []);
+        subMap.get(subKey).push(r);
+      });
+      const orderedTop = ['medical','pharmacy','eligibility', ...Array.from(groups.keys()).filter(k => !['medical','pharmacy','eligibility'].includes(k)).sort()];
+      const usedTop = orderedTop.filter(k => groups.has(k));
+      usedTop.forEach(top => {
+        const subMap = groups.get(top);
+        // Top-level aggregate row
+        const allRows = Array.from(subMap.values()).flat();
+        const agg = sumAgg(allRows);
+        const trTop = document.createElement('tr'); trTop.className = 'group-row';
+        trTop.style.cursor = 'pointer';
+        const caret = collapsedTop.has(top) ? '►' : '▼';
+        const tdMetric = document.createElement('td'); tdMetric.innerHTML = `<span class="caret">${caret}</span>${top}`; trTop.appendChild(tdMetric);
+        const tdPct = document.createElement('td'); tdPct.textContent = fmtPct(agg.valid_pct); trTop.appendChild(tdPct);
+        const tdDen = document.createElement('td'); tdDen.textContent = fmtNum(agg.denominator_n); trTop.appendChild(tdDen);
+        const tdValid = document.createElement('td'); tdValid.textContent = fmtNum(agg.valid_n); trTop.appendChild(tdValid);
+        const tdInvalid = document.createElement('td'); tdInvalid.textContent = fmtNum(agg.invalid_n); trTop.appendChild(tdInvalid);
+        const tdNull = document.createElement('td'); tdNull.textContent = fmtNum(agg.null_n); trTop.appendChild(tdNull);
+        const tdMult = document.createElement('td'); tdMult.textContent = fmtNum(agg.multiple_n); trTop.appendChild(tdMult);
+        const tdThr = document.createElement('td'); tdThr.textContent = '—'; trTop.appendChild(tdThr);
+        const tdPass = document.createElement('td'); tdPass.textContent = ''; trTop.appendChild(tdPass);
+        const tdSql = document.createElement('td'); tdSql.textContent = ''; trTop.appendChild(tdSql);
+        trTop.onclick = () => { if (collapsedTop.has(top)) collapsedTop.delete(top); else collapsedTop.add(top); render(); };
+        tbody.appendChild(trTop);
+
+        if (!collapsedTop.has(top)) {
+          // sub-groups
+          for (const [subKey, arrRaw] of subMap.entries()) {
+            const arr = [...arrRaw].sort((a,b) => (a.metric_name||a.metric_id||'').localeCompare(b.metric_name||b.metric_id||''));
+            const showSub = subKey !== '__nosub__';
+            const subLabel = subKey === '__nosub__' ? '—' : subKey;
+            const subAgg = sumAgg(arr);
+            const trSub = document.createElement('tr'); trSub.className = 'subgroup-row';
+            if (showSub) trSub.style.cursor = 'pointer';
+            const subId = `${top}::${subLabel}`;
+            const caret2 = collapsedSub.has(subId) ? '►' : '▼';
+            const tdM = document.createElement('td'); tdM.innerHTML = showSub ? `<span class="caret">${caret2}</span>${subLabel}` : `<span class="caret"></span>${subLabel}`; trSub.appendChild(tdM);
+            const tdP = document.createElement('td'); tdP.textContent = fmtPct(subAgg.valid_pct); trSub.appendChild(tdP);
+            const tdD = document.createElement('td'); tdD.textContent = fmtNum(subAgg.denominator_n); trSub.appendChild(tdD);
+            const tdV = document.createElement('td'); tdV.textContent = fmtNum(subAgg.valid_n); trSub.appendChild(tdV);
+            const tdI = document.createElement('td'); tdI.textContent = fmtNum(subAgg.invalid_n); trSub.appendChild(tdI);
+            const tdN = document.createElement('td'); tdN.textContent = fmtNum(subAgg.null_n); trSub.appendChild(tdN);
+            const tdMu = document.createElement('td'); tdMu.textContent = fmtNum(subAgg.multiple_n); trSub.appendChild(tdMu);
+            const tdT = document.createElement('td'); tdT.textContent = '—'; trSub.appendChild(tdT);
+            const tdPa = document.createElement('td'); tdPa.textContent = ''; trSub.appendChild(tdPa);
+            const tdS = document.createElement('td'); tdS.textContent = ''; trSub.appendChild(tdS);
+            if (showSub) trSub.onclick = () => { const k = `${top}::${subLabel}`; if (collapsedSub.has(k)) collapsedSub.delete(k); else collapsedSub.add(k); render(); };
+            tbody.appendChild(trSub);
+
+            if (!showSub || !collapsedSub.has(subId)) {
+              // metric rows under this sub-group
+              arr.forEach(row => {
+                const idx = filtered.indexOf(row);
+                const tr = document.createElement('tr');
+                const tdMetric = document.createElement('td');
+                tdMetric.innerHTML = `<div style="font-weight:600;">${row.metric_name || row.metric_id}</div><div class="small">${row.metric_id} · ${row.claim_scope||''}</div>`;
+                tr.appendChild(tdMetric);
+
+                const tdPct = document.createElement('td');
+                const pctWrap = document.createElement('div'); pctWrap.style.display = 'flex'; pctWrap.style.alignItems = 'center'; pctWrap.style.gap = '8px';
+                const pctText = document.createElement('span'); pctText.className = 'percent-text'; pctText.textContent = fmtPct(row.valid_pct);
+                const bar = document.createElement('div'); bar.className = 'percent-bar'; bar.style.width = '120px';
+                const fill = document.createElement('div'); fill.className = 'percent-fill'; fill.style.width = ((row.valid_pct||0)*100) + '%';
+                const thr = typeof row.threshold === 'number' ? row.threshold : null;
+                const pass = thr !== null ? (row.valid_pct ?? 0) >= thr : true;
+                fill.style.background = pass ? '#16a34a' : '#dc2626';
+                bar.appendChild(fill);
+                pctWrap.appendChild(pctText); pctWrap.appendChild(bar);
+                tdPct.appendChild(pctWrap); tr.appendChild(tdPct);
+
+                const tdDen = document.createElement('td'); tdDen.textContent = fmtNum(row.denominator_n ?? 0); tr.appendChild(tdDen);
+                const tdValid = document.createElement('td'); tdValid.textContent = fmtNum(row.valid_n ?? 0); tr.appendChild(tdValid);
+                const tdInvalid = document.createElement('td');
+                const invalidCount = row.invalid_n ?? 0;
+                if (invalidCount > 0) {
+                  const span = document.createElement('span');
+                  span.className = 'mini';
+                  span.style.textDecoration = 'underline';
+                  span.style.cursor = 'pointer';
+                  span.textContent = fmtNum(invalidCount);
+                  span.onclick = () => openDetails(idx, 'invalid');
+                  tdInvalid.appendChild(span);
+                } else {
+                  tdInvalid.textContent = fmtNum(invalidCount);
+                }
+                tr.appendChild(tdInvalid);
+                const tdNull = document.createElement('td'); tdNull.textContent = fmtNum(row.null_n ?? 0); tr.appendChild(tdNull);
+                const tdMult = document.createElement('td'); tdMult.textContent = fmtNum(row.multiple_n ?? 0); tr.appendChild(tdMult);
+                const tdThr = document.createElement('td'); tdThr.textContent = thr !== null ? fmtPct(thr) : '—'; tr.appendChild(tdThr);
+                const tdPass = document.createElement('td');
+                const badge = document.createElement('span'); badge.className = 'badge ' + ((row.pass_flag ?? true) ? 'pass' : 'fail');
+                badge.textContent = (row.pass_flag ?? true) ? 'PASS' : 'FAIL';
+                tdPass.appendChild(badge); tr.appendChild(tdPass);
+                const tdSql = document.createElement('td');
+                const btn = document.createElement('button'); btn.textContent = 'View SQL'; btn.onclick = () => toggleSQL(idx, null);
+                tdSql.appendChild(btn); tr.appendChild(tdSql);
+                tbody.appendChild(tr);
+
+                const trSql = document.createElement('tr'); trSql.id = `sql-${idx}`; trSql.style.display = 'none';
+                const tdSqlFull = document.createElement('td'); tdSqlFull.colSpan = 10; tdSqlFull.className = 'sql';
+                tdSqlFull.textContent = buildOffendersSQL(row, (byId('schemaPrefix')?.value||'data_quality').trim(), (byId('dataSource')?.value||'').trim());
+                trSql.appendChild(tdSqlFull); tbody.appendChild(trSql);
+              });
+            }
+          }
         }
-      };
-      filtered.sort((a,b) => sortAsc ? cmp(a,b) : -cmp(a,b));
-      renderTable();
+      });
     }
 
     function fmtPct(x) { if (x === null || x === undefined) return '—'; return (x*100).toFixed(1) + '%'; }
@@ -419,8 +603,21 @@ exported from your warehouse (CSV). Do not deploy publicly.
         tdPct.appendChild(pctWrap); tr.appendChild(tdPct);
 
         const tdDen = document.createElement('td'); tdDen.textContent = fmtNum(row.denominator_n ?? 0); tr.appendChild(tdDen);
-        const tdValid = document.createElement('td'); tdValid.innerHTML = `<span class=\"mini\" style=\"text-decoration:underline; cursor:pointer;\">${fmtNum(row.valid_n ?? 0)}</span>`; tdValid.onclick = () => toggleSQL(idx, 'valid'); tr.appendChild(tdValid);
-        const tdInvalid = document.createElement('td'); tdInvalid.innerHTML = `<span class=\"mini\" style=\"text-decoration:underline; cursor:pointer;\">${fmtNum(row.invalid_n ?? 0)}</span>`; tdInvalid.onclick = () => toggleSQL(idx, 'invalid'); tr.appendChild(tdInvalid);
+        const tdValid = document.createElement('td'); tdValid.textContent = fmtNum(row.valid_n ?? 0); tr.appendChild(tdValid);
+        const tdInvalid = document.createElement('td');
+        const invalidCount = row.invalid_n ?? 0;
+        if (invalidCount > 0) {
+          const span = document.createElement('span');
+          span.className = 'mini';
+          span.style.textDecoration = 'underline';
+          span.style.cursor = 'pointer';
+          span.textContent = fmtNum(invalidCount);
+          span.onclick = () => openDetails(idx, 'invalid');
+          tdInvalid.appendChild(span);
+        } else {
+          tdInvalid.textContent = fmtNum(invalidCount);
+        }
+        tr.appendChild(tdInvalid);
         const tdNull = document.createElement('td'); tdNull.textContent = fmtNum(row.null_n ?? 0); tr.appendChild(tdNull);
         const tdMult = document.createElement('td'); tdMult.textContent = fmtNum(row.multiple_n ?? 0); tr.appendChild(tdMult);
 
@@ -449,21 +646,65 @@ exported from your warehouse (CSV). Do not deploy publicly.
       const ds = (byId('dataSource')?.value||'').trim();
       const row = filtered[idx];
       if (tr.style.display === 'none') {
-        // opening: (re)build content
-        let prefix = '';
-        if (bucket) {
-          const tops = getTopValues(ds, row.payer, row.plan, row.metric_id, row.claim_scope, bucket) || [];
-          if (tops.length) {
-            const lines = tops.slice(0, 20).map((r,i) => `${String(i+1).padStart(2,' ')}. ${r.value_code || '(blank)'}${r.value_desc ? ' - ' + r.value_desc : ''} (${(r.frequency||0).toLocaleString()})`);
-            prefix = `Top ${bucket} values (from details CSV):\n` + lines.join('\n') + '\n\n';
-          } else {
-            prefix = `No preloaded ${bucket} values found. Load a details CSV or run the SQL below.\n\n`;
-          }
-        }
-        td.textContent = prefix + buildOffendersSQL(row, (byId('schemaPrefix')?.value||'data_quality').trim(), ds);
+        td.textContent = buildOffendersSQL(row, (byId('schemaPrefix')?.value||'data_quality').trim(), ds);
       }
       tr.style.display = tr.style.display === 'none' ? '' : 'none';
     }
+
+    function openDetails(idx, bucket) {
+      const ds = (byId('dataSource')?.value||'').trim();
+      const row = filtered[idx];
+      const tops = getTopValues(ds, row.payer, row.plan, row.metric_id, row.claim_scope, bucket) || [];
+      const overlay = byId('detailsModal');
+      const title = byId('modalTitle');
+      const valuesHost = byId('modalTopValues');
+      const sqlHost = byId('modalSQL');
+      const sqlContainer = byId('modalSQLContainer');
+      const copyBtn = byId('copySqlBtn');
+      const toggleBtn = byId('toggleSqlBtn');
+      title.textContent = `${row.metric_name || row.metric_id} — Top ${bucket} values`;
+      // Build table or placeholder
+      valuesHost.innerHTML = '';
+      if (tops.length) {
+        const table = document.createElement('table'); table.className = 'table';
+        const thead = document.createElement('thead');
+        thead.innerHTML = '<tr><th style="width:60%;">value</th><th>description</th><th style="text-align:right;">count</th></tr>';
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        tops.slice(0, 200).forEach(r => {
+          const tr = document.createElement('tr');
+          const v = document.createElement('td'); v.textContent = r.value_code || '(blank)'; tr.appendChild(v);
+          const d = document.createElement('td'); d.textContent = r.value_desc || ''; tr.appendChild(d);
+          const c = document.createElement('td'); c.style.textAlign = 'right'; c.textContent = (r.frequency || 0).toLocaleString(); tr.appendChild(c);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        valuesHost.appendChild(table);
+      } else {
+        const msg = document.createElement('div'); msg.className = 'info';
+        msg.textContent = `No preloaded ${bucket} values found. You can run the SQL below.`;
+        valuesHost.appendChild(msg);
+      }
+      // SQL secondary if values present
+      const sql = buildOffendersSQL(row, (byId('schemaPrefix')?.value||'data_quality').trim(), ds);
+      sqlHost.textContent = sql;
+      if (tops.length) {
+        sqlContainer.style.display = 'none';
+        toggleBtn.style.display = '';
+        toggleBtn.textContent = 'Show SQL';
+      } else {
+        sqlContainer.style.display = '';
+        toggleBtn.style.display = 'none';
+      }
+      copyBtn.onclick = () => { try { navigator.clipboard.writeText(sql); copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy SQL', 1500);} catch(e) { alert('Copy failed'); } };
+      toggleBtn.onclick = () => {
+        if (sqlContainer.style.display === 'none') { sqlContainer.style.display = ''; toggleBtn.textContent = 'Hide SQL'; }
+        else { sqlContainer.style.display = 'none'; toggleBtn.textContent = 'Show SQL'; }
+      };
+      overlay.style.display = 'flex';
+    }
+
+    function closeModal() { const overlay = byId('detailsModal'); if (overlay) overlay.style.display = 'none'; }
 
     function buildOffendersSQL(row, schemaPrefix, selectedDataSource) {
       const map = {
@@ -569,6 +810,11 @@ exported from your warehouse (CSV). Do not deploy publicly.
         <input id="schemaPrefix" placeholder="e.g. dev_brad.data_quality" oninput="render()" />
         <label>data_source</label>
         <select id="dataSource" onchange="handleDataSourceChange()"></select>
+        <label>View</label>
+        <select id="viewSelect" onchange="viewMode = this.value; render()">
+          <option value="table" selected>Table</option>
+          <option value="pivot">Pivot</option>
+        </select>
         <label>Search metric</label>
         <input id="searchMetric" placeholder="e.g. HCPCS or DRG" oninput="render()" />
         <span id="payerContainer"><label>payer</label>
@@ -603,6 +849,27 @@ exported from your warehouse (CSV). Do not deploy publicly.
       </div>
 
       <div class="footer">No PHI leaves the warehouse: export an aggregated CSV of metrics from your database and load it here. Set Schema Prefix to generate ready-to-run SQL snippets.</div>
+    </div>
+  </div>
+  <div id="detailsModal" class="modal-overlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">Details</div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="btn" id="toggleSqlBtn" style="display:none;">Show SQL</button>
+          <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="modalTopValues"></div>
+        <div id="modalSQLContainer" style="margin-top:12px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+            <div class="subtle">SQL to query offenders</div>
+            <button class="btn" id="copySqlBtn">Copy SQL</button>
+          </div>
+          <pre class="sql" id="modalSQL"></pre>
+        </div>
+      </div>
     </div>
   </div>
 </body>
