@@ -125,7 +125,7 @@ claim_type as (
         {{ quote_column('plan') }} as plan,
         'claims:medical:CLAIM_TYPE' as metric_id,
         'medical' as claim_scope,
-        m.claim_type || '|' || coalesce(term.claim_type_description,'') as value,
+        cast(m.claim_type as {{ dbt.type_string() }}) as value,
         count(*) as frequency
     from {{ ref('medical_claim') }} m
     left join {{ ref('terminology__claim_type') }} term on m.claim_type = term.claim_type
@@ -155,4 +155,3 @@ select
 from ranked
 where rn <= 5
 group by data_source, payer, {{ quote_column('plan') }}, metric_id, claim_scope
-
