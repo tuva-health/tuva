@@ -70,6 +70,33 @@ models:
       - name: top5_valid_values
         description: Comma-separated list of top 5 valid codes (with descriptions & counts)
 
+  - name: data_quality__terminology_value_counts
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: terminology_value_counts
+      tags:
+        - data_quality
+      materialized: table
+    columns:
+      - name: data_source
+        description: Per-source aggregation key
+      - name: payer
+        description: Payer filter
+      - name: plan
+        description: Plan filter
+      - name: metric_id
+        description: Metric identifier
+      - name: claim_scope
+        description: Scope for denominator
+      - name: bucket_name
+        description: valid or invalid
+      - name: field_value
+        description: code|description for valid, code| for invalid
+      - name: frequency
+        description: Row count for this value
+
   - name: data_quality__data_quality_detail
     config:
       schema: |

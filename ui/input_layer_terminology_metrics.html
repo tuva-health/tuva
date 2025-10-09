@@ -453,14 +453,28 @@ exported from your warehouse (CSV). Do not deploy publicly.
 
     function getTopValues(ds, payer, plan, metric_id, claim_scope, bucket_name) {
       if (!detailsIdx.size) return [];
-      const keys = [
-        `${ds}||${payer||''}||${plan||''}||${metric_id}||${claim_scope||''}||${bucket_name}`,
-        `${ds}||||${metric_id}||${claim_scope||''}||${bucket_name}`
-      ];
-      for (const k of keys) {
-        if (detailsIdx.has(k)) return detailsIdx.get(k);
+      const exactKey = `${ds}||${payer||''}||${plan||''}||${metric_id}||${claim_scope||''}||${bucket_name}`;
+      if (detailsIdx.has(exactKey)) return detailsIdx.get(exactKey);
+      // Fallback: aggregate across payer/plan
+      const all = [];
+      for (const [key, arr] of detailsIdx.entries()) {
+        const parts = key.split('||');
+        if (parts.length !== 6) continue;
+        const [kDs, , , kMetric, kScope, kBucket] = parts;
+        if (kDs === ds && kMetric === metric_id && (kScope || '') === (claim_scope || '') && kBucket === bucket_name) {
+          all.push(...arr);
+        }
       }
-      return [];
+      if (!all.length) return [];
+      // Aggregate by value_code
+      const map = new Map();
+      all.forEach(r => {
+        const k = r.value_code || '';
+        const prev = map.get(k) || { value_code: r.value_code, value_desc: r.value_desc, frequency: 0 };
+        prev.frequency += (r.frequency || 0);
+        map.set(k, prev);
+      });
+      return Array.from(map.values()).sort((a,b) => b.frequency - a.frequency);
     }
 
     function loadSample() {
