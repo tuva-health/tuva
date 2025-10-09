@@ -19,7 +19,17 @@ exported from your warehouse (CSV). Do not deploy publicly.
     .upload { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
     .upload:hover { border-color: #2563eb; background: #eff6ff; }
     .upload.dragover { border-color: #1d4ed8; background: #dbeafe; }
-    .controls { display: flex; gap: 12px; margin: 20px 0; flex-wrap: wrap; align-items: center; }
+    .controls { display: flex; gap: 12px; margin: 20px 0 8px; flex-wrap: wrap; align-items: center; }
+    .filters { display: flex; gap: 12px; margin: 8px 0 20px; flex-wrap: wrap; align-items: center; }
+    .filter-label { font-size: 0.9rem; color:#475569; margin-right: 4px; }
+    .mdrop { position: relative; }
+    .mdrop-button { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; min-width: 180px; text-align: left; }
+    .mdrop-button:hover { border-color:#2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .mdrop-panel { position: absolute; top: calc(100% + 6px); left: 0; background:#fff; border:1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,0.18); border-radius: 10px; width: 260px; max-height: 260px; overflow: auto; z-index: 40; display:none; padding: 8px; }
+    .mdrop-actions { display:flex; gap:8px; margin-bottom:6px; }
+    .btn.small { padding: 6px 8px; font-size: 0.85rem; }
+    .mdrop-option { display:flex; align-items:center; gap:8px; padding:4px; border-radius:6px; }
+    .mdrop-option:hover { background:#f8fafc; }
     select, button { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
     button.primary { background: #2563eb; color: #fff; border: none; }
     .table { width: 100%; border-collapse: collapse; }
@@ -56,6 +66,11 @@ exported from your warehouse (CSV). Do not deploy publicly.
     .popover { position: fixed; z-index: 60; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,0.18); border-radius: 10px; width: 460px; max-width: 90vw; max-height: 60vh; overflow: hidden; display: none; }
     .popover-header { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; display:flex; align-items:center; justify-content: space-between; }
     .popover-body { padding: 10px; overflow: auto; }
+    .popover .table { table-layout: fixed; }
+    .popover .table th:nth-child(1), .popover .table td:nth-child(1) { width: 28%; }
+    .popover .table th:nth-child(2), .popover .table td:nth-child(2) { width: auto; }
+    .popover .table th:nth-child(3), .popover .table td:nth-child(3) { width: 20%; text-align: right; }
+    .popover .table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .popover-close { background: transparent; border: none; cursor: pointer; font-size: 18px; color:#6b7280; }
   </style>
   <script>
@@ -64,6 +79,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
     let byDataSource = new Map();
     // preloaded details index for offender values
     let detailsIdx = new Map();
+    // secondary index by (data_source, scope, field_name, bucket)
+    let detailsByFieldIdx = new Map();
     let sortKey = 'valid_pct';
     let sortAsc = true; // ascending by default
     let viewMode = 'table';
@@ -129,9 +146,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
       const width = Math.min(460, window.innerWidth * 0.9);
       el.style.width = width + 'px';
       const margin = 8;
-      // quickly measure height by showing offscreen
-      el.style.visibility = 'hidden'; el.style.display = 'block';
-      const height = el.offsetHeight || 320; el.style.display = 'none'; el.style.visibility = '';
+      const height = el.offsetHeight || 320;
       let top = rect.bottom + margin;
       let left = rect.left;
       if (top + height > window.innerHeight) {
@@ -145,8 +160,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
 
     function openValuePopover(anchor, idx, bucket) {
       const ds = (byId('dataSource')?.value||'').trim();
-      const row = filtered[idx];
-      const tops = getTopValues(ds, row.payer, row.plan, row.metric_id, row.claim_scope, bucket) || [];
+      const row = displayRows[idx];
+      const tops = getTopValues(ds, null, null, row.metric_id, row.claim_scope, bucket) || [];
       ensurePopover();
       const titleEl = byId('popoverTitle');
       const bodyEl = byId('popoverBody');
@@ -155,7 +170,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
       if (tops.length) {
         const table = document.createElement('table'); table.className = 'table';
         const thead = document.createElement('thead');
-        thead.innerHTML = '<tr><th style=\"width:50%;\">value</th><th>description</th><th style=\"text-align:right;\">count</th></tr>';
+        thead.innerHTML = '<tr><th>value</th><th>description</th><th>count</th></tr>';
         table.appendChild(thead);
         const tbody = document.createElement('tbody');
         tops.slice(0, 50).forEach(r => {
@@ -171,9 +186,9 @@ exported from your warehouse (CSV). Do not deploy publicly.
         msg.textContent = `No preloaded ${bucket} values found. Load a details CSV or use the SQL in the row.`;
         bodyEl.appendChild(msg);
       }
-      valuePopover.style.display = 'block';
       valuePopoverAnchor = anchor;
       positionPopover(anchor);
+      valuePopover.style.display = 'block';
     }
 
     function handleDragOver(e) { e.preventDefault(); byId('drop').classList.add('dragover'); }
@@ -227,9 +242,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
         byDataSource.get(key).push(m);
       });
       populateDataSourceSelector();
-      const currentDs = (byId('dataSource') && byId('dataSource').value) ? byId('dataSource').value : (Array.from(byDataSource.keys())[0] || '');
-      populateScopeSelector(currentDs);
-      populatePayerPlanSelectors(currentDs);
+      initFilters();
       updateSortIndicators();
       render();
     }
@@ -244,12 +257,17 @@ exported from your warehouse (CSV). Do not deploy publicly.
       }
       // index by composite key
       detailsIdx = new Map();
+      detailsByFieldIdx = new Map();
       details.forEach(r => {
         const key = `${r.data_source}||${r.payer||''}||${r.plan||''}||${r.metric_id}||${r.claim_scope||''}||${r.bucket_name}`;
         if (!detailsIdx.has(key)) detailsIdx.set(key, []);
         detailsIdx.get(key).push(r);
+        const fkey = `${r.data_source}||${r.claim_scope||''}||${r.field_name||''}||${r.bucket_name}`;
+        if (!detailsByFieldIdx.has(fkey)) detailsByFieldIdx.set(fkey, []);
+        detailsByFieldIdx.get(fkey).push(r);
       });
       for (const arr of detailsIdx.values()) arr.sort((a,b) => b.frequency - a.frequency);
+      for (const arr of detailsByFieldIdx.values()) arr.sort((a,b) => b.frequency - a.frequency);
       // Surface a friendly confirmation
       let uniqueBuckets = 0; for (const _ of detailsIdx.keys()) uniqueBuckets++;
       showInfo(`Loaded ${details.length.toLocaleString()} details rows across ${uniqueBuckets.toLocaleString()} metric buckets.`);
@@ -312,6 +330,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
         metric_id: metricId,
         claim_scope: claimScope,
         bucket_name: String(get(['bucket_name','bucket'])).trim().toLowerCase(),
+        field_name: fieldName ? String(fieldName).trim().toUpperCase() : '',
         value_code: code,
         value_desc: get(['value_desc','description','drill_down_desc','desc'], desc),
         frequency: freq
@@ -391,54 +410,187 @@ exported from your warehouse (CSV). Do not deploy publicly.
       if (keys.length) sel.value = keys[0];
     }
 
-    function populateScopeSelector(ds=null) {
-      const sel = byId('scopeSelect');
-      if (!sel) return;
-      sel.innerHTML = '';
-      const rows = ds ? (byDataSource.get(ds) || []) : metrics;
-      const scopes = Array.from(new Set(rows.map(m => m.claim_scope || ''))).filter(Boolean).sort();
-      scopes.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s; opt.textContent = s;
-        opt.selected = true; // default select all
-        sel.appendChild(opt);
-      });
-    }
+    // Legacy no-op (scope handled by custom UI)
+    function populateScopeSelector(ds=null) {}
 
-    function populatePayerPlanSelectors(ds=null) {
-      const payerSel = byId('payerSelect');
-      const planSel = byId('planSelect');
-      const payerContainer = byId('payerContainer');
-      const planContainer = byId('planContainer');
-      if (!payerSel || !planSel) return;
-      payerSel.innerHTML = '';
-      planSel.innerHTML = '';
-      const rows = ds ? (byDataSource.get(ds) || []) : metrics;
-      const payers = Array.from(new Set(rows.map(m => m.payer || '').filter(Boolean))).sort();
-      const plans = Array.from(new Set(rows.map(m => m.plan || '').filter(Boolean))).sort();
-      payers.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; opt.selected = true; payerSel.appendChild(opt); });
-      plans.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; opt.selected = true; planSel.appendChild(opt); });
-      if (payerContainer) payerContainer.style.display = payers.length ? '' : 'none';
-      if (planContainer) planContainer.style.display = plans.length ? '' : 'none';
-    }
+    // Legacy no-op (payer/plan handled by custom UI)
+    function populatePayerPlanSelectors(ds=null) {}
 
     function handleDataSourceChange() {
+      initFilters();
+      render();
+    }
+
+    // Custom filter state
+    const selectedFilters = { payer: new Set(), plan: new Set(), scope: new Set() };
+
+    function uniqueValues(rows, key) {
+      return Array.from(new Set(rows.map(r => (r[key] || '')).filter(Boolean))).sort();
+    }
+
+    let filtersClickBound = false;
+
+    function buildFilterUI() {
+      const host = byId('filtersRow'); if (!host) return;
+      host.innerHTML = '';
+      ['payer','plan','scope'].forEach(k => {
+        const label = k;
+        const wrap = document.createElement('div'); wrap.className = 'mdrop'; wrap.id = `mdrop-${k}`;
+        const btn = document.createElement('button'); btn.className = 'mdrop-button'; btn.id = `mdrop-btn-${k}`; btn.type='button'; btn.textContent = `${label} (all)`;
+        const panel = document.createElement('div'); panel.className = 'mdrop-panel'; panel.id = `mdrop-panel-${k}`;
+        const actions = document.createElement('div'); actions.className = 'mdrop-actions';
+        const allBtn = document.createElement('button'); allBtn.className = 'btn small'; allBtn.type='button'; allBtn.textContent = 'Select All'; allBtn.onclick = () => selectAllOptions(k);
+        const noneBtn = document.createElement('button'); noneBtn.className = 'btn small'; noneBtn.type='button'; noneBtn.textContent = 'Clear'; noneBtn.onclick = () => clearOptions(k);
+        actions.appendChild(allBtn); actions.appendChild(noneBtn);
+        const opts = document.createElement('div'); opts.id = `mdrop-options-${k}`;
+        panel.appendChild(actions); panel.appendChild(opts);
+        wrap.appendChild(btn); wrap.appendChild(panel); host.appendChild(wrap);
+        btn.onclick = (e) => togglePanel(k);
+      });
+      if (!filtersClickBound) {
+        document.addEventListener('click', (e) => {
+          ['payer','plan','scope'].forEach(k => {
+            const panel = byId(`mdrop-panel-${k}`), btn = byId(`mdrop-btn-${k}`);
+            if (!panel) return;
+            if (panel.style.display === 'none' || !panel.style.display) return;
+            if (panel.contains(e.target) || btn.contains(e.target)) return;
+            panel.style.display = 'none';
+          });
+        });
+        filtersClickBound = true;
+      }
+    }
+
+    function togglePanel(key) {
+      const panel = byId(`mdrop-panel-${key}`); if (!panel) return;
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function setOptions(key, values) {
+      const host = byId(`mdrop-options-${key}`); const btn = byId(`mdrop-btn-${key}`);
+      if (!host || !btn) return;
       const ds = byId('dataSource').value || '';
-      populateScopeSelector(ds);
-      populatePayerPlanSelectors(ds);
+      const base = byDataSource.get(ds) || [];
+      // Compute available values if not provided or empty
+      let rows = base;
+      if (key === 'plan') rows = rows.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
+      if (key === 'scope') rows = rows.filter(r => (!selectedFilters.payer.size || selectedFilters.payer.has(r.payer || '')) && (!selectedFilters.plan.size || selectedFilters.plan.has(r.plan || '')));
+      const prop = key === 'scope' ? 'claim_scope' : key;
+      const available = uniqueValues(rows, prop);
+      const vals = (values && values.length) ? values : available;
+      host.innerHTML = '';
+      const sel = selectedFilters[key] || new Set();
+      // Render checkboxes; when sel is empty, show as checked (treat as all selected visually)
+      vals.forEach(v => {
+        const row = document.createElement('label'); row.className = 'mdrop-option';
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.checked = sel.size === 0 ? true : sel.has(v);
+        cb.onchange = () => {
+          // If changing from implicit ALL (empty set), expand to explicit set first
+          if (sel.size === 0) { available.forEach(x => sel.add(x)); }
+          if (cb.checked) sel.add(v); else sel.delete(v);
+          onFilterChange(key);
+        };
+        const span = document.createElement('span'); span.textContent = v;
+        row.appendChild(cb); row.appendChild(span); host.appendChild(row);
+      });
+      selectedFilters[key] = sel;
+      updateFilterButtonText(key);
+    }
+
+    function updateFilterButtonText(key) {
+      const btn = byId(`mdrop-btn-${key}`); if (!btn) return;
+      const ds = byId('dataSource').value || '';
+      const base = byDataSource.get(ds) || [];
+      const prop = key === 'scope' ? 'claim_scope' : key;
+      let rows = base;
+      if (key === 'plan') rows = rows.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
+      if (key === 'scope') rows = rows.filter(r => (!selectedFilters.payer.size || selectedFilters.payer.has(r.payer || '')) && (!selectedFilters.plan.size || selectedFilters.plan.has(r.plan || '')));
+      const total = uniqueValues(rows, prop).length;
+      const sel = selectedFilters[key] || new Set();
+      const labelCount = sel.size === 0 || sel.size === total ? 'all' : sel.size;
+      btn.textContent = `${key} (${labelCount})`;
+    }
+
+    function selectAllOptions(key) {
+      // Explicitly select all available values
+      const ds = byId('dataSource').value || '';
+      const base = byDataSource.get(ds) || [];
+      let rows = base;
+      if (key === 'plan') rows = rows.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
+      if (key === 'scope') rows = rows.filter(r => (!selectedFilters.payer.size || selectedFilters.payer.has(r.payer || '')) && (!selectedFilters.plan.size || selectedFilters.plan.has(r.plan || '')));
+      const prop = key === 'scope' ? 'claim_scope' : key;
+      const values = uniqueValues(rows, prop);
+      selectedFilters[key] = new Set(values);
+      setOptions(key, values);
+      onFilterChange(key);
+    }
+
+    function clearOptions(key) {
+      // Clear all selections (no filter applied visually shows unchecked)
+      selectedFilters[key] = new Set();
+      setOptions(key, []);
+      onFilterChange(key);
+    }
+
+    function initFilters() {
+      const ds = byId('dataSource').value || '';
+      const base = byDataSource.get(ds) || [];
+      // Build initial UI if needed
+      buildFilterUI();
+      // Reset selections to All based on DS
+      selectedFilters.payer = new Set(uniqueValues(base, 'payer'));
+      selectedFilters.plan = new Set(uniqueValues(base, 'plan'));
+      selectedFilters.scope = new Set(uniqueValues(base, 'claim_scope'));
+      // Set options
+      setOptions('payer', Array.from(selectedFilters.payer));
+      // Cascade: plan limited by selected payers
+      const rowsPlan = base.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
+      const planVals = uniqueValues(rowsPlan, 'plan');
+      selectedFilters.plan = new Set(planVals);
+      setOptions('plan', planVals);
+      // Cascade: scope limited by selected payers+plans
+      const rowsScope = rowsPlan.filter(r => !selectedFilters.plan.size || selectedFilters.plan.has(r.plan || ''));
+      const scopeVals = uniqueValues(rowsScope, 'claim_scope');
+      selectedFilters.scope = new Set(scopeVals);
+      setOptions('scope', scopeVals);
+    }
+
+    function onFilterChange(changedKey) {
+      const ds = byId('dataSource').value || '';
+      const base = byDataSource.get(ds) || [];
+      // Cascade recompute
+      if (changedKey === 'payer') {
+        const rowsPlan = base.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
+        const planVals = uniqueValues(rowsPlan, 'plan');
+        // intersect keep
+        selectedFilters.plan = new Set(Array.from(selectedFilters.plan).filter(v => planVals.includes(v)));
+        if (!selectedFilters.plan.size) selectedFilters.plan = new Set(planVals);
+        setOptions('plan', planVals);
+        const rowsScope = rowsPlan.filter(r => !selectedFilters.plan.size || selectedFilters.plan.has(r.plan || ''));
+        const scopeVals = uniqueValues(rowsScope, 'claim_scope');
+        selectedFilters.scope = new Set(Array.from(selectedFilters.scope).filter(v => scopeVals.includes(v)));
+        if (!selectedFilters.scope.size) selectedFilters.scope = new Set(scopeVals);
+        setOptions('scope', scopeVals);
+      } else if (changedKey === 'plan') {
+        const rowsPlan = base.filter(r => !selectedFilters.payer.size || selectedFilters.payer.has(r.payer || ''));
+        const rowsScope = rowsPlan.filter(r => !selectedFilters.plan.size || selectedFilters.plan.has(r.plan || ''));
+        const scopeVals = uniqueValues(rowsScope, 'claim_scope');
+        selectedFilters.scope = new Set(Array.from(selectedFilters.scope).filter(v => scopeVals.includes(v)));
+        if (!selectedFilters.scope.size) selectedFilters.scope = new Set(scopeVals);
+        setOptions('scope', scopeVals);
+      }
       render();
     }
 
     function getSelectedMulti(id) {
-      const el = byId(id); if (!el) return [];
-      return Array.from(el.options).filter(o => o.selected).map(o => o.value);
+      // map old ids to new filter keys
+      const map = { payerSelect: 'payer', planSelect: 'plan', scopeSelect: 'scope' };
+      const key = map[id] || id;
+      if (selectedFilters[key]) return Array.from(selectedFilters[key]);
+      return [];
     }
 
-    function getSelectedScopes() {
-      const sel = byId('scopeSelect');
-      if (!sel) return [];
-      return Array.from(sel.options).filter(o => o.selected).map(o => o.value);
-    }
+    function getSelectedScopes() { return Array.from(selectedFilters.scope || []); }
 
     function setSort(key) {
       if (sortKey === key) {
@@ -484,6 +636,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
 
     function render() {
       filtered = getFilteredRows();
+      displayRows = aggregateByMetric(filtered);
       if (viewMode === 'pivot') {
         renderPivot();
       } else {
@@ -506,7 +659,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
             default: return 0;
           }
         };
-        filtered.sort((a,b) => sortAsc ? cmp(a,b) : -cmp(a,b));
+        displayRows.sort((a,b) => sortAsc ? cmp(a,b) : -cmp(a,b));
         renderTable();
       }
     }
@@ -540,12 +693,53 @@ exported from your warehouse (CSV). Do not deploy publicly.
       return agg;
     }
 
+    function aggregateByMetric(rows) {
+      const map = new Map();
+      rows.forEach(r => {
+        const key = `${r.metric_id}||${r.claim_scope||''}`;
+        const cur = map.get(key) || {
+          data_source: r.data_source,
+          payer: null,
+          plan: null,
+          metric_id: r.metric_id,
+          metric_name: r.metric_name,
+          claim_scope: r.claim_scope,
+          denominator_n: 0,
+          valid_n: 0,
+          invalid_n: 0,
+          null_n: 0,
+          multiple_n: 0,
+          threshold: (typeof r.threshold === 'number') ? r.threshold : null,
+          pass_flag: true,
+          denominator_desc: r.denominator_desc,
+          tuva_last_run: r.tuva_last_run
+        };
+        cur.denominator_n += (r.denominator_n||0);
+        cur.valid_n += (r.valid_n||0);
+        cur.invalid_n += (r.invalid_n||0);
+        cur.null_n += (r.null_n||0);
+        cur.multiple_n += (r.multiple_n||0);
+        if (cur.threshold === null && typeof r.threshold === 'number') cur.threshold = r.threshold;
+        map.set(key, cur);
+      });
+      const out = Array.from(map.values());
+      out.forEach(r => {
+        r.valid_pct = r.denominator_n > 0 ? (r.valid_n / r.denominator_n) : null;
+        if (typeof r.threshold === 'number') {
+          r.pass_flag = (r.valid_pct ?? 0) >= r.threshold && (r.multiple_n||0) === 0;
+        } else {
+          r.pass_flag = (r.multiple_n||0) === 0;
+        }
+      });
+      return out;
+    }
+
     function renderPivot() {
       const tbody = byId('tbody');
       tbody.innerHTML = '';
-      // Group by top -> sub -> rows
+      // Group by top -> sub -> rows using aggregated metric rows
       const groups = new Map();
-      filtered.forEach(r => {
+      displayRows.forEach(r => {
         const top = deriveTopGroup(r.claim_scope);
         const sub = deriveSubGroup(r.claim_scope);
         if (!groups.has(top)) groups.set(top, new Map());
@@ -602,9 +796,9 @@ exported from your warehouse (CSV). Do not deploy publicly.
             tbody.appendChild(trSub);
 
             if (!showSub || !collapsedSub.has(subId)) {
-              // metric rows under this sub-group
+              // metric rows under this sub-group (use aggregated displayRows)
               arr.forEach(row => {
-                const idx = filtered.indexOf(row);
+                const idx = displayRows.indexOf(row);
                 const tr = document.createElement('tr');
                 const tdMetric = document.createElement('td');
                 tdMetric.innerHTML = `<div style="font-weight:600;">${row.metric_name || row.metric_id}</div><div class="small">${row.metric_id} · ${row.claim_scope||''}</div>`;
@@ -680,7 +874,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
     function renderTable() {
       const tbody = byId('tbody');
       tbody.innerHTML = '';
-      filtered.forEach((row, idx) => {
+      displayRows.forEach((row, idx) => {
         const tr = document.createElement('tr');
         const tdMetric = document.createElement('td');
         tdMetric.innerHTML = `<div style="font-weight:600;">${row.metric_name || row.metric_id}</div><div class="small">${row.metric_id} · ${row.claim_scope||''}</div>`;
@@ -754,7 +948,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
       const tr = byId(`sql-${idx}`); if (!tr) return;
       const td = tr.querySelector('td');
       const ds = (byId('dataSource')?.value||'').trim();
-      const row = filtered[idx];
+      const row = displayRows[idx];
       if (tr.style.display === 'none') {
         td.textContent = buildOffendersSQL(row, (byId('schemaPrefix')?.value||'data_quality').trim(), ds);
       }
@@ -763,7 +957,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
 
     function openDetails(idx, bucket) {
       const ds = (byId('dataSource')?.value||'').trim();
-      const row = filtered[idx];
+      const row = displayRows[idx];
       const tops = getTopValues(ds, row.payer, row.plan, row.metric_id, row.claim_scope, bucket) || [];
       const overlay = byId('detailsModal');
       const title = byId('modalTitle');
@@ -878,7 +1072,24 @@ exported from your warehouse (CSV). Do not deploy publicly.
           all.push(...arr);
         }
       }
-      if (!all.length) return [];
+      if (!all.length) {
+        // Secondary fallback: use field_name mapping if metric_id didn't match (e.g., NPI details)
+        const field = (metric_id && metric_id.split(':')[2]) || '';
+        const fkey = `${ds}||${claim_scope||''}||${field}||${bucket_name}`;
+        if (detailsByFieldIdx.has(fkey)) {
+          const arr = detailsByFieldIdx.get(fkey) || [];
+          // aggregate by value_code
+          const m = new Map();
+          arr.forEach(r => {
+            const k = r.value_code || '';
+            const prev = m.get(k) || { value_code: r.value_code, value_desc: r.value_desc, frequency: 0 };
+            prev.frequency += (r.frequency && !isNaN(r.frequency) ? r.frequency : 1);
+            m.set(k, prev);
+          });
+          return Array.from(m.values()).sort((a,b) => b.frequency - a.frequency);
+        }
+        return [];
+      }
       // Aggregate by value_code
       const map = new Map();
       all.forEach(r => {
@@ -913,6 +1124,9 @@ exported from your warehouse (CSV). Do not deploy publicly.
         <div style="color:#64748b; font-size:0.95rem;">Metrics CSV columns: data_source, metric_id, metric_name, claim_scope, denominator_n, valid_n, invalid_n, null_n, multiple_n, valid_pct, threshold, pass_flag. Optionally also drop a Details CSV (e.g., data_source, metric_id, claim_scope, bucket_name, field_value/drill_down_value, frequency) to power Top offenders.</div>
         <input id="file" type="file" accept=".csv" multiple style="display:none" onchange="handleFile(event)" />
       </div>
+      <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+        <button class="btn" onclick="loadSample()">Load Sample Data</button>
+      </div>
 
       <div id="errorBox" class="error" style="display:none; margin: 12px 0;"></div>
 
@@ -928,14 +1142,9 @@ exported from your warehouse (CSV). Do not deploy publicly.
         </select>
         <label>Search metric</label>
         <input id="searchMetric" placeholder="e.g. HCPCS or DRG" oninput="render()" />
-        <span id="payerContainer"><label>payer</label>
-        <select id="payerSelect" multiple size="5" onchange="render()"></select></span>
-        <span id="planContainer"><label>plan</label>
-        <select id="planSelect" multiple size="5" onchange="render()"></select></span>
-        <label>Scope</label>
-        <select id="scopeSelect" multiple size="5" onchange="render()"></select>
-        <button class="primary" onclick="loadSample()">Load Sample Data</button>
       </div>
+
+      <div class="filters" id="filtersRow"></div>
 
       <div class="grid">
         <div style="overflow:auto; max-height: 60vh; border:1px solid #e5e7eb; border-radius: 8px;">
