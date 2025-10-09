@@ -2,7 +2,7 @@ name: 'ci_testing'
 version: '1.0.0'
 config-version: 2
 
-profile: default 
+profile: default
 
 vars:
   error_empty_seeds: true
@@ -49,8 +49,6 @@ test-paths: ["tests"]
 seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
-
-target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
@@ -58,7 +56,7 @@ clean-targets:
 
 dispatch:
   - macro_namespace: 'the_tuva_project'
-    search_order: ['integration_tests','the_tuva_project']
+    search_order: ['integration_tests', 'the_tuva_project']
 
 
 seeds:
@@ -84,3 +82,5 @@ seeds:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','hedis_cql_engine_log.csv',headers=true) }}"
     hedis_measure_report_seed:
       +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_ci_testing_data/0.15.0','hedis_measure_report.csv',headers=true) }}"
+flags:
+  require_generic_test_arguments_property: true

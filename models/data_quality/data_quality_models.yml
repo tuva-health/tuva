@@ -20,16 +20,17 @@ models:
         - dqi
     tests:
       - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - data_quality_category
-            - graph_name
-            - level_of_detail
-            - y_axis
-            - x_axis
           config:
             severity: error
             enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
 
+          arguments:
+            combination_of_columns:
+              - data_quality_category
+              - graph_name
+              - level_of_detail
+              - y_axis
+              - x_axis
   - name: data_quality__chronic_conditions_prevalence
     config:
       schema: |
@@ -83,8 +84,7 @@ models:
       - name: data_quality_check
         description: The name of the data quality check
       - name: result_count
-        description: The number of rows in the input layer that match the data quality
-          check criteria
+        description: The number of rows in the input layer that match the data quality check criteria
       - name: tuva_last_ran
         description: '{{ doc("tuva_last_run") }}'
 
@@ -101,8 +101,7 @@ models:
       - name: data_quality_check
         description: The name of the data quality check
       - name: result_count
-        description: The number of eligibility spans in the input layer that match
-          the data quality check criteria
+        description: The number of eligibility spans in the input layer that match the data quality check criteria
       - name: tuva_last_ran
         description: '{{ doc("tuva_last_run") }}'
 
@@ -140,8 +139,7 @@ models:
       - name: data_quality_check
         description: The name of the data quality check
       - name: result_count
-        description: The number of eligibility spans in the input layer that match
-          the data quality check criteria
+        description: The number of eligibility spans in the input layer that match the data quality check criteria
       - name: tuva_last_ran
         description: '{{ doc("tuva_last_run") }}'
 
@@ -159,8 +157,7 @@ models:
       - name: data_quality_check
         description: The name of the data quality check
       - name: result_count
-        description: The number of eligibility spans in the input layer that match
-          the data quality check criteria
+        description: The number of eligibility spans in the input layer that match the data quality check criteria
       - name: tuva_last_ran
         description: '{{ doc("tuva_last_run") }}'
 
@@ -208,8 +205,7 @@ models:
       - name: year_month
         description: The year and month
       - name: member_months
-        description: The count of distinct members with eligibility in the corresponding
-          year and month
+        description: The count of distinct members with eligibility in the corresponding year and month
       - name: tuva_last_ran
         description: '{{ doc("tuva_last_run") }}'
 
@@ -226,26 +222,19 @@ models:
       - name: year_month
         description: The name of the data quality check
       - name: claim_start_date
-        description: The count of distinct claims with a claim start date in the corresponding
-          year and month.
+        description: The count of distinct claims with a claim start date in the corresponding year and month.
       - name: claim_end_date
-        description: The count of distinct claims with a claim end date in the corresponding
-          year and month.
+        description: The count of distinct claims with a claim end date in the corresponding year and month.
       - name: admission_date
-        description: The count of distinct claims with a admission date in the corresponding
-          year and month.
+        description: The count of distinct claims with a admission date in the corresponding year and month.
       - name: discharge_date
-        description: The count of distinct claims with a discharge date in the corresponding
-          year and month.
+        description: The count of distinct claims with a discharge date in the corresponding year and month.
       - name: medical_paid_date
-        description: The count of distinct claims with a medical paid date in the
-          corresponding year and month.
+        description: The count of distinct claims with a medical paid date in the corresponding year and month.
       - name: dispensing_date
-        description: The count of distinct claims with a dispensing date in the corresponding
-          year and month.
+        description: The count of distinct claims with a dispensing date in the corresponding year and month.
       - name: pharmacy_paid_date
-        description: The count of distinct claims with a pharmacy paid date in the
-          corresponding year and month.
+        description: The count of distinct claims with a pharmacy paid date in the corresponding year and month.
       - name: tuva_last_ran
         description: '{{ doc("tuva_last_run") }}'
 
@@ -265,8 +254,7 @@ models:
           - unique
           - not_null
       - name: result_count
-        description: the count of records that match the result of the data quality
-          check
+        description: the count of records that match the result of the data quality check
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
@@ -297,8 +285,7 @@ models:
           - unique
           - not_null
       - name: result_count
-        description: the count of records that match the result of the data quality
-          check
+        description: the count of records that match the result of the data quality check
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
@@ -467,11 +454,9 @@ models:
       - name: metric
         description: the name of the metric being analyzed
       - name: input_layer_value
-        description: the count of the metric found in the input layer schema of the
-          table
+        description: the count of the metric found in the input layer schema of the table
       - name: core_value
-        description: the count of the metric found in the core layer schema of the
-          table
+        description: the count of the metric found in the core layer schema of the table
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
 
@@ -491,8 +476,7 @@ models:
       - name: table_name
         description: the name of the table's records being counted
       - name: record_count
-        description: the total number of records belonging to the specific data quality
-          check
+        description: the total number of records belonging to the specific data quality check
 
 
   - name: data_quality__analytics_populated
@@ -508,8 +492,7 @@ models:
       - name: table_name
         description: the name of the table's records being counted
       - name: record_count
-        description: the total number of records belonging to the specific data quality
-          check
+        description: the total number of records belonging to the specific data quality check
 
   - name: data_quality__readmissions
     config:

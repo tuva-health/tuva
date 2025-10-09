@@ -11,7 +11,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
       alias: acute_inpatient__encounter_grain
-      tags: 
+      tags:
         - acute_inpatient
         - claims_preprocessing
         - encounters
@@ -35,12 +35,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -87,24 +89,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -136,7 +142,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
       alias: emergency_department__encounter_grain
-      tags: 
+      tags:
         - emergency_department
         - claims_preprocessing
         - encounters
@@ -160,12 +166,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -212,24 +220,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -286,12 +298,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -338,24 +352,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -411,12 +429,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -463,24 +483,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -536,12 +560,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -588,24 +614,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -661,12 +691,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -713,24 +745,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -786,12 +822,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -838,24 +876,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -911,12 +953,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -963,24 +1007,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1010,7 +1058,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1033,12 +1081,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1085,24 +1135,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1124,7 +1178,7 @@ models:
       - name: data_source
         description: '{{ doc("data_source") }}'
       - name: tuva_last_run
-        description: '{{ doc("tuva_last_run") }}'    
+        description: '{{ doc("tuva_last_run") }}'
 
   - name: urgent_care__encounter_grain
     description: one row per urgent care encounter id summarizing encounter level metrics
@@ -1132,7 +1186,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1155,12 +1209,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1207,24 +1263,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1254,7 +1314,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1277,12 +1337,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1329,24 +1391,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1376,7 +1442,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1399,12 +1465,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1451,24 +1519,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1491,14 +1563,13 @@ models:
         description: '{{ doc("data_source") }}'
       - name: tuva_last_run
         description: '{{ doc("tuva_last_run") }}'
-  
   - name: outpatient_hospital_or_clinic__encounter_grain
     description: one row per outpatient rehab encounter id summarizing encounter level metrics
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1521,12 +1592,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1573,24 +1646,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1620,7 +1697,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1643,12 +1720,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1695,24 +1774,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1742,7 +1825,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1765,12 +1848,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1817,24 +1902,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1864,7 +1953,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -1887,12 +1976,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -1939,24 +2030,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -1986,7 +2081,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2009,12 +2104,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2061,24 +2158,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2108,7 +2209,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2131,12 +2232,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2183,24 +2286,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2230,7 +2337,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2253,12 +2360,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2305,24 +2414,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2352,7 +2465,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2375,12 +2488,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2427,24 +2542,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2474,7 +2593,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2497,12 +2616,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2549,24 +2670,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2596,7 +2721,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2619,12 +2744,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2671,24 +2798,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2718,7 +2849,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2741,12 +2872,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2793,24 +2926,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2840,7 +2977,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2863,12 +3000,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -2915,24 +3054,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -2962,7 +3105,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -2985,12 +3128,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -3037,24 +3182,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -3084,7 +3233,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3107,12 +3256,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -3159,24 +3310,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -3202,12 +3357,12 @@ models:
 
 
   - name: orphaned_claim__encounter_grain
-    description: orphaned claims (usually professional claims) that don't roll up to an anchor event, get assigned their own encounter id for completeness. 
+    description: orphaned claims (usually professional claims) that don't roll up to an anchor event, get assigned their own encounter id for completeness.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3230,12 +3385,14 @@ models:
         description: '{{ doc("admit_age") }}'
       - name: gender
         description: '{{ doc("gender") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/gender
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/gender
       - name: race
         description: '{{ doc("race") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/race
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/race
       - name: primary_diagnosis_code_type
         description: '{{ doc("primary_diagnosis_code_type") }}'
       - name: primary_diagnosis_code
@@ -3282,24 +3439,28 @@ models:
         description: '{{ doc("drg_description") }}'
       - name: medical_surgical
         description: '{{ doc("medical_surgical") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/ms-drg
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: admit_source_code
         description: '{{ doc("admit_source_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-source
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-source
       - name: admit_source_description
         description: '{{ doc("admit_source_description") }}'
       - name: admit_type_code
         description: '{{ doc("admit_type_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/admit-type
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/admit-type
       - name: admit_type_description
         description: '{{ doc("admit_type_description") }}'
       - name: discharge_disposition_code
         description: '{{ doc("discharge_disposition_code") }}'
-        meta:
-          terminology: https://thetuvaproject.com/terminology/discharge-disposition
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: discharge_disposition_description
         description: '{{ doc("discharge_disposition_description") }}'
       - name: total_paid_amount
@@ -3334,18 +3495,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: acute_inpatient__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3356,7 +3517,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3368,7 +3529,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3379,18 +3540,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: emergency_department__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3401,7 +3562,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3413,18 +3574,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: inpatient_psych__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3435,7 +3596,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3448,18 +3609,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: inpatient_rehab__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3470,7 +3631,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3482,18 +3643,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: inpatient_long_term__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3504,7 +3665,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3518,18 +3679,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: inpatient_snf__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3540,7 +3701,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3552,18 +3713,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: inpatient_substance_use__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3574,7 +3735,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3586,18 +3747,18 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
 
   - name: inpatient_hospice__start_end_dates
-    description: calculate start and end date of encounter 
+    description: calculate start and end date of encounter
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3608,7 +3769,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -3623,8 +3784,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_ptotst
     config:
@@ -3633,8 +3794,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_radiology
     config:
@@ -3643,8 +3804,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_surgery
     config:
@@ -3653,8 +3814,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_em
     config:
@@ -3663,8 +3824,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_telehealth
     config:
@@ -3673,8 +3834,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits
     config:
@@ -3683,8 +3844,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_detail_values
     config:
@@ -3693,8 +3854,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_encounter_ranking
     config:
@@ -3703,8 +3864,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_claim_line
     config:
@@ -3713,8 +3874,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: office_visits__int_office_visits_union
     config:
@@ -3723,8 +3884,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: table
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: urgent_care__anchor_events
     config:
@@ -3733,9 +3894,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - urgent_care
+        - claims_preprocessing
+        - encounters
+        - urgent_care
 
   - name: urgent_care__generate_encounter_id
     config:
@@ -3744,9 +3905,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - urgent_care
+        - claims_preprocessing
+        - encounters
+        - urgent_care
 
   - name: urgent_care__match_claims_to_anchor
     config:
@@ -3755,8 +3916,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
   - name: outpatient_psych__anchor_events
     config:
@@ -3765,9 +3926,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_psych
+        - claims_preprocessing
+        - encounters
+        - outpatient_psych
 
   - name: outpatient_psych__generate_encounter_id
     config:
@@ -3776,9 +3937,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_psych
+        - claims_preprocessing
+        - encounters
+        - outpatient_psych
 
   - name: outpatient_psych__match_claims_to_anchor
     config:
@@ -3787,9 +3948,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_psych
+        - claims_preprocessing
+        - encounters
+        - outpatient_psych
 
   - name: outpatient_rehab__anchor_events
     config:
@@ -3798,9 +3959,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_rehab
+        - claims_preprocessing
+        - encounters
+        - outpatient_rehab
 
   - name: outpatient_rehab__generate_encounter_id
     config:
@@ -3809,9 +3970,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_rehab
+        - claims_preprocessing
+        - encounters
+        - outpatient_rehab
 
   - name: outpatient_rehab__match_claims_to_anchor
     config:
@@ -3820,9 +3981,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_rehab
+        - claims_preprocessing
+        - encounters
+        - outpatient_rehab
 
   - name: outpatient_hospital_or_clinic__anchor_events
     config:
@@ -3831,9 +3992,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_hospital_or_clinic
+        - claims_preprocessing
+        - encounters
+        - outpatient_hospital_or_clinic
 
   - name: outpatient_hospital_or_clinic__generate_encounter_id
     config:
@@ -3842,9 +4003,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_hospital_or_clinic
+        - claims_preprocessing
+        - encounters
+        - outpatient_hospital_or_clinic
 
   - name: outpatient_hospital_or_clinic__match_claims_to_anchor
     config:
@@ -3853,9 +4014,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_hospital_or_clinic
+        - claims_preprocessing
+        - encounters
+        - outpatient_hospital_or_clinic
 
 
   - name: asc__anchor_events
@@ -3865,9 +4026,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - asc
+        - claims_preprocessing
+        - encounters
+        - asc
 
   - name: asc__generate_encounter_id
     config:
@@ -3876,9 +4037,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - asc
+        - claims_preprocessing
+        - encounters
+        - asc
 
   - name: asc__match_claims_to_anchor
     config:
@@ -3887,9 +4048,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - asc
+        - claims_preprocessing
+        - encounters
+        - asc
 
   - name: asc__start_end_dates
     config:
@@ -3898,9 +4059,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - asc
+        - claims_preprocessing
+        - encounters
+        - asc
 
   - name: dialysis__anchor_events
     config:
@@ -3909,9 +4070,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - dialysis
+        - claims_preprocessing
+        - encounters
+        - dialysis
 
   - name: dialysis__generate_encounter_id
     config:
@@ -3920,9 +4081,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - dialysis
+        - claims_preprocessing
+        - encounters
+        - dialysis
 
   - name: dialysis__match_claims_to_anchor
     config:
@@ -3931,9 +4092,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - dialysis
+        - claims_preprocessing
+        - encounters
+        - dialysis
 
   - name: outpatient_hospice__anchor_events
     config:
@@ -3942,9 +4103,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_hospice
+        - claims_preprocessing
+        - encounters
+        - outpatient_hospice
 
   - name: outpatient_hospice__generate_encounter_id
     config:
@@ -3953,9 +4114,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_hospice
+        - claims_preprocessing
+        - encounters
+        - outpatient_hospice
 
   - name: outpatient_hospice__match_claims_to_anchor
     config:
@@ -3964,9 +4125,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_hospice
+        - claims_preprocessing
+        - encounters
+        - outpatient_hospice
 
   - name: home_health__anchor_events
     config:
@@ -3975,9 +4136,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - home_health
+        - claims_preprocessing
+        - encounters
+        - home_health
 
   - name: home_health__generate_encounter_id
     config:
@@ -3986,9 +4147,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - home_health
+        - claims_preprocessing
+        - encounters
+        - home_health
 
   - name: home_health__match_claims_to_anchor
     config:
@@ -3997,9 +4158,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - home_health
+        - claims_preprocessing
+        - encounters
+        - home_health
 
   - name: outpatient_injections__anchor_events
     config:
@@ -4008,9 +4169,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_injections
+        - claims_preprocessing
+        - encounters
+        - outpatient_injections
 
   - name: outpatient_injections__generate_encounter_id
     config:
@@ -4019,9 +4180,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_injections
+        - claims_preprocessing
+        - encounters
+        - outpatient_injections
 
   - name: outpatient_injections__match_claims_to_anchor
     config:
@@ -4030,9 +4191,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_injections
+        - claims_preprocessing
+        - encounters
+        - outpatient_injections
 
 ##
   - name: outpatient_ptotst__anchor_events
@@ -4042,9 +4203,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_ptotst
+        - claims_preprocessing
+        - encounters
+        - outpatient_ptotst
 
   - name: outpatient_ptotst__generate_encounter_id
     config:
@@ -4053,9 +4214,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_ptotst
+        - claims_preprocessing
+        - encounters
+        - outpatient_ptotst
 
   - name: outpatient_ptotst__match_claims_to_anchor
     config:
@@ -4064,10 +4225,10 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_ptotst
-      
+        - claims_preprocessing
+        - encounters
+        - outpatient_ptotst
+
 ##
   - name: outpatient_substance_use__anchor_events
     config:
@@ -4076,9 +4237,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_substance_use
+        - claims_preprocessing
+        - encounters
+        - outpatient_substance_use
 
   - name: outpatient_substance_use__generate_encounter_id
     config:
@@ -4087,9 +4248,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_substance_use
+        - claims_preprocessing
+        - encounters
+        - outpatient_substance_use
 
   - name: outpatient_substance_use__match_claims_to_anchor
     config:
@@ -4098,9 +4259,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_substance_use
+        - claims_preprocessing
+        - encounters
+        - outpatient_substance_use
 ##
   - name: outpatient_radiology__anchor_events
     config:
@@ -4109,9 +4270,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_radiology
+        - claims_preprocessing
+        - encounters
+        - outpatient_radiology
 
   - name: outpatient_radiology__generate_encounter_id
     config:
@@ -4120,9 +4281,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_radiology
+        - claims_preprocessing
+        - encounters
+        - outpatient_radiology
 
   - name: outpatient_radiology__match_claims_to_anchor
     config:
@@ -4131,9 +4292,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_radiology
+        - claims_preprocessing
+        - encounters
+        - outpatient_radiology
 ##
   - name: lab__anchor_events
     config:
@@ -4142,9 +4303,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - lab
+        - claims_preprocessing
+        - encounters
+        - lab
 
   - name: lab__generate_encounter_id
     config:
@@ -4153,9 +4314,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - lab
+        - claims_preprocessing
+        - encounters
+        - lab
 
   - name: lab__match_claims_to_anchor
     config:
@@ -4164,9 +4325,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - lab
+        - claims_preprocessing
+        - encounters
+        - lab
 ##
   - name: dme__anchor_events
     config:
@@ -4175,9 +4336,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - dme
+        - claims_preprocessing
+        - encounters
+        - dme
 
   - name: dme__generate_encounter_id
     config:
@@ -4186,9 +4347,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - dme
+        - claims_preprocessing
+        - encounters
+        - dme
 
   - name: dme__match_claims_to_anchor
     config:
@@ -4197,9 +4358,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - dme
+        - claims_preprocessing
+        - encounters
+        - dme
 
 ##
   - name: ambulance__anchor_events
@@ -4209,9 +4370,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - ambulance
+        - claims_preprocessing
+        - encounters
+        - ambulance
 
   - name: ambulance__generate_encounter_id
     config:
@@ -4220,9 +4381,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - ambulance
+        - claims_preprocessing
+        - encounters
+        - ambulance
 
   - name: ambulance__match_claims_to_anchor
     config:
@@ -4231,9 +4392,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - ambulance
+        - claims_preprocessing
+        - encounters
+        - ambulance
 
   - name: encounters__orphaned_claims
     config:
@@ -4242,8 +4403,8 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
+        - claims_preprocessing
+        - encounters
 
 ##
   - name: outpatient_surgery__anchor_events
@@ -4253,9 +4414,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_surgery
+        - claims_preprocessing
+        - encounters
+        - outpatient_surgery
 
   - name: outpatient_surgery__generate_encounter_id
     config:
@@ -4264,9 +4425,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_surgery
+        - claims_preprocessing
+        - encounters
+        - outpatient_surgery
 
   - name: outpatient_surgery__match_claims_to_anchor
     config:
@@ -4275,9 +4436,9 @@ models:
         {%- else -%}claims_preprocessing{%- endif -%}
       materialized: view
       tags:
-      - claims_preprocessing
-      - encounters
-      - outpatient_surgery
+        - claims_preprocessing
+        - encounters
+        - outpatient_surgery
 
 ## Staging
   - name: encounters__stg_medical_claim
@@ -4286,7 +4447,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters
@@ -4297,7 +4458,7 @@ models:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_claims_preprocessing
         {%- else -%}claims_preprocessing{%- endif -%}
-      materialized: table 
+      materialized: table
       tags:
         - claims_preprocessing
         - encounters

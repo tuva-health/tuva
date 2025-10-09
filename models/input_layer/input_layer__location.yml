@@ -15,180 +15,195 @@ models:
         description: '{{ doc("location_id") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
-                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
-                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
-                'dqi_readmission']
               config:
                 severity: error
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission']
           - unique:
-              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
-                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
-                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
-                'dqi_readmission']
               config:
                 severity: error
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission']
           - not_null:
-              tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
-                'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
-                'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
-                'dqi_readmission']
+              arguments:
+                column_name: location_id
               config:
                 severity: error
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr', 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs', 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures', 'dqi_readmission']
       - name: npi
         description: '{{ doc("npi") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: npi
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: name
         description: '{{ doc("name") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: name
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: facility_type
         description: '{{ doc("facility_type") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: facility_type
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: parent_organization
         description: '{{ doc("parent_organization") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: parent_organization
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: address
         description: '{{ doc("address") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: address
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: city
         description: '{{ doc("city") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: city
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: state
         description: '{{ doc("state") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: state
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: zip_code
         description: '{{ doc("zip_code") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: zip_code
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: latitude
         description: '{{ doc("latitude") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: latitude
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: longitude
         description: '{{ doc("longitude") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: longitude
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
           - the_tuva_project.expect_column_to_exist:
-              tags: ['tuva_dqi_sev_1', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                tags: ['tuva_dqi_sev_1', 'dqi']
           - the_tuva_project.warn_if_null_percentage_above_zero:
+              arguments: 
+                column_name: data_source
               description: "Percentage of values that are null."
-              tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                tags: ['tuva_dqi_sev_5', 'dqi']

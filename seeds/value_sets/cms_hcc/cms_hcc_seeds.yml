@@ -32,8 +32,7 @@ seeds:
 
   - name: cms_hcc__cpt_hcpcs
     description: >
-      CPT/HCPCS encounter filtering included list by payment year. Combined 
-      and cleaned version of code files on cms.gov.
+      CPT/HCPCS encounter filtering included list by payment year. Combined  and cleaned version of code files on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -56,9 +55,8 @@ seeds:
         description: Flag indicating whether the code is included in the filtering
 
   - name: cms_hcc__demographic_factors
-    description: > 
-      Demographic factors by model version and risk segment. Extracted from 
-      rate announcement documents on cms.gov.
+    description: >
+      Demographic factors by model version and risk segment. Extracted from  rate announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -113,9 +111,8 @@ seeds:
         description: Coefficient for the demographic factor
 
   - name: cms_hcc__disabled_interaction_factors
-    description: > 
-      Disease and disabled interaction factors by model version 
-      and risk segment. Extracted from rate announcement documents on cms.gov.
+    description: >
+      Disease and disabled interaction factors by model version  and risk segment. Extracted from rate announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -159,8 +156,7 @@ seeds:
 
   - name: cms_hcc__disease_factors
     description: >
-      Disease factors by model version and risk segment. Extracted from rate 
-      announcement documents on cms.gov.
+      Disease factors by model version and risk segment. Extracted from rate  announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -241,8 +237,7 @@ seeds:
 
   - name: cms_hcc__disease_interaction_factors
     description: >
-      Disease interaction factors by model version and risk segment. Extracted 
-      from rate announcement documents on cms.gov.
+      Disease interaction factors by model version and risk segment. Extracted  from rate announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -302,8 +297,7 @@ seeds:
 
   - name: cms_hcc__enrollment_interaction_factors
     description: >
-      Enrollment interaction factors by model version and risk segment. 
-      Extracted from rate announcement documents on cms.gov.
+      Enrollment interaction factors by model version and risk segment.  Extracted from rate announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -351,8 +345,7 @@ seeds:
 
   - name: cms_hcc__icd_10_cm_mappings
     description: >
-      ICD-10 to HCC mapping by payment year and model version. Combined and 
-      cleaned version of code files on cms.gov.
+      ICD-10 to HCC mapping by payment year and model version. Combined and  cleaned version of code files on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -377,8 +370,9 @@ seeds:
         description: The year for which the ICD-10 to HCC mapping is applicable
       - name: diagnosis_code
         description: ICD-10 diagnosis code
-        meta:
-          terminology: https://thetuvaproject.com/terminology/icd-10-cm
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/icd-10-cm
       - name: cms_hcc_v24
         description: CMS-HCC version 24 code
       - name: cms_hcc_v24_flag
@@ -390,8 +384,7 @@ seeds:
 
   - name: cms_hcc__payment_hcc_count_factors
     description: >
-      Payment HCC count factors by model version and risk segment. Extracted 
-      from rate announcement documents on cms.gov.
+      Payment HCC count factors by model version and risk segment. Extracted  from rate announcement documents on cms.gov.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
@@ -426,18 +419,21 @@ seeds:
         description: Type of HCC count factor
       - name: enrollment_status
         description: Enrollment status of the individual
-        meta:
-          terminology: https://thetuvaproject.com/terminology/medicare-status
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/medicare-status
       - name: medicaid_status
         description: Medicaid status of the individual
       - name: dual_status
         description: Dual eligibility status of the individual
-        meta:
-          terminology: https://thetuvaproject.com/terminology/medicare-dual-eligibility
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/medicare-dual-eligibility
       - name: orec
         description: Original reason for entitlement code
-        meta:
-          terminology: https://thetuvaproject.com/terminology/medicare-orec
+        config:
+          meta:
+            terminology: https://thetuvaproject.com/terminology/medicare-orec
       - name: institutional_status
         description: Institutional status of the individual
       - name: payment_hcc_count
