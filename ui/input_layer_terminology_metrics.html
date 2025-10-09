@@ -37,11 +37,15 @@ exported from your warehouse (CSV). Do not deploy publicly.
     .small { font-size: 0.85rem; color:#6b7280; }
     .error { background:#fee2e2; border:1px solid #ef4444; color:#991b1b; padding:12px 14px; border-radius:8px; }
     .info { background:#eff6ff; border:1px solid #3b82f6; color:#1e40af; padding:12px 14px; border-radius:8px; }
+    .sortable { cursor: pointer; user-select: none; }
+    .sort-indicator { color:#64748b; font-size:0.9em; margin-left:4px; }
   </style>
   <script>
     let metrics = [];
     let filtered = [];
     let byDataSource = new Map();
+    let sortKey = 'valid_pct';
+    let sortAsc = true; // ascending by default
 
     function showError(message) {
       const box = byId('errorBox');
@@ -64,18 +68,30 @@ exported from your warehouse (CSV). Do not deploy publicly.
     function handleDragLeave(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); }
     function handleDrop(e) {
       e.preventDefault(); byId('drop').classList.remove('dragover');
-      const files = e.dataTransfer.files; if (files && files[0]) readFile(files[0]);
+      const files = Array.from(e.dataTransfer.files || []);
+      files.forEach(f => readFile(f));
     }
     function handlePick() { byId('file').click(); }
-    function handleFile(e) { const f = e.target.files[0]; if (f) readFile(f); }
+    function handleFile(e) { const files = Array.from(e.target.files || []); files.forEach(f => readFile(f)); }
 
     function readFile(file) {
       const reader = new FileReader();
-      reader.onload = (e) => { try { loadCSV(e.target.result); clearError(); } catch (err) { console.error(err); showError('Error parsing CSV: ' + err.message); } };
+      reader.onload = (e) => { try { routeCSV(e.target.result); clearError(); } catch (err) { console.error(err); showError('Error parsing CSV: ' + err.message); } };
       reader.readAsText(file);
     }
 
-    function loadCSV(csvText) {
+    function routeCSV(csvText) {
+      const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim().split('\n');
+      if (!lines.length) { showError('Empty file'); return; }
+      const headers = parseCSVLine(lines[0]).map(h => h.replace(/\"/g, '"').replace(/"/g, '').trim().toLowerCase());
+      const isMetrics = headers.includes('metric_id') && (headers.includes('denominator_n') || headers.includes('valid_n'));
+      const isDetails = headers.includes('bucket_name') && (headers.includes('field_value') || headers.includes('value_code') || headers.includes('value'));
+      if (isMetrics) { loadMetricsCSV(csvText); return; }
+      if (isDetails) { loadDetailsCSV(csvText); return; }
+      showError('Unrecognized CSV. Expected metrics or details columns.');
+    }
+
+    function loadMetricsCSV(csvText) {
       metrics = parseCSV(csvText).map(canonicalizeRow).filter(r => r.metric_id && r.data_source);
       if (!metrics.length) {
         showError('No rows parsed from CSV. Confirm headers like data_source, metric_id, metric_name, valid_n, denominator_n exist and that the file uses commas as delimiters.');
@@ -89,7 +105,24 @@ exported from your warehouse (CSV). Do not deploy publicly.
         byDataSource.get(key).push(m);
       });
       populateDataSourceSelector();
+      populateScopeSelector();
+      populatePayerPlanSelectors();
+      updateSortIndicators();
       render();
+    }
+
+    function loadDetailsCSV(csvText) {
+      const raw = parseCSV(csvText);
+      if (!raw.length) { showError('No rows parsed from details CSV'); return; }
+      details = raw.map(canonicalizeDetailsRow);
+      // index by composite key
+      detailsIdx = new Map();
+      details.forEach(r => {
+        const key = `${r.data_source}||${r.payer||''}||${r.plan||''}||${r.metric_id}||${r.claim_scope||''}||${r.bucket_name}`;
+        if (!detailsIdx.has(key)) detailsIdx.set(key, []);
+        detailsIdx.get(key).push(r);
+      });
+      for (const arr of detailsIdx.values()) arr.sort((a,b) => b.frequency - a.frequency);
     }
 
     function parseCSV(csvText) {
@@ -105,6 +138,34 @@ exported from your warehouse (CSV). Do not deploy publicly.
         rows.push(row);
       }
       return rows;
+    }
+
+    function canonicalizeDetailsRow(row) {
+      const get = (keys, def='') => {
+        for (const k of keys) {
+          for (const variant of [k, k.toLowerCase(), k.toUpperCase()]) {
+            if (row.hasOwnProperty(variant)) return row[variant];
+          }
+        }
+        return def;
+      };
+      const num = v => { if (v === null || v === undefined || v === '') return 0; const n = Number(String(v).replace(/,/g,'')); return isNaN(n) ? 0 : n; };
+      const fv = get(['value_code','field_value','value']);
+      let code = fv, desc = '';
+      if (typeof fv === 'string' && fv.includes('|')) {
+        const parts = fv.split('|'); code = parts[0].trim(); desc = (parts[1]||'').trim();
+      }
+      return {
+        data_source: get(['data_source']),
+        payer: get(['payer']),
+        plan: get(['plan']),
+        metric_id: get(['metric_id','metric']),
+        claim_scope: get(['claim_scope','scope']),
+        bucket_name: get(['bucket_name','bucket']),
+        value_code: code,
+        value_desc: get(['value_desc','description'], desc),
+        frequency: num(get(['frequency','count','freq'], '0'))
+      };
     }
 
     function canonicalizeRow(row) {
@@ -128,6 +189,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
       };
       const out = {
         data_source: get(['data_source','datasource']),
+        payer: get(['payer']),
+        plan: get(['plan']),
         metric_id: get(['metric_id','metric']),
         metric_name: get(['metric_name','metriclabel','name']),
         claim_scope: get(['claim_scope','scope']),
@@ -145,6 +208,9 @@ exported from your warehouse (CSV). Do not deploy publicly.
         denominator_desc: get(['denominator_desc','denominator_description']),
         tuva_last_run: get(['tuva_last_run','last_run'])
       };
+      if ((out.valid_pct === null || out.valid_pct === undefined) && out.denominator_n > 0) {
+        out.valid_pct = out.valid_n / out.denominator_n;
+      }
       return out;
     }
 
@@ -175,16 +241,107 @@ exported from your warehouse (CSV). Do not deploy publicly.
       if (keys.length) sel.value = keys[0];
     }
 
+    function populateScopeSelector() {
+      const sel = byId('scopeSelect');
+      if (!sel) return;
+      sel.innerHTML = '';
+      const scopes = Array.from(new Set(metrics.map(m => m.claim_scope || ''))).filter(Boolean).sort();
+      scopes.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        opt.selected = true; // default select all
+        sel.appendChild(opt);
+      });
+    }
+
+    function populatePayerPlanSelectors() {
+      const payerSel = byId('payerSelect');
+      const planSel = byId('planSelect');
+      const payerContainer = byId('payerContainer');
+      const planContainer = byId('planContainer');
+      if (!payerSel || !planSel) return;
+      payerSel.innerHTML = '';
+      planSel.innerHTML = '';
+      const payers = Array.from(new Set(metrics.map(m => m.payer || '').filter(Boolean))).sort();
+      const plans = Array.from(new Set(metrics.map(m => m.plan || '').filter(Boolean))).sort();
+      payers.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; opt.selected = true; payerSel.appendChild(opt); });
+      plans.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = p; opt.selected = true; planSel.appendChild(opt); });
+      if (payerContainer) payerContainer.style.display = payers.length ? '' : 'none';
+      if (planContainer) planContainer.style.display = plans.length ? '' : 'none';
+    }
+
+    function getSelectedMulti(id) {
+      const el = byId(id); if (!el) return [];
+      return Array.from(el.options).filter(o => o.selected).map(o => o.value);
+    }
+
+    function getSelectedScopes() {
+      const sel = byId('scopeSelect');
+      if (!sel) return [];
+      return Array.from(sel.options).filter(o => o.selected).map(o => o.value);
+    }
+
+    function setSort(key) {
+      if (sortKey === key) {
+        sortAsc = !sortAsc;
+      } else {
+        sortKey = key;
+        // sensible defaults: for valid_pct sort ascending, for counts sort descending
+        sortAsc = (key === 'valid_pct' || key === 'threshold' || key === 'metric');
+      }
+      updateSortIndicators();
+      render();
+    }
+
+    function updateSortIndicators() {
+      const keys = ['metric','valid_pct','denominator_n','valid_n','invalid_n','null_n','multiple_n','threshold','pass_flag'];
+      keys.forEach(k => {
+        const th = byId('th-'+k);
+        if (!th) return;
+        const base = th.getAttribute('data-label') || th.textContent.replace(/\s*[▲▼]$/, '');
+        th.setAttribute('data-label', base);
+        if (k === sortKey) {
+          th.innerHTML = `${base}<span class="sort-indicator">${sortAsc ? '▲' : '▼'}</span>`;
+        } else {
+          th.innerHTML = base;
+        }
+      });
+    }
+
     function render() {
       const ds = byId('dataSource').value || '';
       const search = (byId('searchMetric').value || '').toLowerCase();
       const rows = byDataSource.get(ds) || [];
-      filtered = rows.filter(m => !search || (m.metric_name||'').toLowerCase().includes(search) || (m.metric_id||'').toLowerCase().includes(search));
-      filtered.sort((a,b) => (a.valid_pct ?? 0) - (b.valid_pct ?? 0));
+      const scopes = getSelectedScopes();
+      filtered = rows.filter(m =>
+        (!search || (m.metric_name||'').toLowerCase().includes(search) || (m.metric_id||'').toLowerCase().includes(search)) &&
+        (!scopes.length || scopes.includes(m.claim_scope || ''))
+      );
+      const cmp = (a,b) => {
+        const nv = v => (v === null || v === undefined ? -Infinity : v);
+        switch (sortKey) {
+          case 'metric': {
+            const an = (a.metric_name || a.metric_id || '').toLowerCase();
+            const bn = (b.metric_name || b.metric_id || '').toLowerCase();
+            return an.localeCompare(bn);
+          }
+          case 'valid_pct': return nv(a.valid_pct) - nv(b.valid_pct);
+          case 'denominator_n': return nv(a.denominator_n) - nv(b.denominator_n);
+          case 'valid_n': return nv(a.valid_n) - nv(b.valid_n);
+          case 'invalid_n': return nv(a.invalid_n) - nv(b.invalid_n);
+          case 'null_n': return nv(a.null_n) - nv(b.null_n);
+          case 'multiple_n': return nv(a.multiple_n) - nv(b.multiple_n);
+          case 'threshold': return nv(a.threshold) - nv(b.threshold);
+          case 'pass_flag': return (a.pass_flag?1:0) - (b.pass_flag?1:0); // fail first if descending
+          default: return 0;
+        }
+      };
+      filtered.sort((a,b) => sortAsc ? cmp(a,b) : -cmp(a,b));
       renderTable();
     }
 
     function fmtPct(x) { if (x === null || x === undefined) return '—'; return (x*100).toFixed(1) + '%'; }
+    function fmtNum(x) { try { return Number(x||0).toLocaleString(); } catch { return String(x); } }
 
     function renderTable() {
       const tbody = byId('tbody');
@@ -208,11 +365,11 @@ exported from your warehouse (CSV). Do not deploy publicly.
         pctWrap.appendChild(pctText); pctWrap.appendChild(bar);
         tdPct.appendChild(pctWrap); tr.appendChild(tdPct);
 
-        const tdDen = document.createElement('td'); tdDen.textContent = row.denominator_n ?? 0; tr.appendChild(tdDen);
-        const tdValid = document.createElement('td'); tdValid.textContent = row.valid_n ?? 0; tr.appendChild(tdValid);
-        const tdInvalid = document.createElement('td'); tdInvalid.textContent = row.invalid_n ?? 0; tr.appendChild(tdInvalid);
-        const tdNull = document.createElement('td'); tdNull.textContent = row.null_n ?? 0; tr.appendChild(tdNull);
-        const tdMult = document.createElement('td'); tdMult.textContent = row.multiple_n ?? 0; tr.appendChild(tdMult);
+        const tdDen = document.createElement('td'); tdDen.textContent = fmtNum(row.denominator_n ?? 0); tr.appendChild(tdDen);
+        const tdValid = document.createElement('td'); tdValid.innerHTML = `<span class=\"mini\" style=\"text-decoration:underline; cursor:pointer;\">${fmtNum(row.valid_n ?? 0)}</span>`; tdValid.onclick = () => toggleSQL(idx, 'valid'); tr.appendChild(tdValid);
+        const tdInvalid = document.createElement('td'); tdInvalid.innerHTML = `<span class=\"mini\" style=\"text-decoration:underline; cursor:pointer;\">${fmtNum(row.invalid_n ?? 0)}</span>`; tdInvalid.onclick = () => toggleSQL(idx, 'invalid'); tr.appendChild(tdInvalid);
+        const tdNull = document.createElement('td'); tdNull.textContent = fmtNum(row.null_n ?? 0); tr.appendChild(tdNull);
+        const tdMult = document.createElement('td'); tdMult.textContent = fmtNum(row.multiple_n ?? 0); tr.appendChild(tdMult);
 
         const tdThr = document.createElement('td'); tdThr.textContent = thr !== null ? fmtPct(thr) : '—'; tr.appendChild(tdThr);
 
@@ -221,7 +378,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
         badge.textContent = (row.pass_flag ?? true) ? 'PASS' : 'FAIL';
         tdPass.appendChild(badge); tr.appendChild(tdPass);
         const tdSql = document.createElement('td');
-        const btn = document.createElement('button'); btn.textContent = 'View SQL'; btn.onclick = () => toggleSQL(idx);
+        const btn = document.createElement('button'); btn.textContent = 'View SQL'; btn.onclick = () => toggleSQL(idx, null);
         tdSql.appendChild(btn); tr.appendChild(tdSql);
 
         tbody.appendChild(tr);
@@ -233,9 +390,18 @@ exported from your warehouse (CSV). Do not deploy publicly.
       });
     }
 
-    function toggleSQL(idx) {
-      const row = byId(`sql-${idx}`); if (!row) return;
-      row.style.display = row.style.display === 'none' ? '' : 'none';
+    function toggleSQL(idx, bucket) {
+      const tr = byId(`sql-${idx}`); if (!tr) return;
+      const td = tr.querySelector('td');
+      const ds = (byId('dataSource')?.value||'').trim();
+      if (bucket) {
+        // show a contextual message (details CSV optional)
+        const msg = `No preloaded ${bucket} values found. Load a details CSV or run the SQL below.`;
+        if (!td.innerText || td.innerText.indexOf('Top ') !== 0) {
+          td.innerText = msg + "\n\n" + td.innerText;
+        }
+      }
+      tr.style.display = tr.style.display === 'none' ? '' : 'none';
     }
 
     function buildOffendersSQL(row, schemaPrefix, selectedDataSource) {
@@ -285,6 +451,18 @@ exported from your warehouse (CSV). Do not deploy publicly.
       return sql;
     }
 
+    function getTopValues(ds, payer, plan, metric_id, claim_scope, bucket_name) {
+      if (!detailsIdx.size) return [];
+      const keys = [
+        `${ds}||${payer||''}||${plan||''}||${metric_id}||${claim_scope||''}||${bucket_name}`,
+        `${ds}||||${metric_id}||${claim_scope||''}||${bucket_name}`
+      ];
+      for (const k of keys) {
+        if (detailsIdx.has(k)) return detailsIdx.get(k);
+      }
+      return [];
+    }
+
     function loadSample() {
       const sample = `"data_source","metric_id","metric_name","claim_scope","denominator_n","valid_n","invalid_n","null_n","multiple_n","valid_pct","threshold","pass_flag","denominator_desc","tuva_last_run"\n"payer_a","claims:institutional_inpatient:DRG_CODE","DRG Code (Inpatient)","institutional_inpatient",12000,11856,96,48,0,0.988,0.97,TRUE,"Institutional inpatient claims","2024-10-08"\n"payer_b","claims:institutional:REVENUE_CENTER_CODE","Revenue Center Code (Institutional)","institutional",500000,498000,1000,1000,0,0.996,0.97,TRUE,"Institutional claim lines","2024-10-08"\n"payer_a","claims:institutional:BILL_TYPE_CODE","Bill Type Code (Institutional)","institutional",14000,13720,200,60,20,0.980,0.97,TRUE,"Institutional claims","2024-10-08"\n"payer_a","claims:professional:HCPCS_CODE","HCPCS Code (Professional)","professional",800000,792000,6000,2000,0,0.990,0.97,TRUE,"Professional claim lines","2024-10-08"\n"payer_a","claims:institutional_outpatient:HCPCS_CODE","HCPCS Code (Institutional Outpatient)","institutional_outpatient",220000,185000,18000,17000,0,0.841,0.80,TRUE,"Institutional outpatient claim lines","2024-10-08"`;
       loadCSV(sample);
@@ -301,7 +479,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
       <div id="drop" class="upload" onclick="handlePick()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
         <div style="font-weight:600;">Drop CSV here or click to choose</div>
         <div style="color:#64748b; font-size:0.95rem;">Expected columns: data_source, metric_id, metric_name, claim_scope, denominator_n, valid_n, invalid_n, null_n, multiple_n, valid_pct, threshold, pass_flag</div>
-        <input id="file" type="file" accept=".csv" style="display:none" onchange="handleFile(event)" />
+        <input id="file" type="file" accept=".csv" multiple style="display:none" onchange="handleFile(event)" />
       </div>
 
       <div id="errorBox" class="error" style="display:none; margin: 12px 0;"></div>
@@ -313,6 +491,12 @@ exported from your warehouse (CSV). Do not deploy publicly.
         <select id="dataSource" onchange="render()"></select>
         <label>Search metric</label>
         <input id="searchMetric" placeholder="e.g. HCPCS or DRG" oninput="render()" />
+        <span id="payerContainer"><label>payer</label>
+        <select id="payerSelect" multiple size="5" onchange="render()"></select></span>
+        <span id="planContainer"><label>plan</label>
+        <select id="planSelect" multiple size="5" onchange="render()"></select></span>
+        <label>Scope</label>
+        <select id="scopeSelect" multiple size="5" onchange="render()"></select>
         <button class="primary" onclick="loadSample()">Load Sample Data</button>
       </div>
 
@@ -321,15 +505,15 @@ exported from your warehouse (CSV). Do not deploy publicly.
           <table class="table">
             <thead>
               <tr>
-                <th>metric</th>
-                <th>valid %</th>
-                <th>denominator</th>
-                <th>valid</th>
-                <th>invalid</th>
-                <th>null</th>
-                <th>multiple</th>
-                <th>threshold</th>
-                <th>status</th>
+                <th id="th-metric" class="sortable" onclick="setSort('metric')">metric</th>
+                <th id="th-valid_pct" class="sortable" onclick="setSort('valid_pct')">valid %</th>
+                <th id="th-denominator_n" class="sortable" onclick="setSort('denominator_n')">denominator</th>
+                <th id="th-valid_n" class="sortable" onclick="setSort('valid_n')">valid</th>
+                <th id="th-invalid_n" class="sortable" onclick="setSort('invalid_n')">invalid</th>
+                <th id="th-null_n" class="sortable" onclick="setSort('null_n')">null</th>
+                <th id="th-multiple_n" class="sortable" onclick="setSort('multiple_n')">multiple</th>
+                <th id="th-threshold" class="sortable" onclick="setSort('threshold')">threshold</th>
+                <th id="th-pass_flag" class="sortable" onclick="setSort('pass_flag')">status</th>
                 <th>offenders</th>
               </tr>
             </thead>
