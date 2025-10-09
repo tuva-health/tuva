@@ -30,57 +30,111 @@ Definitions:
 */
 
 with drg as (
+    /* Inpatient DRG by claim_id with multiple detection; includes payer and plan */
+    with base as (
+        select *
+        from {{ ref('medical_claim') }}
+        where claim_type = 'institutional'
+          and {{ substring('bill_type_code', 1, 2) }} = '11'
+    ),
+    per_claim as (
+        select
+            b.data_source,
+            b.payer,
+            {{ quote_column('plan') }} as plan,
+            b.claim_id,
+            count(distinct case when b.drg_code is not null then b.drg_code end) as distinct_codes,
+            max(case when b.drg_code is not null and (
+                    (b.drg_code_type = 'ms-drg' and ms.ms_drg_code is not null) or
+                    (b.drg_code_type = 'apr-drg' and apr.apr_drg_code is not null)
+                ) then 1 else 0 end) as has_valid,
+            max(case when b.drg_code is not null and (
+                    (b.drg_code_type = 'ms-drg' and ms.ms_drg_code is null) or
+                    (b.drg_code_type = 'apr-drg' and apr.apr_drg_code is null)
+                ) then 1 else 0 end) as has_invalid,
+            max(case when b.drg_code is null then 1 else 0 end) as has_null
+        from base b
+        left join {{ ref('terminology__ms_drg') }} ms on b.drg_code_type = 'ms-drg' and b.drg_code = ms.ms_drg_code
+        left join {{ ref('terminology__apr_drg') }} apr on b.drg_code_type = 'apr-drg' and b.drg_code = apr.apr_drg_code
+        group by b.data_source, b.payer, {{ quote_column('plan') }}, b.claim_id
+    )
     select
-        m.data_source,
+        data_source,
+        payer,
+        {{ quote_column('plan') }} as plan,
         'claims:institutional_inpatient:DRG_CODE' as metric_id,
-        'DRG Code (Inpatient)'                  as metric_name,
-        'institutional_inpatient'               as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
-        count(*)                                                   as denominator_n,
-        'Institutional inpatient claims'                           as denominator_desc
-    from {{ ref('data_quality__institutional_drg_code') }} as m
-    group by m.data_source
+        'DRG Code (Inpatient)' as metric_name,
+        'institutional_inpatient' as claim_scope,
+        sum(case when distinct_codes > 1 then 0 when has_valid = 1 then 1 else 0 end) as valid_n,
+        sum(case when distinct_codes > 1 then 0 when has_invalid = 1 then 1 else 0 end) as invalid_n,
+        sum(case when distinct_codes > 1 then 0 when has_null = 1 then 1 else 0 end) as null_n,
+        sum(case when distinct_codes > 1 then 1 else 0 end) as multiple_n,
+        count(*) as denominator_n,
+        'Institutional inpatient claims' as denominator_desc
+    from per_claim
+    group by data_source, payer, {{ quote_column('plan') }}
 ),
 
 bill_type as (
+    with base as (
+        select * from {{ ref('medical_claim') }} where claim_type = 'institutional'
+    ), per_claim as (
+        select
+            b.data_source,
+            b.payer,
+            {{ quote_column('plan') }} as plan,
+            b.claim_id,
+            count(distinct case when b.bill_type_code is not null then b.bill_type_code end) as distinct_codes,
+            max(case when b.bill_type_code is not null and bt.bill_type_code is not null then 1 else 0 end) as has_valid,
+            max(case when b.bill_type_code is not null and bt.bill_type_code is null then 1 else 0 end) as has_invalid,
+            max(case when b.bill_type_code is null then 1 else 0 end) as has_null
+        from base b
+        left join {{ ref('terminology__bill_type') }} bt on b.bill_type_code = bt.bill_type_code
+        group by b.data_source, b.payer, {{ quote_column('plan') }}, b.claim_id
+    )
     select
-        m.data_source,
-        'claims:institutional:BILL_TYPE_CODE'   as metric_id,
-        'Bill Type Code (Institutional)'        as metric_name,
-        'institutional'                         as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
-        count(*)                                                   as denominator_n,
-        'Institutional claims'                                     as denominator_desc
-    from {{ ref('data_quality__institutional_bill_type_code') }} as m
-    group by m.data_source
+        data_source,
+        payer,
+        {{ quote_column('plan') }} as plan,
+        'claims:institutional:BILL_TYPE_CODE' as metric_id,
+        'Bill Type Code (Institutional)' as metric_name,
+        'institutional' as claim_scope,
+        sum(case when distinct_codes > 1 then 0 when has_valid = 1 then 1 else 0 end) as valid_n,
+        sum(case when distinct_codes > 1 then 0 when has_invalid = 1 then 1 else 0 end) as invalid_n,
+        sum(case when distinct_codes > 1 then 0 when has_null = 1 then 1 else 0 end) as null_n,
+        sum(case when distinct_codes > 1 then 1 else 0 end) as multiple_n,
+        count(*) as denominator_n,
+        'Institutional claims' as denominator_desc
+    from per_claim
+    group by data_source, payer, {{ quote_column('plan') }}
 ),
 
 revenue_center as (
     select
-        m.data_source,
+        mc.data_source,
+        mc.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:institutional:REVENUE_CENTER_CODE' as metric_id,
         'Revenue Center Code (Institutional)'      as metric_name,
         'institutional'                             as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
-        count(*)                                                   as denominator_n,
-        'Institutional claim lines'                                as denominator_desc
-    from {{ ref('data_quality__institutional_revenue_center_code') }} as m
-    group by m.data_source
+        sum(case when term.revenue_center_code is not null then 1 else 0 end)     as valid_n,
+        sum(case when mc.revenue_center_code is not null and term.revenue_center_code is null then 1 else 0 end)   as invalid_n,
+        sum(case when mc.revenue_center_code is null then 1 else 0 end)      as null_n,
+        0 as multiple_n,
+        count(*) as denominator_n,
+        'Institutional claim lines' as denominator_desc
+    from {{ ref('medical_claim') }} mc
+    left join {{ ref('terminology__revenue_center') }} term on mc.revenue_center_code = term.revenue_center_code
+    where mc.claim_type = 'institutional'
+    group by mc.data_source, mc.payer, {{ quote_column('plan') }}
 ),
 
 -- HCPCS (Professional): mirror data_quality__claim_hcpcs_code but restrict to professional claim_type for denominator scope
 hcpcs_professional as (
     select
         mc.data_source,
+        mc.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:professional:HCPCS_CODE'         as metric_id,
         'HCPCS Code (Professional)'              as metric_name,
         'professional'                           as claim_scope,
@@ -94,13 +148,15 @@ hcpcs_professional as (
     left join {{ ref('terminology__hcpcs_level_2') }} as term
         on mc.hcpcs_code = term.hcpcs
     where mc.claim_type = 'professional'
-    group by mc.data_source
+    group by mc.data_source, mc.payer, {{ quote_column('plan') }}
 ),
 
 -- HCPCS (Institutional Outpatient): institutional claim_type excluding inpatient (bill_type prefix '11')
 hcpcs_institutional_outpatient as (
     select
         mc.data_source,
+        mc.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:institutional_outpatient:HCPCS_CODE' as metric_id,
         'HCPCS Code (Institutional Outpatient)'      as metric_name,
         'institutional_outpatient'                   as claim_scope,
@@ -115,139 +171,212 @@ hcpcs_institutional_outpatient as (
         on mc.hcpcs_code = term.hcpcs
     where mc.claim_type = 'institutional'
       and {{ substring('mc.bill_type_code', 1, 2) }} != '11'
-    group by mc.data_source
+    group by mc.data_source, mc.payer, {{ quote_column('plan') }}
 ),
 
 -- Claim Type (All Medical Claims)
 claim_type as (
     select
         m.data_source,
+        m.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:medical:CLAIM_TYPE'            as metric_id,
         'Claim Type (Medical)'                 as metric_name,
         'medical'                              as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
+        sum(case when term.claim_type is not null then 1 else 0 end)     as valid_n,
+        sum(case when m.claim_type is not null and term.claim_type is null then 1 else 0 end)   as invalid_n,
+        sum(case when m.claim_type is null then 1 else 0 end)      as null_n,
+        0 as multiple_n,
         count(*)                                                   as denominator_n,
         'All medical claims'                                       as denominator_desc
-    from {{ ref('data_quality__claim_claim_type') }} as m
-    group by m.data_source
+    from {{ ref('medical_claim') }} as m
+    left join {{ ref('terminology__claim_type') }} as term on m.claim_type = term.claim_type
+    group by m.data_source, m.payer, {{ quote_column('plan') }}
 ),
 
 -- Professional POS
 pos_professional as (
     select
         m.data_source,
+        m.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:professional:PLACE_OF_SERVICE_CODE' as metric_id,
         'Place of Service (Professional)'           as metric_name,
         'professional'                               as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        0                                                          as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when term.place_of_service_code is not null then 1 else 0 end)     as valid_n,
+        sum(case when m.place_of_service_code is not null and term.place_of_service_code is null then 1 else 0 end)   as invalid_n,
+        sum(case when m.place_of_service_code is null then 1 else 0 end)      as null_n,
+        0 as multiple_n,
+        count(*) as denominator_n,
         'Professional claim lines'                                 as denominator_desc
-    from {{ ref('data_quality__professional_place_of_service_code') }} as m
-    group by m.data_source
+    from {{ ref('medical_claim') }} as m
+    left join {{ ref('terminology__place_of_service') }} as term on m.place_of_service_code = term.place_of_service_code
+    where m.claim_type = 'professional'
+    group by m.data_source, m.payer, {{ quote_column('plan') }}
 ),
 
 -- Professional NPIs
 prof_billing_npi as (
     select
         m.data_source,
+        m.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:professional:BILLING_NPI'      as metric_id,
         'Billing NPI (Professional)'           as metric_name,
         'professional'                         as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        0                                                          as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when term.npi is not null then 1 else 0 end) as valid_n,
+        sum(case when m.billing_npi is not null and term.npi is null then 1 else 0 end) as invalid_n,
+        sum(case when m.billing_npi is null then 1 else 0 end) as null_n,
+        0 as multiple_n,
+        count(*) as denominator_n,
         'Professional claim lines'                                 as denominator_desc
-    from {{ ref('data_quality__professional_billing_npi') }} as m
-    group by m.data_source
+    from {{ ref('medical_claim') }} as m
+    left join {{ ref('terminology__provider') }} as term on m.billing_npi = term.npi
+    where m.claim_type = 'professional'
+    group by m.data_source, m.payer, {{ quote_column('plan') }}
 ),
 
 prof_rendering_npi as (
     select
         m.data_source,
+        m.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:professional:RENDERING_NPI'     as metric_id,
         'Rendering NPI (Professional)'          as metric_name,
         'professional'                          as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        0                                                          as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when term.npi is not null then 1 else 0 end) as valid_n,
+        sum(case when m.rendering_npi is not null and term.npi is null then 1 else 0 end) as invalid_n,
+        sum(case when m.rendering_npi is null then 1 else 0 end) as null_n,
+        0 as multiple_n,
+        count(*) as denominator_n,
         'Professional claim lines'                                 as denominator_desc
-    from {{ ref('data_quality__professional_rendering_npi') }} as m
-    group by m.data_source
+    from {{ ref('medical_claim') }} as m
+    left join {{ ref('terminology__provider') }} as term on m.rendering_npi = term.npi
+    where m.claim_type = 'professional'
+    group by m.data_source, m.payer, {{ quote_column('plan') }}
 ),
 
 prof_facility_npi as (
     select
         m.data_source,
+        m.payer,
+        {{ quote_column('plan') }} as plan,
         'claims:professional:FACILITY_NPI'      as metric_id,
         'Facility NPI (Professional)'           as metric_name,
         'professional'                          as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        0                                                          as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when term.npi is not null then 1 else 0 end) as valid_n,
+        sum(case when m.facility_npi is not null and term.npi is null then 1 else 0 end) as invalid_n,
+        sum(case when m.facility_npi is null then 1 else 0 end) as null_n,
+        0 as multiple_n,
+        count(*) as denominator_n,
         'Professional claim lines'                                 as denominator_desc
-    from {{ ref('data_quality__professional_facility_npi') }} as m
-    group by m.data_source
+    from {{ ref('medical_claim') }} as m
+    left join {{ ref('terminology__provider') }} as term on m.facility_npi = term.npi
+    where m.claim_type = 'professional'
+    group by m.data_source, m.payer, {{ quote_column('plan') }}
 ),
 
 -- Institutional NPIs (claim-level, includes multiple detection)
 inst_billing_npi as (
+    with base as (
+        select * from {{ ref('medical_claim') }} where claim_type = 'institutional'
+    ), per_claim as (
+        select
+            b.data_source,
+            b.payer,
+            {{ quote_column('plan') }} as plan,
+            b.claim_id,
+            count(distinct case when b.billing_npi is not null then b.billing_npi end) as distinct_vals,
+            max(case when b.billing_npi is not null and prov.npi is not null then 1 else 0 end) as has_valid,
+            max(case when b.billing_npi is not null and prov.npi is null then 1 else 0 end) as has_invalid,
+            max(case when b.billing_npi is null then 1 else 0 end) as has_null
+        from base b
+        left join {{ ref('terminology__provider') }} prov on b.billing_npi = prov.npi
+        group by b.data_source, b.payer, {{ quote_column('plan') }}, b.claim_id
+    )
     select
-        m.data_source,
+        data_source,
+        payer,
+        {{ quote_column('plan') }} as plan,
         'claims:institutional:BILLING_NPI'      as metric_id,
         'Billing NPI (Institutional)'           as metric_name,
         'institutional'                         as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when distinct_vals > 1 then 0 when has_valid = 1 then 1 else 0 end) as valid_n,
+        sum(case when distinct_vals > 1 then 0 when has_invalid = 1 then 1 else 0 end) as invalid_n,
+        sum(case when distinct_vals > 1 then 0 when has_null = 1 then 1 else 0 end) as null_n,
+        sum(case when distinct_vals > 1 then 1 else 0 end) as multiple_n,
+        count(*) as denominator_n,
         'Institutional claims'                                     as denominator_desc
-    from {{ ref('data_quality__institutional_billing_npi') }} as m
-    group by m.data_source
+    from per_claim
+    group by data_source, payer, {{ quote_column('plan') }}
 ),
 
 inst_rendering_npi as (
+    with base as (
+        select * from {{ ref('medical_claim') }} where claim_type = 'institutional'
+    ), per_claim as (
+        select
+            b.data_source,
+            b.payer,
+            {{ quote_column('plan') }} as plan,
+            b.claim_id,
+            count(distinct case when b.rendering_npi is not null then b.rendering_npi end) as distinct_vals,
+            max(case when b.rendering_npi is not null and prov.npi is not null then 1 else 0 end) as has_valid,
+            max(case when b.rendering_npi is not null and prov.npi is null then 1 else 0 end) as has_invalid,
+            max(case when b.rendering_npi is null then 1 else 0 end) as has_null
+        from base b
+        left join {{ ref('terminology__provider') }} prov on b.rendering_npi = prov.npi
+        group by b.data_source, b.payer, {{ quote_column('plan') }}, b.claim_id
+    )
     select
-        m.data_source,
+        data_source,
+        payer,
+        {{ quote_column('plan') }} as plan,
         'claims:institutional:RENDERING_NPI'     as metric_id,
         'Rendering NPI (Institutional)'          as metric_name,
         'institutional'                          as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when distinct_vals > 1 then 0 when has_valid = 1 then 1 else 0 end) as valid_n,
+        sum(case when distinct_vals > 1 then 0 when has_invalid = 1 then 1 else 0 end) as invalid_n,
+        sum(case when distinct_vals > 1 then 0 when has_null = 1 then 1 else 0 end) as null_n,
+        sum(case when distinct_vals > 1 then 1 else 0 end) as multiple_n,
+        count(*) as denominator_n,
         'Institutional claims'                                     as denominator_desc
-    from {{ ref('data_quality__institutional_rendering_npi') }} as m
-    group by m.data_source
+    from per_claim
+    group by data_source, payer, {{ quote_column('plan') }}
 ),
 
 inst_facility_npi as (
+    with base as (
+        select * from {{ ref('medical_claim') }} where claim_type = 'institutional'
+    ), per_claim as (
+        select
+            b.data_source,
+            b.payer,
+            {{ quote_column('plan') }} as plan,
+            b.claim_id,
+            count(distinct case when b.facility_npi is not null then b.facility_npi end) as distinct_vals,
+            max(case when b.facility_npi is not null and prov.npi is not null then 1 else 0 end) as has_valid,
+            max(case when b.facility_npi is not null and prov.npi is null then 1 else 0 end) as has_invalid,
+            max(case when b.facility_npi is null then 1 else 0 end) as has_null
+        from base b
+        left join {{ ref('terminology__provider') }} prov on b.facility_npi = prov.npi
+        group by b.data_source, b.payer, {{ quote_column('plan') }}, b.claim_id
+    )
     select
-        m.data_source,
+        data_source,
+        payer,
+        {{ quote_column('plan') }} as plan,
         'claims:institutional:FACILITY_NPI'      as metric_id,
         'Facility NPI (Institutional)'           as metric_name,
         'institutional'                          as claim_scope,
-        sum(case when bucket_name = 'valid' then 1 else 0 end)     as valid_n,
-        sum(case when bucket_name = 'invalid' then 1 else 0 end)   as invalid_n,
-        sum(case when bucket_name = 'null' then 1 else 0 end)      as null_n,
-        sum(case when bucket_name = 'multiple' then 1 else 0 end)  as multiple_n,
-        count(*)                                                   as denominator_n,
+        sum(case when distinct_vals > 1 then 0 when has_valid = 1 then 1 else 0 end) as valid_n,
+        sum(case when distinct_vals > 1 then 0 when has_invalid = 1 then 1 else 0 end) as invalid_n,
+        sum(case when distinct_vals > 1 then 0 when has_null = 1 then 1 else 0 end) as null_n,
+        sum(case when distinct_vals > 1 then 1 else 0 end) as multiple_n,
+        count(*) as denominator_n,
         'Institutional claims'                                     as denominator_desc
-    from {{ ref('data_quality__institutional_facility_npi') }} as m
-    group by m.data_source
+    from per_claim
+    group by data_source, payer, {{ quote_column('plan') }}
 ),
 
 -- Diagnosis Codes (Professional 1-3)
@@ -583,51 +712,53 @@ unioned as (
     union all
     select * from inst_facility_npi
     union all
-    select * from prof_dx1
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from prof_dx1
     union all
-    select * from prof_dx2
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from prof_dx2
     union all
-    select * from prof_dx3
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from prof_dx3
     union all
-    select * from inst_dx1
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_dx1
     union all
-    select * from inst_dx2
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_dx2
     union all
-    select * from inst_dx3
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_dx3
     union all
-    select * from inst_proc1
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_proc1
     union all
-    select * from inst_proc2
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_proc2
     union all
-    select * from inst_proc3
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_proc3
     union all
-    select * from inst_admit_source
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_admit_source
     union all
-    select * from inst_admit_type
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_admit_type
     union all
-    select * from inst_discharge_disposition
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from inst_discharge_disposition
     union all
-    select * from pharm_ndc
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from pharm_ndc
     union all
-    select * from pharm_dispensing_npi
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from pharm_dispensing_npi
     union all
-    select * from pharm_prescribing_npi
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from pharm_prescribing_npi
     union all
-    select * from elig_gender
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from elig_gender
     union all
-    select * from elig_race
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from elig_race
     union all
-    select * from elig_payer_type
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from elig_payer_type
     union all
-    select * from elig_medicare_status
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from elig_medicare_status
     union all
-    select * from elig_dual_status
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from elig_dual_status
     union all
-    select * from elig_orec
+    select data_source, null as payer, null as plan, metric_id, metric_name, claim_scope, valid_n, invalid_n, null_n, multiple_n, denominator_n, denominator_desc from elig_orec
 )
 
 select
     data_source,
+    payer,
+    {{ quote_column('plan') }} as plan,
     metric_id,
     metric_name,
     claim_scope,
