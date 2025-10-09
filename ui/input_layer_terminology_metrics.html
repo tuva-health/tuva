@@ -52,6 +52,11 @@ exported from your warehouse (CSV). Do not deploy publicly.
     .btn { padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; cursor: pointer; }
     .btn.primary { background: #2563eb; color: #fff; border: none; }
     .subtle { color:#64748b; }
+    /* Anchored popover for value lists */
+    .popover { position: fixed; z-index: 60; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 10px 30px rgba(0,0,0,0.18); border-radius: 10px; width: 460px; max-width: 90vw; max-height: 60vh; overflow: hidden; display: none; }
+    .popover-header { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-weight: 600; display:flex; align-items:center; justify-content: space-between; }
+    .popover-body { padding: 10px; overflow: auto; }
+    .popover-close { background: transparent; border: none; cursor: pointer; font-size: 18px; color:#6b7280; }
   </style>
   <script>
     let metrics = [];
@@ -64,6 +69,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
     let viewMode = 'table';
     const collapsedTop = new Set();
     const collapsedSub = new Set();
+    let valuePopover = null;
+    let valuePopoverAnchor = null;
 
     function showError(message) {
       const box = byId('errorBox');
@@ -91,6 +98,83 @@ exported from your warehouse (CSV). Do not deploy publicly.
     }
 
     function byId(id) { return document.getElementById(id); }
+
+    function ensurePopover() {
+      if (valuePopover) return valuePopover;
+      const el = document.createElement('div'); el.id = 'valuePopover'; el.className = 'popover';
+      el.innerHTML = `<div class="popover-header"><div id=\"popoverTitle\">Top values</div><button class=\"popover-close\" aria-label=\"Close\" onclick=\"closePopover()\">×</button></div><div class=\"popover-body\" id=\"popoverBody\"></div>`;
+      document.body.appendChild(el);
+      valuePopover = el;
+      document.addEventListener('click', (e) => {
+        if (!valuePopover || valuePopover.style.display === 'none') return;
+        if (valuePopover.contains(e.target)) return;
+        if (valuePopoverAnchor && valuePopoverAnchor.contains(e.target)) return;
+        closePopover();
+      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopover(); });
+      window.addEventListener('scroll', () => { if (valuePopover && valuePopover.style.display !== 'none') closePopover(); }, true);
+      window.addEventListener('resize', () => { if (valuePopover && valuePopover.style.display !== 'none') closePopover(); });
+      return valuePopover;
+    }
+
+    function closePopover() {
+      if (!valuePopover) return;
+      valuePopover.style.display = 'none';
+      valuePopoverAnchor = null;
+    }
+
+    function positionPopover(anchor) {
+      const rect = anchor.getBoundingClientRect();
+      const el = ensurePopover();
+      const width = Math.min(460, window.innerWidth * 0.9);
+      el.style.width = width + 'px';
+      const margin = 8;
+      // quickly measure height by showing offscreen
+      el.style.visibility = 'hidden'; el.style.display = 'block';
+      const height = el.offsetHeight || 320; el.style.display = 'none'; el.style.visibility = '';
+      let top = rect.bottom + margin;
+      let left = rect.left;
+      if (top + height > window.innerHeight) {
+        top = Math.max(margin, rect.top - height - margin);
+      }
+      if (left + width > window.innerWidth - margin) left = window.innerWidth - width - margin;
+      if (left < margin) left = margin;
+      el.style.top = `${top}px`;
+      el.style.left = `${left}px`;
+    }
+
+    function openValuePopover(anchor, idx, bucket) {
+      const ds = (byId('dataSource')?.value||'').trim();
+      const row = filtered[idx];
+      const tops = getTopValues(ds, row.payer, row.plan, row.metric_id, row.claim_scope, bucket) || [];
+      ensurePopover();
+      const titleEl = byId('popoverTitle');
+      const bodyEl = byId('popoverBody');
+      titleEl.textContent = `${row.metric_name || row.metric_id} — Top ${bucket} values`;
+      bodyEl.innerHTML = '';
+      if (tops.length) {
+        const table = document.createElement('table'); table.className = 'table';
+        const thead = document.createElement('thead');
+        thead.innerHTML = '<tr><th style=\"width:50%;\">value</th><th>description</th><th style=\"text-align:right;\">count</th></tr>';
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        tops.slice(0, 50).forEach(r => {
+          const tr = document.createElement('tr');
+          const v = document.createElement('td'); v.textContent = r.value_code || '(blank)'; tr.appendChild(v);
+          const d = document.createElement('td'); d.textContent = r.value_desc || ''; tr.appendChild(d);
+          const c = document.createElement('td'); c.style.textAlign = 'right'; c.textContent = (r.frequency || 0).toLocaleString(); tr.appendChild(c);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody); bodyEl.appendChild(table);
+      } else {
+        const msg = document.createElement('div'); msg.className = 'info';
+        msg.textContent = `No preloaded ${bucket} values found. Load a details CSV or use the SQL in the row.`;
+        bodyEl.appendChild(msg);
+      }
+      valuePopover.style.display = 'block';
+      valuePopoverAnchor = anchor;
+      positionPopover(anchor);
+    }
 
     function handleDragOver(e) { e.preventDefault(); byId('drop').classList.add('dragover'); }
     function handleDragLeave(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); }
@@ -539,21 +623,34 @@ exported from your warehouse (CSV). Do not deploy publicly.
                 tdPct.appendChild(pctWrap); tr.appendChild(tdPct);
 
                 const tdDen = document.createElement('td'); tdDen.textContent = fmtNum(row.denominator_n ?? 0); tr.appendChild(tdDen);
-                const tdValid = document.createElement('td'); tdValid.textContent = fmtNum(row.valid_n ?? 0); tr.appendChild(tdValid);
-                const tdInvalid = document.createElement('td');
-                const invalidCount = row.invalid_n ?? 0;
-                if (invalidCount > 0) {
-                  const span = document.createElement('span');
-                  span.className = 'mini';
-                  span.style.textDecoration = 'underline';
-                  span.style.cursor = 'pointer';
-                  span.textContent = fmtNum(invalidCount);
-                  span.onclick = () => openDetails(idx, 'invalid');
-                  tdInvalid.appendChild(span);
+                const tdValid = document.createElement('td');
+                const validCount2 = row.valid_n ?? 0;
+                if (validCount2 > 0) {
+                  const spanV2 = document.createElement('span');
+                  spanV2.className = 'mini';
+                  spanV2.style.textDecoration = 'underline';
+                  spanV2.style.cursor = 'pointer';
+                  spanV2.textContent = fmtNum(validCount2);
+                  spanV2.onclick = (e) => openValuePopover(e.currentTarget, idx, 'valid');
+                  tdValid.appendChild(spanV2);
                 } else {
-                  tdInvalid.textContent = fmtNum(invalidCount);
+                  tdValid.textContent = fmtNum(validCount2);
                 }
-                tr.appendChild(tdInvalid);
+                tr.appendChild(tdValid);
+        const tdInvalid = document.createElement('td');
+        const invalidCount = row.invalid_n ?? 0;
+        if (invalidCount > 0) {
+          const span = document.createElement('span');
+          span.className = 'mini';
+          span.style.textDecoration = 'underline';
+          span.style.cursor = 'pointer';
+          span.textContent = fmtNum(invalidCount);
+          span.onclick = (e) => openValuePopover(e.currentTarget, idx, 'invalid');
+          tdInvalid.appendChild(span);
+        } else {
+          tdInvalid.textContent = fmtNum(invalidCount);
+        }
+        tr.appendChild(tdInvalid);
                 const tdNull = document.createElement('td'); tdNull.textContent = fmtNum(row.null_n ?? 0); tr.appendChild(tdNull);
                 const tdMult = document.createElement('td'); tdMult.textContent = fmtNum(row.multiple_n ?? 0); tr.appendChild(tdMult);
                 const tdThr = document.createElement('td'); tdThr.textContent = thr !== null ? fmtPct(thr) : '—'; tr.appendChild(tdThr);
@@ -603,7 +700,20 @@ exported from your warehouse (CSV). Do not deploy publicly.
         tdPct.appendChild(pctWrap); tr.appendChild(tdPct);
 
         const tdDen = document.createElement('td'); tdDen.textContent = fmtNum(row.denominator_n ?? 0); tr.appendChild(tdDen);
-        const tdValid = document.createElement('td'); tdValid.textContent = fmtNum(row.valid_n ?? 0); tr.appendChild(tdValid);
+        const tdValid = document.createElement('td');
+        const validCount = row.valid_n ?? 0;
+        if (validCount > 0) {
+          const spanV = document.createElement('span');
+          spanV.className = 'mini';
+          spanV.style.textDecoration = 'underline';
+          spanV.style.cursor = 'pointer';
+          spanV.textContent = fmtNum(validCount);
+          spanV.onclick = (e) => openValuePopover(e.currentTarget, idx, 'valid');
+          tdValid.appendChild(spanV);
+        } else {
+          tdValid.textContent = fmtNum(validCount);
+        }
+        tr.appendChild(tdValid);
         const tdInvalid = document.createElement('td');
         const invalidCount = row.invalid_n ?? 0;
         if (invalidCount > 0) {
@@ -612,7 +722,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
           span.style.textDecoration = 'underline';
           span.style.cursor = 'pointer';
           span.textContent = fmtNum(invalidCount);
-          span.onclick = () => openDetails(idx, 'invalid');
+                  span.onclick = (e) => openValuePopover(e.currentTarget, idx, 'invalid');
           tdInvalid.appendChild(span);
         } else {
           tdInvalid.textContent = fmtNum(invalidCount);
@@ -704,7 +814,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
       overlay.style.display = 'flex';
     }
 
-    function closeModal() { const overlay = byId('detailsModal'); if (overlay) overlay.style.display = 'none'; }
+    // closeModal deprecated (modal removed)
+    function closeModal() {}
 
     function buildOffendersSQL(row, schemaPrefix, selectedDataSource) {
       const map = {
@@ -851,26 +962,6 @@ exported from your warehouse (CSV). Do not deploy publicly.
       <div class="footer">No PHI leaves the warehouse: export an aggregated CSV of metrics from your database and load it here. Set Schema Prefix to generate ready-to-run SQL snippets.</div>
     </div>
   </div>
-  <div id="detailsModal" class="modal-overlay" onclick="if(event.target===this) closeModal()">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-      <div class="modal-header">
-        <div class="modal-title" id="modalTitle">Details</div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <button class="btn" id="toggleSqlBtn" style="display:none;">Show SQL</button>
-          <button class="modal-close" onclick="closeModal()" aria-label="Close">×</button>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div id="modalTopValues"></div>
-        <div id="modalSQLContainer" style="margin-top:12px;">
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-            <div class="subtle">SQL to query offenders</div>
-            <button class="btn" id="copySqlBtn">Copy SQL</button>
-          </div>
-          <pre class="sql" id="modalSQL"></pre>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- anchored popover is created dynamically -->
 </body>
 </html>
