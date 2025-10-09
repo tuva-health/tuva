@@ -288,7 +288,7 @@ elig_gender as (
         'claims:eligibility:GENDER' as metric_id,
         'eligibility' as claim_scope,
         case when term.gender is not null then 'valid' else 'invalid' end as bucket_name,
-        case when term.gender is not null then concat(e.gender,'|',coalesce(term.description,'')) else concat(e.gender,'|') end as field_value
+        concat(e.gender,'|') as field_value
     from {{ ref('eligibility') }} e
     left join {{ ref('terminology__gender') }} term on e.gender = term.gender
     where e.gender is not null
