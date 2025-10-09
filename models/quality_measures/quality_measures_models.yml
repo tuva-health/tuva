@@ -60,14 +60,14 @@ models:
       Each row represents the results a measure per patient. A null for the  denominator
       indicates that the patient was not eligible for that measure.
     tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-# description: This is a check in one of the final downstream marts to see if quality_measures__summary_long is populated. If this is flagging, please check other areas further upstream on the input layer.
+      - the_tuva_project.expect_table_row_count_to_be_between:
+          description: This is a check in one of the final downstream marts to see if quality_measures__summary_long is populated. If this is flagging, please check other areas further upstream on the input layer.
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_quality_measures', 'dqi_usability']
           min_value: 1
-          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          strictly: false
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+            enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
             meta:
               dqi_test_description: "This is a check in one of the final downstream
@@ -1401,7 +1401,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_condition
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: Staging conditions from core.
     columns:
       - name: person_id
@@ -1421,7 +1421,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_encounter
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: >
       Staging encounters from core. Creates an empty table if using claims only.
     columns:
@@ -1440,7 +1440,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_medication
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: >
       Staging medications from core. Creates an empty table if using claims only.
     columns:
@@ -1461,7 +1461,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_observation
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: >
       Staging medications from core. Creates an empty table if using claims only.
     columns:
@@ -1482,7 +1482,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_patient
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: Staging eligibility from the input layer.
     columns:
       - name: person_id
@@ -1509,7 +1509,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_procedure
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: Staging procedures from core.
     columns:
       - name: person_id
@@ -1534,7 +1534,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_medical_claim
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: >
       Staging medical claims from the input layer. Creates an empty table if 
       using clinical only.
@@ -1557,7 +1557,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_pharmacy_claim
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: >
       Staging pharmacy claims from the input layer. Creates an empty table if 
       using clinical only.
@@ -1576,15 +1576,14 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_quality_measures{% else %}quality_measures{%- endif -%}
       alias: _stg_lab_result
       tags: quality_measures
-      materialized: ephemeral
+      materialized: view
     description: >
       Staging lab results from the input layer. Creates an empty table if 
       using claims only.
     columns:
       - name: person_id
+      - name: result
       - name: result_date
       - name: collection_date
-      - name: source_code_type
-      - name: source_code
-      - name: normalized_code_type
-      - name: normalized_code
+      - name: code_type
+      - name: code

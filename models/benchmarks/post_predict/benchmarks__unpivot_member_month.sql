@@ -11,6 +11,7 @@ with unpivoted as (
         , payer
         , {{ quote_column('plan') }} 
         , data_source
+        , benchmark_key
         , metric
         , value
     from (
@@ -20,6 +21,7 @@ with unpivoted as (
             , payer
             , {{ quote_column('plan') }}
             , data_source
+            , benchmark_key
             , cast(actual_paid_amount as float) as actual_paid_amount
             , cast(actual_inpatient_paid_amount as float) as actual_inpatient_paid_amount
             , cast(actual_outpatient_paid_amount as float) as actual_outpatient_paid_amount
@@ -100,6 +102,7 @@ with unpivoted as (
         , payer
         , {{ quote_column('plan') }}
         , data_source
+        , benchmark_key
         , lower(metric) as metric
         , value
         -- Determine the metric type from the original metric name
@@ -116,6 +119,7 @@ select
     , payer
     , {{ quote_column('plan') }}
     , data_source
+    , benchmark_key
     , case 
         when metric = 'actual_paid_amount' then 'total paid amount'
         when metric = 'expected_paid_amount' then 'total paid amount'

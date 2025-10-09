@@ -355,12 +355,34 @@ models:
       materialized: table
 
 
+  - name: data_quality__eligibility_name_suffix
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_name_suffix
+      tags:
+        - data_quality
+      materialized: table
+
+
   - name: data_quality__eligibility_first_name
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
       alias: eligibility_first_name
+      tags:
+        - data_quality
+      materialized: table
+
+  
+  - name: data_quality__eligibility_middle_name
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_middle_name
       tags:
         - data_quality
       materialized: table
@@ -463,7 +485,29 @@ models:
       tags:
         - data_quality
       materialized: table
+    
 
+  - name: data_quality__eligibility_email
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_email
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__eligibility_ethnicity
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: eligibility_ethnicity
+      tags:
+        - data_quality
+      materialized: table
+      
 
   - name: data_quality__eligibility_plan
     config:
@@ -1355,7 +1399,318 @@ models:
       materialized: table
 
 #### Atomic Checks
-## Clinical condition
+## Clinical appointment
+  - name: data_quality__appointment_appointment_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_appointment_id
+      tags:
+        - data_quality
+      materialized: table  
+
+  - name: data_quality__appointment_appointment_specialty
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_appointment_specialty
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_cancellation_reason
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_cancellation_reason
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_data_source
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_data_source
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_duration
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_duration
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_encounter_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_end_datetime
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_end_datetime
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_location_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_location_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_appointment_type_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_appointment_type_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_appointment_type_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_appointment_type_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_cancellation_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_cancellation_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_cancellation_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_cancellation_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_cancellation_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_cancellation_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_normalized_status
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_normalized_status
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_patient_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_patient_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_person_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_practitioner_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_practitioner_id
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_reason
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_reason
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_appointment_type_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_appointment_type_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_appointment_type_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_appointment_type_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_cancellation_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_cancellation_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_cancellation_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_cancellation_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_cancellation_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_cancellation_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_reason_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_reason_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_reason_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_reason_code_type
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_reason_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_reason_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_source_status
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_source_status
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__appointment_start_datetime
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: appointment_start_datetime
+      tags:
+        - data_quality
+      materialized: table
+
+  ## Clinical condition
   - name: data_quality__condition_claim_id
     config:
       schema: |
@@ -1817,6 +2172,204 @@ models:
         - data_quality
       materialized: table
 
+## Clinical immunization
+  - name: data_quality__immunization_body_site
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_body_site
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_data_source
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_data_source
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_encounter_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_encounter_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_immunization_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_immunization_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_location_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_location_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_lot_number
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_lot_number
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_code
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_code_type
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_description
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_normalized_dose
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_normalized_dose
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_occurrence_date
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_occurrence_date
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_patient_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_patient_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_person_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_person_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_practitioner_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_practitioner_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_code
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_code
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_code_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_code_type
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_description
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
+
+  - name: data_quality__immunization_source_dose
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: immunization_source_dose
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
 
 ## Clinical lab result
   - name: data_quality__lab_result_source_abnormal_flag
@@ -1874,23 +2427,43 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_collection_date
+  - name: data_quality__lab_result_collection_datetime
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_collection_date
+      alias: lab_result_collection_datetime
       tags:
         - data_quality
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_component
+  - name: data_quality__lab_result_normalized_component_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_component
+      alias: lab_result_normalized_component_code
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__lab_result_normalized_component_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_normalized_component_description
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__lab_result_normalized_component_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_normalized_component_type
       tags:
         - data_quality
       materialized: table
@@ -1918,23 +2491,23 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_source_code_type
+  - name: data_quality__lab_result_source_order_type
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_source_code_type
+      alias: lab_result_source_order_type
       tags:
         - data_quality
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_description
+  - name: data_quality__lab_result_normalized_order_description
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_description
+      alias: lab_result_normalized_order_description
       tags:
         - data_quality
       materialized: table
@@ -1962,23 +2535,23 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_code
+  - name: data_quality__lab_result_normalized_order_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_code
+      alias: lab_result_normalized_order_code
       tags:
         - data_quality
       materialized: table
 
 
-  - name: data_quality__lab_result_source_description
+  - name: data_quality__lab_result_source_order_description
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_source_description
+      alias: lab_result_source_order_description
       tags:
         - data_quality
       materialized: table
@@ -2006,12 +2579,12 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_result_date
+  - name: data_quality__lab_result_result_datetime
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_result_date
+      alias: lab_result_result_datetime
       tags:
         - data_quality
       materialized: table
@@ -2050,12 +2623,12 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_normalized_code_type
+  - name: data_quality__lab_result_normalized_order_type
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_normalized_code_type
+      alias: lab_result_normalized_order_type
       tags:
         - data_quality
       materialized: table
@@ -2072,12 +2645,12 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_source_code
+  - name: data_quality__lab_result_source_order_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_source_code
+      alias: lab_result_source_order_code
       tags:
         - data_quality
       materialized: table
@@ -2094,12 +2667,34 @@ models:
       materialized: table
 
 
-  - name: data_quality__lab_result_source_component
+  - name: data_quality__lab_result_source_component_code
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
         {% else %}data_quality{%- endif -%}
-      alias: lab_result_source_component
+      alias: lab_result_source_component_code
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__lab_result_source_component_description
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_source_component_description
+      tags:
+        - data_quality
+      materialized: table
+
+
+  - name: data_quality__lab_result_source_component_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: lab_result_source_component_type
       tags:
         - data_quality
       materialized: table
@@ -2709,6 +3304,25 @@ models:
         - data_quality
       materialized: table
 
+  - name: data_quality__patient_email
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_email
+      tags:
+        - data_quality
+      materialized: table
+
+  - name: data_quality__patient_ethnicity
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_ethnicity
+      tags:
+        - data_quality
+      materialized: table
 
   - name: data_quality__patient_state
     config:
@@ -2808,6 +3422,15 @@ models:
         - data_quality
       materialized: table
 
+  - name: data_quality__patient_name_suffix
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_name_suffix
+      tags:
+        - data_quality
+      materialized: table
 
   - name: data_quality__patient_first_name
     config:
@@ -2819,6 +3442,15 @@ models:
         - data_quality
       materialized: table
 
+  - name: data_quality__patient_middle_name
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: patient_middle_name
+      tags:
+        - data_quality
+      materialized: table
 
   - name: data_quality__patient_last_name
     config:
@@ -3171,6 +3803,17 @@ models:
       materialized: table
 
 
+  - name: data_quality__primary_keys_appointment_appointment_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: primary_keys_appointment_appointment_id
+      tags:
+        - data_quality
+      materialized: table
+
+
   - name: data_quality__primary_keys_condition_condition_id
     config:
       schema: |
@@ -3191,7 +3834,17 @@ models:
       tags:
         - data_quality
       materialized: table
-
+  
+  - name: data_quality__primary_keys_immunization_immunization_id
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+        {% else %}data_quality{%- endif -%}
+      alias: primary_keys_immunization_immunization_id
+      tags:
+        - data_quality
+        - dqi_immunization
+      materialized: table
 
   - name: data_quality__primary_keys_lab_result_lab_result_id
     config:
@@ -3341,6 +3994,7 @@ models:
         - data_quality
       materialized: table
 
+
   - name: data_quality__data_quality_clinical_detail
     description: "This model adds the dense ranking in a separate step due to memory constraints"
     config:
@@ -3369,6 +4023,13 @@ models:
     config:
       tags:
         - data_quality
+      materialized: ephemeral
+
+  - name: data_quality__stg_immunization
+    config:
+      tags:
+        - data_quality
+        - dqi_immunization
       materialized: ephemeral
 
   - name: data_quality__stg_institutional_inpatient

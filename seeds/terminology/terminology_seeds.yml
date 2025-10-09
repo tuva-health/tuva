@@ -1,6 +1,25 @@
 version: 2
 
 seeds:
+  - name: terminology__act_site
+    description: 'This seed contains An anatomical location on a human which can be the focus of an act.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: act_site
+      tags:
+        - terminology
+      column_types:
+        body_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: body_code
+        description: 'The code representing the anatomical location.'
+      - name: description
+        description: 'A description of the anatomical location.'
+
   - name: terminology__admit_source
     description: 'NUBC Admit Sources'
     config:
@@ -46,6 +65,59 @@ seeds:
         description: 'The code representing the type of admission.'
       - name: admit_type_description
         description: 'A description of the admission type.'
+
+  - name: terminology__appointment_cancellation_reason
+    description: 'The coded reason for the appointment being cancelled.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: appointment_cancellation_reason
+      tags:
+        - terminology
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code for the cancellation reason.'
+      - name: description
+        description: 'The description of the cancellation reason code.'
+
+  - name: terminology__appointment_status
+    description: 'The coded status for the appointment.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: appointment_status
+      tags:
+        - terminology
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code for the appointment status.'
+
+  - name: terminology__appointment_type
+    description: 'Appointment type code.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: appointment_type
+      tags:
+        - terminology
+      column_types:
+        code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: code
+        description: 'The code for the appointment type.'
+      - name: description
+        description: 'The description of the appointment type code.'
 
   - name: terminology__apr_drg
     description: 'Seed containing All Patient Refined Diagnosis Related Groups (APR-DRG) codes and descriptions.'
@@ -116,6 +188,30 @@ seeds:
     columns:
       - name: claim_type
         description: 'The type of the claim.'
+
+  - name: terminology__cvx
+    description: 'Seed containing cvx codes and descriptions.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: cvx
+      tags:
+        - terminology
+        - data_profiling
+      column_types:
+        cvx : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        short_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        long_description : |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: cvx
+        description: 'CVX code, which is a unique identifier for vaccines.'
+      - name: short_description
+        description: 'Short description of the vaccine.'
+      - name: long_description
+        description: 'Long description of the vaccine.'
 
   - name: terminology__discharge_disposition
     description: 'Seed containing NUBC discharge disposition codes and descriptions.'
@@ -393,6 +489,67 @@ seeds:
       - name: description
         description: 'The description of the ICD-10-PCS code.'
 
+  - name: terminology__immunization_route_code
+    description: 'This seed contains the administrative routes used during vaccination.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: immunization_route_code
+      tags:
+        - terminology
+      column_types:
+        route_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: route_code
+        description: 'The code representing the route of administration for the immunization.'
+      - name: description
+        description: 'A description of the route of administration for the immunization.'
+
+  - name: terminology__immunization_status_reason
+    description: 'This seed describes the reason why a dose of vaccine was not administered.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: immunization_status_reason
+      tags:
+        - terminology
+      column_types:
+        reason_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        code_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: reason_code
+        description: 'The code representing the immunization status reason.'
+      - name: code_type
+        description: 'The type of the code representing the immunization status reason.'
+      - name: description
+        description: 'A description of the immunization status reason.'
+
+  - name: terminology__immunization_status
+    description: 'This seed contains the current status of the administered dose of vaccine.'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: immunization_status
+      tags:
+        - terminology
+      column_types:
+        status_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        status: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: status_code
+        description: 'The code representing the immunization status.'
+      - name: status
+        description: 'The display of the immunization status.'
+
   - name: terminology__loinc
     description: 'Seed containing LOINC codes and descriptions.'
     config:
@@ -609,9 +766,11 @@ seeds:
       column_types:
         ms_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        fy_2024_final_post_acute_drg: |
+        fiscal_year: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
-        fy_2024_final_special_pay_drg: |
+        final_post_acute_drg: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        final_special_pay_drg: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         mdc: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -620,20 +779,22 @@ seeds:
         ms_drg_title: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
         drg_weight_raw: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         drg_weight: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,4) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         geometric_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
         arithmetic_mean_los: |
-          {%- if target.type in ("bigquery", "databricks") -%} float {%- elif target.type in ("athena") -%} real {%- else -%} numeric(18,2) {%- endif -%}
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- elif target.type in ("athena") -%} varchar(256) {%- else -%} varchar(256) {%- endif -%}
     columns:
       - name: ms_drg
         description: 'The Medicare Severity Diagnosis Related Group (MS-DRG) code.'
-      - name: fy_2024_final_post_acute_drg
-        description: 'Indicates if this is a FY 2024 final post-acute DRG.'
-      - name: fy_2024_final_special_pay_drg
-        description: 'Indicates if this is a FY 2024 final special pay DRG.'
+      - name: fiscal_year
+        description: 'Fiscal year for the DRG weight and LOS values.'
+      - name: final_post_acute_drg
+        description: 'Indicates if this is a final post-acute DRG for the given year.'
+      - name: final_special_pay_drg
+        description: 'Indicates if this is a final special pay DRG for the given year.'
       - name: mdc
         description: 'The Major Diagnostic Category (MDC) code associated with the MS-DRG.'
       - name: type
@@ -711,6 +872,20 @@ seeds:
         description: 'The description of the RxNorm concept.'
       - name: fda_description
         description: 'The FDA description of the drug.'
+
+  - name: terminology__observation_type
+    description: 'Seed containing observation types used by HEDIS/FHIR US Core, with an other category. https://terminology.hl7.org/1.0.0/CodeSystem-observation-category.html'
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      tags:
+        - terminology
+      column_types:
+        observation_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: observation_type
+        description: The type of observation.
 
   - name: terminology__other_provider_taxonomy
     description: 'Seed containing other provider taxonomy codes and descriptions.'
@@ -1182,6 +1357,13 @@ seeds:
         ccs_category: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(3) {%- endif -%}
         ccs_category_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        release_year: integer
+        start_valid_date: date
+        end_valid_date: date
+        code_range: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        source_file: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
 
   - name: terminology__nitos

@@ -3,8 +3,7 @@ version: 2
 models:
 
   - name: normalize__all_unmapped
-    description: >
-      unmapped condition codes
+    description: all unmapped codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -14,8 +13,7 @@ models:
       materialized: table
 
   - name: normalize__all_codes
-    description: >
-      unmapped condition codes
+    description: all codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -24,32 +22,38 @@ models:
       tags: normalized
       materialized: view
 
+  - name: normalize__unmapped_appointment
+    description: unmapped appointment codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_appointment
+      tags: normalized
+      materialized: table
 
   - name: normalize__unmapped_condition
-    description: >
-      unmapped condition codes
+    description: unmapped condition codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
         {% else %}normalize{%- endif -%}
       alias: unmapped_condition
-      tags: normalize
+      tags: normalized
       materialized: table
 
-  - name: normalize__unmapped_procedure
-    description: >
-      unmapped procedure codes
+  - name: normalize__unmapped_immunization
+    description: unmapped immunization codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
         {% else %}normalize{%- endif -%}
-      alias: unmapped_procedure
+      alias: unmapped_immunization
       tags: normalize
       materialized: table
 
   - name: normalize__unmapped_lab_result
-    description: >
-      unmapped procedure codes
+    description: unmapped lab result order and component codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -59,8 +63,7 @@ models:
       materialized: table
 
   - name: normalize__unmapped_medication
-    description: >
-      unmapped procedure codes
+    description: unmapped medication codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -70,8 +73,7 @@ models:
       materialized: table
 
   - name: normalize__unmapped_observation
-    description: >
-      unmapped procedure codes
+    description: unmapped observation codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
@@ -79,42 +81,57 @@ models:
       alias: unmapped_observation
       tags: normalized
       materialized: table
-      
 
+  - name: normalize__unmapped_procedure
+    description: unmapped procedure codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_normalize
+        {% else %}normalize{%- endif -%}
+      alias: unmapped_procedure
+      tags: normalized
+      materialized: table
 
+# staging
 
-
-  - name: normalize__stg_unmapped_condition
-    description: >
-      unmapped condition codes
+  - name: normalize__stg_unmapped_appointment
+    description: unmapped appointment codes
     config:
       tags: normalized
       materialized: ephemeral
 
-  - name: normalize__stg_unmapped_procedure
-    description: >
-      unmapped procedure codes
+  - name: normalize__stg_unmapped_condition
+    description: unmapped condition codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_immunization
+    description: unmapped immunization codes
     config:
       tags: normalized
       materialized: ephemeral
 
   - name: normalize__stg_unmapped_lab_result
-    description: >
-      unmapped procedure codes
+    description: unmapped lab result order and component codes
     config:
       tags: normalized
       materialized: ephemeral
 
   - name: normalize__stg_unmapped_medication
-    description: >
-      unmapped procedure codes
+    description: unmapped medication codes
     config:
       tags: normalized
       materialized: ephemeral
 
   - name: normalize__stg_unmapped_observation
-    description: >
-      unmapped procedure codes
+    description: unmapped observation codes
+    config:
+      tags: normalized
+      materialized: ephemeral
+
+  - name: normalize__stg_unmapped_procedure
+    description: unmapped procedure codes
     config:
       tags: normalized
       materialized: ephemeral
