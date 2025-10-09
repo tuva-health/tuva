@@ -47,28 +47,6 @@ models:
       - name: tuva_last_run
         description: The last run timestamp
 
-  - name: data_quality__terminology_top_values
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: terminology_top_values
-      tags:
-        - data_quality
-      materialized: table
-    columns:
-      - name: data_source
-        description: Per-source aggregation key
-      - name: payer
-        description: Payer filter
-      - name: plan
-        description: Plan filter
-      - name: metric_id
-        description: Metric identifier
-      - name: claim_scope
-        description: Scope for denominator
-      - name: top5_valid_values
-        description: Comma-separated list of top 5 valid codes (with descriptions & counts)
 
   - name: data_quality__terminology_value_counts
     config:

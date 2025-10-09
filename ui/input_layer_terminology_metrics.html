@@ -53,6 +53,7 @@ exported from your warehouse (CSV). Do not deploy publicly.
       box.className = 'error';
       box.innerText = message;
       box.style.display = '';
+      try { showToast('Error: ' + message, 'error'); } catch(e){}
     }
 
     function clearError() {
@@ -478,8 +479,8 @@ exported from your warehouse (CSV). Do not deploy publicly.
     }
 
     function loadSample() {
-      const sample = `"data_source","metric_id","metric_name","claim_scope","denominator_n","valid_n","invalid_n","null_n","multiple_n","valid_pct","threshold","pass_flag","denominator_desc","tuva_last_run"\n"payer_a","claims:institutional_inpatient:DRG_CODE","DRG Code (Inpatient)","institutional_inpatient",12000,11856,96,48,0,0.988,0.97,TRUE,"Institutional inpatient claims","2024-10-08"\n"payer_b","claims:institutional:REVENUE_CENTER_CODE","Revenue Center Code (Institutional)","institutional",500000,498000,1000,1000,0,0.996,0.97,TRUE,"Institutional claim lines","2024-10-08"\n"payer_a","claims:institutional:BILL_TYPE_CODE","Bill Type Code (Institutional)","institutional",14000,13720,200,60,20,0.980,0.97,TRUE,"Institutional claims","2024-10-08"\n"payer_a","claims:professional:HCPCS_CODE","HCPCS Code (Professional)","professional",800000,792000,6000,2000,0,0.990,0.97,TRUE,"Professional claim lines","2024-10-08"\n"payer_a","claims:institutional_outpatient:HCPCS_CODE","HCPCS Code (Institutional Outpatient)","institutional_outpatient",220000,185000,18000,17000,0,0.841,0.80,TRUE,"Institutional outpatient claim lines","2024-10-08"`;
-      loadCSV(sample);
+      const sample = `"data_source","metric_id","metric_name","claim_scope","denominator_n","valid_n","invalid_n","null_n","multiple_n","valid_pct","threshold","pass_flag","denominator_desc","tuva_last_run"\n"payer_a","claims:institutional_inpatient:DRG_CODE","DRG Code (Inpatient)","institutional_inpatient",12000,11856,96,48,0,0.988,0.97,TRUE,"Institutional inpatient claims","2024-10-08"`;
+      routeCSV(sample);
     }
   </script>
 </head>
