@@ -15,11 +15,10 @@ select
   f.hcc_code,
   count(distinct f.person_id) as count_members,
   '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('mart_review__patient_risk_factors') }} f
+from {{ ref('cms_hcc__int_disease_factors') }} f
 left join {{ ref('mart_review__patient') }} x
   on f.person_id = x.person_id
 left join mm_distinct m
   on f.person_id = m.person_id and x.data_source = m.data_source
 where f.hcc_code is not null
 group by x.data_source, m.payer, m.{{ quote_column('plan') }}, f.hcc_code
-

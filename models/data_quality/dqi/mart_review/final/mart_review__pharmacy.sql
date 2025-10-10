@@ -21,6 +21,8 @@ select
   , p.paid_date
   , p.dispensing_date
   , p.days_supply
+  , p.quantity
+  , p.refills
   , case 
       when p.days_supply = 0 then null
       else p.paid_amount / p.days_supply
