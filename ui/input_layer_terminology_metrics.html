@@ -12,9 +12,12 @@ exported from your warehouse (CSV). Do not deploy publicly.
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1f2937; margin: 0; padding: 24px; }
     .container { max-width: 1600px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); overflow: hidden; }
-    .header { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color: #fff; padding: 32px 40px; display: flex; align-items: center; gap: 16px; }
+    .header { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color: #fff; padding: 32px 40px; display: flex; align-items: center; gap: 16px; justify-content: space-between; }
     .header img { height: 32px; }
     .header h1 { font-size: 1.8rem; margin: 0; }
+    .header .left { display:flex; align-items:center; gap:16px; }
+    .header .back { margin-left:auto; color:#fff; text-decoration:none; border:1px solid rgba(255,255,255,0.6); padding:6px 10px; border-radius:8px; font-size:0.9rem; }
+    .header .back:hover { background: rgba(255,255,255,0.15); }
     .content { padding: 20px 24px 30px; }
     .upload { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
     .upload:hover { border-color: #2563eb; background: #eff6ff; }
@@ -1113,8 +1116,11 @@ exported from your warehouse (CSV). Do not deploy publicly.
 <body>
   <div class="container">
     <div class="header">
-      <img src="assets/tuva_logo.png" alt="Tuva" />
-      <h1>Terminology Metrics</h1>
+      <div class="left">
+        <img src="assets/tuva_logo.png" alt="Tuva" />
+        <h1>Terminology Metrics</h1>
+      </div>
+      <a class="back" href="index.html">← Back</a>
     </div>
     <div class="content">
       <div id="drop" class="upload" onclick="handlePick()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">

@@ -16,9 +16,12 @@ Do not deploy publicly.
     :root { --bg:#f8fafc; --text:#1f2937; --card:#fff; --muted:#64748b; --line:#e5e7eb; --brand:#2563eb; --ok:#16a34a; --bad:#dc2626; }
     body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); margin:0; padding:24px; }
     .container { max-width: 1600px; margin: 0 auto; background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); overflow: hidden; }
-    .header { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color:#fff; padding: 28px 36px; display:flex; align-items:center; gap:14px; }
+    .header { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color:#fff; padding: 28px 36px; display:flex; align-items:center; gap:14px; justify-content:space-between; }
     .header img { height: 30px; }
     .header h1 { font-size: 1.6rem; margin:0; }
+    .header .left { display:flex; align-items:center; gap:14px; }
+    .header .back { margin-left:auto; color:#fff; text-decoration:none; border:1px solid rgba(255,255,255,0.6); padding:6px 10px; border-radius:8px; font-size:0.9rem; }
+    .header .back:hover { background: rgba(255,255,255,0.15); }
     .content { padding: 18px 22px 28px; }
     .upload { border:2px dashed #cbd5e1; border-radius:12px; padding: 18px; text-align:center; cursor:pointer; transition: all 0.2s ease; }
     .upload:hover { border-color: var(--brand); background:#eff6ff; }
@@ -44,13 +47,25 @@ Do not deploy publicly.
     details { margin-top:8px; }
     code.sql { display:block; white-space: pre-wrap; background:#0b1020; color:#cfe7ff; padding:10px; border-radius:8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; font-size:0.82rem; }
     .footer { margin-top: 20px; color:#6b7280; font-size:0.88rem; text-align:center; }
+    /* Tabs */
+    .tabs { display:flex; gap:8px; border-bottom:1px solid var(--line); margin:12px 0 16px; flex-wrap:wrap; }
+    .tabs button { background:#f8fafc; border:1px solid var(--line); border-bottom:none; border-radius:8px 8px 0 0; padding:8px 12px; cursor:pointer; color:#334155; }
+    .tabs button.active { background:#fff; color:#111827; border-color:#cbd5e1; }
+    .tab-pane { display:none; }
+    .tab-pane.active { display:block; }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    .nowrap { white-space: nowrap; }
+    .toggle { display:inline-flex; align-items:center; gap:6px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <img src="assets/tuva_logo.png" alt="Tuva" />
-      <h1>Mart Review Dashboard</h1>
+      <div class="left">
+        <img src="assets/tuva_logo.png" alt="Tuva" />
+        <h1>Mart Review Dashboard</h1>
+      </div>
+      <a class="back" href="index.html">← Back</a>
     </div>
     <div class="content">
       <div id="drop" class="upload" onclick="pickFiles()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
@@ -75,12 +90,22 @@ Do not deploy publicly.
         <label>plan</label>
         <select id="selPlan" onchange="handleFilterChange()"></select>
         <button class="primary" onclick="loadSample()">Load Sample</button>
+        <button onclick="clearAll()">Clear All</button>
       </div>
 
-      <div class="grid">
+      <div class="tabs">
+        <button class="active" data-tab="tab-pop">Population Overview</button>
+        <button data-tab="tab-cond">Conditions & Risk</button>
+        <button data-tab="tab-inpt">Inpatient</button>
+        <button data-tab="tab-ed">Emergency Dept</button>
+        <button data-tab="tab-svc">Services & Encounters</button>
+        <button data-tab="tab-pharm">Pharmacy</button>
+      </div>
+
+      <div id="tab-pop" class="tab-pane active">
         <div class="section">
           <h2>Population Overview</h2>
-          <p>Average age and gender distribution for the selected filters.</p>
+          <p>Average age, gender distribution, and members by state.</p>
           <div class="stat-grid">
             <div class="stat"><div class="label">Average Age</div><div id="avgAge" class="value">—</div></div>
             <div class="stat"><div class="label">Population</div><div id="populationCount" class="value">—</div></div>
@@ -102,7 +127,19 @@ Do not deploy publicly.
             </div>
           </div>
         </div>
-
+        <div class="section">
+          <h2>Members by State</h2>
+          <p>Count of members by state (descending).</p>
+          <div style="overflow:auto; max-height: 320px; border:1px solid var(--line); border-radius:10px;">
+            <table class="table" id="tblState"><thead><tr>
+              <th>state</th><th class="nowrap">members</th>
+            </tr></thead><tbody></tbody></table>
+          </div>
+          <details>
+            <summary>SQL template: Members by state (aggregated)</summary>
+            <code class="sql" id="sqlState"></code>
+          </details>
+        </div>
         <div class="section">
           <h2>Monthly Trends</h2>
           <p>PMPM, members with claims, and claims with enrollment by month.</p>
@@ -130,7 +167,9 @@ Do not deploy publicly.
             </details>
           </div>
         </div>
+      </div>
 
+      <div id="tab-cond" class="tab-pane">
         <div class="section">
           <h2>Conditions & Risk</h2>
           <p>Chronic condition frequency and CMS-HCC code frequency.</p>
@@ -151,10 +190,17 @@ Do not deploy publicly.
             </div>
           </div>
         </div>
+      </div>
 
+      <div id="tab-inpt" class="tab-pane">
         <div class="section">
-          <h2>Encounters</h2>
-          <p>Inpatient LOS distribution and DRG frequency; ED avoidable categories by count.</p>
+          <h2>Inpatient</h2>
+          <p>LOS distribution, DRG frequency, readmission rate, and discharge locations.</p>
+          <div class="stat-grid">
+            <div class="stat"><div class="label">Inpatient Encounters</div><div id="ipEncounters" class="value">—</div></div>
+            <div class="stat"><div class="label">Readmission Rate</div><div id="ipReadmitRate" class="value">—</div></div>
+            <div class="stat"><div class="label">Top DRG</div><div id="ipTopDrg" class="value">—</div></div>
+          </div>
           <div class="two-col">
             <div>
               <canvas id="chartInpatientLos" class="chart"></canvas>
@@ -165,47 +211,107 @@ Do not deploy publicly.
             </div>
             <div>
               <canvas id="chartDrg" class="chart"></canvas>
+              <details>
+                <summary>SQL template: DRG frequency (aggregated)</summary>
+                <code class="sql" id="sqlDrg"></code>
+              </details>
             </div>
           </div>
-          <div>
-            <canvas id="chartEd" class="chart"></canvas>
-            <details>
-              <summary>SQL template: ED avoidable categories (aggregated)</summary>
-              <code class="sql" id="sqlEd"></code>
-            </details>
+          <div class="two-col">
+            <div>
+              <h3 class="small">Discharge Location by Facility</h3>
+              <div style="overflow:auto; max-height: 280px; border:1px solid var(--line); border-radius:10px;">
+                <table class="table" id="tblDischarge"><thead><tr>
+                  <th>facility_id</th><th>discharge_location</th><th>count</th>
+                </tr></thead><tbody></tbody></table>
+              </div>
+              <details>
+                <summary>SQL template: Discharge location by facility (aggregated)</summary>
+                <code class="sql" id="sqlDischarge"></code>
+              </details>
+            </div>
+            <div>
+              <h3 class="small">Readmission Rate (overall)</h3>
+              <details>
+                <summary>SQL template: Readmission rate (aggregated)</summary>
+                <code class="sql" id="sqlReadmit"></code>
+              </details>
+            </div>
           </div>
         </div>
+      </div>
 
+      <div id="tab-ed" class="tab-pane">
+        <div class="section">
+          <h2>Emergency Department</h2>
+          <p>ED spend by facility and avoidable categories by count and spend.</p>
+          <div class="two-col">
+            <div>
+              <h3 class="small">ED Spend by Facility</h3>
+              <div style="overflow:auto; max-height: 320px; border:1px solid var(--line); border-radius:10px;">
+                <table class="table" id="tblEdFacility"><thead><tr>
+                  <th>facility_id</th><th>spend</th>
+                </tr></thead><tbody></tbody></table>
+              </div>
+              <details>
+                <summary>SQL template: ED spend by facility (aggregated)</summary>
+                <code class="sql" id="sqlEdFacility"></code>
+              </details>
+            </div>
+            <div>
+              <h3 class="small">Avoidable ED Category</h3>
+              <canvas id="chartEd" class="chart"></canvas>
+              <canvas id="chartEdSpend" class="chart" style="margin-top:10px;"></canvas>
+              <details>
+                <summary>SQL template: ED avoidable categories (aggregated)</summary>
+                <code class="sql" id="sqlEd"></code>
+              </details>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-svc" class="tab-pane">
         <div class="section">
           <h2>Service Categories</h2>
-          <p>Paid amount by service_category_1 / service_category_2.</p>
-          <div>
-            <canvas id="chartSvcCat" class="chart"></canvas>
-            <details>
-              <summary>SQL template: Service categories (aggregated)</summary>
-              <code class="sql" id="sqlSvc"></code>
-            </details>
+          <p>Paid amount and unique visits by category. Expand to view sub-categories.</p>
+          <div style="overflow:auto; max-height: 380px; border:1px solid var(--line); border-radius:10px;">
+            <table class="table" id="tblSvc"><thead><tr>
+              <th>service_category_1</th><th>service_category_2</th><th>service_category_3</th><th>paid</th><th>visits</th>
+            </tr></thead><tbody></tbody></table>
           </div>
+          <details>
+            <summary>SQL template: Service categories (aggregated)</summary>
+            <code class="sql" id="sqlSvc"></code>
+          </details>
         </div>
-
         <div class="section">
-          <h2>Encounter Types</h2>
-          <p>Encounter counts and paid by encounter_group/type.</p>
-          <div>
-            <canvas id="chartEncTypes" class="chart"></canvas>
-            <details>
-              <summary>SQL template: Encounter group/type (aggregated)</summary>
-              <code class="sql" id="sqlEncTypes"></code>
-            </details>
+          <h2>Encounter Groups</h2>
+          <p>Distinct encounter count and paid by group; expand to type.</p>
+          <div style="overflow:auto; max-height: 380px; border:1px solid var(--line); border-radius:10px;">
+            <table class="table" id="tblEnc"><thead><tr>
+              <th>encounter_group</th><th>encounter_type</th><th>encounters</th><th>paid</th>
+            </tr></thead><tbody></tbody></table>
           </div>
+          <details>
+            <summary>SQL template: Encounter group/type (aggregated)</summary>
+            <code class="sql" id="sqlEncTypes"></code>
+          </details>
         </div>
+      </div>
 
+      <div id="tab-pharm" class="tab-pane">
         <div class="section">
           <h2>Pharmacy</h2>
-          <p>Pivot by therapeutic class and NDC with financial and utilization metrics.</p>
+          <p>
+            Pivot by therapeutic class and optionally NDC.
+            <span class="muted">Performance tip: leave NDC off to keep tables lighter.</span>
+          </p>
+          <label class="toggle"><input type="checkbox" id="chkPharmNdc" onchange="renderPharmacy()" /> Include NDC detail</label>
+          <div class="muted">Viewer only renders first 500 rows for readability.</div>
           <div style="overflow:auto; max-height: 360px; border:1px solid var(--line); border-radius:10px;">
             <table class="table" id="tblPharm"><thead><tr>
-              <th>theraclass</th><th>ndc_code</th><th>ndc_description</th>
+              <th>theraclass</th><th class="ndc-col">ndc_code</th><th class="ndc-col">ndc_description</th>
               <th>spend</th><th>avg_days_supply</th><th>avg_quantity</th><th>avg_refills</th>
             </tr></thead><tbody></tbody></table>
           </div>
@@ -232,11 +338,16 @@ Do not deploy publicly.
       inpatient: [],
       drg: [],
       ed: [],
+      edFacility: [],
       svcCats: [],
       encTypes: [],
       hcc: [],
-      pharmacy: []
+      pharmacy: [],
+      stateMembers: [],
+      dischargeByFacility: [],
+      readmitRate: []
     };
+    let sampleLoaded = false;
     const globalFilters = { data_source: new Set(), payer: new Set(), plan: new Set() };
     const canonical = s => (s==null? '': String(s)).trim();
     const num = v => { if (v===null||v===undefined||v==='') return NaN; const n = Number(String(v).replace(/,/g,'')); return isNaN(n)? NaN : n; };
@@ -249,14 +360,25 @@ Do not deploy publicly.
     function pickFiles() { byId('file').click(); }
     function dragOver(e) { e.preventDefault(); byId('drop').classList.add('dragover'); }
     function dragLeave(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); }
-    function dropFiles(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); const files = Array.from(e.dataTransfer.files||[]); files.forEach(readFile); }
-    byId('file').addEventListener('change', e => { Array.from(e.target.files||[]).forEach(readFile); e.target.value=''; });
+    function dropFiles(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); const files = Array.from(e.dataTransfer.files||[]); if (files.length) maybeClearSample(); files.forEach(readFile); }
+    byId('file').addEventListener('change', e => { const arr = Array.from(e.target.files||[]); if (arr.length) maybeClearSample(); arr.forEach(readFile); e.target.value=''; });
 
     function readFile(file) {
       const reader = new FileReader();
-      reader.onload = e => { try { routeCSV(e.target.result); } catch(err){ console.error(err); showError('Error parsing CSV: '+(err.message||err)); } };
+      reader.onload = e => { try { routeCSV(e.target.result, file && file.name ? file.name : ''); } catch(err){ console.error(err); showError('Error parsing CSV: '+(err.message||err)); } };
       reader.readAsText(file);
     }
+
+    function clearDatasets() {
+      Object.keys(datasets).forEach(k => { if (Array.isArray(datasets[k])) datasets[k] = []; });
+      globalFilters.data_source.clear(); globalFilters.payer.clear(); globalFilters.plan.clear();
+      ['avgAge','populationCount','ipEncounters','ipReadmitRate','ipTopDrg'].forEach(id=>{ const el=byId(id); if (el) el.textContent='—'; });
+      Object.keys(charts).forEach(id=>{ try{ charts[id].destroy(); }catch(_e){} delete charts[id]; });
+      populateFilters();
+      renderAll();
+    }
+    function maybeClearSample() { if (sampleLoaded) { clearDatasets(); sampleLoaded=false; showInfo('Sample datasets cleared.'); } }
+    function clearAll() { sampleLoaded=false; clearDatasets(); showInfo('Cleared all datasets.'); }
 
     function parseCSV(text) {
       const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim().split('\n');
@@ -273,7 +395,7 @@ Do not deploy publicly.
     function parseCSVLine(line) {
       const out = []; let cur=''; let inQ=false; for (let i=0;i<line.length;i++){ const ch=line[i]; if (ch==='"'){ inQ=!inQ; continue; } if (ch===',' && !inQ){ out.push(cur); cur=''; } else { cur+=ch; } } out.push(cur); return out; }
 
-    function routeCSV(csvText) {
+    function routeCSV(csvText, sourceName='') {
       clearError();
       const rows = parseCSV(csvText);
       if (!rows.length) { showError('Empty CSV.'); return; }
@@ -289,17 +411,21 @@ Do not deploy publicly.
       else if (has('year_month') && (cols.has('claims_with_enrollment') || cols.has('percentage_claims_with_enrollment'))) { datasets.claimsEnrollment.push(...rows); }
       else if (has('condition','count')) { datasets.conditions.push(...rows); }
       else if (has('los_groups','count')) { datasets.inpatient.push(...rows); }
+      else if (has('state') && (cols.has('count') || cols.has('members') || cols.has('member_count'))) { datasets.stateMembers.push(...rows); }
       else if (has('drg_code') && (cols.has('count') || cols.has('encounters'))) { datasets.drg.push(...rows); }
       else if (has('avoidable_category','count')) { datasets.ed.push(...rows); }
-      else if (has('service_category_1','paid_amt')) { datasets.svcCats.push(...rows); }
-      else if (has('hcc_code','count')) { datasets.hcc.push(...rows); }
+      else if (has('avoidable_category','spend')) { datasets.ed.push(...rows); }
+      else if (has('facility_id','spend') && (cols.has('ed_flag') || cols.has('ed'))) { datasets.edFacility.push(...rows); }
+      else if (has('facility_id','discharge_location') && (cols.has('count') || cols.has('encounters'))) { datasets.dischargeByFacility.push(...rows); }
+      else if ((cols.has('readmission_rate') || cols.has('rate')) && (cols.has('data_source') || cols.has('payer') || cols.has('plan'))) { datasets.readmitRate.push(...rows); }
+      else if (has('service_category_1') && (cols.has('paid_amt') || cols.has('visits'))) { datasets.svcCats.push(...rows); }
       else if ((cols.has('encounter_group') || cols.has('encounter_type')) && (cols.has('count') || cols.has('encounters')) && (cols.has('paid_amount') || cols.has('paid'))) { datasets.encTypes.push(...rows); }
       else if ((cols.has('ndc_code') || cols.has('ndc')) && (cols.has('spend') || cols.has('paid_amount'))) { datasets.pharmacy.push(...rows); }
       else { showError('Unrecognized CSV schema. Ensure you export aggregated datasets with expected columns.'); return; }
       indexFilters(rows);
       populateFilters();
       renderAll();
-      showInfo('Loaded '+rows.length.toLocaleString()+' rows.');
+      showInfo('Loaded '+(sourceName||'dataset')+': '+rows.length.toLocaleString()+' rows.');
     }
 
     function loadUnifiedCSV(rows) {
@@ -358,6 +484,21 @@ Do not deploy publicly.
             break;
           case 'ed_avoidable':
             datasets.ed.push({ data_source: ds, payer, plan, avoidable_category: d1v, count: val });
+            break;
+          case 'ed_avoidable_spend':
+            datasets.ed.push({ data_source: ds, payer, plan, avoidable_category: d1v, spend: val });
+            break;
+          case 'ed_facility_spend':
+            datasets.edFacility.push({ data_source: ds, payer, plan, facility_id: d1v, spend: val });
+            break;
+          case 'discharge_by_facility':
+            datasets.dischargeByFacility.push({ data_source: ds, payer, plan, facility_id: d1v, discharge_location: d2v, count: val });
+            break;
+          case 'state_members':
+            datasets.stateMembers.push({ data_source: ds, payer, plan, state: d1v, count: val });
+            break;
+          case 'readmission_rate':
+            datasets.readmitRate.push({ data_source: ds, payer, plan, readmission_rate: val });
             break;
           case 'svc_paid_amt':
           case 'svc_visits': {
@@ -435,7 +576,7 @@ Do not deploy publicly.
     function ensureChart(id, type, config){ if (charts[id]) { charts[id].destroy(); } charts[id] = new Chart(byId(id), { type, data: config.data, options: config.options||{} }); }
 
     function renderAll() {
-      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy();
+      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy(); renderStateTable(); renderInpatientKPIs(); renderEdFacility(); renderDischargeFacility();
       injectSQLTemplates();
     }
 
@@ -516,18 +657,81 @@ Do not deploy publicly.
     }
 
     function renderEd() {
-      const rows = filterRows(datasets.ed).map(r=>({ cat: canonical(r.avoidable_category)||canonical(r.ed_classification)||canonical(r.category), count: num(r.count) })).filter(r=>!isNaN(r.count));
-      const data = { labels: rows.map(r=>r.cat), datasets:[{ label:'Encounters', data: rows.map(r=>r.count), backgroundColor:['#22c55e','#f97316','#3b82f6','#eab308','#ef4444'] }] };
-      ensureChart('chartEd','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
+      const rows = filterRows(datasets.ed).map(r=>({ cat: canonical(r.avoidable_category)||canonical(r.ed_classification)||canonical(r.category), count: num(r.count), spend: num(r.spend)}));
+      const byCat = new Map();
+      rows.forEach(r=>{ const k=r.cat||'(unknown)'; const v=byCat.get(k)||{count:0, spend:0}; v.count += (isNaN(r.count)?0:r.count); v.spend += (isNaN(r.spend)?0:r.spend); byCat.set(k,v); });
+      const arr = Array.from(byCat.entries()).map(([cat,v])=>({cat, ...v}));
+      const dataCount = { labels: arr.map(r=>r.cat), datasets:[{ label:'Encounters', data: arr.map(r=>r.count), backgroundColor:['#22c55e','#f97316','#3b82f6','#eab308','#ef4444'] }] };
+      ensureChart('chartEd','bar',{ data: dataCount, options:{ plugins:{ legend:{display:false} } } });
+      const dataSpend = { labels: arr.map(r=>r.cat), datasets:[{ label:'Spend', data: arr.map(r=>r.spend), backgroundColor:'rgba(59,130,246,0.5)' }] };
+      ensureChart('chartEdSpend','bar',{ data: dataSpend, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> 'Spend: '+formatMoney(c.parsed.y) } } } } });
     }
 
     function renderSvcCats() {
-      const rows = filterRows(datasets.svcCats).map(r=>({ cat1: canonical(r.service_category_1), cat2: canonical(r.service_category_2), paid: num(r.paid_amt)||num(r.paid_amount), visits: num(r.visits) }));
-      const agg = new Map();
-      rows.forEach(r=>{ const k=r.cat1||'(unknown)'; agg.set(k,(agg.get(k)||0)+(r.paid||0)); });
-      const arr = Array.from(agg.entries()).map(([k,v])=>({k,v})).sort((a,b)=> b.v-a.v).slice(0,12);
-      const data = { labels: arr.map(x=>x.k), datasets:[{ label:'Paid', data: arr.map(x=>x.v), backgroundColor:'#0ea5e9' }] };
-      ensureChart('chartSvcCat','bar',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(ctx)=> 'Paid: '+formatMoney(ctx.parsed.y) } } } } });
+      const rows = filterRows(datasets.svcCats).map(r=>({
+        cat1: canonical(r.service_category_1),
+        cat2: canonical(r.service_category_2),
+        cat3: canonical(r.service_category_3),
+        paid: num(r.paid_amt)||num(r.paid_amount),
+        visits: num(r.visits)
+      }));
+      const hasSc3 = rows.some(r=> r.cat3);
+      const m1 = new Map();
+      rows.forEach(r=>{
+        const c1 = r.cat1||'(unknown)'; const c2 = r.cat2||''; const c3 = hasSc3 ? (r.cat3||'') : '';
+        const level1 = m1.get(c1) || { paid:0, visits:0, children:new Map() };
+        level1.paid += (r.paid||0); level1.visits += (r.visits||0);
+        const m2 = level1.children; const level2 = m2.get(c2) || { paid:0, visits:0, children: new Map() };
+        level2.paid += (r.paid||0); level2.visits += (r.visits||0);
+        if (hasSc3 && c3) { const m3 = level2.children; const level3 = m3.get(c3) || { paid:0, visits:0 }; level3.paid += (r.paid||0); level3.visits += (r.visits||0); m3.set(c3, level3); }
+        m2.set(c2, level2); m1.set(c1, level1);
+      });
+      const tbody = byId('tblSvc').querySelector('tbody'); if (!tbody) return; tbody.innerHTML='';
+      const encode = s => (s||'').replace(/[^a-zA-Z0-9_\-]+/g,'_');
+      const parents = Array.from(m1.entries()).map(([k,v])=>({ k, ...v })).sort((a,b)=> b.paid - a.paid);
+      parents.forEach(p=>{
+        const id1 = 'sc1_'+encode(p.k);
+        const tr1=document.createElement('tr'); tr1.className='parent'; tr1.dataset.key=id1;
+        const td1=document.createElement('td'); td1.innerHTML = `<span class="toggle" data-target="${id1}">▶</span> ${p.k}`;
+        const td2=document.createElement('td'); td2.textContent=''; const td3=document.createElement('td'); td3.textContent='';
+        const td4=document.createElement('td'); td4.textContent = formatMoney(p.paid);
+        const td5=document.createElement('td'); td5.textContent = formatNum(p.visits);
+        [td1,td2,td3,td4,td5].forEach(td=> tr1.appendChild(td)); tbody.appendChild(tr1);
+        const lvl2 = Array.from(p.children.entries()).map(([k,v])=>({k,...v})).sort((a,b)=> b.paid - a.paid);
+        lvl2.forEach(c=>{
+          const id2 = id1+'__'+encode(c.k||'other');
+          const tr2=document.createElement('tr'); tr2.className='child child-of-'+id1; tr2.style.display='none';
+          const td21=document.createElement('td'); td21.textContent='';
+          const td22=document.createElement('td'); td22.innerHTML = `<span class="toggle" data-target="${id2}">${hasSc3? '▶':''}</span> ${c.k||'(none)'}`;
+          const td23=document.createElement('td'); td23.textContent='';
+          const td24=document.createElement('td'); td24.textContent = formatMoney(c.paid);
+          const td25=document.createElement('td'); td25.textContent = formatNum(c.visits);
+          [td21,td22,td23,td24,td25].forEach(td=> tr2.appendChild(td)); tbody.appendChild(tr2);
+          if (hasSc3) {
+            const lvl3 = Array.from(c.children.entries()).map(([k,v])=>({k,...v})).sort((a,b)=> b.paid - a.paid);
+            lvl3.forEach(g=>{
+              const tr3=document.createElement('tr'); tr3.className='grand child-of-'+id2; tr3.style.display='none';
+              const td31=document.createElement('td'); td31.textContent='';
+              const td32=document.createElement('td'); td32.textContent='';
+              const td33=document.createElement('td'); td33.textContent=g.k||'(none)';
+              const td34=document.createElement('td'); td34.textContent = formatMoney(g.paid);
+              const td35=document.createElement('td'); td35.textContent = formatNum(g.visits);
+              [td31,td32,td33,td34,td35].forEach(td=> tr3.appendChild(td)); tbody.appendChild(tr3);
+            });
+          }
+        });
+      });
+      // wire toggles
+      tbody.querySelectorAll('span.toggle').forEach(el=>{
+        el.style.cursor='pointer';
+        el.addEventListener('click', (e)=>{
+          const tgt = e.currentTarget.getAttribute('data-target');
+          const children = tbody.querySelectorAll('.child-of-'+tgt);
+          const showing = Array.from(children).some(r=> r.style.display!== 'none');
+          children.forEach(r=> r.style.display = showing? 'none' : 'table-row');
+          e.currentTarget.textContent = showing? '▶' : '▼';
+        });
+      });
     }
 
     function renderHcc() {
@@ -542,20 +746,43 @@ Do not deploy publicly.
         group: canonical(r.encounter_group)||'', type: canonical(r.encounter_type)||'',
         count: num(r.count)||num(r.encounters), paid: num(r.paid_amount)||num(r.paid)
       })).filter(r=>!isNaN(r.count));
-      // Aggregate by encounter_group or type if only one present
-      const keyName = rows.some(r=>r.group) ? 'group' : 'type';
-      const agg = new Map();
-      rows.forEach(r=>{ const k = r[keyName] || '(unknown)'; const v = agg.get(k)||{count:0, paid:0}; v.count += (r.count||0); v.paid += (r.paid||0); agg.set(k,v); });
-      const arr = Array.from(agg.entries()).map(([k,v])=>({k, ...v})).sort((a,b)=> b.count - a.count).slice(0, 15);
-      const data = { labels: arr.map(x=>x.k), datasets:[
-        { label:'Encounters', data: arr.map(x=>x.count), backgroundColor:'rgba(99,102,241,0.5)', borderColor:'#6366f1', yAxisID:'y' },
-        { label:'Paid', data: arr.map(x=>x.paid), type:'line', borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', yAxisID:'y1' }
-      ]};
-      ensureChart('chartEncTypes','bar',{ data, options:{ scales:{ y:{ position:'left', title:{display:true,text:'Encounters'} }, y1:{ position:'right', grid:{ drawOnChartArea:false }, title:{display:true,text:'Paid'}, ticks:{ callback:(v)=> '$'+Number(v).toLocaleString() } } }, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label==='Paid' ? ('Paid: '+formatMoney(ctx.parsed.y)) : ('Encounters: '+formatNum(ctx.parsed.y)) } } } } });
+      const map = new Map();
+      rows.forEach(r=>{ const g=r.group||'(unknown)'; const v=map.get(g)||{paid:0,count:0,children:new Map()}; v.count+=(r.count||0); v.paid+=(r.paid||0); const m=v.children; const c=m.get(r.type||'(unknown)')||{paid:0,count:0}; c.count+=(r.count||0); c.paid+=(r.paid||0); m.set(r.type||'(unknown)',c); map.set(g,v); });
+      const tbody = byId('tblEnc').querySelector('tbody'); if (!tbody) return; tbody.innerHTML='';
+      const encode = s => (s||'').replace(/[^a-zA-Z0-9_\-]+/g,'_');
+      const groups = Array.from(map.entries()).map(([k,v])=>({k,...v})).sort((a,b)=> b.count-a.count);
+      groups.forEach(g=>{
+        const id = 'enc_'+encode(g.k);
+        const tr=document.createElement('tr'); tr.className='parent'; tr.dataset.key=id;
+        const td1=document.createElement('td'); td1.innerHTML = `<span class="toggle" data-target="${id}">▶</span> ${g.k}`;
+        const td2=document.createElement('td'); td2.textContent='';
+        const td3=document.createElement('td'); td3.textContent=formatNum(g.count);
+        const td4=document.createElement('td'); td4.textContent=formatMoney(g.paid);
+        [td1,td2,td3,td4].forEach(td=> tr.appendChild(td)); tbody.appendChild(tr);
+        const children = Array.from(g.children.entries()).map(([k,v])=>({k,...v})).sort((a,b)=> b.count-a.count);
+        children.forEach(c=>{
+          const trc=document.createElement('tr'); trc.className='child child-of-'+id; trc.style.display='none';
+          const td21=document.createElement('td'); td21.textContent='';
+          const td22=document.createElement('td'); td22.textContent=c.k;
+          const td23=document.createElement('td'); td23.textContent=formatNum(c.count);
+          const td24=document.createElement('td'); td24.textContent=formatMoney(c.paid);
+          [td21,td22,td23,td24].forEach(td=> trc.appendChild(td)); tbody.appendChild(trc);
+        });
+      });
+      tbody.querySelectorAll('span.toggle').forEach(el=>{
+        el.style.cursor='pointer';
+        el.addEventListener('click', (e)=>{
+          const tgt = e.currentTarget.getAttribute('data-target');
+          const children = tbody.querySelectorAll('.child-of-'+tgt);
+          const showing = Array.from(children).some(r=> r.style.display!== 'none');
+          children.forEach(r=> r.style.display = showing? 'none' : 'table-row');
+          e.currentTarget.textContent = showing? '▶' : '▼';
+        });
+      });
     }
 
     function renderPharmacy() {
-      const rows = filterRows(datasets.pharmacy).map(r=>({
+      const rowsRaw = filterRows(datasets.pharmacy).map(r=>({
         theraclass: canonical(r.theraclass)||canonical(r.atc_3_name)||canonical(r.atc_2_name),
         ndc_code: canonical(r.ndc_code)||canonical(r.ndc),
         ndc_description: canonical(r.ndc_description)||canonical(r.rxnorm_description)||canonical(r.fda_description),
@@ -564,11 +791,15 @@ Do not deploy publicly.
         quantity: num(r.avg_quantity)||num(r.quantity),
         refills: num(r.avg_refills)||num(r.refills)
       }));
+      const includeNdc = byId('chkPharmNdc') && byId('chkPharmNdc').checked;
+      const rows = includeNdc ? rowsRaw : aggregatePharmByTheraclass(rowsRaw);
       const tbody = byId('tblPharm').querySelector('tbody');
       tbody.innerHTML='';
+      document.querySelectorAll('#tblPharm .ndc-col').forEach(th=> th.style.display = includeNdc? '' : 'none');
       rows.slice(0,500).forEach(r=>{
         const tr=document.createElement('tr');
-        ['theraclass','ndc_code','ndc_description'].forEach(k=>{ const td=document.createElement('td'); td.textContent=r[k]||''; tr.appendChild(td); });
+        const cols = includeNdc ? ['theraclass','ndc_code','ndc_description'] : ['theraclass'];
+        cols.forEach(k=>{ const td=document.createElement('td'); td.textContent=r[k]||''; tr.appendChild(td); });
         const tdSpend=document.createElement('td'); tdSpend.textContent = formatMoney(r.spend); tr.appendChild(tdSpend);
         const tdDS=document.createElement('td'); tdDS.textContent = isNaN(r.days_supply)? '—' : r.days_supply.toFixed(1); tr.appendChild(tdDS);
         const tdQty=document.createElement('td'); tdQty.textContent = isNaN(r.quantity)? '—' : r.quantity.toFixed(1); tr.appendChild(tdQty);
@@ -577,25 +808,97 @@ Do not deploy publicly.
       });
     }
 
+    function aggregatePharmByTheraclass(rows) {
+      const map = new Map();
+      rows.forEach(r=>{
+        const k=r.theraclass||'(unknown)';
+        const v=map.get(k)||{theraclass:k, spend:0, days_supply:0, quantity:0, refills:0, n:0};
+        v.spend += (r.spend||0);
+        if (!isNaN(r.days_supply)) v.days_supply += r.days_supply;
+        if (!isNaN(r.quantity)) v.quantity += r.quantity;
+        if (!isNaN(r.refills)) v.refills += r.refills;
+        v.n += 1;
+        map.set(k,v);
+      });
+      return Array.from(map.values()).map(v=>({
+        theraclass: v.theraclass,
+        spend: v.spend,
+        days_supply: v.n? v.days_supply/v.n : NaN,
+        quantity: v.n? v.quantity/v.n : NaN,
+        refills: v.n? v.refills/v.n : NaN
+      })).sort((a,b)=> b.spend - a.spend);
+    }
+
+    function renderStateTable() {
+      const rows = filterRows(datasets.stateMembers).map(r=>({ state: canonical(r.state)||canonical(r.state_name)||canonical(r.normalized_state_name), members: num(r.members)||num(r.member_count)||num(r.count) })).filter(r=>!isNaN(r.members));
+      rows.sort((a,b)=> b.members - a.members);
+      const tbody = byId('tblState').querySelector('tbody'); if (!tbody) return; tbody.innerHTML='';
+      rows.forEach(r=>{ const tr=document.createElement('tr'); const td1=document.createElement('td'); td1.textContent=r.state||'(unknown)'; const td2=document.createElement('td'); td2.textContent=formatNum(r.members); tr.appendChild(td1); tr.appendChild(td2); tbody.appendChild(tr); });
+    }
+
+    function renderInpatientKPIs() {
+      const inpt = filterRows(datasets.inpatient).map(r=> num(r.count)).filter(v=>!isNaN(v));
+      const totalEnc = inpt.reduce((s,v)=> s+v, 0);
+      if (byId('ipEncounters')) byId('ipEncounters').textContent = totalEnc? formatNum(totalEnc): '—';
+      const drgRows = filterRows(datasets.drg).map(r=>({ drg: canonical(r.drg_code)||canonical(r.drg), count: num(r.count)||num(r.encounters) })).filter(r=>!isNaN(r.count));
+      drgRows.sort((a,b)=> b.count-a.count); if (byId('ipTopDrg')) byId('ipTopDrg').textContent = drgRows.length? drgRows[0].drg : '—';
+      const readmit = filterRows(datasets.readmitRate).map(r=> num(r.readmission_rate)||num(r.rate)).filter(v=>!isNaN(v));
+      if (byId('ipReadmitRate')) { if (readmit.length) { const avg = readmit.reduce((s,v)=>s+v,0)/readmit.length; byId('ipReadmitRate').textContent = pct(avg); } else { byId('ipReadmitRate').textContent='—'; } }
+    }
+
+    function renderEdFacility() {
+      const rows = filterRows(datasets.edFacility).map(r=>({ facility_id: canonical(r.facility_id)||canonical(r.facility_npi)||canonical(r.facility), spend: num(r.spend)||num(r.paid)||num(r.paid_amount) })).filter(r=>!isNaN(r.spend));
+      rows.sort((a,b)=> b.spend - a.spend);
+      const tbody = byId('tblEdFacility') ? byId('tblEdFacility').querySelector('tbody') : null; if (!tbody) return; tbody.innerHTML='';
+      rows.forEach(r=>{ const tr=document.createElement('tr'); const td1=document.createElement('td'); td1.textContent=r.facility_id||'(unknown)'; const td2=document.createElement('td'); td2.textContent = formatMoney(r.spend); tr.appendChild(td1); tr.appendChild(td2); tbody.appendChild(tr); });
+    }
+
+    function renderDischargeFacility() {
+      const rows = filterRows(datasets.dischargeByFacility).map(r=>({ facility_id: canonical(r.facility_id)||canonical(r.facility_npi)||canonical(r.facility), discharge_location: canonical(r.discharge_location)||canonical(r.discharge_disposition)||canonical(r.disposition), count: num(r.count)||num(r.encounters) })).filter(r=>!isNaN(r.count));
+      rows.sort((a,b)=> b.count - a.count);
+      const tbody = byId('tblDischarge') ? byId('tblDischarge').querySelector('tbody') : null; if (!tbody) return; tbody.innerHTML='';
+      rows.slice(0,500).forEach(r=>{ const tr=document.createElement('tr'); ['facility_id','discharge_location'].forEach(k=>{ const td=document.createElement('td'); td.textContent=r[k]||''; tr.appendChild(td); }); const td3=document.createElement('td'); td3.textContent=formatNum(r.count); tr.appendChild(td3); tbody.appendChild(tr); });
+    }
+
     function injectSQLTemplates() {
       const pfx = (byId('schemaPrefix').value||'data_quality').trim();
       byId('sqlAge').textContent = `-- Age distribution joined to member_months for payer/plan (no PHI)\nwith base as (\n  select p.data_source, mm.payer, mm.plan,\n         case when p.age < 5 then '00-04' when p.age < 18 then '05-17' when p.age < 30 then '18-29'\n              when p.age < 40 then '30-39' when p.age < 50 then '40-49' when p.age < 60 then '50-59'\n              when p.age < 70 then '60-69' when p.age < 80 then '70-79' else '80+' end as age_bucket,\n         p.age\n  from ${pfx}.mart_review__patient p\n  left join ${pfx}.mart_review__member_months mm\n    on p.person_id = mm.person_id and p.data_source = mm.data_source\n), agg as (\n  select data_source, payer, plan, age_bucket, count(*) as count, avg(age) as avg_age\n  from base group by 1,2,3,4\n) select * from agg order by data_source, payer, plan, age_bucket;`;
       byId('sqlGender').textContent = `-- Gender distribution joined to member_months for payer/plan (no PHI)\nselect p.data_source, mm.payer, mm.plan, p.sex as gender, count(*) as count\nfrom ${pfx}.mart_review__patient p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\nwhere p.sex is not null\ngroup by 1,2,3,4;`;
+      byId('sqlState').textContent = `-- Members by state (no PHI)\nselect p.data_source, mm.payer, mm.plan, p.state as state, count(distinct p.person_id) as count\nfrom ${pfx}.mart_review__patient p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\nwhere p.state is not null\ngroup by 1,2,3,4\norder by 5 desc;`;
       byId('sqlPmpm').textContent = `-- PMPM by month (no PHI)\nselect data_source, payer, plan, year_month, total_paid as total_paid, medical_paid, pharmacy_paid\nfrom ${pfx}.mart_review__pmpm;`;
       byId('sqlMembersClaims').textContent = `-- Members with claims by month (no PHI)\nselect data_source, year_month, total_member_months, members_with_claims,\n  cast(members_with_claims/ nullif(total_member_months,0) as numeric) as percent_members_with_claims\nfrom ${pfx}.mart_review__members_with_claims;`;
       byId('sqlClaimsEnrollment').textContent = `-- Claims with enrollment by month (no PHI)\nselect data_source, payer, plan, year_month, claims_with_enrollment, claims,\n  cast(claims_with_enrollment/ nullif(claims,0) as numeric) as percentage_claims_with_enrollment\nfrom ${pfx}.mart_review__claims_with_enrollment;`;
       byId('sqlConditions').textContent = `-- Chronic conditions (no PHI)\nselect data_source, condition, count(*) as count\nfrom ${pfx}.mart_review__tuva_chronic_conditions\ngroup by 1,2\norder by 3 desc;`;
       byId('sqlInpatient').textContent = `-- Inpatient LOS distribution (no PHI)\nselect data_source, payer, plan, los_groups, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4\norder by 4;`;
-      byId('sqlEd').textContent = `-- ED avoidable categories (no PHI)\nselect data_source, avoidable_category, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__ed_classification\ngroup by 1,2;`;
+      byId('sqlEd').textContent = `-- ED avoidable categories (no PHI)\nselect data_source, avoidable_category, count(distinct encounter_id) as count, sum(paid_amount) as spend\nfrom ${pfx}.mart_review__ed_classification\ngroup by 1,2;`;
+      const pfxCore = pfx.replace('_data_quality','_core');
+      byId('sqlEdFacility').textContent = `-- ED spend by facility (no PHI)\nselect mc.data_source, e.facility_id, sum(mc.paid_amount) as spend, 1 as ed_flag\nfrom ${pfx}.mart_review__stg_medical_claim mc\nleft join ${pfxCore}.encounter e on mc.encounter_id = e.encounter_id\nwhere coalesce(e.encounter_type,'') = 'emergency'\ngroup by 1,2\norder by 3 desc;`;
+      byId('sqlDrg').textContent = `-- DRG frequency (no PHI)\nselect data_source, payer, plan, drg_code, count(distinct encounter_id) as encounters\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4\norder by 5 desc;`;
+      byId('sqlDischarge').textContent = `-- Discharge location by facility (no PHI)\nselect data_source, facility_id, discharge_location, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3\norder by 4 desc;`;
+      byId('sqlReadmit').textContent = `-- Readmission rate (no PHI)\nwith denom as (\n  select data_source, payer, plan, count(*) as index_admissions\n  from ${pfx}.mart_review__inpatient\n  group by 1,2,3\n), num as (\n  select data_source, payer, plan, count(*) as readmissions\n  from ${pfx}.mart_review__readmissions\n  group by 1,2,3\n) select coalesce(denom.data_source,num.data_source) as data_source, coalesce(denom.payer,num.payer) as payer, coalesce(denom.plan,num.plan) as plan,\n  cast(readmissions as double)/nullifzero(index_admissions) as readmission_rate from denom full outer join num using (data_source,payer,plan);`;
       byId('sqlSvc').textContent = `-- Service categories (no PHI)\nselect data_source, payer, plan, year_month, service_category_1, service_category_2,\n  sum(paid_amt) as paid_amt, sum(visits) as visits\nfrom ${pfx}.mart_review__service_categories_long\ngroup by 1,2,3,4,5,6;`;
       byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nwith base as (\n  select mc.data_source, mc.payer, mc.plan, e.encounter_group, e.encounter_type,\n         count(distinct mc.encounter_id) as encounters, sum(mc.paid_amount) as paid_amount\n  from ${pfx}.mart_review__stg_medical_claim mc\n  left join ${pfx.replace('_data_quality','_core')}.encounter e\n    on mc.encounter_id = e.encounter_id\n  group by 1,2,3,4,5\n) select * from base;`;
       byId('sqlPharm').textContent = `-- Pharmacy pivot (no PHI)\nselect p.data_source, mm.payer, mm.plan,\n  coalesce(p.atc_3_name, p.atc_2_name) as theraclass, p.ndc_code, coalesce(p.ndc_description, p.rxnorm_description) as ndc_description,\n  sum(p.paid_amount) as spend, avg(nullif(p.days_supply,0)) as avg_days_supply, avg(nullif(p.quantity,0)) as avg_quantity, avg(nullif(p.refills,0)) as avg_refills\nfrom ${pfx}.mart_review__pharmacy p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\ngroup by 1,2,3,4,5,6;`;
       byId('sqlHcc').textContent = `-- HCC codes (no PHI)\nselect x.data_source, f.hcc_code, count(distinct f.person_id) as count\nfrom ${pfx}.mart_review__patient_risk_factors f\nleft join ${pfx}.mart_review__patient x\n  on f.person_id = x.person_id\nwhere f.hcc_code is not null\ngroup by 1,2\norder by 3 desc;`;
     }
 
+    function initTabs() {
+      document.querySelectorAll('.tabs button').forEach(btn => {
+        btn.addEventListener('click', ()=>{
+          document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+          btn.classList.add('active');
+          const tab = btn.getAttribute('data-tab');
+          document.querySelectorAll('.tab-pane').forEach(p=> p.classList.remove('active'));
+          byId(tab).classList.add('active');
+          renderAll();
+        });
+      });
+    }
+
     function loadSample() {
       // Minimal synthetic samples (no PHI) to demo layout
       const ds = 'sample_source';
+      sampleLoaded = true;
       const age = `data_source,payer,plan,age_bucket,count,avg_age\n${ds},,,'00-04',100,2\n${ds},,,'05-17',200,12\n${ds},,,'18-29',300,24\n${ds},,,'30-39',250,35\n${ds},,,'40-49',220,45\n${ds},,,'50-59',210,55\n${ds},,,'60-69',150,65\n${ds},,,'70-79',120,75\n${ds},,,'80+',80,84`;
       const gender = `data_source,payer,plan,gender,count\n${ds},,,female,900\n${ds},,,male,930\n${ds},,,unknown,20`;
       const pmpm = `data_source,payer,plan,year_month,total_paid,medical_paid,pharmacy_paid\n${ds},,,202301,425,320,105\n${ds},,,202302,432,327,105\n${ds},,,202303,441,332,109\n${ds},,,202304,438,329,109`;
@@ -608,9 +911,13 @@ Do not deploy publicly.
       const svc = `data_source,payer,plan,year_month,service_category_1,service_category_2,paid_amt,visits\n${ds},,,202301,Inpatient,Acute,450000,120\n${ds},,,202301,Outpatient,Surgery,280000,340\n${ds},,,202301,Pharmacy,Specialty,160000,540\n${ds},,,202302,Inpatient,Acute,420000,110`;
       const hcc = `data_source,hcc_code,count\n${ds},HCC18,120\n${ds},HCC19,90\n${ds},HCC85,75\n${ds},HCC96,60`;
       const pharm = `data_source,payer,plan,theraclass,ndc_code,ndc_description,spend,avg_days_supply,avg_quantity,avg_refills\n${ds},,,Statins,0001-0001-01,Lipitor 20mg,120000,28,30,0.2\n${ds},,,Statins,0001-0002-01,Crestor 10mg,80000,28,30,0.1\n${ds},,,Diabetes,0002-0001-01,Metformin 500mg,60000,30,60,0.0`;
-      [age,gender,pmpm,members,claimsEnroll,cond,inpatient,drg,ed,svc,hcc,pharm].forEach(routeCSV);
+      const states = `data_source,payer,plan,state,count\n${ds},,,CA,1200\n${ds},,,TX,900\n${ds},,,NY,800\n${ds},,,FL,600`;
+      [age,gender,pmpm,members,claimsEnroll,cond,inpatient,drg,ed,svc,hcc,pharm,states].forEach(txt=> routeCSV(txt,'sample'));
       showInfo('Sample datasets loaded.');
     }
+
+    // init
+    initTabs();
   </script>
 </body>
 </html>

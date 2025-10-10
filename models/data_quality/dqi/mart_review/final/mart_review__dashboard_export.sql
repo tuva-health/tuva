@@ -249,3 +249,127 @@ from (
   union all
   select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_refills' as metric, avg_refills as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary') }}
 ) x
+
+union all
+
+-- Members by state
+select
+  p.data_source,
+  m.payer,
+  m.{{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'state_members' as metric,
+  'state' as dim1_name,
+  p.state as dim1_value,
+  p.state as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name,
+  cast(null as {{ dbt.type_string() }}) as dim2_value,
+  cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(count(distinct p.person_id) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__patient') }} p
+left join {{ ref('mart_review__member_months') }} m
+  on p.person_id = m.person_id and p.data_source = m.data_source
+where p.state is not null
+group by p.data_source, m.payer, m.{{ quote_column('plan') }}, p.state
+
+union all
+
+-- ED avoidable spend by category
+with epp as (
+  select distinct data_source, payer, {{ quote_column('plan') }}, encounter_id
+  from {{ ref('mart_review__stg_medical_claim') }}
+)
+select
+  ed.data_source,
+  epp.payer,
+  epp.{{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'ed_avoidable_spend' as metric,
+  'avoidable_category' as dim1_name,
+  ed.avoidable_category as dim1_value,
+  ed.avoidable_category as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name,
+  cast(null as {{ dbt.type_string() }}) as dim2_value,
+  cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(sum(coalesce(ed.paid_amount,0)) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__ed_classification') }} ed
+left join epp on ed.data_source = epp.data_source and ed.encounter_id = epp.encounter_id
+group by ed.data_source, epp.payer, epp.{{ quote_column('plan') }}, ed.avoidable_category
+
+union all
+
+-- ED spend by facility
+with epp2 as (
+  select distinct data_source, payer, {{ quote_column('plan') }}, encounter_id
+  from {{ ref('mart_review__stg_medical_claim') }}
+)
+select
+  ed.data_source,
+  epp2.payer,
+  epp2.{{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'ed_facility_spend' as metric,
+  'facility_id' as dim1_name,
+  ed.facility_id as dim1_value,
+  ed.facility_id as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name,
+  cast(null as {{ dbt.type_string() }}) as dim2_value,
+  cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(sum(coalesce(ed.paid_amount,0)) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__ed_classification') }} ed
+left join epp2 on ed.data_source = epp2.data_source and ed.encounter_id = epp2.encounter_id
+group by ed.data_source, epp2.payer, epp2.{{ quote_column('plan') }}, ed.facility_id
+
+union all
+
+-- Discharge location by facility (inpatient)
+with epp3 as (
+  select distinct data_source, payer, {{ quote_column('plan') }}, encounter_id
+  from {{ ref('mart_review__stg_medical_claim') }}
+)
+select
+  i.data_source,
+  epp3.payer,
+  epp3.{{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'discharge_by_facility' as metric,
+  'facility_id' as dim1_name,
+  cast(i.facility_id as {{ dbt.type_string() }}) as dim1_value,
+  cast(i.facility_id as {{ dbt.type_string() }}) as dim1_label,
+  'discharge_location' as dim2_name,
+  i.discharge_disposition_description as dim2_value,
+  i.discharge_disposition_description as dim2_label,
+  cast(count(distinct i.encounter_id) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__inpatient') }} i
+left join epp3 on i.data_source = epp3.data_source and i.encounter_id = epp3.encounter_id
+where i.discharge_disposition_description is not null
+group by i.data_source, epp3.payer, epp3.{{ quote_column('plan') }}, i.facility_id, i.discharge_disposition_description
+
+union all
+
+-- Readmission rate (unplanned 30-day)
+with epp4 as (
+  select distinct data_source, payer, {{ quote_column('plan') }}, encounter_id
+  from {{ ref('mart_review__stg_medical_claim') }}
+)
+select
+  coalesce(epp4.data_source,'') as data_source,
+  epp4.payer,
+  epp4.{{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'readmission_rate' as metric,
+  cast(null as {{ dbt.type_string() }}) as dim1_name,
+  cast(null as {{ dbt.type_string() }}) as dim1_value,
+  cast(null as {{ dbt.type_string() }}) as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name,
+  cast(null as {{ dbt.type_string() }}) as dim2_value,
+  cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(avg(case when r.unplanned_readmit_30_flag = 1 then 1.0 else 0.0 end) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__readmissions') }} r
+left join epp4 on r.encounter_id = epp4.encounter_id
+group by coalesce(epp4.data_source,''), epp4.payer, epp4.{{ quote_column('plan') }}
