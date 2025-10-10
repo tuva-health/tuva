@@ -23,5 +23,10 @@ select
 from {{ ref('mart_review__pharmacy') }} p
 left join mm_distinct m
   on p.person_id = m.person_id and p.data_source = m.data_source
-group by p.data_source, m.payer, m.{{ quote_column('plan') }}, theraclass, p.ndc_code, ndc_description
-
+group by
+  p.data_source,
+  m.payer,
+  m.{{ quote_column('plan') }},
+  coalesce(p.atc_3_name, p.atc_2_name),
+  p.ndc_code,
+  coalesce(p.ndc_description, p.rxnorm_description)
