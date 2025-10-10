@@ -82,8 +82,8 @@ with drg as (
 all_atomic_raw as (
     select
         d.data_source,
-        d.claim_type,
-        d.field_name,
+        lower(cast(d.claim_type as {{ dbt.type_string() }})) as claim_type_norm,
+        upper(cast(d.field_name as {{ dbt.type_string() }})) as field_name,
         sum(case when d.bucket_name = 'valid' then 1 else 0 end)   as valid_n,
         sum(case when d.bucket_name = 'invalid' then 1 else 0 end) as invalid_n,
         sum(case when d.bucket_name = 'null' then 1 else 0 end)    as null_n,
@@ -93,28 +93,29 @@ all_atomic_raw as (
     from {{ ref('data_quality__data_quality_claims_detail_union') }} d
     where not (
         -- Exclude metrics that are already included explicitly in this model
-        (d.claim_type = 'institutional_inpatient' and d.field_name in ('DRG_CODE', 'PROCEDURE_CODE_1', 'PROCEDURE_CODE_2', 'PROCEDURE_CODE_3'))
-        or (d.claim_type = 'institutional' and d.field_name in (
+        (lower(cast(d.claim_type as {{ dbt.type_string() }})) = 'institutional_inpatient' and upper(cast(d.field_name as {{ dbt.type_string() }})) in ('DRG_CODE', 'PROCEDURE_CODE_1', 'PROCEDURE_CODE_2', 'PROCEDURE_CODE_3'))
+        or (lower(cast(d.claim_type as {{ dbt.type_string() }})) = 'institutional' and upper(cast(d.field_name as {{ dbt.type_string() }})) in (
             'DRG_CODE', 'BILL_TYPE_CODE', 'REVENUE_CENTER_CODE',
             'BILLING_NPI', 'RENDERING_NPI', 'FACILITY_NPI',
             'DIAGNOSIS_CODE_1', 'DIAGNOSIS_CODE_2', 'DIAGNOSIS_CODE_3',
+            'PROCEDURE_CODE_1', 'PROCEDURE_CODE_2', 'PROCEDURE_CODE_3',
             'ADMIT_SOURCE_CODE', 'ADMIT_TYPE_CODE', 'DISCHARGE_DISPOSITION_CODE'
         ))
-        or (d.claim_type = 'professional' and d.field_name in (
+        or (lower(cast(d.claim_type as {{ dbt.type_string() }})) = 'professional' and upper(cast(d.field_name as {{ dbt.type_string() }})) in (
             'HCPCS_CODE', 'PLACE_OF_SERVICE_CODE',
             'BILLING_NPI', 'RENDERING_NPI', 'FACILITY_NPI',
             'DIAGNOSIS_CODE_1', 'DIAGNOSIS_CODE_2', 'DIAGNOSIS_CODE_3'
         ))
-        or (d.claim_type = 'institutional_outpatient' and d.field_name in ('HCPCS_CODE'))
-        or (d.claim_type = 'pharmacy' and d.field_name in (
+        or (lower(cast(d.claim_type as {{ dbt.type_string() }})) = 'institutional_outpatient' and upper(cast(d.field_name as {{ dbt.type_string() }})) in ('HCPCS_CODE'))
+        or (lower(cast(d.claim_type as {{ dbt.type_string() }})) = 'pharmacy' and upper(cast(d.field_name as {{ dbt.type_string() }})) in (
             'NDC_CODE', 'DISPENSING_PROVIDER_NPI', 'PRESCRIBING_PROVIDER_NPI'
         ))
-        or (d.claim_type = 'eligibility' and d.field_name in (
+        or (lower(cast(d.claim_type as {{ dbt.type_string() }})) = 'eligibility' and upper(cast(d.field_name as {{ dbt.type_string() }})) in (
             'GENDER', 'RACE', 'PAYER_TYPE', 'MEDICARE_STATUS_CODE', 'DUAL_STATUS_CODE', 'ORIGINAL_REASON_ENTITLEMENT_CODE'
         ))
-        or (d.claim_type = 'medical' and d.field_name in ('CLAIM_TYPE'))
+        or (upper(cast(d.field_name as {{ dbt.type_string() }})) in ('CLAIM_TYPE'))
     )
-    group by d.data_source, d.claim_type, d.field_name
+    group by d.data_source, lower(cast(d.claim_type as {{ dbt.type_string() }})), upper(cast(d.field_name as {{ dbt.type_string() }}))
 ),
 
 all_atomic as (
@@ -122,21 +123,21 @@ all_atomic as (
         data_source,
         null as payer,
         null as plan,
-        {{ concat_custom(["'claims:'", "claim_type", "':'", "field_name"]) }} as metric_id,
+        {{ concat_custom(["'claims:'", "claim_type_norm", "':'", "field_name"]) }} as metric_id,
         field_name as metric_name,
-        claim_type as claim_scope,
+        claim_type_norm as claim_scope,
         valid_n,
         invalid_n,
         null_n,
         multiple_n,
         denominator_n,
         case
-            when claim_type = 'eligibility' then 'Eligibility records'
-            when claim_type = 'pharmacy' then 'Pharmacy claim lines'
-            when claim_type = 'professional' then 'Professional claim lines'
-            when claim_type = 'medical' then 'All medical claims'
-            when claim_type = 'institutional' and any_line_level = 1 then 'Institutional claim lines'
-            when claim_type = 'institutional' then 'Institutional claims'
+            when claim_type_norm = 'eligibility' then 'Eligibility records'
+            when claim_type_norm = 'pharmacy' then 'Pharmacy claim lines'
+            when claim_type_norm = 'professional' then 'Professional claim lines'
+            when claim_type_norm = 'medical' then 'All medical claims'
+            when claim_type_norm = 'institutional' and any_line_level = 1 then 'Institutional claim lines'
+            when claim_type_norm = 'institutional' then 'Institutional claims'
             else 'Records evaluated'
         end as denominator_desc
     from all_atomic_raw
