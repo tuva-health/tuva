@@ -3740,15 +3740,6 @@ models:
 #### union all processing
 ### Claims Specific
 
-  - name: data_quality__claim_type_summary
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: claim_type_summary
-      tags:
-        - data_quality
-      materialized: table
 
   - name: data_quality__claim_drg_code_type
     config:
@@ -3761,75 +3752,13 @@ models:
       materialized: table
 
 
-  - name: data_quality__data_quality_claims_detail
-    description: "Combines all of the data quality claims tables together"
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_claims_detail
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__data_quality_claims_detail_union
-    description: "This model adds the dense ranking in a separate step due to memory constraints"
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_claims_detail_union
-      tags:
-        - data_quality
-      materialized: table
-
-  - name: data_quality__data_quality_claims_for_pbi
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_claims_for_pbi
-      tags:
-        - data_quality
-      materialized: table
+  # pruned legacy PBI/union models removed
 
 
 ### Clinical Specific
 
 
-  - name: data_quality__data_quality_clinical_detail_union
-    description: "Combines all of the data quality clinical tables together"
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_clinical_detail_union
-      tags:
-        - data_quality
-      materialized: table
-
-
-  - name: data_quality__data_quality_clinical_detail
-    description: "This model adds the dense ranking in a separate step due to memory constraints"
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_clinical_detail
-      tags:
-        - data_quality
-      materialized: table      
-
-
-  - name: data_quality__data_quality_clinical_for_pbi
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-        {% else %}data_quality{%- endif -%}
-      alias: data_quality_clinical_for_pbi
-      tags:
-        - data_quality
-      materialized: table
+  # pruned legacy PBI/union models removed
 
 ## Staging
 
