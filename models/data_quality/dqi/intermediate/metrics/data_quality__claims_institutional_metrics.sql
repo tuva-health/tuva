@@ -1,5 +1,6 @@
 {{ config(
     materialized='ephemeral',
+    tags=['dqi','data_quality'],
     enabled = (
         var('enable_input_layer_testing', true) | as_bool
     ) and (
@@ -94,4 +95,3 @@ line_metrics as (
 select * from claim_metrics
 union all
 select * from line_metrics
-

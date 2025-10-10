@@ -1,5 +1,6 @@
 {{ config(
     materialized='ephemeral',
+    tags=['dqi','data_quality'],
     enabled = (
         var('enable_input_layer_testing', true) | as_bool
     ) and (
@@ -27,4 +28,3 @@ select
     case when m.claim_type is null then 1 else 0 end as has_null
 from m
 left join {{ ref('terminology__claim_type') }} term on m.claim_type = term.claim_type
-

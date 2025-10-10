@@ -1,5 +1,6 @@
 {{ config(
     materialized='ephemeral',
+    tags=['dqi','data_quality'],
     enabled = (
         var('enable_input_layer_testing', true) | as_bool
     ) and (

@@ -1,5 +1,6 @@
 {{ config(
     materialized='ephemeral',
+    tags=['dqi','data_quality'],
     enabled = (
         var('enable_input_layer_testing', true) | as_bool
     ) and (
@@ -222,4 +223,3 @@ union all select * from inst_admit_type_per_claim
 union all select * from inst_discharge_disposition_per_claim
 union all select * from revenue_center_per_line
 union all select * from hcpcs_outpatient_per_line
-

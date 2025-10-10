@@ -1,5 +1,6 @@
 {{ config(
     materialized='ephemeral',
+    tags=['dqi','data_quality'],
     enabled = (
         var('enable_input_layer_testing', true) | as_bool
     ) and (
@@ -112,4 +113,3 @@ select * from drg_per_claim
 union all select * from proc1_per_claim
 union all select * from proc2_per_claim
 union all select * from proc3_per_claim
-
