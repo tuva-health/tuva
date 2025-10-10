@@ -11,112 +11,29 @@
 Aggregated eligibility terminology metrics at data_source/payer/plan grain.
 */
 
-with gender as (
-    select
-        e.data_source, e.payer, {{ quote_column('plan') }} as plan,
-        'claims:eligibility:GENDER' as metric_id,
-        'Gender (Eligibility)'      as metric_name,
-        'eligibility'               as claim_scope,
-        sum(case when term.gender is not null then 1 else 0 end) as valid_n,
-        sum(case when e.gender is not null and term.gender is null then 1 else 0 end) as invalid_n,
-        sum(case when e.gender is null then 1 else 0 end) as null_n,
-        0 as multiple_n,
-        count(*) as denominator_n,
-        'Eligibility records' as denominator_desc
-    from {{ ref('eligibility') }} e
-    left join {{ ref('terminology__gender') }} term on e.gender = term.gender
-    group by e.data_source, e.payer, {{ quote_column('plan') }}
-),
-
-race as (
-    select
-        e.data_source, e.payer, {{ quote_column('plan') }} as plan,
-        'claims:eligibility:RACE' as metric_id,
-        'Race (Eligibility)'      as metric_name,
-        'eligibility'             as claim_scope,
-        sum(case when term.description is not null then 1 else 0 end) as valid_n,
-        sum(case when e.race is not null and term.description is null then 1 else 0 end) as invalid_n,
-        sum(case when e.race is null then 1 else 0 end) as null_n,
-        0 as multiple_n,
-        count(*) as denominator_n,
-        'Eligibility records' as denominator_desc
-    from {{ ref('eligibility') }} e
-    left join {{ ref('terminology__race') }} term on e.race = term.description
-    group by e.data_source, e.payer, {{ quote_column('plan') }}
-),
-
-payer_type as (
-    select
-        e.data_source, e.payer, {{ quote_column('plan') }} as plan,
-        'claims:eligibility:PAYER_TYPE' as metric_id,
-        'Payer Type (Eligibility)'      as metric_name,
-        'eligibility'                   as claim_scope,
-        sum(case when term.payer_type is not null then 1 else 0 end) as valid_n,
-        sum(case when e.payer_type is not null and term.payer_type is null then 1 else 0 end) as invalid_n,
-        sum(case when e.payer_type is null then 1 else 0 end) as null_n,
-        0 as multiple_n,
-        count(*) as denominator_n,
-        'Eligibility records' as denominator_desc
-    from {{ ref('eligibility') }} e
-    left join {{ ref('terminology__payer_type') }} term on e.payer_type = term.payer_type
-    group by e.data_source, e.payer, {{ quote_column('plan') }}
-),
-
-medicare_status as (
-    select
-        e.data_source, e.payer, {{ quote_column('plan') }} as plan,
-        'claims:eligibility:MEDICARE_STATUS_CODE' as metric_id,
-        'Medicare Status Code (Eligibility)'      as metric_name,
-        'eligibility'                              as claim_scope,
-        sum(case when term.medicare_status_code is not null then 1 else 0 end) as valid_n,
-        sum(case when e.medicare_status_code is not null and term.medicare_status_code is null then 1 else 0 end) as invalid_n,
-        sum(case when e.medicare_status_code is null then 1 else 0 end) as null_n,
-        0 as multiple_n,
-        count(*) as denominator_n,
-        'Eligibility records' as denominator_desc
-    from {{ ref('eligibility') }} e
-    left join {{ ref('terminology__medicare_status') }} term on e.medicare_status_code = term.medicare_status_code
-    group by e.data_source, e.payer, {{ quote_column('plan') }}
-),
-
-dual_status as (
-    select
-        e.data_source, e.payer, {{ quote_column('plan') }} as plan,
-        'claims:eligibility:DUAL_STATUS_CODE' as metric_id,
-        'Dual Status Code (Eligibility)'      as metric_name,
-        'eligibility'                          as claim_scope,
-        sum(case when term.dual_status_code is not null then 1 else 0 end) as valid_n,
-        sum(case when e.dual_status_code is not null and term.dual_status_code is null then 1 else 0 end) as invalid_n,
-        sum(case when e.dual_status_code is null then 1 else 0 end) as null_n,
-        0 as multiple_n,
-        count(*) as denominator_n,
-        'Eligibility records' as denominator_desc
-    from {{ ref('eligibility') }} e
-    left join {{ ref('terminology__medicare_dual_eligibility') }} term on e.dual_status_code = term.dual_status_code
-    group by e.data_source, e.payer, {{ quote_column('plan') }}
-),
-
-orec as (
-    select
-        e.data_source, e.payer, {{ quote_column('plan') }} as plan,
-        'claims:eligibility:ORIGINAL_REASON_ENTITLEMENT_CODE' as metric_id,
-        'Original Reason Entitlement Code (Eligibility)'       as metric_name,
-        'eligibility'                                          as claim_scope,
-        sum(case when term.original_reason_entitlement_code is not null then 1 else 0 end) as valid_n,
-        sum(case when e.original_reason_entitlement_code is not null and term.original_reason_entitlement_code is null then 1 else 0 end) as invalid_n,
-        sum(case when e.original_reason_entitlement_code is null then 1 else 0 end) as null_n,
-        0 as multiple_n,
-        count(*) as denominator_n,
-        'Eligibility records' as denominator_desc
-    from {{ ref('eligibility') }} e
-    left join {{ ref('terminology__medicare_orec') }} term on e.original_reason_entitlement_code = term.original_reason_entitlement_code
-    group by e.data_source, e.payer, {{ quote_column('plan') }}
+with checks as (
+    select * from {{ ref('data_quality__eligibility_checks') }}
 )
 
-select * from gender
-union all select * from race
-union all select * from payer_type
-union all select * from medicare_status
-union all select * from dual_status
-union all select * from orec
-
+select
+    data_source,
+    payer,
+    {{ quote_column('plan') }} as plan,
+    metric_id,
+    case metric_id
+        when 'claims:eligibility:GENDER' then 'Gender (Eligibility)'
+        when 'claims:eligibility:RACE' then 'Race (Eligibility)'
+        when 'claims:eligibility:PAYER_TYPE' then 'Payer Type (Eligibility)'
+        when 'claims:eligibility:MEDICARE_STATUS_CODE' then 'Medicare Status Code (Eligibility)'
+        when 'claims:eligibility:DUAL_STATUS_CODE' then 'Dual Status Code (Eligibility)'
+        when 'claims:eligibility:ORIGINAL_REASON_ENTITLEMENT_CODE' then 'Original Reason Entitlement Code (Eligibility)'
+    end as metric_name,
+    'eligibility' as claim_scope,
+    sum(case when has_valid = 1 then 1 else 0 end) as valid_n,
+    sum(case when has_invalid = 1 then 1 else 0 end) as invalid_n,
+    sum(case when has_null = 1 then 1 else 0 end) as null_n,
+    0 as multiple_n,
+    count(*) as denominator_n,
+    'Eligibility records' as denominator_desc
+from checks
+group by data_source, payer, {{ quote_column('plan') }}, metric_id

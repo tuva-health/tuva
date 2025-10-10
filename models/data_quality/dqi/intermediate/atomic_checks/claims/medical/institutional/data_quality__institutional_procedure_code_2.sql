@@ -12,7 +12,7 @@ unique_field as (
         , {{ concat_custom(["procedure_code_2", "'|'", "coalesce(term.description, '')"]) }} as field
         , data_source
     from base
-    left outer join {{ ref('terminology__icd_10_pcs') }} as term on base.procedure_code_1 = term.icd_10_pcs
+    left outer join {{ ref('terminology__icd_10_pcs') }} as term on base.procedure_code_2 = term.icd_10_pcs
 ),
 
 claim_grain as (

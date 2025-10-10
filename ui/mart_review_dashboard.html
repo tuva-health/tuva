@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<!-- 
+LOCAL DEVELOPMENT TOOL ONLY
+This page visualizes aggregated, non-PHI metrics from the mart_review area.
+Export small, aggregated CSVs from your warehouse and load them here.
+Do not deploy publicly.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tuva Mart Review Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <style>
+    :root { --bg:#f8fafc; --text:#1f2937; --card:#fff; --muted:#64748b; --line:#e5e7eb; --brand:#2563eb; --ok:#16a34a; --bad:#dc2626; }
+    body { font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); margin:0; padding:24px; }
+    .container { max-width: 1600px; margin: 0 auto; background: var(--card); border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); overflow: hidden; }
+    .header { background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%); color:#fff; padding: 28px 36px; display:flex; align-items:center; gap:14px; }
+    .header img { height: 30px; }
+    .header h1 { font-size: 1.6rem; margin:0; }
+    .content { padding: 18px 22px 28px; }
+    .upload { border:2px dashed #cbd5e1; border-radius:12px; padding: 18px; text-align:center; cursor:pointer; transition: all 0.2s ease; }
+    .upload:hover { border-color: var(--brand); background:#eff6ff; }
+    .upload.dragover { border-color:#1d4ed8; background:#dbeafe; }
+    .small { color: var(--muted); font-size: 0.92rem; }
+    .error { background:#fee2e2; border:1px solid #ef4444; color:#991b1b; padding:10px 12px; border-radius:8px; margin-top:10px; display:none; }
+    .info { background:#eff6ff; border:1px solid #3b82f6; color:#1e40af; padding:10px 12px; border-radius:8px; margin-top:10px; display:none; }
+    .controls { display:flex; gap:12px; margin: 14px 0; align-items:center; flex-wrap: wrap; }
+    input, select, button { padding: 8px 10px; border:1px solid #cbd5e1; border-radius:8px; background:#fff; }
+    button.primary { background: var(--brand); color:#fff; border:none; }
+    .grid { display:grid; grid-template-columns: 1fr; gap: 20px; }
+    .section { border:1px solid var(--line); border-radius:12px; padding:14px; background:#fff; }
+    .section h2 { font-size:1.1rem; margin:0 0 6px; }
+    .section p { margin: 4px 0 10px; color: var(--muted); }
+    .stat-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+    .stat { background:#f9fafb; border:1px solid var(--line); border-radius:10px; padding:12px; }
+    .stat .label { font-size: 0.85rem; color: var(--muted); }
+    .stat .value { font-size: 1.4rem; font-weight: 700; }
+    .chart { height: 280px; }
+    .two-col { display:grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap:14px; }
+    .table { width:100%; border-collapse: collapse; }
+    .table th, .table td { text-align:left; padding:8px 8px; border-bottom:1px solid var(--line); font-size:0.92rem; }
+    details { margin-top:8px; }
+    code.sql { display:block; white-space: pre-wrap; background:#0b1020; color:#cfe7ff; padding:10px; border-radius:8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace; font-size:0.82rem; }
+    .footer { margin-top: 20px; color:#6b7280; font-size:0.88rem; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="assets/tuva_logo.png" alt="Tuva" />
+      <h1>Mart Review Dashboard</h1>
+    </div>
+    <div class="content">
+      <div id="drop" class="upload" onclick="pickFiles()" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFiles(event)">
+        <div style="font-weight:600;">Drop aggregated CSVs here or click to choose</div>
+        <div class="small">Accepted datasets are aggregated exports from the `data_quality` mart_review views (no PHI). You can load multiple files (age, gender, PMPM, claims/enrollment, conditions, inpatient, ED, service categories, HCC, pharmacy).</div>
+        <input id="file" type="file" accept=".csv" multiple style="display:none" />
+      </div>
+      <div id="errorBox" class="error"></div>
+      <div id="infoBox" class="info"></div>
+
+      <div class="controls">
+        <label>Schema Prefix</label>
+        <input id="schemaPrefix" placeholder="e.g. dev_brad.data_quality" oninput="renderAll()" />
+        <label>data_source</label>
+        <select id="selDataSource" onchange="handleFilterChange()"></select>
+        <label>payer</label>
+        <select id="selPayer" onchange="handleFilterChange()"></select>
+        <label>plan</label>
+        <select id="selPlan" onchange="handleFilterChange()"></select>
+        <button class="primary" onclick="loadSample()">Load Sample</button>
+      </div>
+
+      <div class="grid">
+        <div class="section">
+          <h2>Population Overview</h2>
+          <p>Average age and gender distribution for the selected filters.</p>
+          <div class="stat-grid">
+            <div class="stat"><div class="label">Average Age</div><div id="avgAge" class="value">—</div></div>
+            <div class="stat"><div class="label">Population</div><div id="populationCount" class="value">—</div></div>
+          </div>
+          <div class="two-col">
+            <div>
+              <canvas id="chartAgeHist" class="chart"></canvas>
+              <details>
+                <summary>SQL template: Age distribution (aggregated)</summary>
+                <code class="sql" id="sqlAge"></code>
+              </details>
+            </div>
+            <div>
+              <canvas id="chartGender" class="chart"></canvas>
+              <details>
+                <summary>SQL template: Gender distribution (aggregated)</summary>
+                <code class="sql" id="sqlGender"></code>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Monthly Trends</h2>
+          <p>PMPM, members with claims, and claims with enrollment by month.</p>
+          <div class="two-col">
+            <div>
+              <canvas id="chartPmpm" class="chart"></canvas>
+              <details>
+                <summary>SQL template: PMPM by month (aggregated)</summary>
+                <code class="sql" id="sqlPmpm"></code>
+              </details>
+            </div>
+            <div>
+              <canvas id="chartMembersClaims" class="chart"></canvas>
+              <details>
+                <summary>SQL template: Members with claims by month (aggregated)</summary>
+                <code class="sql" id="sqlMembersClaims"></code>
+              </details>
+            </div>
+          </div>
+          <div>
+            <canvas id="chartClaimsEnrollment" class="chart"></canvas>
+            <details>
+              <summary>SQL template: Claims with enrollment by month (aggregated)</summary>
+              <code class="sql" id="sqlClaimsEnrollment"></code>
+            </details>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Conditions & Risk</h2>
+          <p>Chronic condition frequency and CMS-HCC code frequency.</p>
+          <div class="two-col">
+            <div>
+              <canvas id="chartConditions" class="chart"></canvas>
+              <details>
+                <summary>SQL template: Chronic conditions (aggregated)</summary>
+                <code class="sql" id="sqlConditions"></code>
+              </details>
+            </div>
+            <div>
+              <canvas id="chartHcc" class="chart"></canvas>
+              <details>
+                <summary>SQL template: HCC codes (aggregated)</summary>
+                <code class="sql" id="sqlHcc"></code>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Encounters</h2>
+          <p>Inpatient LOS distribution and DRG frequency; ED avoidable categories by count.</p>
+          <div class="two-col">
+            <div>
+              <canvas id="chartInpatientLos" class="chart"></canvas>
+              <details>
+                <summary>SQL template: Inpatient LOS distribution (aggregated)</summary>
+                <code class="sql" id="sqlInpatient"></code>
+              </details>
+            </div>
+            <div>
+              <canvas id="chartDrg" class="chart"></canvas>
+            </div>
+          </div>
+          <div>
+            <canvas id="chartEd" class="chart"></canvas>
+            <details>
+              <summary>SQL template: ED avoidable categories (aggregated)</summary>
+              <code class="sql" id="sqlEd"></code>
+            </details>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Service Categories</h2>
+          <p>Paid amount by service_category_1 / service_category_2.</p>
+          <div>
+            <canvas id="chartSvcCat" class="chart"></canvas>
+            <details>
+              <summary>SQL template: Service categories (aggregated)</summary>
+              <code class="sql" id="sqlSvc"></code>
+            </details>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Encounter Types</h2>
+          <p>Encounter counts and paid by encounter_group/type.</p>
+          <div>
+            <canvas id="chartEncTypes" class="chart"></canvas>
+            <details>
+              <summary>SQL template: Encounter group/type (aggregated)</summary>
+              <code class="sql" id="sqlEncTypes"></code>
+            </details>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Pharmacy</h2>
+          <p>Pivot by therapeutic class and NDC with financial and utilization metrics.</p>
+          <div style="overflow:auto; max-height: 360px; border:1px solid var(--line); border-radius:10px;">
+            <table class="table" id="tblPharm"><thead><tr>
+              <th>theraclass</th><th>ndc_code</th><th>ndc_description</th>
+              <th>spend</th><th>avg_days_supply</th><th>avg_quantity</th><th>avg_refills</th>
+            </tr></thead><tbody></tbody></table>
+          </div>
+          <details>
+            <summary>SQL template: Pharmacy pivot (aggregated)</summary>
+            <code class="sql" id="sqlPharm"></code>
+          </details>
+        </div>
+      </div>
+
+      <div class="footer">No PHI leaves the warehouse: export aggregated, small CSVs from your database (mart_review views) and load them here. Use Schema Prefix to generate copyable SQL templates.</div>
+    </div>
+  </div>
+
+  <script>
+    const charts = {};
+    const datasets = {
+      age: [],
+      gender: [],
+      pmpm: [],
+      membersClaims: [],
+      claimsEnrollment: [],
+      conditions: [],
+      inpatient: [],
+      drg: [],
+      ed: [],
+      svcCats: [],
+      encTypes: [],
+      hcc: [],
+      pharmacy: []
+    };
+    const globalFilters = { data_source: new Set(), payer: new Set(), plan: new Set() };
+    const canonical = s => (s==null? '': String(s)).trim();
+    const num = v => { if (v===null||v===undefined||v==='') return NaN; const n = Number(String(v).replace(/,/g,'')); return isNaN(n)? NaN : n; };
+
+    function byId(id) { return document.getElementById(id); }
+    function showError(msg) { const el = byId('errorBox'); el.textContent = msg; el.style.display = 'block'; }
+    function clearError() { const el = byId('errorBox'); el.style.display = 'none'; el.textContent = ''; }
+    function showInfo(msg) { const el = byId('infoBox'); el.textContent = msg; el.style.display = 'block'; setTimeout(()=>{ el.style.display='none'; }, 4000); }
+
+    function pickFiles() { byId('file').click(); }
+    function dragOver(e) { e.preventDefault(); byId('drop').classList.add('dragover'); }
+    function dragLeave(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); }
+    function dropFiles(e) { e.preventDefault(); byId('drop').classList.remove('dragover'); const files = Array.from(e.dataTransfer.files||[]); files.forEach(readFile); }
+    byId('file').addEventListener('change', e => { Array.from(e.target.files||[]).forEach(readFile); e.target.value=''; });
+
+    function readFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => { try { routeCSV(e.target.result); } catch(err){ console.error(err); showError('Error parsing CSV: '+(err.message||err)); } };
+      reader.readAsText(file);
+    }
+
+    function parseCSV(text) {
+      const lines = text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim().split('\n');
+      if (!lines.length) return [];
+      const headers = parseCSVLine(lines[0]).map(h => h.replace(/\"/g,'"').replace(/"/g,'').trim().toLowerCase());
+      const rows = [];
+      for (let i=1;i<lines.length;i++) {
+        const line = lines[i]; if (!line.trim()) continue;
+        const values = parseCSVLine(line).map(v => v.replace(/\"/g,'"').replace(/"/g,'').trim());
+        const obj = {}; headers.forEach((h,idx)=> obj[h]=values[idx]??''); rows.push(obj);
+      }
+      return rows;
+    }
+    function parseCSVLine(line) {
+      const out = []; let cur=''; let inQ=false; for (let i=0;i<line.length;i++){ const ch=line[i]; if (ch==='"'){ inQ=!inQ; continue; } if (ch===',' && !inQ){ out.push(cur); cur=''; } else { cur+=ch; } } out.push(cur); return out; }
+
+    function routeCSV(csvText) {
+      clearError();
+      const rows = parseCSV(csvText);
+      if (!rows.length) { showError('Empty CSV.'); return; }
+      const cols = new Set(Object.keys(rows[0]).map(c=>c.toLowerCase()));
+      // Heuristics to classify
+      const has = (...c)=> c.every(x=> cols.has(x));
+      const isUnified = has('metric','value') && (cols.has('dim1_name') || cols.has('dim1'));
+      if (isUnified) { loadUnifiedCSV(rows); indexFilters(rows); populateFilters(); renderAll(); showInfo('Loaded unified export: '+rows.length.toLocaleString()+' rows.'); return; }
+      if (has('age_bucket','count')) { datasets.age.push(...rows); }
+      else if (has('gender','count')) { datasets.gender.push(...rows); }
+      else if (has('year_month') && (cols.has('total_paid') || cols.has('total_paid_absolute'))) { datasets.pmpm.push(...rows); }
+      else if (has('year_month') && (cols.has('members_with_claims') || cols.has('percent_members_with_claims'))) { datasets.membersClaims.push(...rows); }
+      else if (has('year_month') && (cols.has('claims_with_enrollment') || cols.has('percentage_claims_with_enrollment'))) { datasets.claimsEnrollment.push(...rows); }
+      else if (has('condition','count')) { datasets.conditions.push(...rows); }
+      else if (has('los_groups','count')) { datasets.inpatient.push(...rows); }
+      else if (has('drg_code') && (cols.has('count') || cols.has('encounters'))) { datasets.drg.push(...rows); }
+      else if (has('avoidable_category','count')) { datasets.ed.push(...rows); }
+      else if (has('service_category_1','paid_amt')) { datasets.svcCats.push(...rows); }
+      else if (has('hcc_code','count')) { datasets.hcc.push(...rows); }
+      else if ((cols.has('encounter_group') || cols.has('encounter_type')) && (cols.has('count') || cols.has('encounters')) && (cols.has('paid_amount') || cols.has('paid'))) { datasets.encTypes.push(...rows); }
+      else if ((cols.has('ndc_code') || cols.has('ndc')) && (cols.has('spend') || cols.has('paid_amount'))) { datasets.pharmacy.push(...rows); }
+      else { showError('Unrecognized CSV schema. Ensure you export aggregated datasets with expected columns.'); return; }
+      indexFilters(rows);
+      populateFilters();
+      renderAll();
+      showInfo('Loaded '+rows.length.toLocaleString()+' rows.');
+    }
+
+    function loadUnifiedCSV(rows) {
+      const pmpmMap = new Map();
+      const svcMap = new Map();
+      const encMap = new Map();
+      const pharmMap = new Map();
+      const key3 = (a,b,c) => `${a}||${b||''}||${c||''}`;
+      const key4 = (a,b,c,d) => `${a}||${b||''}||${c||''}||${d||''}`;
+      const key6 = (a,b,c,d,e,f) => `${a}||${b||''}||${c||''}||${d||''}||${e||''}||${f||''}`;
+      rows.forEach(r => {
+        const ds = canonical(r.data_source||'');
+        const payer = canonical(r.payer||'');
+        const plan = canonical(r.plan||'');
+        const ym = canonical(r.year_month||'');
+        const metric = canonical(r.metric||'');
+        const d1n = canonical(r.dim1_name||r.dim1||'');
+        const d1v = canonical(r.dim1_value||r.dim1val||'');
+        const d1l = canonical(r.dim1_label||'');
+        const d2n = canonical(r.dim2_name||'');
+        const d2v = canonical(r.dim2_value||'');
+        const d2l = canonical(r.dim2_label||'');
+        const val = num(r.value);
+        if (isNaN(val)) return;
+        switch(metric){
+          case 'age_distribution':
+            datasets.age.push({ data_source: ds, payer, plan, age_bucket: d1v, count: val });
+            break;
+          case 'gender_distribution':
+            datasets.gender.push({ data_source: ds, payer, plan, gender: d1v, count: val });
+            break;
+          case 'pmpm_total':
+          case 'pmpm_medical':
+          case 'pmpm_pharmacy': {
+            const k = key4(ds,payer,plan,ym);
+            const obj = pmpmMap.get(k) || { data_source: ds, payer, plan, year_month: ym };
+            if (metric==='pmpm_total') obj.total_paid = val;
+            else if (metric==='pmpm_medical') obj.medical_paid = val;
+            else if (metric==='pmpm_pharmacy') obj.pharmacy_paid = val;
+            pmpmMap.set(k,obj);
+            break; }
+          case 'members_with_claims_pct':
+            datasets.membersClaims.push({ data_source: ds, payer, plan, year_month: ym, percent_members_with_claims: val });
+            break;
+          case 'claims_with_enrollment_pct':
+            datasets.claimsEnrollment.push({ data_source: ds, payer, plan, year_month: ym, percentage_claims_with_enrollment: val });
+            break;
+          case 'condition_count':
+            datasets.conditions.push({ data_source: ds, payer, plan, condition: d1v, count: val });
+            break;
+          case 'inpatient_los':
+            datasets.inpatient.push({ data_source: ds, payer, plan, los_groups: d1v, count: val });
+            break;
+          case 'drg_count':
+            datasets.drg.push({ data_source: ds, payer, plan, drg_code: d1v, count: val });
+            break;
+          case 'ed_avoidable':
+            datasets.ed.push({ data_source: ds, payer, plan, avoidable_category: d1v, count: val });
+            break;
+          case 'svc_paid_amt':
+          case 'svc_visits': {
+            const k = key6(ds,payer,plan,ym,d1v,d2v);
+            const obj = svcMap.get(k) || { data_source: ds, payer, plan, year_month: ym, service_category_1: d1v, service_category_2: d2v, paid_amt: 0, visits: 0 };
+            if (metric==='svc_paid_amt') obj.paid_amt = val;
+            else obj.visits = val;
+            svcMap.set(k,obj);
+            break; }
+          case 'encounter_count_by_group':
+          case 'encounter_paid_by_group': {
+            const k = key3(ds,payer,plan)+`||group||${d1v}`;
+            const obj = encMap.get(k) || { data_source: ds, payer, plan, encounter_group: d1v, count: 0, paid_amount: 0 };
+            if (metric==='encounter_count_by_group') obj.count = val; else obj.paid_amount = val;
+            encMap.set(k,obj);
+            break; }
+          case 'encounter_count_by_type':
+          case 'encounter_paid_by_type': {
+            const k = key3(ds,payer,plan)+`||type||${d1v}`;
+            const obj = encMap.get(k) || { data_source: ds, payer, plan, encounter_type: d1v, count: 0, paid_amount: 0 };
+            if (metric==='encounter_count_by_type') obj.count = val; else obj.paid_amount = val;
+            encMap.set(k,obj);
+            break; }
+          case 'hcc_count':
+            datasets.hcc.push({ data_source: ds, payer, plan, hcc_code: d1v, count: val });
+            break;
+          case 'pharm_spend':
+          case 'pharm_avg_days_supply':
+          case 'pharm_avg_quantity':
+          case 'pharm_avg_refills': {
+            const k = key6(ds,payer,plan,'',d1v,d2v);
+            const obj = pharmMap.get(k) || { data_source: ds, payer, plan, theraclass: d1v, ndc_code: d2v, ndc_description: d2l, spend: 0, avg_days_supply: NaN, avg_quantity: NaN, avg_refills: NaN };
+            if (metric==='pharm_spend') obj.spend = val;
+            else if (metric==='pharm_avg_days_supply') obj.avg_days_supply = val;
+            else if (metric==='pharm_avg_quantity') obj.avg_quantity = val;
+            else if (metric==='pharm_avg_refills') obj.avg_refills = val;
+            pharmMap.set(k,obj);
+            break; }
+          default:
+            break;
+        }
+      });
+      // materialize maps
+      pmpmMap.forEach(v => datasets.pmpm.push(v));
+      svcMap.forEach(v => datasets.svcCats.push(v));
+      encMap.forEach(v => datasets.encTypes.push(v));
+      pharmMap.forEach(v => datasets.pharmacy.push(v));
+    }
+
+    function indexFilters(rows) {
+      rows.forEach(r => {
+        const ds = canonical(r.data_source||''); if (ds) globalFilters.data_source.add(ds);
+        const payer = canonical(r.payer||''); if (payer) globalFilters.payer.add(payer);
+        const plan = canonical(r.plan||''); if (plan) globalFilters.plan.add(plan);
+      });
+    }
+    function populateFilters() {
+      const dd = (id,set) => { const el=byId(id); const cur=el.value; el.innerHTML=''; const optAll=document.createElement('option'); optAll.value=''; optAll.textContent='(all)'; el.appendChild(optAll); Array.from(set).sort().forEach(v=>{ const o=document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o); }); if ([...set].includes(cur)) el.value=cur; };
+      dd('selDataSource', globalFilters.data_source);
+      dd('selPayer', globalFilters.payer);
+      dd('selPlan', globalFilters.plan);
+    }
+    function handleFilterChange(){ renderAll(); }
+
+    function filterRows(arr) {
+      const ds = byId('selDataSource').value; const payer = byId('selPayer').value; const plan = byId('selPlan').value;
+      return (arr||[]).filter(r => (!ds || canonical(r.data_source||'')===ds) && (!payer || canonical(r.payer||'')===payer) && (!plan || canonical(r.plan||'')===plan));
+    }
+
+    function toMonthDate(ym) { const s = String(ym||''); if (s.length===6) { const y=+s.slice(0,4), m=+s.slice(4,6); return new Date(y, m-1, 1); } return null; }
+    function formatMoney(n) { if (n==null || isNaN(n)) return '—'; return '$'+Number(n).toLocaleString(undefined,{maximumFractionDigits:0}); }
+    function formatNum(n) { if (n==null || isNaN(n)) return '—'; return Number(n).toLocaleString(); }
+    function pct(n) { if (n==null || isNaN(n)) return '—'; return (Number(n)*100).toFixed(1)+'%'; }
+
+    function ensureChart(id, type, config){ if (charts[id]) { charts[id].destroy(); } charts[id] = new Chart(byId(id), { type, data: config.data, options: config.options||{} }); }
+
+    function renderAll() {
+      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy();
+      injectSQLTemplates();
+    }
+
+    function renderAge() {
+      const rows = filterRows(datasets.age).map(r=>({
+        age_bucket: canonical(r.age_bucket),
+        count: num(r.count),
+        avg_age: num(r.avg_age),
+      }));
+      rows.sort((a,b)=> a.age_bucket.localeCompare(b.age_bucket));
+      const total = rows.reduce((s,r)=> s + (r.count||0), 0);
+      const wAvg = (()=>{ let sum=0; let n=0; rows.forEach(r=>{ if (!isNaN(r.avg_age) && !isNaN(r.count)) { sum += (r.avg_age*r.count); n += r.count; } }); return n? sum/n : NaN; })();
+      byId('populationCount').textContent = formatNum(total);
+      byId('avgAge').textContent = isNaN(wAvg)? '—' : (wAvg).toFixed(1);
+      const data = { labels: rows.map(r=>r.age_bucket), datasets:[{ label:'Members', data: rows.map(r=>r.count||0), backgroundColor:'#3b82f6' }] };
+      ensureChart('chartAgeHist','bar',{ data, options:{ plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
+    }
+
+    function renderGender() {
+      const rows = filterRows(datasets.gender).map(r=>({ gender: canonical(r.gender), count: num(r.count) }));
+      const data = { labels: rows.map(r=>r.gender||'(unknown)'), datasets:[{ label:'Members', data: rows.map(r=>r.count||0), backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'] }] };
+      ensureChart('chartGender','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
+    }
+
+    function renderPmpm() {
+      const rows = filterRows(datasets.pmpm).map(r=>({
+        ym: toMonthDate(r.year_month||r.yearmonth||r.ym),
+        total: num(r.total_paid)||num(r.total_pmpm)||num(r.total),
+        medical: num(r.medical_paid)||NaN,
+        pharmacy: num(r.pharmacy_paid)||NaN
+      })).filter(r=>r.ym);
+      rows.sort((a,b)=> a.ym - b.ym);
+      const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
+      const data = { labels, datasets:[
+        { label:'Total PMPM', data: rows.map(r=>r.total||0), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.3)', fill:false },
+        { label:'Medical PMPM', data: rows.map(r=>r.medical||0), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.3)', fill:false },
+        { label:'Pharmacy PMPM', data: rows.map(r=>r.pharmacy||0), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.3)', fill:false }
+      ] };
+      ensureChart('chartPmpm','line',{ data, options:{ responsive:true, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+formatMoney(ctx.parsed.y) } } } } });
+    }
+
+    function renderMembersClaims() {
+      const rows = filterRows(datasets.membersClaims).map(r=>({ ym: toMonthDate(r.year_month), pct: (num(r.percent_members_with_claims)) || (num(r.members_with_claims)/num(r.total_member_months)) })).filter(r=>r.ym && !isNaN(r.pct));
+      rows.sort((a,b)=> a.ym - b.ym);
+      const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
+      const data = { labels, datasets:[{ label:'Members with claims %', data: rows.map(r=>r.pct||0), borderColor:'#9333ea', backgroundColor:'rgba(147,51,234,0.25)', fill:false }] };
+      ensureChart('chartMembersClaims','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
+    }
+
+    function renderClaimsEnrollment() {
+      const rows = filterRows(datasets.claimsEnrollment).map(r=>({ ym: toMonthDate(r.year_month), pct: (num(r.percentage_claims_with_enrollment)) || (num(r.claims_with_enrollment)/num(r.claims)) })).filter(r=>r.ym && !isNaN(r.pct));
+      rows.sort((a,b)=> a.ym - b.ym);
+      const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
+      const data = { labels, datasets:[{ label:'Claims with enrollment %', data: rows.map(r=>r.pct||0), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.25)', fill:false }] };
+      ensureChart('chartClaimsEnrollment','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
+    }
+
+    function renderConditions() {
+      const rows = filterRows(datasets.conditions).map(r=>({ condition: canonical(r.condition), count: num(r.count) })).filter(r=>!isNaN(r.count));
+      rows.sort((a,b)=> b.count - a.count);
+      const top = rows.slice(0, 15);
+      const data = { labels: top.map(r=>r.condition), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#0ea5e9' }] };
+      ensureChart('chartConditions','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
+    }
+
+    function renderInpatient() {
+      const rows = filterRows(datasets.inpatient).map(r=>({ group: canonical(r.los_groups), count: num(r.count) })).filter(r=>!isNaN(r.count));
+      rows.sort((a,b)=> a.group.localeCompare(b.group));
+      const data = { labels: rows.map(r=>r.group), datasets:[{ label:'Encounters', data: rows.map(r=>r.count), backgroundColor:'#14b8a6' }] };
+      ensureChart('chartInpatientLos','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
+    }
+
+    function renderDrg() {
+      const rows = filterRows(datasets.drg).map(r=>({ drg: canonical(r.drg_code)||canonical(r.drg)||canonical(r.drgwithdescription), count: num(r.count)||num(r.encounters) })).filter(r=>!isNaN(r.count));
+      rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0, 12);
+      const data = { labels: top.map(r=>r.drg), datasets:[{ label:'Encounters', data: top.map(r=>r.count), backgroundColor:'#6366f1' }] };
+      ensureChart('chartDrg','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
+    }
+
+    function renderEd() {
+      const rows = filterRows(datasets.ed).map(r=>({ cat: canonical(r.avoidable_category)||canonical(r.ed_classification)||canonical(r.category), count: num(r.count) })).filter(r=>!isNaN(r.count));
+      const data = { labels: rows.map(r=>r.cat), datasets:[{ label:'Encounters', data: rows.map(r=>r.count), backgroundColor:['#22c55e','#f97316','#3b82f6','#eab308','#ef4444'] }] };
+      ensureChart('chartEd','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
+    }
+
+    function renderSvcCats() {
+      const rows = filterRows(datasets.svcCats).map(r=>({ cat1: canonical(r.service_category_1), cat2: canonical(r.service_category_2), paid: num(r.paid_amt)||num(r.paid_amount), visits: num(r.visits) }));
+      const agg = new Map();
+      rows.forEach(r=>{ const k=r.cat1||'(unknown)'; agg.set(k,(agg.get(k)||0)+(r.paid||0)); });
+      const arr = Array.from(agg.entries()).map(([k,v])=>({k,v})).sort((a,b)=> b.v-a.v).slice(0,12);
+      const data = { labels: arr.map(x=>x.k), datasets:[{ label:'Paid', data: arr.map(x=>x.v), backgroundColor:'#0ea5e9' }] };
+      ensureChart('chartSvcCat','bar',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(ctx)=> 'Paid: '+formatMoney(ctx.parsed.y) } } } } });
+    }
+
+    function renderHcc() {
+      const rows = filterRows(datasets.hcc).map(r=>({ hcc: canonical(r.hcc_code)||canonical(r.hcc), count: num(r.count) })).filter(r=>!isNaN(r.count));
+      rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0,15);
+      const data = { labels: top.map(r=>r.hcc), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#fb7185' }] };
+      ensureChart('chartHcc','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
+    }
+
+    function renderEncTypes() {
+      const rows = filterRows(datasets.encTypes).map(r=>({
+        group: canonical(r.encounter_group)||'', type: canonical(r.encounter_type)||'',
+        count: num(r.count)||num(r.encounters), paid: num(r.paid_amount)||num(r.paid)
+      })).filter(r=>!isNaN(r.count));
+      // Aggregate by encounter_group or type if only one present
+      const keyName = rows.some(r=>r.group) ? 'group' : 'type';
+      const agg = new Map();
+      rows.forEach(r=>{ const k = r[keyName] || '(unknown)'; const v = agg.get(k)||{count:0, paid:0}; v.count += (r.count||0); v.paid += (r.paid||0); agg.set(k,v); });
+      const arr = Array.from(agg.entries()).map(([k,v])=>({k, ...v})).sort((a,b)=> b.count - a.count).slice(0, 15);
+      const data = { labels: arr.map(x=>x.k), datasets:[
+        { label:'Encounters', data: arr.map(x=>x.count), backgroundColor:'rgba(99,102,241,0.5)', borderColor:'#6366f1', yAxisID:'y' },
+        { label:'Paid', data: arr.map(x=>x.paid), type:'line', borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.2)', yAxisID:'y1' }
+      ]};
+      ensureChart('chartEncTypes','bar',{ data, options:{ scales:{ y:{ position:'left', title:{display:true,text:'Encounters'} }, y1:{ position:'right', grid:{ drawOnChartArea:false }, title:{display:true,text:'Paid'}, ticks:{ callback:(v)=> '$'+Number(v).toLocaleString() } } }, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label==='Paid' ? ('Paid: '+formatMoney(ctx.parsed.y)) : ('Encounters: '+formatNum(ctx.parsed.y)) } } } } });
+    }
+
+    function renderPharmacy() {
+      const rows = filterRows(datasets.pharmacy).map(r=>({
+        theraclass: canonical(r.theraclass)||canonical(r.atc_3_name)||canonical(r.atc_2_name),
+        ndc_code: canonical(r.ndc_code)||canonical(r.ndc),
+        ndc_description: canonical(r.ndc_description)||canonical(r.rxnorm_description)||canonical(r.fda_description),
+        spend: num(r.spend)||num(r.paid_amount),
+        days_supply: num(r.avg_days_supply)||num(r.days_supply),
+        quantity: num(r.avg_quantity)||num(r.quantity),
+        refills: num(r.avg_refills)||num(r.refills)
+      }));
+      const tbody = byId('tblPharm').querySelector('tbody');
+      tbody.innerHTML='';
+      rows.slice(0,500).forEach(r=>{
+        const tr=document.createElement('tr');
+        ['theraclass','ndc_code','ndc_description'].forEach(k=>{ const td=document.createElement('td'); td.textContent=r[k]||''; tr.appendChild(td); });
+        const tdSpend=document.createElement('td'); tdSpend.textContent = formatMoney(r.spend); tr.appendChild(tdSpend);
+        const tdDS=document.createElement('td'); tdDS.textContent = isNaN(r.days_supply)? '—' : r.days_supply.toFixed(1); tr.appendChild(tdDS);
+        const tdQty=document.createElement('td'); tdQty.textContent = isNaN(r.quantity)? '—' : r.quantity.toFixed(1); tr.appendChild(tdQty);
+        const tdRef=document.createElement('td'); tdRef.textContent = isNaN(r.refills)? '—' : r.refills.toFixed(2); tr.appendChild(tdRef);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function injectSQLTemplates() {
+      const pfx = (byId('schemaPrefix').value||'data_quality').trim();
+      byId('sqlAge').textContent = `-- Age distribution joined to member_months for payer/plan (no PHI)\nwith base as (\n  select p.data_source, mm.payer, mm.plan,\n         case when p.age < 5 then '00-04' when p.age < 18 then '05-17' when p.age < 30 then '18-29'\n              when p.age < 40 then '30-39' when p.age < 50 then '40-49' when p.age < 60 then '50-59'\n              when p.age < 70 then '60-69' when p.age < 80 then '70-79' else '80+' end as age_bucket,\n         p.age\n  from ${pfx}.mart_review__patient p\n  left join ${pfx}.mart_review__member_months mm\n    on p.person_id = mm.person_id and p.data_source = mm.data_source\n), agg as (\n  select data_source, payer, plan, age_bucket, count(*) as count, avg(age) as avg_age\n  from base group by 1,2,3,4\n) select * from agg order by data_source, payer, plan, age_bucket;`;
+      byId('sqlGender').textContent = `-- Gender distribution joined to member_months for payer/plan (no PHI)\nselect p.data_source, mm.payer, mm.plan, p.sex as gender, count(*) as count\nfrom ${pfx}.mart_review__patient p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\nwhere p.sex is not null\ngroup by 1,2,3,4;`;
+      byId('sqlPmpm').textContent = `-- PMPM by month (no PHI)\nselect data_source, payer, plan, year_month, total_paid as total_paid, medical_paid, pharmacy_paid\nfrom ${pfx}.mart_review__pmpm;`;
+      byId('sqlMembersClaims').textContent = `-- Members with claims by month (no PHI)\nselect data_source, year_month, total_member_months, members_with_claims,\n  cast(members_with_claims/ nullif(total_member_months,0) as numeric) as percent_members_with_claims\nfrom ${pfx}.mart_review__members_with_claims;`;
+      byId('sqlClaimsEnrollment').textContent = `-- Claims with enrollment by month (no PHI)\nselect data_source, payer, plan, year_month, claims_with_enrollment, claims,\n  cast(claims_with_enrollment/ nullif(claims,0) as numeric) as percentage_claims_with_enrollment\nfrom ${pfx}.mart_review__claims_with_enrollment;`;
+      byId('sqlConditions').textContent = `-- Chronic conditions (no PHI)\nselect data_source, condition, count(*) as count\nfrom ${pfx}.mart_review__tuva_chronic_conditions\ngroup by 1,2\norder by 3 desc;`;
+      byId('sqlInpatient').textContent = `-- Inpatient LOS distribution (no PHI)\nselect data_source, payer, plan, los_groups, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4\norder by 4;`;
+      byId('sqlEd').textContent = `-- ED avoidable categories (no PHI)\nselect data_source, avoidable_category, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__ed_classification\ngroup by 1,2;`;
+      byId('sqlSvc').textContent = `-- Service categories (no PHI)\nselect data_source, payer, plan, year_month, service_category_1, service_category_2,\n  sum(paid_amt) as paid_amt, sum(visits) as visits\nfrom ${pfx}.mart_review__service_categories_long\ngroup by 1,2,3,4,5,6;`;
+      byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nwith base as (\n  select mc.data_source, mc.payer, mc.plan, e.encounter_group, e.encounter_type,\n         count(distinct mc.encounter_id) as encounters, sum(mc.paid_amount) as paid_amount\n  from ${pfx}.mart_review__stg_medical_claim mc\n  left join ${pfx.replace('_data_quality','_core')}.encounter e\n    on mc.encounter_id = e.encounter_id\n  group by 1,2,3,4,5\n) select * from base;`;
+      byId('sqlPharm').textContent = `-- Pharmacy pivot (no PHI)\nselect p.data_source, mm.payer, mm.plan,\n  coalesce(p.atc_3_name, p.atc_2_name) as theraclass, p.ndc_code, coalesce(p.ndc_description, p.rxnorm_description) as ndc_description,\n  sum(p.paid_amount) as spend, avg(nullif(p.days_supply,0)) as avg_days_supply, avg(nullif(p.quantity,0)) as avg_quantity, avg(nullif(p.refills,0)) as avg_refills\nfrom ${pfx}.mart_review__pharmacy p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\ngroup by 1,2,3,4,5,6;`;
+      byId('sqlHcc').textContent = `-- HCC codes (no PHI)\nselect x.data_source, f.hcc_code, count(distinct f.person_id) as count\nfrom ${pfx}.mart_review__patient_risk_factors f\nleft join ${pfx}.mart_review__patient x\n  on f.person_id = x.person_id\nwhere f.hcc_code is not null\ngroup by 1,2\norder by 3 desc;`;
+    }
+
+    function loadSample() {
+      // Minimal synthetic samples (no PHI) to demo layout
+      const ds = 'sample_source';
+      const age = `data_source,payer,plan,age_bucket,count,avg_age\n${ds},,,'00-04',100,2\n${ds},,,'05-17',200,12\n${ds},,,'18-29',300,24\n${ds},,,'30-39',250,35\n${ds},,,'40-49',220,45\n${ds},,,'50-59',210,55\n${ds},,,'60-69',150,65\n${ds},,,'70-79',120,75\n${ds},,,'80+',80,84`;
+      const gender = `data_source,payer,plan,gender,count\n${ds},,,female,900\n${ds},,,male,930\n${ds},,,unknown,20`;
+      const pmpm = `data_source,payer,plan,year_month,total_paid,medical_paid,pharmacy_paid\n${ds},,,202301,425,320,105\n${ds},,,202302,432,327,105\n${ds},,,202303,441,332,109\n${ds},,,202304,438,329,109`;
+      const members = `data_source,year_month,members_with_claims,total_member_months,percent_members_with_claims\n${ds},202301,1200,2000,0.6\n${ds},202302,1400,2200,0.636\n${ds},202303,1500,2300,0.652\n${ds},202304,1550,2400,0.646`;
+      const claimsEnroll = `data_source,payer,plan,year_month,claims_with_enrollment,claims,percentage_claims_with_enrollment\n${ds},,,202301,800,1000,0.8\n${ds},,,202302,900,1100,0.818\n${ds},,,202303,950,1200,0.792\n${ds},,,202304,1000,1250,0.8`;
+      const cond = `data_source,condition,count\n${ds},Diabetes,400\n${ds},Hypertension,700\n${ds},CHF,120\n${ds},No Chronic Conditions,800`;
+      const inpatient = `data_source,payer,plan,los_groups,count\n${ds},,,1. 0-1 day,120\n${ds},,,2. 2-3 days,90\n${ds},,,3. 4-5 days,70\n${ds},,,4. 6-7 days,40\n${ds},,,5. 8-14 days,20\n${ds},,,6. 15-30 days,8\n${ds},,,7. 31+ Days,4`;
+      const drg = `data_source,drg_code,count\n${ds},291,40\n${ds},292,32\n${ds},641,20\n${ds},945,12`;
+      const ed = `data_source,avoidable_category,count\n${ds},ED Care Needed - Not Preventable,300\n${ds},ED Care Needed - Preventable/Avoidable,80\n${ds},Primary Care Treatable,120\n${ds},Non-Emergent,60`;
+      const svc = `data_source,payer,plan,year_month,service_category_1,service_category_2,paid_amt,visits\n${ds},,,202301,Inpatient,Acute,450000,120\n${ds},,,202301,Outpatient,Surgery,280000,340\n${ds},,,202301,Pharmacy,Specialty,160000,540\n${ds},,,202302,Inpatient,Acute,420000,110`;
+      const hcc = `data_source,hcc_code,count\n${ds},HCC18,120\n${ds},HCC19,90\n${ds},HCC85,75\n${ds},HCC96,60`;
+      const pharm = `data_source,payer,plan,theraclass,ndc_code,ndc_description,spend,avg_days_supply,avg_quantity,avg_refills\n${ds},,,Statins,0001-0001-01,Lipitor 20mg,120000,28,30,0.2\n${ds},,,Statins,0001-0002-01,Crestor 10mg,80000,28,30,0.1\n${ds},,,Diabetes,0002-0001-01,Metformin 500mg,60000,30,60,0.0`;
+      [age,gender,pmpm,members,claimsEnroll,cond,inpatient,drg,ed,svc,hcc,pharm].forEach(routeCSV);
+      showInfo('Sample datasets loaded.');
+    }
+  </script>
+</body>
+</html>
