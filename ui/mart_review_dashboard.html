@@ -58,6 +58,10 @@ Do not deploy publicly.
         <div class="small">Accepted datasets are aggregated exports from the `data_quality` mart_review views (no PHI). You can load multiple files (age, gender, PMPM, claims/enrollment, conditions, inpatient, ED, service categories, HCC, pharmacy).</div>
         <input id="file" type="file" accept=".csv" multiple style="display:none" />
       </div>
+      <p class="small" style="margin-top:8px;">
+        Tip: You can also export a single unified table that powers this dashboard: <code>data_quality.mart_review__dashboard_export</code>.
+        Build it with <code>dbt run -s data_quality.dqi.mart_review.final.mart_review__dashboard_export</code> and load that one CSV here.
+      </p>
       <div id="errorBox" class="error"></div>
       <div id="infoBox" class="info"></div>
 
