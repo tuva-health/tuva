@@ -173,25 +173,7 @@ models:
       - data_quality_mart_review
     materialized: table
 
-- name: mart_review__quality_measures_summary_long
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__quality_measures_summary_long
-    tags:
-      - data_quality_mart_review
-    materialized: table
-
-- name: mart_review__quality_measures_value_set
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__quality_measures_value_set
-    tags:
-      - data_quality_mart_review
-    materialized: table
+# quality_measures models are not present in this package currently
 
 - name: mart_review__generics
   config:

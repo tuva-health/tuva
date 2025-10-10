@@ -14,11 +14,11 @@ with p as (
 )
 
 select
-    p.data_source,
-    p.payer,
-    {{ quote_column('plan') }} as plan,
-    p.claim_id,
-    p.claim_line_number,
+    t.data_source,
+    t.payer,
+    t.plan as {{ quote_column('plan') }},
+    t.claim_id,
+    t.claim_line_number,
     metric_id,
     'pharmacy' as claim_scope,
     1 as distinct_vals,
@@ -70,4 +70,3 @@ from (
     from p
     left join {{ ref('terminology__provider') }} prov on p.prescribing_provider_npi = prov.npi
 ) t
-

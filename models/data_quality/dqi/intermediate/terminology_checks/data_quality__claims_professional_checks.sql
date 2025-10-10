@@ -17,11 +17,11 @@ with mc as (
 )
 
 select
-    mc.data_source,
-    mc.payer,
-    {{ quote_column('plan') }} as plan,
-    mc.claim_id,
-    mc.claim_line_number,
+    t.data_source,
+    t.payer,
+    t.plan as {{ quote_column('plan') }},
+    t.claim_id,
+    t.claim_line_number,
     metric_id,
     'professional' as claim_scope,
     1 as distinct_vals,
@@ -148,4 +148,3 @@ from (
     from mc
     left join {{ ref('terminology__icd_10_cm') }} term on mc.diagnosis_code_3 = term.icd_10_cm
 ) t
-

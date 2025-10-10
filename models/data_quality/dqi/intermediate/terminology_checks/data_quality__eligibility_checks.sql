@@ -14,9 +14,9 @@ with e as (
 )
 
 select
-    e.data_source,
-    e.payer,
-    {{ quote_column('plan') }} as plan,
+    t.data_source,
+    t.payer,
+    t.plan as {{ quote_column('plan') }},
     cast(null as {{ dbt.type_string() }}) as claim_id,
     cast(null as {{ dbt.type_int() }}) as claim_line_number,
     metric_id,
@@ -115,4 +115,3 @@ from (
     from e
     left join {{ ref('terminology__medicare_orec') }} term on e.original_reason_entitlement_code = term.original_reason_entitlement_code
 ) t
-
