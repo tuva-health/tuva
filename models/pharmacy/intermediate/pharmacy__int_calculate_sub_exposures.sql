@@ -2,7 +2,7 @@
     enabled = var('brand_generic_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 ) }}
 
-with drug_exposure_input as (
+with recursive drug_exposure_input as (
    select * from {{ ref('pharmacy__stg_add_ingredient_concepts') }}
 ),
 
