@@ -7,6 +7,7 @@ with recursive drug_exposure_input as (
 ),
 
 -- Add row numbers for processing order
+-- Filter out invalid days_supply records upfront for data quality
 numbered_exposures as (
    select
        person_id,
@@ -20,6 +21,10 @@ numbered_exposures as (
            order by drug_exposure_start_date, drug_exposure_end_date
        ) as rn
    from drug_exposure_input
+   -- Exclude records with invalid days_supply
+   -- These represent data quality issues and should not contribute to PDC
+   where days_supply is not null
+     and days_supply > 0
 ),
 
 -- Recursive CTE to compute sequential adjustments
@@ -36,10 +41,8 @@ recursive_adjustments as (
        rn,
        -- First fill: no adjustment needed
        drug_exposure_start_date as adjusted_start_date,
-       case
-           when days_supply > 0 then drug_exposure_start_date + interval '1 day' * (days_supply - 1)
-           else drug_exposure_start_date
-       end as adjusted_end_date
+       -- Simplified: days_supply is guaranteed > 0 due to filter
+       drug_exposure_start_date + interval '1 day' * (days_supply - 1) as adjusted_end_date
    from numbered_exposures
    where rn = 1
    
@@ -60,13 +63,11 @@ recursive_adjustments as (
            ra.adjusted_end_date + interval '1 day'
        ) as adjusted_start_date,
        -- Adjusted end: adjusted start + days_supply - 1
+       -- Simplified: days_supply is guaranteed > 0 due to filter
        greatest(
            ne.drug_exposure_start_date,
            ra.adjusted_end_date + interval '1 day'
-       ) + case
-           when ne.days_supply > 0 then interval '1 day' * (ne.days_supply - 1)
-           else interval '0 day'
-       end as adjusted_end_date
+       ) + interval '1 day' * (ne.days_supply - 1) as adjusted_end_date
    from numbered_exposures ne
    inner join recursive_adjustments ra
        on ne.person_id = ra.person_id
