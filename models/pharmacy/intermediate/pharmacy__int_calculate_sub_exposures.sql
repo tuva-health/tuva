@@ -6,8 +6,8 @@ with drug_exposure_input as (
    select * from {{ ref('pharmacy__stg_add_ingredient_concepts') }}
 ),
 
--- Adjust overlapping fills to start after previous supply ends (PQA requirement)
-adjusted_exposures as (
+-- Add row numbers for processing order
+numbered_exposures as (
    select
        person_id,
        ingredient_rxcui,
@@ -15,61 +15,82 @@ adjusted_exposures as (
        drug_exposure_start_date,
        drug_exposure_end_date,
        days_supply,
-       -- Get the end date of the previous exposure for this person and ingredient
-       lag(drug_exposure_end_date) over(
-           partition by person_id, ingredient_rxcui 
+       row_number() over(
+           partition by person_id, ingredient_rxcui
            order by drug_exposure_start_date, drug_exposure_end_date
-       ) as prev_end_date,
-       -- Calculate adjusted start date when overlap is detected
-       case
-           -- If current fill starts before or on the day previous fill ends (overlap scenario)
-           when drug_exposure_start_date <= coalesce(
-               lag(drug_exposure_end_date) over(
-                   partition by person_id, ingredient_rxcui 
-                   order by drug_exposure_start_date, drug_exposure_end_date
-               ),
-               drug_exposure_start_date - interval '1 day'  -- First fill, no adjustment needed
-           )
-           -- Adjust start date to be day after previous supply ends
-           then coalesce(
-               lag(drug_exposure_end_date) over(
-                   partition by person_id, ingredient_rxcui 
-                   order by drug_exposure_start_date, drug_exposure_end_date
-               ),
-               drug_exposure_start_date - interval '1 day'
-           ) + interval '1 day'
-           -- No overlap, use actual start date
-           else drug_exposure_start_date
-       end as adjusted_start_date
+       ) as rn
    from drug_exposure_input
 ),
 
--- Recalculate end dates based on days_supply from the adjusted start date
-recalculated_dates as (
+-- Recursive CTE to compute sequential adjustments
+-- Each row's adjusted dates depend on the previous row's adjusted dates
+recursive_adjustments as (
+   -- Base case: first fill for each person + ingredient combination
+   select
+       person_id,
+       ingredient_rxcui,
+       ingredient_name,
+       drug_exposure_start_date,
+       drug_exposure_end_date,
+       days_supply,
+       rn,
+       -- First fill: no adjustment needed
+       drug_exposure_start_date as adjusted_start_date,
+       case
+           when days_supply > 0 then drug_exposure_start_date + interval '1 day' * (days_supply - 1)
+           else drug_exposure_start_date
+       end as adjusted_end_date
+   from numbered_exposures
+   where rn = 1
+   
+   union all
+   
+   -- Recursive case: subsequent fills
+   select
+       ne.person_id,
+       ne.ingredient_rxcui,
+       ne.ingredient_name,
+       ne.drug_exposure_start_date,
+       ne.drug_exposure_end_date,
+       ne.days_supply,
+       ne.rn,
+       -- Adjusted start: later of (original start, prior adjusted end + 1 day)
+       greatest(
+           ne.drug_exposure_start_date,
+           ra.adjusted_end_date + interval '1 day'
+       ) as adjusted_start_date,
+       -- Adjusted end: adjusted start + days_supply - 1
+       greatest(
+           ne.drug_exposure_start_date,
+           ra.adjusted_end_date + interval '1 day'
+       ) + case
+           when ne.days_supply > 0 then interval '1 day' * (ne.days_supply - 1)
+           else interval '0 day'
+       end as adjusted_end_date
+   from numbered_exposures ne
+   inner join recursive_adjustments ra
+       on ne.person_id = ra.person_id
+       and ne.ingredient_rxcui = ra.ingredient_rxcui
+       and ne.rn = ra.rn + 1  -- Sequential processing
+),
+
+-- Detect gaps and assign group IDs based on adjusted dates
+exposures_with_gaps as (
    select
        person_id,
        ingredient_rxcui,
        ingredient_name,
        adjusted_start_date as drug_exposure_start_date,
-       -- Recalculate end date: adjusted_start + days_supply - 1
-       case
-           when days_supply > 0 then adjusted_start_date + interval '1 day' * (days_supply - 1)
-           else adjusted_start_date
-       end as drug_exposure_end_date,
-       -- Get previous adjusted end date for gap calculation
-       lag(
-           case
-               when days_supply > 0 then adjusted_start_date + interval '1 day' * (days_supply - 1)
-               else adjusted_start_date
-           end
-       ) over(
+       adjusted_end_date as drug_exposure_end_date,
+       -- Get previous adjusted end date for gap detection
+       lag(adjusted_end_date) over(
            partition by person_id, ingredient_rxcui 
            order by adjusted_start_date
        ) as prev_adjusted_end_date
-   from adjusted_exposures
+   from recursive_adjustments
 ),
 
--- Assign group IDs to continuous exposure periods (gaps > 1 day get new group)
+-- Assign group IDs based on gaps > 1 day after adjustment
 exposures_with_groups as (
    select
        person_id,
@@ -77,22 +98,23 @@ exposures_with_groups as (
        ingredient_name,
        drug_exposure_start_date,
        drug_exposure_end_date,
-       -- Create group IDs based on gaps after adjustment
+       -- Create group IDs: increment when there's a gap > 1 day
        sum(case
            when drug_exposure_start_date > coalesce(
                prev_adjusted_end_date + interval '1 day', 
                drug_exposure_start_date - interval '1 day'
            ) 
-           then 1 else 0 
+           then 1 
+           else 0 
        end) over(
            partition by person_id, ingredient_rxcui
-           order by drug_exposure_start_date, drug_exposure_end_date
+           order by drug_exposure_start_date
            rows between unbounded preceding and current row
        ) as group_id
-   from recalculated_dates
+   from exposures_with_gaps
 )
 
--- Aggregate by group to create sub-exposures
+-- Final: Aggregate by group to create sub-exposures
 select
    person_id,
    ingredient_rxcui,
@@ -100,7 +122,7 @@ select
    min(drug_exposure_start_date) as drug_sub_exposure_start_date,
    max(drug_exposure_end_date) as drug_sub_exposure_end_date,
    count(*) as drug_exposure_count,
-   -- days_exposed now correctly represents sequential coverage after overlap adjustment
+   -- days_exposed correctly represents sequential coverage
    datediff('day', min(drug_exposure_start_date), max(drug_exposure_end_date)) + 1 as days_exposed
 from exposures_with_groups
 group by
