@@ -42,7 +42,7 @@ recursive_adjustments as (
        -- First fill: no adjustment needed
        drug_exposure_start_date as adjusted_start_date,
        -- Simplified: days_supply is guaranteed > 0 due to filter
-       drug_exposure_start_date + interval '1 day' * (days_supply - 1) as adjusted_end_date
+       {{ dbt.dateadd('day', 'days_supply - 1', 'drug_exposure_start_date') }} as adjusted_end_date
    from numbered_exposures
    where rn = 1
    
@@ -60,14 +60,18 @@ recursive_adjustments as (
        -- Adjusted start: later of (original start, prior adjusted end + 1 day)
        greatest(
            ne.drug_exposure_start_date,
-           ra.adjusted_end_date + interval '1 day'
+           {{ dbt.dateadd('day', 1, 'ra.adjusted_end_date') }}
        ) as adjusted_start_date,
        -- Adjusted end: adjusted start + days_supply - 1
        -- Simplified: days_supply is guaranteed > 0 due to filter
-       greatest(
-           ne.drug_exposure_start_date,
-           ra.adjusted_end_date + interval '1 day'
-       ) + interval '1 day' * (ne.days_supply - 1) as adjusted_end_date
+       {{ dbt.dateadd(
+           'day',
+           'ne.days_supply - 1',
+           greatest(
+               ne.drug_exposure_start_date,
+               {{ dbt.dateadd('day', 1, 'ra.adjusted_end_date') }}
+           )
+       ) }} as adjusted_end_date
    from numbered_exposures ne
    inner join recursive_adjustments ra
        on ne.person_id = ra.person_id
@@ -86,12 +90,12 @@ exposures_with_gaps as (
        -- Get previous adjusted end date for gap detection
        lag(adjusted_end_date) over(
            partition by person_id, ingredient_rxcui 
-           order by adjusted_start_date
+           order by adjusted_start_date, adjusted_end_date
        ) as prev_adjusted_end_date
    from recursive_adjustments
 ),
 
--- Assign group IDs based on gaps > 1 day after adjustment
+-- Assign group IDs based on gaps >= 1 day after adjustment
 exposures_with_groups as (
    select
        person_id,
@@ -99,17 +103,17 @@ exposures_with_groups as (
        ingredient_name,
        drug_exposure_start_date,
        drug_exposure_end_date,
-       -- Create group IDs: increment when there's a gap > 1 day
+       -- Create group IDs: increment when there's a gap >= 1 day
        sum(case
            when drug_exposure_start_date > coalesce(
-               prev_adjusted_end_date + interval '1 day', 
-               drug_exposure_start_date - interval '1 day'
+               {{ dbt.dateadd('day', 1, 'prev_adjusted_end_date') }}, 
+               {{ dbt.dateadd('day', -1, 'drug_exposure_start_date') }}
            ) 
            then 1 
            else 0 
        end) over(
            partition by person_id, ingredient_rxcui
-           order by drug_exposure_start_date
+           order by drug_exposure_start_date, drug_exposure_end_date
            rows between unbounded preceding and current row
        ) as group_id
    from exposures_with_gaps
@@ -124,7 +128,7 @@ select
    max(drug_exposure_end_date) as drug_sub_exposure_end_date,
    count(*) as drug_exposure_count,
    -- days_exposed correctly represents sequential coverage
-   datediff('day', min(drug_exposure_start_date), max(drug_exposure_end_date)) + 1 as days_exposed
+   {{ dbt.datediff('min(drug_exposure_start_date)', 'max(drug_exposure_end_date)', 'day') }} + 1 as days_exposed
 from exposures_with_groups
 group by
    person_id,
