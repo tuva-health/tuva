@@ -15,7 +15,13 @@
 -- number of rows as the stg_encounter model, i.e.,
 -- there is a one to one correspondence between the
 -- rows in stg_encounter and this CTE.
-with encounter_data_quality_issues as (
+with best_encounter as (
+    select distinct encounter_id
+    from {{ ref('readmissions__encounter_overlap') }} as overlap
+    where overlap.is_best_encounter = 0
+)
+
+, encounter_data_quality_issues as (
 select
     aa.encounter_id
     , case
@@ -54,12 +60,8 @@ select
 	else 0
     end as no_diagnosis_ccs_flag
     , aa.ccs_diagnosis_category as diagnosis_ccs
-    , case
-        when aa.encounter_id in (select distinct encounter_id_a
-	                         from {{ ref('readmissions__encounter_overlap') }})
-	     or
-	     aa.encounter_id in (select distinct encounter_id_b
-	                         from {{ ref('readmissions__encounter_overlap') }})
+    , case /* WHEN ENCOUNTER IS NOT THE BEST, THEN FLAG THIS ERROR. */
+    when be.encounter_id is not null
 	then 1
 	else 0
     end as overlaps_with_another_encounter_flag
@@ -81,6 +83,8 @@ from {{ ref('readmissions__encounter_with_ccs') }} as aa
      left outer join {{ ref('terminology__apr_drg') }} as dd
      on aa.drg_code = dd.apr_drg_code
      and aa.drg_code_type = 'apr-drg'
+     left outer join best_encounter as be
+     on aa.encounter_id = be.encounter_id
 )
 
 

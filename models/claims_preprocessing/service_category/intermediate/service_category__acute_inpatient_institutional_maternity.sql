@@ -5,6 +5,7 @@
 
 select distinct
     a.claim_id
+  , a.data_source
   , 'inpatient' as service_category_1
   , 'acute inpatient' as service_category_2
   , case
@@ -20,8 +21,9 @@ select distinct
 from {{ ref('service_category__stg_medical_claim') }} as s
 inner join {{ ref('service_category__stg_inpatient_institutional') }} as a
   on s.claim_id = a.claim_id
+  and s.data_source = a.data_source
 inner join {{ ref('terminology__ms_drg') }} as m
   on s.drg_code = m.ms_drg_code
   and s.drg_code_type = 'ms-drg'
 where
-  m.mdc_code in ('MDC 14', 'MDC 15')
+  m.mdc_code in ('14', '15')

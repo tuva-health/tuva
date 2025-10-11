@@ -33,14 +33,14 @@ models:
       - name: person_id
         description: '{{ doc("person_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
                 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
                 'dqi_readmission']
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
@@ -52,22 +52,22 @@ models:
       - name: patient_id
         description: '{{ doc("patient_id") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: year_month
         description: '{{ doc("year_month") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
                 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
                 'dqi_readmission']
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
@@ -79,30 +79,30 @@ models:
       - name: payer
         description: '{{ doc("payer") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: plan
         description: '{{ doc("plan") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: data_source
         description: '{{ doc("data_source") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
                 'dqi_ed_classification', 'dqi_financial_pmpm', 'dqi_quality_measures',
                 'dqi_readmission']
               config:
                 severity: error
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
           - not_null:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_service_categories', 'dqi_ccsr',
                 'dqi_cms_chronic_conditions', 'dqi_tuva_chronic_conditions', 'dqi_cms_hccs',
@@ -114,64 +114,64 @@ models:
       - name: payer_attributed_provider
         description: '{{ doc("payer_attributed_provider") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer_attributed_provider_practice
         description: '{{ doc("payer_attributed_provider_practice") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer_attributed_provider_organization
         description: '{{ doc("payer_attributed_provider_organization") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: payer_attributed_provider_lob
         description: '{{ doc("payer_attributed_provider_lob") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider
         description: '{{ doc("custom_attributed_provider") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider_practice
         description: '{{ doc("custom_attributed_provider_practice") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider_organization
         description: '{{ doc("custom_attributed_provider_organization") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: custom_attributed_provider_lob
         description: '{{ doc("custom_attributed_provider_lob") }}'
         tests:
-          - dbt_expectations.expect_column_to_exist:
+          - the_tuva_project.expect_column_to_exist:
               tags: ['tuva_dqi_sev_1', 'dqi', 'dqi_financial_pmpm']
               config:
                 severity: warn
-                enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing', true)) | as_bool }}"
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"

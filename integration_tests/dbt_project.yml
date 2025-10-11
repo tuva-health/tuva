@@ -3,19 +3,19 @@ version: '1.0.0'
 config-version: 2
 
 profile: default
-
+  
 vars:
   error_empty_seeds: true
   ## Use this variable to run the project with synthetic data loaded as seeds
   # otherwise set to false and set the input vars below
   use_synthetic_data: false
 
+
   ## Update these vars to use your own data as input, do not comment out
   # enabled logic has been added to the sources config
   input_database: dev_ci_testing
   input_schema: input_layer
 
-  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
   ## The Tuva Project can support claims and clinical data.
   # By default, all models are disabled.
@@ -35,7 +35,7 @@ vars:
 
   ## Quality Measures period var
   # to run quality measueres for a period other than current year, add the below variable uncommented to your project
-#  quality_measures_period_end: "2018-12-31"
+  # quality_measures_period_end: "2018-12-31"
 
   ## The vars directly below enable a single data mart.  See the Quickstart
   # guide for instructions.
@@ -50,6 +50,8 @@ vars:
   # insights_enabled: false
   # quality_measures_enabled: false
   # readmissions_enabled: true
+  # fhir_preprocessing_enabled: true # defaults to false
+  # hedis_enabled: true # defaults to false
 
 
 model-paths: ["models"]
@@ -72,18 +74,27 @@ dispatch:
 
 seeds:
   integration_tests:
+    appointment_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','appointment.csv',headers=true) }}"
     eligibility_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.14.0','eligibility.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','eligibility.csv',headers=true) }}"
+    immunization_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','immunization.csv',headers=true) }}"
     lab_result_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.14.0','lab_result.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','lab_result.csv',headers=true) }}"
     medical_claim_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.14.0','medical_claim.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','medical_claim.csv',headers=true) }}"
     observation_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.14.0','observation.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','observation.csv',headers=true) }}"
     pharmacy_claim_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.14.0','pharmacy_claim.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','pharmacy_claim.csv',headers=true) }}"
     provider_attribution_seed:
-      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.14.0','provider_attribution.csv',headers=true) }}"
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','provider_attribution.csv',headers=true) }}"
+    # optional mart data
+    hedis_cql_engine_log_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','hedis_cql_engine_log.csv',headers=true) }}"
+    hedis_measure_report_seed:
+      +post-hook: "{{ the_tuva_project.load_seed('tuva-public-resources/versioned_tuva_synthetic_data/0.15.0','hedis_measure_report.csv',headers=true) }}"
 
 models:
   integration_tests:

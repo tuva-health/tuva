@@ -100,6 +100,7 @@ group by encounter_id
        , max(case when scr.service_category_2 = 'emergency department' then 1 else 0 end) as ed_flag
        , max(case when scr.service_category_2 = 'pharmacy' then 1
               else 0 end) as pharmacy_flag
+       , max(case when scr.service_category_3 = 'inpatient part B' then 1 else 0 end) as snf_part_b_flag
     from detail_values as d
     left outer join {{ ref('service_category__service_category_grouper') }} as scr on d.claim_id = scr.claim_id
     and
@@ -129,6 +130,7 @@ select
 , sc.pharmacy_flag
 , sc.observation_flag
 , sc.ed_flag
+, sc.snf_part_b_flag
 , c.drg_code_type
 , c.drg_code
 , coalesce(msdrg.ms_drg_description, aprdrg.apr_drg_description) as drg_description
