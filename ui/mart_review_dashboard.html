@@ -414,6 +414,7 @@ Do not deploy publicly.
       else if (has('los_groups','count')) { datasets.inpatient.push(...rows); }
       else if (has('state') && (cols.has('count') || cols.has('members') || cols.has('member_count'))) { datasets.stateMembers.push(...rows); }
       else if (has('drg_code') && (cols.has('count') || cols.has('encounters'))) { datasets.drg.push(...rows); }
+      else if (has('hcc_code') && (cols.has('count') || cols.has('count_members'))) { datasets.hcc.push(...rows); }
       else if (has('avoidable_category','count')) { datasets.ed.push(...rows); }
       else if (has('avoidable_category','spend')) { datasets.ed.push(...rows); }
       else if (has('facility_id','spend') && (cols.has('ed_flag') || cols.has('ed'))) { datasets.edFacility.push(...rows); }
@@ -524,7 +525,7 @@ Do not deploy publicly.
             encMap.set(k,obj);
             break; }
           case 'hcc_count':
-            datasets.hcc.push({ data_source: ds, payer, plan, hcc_code: d1v, count: val });
+            datasets.hcc.push({ data_source: ds, payer, plan, hcc_code: d1v, hcc_description: d1l, count: val });
             break;
           case 'pharm_spend':
           case 'pharm_avg_days_supply':
@@ -642,7 +643,7 @@ Do not deploy publicly.
       const rows = Array.from(byGender.entries()).map(([gender,count])=>({gender,count}));
       const labels = rows.map(r=>r.gender);
       const data = { labels, datasets:[{ label:'Members', data: rows.map(r=>r.count||0), backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16'] }] };
-      ensureChart('chartGender','doughnut',{ data, options:{ plugins:{ legend:{position:'bottom'} } } });
+      ensureChart('chartGender','doughnut',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{position:'bottom'} } } });
     }
 
     function renderPmpm() {
@@ -706,8 +707,10 @@ Do not deploy publicly.
     }
 
     function renderConditions() {
-      // Aggregate counts across payer/plan for each condition
-      const arr = filterRows(datasets.conditions).map(r=>({ condition: canonical(r.condition), count: num(r.count) })).filter(r=> r.condition && !isNaN(r.count));
+      // Aggregate counts across payer/plan for each condition, while respecting selected payer/plan
+      const wantPayer = byId('selPayer').value; const wantPlan = byId('selPlan').value;
+      const arrRaw = filterRows(datasets.conditions).map(r=>({ condition: canonical(r.condition), payer: canonical(r.payer||''), plan: canonical(r.plan||''), count: num(r.count) })).filter(r=> r.condition && !isNaN(r.count));
+      const arr = arrRaw.filter(r=> { if (wantPayer && r.payer !== wantPayer) return false; if (wantPlan && r.plan !== wantPlan) return false; return true; });
       const byCond = new Map();
       arr.forEach(r=>{ const v=byCond.get(r.condition)||0; byCond.set(r.condition, v + r.count); });
       const rows = Array.from(byCond.entries()).map(([condition,count])=>({condition,count}));
@@ -736,7 +739,7 @@ Do not deploy publicly.
       }).filter(r=>!isNaN(r.count));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0, 12);
       const data = { labels: top.map(r=>r.drg), datasets:[{ label:'Encounters', data: top.map(r=>r.count), backgroundColor:'#6366f1' }] };
-      ensureChart('chartDrg','bar',{ data, options:{ plugins:{ legend:{display:false} } , indexAxis:'y', layout:{ padding:{ left: 16, right: 8 } }, scales:{ y:{ ticks:{ mirror:true, crossAlign:'near' } } } } });
+      ensureChart('chartDrg','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, indexAxis:'y', layout:{ padding:{ left: 24, right: 8 } } } });
     }
 
     function renderEd() {
@@ -818,9 +821,25 @@ Do not deploy publicly.
     }
 
     function renderHcc() {
-      const rows = filterRows(datasets.hcc).map(r=>({ hcc: canonical(r.hcc_code)||canonical(r.hcc), count: num(r.count) })).filter(r=>!isNaN(r.count));
+      const wantPayer = byId('selPayer').value; const wantPlan = byId('selPlan').value;
+      const arr = filterRows(datasets.hcc).map(r=>({
+        code: canonical(r.hcc_code)||canonical(r.hcc),
+        desc: canonical(r.hcc_description)||canonical(r.hcc_label)||'',
+        payer: canonical(r.payer||''),
+        plan: canonical(r.plan||''),
+        count: num(r.count)
+      })).filter(r=> !isNaN(r.count));
+      // Enforce payer/plan filter when set: drop rows missing those dims
+      const filtered = arr.filter(r=> {
+        if (wantPayer && r.payer !== wantPayer) return false;
+        if (wantPlan && r.plan !== wantPlan) return false;
+        return true;
+      });
+      const byCode = new Map();
+      filtered.forEach(r=>{ const v=byCode.get(r.code)||{count:0, desc:r.desc}; v.count += r.count; if (!v.desc && r.desc) v.desc = r.desc; byCode.set(r.code, v); });
+      const rows = Array.from(byCode.entries()).map(([code,v])=>({ label: (v.desc? `${v.desc} (${code})` : code), count: v.count }));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0,15);
-      const data = { labels: top.map(r=>r.hcc), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#fb7185' }] };
+      const data = { labels: top.map(r=>r.label), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#fb7185' }] };
       ensureChart('chartHcc','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
     }
 
