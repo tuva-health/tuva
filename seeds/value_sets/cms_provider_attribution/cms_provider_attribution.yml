@@ -1,0 +1,46 @@
+version: 2
+
+seeds:
+  - name: cms_provider_attribution__assignment_windows
+    description: ""
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attr{% else %}cms_provider_attr{%- endif -%}
+      alias: assignment_windows
+      tags: cms_provider_attribution
+      enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        performance_year: varchar(4)
+        service_year: varchar(4)
+        assignment_methodology: varchar(32)
+        expanded_window_start: varchar(32)
+        window_start: varchar(32)
+        window_end: varchar(32)
+
+  - name: cms_provider_attribution__primary_care_hcpcs_codes
+    description: ""
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attr{% else %}cms_provider_attr{%- endif -%}
+      alias: primary_care_hcpcs_codes
+      tags: cms_provider_attribution
+      enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcpcs_code: varchar(5)
+        description: varchar(512)
+
+        
+  - name: cms_provider_attribution__provider_specialty_assignment_codes
+    description: ""
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attr{% else %}cms_provider_attr{%- endif -%}
+      alias: provider_specialty_assignment_codes
+      tags: cms_provider_attribution
+      enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        specialty_code: varchar(8)
+        description: varchar(512)
+        primary_care_physician_step1: varchar(4)
+        specialist_physician_step_2: varchar(4)
+        physician: integer
