@@ -584,7 +584,15 @@ Do not deploy publicly.
     function formatNum(n) { if (n==null || isNaN(n)) return '—'; return Number(n).toLocaleString(); }
     function pct(n) { if (n==null || isNaN(n)) return '—'; return (Number(n)*100).toFixed(1)+'%'; }
 
-    function ensureChart(id, type, config){ if (charts[id]) { charts[id].destroy(); } charts[id] = new Chart(byId(id), { type, data: config.data, options: config.options||{} }); }
+    function ensureChart(id, type, config){
+      const el = byId(id);
+      if (!el) return;
+      if (charts[id]) { try { charts[id].destroy(); } catch(_e){} }
+      // Clear any inline sizes applied by Chart.js from previous renders to prevent growth
+      el.removeAttribute('width'); el.removeAttribute('height');
+      if (el.style) { el.style.width=''; el.style.height=''; }
+      charts[id] = new Chart(el, { type, data: config.data, options: config.options||{} });
+    }
 
     function renderAll() {
       renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy(); renderStateTable(); renderInpatientKPIs(); renderEdFacility(); renderDischargeFacility(); renderReadmitChart();
@@ -632,7 +640,7 @@ Do not deploy publicly.
       byId('populationCount').textContent = formatNum(total);
       byId('avgAge').textContent = isNaN(wAvg)? '—' : (wAvg).toFixed(1);
       const data = { labels, datasets:[{ label:'Members', data: series, backgroundColor:'#3b82f6' }] };
-      ensureChart('chartAgeHist','bar',{ data, options:{ plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
+      ensureChart('chartAgeHist','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
     }
 
     function renderGender() {
@@ -660,7 +668,7 @@ Do not deploy publicly.
         { label:'Medical PMPM', data: rows.map(r=>r.medical||0), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.3)', fill:false },
         { label:'Pharmacy PMPM', data: rows.map(r=>r.pharmacy||0), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.3)', fill:false }
       ] };
-      ensureChart('chartPmpm','line',{ data, options:{ responsive:true, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+formatMoney(ctx.parsed.y) } } } } });
+      ensureChart('chartPmpm','line',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+formatMoney(ctx.parsed.y) } } } } });
     }
 
     function renderMembersClaims() {
@@ -682,7 +690,7 @@ Do not deploy publicly.
       const rows = Array.from(map.values()).filter(r=> r.ym).sort((a,b)=> a.ym - b.ym).map(r=>({ ym:r.ym, pct: (r.den>0? (r.num/r.den) : (r.pctN>0? (r.pctSum/r.pctN) : NaN)) }));
       const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
       const data = { labels, datasets:[{ label:'Members with claims %', data: rows.map(r=>r.pct||0), borderColor:'#9333ea', backgroundColor:'rgba(147,51,234,0.25)', fill:false }] };
-      ensureChart('chartMembersClaims','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
+      ensureChart('chartMembersClaims','line',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
     }
 
     function renderClaimsEnrollment() {
@@ -703,7 +711,7 @@ Do not deploy publicly.
       const rows = Array.from(map.values()).filter(r=> r.ym).sort((a,b)=> a.ym - b.ym).map(r=>({ ym:r.ym, pct: (r.den>0? (r.num/r.den) : (r.pctN>0? (r.pctSum/r.pctN) : NaN)) }));
       const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
       const data = { labels, datasets:[{ label:'Claims with enrollment %', data: rows.map(r=>r.pct||0), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.25)', fill:false }] };
-      ensureChart('chartClaimsEnrollment','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
+      ensureChart('chartClaimsEnrollment','line',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
     }
 
     function renderConditions() {
@@ -717,7 +725,7 @@ Do not deploy publicly.
       rows.sort((a,b)=> b.count - a.count);
       const top = rows.slice(0, 15);
       const data = { labels: top.map(r=>r.condition), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#0ea5e9' }] };
-      ensureChart('chartConditions','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
+      ensureChart('chartConditions','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, indexAxis:'y' } });
     }
 
     function renderInpatient() {
@@ -727,7 +735,7 @@ Do not deploy publicly.
       arr.forEach(r=>{ const v=byGroup.get(r.group)||0; byGroup.set(r.group, v + r.count); });
       const rows = Array.from(byGroup.entries()).map(([group,count])=>({group,count})).sort((a,b)=> a.group.localeCompare(b.group));
       const data = { labels: rows.map(r=>r.group), datasets:[{ label:'Encounters', data: rows.map(r=>r.count), backgroundColor:'#14b8a6' }] };
-      ensureChart('chartInpatientLos','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
+      ensureChart('chartInpatientLos','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
     }
 
     function renderDrg() {
@@ -748,9 +756,9 @@ Do not deploy publicly.
       rows.forEach(r=>{ const k=r.cat||'(unknown)'; const v=byCat.get(k)||{count:0, spend:0}; v.count += (isNaN(r.count)?0:r.count); v.spend += (isNaN(r.spend)?0:r.spend); byCat.set(k,v); });
       const arr = Array.from(byCat.entries()).map(([cat,v])=>({cat, ...v}));
       const dataCount = { labels: arr.map(r=>r.cat), datasets:[{ label:'Encounters', data: arr.map(r=>r.count), backgroundColor:['#22c55e','#f97316','#3b82f6','#eab308','#ef4444'] }] };
-      ensureChart('chartEd','bar',{ data: dataCount, options:{ plugins:{ legend:{display:false} } } });
+      ensureChart('chartEd','bar',{ data: dataCount, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} } } });
       const dataSpend = { labels: arr.map(r=>r.cat), datasets:[{ label:'Spend', data: arr.map(r=>r.spend), backgroundColor:'rgba(59,130,246,0.5)' }] };
-      ensureChart('chartEdSpend','bar',{ data: dataSpend, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> 'Spend: '+formatMoney(c.parsed.y) } } } } });
+      ensureChart('chartEdSpend','bar',{ data: dataSpend, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> 'Spend: '+formatMoney(c.parsed.y) } } } } });
     }
 
     function renderSvcCats() {
@@ -840,7 +848,7 @@ Do not deploy publicly.
       const rows = Array.from(byCode.entries()).map(([code,v])=>({ label: (v.desc? `${v.desc} (${code})` : code), count: v.count }));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0,15);
       const data = { labels: top.map(r=>r.label), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#fb7185' }] };
-      ensureChart('chartHcc','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
+      ensureChart('chartHcc','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, indexAxis:'y' } });
     }
 
     function renderEncTypes() {
@@ -1003,13 +1011,13 @@ Do not deploy publicly.
       if (rows.length) {
         const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
         const data = { labels, datasets:[{ label:'Readmission Rate', data: rows.map(r=>r.rate||0), borderColor:'#0ea5e9', backgroundColor:'rgba(14,165,233,0.25)', fill:false }] };
-        ensureChart('chartReadmit','line',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
+        ensureChart('chartReadmit','line',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
       } else {
         // fallback to overall bar if no monthly grain present
         const vals = arr.map(r=> num(r.readmission_rate)||num(r.rate)).filter(v=>!isNaN(v));
         const avg = vals.length ? (vals.reduce((s,v)=>s+v,0)/vals.length) : NaN;
         const data = { labels: ['Overall'], datasets:[{ label:'Readmission Rate', data: [isNaN(avg)?0:avg], backgroundColor:'#0ea5e9' }] };
-        ensureChart('chartReadmit','bar',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' }, beginAtZero:true, max: Math.min(1, (isNaN(avg)?0.5:Math.max(avg*1.5,0.2))) } } } });
+        ensureChart('chartReadmit','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' }, beginAtZero:true, max: Math.min(1, (isNaN(avg)?0.5:Math.max(avg*1.5,0.2))) } } } });
       }
     }
 
