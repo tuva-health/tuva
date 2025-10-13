@@ -199,7 +199,7 @@ Do not deploy publicly.
           <div class="stat-grid">
             <div class="stat"><div class="label">Inpatient Encounters</div><div id="ipEncounters" class="value">—</div></div>
             <div class="stat"><div class="label">Readmission Rate</div><div id="ipReadmitRate" class="value">—</div></div>
-            <div class="stat"><div class="label">Top DRG</div><div id="ipTopDrg" class="value">—</div></div>
+            <div class="stat"><div class="label">Avg LOS</div><div id="ipAvgLos" class="value">—</div></div>
           </div>
           <div class="two-col">
             <div>
@@ -232,6 +232,7 @@ Do not deploy publicly.
             </div>
             <div>
               <h3 class="small">Readmission Rate (overall)</h3>
+              <canvas id="chartReadmit" class="chart"></canvas>
               <details>
                 <summary>SQL template: Readmission rate (aggregated)</summary>
                 <code class="sql" id="sqlReadmit"></code>
@@ -372,7 +373,7 @@ Do not deploy publicly.
     function clearDatasets() {
       Object.keys(datasets).forEach(k => { if (Array.isArray(datasets[k])) datasets[k] = []; });
       globalFilters.data_source.clear(); globalFilters.payer.clear(); globalFilters.plan.clear();
-      ['avgAge','populationCount','ipEncounters','ipReadmitRate','ipTopDrg'].forEach(id=>{ const el=byId(id); if (el) el.textContent='—'; });
+      ['avgAge','populationCount','ipEncounters','ipReadmitRate','ipAvgLos'].forEach(id=>{ const el=byId(id); if (el) el.textContent='—'; });
       Object.keys(charts).forEach(id=>{ try{ charts[id].destroy(); }catch(_e){} delete charts[id]; });
       populateFilters();
       renderAll();
@@ -480,7 +481,7 @@ Do not deploy publicly.
             datasets.inpatient.push({ data_source: ds, payer, plan, los_groups: d1v, count: val });
             break;
           case 'drg_count':
-            datasets.drg.push({ data_source: ds, payer, plan, drg_code: d1v, count: val });
+            datasets.drg.push({ data_source: ds, payer, plan, drg_code: d1v, drg_description: d1l, count: val });
             break;
           case 'ed_avoidable':
             datasets.ed.push({ data_source: ds, payer, plan, avoidable_category: d1v, count: val });
@@ -565,7 +566,16 @@ Do not deploy publicly.
 
     function filterRows(arr) {
       const ds = byId('selDataSource').value; const payer = byId('selPayer').value; const plan = byId('selPlan').value;
-      return (arr||[]).filter(r => (!ds || canonical(r.data_source||'')===ds) && (!payer || canonical(r.payer||'')===payer) && (!plan || canonical(r.plan||'')===plan));
+      // Treat missing dimensions in a row as wildcard to avoid dropping aggregated rows
+      return (arr||[]).filter(r => {
+        const rds = canonical(r.data_source||'');
+        const rpy = canonical(r.payer||'');
+        const rpl = canonical(r.plan||'');
+        const dsOk = (!ds) || rds === ds || rds === '';
+        const pyOk = (!payer) || rpy === payer || rpy === '';
+        const plOk = (!plan) || rpl === plan || rpl === '';
+        return dsOk && pyOk && plOk;
+      });
     }
 
     function toMonthDate(ym) { const s = String(ym||''); if (s.length===6) { const y=+s.slice(0,4), m=+s.slice(4,6); return new Date(y, m-1, 1); } return null; }
@@ -576,7 +586,7 @@ Do not deploy publicly.
     function ensureChart(id, type, config){ if (charts[id]) { charts[id].destroy(); } charts[id] = new Chart(byId(id), { type, data: config.data, options: config.options||{} }); }
 
     function renderAll() {
-      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy(); renderStateTable(); renderInpatientKPIs(); renderEdFacility(); renderDischargeFacility();
+      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy(); renderStateTable(); renderInpatientKPIs(); renderEdFacility(); renderDischargeFacility(); renderReadmitChart();
       injectSQLTemplates();
     }
 
@@ -584,14 +594,43 @@ Do not deploy publicly.
       const rows = filterRows(datasets.age).map(r=>({
         age_bucket: canonical(r.age_bucket),
         count: num(r.count),
-        avg_age: num(r.avg_age),
-      }));
-      rows.sort((a,b)=> a.age_bucket.localeCompare(b.age_bucket));
-      const total = rows.reduce((s,r)=> s + (r.count||0), 0);
-      const wAvg = (()=>{ let sum=0; let n=0; rows.forEach(r=>{ if (!isNaN(r.avg_age) && !isNaN(r.count)) { sum += (r.avg_age*r.count); n += r.count; } }); return n? sum/n : NaN; })();
+        avg_age: num(r.avg_age)
+      })).filter(r=> r.age_bucket);
+      // Helper: fallback midpoint for bucket when avg_age missing
+      const bucketMid = (b)=>{
+        const m = String(b||'');
+        const m1 = m.match(/^(\d+)[^\d]+(\d+)/); if (m1) { const a=+m1[1], c=+m1[2]; return (a+c)/2; }
+        if (/^00-04$/.test(m)) return 2;
+        if (/^05-17$/.test(m)) return 11;
+        if (/^18-29$/.test(m)) return 23.5;
+        if (/^30-39$/.test(m)) return 35;
+        if (/^40-49$/.test(m)) return 45;
+        if (/^50-59$/.test(m)) return 55;
+        if (/^60-69$/.test(m)) return 65;
+        if (/^70-79$/.test(m)) return 75;
+        if (/80\+/.test(m)) return 85;
+        return NaN;
+      };
+      // Compute weighted average using per-row avg_age if available; else bucket midpoint
+      let sumVal = 0, sumCnt = 0;
+      rows.forEach(r=>{
+        const v = !isNaN(r.avg_age) ? r.avg_age : bucketMid(r.age_bucket);
+        if (!isNaN(v) && !isNaN(r.count)) { sumVal += v * r.count; sumCnt += r.count; }
+      });
+      const wAvg = sumCnt ? (sumVal / sumCnt) : NaN;
+      // Aggregate counts across payer/plan to single series per bucket
+      const byBucket = new Map();
+      rows.forEach(r=>{ const k=r.age_bucket; const v=byBucket.get(k)||0; byBucket.set(k, v + (isNaN(r.count)?0:r.count)); });
+      const order = ['00-04','05-17','18-29','30-39','40-49','50-59','60-69','70-79','80+'];
+      const labels = Array.from(byBucket.keys()).sort((a,b)=>{
+        const ia = order.indexOf(a); const ib = order.indexOf(b);
+        if (ia>=0 && ib>=0) return ia-ib; if (ia>=0) return -1; if (ib>=0) return 1; return a.localeCompare(b);
+      });
+      const series = labels.map(k=> byBucket.get(k)||0);
+      const total = series.reduce((s,v)=> s+v, 0);
       byId('populationCount').textContent = formatNum(total);
       byId('avgAge').textContent = isNaN(wAvg)? '—' : (wAvg).toFixed(1);
-      const data = { labels: rows.map(r=>r.age_bucket), datasets:[{ label:'Members', data: rows.map(r=>r.count||0), backgroundColor:'#3b82f6' }] };
+      const data = { labels, datasets:[{ label:'Members', data: series, backgroundColor:'#3b82f6' }] };
       ensureChart('chartAgeHist','bar',{ data, options:{ plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
     }
 
@@ -619,23 +658,54 @@ Do not deploy publicly.
     }
 
     function renderMembersClaims() {
-      const rows = filterRows(datasets.membersClaims).map(r=>({ ym: toMonthDate(r.year_month), pct: (num(r.percent_members_with_claims)) || (num(r.members_with_claims)/num(r.total_member_months)) })).filter(r=>r.ym && !isNaN(r.pct));
-      rows.sort((a,b)=> a.ym - b.ym);
+      // Aggregate across payer/plan: sum members_with_claims and member_months per month
+      const arr = filterRows(datasets.membersClaims);
+      const map = new Map();
+      arr.forEach(r=>{
+        const ymStr = String(r.year_month||'');
+        if (!ymStr) return;
+        const mm = num(r.total_member_months);
+        const mwc = num(r.members_with_claims);
+        const pct = num(r.percent_members_with_claims);
+        const v = map.get(ymStr) || { ym: toMonthDate(ymStr), num:0, den:0, pctSum:0, pctN:0 };
+        if (!isNaN(mwc)) v.num += mwc;
+        if (!isNaN(mm)) v.den += mm;
+        if (isNaN(mwc) || isNaN(mm)) { if (!isNaN(pct)) { v.pctSum += pct; v.pctN += 1; } }
+        map.set(ymStr, v);
+      });
+      const rows = Array.from(map.values()).filter(r=> r.ym).sort((a,b)=> a.ym - b.ym).map(r=>({ ym:r.ym, pct: (r.den>0? (r.num/r.den) : (r.pctN>0? (r.pctSum/r.pctN) : NaN)) }));
       const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
       const data = { labels, datasets:[{ label:'Members with claims %', data: rows.map(r=>r.pct||0), borderColor:'#9333ea', backgroundColor:'rgba(147,51,234,0.25)', fill:false }] };
       ensureChart('chartMembersClaims','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
     }
 
     function renderClaimsEnrollment() {
-      const rows = filterRows(datasets.claimsEnrollment).map(r=>({ ym: toMonthDate(r.year_month), pct: (num(r.percentage_claims_with_enrollment)) || (num(r.claims_with_enrollment)/num(r.claims)) })).filter(r=>r.ym && !isNaN(r.pct));
-      rows.sort((a,b)=> a.ym - b.ym);
+      // Aggregate across payer/plan: sum claims_with_enrollment and claims per month
+      const arr = filterRows(datasets.claimsEnrollment);
+      const map = new Map();
+      arr.forEach(r=>{
+        const ymStr = String(r.year_month||''); if (!ymStr) return;
+        const ce = num(r.claims_with_enrollment);
+        const cl = num(r.claims);
+        const pct = num(r.percentage_claims_with_enrollment);
+        const v = map.get(ymStr) || { ym: toMonthDate(ymStr), num:0, den:0, pctSum:0, pctN:0 };
+        if (!isNaN(ce)) v.num += ce;
+        if (!isNaN(cl)) v.den += cl;
+        if (isNaN(ce) || isNaN(cl)) { if (!isNaN(pct)) { v.pctSum += pct; v.pctN += 1; } }
+        map.set(ymStr, v);
+      });
+      const rows = Array.from(map.values()).filter(r=> r.ym).sort((a,b)=> a.ym - b.ym).map(r=>({ ym:r.ym, pct: (r.den>0? (r.num/r.den) : (r.pctN>0? (r.pctSum/r.pctN) : NaN)) }));
       const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
       const data = { labels, datasets:[{ label:'Claims with enrollment %', data: rows.map(r=>r.pct||0), borderColor:'#ef4444', backgroundColor:'rgba(239,68,68,0.25)', fill:false }] };
       ensureChart('chartClaimsEnrollment','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+pct(ctx.parsed.y) } }, legend:{display:false} }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
     }
 
     function renderConditions() {
-      const rows = filterRows(datasets.conditions).map(r=>({ condition: canonical(r.condition), count: num(r.count) })).filter(r=>!isNaN(r.count));
+      // Aggregate counts across payer/plan for each condition
+      const arr = filterRows(datasets.conditions).map(r=>({ condition: canonical(r.condition), count: num(r.count) })).filter(r=> r.condition && !isNaN(r.count));
+      const byCond = new Map();
+      arr.forEach(r=>{ const v=byCond.get(r.condition)||0; byCond.set(r.condition, v + r.count); });
+      const rows = Array.from(byCond.entries()).map(([condition,count])=>({condition,count}));
       rows.sort((a,b)=> b.count - a.count);
       const top = rows.slice(0, 15);
       const data = { labels: top.map(r=>r.condition), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#0ea5e9' }] };
@@ -643,14 +713,22 @@ Do not deploy publicly.
     }
 
     function renderInpatient() {
-      const rows = filterRows(datasets.inpatient).map(r=>({ group: canonical(r.los_groups), count: num(r.count) })).filter(r=>!isNaN(r.count));
-      rows.sort((a,b)=> a.group.localeCompare(b.group));
+      // Aggregate LOS buckets across payer/plan
+      const arr = filterRows(datasets.inpatient).map(r=>({ group: canonical(r.los_groups), count: num(r.count) })).filter(r=> r.group && !isNaN(r.count));
+      const byGroup = new Map();
+      arr.forEach(r=>{ const v=byGroup.get(r.group)||0; byGroup.set(r.group, v + r.count); });
+      const rows = Array.from(byGroup.entries()).map(([group,count])=>({group,count})).sort((a,b)=> a.group.localeCompare(b.group));
       const data = { labels: rows.map(r=>r.group), datasets:[{ label:'Encounters', data: rows.map(r=>r.count), backgroundColor:'#14b8a6' }] };
       ensureChart('chartInpatientLos','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
     }
 
     function renderDrg() {
-      const rows = filterRows(datasets.drg).map(r=>({ drg: canonical(r.drg_code)||canonical(r.drg)||canonical(r.drgwithdescription), count: num(r.count)||num(r.encounters) })).filter(r=>!isNaN(r.count));
+      const rows = filterRows(datasets.drg).map(r=>{
+        const code = canonical(r.drg_code)||canonical(r.drg);
+        const desc = canonical(r.drg_description)||canonical(r.drgwithdescription)||'';
+        const label = (desc && code) ? `${desc} (${code})` : (code || desc);
+        return { drg: label, count: num(r.count)||num(r.encounters) };
+      }).filter(r=>!isNaN(r.count));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0, 12);
       const data = { labels: top.map(r=>r.drg), datasets:[{ label:'Encounters', data: top.map(r=>r.count), backgroundColor:'#6366f1' }] };
       ensureChart('chartDrg','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
@@ -742,12 +820,32 @@ Do not deploy publicly.
     }
 
     function renderEncTypes() {
+      const deriveGroup = (t)=>{
+        const s = (t||'').toLowerCase();
+        if (!s) return '';
+        if (s.includes('inpatient')) return 'inpatient';
+        if (s.includes('emergency')) return 'emergency';
+        if (s.includes('office')) return 'office based';
+        if (s.includes('tele') || s.includes('virtual')) return 'office based';
+        if (s.includes('outpatient')) return 'outpatient';
+        if (s.includes('surgery')) return 'outpatient';
+        if (s.includes('skilled') || s.includes('snf') || s.includes('home health') || s.includes('rehab') || s.includes('ltch') || s.includes('long term')) return 'post-acute';
+        return '';
+      };
       const rows = filterRows(datasets.encTypes).map(r=>({
         group: canonical(r.encounter_group)||'', type: canonical(r.encounter_type)||'',
         count: num(r.count)||num(r.encounters), paid: num(r.paid_amount)||num(r.paid)
       })).filter(r=>!isNaN(r.count));
       const map = new Map();
-      rows.forEach(r=>{ const g=r.group||'(unknown)'; const v=map.get(g)||{paid:0,count:0,children:new Map()}; v.count+=(r.count||0); v.paid+=(r.paid||0); const m=v.children; const c=m.get(r.type||'(unknown)')||{paid:0,count:0}; c.count+=(r.count||0); c.paid+=(r.paid||0); m.set(r.type||'(unknown)',c); map.set(g,v); });
+      rows.forEach(r=>{
+        const gRaw = r.group || deriveGroup(r.type);
+        const g = gRaw || '(unknown)';
+        const v = map.get(g)||{paid:0,count:0,children:new Map()};
+        v.count+=(r.count||0); v.paid+=(r.paid||0);
+        const m=v.children; const t = r.type || '(unknown)';
+        const c=m.get(t)||{paid:0,count:0}; c.count+=(r.count||0); c.paid+=(r.paid||0); m.set(t,c);
+        map.set(g,v);
+      });
       const tbody = byId('tblEnc').querySelector('tbody'); if (!tbody) return; tbody.innerHTML='';
       const encode = s => (s||'').replace(/[^a-zA-Z0-9_\-]+/g,'_');
       const groups = Array.from(map.entries()).map(([k,v])=>({k,...v})).sort((a,b)=> b.count-a.count);
@@ -830,20 +928,47 @@ Do not deploy publicly.
     }
 
     function renderStateTable() {
-      const rows = filterRows(datasets.stateMembers).map(r=>({ state: canonical(r.state)||canonical(r.state_name)||canonical(r.normalized_state_name), members: num(r.members)||num(r.member_count)||num(r.count) })).filter(r=>!isNaN(r.members));
+      const arr = filterRows(datasets.stateMembers).map(r=>({ state: canonical(r.state)||canonical(r.state_name)||canonical(r.normalized_state_name)||'(unknown)', members: num(r.members)||num(r.member_count)||num(r.count) })).filter(r=>!isNaN(r.members));
+      const byState = new Map();
+      arr.forEach(r=>{ const v=byState.get(r.state)||0; byState.set(r.state, v + r.members); });
+      const rows = Array.from(byState.entries()).map(([state,members])=>({state,members}));
       rows.sort((a,b)=> b.members - a.members);
       const tbody = byId('tblState').querySelector('tbody'); if (!tbody) return; tbody.innerHTML='';
       rows.forEach(r=>{ const tr=document.createElement('tr'); const td1=document.createElement('td'); td1.textContent=r.state||'(unknown)'; const td2=document.createElement('td'); td2.textContent=formatNum(r.members); tr.appendChild(td1); tr.appendChild(td2); tbody.appendChild(tr); });
     }
 
     function renderInpatientKPIs() {
-      const inpt = filterRows(datasets.inpatient).map(r=> num(r.count)).filter(v=>!isNaN(v));
-      const totalEnc = inpt.reduce((s,v)=> s+v, 0);
+      // Encounters total
+      const inptRows = filterRows(datasets.inpatient).map(r=> ({ group: canonical(r.los_groups), count: num(r.count) })).filter(r=> !isNaN(r.count));
+      const totalEnc = inptRows.reduce((s,r)=> s + r.count, 0);
       if (byId('ipEncounters')) byId('ipEncounters').textContent = totalEnc? formatNum(totalEnc): '—';
-      const drgRows = filterRows(datasets.drg).map(r=>({ drg: canonical(r.drg_code)||canonical(r.drg), count: num(r.count)||num(r.encounters) })).filter(r=>!isNaN(r.count));
-      drgRows.sort((a,b)=> b.count-a.count); if (byId('ipTopDrg')) byId('ipTopDrg').textContent = drgRows.length? drgRows[0].drg : '—';
+      // Avg LOS from LOS buckets (use midpoints)
+      const losMid = (g)=>{
+        const m = String(g||'');
+        const m1 = m.match(/(\d+)\s*[-–]\s*(\d+)/); if (m1) { const a=+m1[1], b=+m1[2]; return (a+b)/2; }
+        if (/0-1/.test(m)) return 0.5;
+        if (/2-3/.test(m)) return 2.5;
+        if (/4-5/.test(m)) return 4.5;
+        if (/6-7/.test(m)) return 6.5;
+        if (/8-14/.test(m)) return 11;
+        if (/15-30/.test(m)) return 22.5;
+        if (/31\+|31\s*\+|31\s*Days|31\s*days|31\s*\+\s*Days/i.test(m)) return 35; // rough tail estimate
+        return NaN;
+      };
+      let sumLos = 0, sumCnt = 0;
+      inptRows.forEach(r=>{ const mid = losMid(r.group); if (!isNaN(mid)) { sumLos += mid * r.count; sumCnt += r.count; } });
+      const avgLos = sumCnt ? (sumLos / sumCnt) : NaN;
+      if (byId('ipAvgLos')) byId('ipAvgLos').textContent = isNaN(avgLos)? '—' : avgLos.toFixed(1);
+      // Readmit rate KPI
       const readmit = filterRows(datasets.readmitRate).map(r=> num(r.readmission_rate)||num(r.rate)).filter(v=>!isNaN(v));
       if (byId('ipReadmitRate')) { if (readmit.length) { const avg = readmit.reduce((s,v)=>s+v,0)/readmit.length; byId('ipReadmitRate').textContent = pct(avg); } else { byId('ipReadmitRate').textContent='—'; } }
+    }
+
+    function renderReadmitChart() {
+      const vals = filterRows(datasets.readmitRate).map(r=> num(r.readmission_rate)||num(r.rate)).filter(v=>!isNaN(v));
+      const avg = vals.length ? (vals.reduce((s,v)=>s+v,0)/vals.length) : NaN;
+      const data = { labels: ['Overall'], datasets:[{ label:'Readmission Rate', data: [isNaN(avg)?0:avg], backgroundColor:'#0ea5e9' }] };
+      ensureChart('chartReadmit','bar',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' }, beginAtZero:true, max: Math.min(1, (isNaN(avg)?0.5:Math.max(avg*1.5,0.2))) } } } });
     }
 
     function renderEdFacility() {
@@ -872,12 +997,12 @@ Do not deploy publicly.
       byId('sqlInpatient').textContent = `-- Inpatient LOS distribution (no PHI)\nselect data_source, payer, plan, los_groups, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4\norder by 4;`;
       byId('sqlEd').textContent = `-- ED avoidable categories (no PHI)\nselect data_source, avoidable_category, count(distinct encounter_id) as count, sum(paid_amount) as spend\nfrom ${pfx}.mart_review__ed_classification\ngroup by 1,2;`;
       const pfxCore = pfx.replace('_data_quality','_core');
-      byId('sqlEdFacility').textContent = `-- ED spend by facility (no PHI)\nselect mc.data_source, e.facility_id, sum(mc.paid_amount) as spend, 1 as ed_flag\nfrom ${pfx}.mart_review__stg_medical_claim mc\nleft join ${pfxCore}.encounter e on mc.encounter_id = e.encounter_id\nwhere coalesce(e.encounter_type,'') = 'emergency'\ngroup by 1,2\norder by 3 desc;`;
-      byId('sqlDrg').textContent = `-- DRG frequency (no PHI)\nselect data_source, payer, plan, drg_code, count(distinct encounter_id) as encounters\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4\norder by 5 desc;`;
+      byId('sqlEdFacility').textContent = `-- ED spend by facility (no PHI)\nselect mc.data_source, e.facility_id, sum(mc.paid_amount) as spend, 1 as ed_flag\nfrom ${pfx}.mart_review__stg_medical_claim mc\nleft join ${pfxCore}.encounter e on mc.encounter_id = e.encounter_id and mc.data_source = e.data_source\nwhere coalesce(e.encounter_type,'') = 'emergency department'\ngroup by 1,2\norder by 3 desc;`;
+      byId('sqlDrg').textContent = `-- DRG frequency (no PHI)\nselect data_source, payer, plan, drg_code, drg_description, count(distinct encounter_id) as encounters\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4,5\norder by 6 desc;`;
       byId('sqlDischarge').textContent = `-- Discharge location by facility (no PHI)\nselect data_source, facility_id, discharge_location, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3\norder by 4 desc;`;
       byId('sqlReadmit').textContent = `-- Readmission rate (no PHI)\nwith denom as (\n  select data_source, payer, plan, count(*) as index_admissions\n  from ${pfx}.mart_review__inpatient\n  group by 1,2,3\n), num as (\n  select data_source, payer, plan, count(*) as readmissions\n  from ${pfx}.mart_review__readmissions\n  group by 1,2,3\n) select coalesce(denom.data_source,num.data_source) as data_source, coalesce(denom.payer,num.payer) as payer, coalesce(denom.plan,num.plan) as plan,\n  cast(readmissions as double)/nullifzero(index_admissions) as readmission_rate from denom full outer join num using (data_source,payer,plan);`;
       byId('sqlSvc').textContent = `-- Service categories (no PHI)\nselect data_source, payer, plan, year_month, service_category_1, service_category_2,\n  sum(paid_amt) as paid_amt, sum(visits) as visits\nfrom ${pfx}.mart_review__service_categories_long\ngroup by 1,2,3,4,5,6;`;
-      byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nwith base as (\n  select mc.data_source, mc.payer, mc.plan, e.encounter_group, e.encounter_type,\n         count(distinct mc.encounter_id) as encounters, sum(mc.paid_amount) as paid_amount\n  from ${pfx}.mart_review__stg_medical_claim mc\n  left join ${pfx.replace('_data_quality','_core')}.encounter e\n    on mc.encounter_id = e.encounter_id\n  group by 1,2,3,4,5\n) select * from base;`;
+      byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nwith base as (\n  select mc.data_source, mc.payer, mc.plan, e.encounter_group, e.encounter_type,\n         count(distinct mc.encounter_id) as encounters, sum(mc.paid_amount) as paid_amount\n  from ${pfx}.mart_review__stg_medical_claim mc\n  left join ${pfx.replace('_data_quality','_core')}.encounter e\n    on mc.encounter_id = e.encounter_id and mc.data_source = e.data_source\n  group by 1,2,3,4,5\n) select * from base;`;
       byId('sqlPharm').textContent = `-- Pharmacy pivot (no PHI)\nselect p.data_source, mm.payer, mm.plan,\n  coalesce(p.atc_3_name, p.atc_2_name) as theraclass, p.ndc_code, coalesce(p.ndc_description, p.rxnorm_description) as ndc_description,\n  sum(p.paid_amount) as spend, avg(nullif(p.days_supply,0)) as avg_days_supply, avg(nullif(p.quantity,0)) as avg_quantity, avg(nullif(p.refills,0)) as avg_refills\nfrom ${pfx}.mart_review__pharmacy p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\ngroup by 1,2,3,4,5,6;`;
       byId('sqlHcc').textContent = `-- HCC codes (no PHI)\nselect x.data_source, f.hcc_code, count(distinct f.person_id) as count\nfrom ${pfx}.mart_review__patient_risk_factors f\nleft join ${pfx}.mart_review__patient x\n  on f.person_id = x.person_id\nwhere f.hcc_code is not null\ngroup by 1,2\norder by 3 desc;`;
     }
