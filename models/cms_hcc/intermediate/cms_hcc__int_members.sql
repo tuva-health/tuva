@@ -276,10 +276,13 @@ with persons as (
         , min(collection_end_date) as first_elig_month
         , max(collection_end_date) as last_elig_month
     from (
+        /* Consider months where eligibility actually overlaps the month */
         select person_id, collection_end_date
         from stg_eligibility
         where enrollment_start_date is not null
           and row_num = 1
+          and enrollment_start_date <= collection_end_date
+          and (enrollment_end_date is null or enrollment_end_date >= collection_start_date)
     ) x
     group by person_id
 
