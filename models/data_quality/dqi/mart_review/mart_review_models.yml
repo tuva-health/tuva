@@ -102,16 +102,6 @@ models:
       - dqi
     materialized: table
 
-- name: mart_review__patient_risk
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient_risk
-    tags:
-      - data_quality_mart_review
-      - dqi
-    materialized: table
 
 - name: mart_review__pharmacy
   config:
@@ -179,27 +169,8 @@ models:
       - dqi
     materialized: table
 
-- name: mart_review__patient_risk_scores
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient_risk_scores
-    tags:
-      - data_quality_mart_review
-      - dqi
-    materialized: table
 
-- name: mart_review__patient_risk_factors
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
-      {% else %}data_quality{%- endif -%}
-    alias: mart_review__patient_risk_factors
-    tags:
-      - data_quality_mart_review
-      - dqi
-    materialized: table
+## Deprecated/Removed: patient risk models migrated to cms_hcc package for direct use in export
 
 # quality_measures models are not present in this package currently
 
@@ -291,23 +262,47 @@ models:
       - dqi
     materialized: table
 
-- name: mart_review__encounters_by_group
+- name: mart_review__pharmacy_brand_generic
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: mart_review__encounters_by_group
+    alias: mart_review__pharmacy_brand_generic
     tags:
       - data_quality_mart_review
       - dqi
     materialized: table
 
-- name: mart_review__encounters_by_type
+- name: mart_review__encounters_group_type
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
-    alias: mart_review__encounters_by_type
+    alias: mart_review__encounters_group_type
+    tags:
+      - data_quality_mart_review
+      - dqi
+    materialized: table
+
+## Deprecated: encounters_by_group / encounters_by_type now derived in export from encounters_group_type
+
+- name: mart_review__risk_score_monthly
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__risk_score_monthly
+    tags:
+      - data_quality_mart_review
+      - dqi
+    materialized: table
+
+- name: mart_review__demographic_factor_counts
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__demographic_factor_counts
     tags:
       - data_quality_mart_review
       - dqi
@@ -330,6 +325,17 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
       {% else %}data_quality{%- endif -%}
     alias: mart_review__pharmacy_summary
+    tags:
+      - data_quality_mart_review
+      - dqi
+    materialized: table
+
+- name: mart_review__pharmacy_summary_top_ndc
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__pharmacy_summary_top_ndc
     tags:
       - data_quality_mart_review
       - dqi

@@ -169,9 +169,10 @@ select data_source,
   'encounter_count_by_group' as metric,
   'encounter_group' as dim1_name, encounter_group as dim1_value, encounter_group as dim1_label,
   cast(null as {{ dbt.type_string() }}) as dim2_name, cast(null as {{ dbt.type_string() }}) as dim2_value, cast(null as {{ dbt.type_string() }}) as dim2_label,
-  cast(encounters as {{ dbt.type_numeric() }}) as value,
-  tuva_last_run
-from {{ ref('mart_review__encounters_by_group') }}
+  cast(sum(coalesce(encounters,0)) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__encounters_group_type') }}
+group by data_source, payer, {{ quote_column('plan') }}, encounter_group
 
 union all
 
@@ -181,9 +182,10 @@ select data_source,
   'encounter_paid_by_group' as metric,
   'encounter_group' as dim1_name, encounter_group as dim1_value, encounter_group as dim1_label,
   cast(null as {{ dbt.type_string() }}) as dim2_name, cast(null as {{ dbt.type_string() }}) as dim2_value, cast(null as {{ dbt.type_string() }}) as dim2_label,
-  cast(paid_amount as {{ dbt.type_numeric() }}) as value,
-  tuva_last_run
-from {{ ref('mart_review__encounters_by_group') }}
+  cast(sum(coalesce(paid_amount,0)) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__encounters_group_type') }}
+group by data_source, payer, {{ quote_column('plan') }}, encounter_group
 
 union all
 
@@ -193,9 +195,10 @@ select data_source,
   'encounter_count_by_type' as metric,
   'encounter_type' as dim1_name, encounter_type as dim1_value, encounter_type as dim1_label,
   cast(null as {{ dbt.type_string() }}) as dim2_name, cast(null as {{ dbt.type_string() }}) as dim2_value, cast(null as {{ dbt.type_string() }}) as dim2_label,
-  cast(encounters as {{ dbt.type_numeric() }}) as value,
-  tuva_last_run
-from {{ ref('mart_review__encounters_by_type') }}
+  cast(sum(coalesce(encounters,0)) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__encounters_group_type') }}
+group by data_source, payer, {{ quote_column('plan') }}, encounter_type
 
 union all
 
@@ -205,9 +208,10 @@ select data_source,
   'encounter_paid_by_type' as metric,
   'encounter_type' as dim1_name, encounter_type as dim1_value, encounter_type as dim1_label,
   cast(null as {{ dbt.type_string() }}) as dim2_name, cast(null as {{ dbt.type_string() }}) as dim2_value, cast(null as {{ dbt.type_string() }}) as dim2_label,
-  cast(paid_amount as {{ dbt.type_numeric() }}) as value,
-  tuva_last_run
-from {{ ref('mart_review__encounters_by_type') }}
+  cast(sum(coalesce(paid_amount,0)) as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__encounters_group_type') }}
+group by data_source, payer, {{ quote_column('plan') }}, encounter_type
 
 union all
 
@@ -240,7 +244,7 @@ select data_source,
   'ndc_code' as dim2_name, ndc_code as dim2_value, ndc_description as dim2_label,
   cast(spend as {{ dbt.type_numeric() }}) as value,
   tuva_last_run
-from {{ ref('mart_review__pharmacy_summary') }}
+from {{ ref('mart_review__pharmacy_summary_top_ndc') }}
 
 union all
 
@@ -253,12 +257,25 @@ select data_source,
   cast(value as {{ dbt.type_numeric() }}) as value,
   tuva_last_run
 from (
-  select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_days_supply' as metric, avg_days_supply as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary') }}
+  select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_days_supply' as metric, avg_days_supply as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary_top_ndc') }}
   union all
-  select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_quantity' as metric, avg_quantity as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary') }}
+  select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_quantity' as metric, avg_quantity as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary_top_ndc') }}
   union all
-  select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_refills' as metric, avg_refills as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary') }}
+  select data_source, payer, {{ quote_column('plan') }}, theraclass, ndc_code, ndc_description, 'pharm_avg_refills' as metric, avg_refills as value, tuva_last_run from {{ ref('mart_review__pharmacy_summary_top_ndc') }}
 ) x
+
+union all
+
+-- Pharmacy brand vs generic spend
+select data_source,
+  payer, {{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'pharm_brand_generic_spend' as metric,
+  'brand_vs_generic' as dim1_name, brand_vs_generic as dim1_value, brand_vs_generic as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name, cast(null as {{ dbt.type_string() }}) as dim2_value, cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(spend as {{ dbt.type_numeric() }}) as value,
+  tuva_last_run
+from {{ ref('mart_review__pharmacy_brand_generic') }}
 
 union all
 
@@ -374,3 +391,41 @@ select
   cast(readmission_rate as {{ dbt.type_numeric() }}) as value,
   '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('mart_review__readmission_rate_monthly') }}
+
+union all
+
+-- Risk score over time (monthly, weighted average)
+select
+  data_source,
+  payer,
+  {{ quote_column('plan') }},
+  cast(year_month as {{ dbt.type_string() }}) as year_month,
+  'risk_score' as metric,
+  cast(null as {{ dbt.type_string() }}) as dim1_name,
+  cast(null as {{ dbt.type_string() }}) as dim1_value,
+  cast(null as {{ dbt.type_string() }}) as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name,
+  cast(null as {{ dbt.type_string() }}) as dim2_value,
+  cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(avg_risk_score as {{ dbt.type_numeric() }}) as value,
+  '{{ var('tuva_last_run') }}' as tuva_last_run
+from {{ ref('mart_review__risk_score_monthly') }}
+
+union all
+
+-- Demographic factor member counts
+select
+  data_source,
+  payer,
+  {{ quote_column('plan') }},
+  cast(null as {{ dbt.type_string() }}) as year_month,
+  'demographic_members' as metric,
+  'risk_factor_description' as dim1_name,
+  risk_factor_description as dim1_value,
+  risk_factor_description as dim1_label,
+  cast(null as {{ dbt.type_string() }}) as dim2_name,
+  cast(null as {{ dbt.type_string() }}) as dim2_value,
+  cast(null as {{ dbt.type_string() }}) as dim2_label,
+  cast(count_members as {{ dbt.type_numeric() }}) as value,
+  tuva_last_run
+from {{ ref('mart_review__demographic_factor_counts') }}

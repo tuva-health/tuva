@@ -190,6 +190,31 @@ Do not deploy publicly.
             </div>
           </div>
         </div>
+        <div class="section">
+          <h2>Risk Score & Demographics</h2>
+          <p>Monthly risk score (weighted) and demographic factor prevalence.</p>
+          <div class="two-col">
+            <div>
+              <canvas id="chartRiskScore" class="chart"></canvas>
+              <details>
+                <summary>SQL template: Risk score over time (aggregated)</summary>
+                <code class="sql" id="sqlRiskScore"></code>
+              </details>
+            </div>
+            <div>
+              <h3 class="small">Demographic Factors</h3>
+              <div style="overflow:auto; max-height: 320px; border:1px solid var(--line); border-radius:10px;">
+                <table class="table" id="tblDemographics"><thead><tr>
+                  <th>factor</th><th class="nowrap">members</th>
+                </tr></thead><tbody></tbody></table>
+              </div>
+              <details>
+                <summary>SQL template: Demographic factors (aggregated)</summary>
+                <code class="sql" id="sqlDemographics"></code>
+              </details>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="tab-inpt" class="tab-pane">
@@ -321,6 +346,15 @@ Do not deploy publicly.
             <code class="sql" id="sqlPharm"></code>
           </details>
         </div>
+        <div class="section">
+          <h2>Brand vs Generic</h2>
+          <p>Spend split by brand vs generic.</p>
+          <canvas id="chartBrandGeneric" class="chart"></canvas>
+          <details>
+            <summary>SQL template: Brand vs generic spend (aggregated)</summary>
+            <code class="sql" id="sqlBrandGeneric"></code>
+          </details>
+        </div>
       </div>
 
       <div class="footer">No PHI leaves the warehouse: export aggregated, small CSVs from your database (mart_review views) and load them here. Use Schema Prefix to generate copyable SQL templates.</div>
@@ -344,9 +378,12 @@ Do not deploy publicly.
       encTypes: [],
       hcc: [],
       pharmacy: [],
+      brandGeneric: [],
       stateMembers: [],
       dischargeByFacility: [],
-      readmitRate: []
+      readmitRate: [],
+      riskMonthly: [],
+      demographics: []
     };
     let sampleLoaded = false;
     const globalFilters = { data_source: new Set(), payer: new Set(), plan: new Set() };
@@ -423,6 +460,9 @@ Do not deploy publicly.
       else if (has('service_category_1') && (cols.has('paid_amt') || cols.has('visits'))) { datasets.svcCats.push(...rows); }
       else if ((cols.has('encounter_group') || cols.has('encounter_type')) && (cols.has('count') || cols.has('encounters')) && (cols.has('paid_amount') || cols.has('paid'))) { datasets.encTypes.push(...rows); }
       else if ((cols.has('ndc_code') || cols.has('ndc')) && (cols.has('spend') || cols.has('paid_amount'))) { datasets.pharmacy.push(...rows); }
+      else if (cols.has('brand_vs_generic') && (cols.has('spend') || cols.has('paid_amount'))) { datasets.brandGeneric.push(...rows); }
+      else if ((cols.has('risk_factor_description') || cols.has('factor')) && (cols.has('members') || cols.has('count') || cols.has('count_members'))) { datasets.demographics.push(...rows); }
+      else if (has('year_month','risk_score') || (has('year_month','value') && (cols.has('metric') && Array.from(cols).some(c=> String(c).includes('risk'))))) { datasets.riskMonthly.push(...rows); }
       else { showError('Unrecognized CSV schema. Ensure you export aggregated datasets with expected columns.'); return; }
       indexFilters(rows);
       populateFilters();
@@ -539,6 +579,15 @@ Do not deploy publicly.
             else if (metric==='pharm_avg_refills') obj.avg_refills = val;
             pharmMap.set(k,obj);
             break; }
+          case 'pharm_brand_generic_spend':
+            datasets.brandGeneric.push({ data_source: ds, payer, plan, brand_vs_generic: d1v, spend: val });
+            break;
+          case 'risk_score':
+            datasets.riskMonthly.push({ data_source: ds, payer, plan, year_month: ym, risk_score: val });
+            break;
+          case 'demographic_members':
+            datasets.demographics.push({ data_source: ds, payer, plan, risk_factor_description: d1v, count: val });
+            break;
           default:
             break;
         }
@@ -588,14 +637,18 @@ Do not deploy publicly.
       const el = byId(id);
       if (!el) return;
       if (charts[id]) { try { charts[id].destroy(); } catch(_e){} }
-      // Clear any inline sizes applied by Chart.js from previous renders to prevent growth
+      // Reset any previous inline sizes and enforce fixed canvas size
       el.removeAttribute('width'); el.removeAttribute('height');
-      if (el.style) { el.style.width=''; el.style.height=''; }
-      charts[id] = new Chart(el, { type, data: config.data, options: config.options||{} });
+      if (el.style) { el.style.width = '100%'; el.style.height = '280px'; }
+      const opts = Object.assign({}, (config && config.options) || {});
+      // Standardize sizing across all charts: fixed height, non-responsive
+      opts.responsive = false;
+      opts.maintainAspectRatio = false;
+      charts[id] = new Chart(el, { type, data: (config && config.data) || {}, options: opts });
     }
 
     function renderAll() {
-      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy(); renderStateTable(); renderInpatientKPIs(); renderEdFacility(); renderDischargeFacility(); renderReadmitChart();
+      renderAge(); renderGender(); renderPmpm(); renderMembersClaims(); renderClaimsEnrollment(); renderConditions(); renderInpatient(); renderDrg(); renderEd(); renderSvcCats(); renderEncTypes(); renderHcc(); renderPharmacy(); renderBrandGeneric(); renderRiskScore(); renderDemographics(); renderStateTable(); renderInpatientKPIs(); renderEdFacility(); renderDischargeFacility(); renderReadmitChart();
       injectSQLTemplates();
     }
 
@@ -655,20 +708,47 @@ Do not deploy publicly.
     }
 
     function renderPmpm() {
-      const rows = filterRows(datasets.pmpm).map(r=>({
-        ym: toMonthDate(r.year_month||r.yearmonth||r.ym),
-        total: num(r.total_paid)||num(r.total_pmpm)||num(r.total),
-        medical: num(r.medical_paid)||NaN,
-        pharmacy: num(r.pharmacy_paid)||NaN
-      })).filter(r=>r.ym);
-      rows.sort((a,b)=> a.ym - b.ym);
+      // Aggregate across payer/plan for each month; prefer weighted average by member_months or absolutes
+      const arr = filterRows(datasets.pmpm);
+      const map = new Map();
+      arr.forEach(r=>{
+        const ymStr = String(r.year_month||r.yearmonth||r.ym||''); if (!ymStr) return;
+        const ym = toMonthDate(ymStr); if (!ym) return;
+        const mm = num(r.member_months);
+        const tot = num(r.total_paid)||num(r.total_pmpm)||num(r.total);
+        const med = num(r.medical_paid);
+        const phr = num(r.pharmacy_paid);
+        const totAbs = num(r.total_paid_absolute);
+        const medAbs = num(r.medical_paid_absolute);
+        const phrAbs = num(r.pharmacy_paid_absolute);
+        const v = map.get(ymStr) || { ym, wNum:0, wDen:0, tSum:0, tCnt:0, mSum:0, mCnt:0, pSum:0, pCnt:0, mWNum:0, mWDen:0, pWNum:0, pWDen:0 };
+        // total
+        if (!isNaN(totAbs) && totAbs>0 && !isNaN(mm) && mm>0) { v.wNum += totAbs; v.wDen += mm; }
+        else if (!isNaN(tot) && !isNaN(mm) && mm>0) { v.wNum += tot*mm; v.wDen += mm; }
+        else if (!isNaN(tot)) { v.tSum += tot; v.tCnt += 1; }
+        // medical
+        if (!isNaN(medAbs) && !isNaN(mm) && mm>0) { v.mWNum += medAbs; v.mWDen += mm; }
+        else if (!isNaN(med) && !isNaN(mm) && mm>0) { v.mWNum += med*mm; v.mWDen += mm; }
+        else if (!isNaN(med)) { v.mSum += med; v.mCnt += 1; }
+        // pharmacy
+        if (!isNaN(phrAbs) && !isNaN(mm) && mm>0) { v.pWNum += phrAbs; v.pWDen += mm; }
+        else if (!isNaN(phr) && !isNaN(mm) && mm>0) { v.pWNum += phr*mm; v.pWDen += mm; }
+        else if (!isNaN(phr)) { v.pSum += phr; v.pCnt += 1; }
+        map.set(ymStr, v);
+      });
+      const rows = Array.from(map.values()).sort((a,b)=> a.ym - b.ym).map(v=>({
+        ym: v.ym,
+        total: (v.wDen>0? v.wNum/v.wDen : (v.tCnt>0? v.tSum/v.tCnt : NaN)),
+        medical: (v.mWDen>0? v.mWNum/v.mWDen : (v.mCnt>0? v.mSum/v.mCnt : NaN)),
+        pharmacy: (v.pWDen>0? v.pWNum/v.pWDen : (v.pCnt>0? v.pSum/v.pCnt : NaN))
+      }));
       const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
       const data = { labels, datasets:[
         { label:'Total PMPM', data: rows.map(r=>r.total||0), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.3)', fill:false },
         { label:'Medical PMPM', data: rows.map(r=>r.medical||0), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.3)', fill:false },
         { label:'Pharmacy PMPM', data: rows.map(r=>r.pharmacy||0), borderColor:'#f59e0b', backgroundColor:'rgba(245,158,11,0.3)', fill:false }
       ] };
-      ensureChart('chartPmpm','line',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+formatMoney(ctx.parsed.y) } } } } });
+      ensureChart('chartPmpm','line',{ data, options:{ plugins:{ tooltip:{ callbacks:{ label:(ctx)=> ctx.dataset.label+': '+formatMoney(ctx.parsed.y) } } } } });
     }
 
     function renderMembersClaims() {
@@ -747,7 +827,7 @@ Do not deploy publicly.
       }).filter(r=>!isNaN(r.count));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0, 12);
       const data = { labels: top.map(r=>r.drg), datasets:[{ label:'Encounters', data: top.map(r=>r.count), backgroundColor:'#6366f1' }] };
-      ensureChart('chartDrg','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, indexAxis:'y', layout:{ padding:{ left: 24, right: 8 } } } });
+      ensureChart('chartDrg','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y', layout:{ padding:{ left: 24, right: 8 } }, scales:{ y:{ ticks:{ align:'start', maxRotation:0, autoSkip:false }, afterFit:(axis)=>{ axis.width = 220; } } } } });
     }
 
     function renderEd() {
@@ -848,7 +928,7 @@ Do not deploy publicly.
       const rows = Array.from(byCode.entries()).map(([code,v])=>({ label: (v.desc? `${v.desc} (${code})` : code), count: v.count }));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0,15);
       const data = { labels: top.map(r=>r.label), datasets:[{ label:'Members', data: top.map(r=>r.count), backgroundColor:'#fb7185' }] };
-      ensureChart('chartHcc','bar',{ data, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, indexAxis:'y' } });
+      ensureChart('chartHcc','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y', scales:{ y:{ ticks:{ align:'start', maxRotation:0, autoSkip:false }, afterFit:(axis)=>{ axis.width = 220; } } } } });
     }
 
     function renderEncTypes() {
@@ -936,6 +1016,30 @@ Do not deploy publicly.
         const tdRef=document.createElement('td'); tdRef.textContent = isNaN(r.refills)? '—' : r.refills.toFixed(2); tr.appendChild(tdRef);
         tbody.appendChild(tr);
       });
+    }
+
+    function renderBrandGeneric() {
+      const rows = filterRows(datasets.brandGeneric).map(r=>({ brand_vs_generic: canonical(r.brand_vs_generic)||'(unknown)', spend: num(r.spend)||num(r.paid_amount)||num(r.paid) })).filter(r=>!isNaN(r.spend));
+      const byBg = new Map();
+      rows.forEach(r=>{ const k=r.brand_vs_generic; const v=byBg.get(k)||0; byBg.set(k, v+(r.spend||0)); });
+      const labels = Array.from(byBg.keys()); const dataVals = labels.map(k=> byBg.get(k)||0);
+      ensureChart('chartBrandGeneric','doughnut',{ data:{ labels, datasets:[{ label:'Spend', data:dataVals, backgroundColor:['#60a5fa','#34d399','#fbbf24','#f87171','#a78bfa'] }] }, options:{ plugins:{ legend:{ position:'bottom' } } } });
+    }
+
+    function renderRiskScore() {
+      const rows = filterRows(datasets.riskMonthly).map(r=>({ ym: canonical(r.year_month)||canonical(r.month)||'', val: num(r.risk_score)||num(r.value) })).filter(r=> r.ym && !isNaN(r.val));
+      rows.sort((a,b)=> a.ym.localeCompare(b.ym));
+      const labels = rows.map(r=>{ const s=String(r.ym); return s.length===6? s.slice(0,4)+'-'+s.slice(4,6) : s; });
+      const data = { labels, datasets:[{ label:'Risk Score', data: rows.map(r=>r.val), borderColor:'#10b981', backgroundColor:'rgba(16,185,129,0.25)', fill:false }] };
+      ensureChart('chartRiskScore','line',{ data, options:{ plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } } });
+    }
+
+    function renderDemographics() {
+      const rows = filterRows(datasets.demographics).map(r=>({ factor: canonical(r.risk_factor_description)||canonical(r.factor)||'', count: num(r.count)||num(r.count_members)||num(r.members) })).filter(r=> r.factor && !isNaN(r.count));
+      const byFactor = new Map(); rows.forEach(r=>{ const v=byFactor.get(r.factor)||0; byFactor.set(r.factor, v+(r.count||0)); });
+      const arr = Array.from(byFactor.entries()).map(([k,v])=>({factor:k,count:v})).sort((a,b)=> b.count - a.count);
+      const tbody = byId('tblDemographics') ? byId('tblDemographics').querySelector('tbody') : null; if (!tbody) return; tbody.innerHTML='';
+      arr.slice(0,100).forEach(r=>{ const tr=document.createElement('tr'); const td1=document.createElement('td'); td1.textContent=r.factor; const td2=document.createElement('td'); td2.textContent=formatNum(r.count); tr.appendChild(td1); tr.appendChild(td2); tbody.appendChild(tr); });
     }
 
     function aggregatePharmByTheraclass(rows) {
@@ -1052,9 +1156,12 @@ Do not deploy publicly.
       byId('sqlDischarge').textContent = `-- Discharge location by facility (no PHI)\nselect data_source, facility_id, discharge_location, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3\norder by 4 desc;`;
       byId('sqlReadmit').textContent = `-- Readmission rate by month (calendar-based; no PHI)\nwith stg as (\n  select distinct data_source, payer, ${pfx.includes('"') ? '"plan"' : 'plan'} as plan, encounter_id\n  from ${pfx}.mart_review__stg_medical_claim\n), denom as (\n  select i.data_source, s.payer, s.plan, cast(cal.year_month_int as varchar) as year_month, count(*) as index_admissions\n  from ${pfx}.mart_review__inpatient i\n  left join stg s on i.data_source = s.data_source and i.encounter_id = s.encounter_id\n  left join ${pfx.replace('_data_quality','_reference_data')}.calendar cal on i.encounter_end_date = cal.full_date\n  group by 1,2,3,4\n), num as (\n  select coalesce(s.data_source,'') as data_source, s.payer, s.plan, cast(cal.year_month_int as varchar) as year_month,\n         sum(case when r.unplanned_readmit_30_flag = 1 then 1 else 0 end) as readmissions\n  from ${pfx}.mart_review__readmissions r\n  left join stg s on r.encounter_id = s.encounter_id\n  left join ${pfx.replace('_data_quality','_reference_data')}.calendar cal on r.discharge_date = cal.full_date\n  group by 1,2,3,4\n)\nselect coalesce(d.data_source,n.data_source) as data_source, coalesce(d.payer,n.payer) as payer, coalesce(d.plan, n.plan) as plan,\n       coalesce(d.year_month,n.year_month) as year_month,\n       cast(n.readmissions as double)/nullifzero(d.index_admissions) as readmission_rate\nfrom denom d full outer join num n using (data_source,payer,plan,year_month)\norder by 1,2,3,4;`;
       byId('sqlSvc').textContent = `-- Service categories (no PHI)\nselect data_source, payer, plan, year_month, service_category_1, service_category_2,\n  sum(paid_amt) as paid_amt, sum(visits) as visits\nfrom ${pfx}.mart_review__service_categories_long\ngroup by 1,2,3,4,5,6;`;
-      byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nwith base as (\n  select mc.data_source, mc.payer, mc.plan, e.encounter_group, e.encounter_type,\n         count(distinct mc.encounter_id) as encounters, sum(mc.paid_amount) as paid_amount\n  from ${pfx}.mart_review__stg_medical_claim mc\n  left join ${pfx.replace('_data_quality','_core')}.encounter e\n    on mc.encounter_id = e.encounter_id and mc.data_source = e.data_source\n  group by 1,2,3,4,5\n) select * from base;`;
-      byId('sqlPharm').textContent = `-- Pharmacy pivot (no PHI)\nselect p.data_source, mm.payer, mm.plan,\n  coalesce(p.atc_3_name, p.atc_2_name) as theraclass, p.ndc_code, coalesce(p.ndc_description, p.rxnorm_description) as ndc_description,\n  sum(p.paid_amount) as spend, avg(nullif(p.days_supply,0)) as avg_days_supply, avg(nullif(p.quantity,0)) as avg_quantity, avg(nullif(p.refills,0)) as avg_refills\nfrom ${pfx}.mart_review__pharmacy p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\ngroup by 1,2,3,4,5,6;`;
-      byId('sqlHcc').textContent = `-- HCC codes (no PHI)\nselect x.data_source, f.hcc_code, count(distinct f.person_id) as count\nfrom ${pfx}.mart_review__patient_risk_factors f\nleft join ${pfx}.mart_review__patient x\n  on f.person_id = x.person_id\nwhere f.hcc_code is not null\ngroup by 1,2\norder by 3 desc;`;
+      byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nselect data_source, payer, plan,\n       encounter_group, encounter_type,\n       sum(encounters) as encounters, sum(paid_amount) as paid_amount\nfrom ${pfx}.mart_review__encounters_group_type\ngroup by 1,2,3,4,5;`;
+      byId('sqlPharm').textContent = `-- Pharmacy pivot with NDC top 10 + other (no PHI)\nwith mm as (select distinct person_id, data_source, payer, plan from ${pfx}.mart_review__member_months)\n, base as (\n  select p.data_source, m.payer, m.plan, coalesce(p.atc_3_name,p.atc_2_name) as theraclass, p.ndc_code, coalesce(p.ndc_description,p.rxnorm_description) as ndc_description, p.paid_amount, p.days_supply, p.quantity, p.refills\n  from ${pfx}.mart_review__pharmacy p left join mm m on p.person_id=m.person_id and p.data_source=m.data_source\n)\n, ndc_spend as (select data_source, payer, plan, ndc_code, sum(paid_amount) as spend from base group by 1,2,3,4)\n, ranked as (select *, row_number() over(partition by data_source,payer,plan order by spend desc) as rn from ndc_spend)\n, with_rank as (select b.*, r.rn from base b join ranked r using(data_source,payer,plan,ndc_code))\n, top10 as (\n  select data_source,payer,plan,theraclass,ndc_code,ndc_description, sum(paid_amount) as spend, avg(nullif(days_supply,0)) as avg_days_supply, avg(nullif(quantity,0)) as avg_quantity, avg(nullif(refills,0)) as avg_refills\n  from with_rank where rn<=10 group by 1,2,3,4,5,6\n), other as (\n  select data_source,payer,plan, cast('(various)' as text) as theraclass, cast('OTHER_NDC_OUTSIDE_PREVIEW' as text) as ndc_code, cast('Other NDCs outside preview' as text) as ndc_description, sum(paid_amount) as spend, avg(nullif(days_supply,0)) as avg_days_supply, avg(nullif(quantity,0)) as avg_quantity, avg(nullif(refills,0)) as avg_refills\n  from with_rank where rn>10 group by 1,2,3\n)\nselect * from top10 union all select * from other;`;
+      byId('sqlBrandGeneric').textContent = `-- Brand vs generic spend (no PHI)\nselect data_source, payer, plan, brand_vs_generic, sum(spend) as spend\nfrom ${pfx}.mart_review__pharmacy_brand_generic\ngroup by 1,2,3,4;`;
+      byId('sqlHcc').textContent = `-- HCC codes (no PHI)\nselect data_source, payer, plan, hcc_code, count_members as count\nfrom ${pfx}.mart_review__hcc_counts\norder by count_members desc;`;
+      byId('sqlRiskScore').textContent = `-- Risk score over time (weighted average; no PHI)\nwith monthly as (\n  select person_id, collection_end_date, payment_risk_score_weighted_by_months as w_score, member_months\n  from ${pfx.replace('_data_quality','_cms_hcc')}.patient_risk_scores_monthly\n), mm as (\n  select person_id, data_source, payer, plan, year_month\n  from ${pfx.replace('_data_quality','_core')}.member_months\n)\nselect mm.data_source, mm.payer, mm.plan, mm.year_month,\n  sum(w_score)/nullif(sum(member_months),0) as risk_score\nfrom monthly\njoin mm on monthly.person_id = mm.person_id\n  and cast(extract(year from monthly.collection_end_date)||lpad(cast(extract(month from monthly.collection_end_date) as text),2,'0') as text) = cast(mm.year_month as text)\ngroup by 1,2,3,4;`;
+      byId('sqlDemographics').textContent = `-- Demographic factor member counts (no PHI)\nselect data_source, payer, plan, risk_factor_description, count_members\nfrom ${pfx}.mart_review__demographic_factor_counts;`;
     }
 
     function initTabs() {
