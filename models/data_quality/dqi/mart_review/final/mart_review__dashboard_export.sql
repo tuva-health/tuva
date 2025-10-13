@@ -348,12 +348,12 @@ group by i.data_source, epp3.payer, epp3.{{ quote_column('plan') }}, i.facility_
 
 union all
 
--- Readmission rate (unplanned 30-day)
+-- Readmission rate (monthly, pre-aggregated)
 select
-  coalesce(epp4.data_source,'') as data_source,
-  epp4.payer,
-  epp4.{{ quote_column('plan') }},
-  cast(null as {{ dbt.type_string() }}) as year_month,
+  data_source,
+  payer,
+  {{ quote_column('plan') }},
+  year_month,
   'readmission_rate' as metric,
   cast(null as {{ dbt.type_string() }}) as dim1_name,
   cast(null as {{ dbt.type_string() }}) as dim1_value,
@@ -361,11 +361,6 @@ select
   cast(null as {{ dbt.type_string() }}) as dim2_name,
   cast(null as {{ dbt.type_string() }}) as dim2_value,
   cast(null as {{ dbt.type_string() }}) as dim2_label,
-  cast(avg(case when r.unplanned_readmit_30_flag = 1 then 1.0 else 0.0 end) as {{ dbt.type_numeric() }}) as value,
+  cast(readmission_rate as {{ dbt.type_numeric() }}) as value,
   '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('mart_review__readmissions') }} r
-left join (
-  select distinct data_source, payer, {{ quote_column('plan') }}, encounter_id
-  from {{ ref('mart_review__stg_medical_claim') }}
-) epp4 on r.encounter_id = epp4.encounter_id
-group by coalesce(epp4.data_source,''), epp4.payer, epp4.{{ quote_column('plan') }}
+from {{ ref('mart_review__readmission_rate_monthly') }}

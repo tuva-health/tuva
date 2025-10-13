@@ -499,7 +499,7 @@ Do not deploy publicly.
             datasets.stateMembers.push({ data_source: ds, payer, plan, state: d1v, count: val });
             break;
           case 'readmission_rate':
-            datasets.readmitRate.push({ data_source: ds, payer, plan, readmission_rate: val });
+            datasets.readmitRate.push({ data_source: ds, payer, plan, year_month: ym, readmission_rate: val });
             break;
           case 'svc_paid_amt':
           case 'svc_visits': {
@@ -635,9 +635,14 @@ Do not deploy publicly.
     }
 
     function renderGender() {
-      const rows = filterRows(datasets.gender).map(r=>({ gender: canonical(r.gender), count: num(r.count) }));
-      const data = { labels: rows.map(r=>r.gender||'(unknown)'), datasets:[{ label:'Members', data: rows.map(r=>r.count||0), backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6'] }] };
-      ensureChart('chartGender','bar',{ data, options:{ plugins:{ legend:{display:false} } } });
+      // Aggregate counts across payer/plan by gender
+      const arr = filterRows(datasets.gender).map(r=>({ gender: canonical(r.gender)||'(unknown)', count: num(r.count) })).filter(r=> !isNaN(r.count));
+      const byGender = new Map();
+      arr.forEach(r=>{ const v=byGender.get(r.gender)||0; byGender.set(r.gender, v + r.count); });
+      const rows = Array.from(byGender.entries()).map(([gender,count])=>({gender,count}));
+      const labels = rows.map(r=>r.gender);
+      const data = { labels, datasets:[{ label:'Members', data: rows.map(r=>r.count||0), backgroundColor:['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#84cc16'] }] };
+      ensureChart('chartGender','doughnut',{ data, options:{ plugins:{ legend:{position:'bottom'} } } });
     }
 
     function renderPmpm() {
@@ -731,7 +736,7 @@ Do not deploy publicly.
       }).filter(r=>!isNaN(r.count));
       rows.sort((a,b)=> b.count - a.count); const top = rows.slice(0, 12);
       const data = { labels: top.map(r=>r.drg), datasets:[{ label:'Encounters', data: top.map(r=>r.count), backgroundColor:'#6366f1' }] };
-      ensureChart('chartDrg','bar',{ data, options:{ plugins:{ legend:{display:false} }, indexAxis:'y' } });
+      ensureChart('chartDrg','bar',{ data, options:{ plugins:{ legend:{display:false} } , indexAxis:'y', layout:{ padding:{ left: 16, right: 8 } }, scales:{ y:{ ticks:{ mirror:true, crossAlign:'near' } } } } });
     }
 
     function renderEd() {
@@ -965,10 +970,28 @@ Do not deploy publicly.
     }
 
     function renderReadmitChart() {
-      const vals = filterRows(datasets.readmitRate).map(r=> num(r.readmission_rate)||num(r.rate)).filter(v=>!isNaN(v));
-      const avg = vals.length ? (vals.reduce((s,v)=>s+v,0)/vals.length) : NaN;
-      const data = { labels: ['Overall'], datasets:[{ label:'Readmission Rate', data: [isNaN(avg)?0:avg], backgroundColor:'#0ea5e9' }] };
-      ensureChart('chartReadmit','bar',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' }, beginAtZero:true, max: Math.min(1, (isNaN(avg)?0.5:Math.max(avg*1.5,0.2))) } } } });
+      const arr = filterRows(datasets.readmitRate);
+      const map = new Map();
+      arr.forEach(r=>{
+        const ymStr = canonical(r.year_month||'');
+        const rate = num(r.readmission_rate)||num(r.rate);
+        const key = ymStr || '';
+        const v = map.get(key) || { ym: ymStr ? toMonthDate(ymStr) : null, sum:0, n:0 };
+        if (!isNaN(rate)) { v.sum += rate; v.n += 1; }
+        map.set(key, v);
+      });
+      const rows = Array.from(map.values()).filter(r=> r.ym).sort((a,b)=> a.ym - b.ym).map(r=> ({ ym: r.ym, rate: r.n? r.sum/r.n : NaN }));
+      if (rows.length) {
+        const labels = rows.map(r=> r.ym.toLocaleDateString('en-US',{month:'short',year:'numeric'}));
+        const data = { labels, datasets:[{ label:'Readmission Rate', data: rows.map(r=>r.rate||0), borderColor:'#0ea5e9', backgroundColor:'rgba(14,165,233,0.25)', fill:false }] };
+        ensureChart('chartReadmit','line',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' } } } } });
+      } else {
+        // fallback to overall bar if no monthly grain present
+        const vals = arr.map(r=> num(r.readmission_rate)||num(r.rate)).filter(v=>!isNaN(v));
+        const avg = vals.length ? (vals.reduce((s,v)=>s+v,0)/vals.length) : NaN;
+        const data = { labels: ['Overall'], datasets:[{ label:'Readmission Rate', data: [isNaN(avg)?0:avg], backgroundColor:'#0ea5e9' }] };
+        ensureChart('chartReadmit','bar',{ data, options:{ plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(c)=> pct(c.parsed.y) } } }, scales:{ y:{ ticks:{ callback:(v)=> (v*100)+'%' }, beginAtZero:true, max: Math.min(1, (isNaN(avg)?0.5:Math.max(avg*1.5,0.2))) } } } });
+      }
     }
 
     function renderEdFacility() {
@@ -1000,7 +1023,7 @@ Do not deploy publicly.
       byId('sqlEdFacility').textContent = `-- ED spend by facility (no PHI)\nselect mc.data_source, e.facility_id, sum(mc.paid_amount) as spend, 1 as ed_flag\nfrom ${pfx}.mart_review__stg_medical_claim mc\nleft join ${pfxCore}.encounter e on mc.encounter_id = e.encounter_id and mc.data_source = e.data_source\nwhere coalesce(e.encounter_type,'') = 'emergency department'\ngroup by 1,2\norder by 3 desc;`;
       byId('sqlDrg').textContent = `-- DRG frequency (no PHI)\nselect data_source, payer, plan, drg_code, drg_description, count(distinct encounter_id) as encounters\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3,4,5\norder by 6 desc;`;
       byId('sqlDischarge').textContent = `-- Discharge location by facility (no PHI)\nselect data_source, facility_id, discharge_location, count(distinct encounter_id) as count\nfrom ${pfx}.mart_review__inpatient\ngroup by 1,2,3\norder by 4 desc;`;
-      byId('sqlReadmit').textContent = `-- Readmission rate (no PHI)\nwith denom as (\n  select data_source, payer, plan, count(*) as index_admissions\n  from ${pfx}.mart_review__inpatient\n  group by 1,2,3\n), num as (\n  select data_source, payer, plan, count(*) as readmissions\n  from ${pfx}.mart_review__readmissions\n  group by 1,2,3\n) select coalesce(denom.data_source,num.data_source) as data_source, coalesce(denom.payer,num.payer) as payer, coalesce(denom.plan,num.plan) as plan,\n  cast(readmissions as double)/nullifzero(index_admissions) as readmission_rate from denom full outer join num using (data_source,payer,plan);`;
+      byId('sqlReadmit').textContent = `-- Readmission rate by month (calendar-based; no PHI)\nwith stg as (\n  select distinct data_source, payer, ${pfx.includes('"') ? '"plan"' : 'plan'} as plan, encounter_id\n  from ${pfx}.mart_review__stg_medical_claim\n), denom as (\n  select i.data_source, s.payer, s.plan, cast(cal.year_month_int as varchar) as year_month, count(*) as index_admissions\n  from ${pfx}.mart_review__inpatient i\n  left join stg s on i.data_source = s.data_source and i.encounter_id = s.encounter_id\n  left join ${pfx.replace('_data_quality','_reference_data')}.calendar cal on i.encounter_end_date = cal.full_date\n  group by 1,2,3,4\n), num as (\n  select coalesce(s.data_source,'') as data_source, s.payer, s.plan, cast(cal.year_month_int as varchar) as year_month,\n         sum(case when r.unplanned_readmit_30_flag = 1 then 1 else 0 end) as readmissions\n  from ${pfx}.mart_review__readmissions r\n  left join stg s on r.encounter_id = s.encounter_id\n  left join ${pfx.replace('_data_quality','_reference_data')}.calendar cal on r.discharge_date = cal.full_date\n  group by 1,2,3,4\n)\nselect coalesce(d.data_source,n.data_source) as data_source, coalesce(d.payer,n.payer) as payer, coalesce(d.plan, n.plan) as plan,\n       coalesce(d.year_month,n.year_month) as year_month,\n       cast(n.readmissions as double)/nullifzero(d.index_admissions) as readmission_rate\nfrom denom d full outer join num n using (data_source,payer,plan,year_month)\norder by 1,2,3,4;`;
       byId('sqlSvc').textContent = `-- Service categories (no PHI)\nselect data_source, payer, plan, year_month, service_category_1, service_category_2,\n  sum(paid_amt) as paid_amt, sum(visits) as visits\nfrom ${pfx}.mart_review__service_categories_long\ngroup by 1,2,3,4,5,6;`;
       byId('sqlEncTypes').textContent = `-- Encounter group/type paid and counts (no PHI)\nwith base as (\n  select mc.data_source, mc.payer, mc.plan, e.encounter_group, e.encounter_type,\n         count(distinct mc.encounter_id) as encounters, sum(mc.paid_amount) as paid_amount\n  from ${pfx}.mart_review__stg_medical_claim mc\n  left join ${pfx.replace('_data_quality','_core')}.encounter e\n    on mc.encounter_id = e.encounter_id and mc.data_source = e.data_source\n  group by 1,2,3,4,5\n) select * from base;`;
       byId('sqlPharm').textContent = `-- Pharmacy pivot (no PHI)\nselect p.data_source, mm.payer, mm.plan,\n  coalesce(p.atc_3_name, p.atc_2_name) as theraclass, p.ndc_code, coalesce(p.ndc_description, p.rxnorm_description) as ndc_description,\n  sum(p.paid_amount) as spend, avg(nullif(p.days_supply,0)) as avg_days_supply, avg(nullif(p.quantity,0)) as avg_quantity, avg(nullif(p.refills,0)) as avg_refills\nfrom ${pfx}.mart_review__pharmacy p\nleft join ${pfx}.mart_review__member_months mm\n  on p.person_id = mm.person_id and p.data_source = mm.data_source\ngroup by 1,2,3,4,5,6;`;

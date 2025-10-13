@@ -146,6 +146,17 @@ models:
       - dqi
     materialized: table
 
+- name: mart_review__readmission_rate_monthly
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_data_quality
+      {% else %}data_quality{%- endif -%}
+    alias: mart_review__readmission_rate_monthly
+    tags:
+      - data_quality_mart_review
+      - dqi
+    materialized: table
+
 - name: mart_review__tuva_chronic_conditions
   config:
     schema: |
