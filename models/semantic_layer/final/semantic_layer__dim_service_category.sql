@@ -5,9 +5,9 @@
 
 with cte as (
 select distinct
-    service_category_1
-    ,service_category_2
-    ,service_category_3
+    service_category_1,
+    service_category_2,
+    service_category_3
 from {{ ref('service_category__service_categories') }}
 )
 select 

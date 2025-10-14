@@ -28,13 +28,14 @@ select
     , encounter_type_sk
     , primary_diagnosis_code
     , primary_diagnosis_description
-    ,primary_provider_id
-    ,specialty
+    , primary_provider_id
+    , specialty
     , ccsr_parent_category
     , ccsr_category
     , ccsr_category_description
     , person_id
     , {{ dbt.concat(["person_id", "'|'", "mc.data_source"]) }} as patient_source_key
+    , {{ dbt.concat(["person_id", "'|'", "TO_CHAR(claim_start_date, 'YYYYMM')"]) }} as member_month_sk
     , TO_CHAR(claim_start_date, 'YYYYMM') as year_month
     , sc.service_category_sk
     , claim_id

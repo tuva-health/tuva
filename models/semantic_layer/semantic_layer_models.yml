@@ -35,6 +35,17 @@ models:
     tags: semantic_layer
     materialized: table
 
+- name: semantic_layer__ed_classification
+  description: >
+    ED classifications for all ED encounters.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: ed_classification
+    tags: semantic_layer
+    materialized: table
+
 - name: semantic_layer__dim_encounter_group
   description: >
     Unique encounter group dimension for use in Power BI data models.
@@ -89,6 +100,17 @@ models:
         config:
           severity: error
 
+- name: semantic_layer__dim_member_months
+  description: >
+    Per member per month financials for all Tuva service categories and encounter groups.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_member_months
+    tags: semantic_layer
+    materialized: table
+
 - name: semantic_layer__dim_member
   description: >
     Member dimension for use in Power BI data models.
@@ -133,6 +155,16 @@ models:
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
       {% else %}semantic_layer{%- endif -%}
     alias: dim_year
+    tags: semantic_layer
+    materialized: table
+- name: semantic_layer__dim_year_month
+  description: >
+    Year month dimension for use in Power BI data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: dim_year_month
     tags: semantic_layer
     materialized: table
 
@@ -236,3 +268,26 @@ models:
   columns:
   - name: patient_source_key
     description: Unique combination of patient id and data source
+
+- name: semantic_layer__fact_quality_measures
+  description: >
+    Quality measure level fact for use in analytic data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_quality_measure
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_hcc_gaps
+  description: >
+    HCC gaps for use in analytic data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_hcc_gap
+    tags: semantic_layer
+    materialized: table
+
