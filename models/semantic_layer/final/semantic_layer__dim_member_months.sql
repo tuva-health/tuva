@@ -3,7 +3,7 @@
    )
 }}
 
-WITH combined_data_cte AS (
+WITH data_with_sks AS (
     SELECT
         mm.person_id,
         mm.data_source,
@@ -24,20 +24,20 @@ WITH combined_data_cte AS (
     FROM {{ ref('core__member_months') }} mm
 )
 SELECT
-    cd.person_id,
-    cd.year_nbr,
-    cd.year_month,
-    cd.member_month_sk,
-    cd.data_source,
-    cd.patient_source_key,
-    cd.payer,
-    cd.{{ quote_column('plan') }},
-    cd.payer_attributed_provider,
-    cd.payer_attributed_provider_practice,
-    cd.payer_attributed_provider_organization,
-    cd.payer_attributed_provider_lob,
-    cd.custom_attributed_provider,
-    cd.custom_attributed_provider_practice,
-    cd.custom_attributed_provider_organization,
-    cd.custom_attributed_provider_lob,
-FROM combined_data_cte cd
+    dws.person_id,
+    dws.year_nbr,
+    dws.year_month,
+    dws.member_month_sk,
+    dws.data_source,
+    dws.patient_source_key,
+    dws.payer,
+    dws.{{ quote_column('plan') }},
+    dws.payer_attributed_provider,
+    dws.payer_attributed_provider_practice,
+    dws.payer_attributed_provider_organization,
+    dws.payer_attributed_provider_lob,
+    dws.custom_attributed_provider,
+    dws.custom_attributed_provider_practice,
+    dws.custom_attributed_provider_organization,
+    dws.custom_attributed_provider_lob,
+FROM data_with_sks dws
