@@ -18,5 +18,5 @@ SELECT
   , sl.measure_id
   , sl.measure_name
   , sl.measure_version
-  , sl.tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('quality_measures__summary_long') }} sl

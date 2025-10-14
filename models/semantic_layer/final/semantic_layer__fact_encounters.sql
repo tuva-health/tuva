@@ -40,7 +40,7 @@ select
   , source_model
   , data_source
   , encounter_source_type
-  , tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__encounter') }} e
 inner join {{ ref('semantic_layer__dim_encounter_group') }} eg on e.encounter_group = eg.encounter_group
 inner join {{ ref('semantic_layer__dim_encounter_type') }} et on e.encounter_type = et.encounter_type

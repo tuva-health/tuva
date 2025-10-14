@@ -275,7 +275,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
       {% else %}semantic_layer{%- endif -%}
-    alias: fact_quality_measure
+    alias: fact_quality_measures
     tags: semantic_layer
     materialized: table
 
@@ -286,7 +286,7 @@ models:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
       {% else %}semantic_layer{%- endif -%}
-    alias: fact_hcc_gap
+    alias: fact_hcc_gaps
     tags: semantic_layer
     materialized: table
 

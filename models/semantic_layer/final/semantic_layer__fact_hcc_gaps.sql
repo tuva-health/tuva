@@ -10,5 +10,5 @@ SELECT
   , lr.reason
   , lr.contributing_factor
   , lr.latest_suspect_date
-  , lr.tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('hcc_suspecting__list_rollup') }} lr

@@ -89,7 +89,7 @@ select
   , total_cost_amount
   , in_network_flag
   , mc.data_source
-  , mc.tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medical_claim') }} mc
 INNER JOIN {{ ref('semantic_layer__dim_service_category') }} sc on mc.service_category_1 = sc.service_category_1
     AND mc.service_category_2 = sc.service_category_2
