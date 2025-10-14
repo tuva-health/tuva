@@ -1,3 +1,7 @@
+{% docs _dbt_source_relation %}
+dbt utils metadata column to indicate the source table from unioning tables together.
+{% enddocs %}
+
 {% docs accession_number %}
 The lab order number from the source system.
 {% enddocs %}
@@ -1038,6 +1042,10 @@ The number of units for the particular revenue center code.
 The gender of the patient.
 {% enddocs %}
 
+{% docs snf_part_b_flag %}
+Indicates whether the inpatient medical service for Medicare covers under Part B or not. (1 for yes and 0 for no)
+{% enddocs %}
+
 {% docs social_security_number %}
 The social security number of the patient.
 {% enddocs %}
@@ -1212,9 +1220,80 @@ FIPS code for the state the patient lives in (most recent known address).
 
 {% docs normalized_state_name %}
 State for the patient (most recent known address).
-{% enddocs%}
+{% enddocs %}
 
 {% docs fips_state_abbreviation %}
 Abbreviated form of the state for the patient (most recient known address).
-{% enddocs%}
+{% enddocs %}
 
+{% docs hedis_measure_id %}
+Measure unique identifier.
+{% enddocs %}
+
+{% docs hedis_measure_name %}
+Measure name.
+{% enddocs %}
+
+{% docs hedis_measure_year %}
+Year indicating the definition used.
+{% enddocs %}
+
+{% docs hedis_cql_key %}
+CQL concept key.
+{% enddocs %}
+
+{% docs hedis_cql_value %}
+CQL concept value.
+{% enddocs %}
+
+{% docs hedis_execution_id %}
+Unique identifier for the measure, execution, and patient.
+{% enddocs %}
+
+{% docs hedis_status %}
+Execution status.
+{% enddocs %}
+
+{% docs hedis_type %}
+Execution type.
+{% enddocs %}
+
+{% docs hedis_rate_id %}
+Identifier for "rate-1" or "rate-2". Some HEDIS measures report two rates for different outcomes (e.g., (GSD) Glycemic Status Assessment) or follow-up care (e.g., (DSF-E) Depression Screening and Follow-up). Refer to HEDIS measure documentation.
+{% enddocs %}
+
+{% docs hedis_population_type %}
+Population type description for the pivoted values ("initial-population", "denominator", "denominator-exclusion", "denominator-exclusion-medicare", "denominator-medicare", "numerator").
+{% enddocs %}
+
+{% docs hedis_population_count %}
+Boolean value for the pivoted values.
+{% enddocs %}
+
+{% docs period_start %}
+Starting date of the performance or measurement period.
+{% enddocs %}
+
+{% docs period_end %}
+Ending date of the performance or measurement period.
+{% enddocs %}
+
+{% docs performance_flag %}
+Performance flag calculated by using exclusion, numerator, and denominator flags. When excluded from a measure the flag is null.
+{% enddocs %}
+
+{% docs denominator %}
+The denominator is associated with a given patient population that may be counted as eligible to meet a measure’s inclusion requirements.
+{% enddocs %}
+
+{% docs numerator %}
+The numerator reflects the subset of patients in the denominator for whom a particular service has been provided or for whom a particular outcome has been achieved with exclusion logic applied.
+{% enddocs %}
+
+{% docs exclusion %}
+Specifications of those characteristics that would cause groups of individuals to be removed from the numerator and/or denominator of a measure although they experience the denominator index event.
+{% enddocs %}
+
+{% docs performance_rate %}
+Calculated performance rate. The performance flag sum divided by the performance flag count multiplied by 100.
+{% enddocs %}
