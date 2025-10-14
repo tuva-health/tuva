@@ -12,9 +12,7 @@ with cte as (
 )
 
 select
-    {{ dbt_utils.generate_surrogate_key([
-+      'service_category_1','service_category_2','service_category_3'
-+    ]) }} as service_category_sk
+    {{ dbt_utils.generate_surrogate_key(['service_category_1', 'service_category_2', 'service_category_3']) }} as service_category_sk
   , service_category_1
   , service_category_2
   , service_category_3
