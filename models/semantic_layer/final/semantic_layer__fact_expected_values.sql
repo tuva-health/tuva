@@ -45,7 +45,10 @@
       , ep.inpatient_psych_paid_amount_pred
       , ep.inpatient_rehabilitation_paid_amount_pred
       , ep.inpatient_skilled_nursing_paid_amount_pred
-      , ep.inpatient_count_pred + ep.office_based_count_pred + ep.other_count_pred + ep.outpatient_count_pred as count_pred
+      , coalesce(ep.inpatient_count_pred, 0)
+        + coalesce(ep.office_based_count_pred, 0) 
+        + coalesce(ep.other_count_pred, 0)
+        + coalesce(ep.outpatient_count_pred, 0) as count_pred
       , ep.inpatient_count_pred
       , ep.office_based_count_pred
       , ep.other_count_pred
