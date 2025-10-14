@@ -9,7 +9,7 @@ seeds:
       alias: _value_set_encounter_group_sk
       tags:
         - semantic_layer
-      enabled: "{{ var('semantic_layer_enabled',True) }}"
+      enabled: "{{ var('semantic_layer_enabled',False) }}"
       column_types:
         encounter_group: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -29,7 +29,7 @@ seeds:
       alias: _value_set_encounter_type_sk
       tags:
         - semantic_layer
-      enabled: "{{ var('semantic_layer_enabled',True) }}"
+      enabled: "{{ var('semantic_layer_enabled',False) }}"
       column_types:
         encounter_type: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
@@ -53,7 +53,7 @@ seeds:
       alias: _value_set_predictor_encounter_xwalk
       tags:
         - semantic_layer
-      enabled: "{{ var('semantic_layer_enabled',True) }}"
+      enabled: "{{ var('semantic_layer_enabled',False) }}"
       column_types:
         predictor_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
