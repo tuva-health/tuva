@@ -4,12 +4,13 @@
 }}
 
 with cte as (
-SELECT DISTINCT
-    condition
-  , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM {{ ref('chronic_conditions__tuva_chronic_conditions_long')}}
+  SELECT DISTINCT
+      condition
+  FROM {{ ref('chronic_conditions__tuva_chronic_conditions_long')}}
 )
+
 select 
-    condition
-  , ROW_NUMBER() OVER (order by condition) as condition_sk
+    {{ dbt_utils.generate_surrogate_key(['condition']) }} as condition_sk
+  , condition
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from cte

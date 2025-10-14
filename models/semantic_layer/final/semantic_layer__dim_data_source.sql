@@ -23,6 +23,7 @@ FROM {{ ref('core__pharmacy_claim')}}
 )
 
 SELECT DISTINCT
-    data_source
+    {{ dbt_utils.generate_surrogate_key(['data_source']) }} as data_source_sk
+  , data_source
   , '{{ var('tuva_last_run')}}' as tuva_last_run
 from data_sources

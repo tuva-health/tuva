@@ -3,7 +3,7 @@
    )
 }}
 
-SELECT distinct
+SELECT DISTINCT
     year
   , month
   , year_month
