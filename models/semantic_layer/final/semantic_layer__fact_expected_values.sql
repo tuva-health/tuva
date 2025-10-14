@@ -89,76 +89,76 @@
 
   select
       cast(null as {{ dbt.type_string() }}) AS benchmark_key
-      ,cast(null as {{ dbt.type_integer() }}) AS year_nbr
+      ,cast(null as DECIMAL) AS year_nbr
       ,cast(null as {{ dbt.type_string() }}) AS person_id
       ,cast(null as {{ dbt.type_string() }}) AS payer
       ,cast(null as {{ dbt.type_string() }}) AS plan
       ,cast(null as {{ dbt.type_string() }}) AS data_source
-      ,cast(null as {{ dbt.type_decimal() }}) AS paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS other_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_based_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_injections_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS emergency_department_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_radiology_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_pt_ot_st_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_hospice_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }})AS urgent_care_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_hospital_or_clinic_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS home_health_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS dialysis_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_rehabilitation_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_surgery_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS ambulatory_surgery_center_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_psych_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS dme_orphaned_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS orphaned_claim_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS ambulance_orphaned_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS lab_orphaned_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_radiology_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_surgery_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_other_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS telehealth_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_pt_ot_st_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_injections_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS acute_inpatient_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_hospice_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_psych_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_rehabilitation_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_skilled_nursing_paid_amount_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_based_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS other_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_injections_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS emergency_department_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_radiology_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_pt_ot_st_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_hospice_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS urgent_care_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_hospital_or_clinic_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS home_health_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS dialysis_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_rehabilitation_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_surgery_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS ambulatory_surgery_center_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS outpatient_psych_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS dme_orphaned_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS orphaned_claim_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS ambulance_orphaned_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS lab_orphaned_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_radiology_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_surgery_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_other_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS telehealth_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_pt_ot_st_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS office_visit_injections_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS acute_inpatient_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_hospice_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_psych_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_rehabilitation_count_pred
-      ,cast(null as {{ dbt.type_decimal() }}) AS inpatient_skilled_nursing_count_pred
+      ,cast(null as DECIMAL) AS paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_paid_amount_pred
+      ,cast(null as DECIMAL) AS other_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_based_paid_amount_pred
+      ,cast(null as DECIMAL) AS inpatient_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_injections_paid_amount_pred
+      ,cast(null as DECIMAL) AS emergency_department_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_radiology_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_pt_ot_st_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_hospice_paid_amount_pred
+      ,cast(null as DECIMAL)AS urgent_care_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_hospital_or_clinic_paid_amount_pred
+      ,cast(null as DECIMAL) AS home_health_paid_amount_pred
+      ,cast(null as DECIMAL) AS dialysis_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_rehabilitation_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_surgery_paid_amount_pred
+      ,cast(null as DECIMAL) AS ambulatory_surgery_center_paid_amount_pred
+      ,cast(null as DECIMAL) AS outpatient_psych_paid_amount_pred
+      ,cast(null as DECIMAL) AS dme_orphaned_paid_amount_pred
+      ,cast(null as DECIMAL) AS orphaned_claim_paid_amount_pred
+      ,cast(null as DECIMAL) AS ambulance_orphaned_paid_amount_pred
+      ,cast(null as DECIMAL) AS lab_orphaned_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_visit_radiology_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_visit_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_visit_surgery_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_visit_other_paid_amount_pred
+      ,cast(null as DECIMAL) AS telehealth_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_visit_pt_ot_st_paid_amount_pred
+      ,cast(null as DECIMAL) AS office_visit_injections_paid_amount_pred
+      ,cast(null as DECIMAL) AS acute_inpatient_paid_amount_pred
+      ,cast(null as DECIMAL) AS inpatient_hospice_paid_amount_pred
+      ,cast(null as DECIMAL) AS inpatient_psych_paid_amount_pred
+      ,cast(null as DECIMAL) AS inpatient_rehabilitation_paid_amount_pred
+      ,cast(null as DECIMAL) AS inpatient_skilled_nursing_paid_amount_pred
+      ,cast(null as DECIMAL) AS count_pred
+      ,cast(null as DECIMAL) AS inpatient_count_pred
+      ,cast(null as DECIMAL) AS office_based_count_pred
+      ,cast(null as DECIMAL) AS other_count_pred
+      ,cast(null as DECIMAL) AS outpatient_count_pred
+      ,cast(null as DECIMAL) AS outpatient_injections_count_pred
+      ,cast(null as DECIMAL) AS emergency_department_count_pred
+      ,cast(null as DECIMAL) AS outpatient_radiology_count_pred
+      ,cast(null as DECIMAL) AS outpatient_pt_ot_st_count_pred
+      ,cast(null as DECIMAL) AS outpatient_hospice_count_pred
+      ,cast(null as DECIMAL) AS urgent_care_count_pred
+      ,cast(null as DECIMAL) AS outpatient_hospital_or_clinic_count_pred
+      ,cast(null as DECIMAL) AS home_health_count_pred
+      ,cast(null as DECIMAL) AS dialysis_count_pred
+      ,cast(null as DECIMAL) AS outpatient_rehabilitation_count_pred
+      ,cast(null as DECIMAL) AS outpatient_surgery_count_pred
+      ,cast(null as DECIMAL) AS ambulatory_surgery_center_count_pred
+      ,cast(null as DECIMAL) AS outpatient_psych_count_pred
+      ,cast(null as DECIMAL) AS dme_orphaned_count_pred
+      ,cast(null as DECIMAL) AS orphaned_claim_count_pred
+      ,cast(null as DECIMAL) AS ambulance_orphaned_count_pred
+      ,cast(null as DECIMAL) AS lab_orphaned_count_pred
+      ,cast(null as DECIMAL) AS office_visit_radiology_count_pred
+      ,cast(null as DECIMAL) AS office_visit_count_pred
+      ,cast(null as DECIMAL) AS office_visit_surgery_count_pred
+      ,cast(null as DECIMAL) AS office_visit_other_count_pred
+      ,cast(null as DECIMAL) AS telehealth_count_pred
+      ,cast(null as DECIMAL) AS office_visit_pt_ot_st_count_pred
+      ,cast(null as DECIMAL) AS office_visit_injections_count_pred
+      ,cast(null as DECIMAL) AS acute_inpatient_count_pred
+      ,cast(null as DECIMAL) AS inpatient_hospice_count_pred
+      ,cast(null as DECIMAL) AS inpatient_psych_count_pred
+      ,cast(null as DECIMAL) AS inpatient_rehabilitation_count_pred
+      ,cast(null as DECIMAL) AS inpatient_skilled_nursing_count_pred

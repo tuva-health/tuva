@@ -4,7 +4,7 @@ models:
 
 - name: semantic_layer__dim_condition
   description: >
-    Condition dimension table for use in Power BI data models.
+    Condition dimension table for use in analytic data models, includes sovereign key to link condition descriptions in a unified way.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -15,7 +15,7 @@ models:
 
 - name: semantic_layer__dim_data_source
   description: >
-    Data source dimension table for use in Power BI data models.
+    Data source dimension table for use in analytic data models.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -26,7 +26,7 @@ models:
 
 - name: semantic_layer__dim_date
   description: >
-    Date dimension for use in Power BI data models.
+    Date dimension for use in analytic data models, provides all dates along with categorizations like year month, month, quarter, and year, day of week, etc.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -37,7 +37,7 @@ models:
 
 - name: semantic_layer__dim_encounter_group
   description: >
-    Unique encounter group dimension for use in Power BI data models.
+    Unique encounter group dimension for use in analytic data models.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -55,7 +55,7 @@ models:
 
 - name: semantic_layer__dim_encounter_provider
   description: >
-    Unique primary provider dimension for use in Power BI data models.
+    Unique primary provider dimension for use in analytic data models.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -73,7 +73,7 @@ models:
 
 - name: semantic_layer__dim_encounter_type
   description: >
-    Unique encounter type dimension for use in Power BI data models.
+     Unique encounter type dimension for use in analytic data models.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -91,7 +91,7 @@ models:
 
 - name: semantic_layer__dim_member_months
   description: >
-    Per member per month financials for all Tuva service categories and encounter groups.
+    Member dimension information at the member month grain, can be joined via member_month_sk to most fact tables for member attributes that change over time.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -102,7 +102,7 @@ models:
 
 - name: semantic_layer__dim_member
   description: >
-    Member dimension for use in Power BI data models.
+    Member dimension for use in analytics data models, provides the current value of member attributes and attributes that do not change over time.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -111,7 +111,7 @@ models:
     tags: semantic_layer
     materialized: table
   columns:
-  - name: patient_source_key
+  - name: person_sk
     description: Unique key of patient id and data source
     tests:
     - unique:
@@ -120,7 +120,7 @@ models:
 
 - name: semantic_layer__dim_service_category
   description: >
-    Unique service categories dimension for use in Power BI data models.
+    Unique service categories dimension for use in analytic data models.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -264,7 +264,6 @@ models:
         - person_id
         - data_source
         - year_month
-        - "[plan]"
   columns:
   - name: patient_source_key
     description: Unique combination of patient id and data source

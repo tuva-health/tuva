@@ -27,8 +27,6 @@ SELECT
     e.drg_code,
     e.drg_description,
     r.readmission_encounter_id,
-    r.index_admission_flag,
-    r.had_readmission_flag,
     r.days_to_readmit,
     r.readmission_admit_date,
     r.readmission_discharge_date,

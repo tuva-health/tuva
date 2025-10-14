@@ -5,7 +5,7 @@
 
 SELECT
   sl.person_id,
-  sl.denonminator_flag,
+  sl.denominator_flag,
   sl.numerator_flag,
   sl.exclusion_flag,
   sl.performance_flag,
