@@ -21,6 +21,7 @@ SELECT distinct
   , cal.first_day_of_month
   , cal.last_day_of_month
   , cal.year_month_int
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('reference_data__calendar') }} cal
 INNER JOIN min_max_dates mmd
   ON cal.full_date BETWEEN mmd.min_date AND mmd.end_date

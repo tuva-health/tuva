@@ -40,6 +40,7 @@ SELECT
   , r.readmission_specialty_cohort
   , r.readmission_died_flag
   , r.readmission_diagnosis_ccs
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('readmissions__encounter_augmented') }} ea 
 LEFT JOIN {{ ref('core__encounter') }} e ON ea.encounter_id = e.encounter_id
 LEFT JOIN {{ ref('readmissions__readmission_summary') }} r ON r.encounter_id = ea.encounter_id

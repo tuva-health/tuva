@@ -6,5 +6,6 @@
 select distinct
     tccl.person_id
   , csk.condition_sk
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('chronic_conditions__tuva_chronic_conditions_long') }} tccl
 inner join {{ ref('semantic_layer__dim_condition') }} csk on tccl.condition = csk.condition

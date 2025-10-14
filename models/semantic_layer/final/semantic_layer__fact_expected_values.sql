@@ -79,6 +79,7 @@
       , ep.inpatient_psych_count_pred
       , ep.inpatient_rehabilitation_count_pred
       , ep.inpatient_skilled_nursing_count_pred
+      , '{{ var('tuva_last_run') }}' as tuva_last_run
     FROM {{ source('expected_values','person_year') }} py
     INNER JOIN {{ source('expected_values', 'encounter_predictions') }} ep
       ON py.benchmark_key = ep.benchmark_key
@@ -162,3 +163,4 @@
     , cast(null as DECIMAL) AS inpatient_psych_count_pred
     , cast(null as DECIMAL) AS inpatient_rehabilitation_count_pred
     , cast(null as DECIMAL) AS inpatient_skilled_nursing_count_pred
+    , '{{ var('tuva_last_run') }}' as tuva_last_run

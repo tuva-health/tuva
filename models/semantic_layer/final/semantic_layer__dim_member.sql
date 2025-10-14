@@ -28,5 +28,5 @@ SELECT
   , p.data_source
   , p.age
   , p.age_group
-  , p.tuva_last_run
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('core__patient')}} p

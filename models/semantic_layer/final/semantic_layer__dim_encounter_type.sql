@@ -4,5 +4,6 @@
 }}
 
 select
-  *
+    *
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('encounter_type_sk') }}

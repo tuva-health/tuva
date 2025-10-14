@@ -39,8 +39,8 @@ select
   , prof_claim_count
   , source_model
   , data_source
-  , tuva_last_run
   , encounter_source_type
+  , tuva_last_run
 from {{ ref('core__encounter') }} e
 inner join {{ ref('semantic_layer__dim_encounter_group') }} eg on e.encounter_group = eg.encounter_group
 inner join {{ ref('semantic_layer__dim_encounter_type') }} et on e.encounter_type = et.encounter_type

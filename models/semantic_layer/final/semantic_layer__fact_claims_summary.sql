@@ -22,6 +22,7 @@ select
     , ccsr_category_description
     , person_id
     , patient_source_key
+    , '{{ var('tuva_last_run') }}' as tuva_last_run
     , min(claim_start_date) as claim_start_date
     , max(claim_end_date) as claim_end_date
     , sum(paid_amount) as paid_amount
@@ -43,3 +44,4 @@ group by
     , ccsr_category_description
     , person_id
     , patient_source_key
+    , '{{ var('tuva_last_run') }}' as tuva_last_run

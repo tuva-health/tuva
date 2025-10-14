@@ -27,5 +27,6 @@ SELECT
     encounter_id
   , rendering_id as primary_provider_id
   , specialty
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from claim_provider_data
 where rn = 1

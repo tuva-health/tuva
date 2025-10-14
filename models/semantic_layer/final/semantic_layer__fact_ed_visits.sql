@@ -13,6 +13,7 @@ SELECT
   , case when s.encounter_id is null then 'Unclassified'
         when s.ed_classification_order <= 3 then s.ed_classification_description
         else 'Non-Avoidable' end as avoidable_category
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('core__encounter') }} e
 LEFT JOIN {{ ref('ed_classification__summary')}} s
     ON e.encounter_id = s.encounter_id

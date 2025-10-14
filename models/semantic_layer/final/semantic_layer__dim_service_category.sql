@@ -13,4 +13,5 @@ from {{ ref('service_category__service_categories') }}
 select 
     *
   , ROW_NUMBER() OVER (order by service_category_3) as service_category_sk
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from cte

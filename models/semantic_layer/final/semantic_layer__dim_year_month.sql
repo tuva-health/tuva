@@ -9,4 +9,5 @@ SELECT distinct
   , year_month
   , year_month_int
   , first_day_of_month
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 FROM {{ ref('semantic_layer__dim_date') }} cal
