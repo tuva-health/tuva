@@ -5,5 +5,5 @@
 
 SELECT DISTINCT
     encounter_id
-    ,service_category_sk
+  , service_category_sk
 from {{ ref('semantic_layer__fact_claims') }}

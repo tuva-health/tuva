@@ -27,7 +27,7 @@ select
     , sum(paid_amount) as paid_amount
 from {{ ref('semantic_layer__fact_claims') }}
 group by
-    year_month
+      year_month
     , service_category_sk
     , paid_date
     , data_source

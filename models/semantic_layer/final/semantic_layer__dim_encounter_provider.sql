@@ -6,15 +6,15 @@
 with claim_provider_data as (
     select
         c.encounter_id
-        , c.rendering_id
-        , p.specialty
-        , sum(c.paid_amount) as paid_amount
-        , row_number() over(
-            partition by
-                c.encounter_id
-            order by sum(c.paid_amount) desc
-        ) as rn
-    from {{ ref('core__medical_claim') }} as c
+      , c.rendering_id
+      , p.specialty
+      , sum(c.paid_amount) as paid_amount
+      , row_number() over(
+          partition by
+              c.encounter_id
+          order by sum(c.paid_amount) desc
+      ) as rn
+  from {{ ref('core__medical_claim') }} as c
     inner join {{ ref('semantic_layer__dim_data_source') }} ds on c.data_source = ds.data_source
     left join {{ ref('core__practitioner') }} as p
         on c.rendering_id = p.npi
@@ -25,7 +25,7 @@ with claim_provider_data as (
 )
 SELECT
     encounter_id
-    ,rendering_id as primary_provider_id
-    ,specialty
+  , rendering_id as primary_provider_id
+  , specialty
 from claim_provider_data
 where rn = 1

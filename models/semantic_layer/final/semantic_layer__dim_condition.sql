@@ -10,5 +10,5 @@ FROM {{ ref('chronic_conditions__tuva_chronic_conditions_long')}}
 )
 select 
     condition
-    ,ROW_NUMBER() OVER (order by condition) as condition_sk
+  , ROW_NUMBER() OVER (order by condition) as condition_sk
 from cte

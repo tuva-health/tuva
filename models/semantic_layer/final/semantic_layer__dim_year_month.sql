@@ -4,9 +4,9 @@
 }}
 
 SELECT distinct
-    year,
-    month,
-    year_month,
-    year_month_int,
-    first_day_of_month
+    year
+  , month
+  , year_month
+  , year_month_int
+  , first_day_of_month
 FROM {{ ref('semantic_layer__dim_date') }} cal
