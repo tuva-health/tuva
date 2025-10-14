@@ -35,17 +35,6 @@ models:
     tags: semantic_layer
     materialized: table
 
-- name: semantic_layer__ed_classification
-  description: >
-    ED classifications for all ED encounters.
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
-      {% else %}semantic_layer{%- endif -%}
-    alias: ed_classification
-    tags: semantic_layer
-    materialized: table
-
 - name: semantic_layer__dim_encounter_group
   description: >
     Unique encounter group dimension for use in Power BI data models.
@@ -196,6 +185,17 @@ models:
     - unique:
         config:
           severity: error
+
+- name: semantic_layer__fact_ed_visits
+  description: >
+    ED classifications for all ED encounters.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_ed_visits
+    tags: semantic_layer
+    materialized: table
 
 - name: semantic_layer__fact_encounter_service_bridge
   description: >
