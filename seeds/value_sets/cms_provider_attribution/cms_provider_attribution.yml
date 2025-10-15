@@ -7,7 +7,7 @@ seeds:
       Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attributionibution{% else %}cms_provider_attr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
       alias: _assignment_windows
       tags: cms_provider_attribution
       enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
@@ -31,7 +31,7 @@ seeds:
       Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
       alias: _primary_care_hcpcs_codes
       tags: cms_provider_attribution
       enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
@@ -48,7 +48,7 @@ seeds:
        Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
       alias: _provider_specialty_assignment_codes
       tags: cms_provider_attribution
       enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
