@@ -1435,7 +1435,9 @@ seeds:
         description: Qualifier associated with the ICD-10-PCS code; corresponds to the seventh character of the code
 
   - name: terminology__medicare_provider_and_supplier_taxonomy_crosswalk
-    description: ''
+    description: |
+      A source for crosswalk CMS provider specialty codes with NPPES taxonomy codes. Source can be found here: 
+      https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk/data
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1453,7 +1455,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
 
   - name: terminology__electing_teaching_hospital_list
-    description: ''
+    description: |
+      CMS electing teaching hospitals. Source can be found here: https://www.cms.gov/priorities/key-initiatives/open-payments/resources/reporting-entitities
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
