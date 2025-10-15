@@ -185,6 +185,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: days_supply
         description: '{{ doc("days_supply") }}'
         tests:
@@ -198,6 +205,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: refills
         description: '{{ doc("refills") }}'
         tests:
@@ -258,6 +272,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: allowed_amount
         description: '{{ doc("allowed_amount") }}'
         tests:
@@ -270,6 +291,13 @@ models:
               column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi', 'dqi_financial_pmpm']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -288,6 +316,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: coinsurance_amount
         description: '{{ doc("coinsurance_amount") }}'
         tests:
@@ -300,6 +335,13 @@ models:
               column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
@@ -318,6 +360,13 @@ models:
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
       - name: deductible_amount
         description: '{{ doc("deductible_amount") }}'
         tests:
@@ -330,6 +379,13 @@ models:
               column_type_list: [number, decimal, numeric, float,
                 float4, float8, double, double precision, real, float64, bignumeric]
               tags: ['tuva_dqi_sev_2', 'dqi']
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: null
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dev_test']
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
