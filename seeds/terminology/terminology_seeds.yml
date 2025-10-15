@@ -1443,10 +1443,14 @@ seeds:
       tags:
         - terminology
       column_types:
-        medicare_specialty_code: varchar(16)
-        medicare_provider_supplier_type_description: varchar(256)
-        provider_taxonomy_code: varchar(32)
-        provider_taxonomy_description: varchar(512)
+        medicare_specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(16) {%- endif -%}
+        medicare_provider_supplier_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        provider_taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        provider_taxonomy_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
 
   - name: terminology__electing_teaching_hospital_list
     description: ''
@@ -1457,22 +1461,36 @@ seeds:
       tags:
         - terminology
       column_types:
-        collection_year: varchar(4)
-        ccn: varchar(6)
-        tin: varchar(9)
-        hospital_name: varchar(256)
-        pecos_legal_business_name: varchar(256)
-        street_address: varchar(256)
-        po_box: varchar(256)
-        city: varchar(256)
-        state: varchar(256)
-        zip_code: varchar(256)
-        street_address_1: varchar(256)
-        street_address_2: varchar(256)
-        city_2: varchar(256)
-        state_2: varchar(256)
-        zip_code_2: varchar(256)
-
+        collection_year: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        ccn: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(6) {%- endif -%}
+        tin: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(9) {%- endif -%}
+        hospital_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        pecos_legal_business_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        po_box: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        city: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        state: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        zip_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address_1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        city_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        state_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        zip_code_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
 
   - name: terminology__cms_acceptable_provider_specialty_codes
     description: ''
@@ -1483,9 +1501,12 @@ seeds:
       tags:
         - terminology
       column_types:
-        specialty_code: varchar(8)
-        specialty_description: varchar(256)
-        pecos_specialty_description: varchar(256)
+        specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(8) {%- endif -%} 
+        specialty_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        pecos_specialty_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
 
   - name: terminology__ssa_fips_state_county_crosswalk
     description: ''
@@ -1496,11 +1517,19 @@ seeds:
       tags:
         - terminology
       column_types:
-        fipscounty: varchar(5)
-        countyname_fips: varchar(256)
-        state: varchar(2)
-        cbsa_code: varchar(5)
-        cbsa_name: varchar(256)
-        ssa_code: varchar(5)
-        state_name: varchar(64)
-        countyname_rate: varchar(128)
+        fipscounty: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+        countyname_fips: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        state: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2) {%- endif -%} 
+        cbsa_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+        cbsa_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        ssa_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+        state_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(64) {%- endif -%} 
+        countyname_rate: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(128) {%- endif -%} 

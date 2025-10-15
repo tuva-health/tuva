@@ -202,6 +202,8 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','electing_teaching_hospital_list.csv',compression=true,null_marker=true, headers=true) }}"
       terminology__medicare_provider_and_supplier_taxonomy_crosswalk:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','medicare_provider_and_supplier_taxonomy_crosswalk.csv',compression=true,null_marker=true, headers=true) }}"
+      terminology__ssa_fips_state_county_crosswalk:
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','ssa_fips_state_county_crosswalk.csv',compression=true,null_marker=true, headers=true) }}"
 
     value_sets:
       ccsr:
