@@ -1496,7 +1496,8 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
 
   - name: terminology__cms_acceptable_provider_specialty_codes
-    description: ''
+    description: |
+      A list of acceptable provider specialty codes for risk adjustment. Source can be found here: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment/acceptable-physician-specialty-type-lists
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
@@ -1512,7 +1513,9 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
 
   - name: terminology__ssa_fips_state_county_crosswalk
-    description: ''
+    description: |
+      SSA to FIPS State county crosswalk from the National Bureau of Economic Research.
+      Source can be found here: https://www.nber.org/research/data/ssa-federal-information-processing-series-fips-state-and-county-crosswalk
     config:
       schema: |
         {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}

@@ -2,10 +2,12 @@ version: 2
 
 seeds:
   - name: cms_provider_attribution__assignment_windows
-    description: ""
+    description: |
+      Taken from p.82-86 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), "APPENDIX B: ASSIGNMENT WINDOW, EXPANDED WINDOW FOR ASSIGNMENT, AND EXPENDITURES PERIOD DATES".
+      Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attr{% else %}cms_provider_attr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attributionibution{% else %}cms_provider_attr{%- endif -%}
       alias: _assignment_windows
       tags: cms_provider_attribution
       enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
@@ -24,10 +26,12 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
 
   - name: cms_provider_attribution__primary_care_hcpcs_codes
-    description: ""
+    description: |
+      Taken from p.87 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), "APPENDIX C: PRIMARY CARE AND SPECIALTY CODES USED IN ASSIGNMENT".
+      Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attr{% else %}cms_provider_attr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attr{%- endif -%}
       alias: _primary_care_hcpcs_codes
       tags: cms_provider_attribution
       enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
@@ -39,10 +43,12 @@ seeds:
 
         
   - name: cms_provider_attribution__provider_specialty_assignment_codes
-    description: ""
+    description: |
+       Taken from p.93 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), in Table 11 and 12.
+       Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
     config:
       schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attr{% else %}cms_provider_attr{%- endif -%}
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attr{%- endif -%}
       alias: _provider_specialty_assignment_codes
       tags: cms_provider_attribution
       enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
