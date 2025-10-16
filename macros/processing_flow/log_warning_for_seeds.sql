@@ -1,5 +1,6 @@
 -- macros/log_warning_for_seeds.sql
 {% macro log_warning_for_seeds() %}
+
     {% set seeds = get_selected_seeds() %}
 
     {% for seed in seeds %}
