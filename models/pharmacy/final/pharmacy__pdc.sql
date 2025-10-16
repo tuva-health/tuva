@@ -67,7 +67,7 @@ drug_era_ends as (
     select
         se.person_id,
         se.ingredient_rxcui,
-        se.ingredient_name,
+        min(se.ingredient_name) as ingredient_name,
         se.drug_sub_exposure_start_date,
         min(e.end_date) as drug_era_end_date, 
         se.drug_exposure_count,
@@ -80,7 +80,6 @@ drug_era_ends as (
     group by
         se.person_id,
         se.ingredient_rxcui,
-        se.ingredient_name,
         se.drug_sub_exposure_start_date,
         se.drug_exposure_count,
         se.days_exposed
@@ -91,7 +90,7 @@ final_eras as (
     select
         person_id,
         ingredient_rxcui,
-        ingredient_name,
+        min(ingredient_name) as ingredient_name,
         min(drug_sub_exposure_start_date) as drug_era_start_date,
         drug_era_end_date,
         sum(drug_exposure_count) as drug_exposure_count,
@@ -102,7 +101,6 @@ final_eras as (
     group by
         person_id,
         ingredient_rxcui,
-        ingredient_name,
         drug_era_end_date
 )
 
@@ -121,7 +119,7 @@ select
     round(
         case 
             when era_duration_in_days > 0 
-            then (total_days_exposed::float / era_duration_in_days::float) * 100
+            then (cast(total_days_exposed as {{ type_float() }}) / cast(era_duration_in_days as {{ type_float() }})) * 100
             else 0 
         end, 
         2
