@@ -56,6 +56,26 @@ vars:
 
     ## Set this variable to true if you want legacy data quality models to build
     enable_legacy_data_quality: false
+
+    # Enable groups of marts
+    # clinical_enabled: true
+    # claims_enabled: true
+
+    # Enable certain marts
+    # ccsr_enabled: false
+    # claims_preprocessing_enabled: false
+    # cms_chronic_conditions_enabled: false
+    # cms_hcc_enabled: false
+    # cms_provider_attribution_enabled: false
+    # ed_classification_enabled: false
+    # fhir_preprocessing_enabled: true # defaults to false
+    # financial_pmpm_enabled: false
+    # hedis_enabled: true # defaults to false
+    # insights_enabled: false
+    # quality_measures_enabled: false
+    # readmissions_enabled: true
+    # tuva_chronic_conditions_enabled: false
+    
 on-run-start:
   - "{{ log_invocation_start() }}"
 on-run-end:
