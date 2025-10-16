@@ -50,12 +50,6 @@
 
 
 {% macro log_invocation_start() %}
-    {# Check if Tuva resources are selected #}
-    {% if not the_tuva_project.is_tuva_selected() %}
-        {% do log("No Tuva resources selected, skipping invocation tracking", info=true) %}
-        {% do return('') %}
-    {% endif %}
-
     {# Check if invocation tracking is disabled #}
     {% if the_tuva_project.get_config_var('disable_tuva_invocation_tracking') %}
         {% do log("Tuva invocation tracking disabled via disable_tuva_invocation_tracking variable", info=true) %}
