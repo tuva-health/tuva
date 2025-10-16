@@ -5,13 +5,14 @@
 with sub_exposures as (
     select * from {{ ref('pharmacy__int_calculate_sub_exposures') }}
 ),
--- Apply a 30-day persistence window. if subsequent exposure is within 30 days, it is considered a continuation of the previous exposure.
+
+-- Apply a 30-day persistence window
 get_end_dates as (
     select
         person_id,
         ingredient_rxcui,
         ingredient_name,
-        event_date - interval '30 days' as end_date -- Subtract the 30-day persistence window
+        {{ dbt.dateadd('day', -30, 'event_date') }} as end_date
     from (
         select
             person_id,
@@ -49,15 +50,16 @@ get_end_dates as (
                 person_id,
                 ingredient_rxcui,
                 ingredient_name,
-                drug_sub_exposure_end_date + interval '30 days' as event_date,
+                {{ dbt.dateadd('day', 30, 'drug_sub_exposure_end_date') }} as event_date,
                 1 as event_type,
-                null
+                null as start_ordinal
             from sub_exposures
         ) raw_data
     ) e
     where (2 * e.start_ordinal) - e.overall_ord = 0
 ),
--- Determine the final drug era end date by joining sub-exposures with padded end dates
+
+-- Determine the final drug era end date
 drug_era_ends as (
     select
         se.person_id,
@@ -73,13 +75,14 @@ drug_era_ends as (
         and se.ingredient_rxcui = e.ingredient_rxcui
         and e.end_date >= se.drug_sub_exposure_start_date
     group by
-         se.person_id,
-         se.ingredient_rxcui,
-         se.ingredient_name,
-         se.drug_sub_exposure_start_date,
-         se.drug_exposure_count,
-         se.days_exposed
+        se.person_id,
+        se.ingredient_rxcui,
+        se.ingredient_name,
+        se.drug_sub_exposure_start_date,
+        se.drug_exposure_count,
+        se.days_exposed
 ),
+
 -- Aggregate results
 final_eras as (
     select
@@ -89,9 +92,9 @@ final_eras as (
         min(drug_sub_exposure_start_date) as drug_era_start_date,
         drug_era_end_date,
         sum(drug_exposure_count) as drug_exposure_count,
-        greatest(0, datediff('day', min(drug_sub_exposure_start_date), drug_era_end_date) + 1 - sum(days_exposed)) as gap_days,
+        greatest(0, {{ dbt.datediff('min(drug_sub_exposure_start_date)', 'drug_era_end_date', 'day') }} + 1 - sum(days_exposed)) as gap_days,
         sum(days_exposed) as total_days_exposed,
-        datediff('day', min(drug_sub_exposure_start_date), drug_era_end_date) + 1 as era_duration_in_days
+        {{ dbt.datediff('min(drug_sub_exposure_start_date)', 'drug_era_end_date', 'day') }} + 1 as era_duration_in_days
     from drug_era_ends
     group by
         person_id,
@@ -99,6 +102,7 @@ final_eras as (
         ingredient_name,
         drug_era_end_date
 )
+
 -- Calculate PDC and select final columns
 select
     person_id,
@@ -110,6 +114,14 @@ select
     cast(total_days_exposed as integer) as total_days_exposed,
     cast(era_duration_in_days as integer) as era_duration_in_days,
     cast(gap_days as integer) as gap_days,
-    round((total_days_exposed::float / era_duration_in_days::float) * 100, 2) as pdc,
+    -- Safety guard for division by zero
+    round(
+        case 
+            when era_duration_in_days > 0 
+            then (total_days_exposed::float / era_duration_in_days::float) * 100
+            else 0 
+        end, 
+        2
+    ) as pdc,
     '{{ var('tuva_last_run') }}' as tuva_last_run
 from final_eras
