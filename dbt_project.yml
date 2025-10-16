@@ -57,10 +57,6 @@ vars:
     ## Set this variable to true if you want legacy data quality models to build
     enable_legacy_data_quality: false
 
-    ## Control whether the on-run-start tuva invocation tracking hook executes.
-    ## Set to true to disable the hook. Enabled by default.
-    disable_tuva_invocation_tracking: false
-
 on-run-start:
   - "{{ log_invocation_start() }}"
 on-run-end:

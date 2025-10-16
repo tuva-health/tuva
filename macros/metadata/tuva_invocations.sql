@@ -56,12 +56,6 @@
         {% do return('') %}
     {% endif %}
 
-    {# Check if invocation tracking is disabled #}
-    {% if the_tuva_project.get_config_var('disable_tuva_invocation_tracking') %}
-        {% do log("Tuva invocation tracking disabled via disable_tuva_invocation_tracking variable", info=true) %}
-        {% do return('') %}
-    {% endif %}
-
     {# Records the invocation start with the tuva project package version. #}
     {%- set schema_name = generate_schema_name(custom_schema_name='metadata') %}
     {# Capture the boolean result from create_tuva_invocations_table #}
