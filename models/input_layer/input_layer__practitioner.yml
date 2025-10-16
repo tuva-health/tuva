@@ -11,7 +11,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
       tags: input_layer
       materialized: view
-    columns:
+    columns:         
       - name: practitioner_id
         description: '{{ doc("practitioner_id") }}'
         tests:
@@ -81,6 +81,10 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: year
+      - name: aco_id
+      - name: ccn
+      - name: tin
       - name: practice_affiliation
         description: '{{ doc("practice_affiliation") }}'
         tests:
@@ -94,7 +98,7 @@ models:
               tags: ['tuva_dqi_sev_5', 'dqi']
               config:
                 severity: warn
-                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+                enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"          
       - name: specialty
         description: '{{ doc("specialty") }}'
         tests:
