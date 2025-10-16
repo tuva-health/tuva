@@ -1,5 +1,5 @@
-name: "the_tuva_project"
-version: "0.15.3"
+name: 'the_tuva_project'
+version: '0.15.3'
 config-version: 2
 require-dbt-version: ">=1.9.0"
 
@@ -18,48 +18,48 @@ flags:
   require_explicit_package_overrides_for_builtin_materializations: false # Needed for Elementary
 
 vars:
-  ## CCSR data mart vars
-  # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
-  record_type: "ip"
+    ## CCSR data mart vars
+    # Set to "ip" for inpatient data or "op" for outpatient data (More info in the README)
+    record_type: "ip"
 
-  # CCSR Version numbers from HCUP
-  dxccsr_version: "'2023.1'"
-  prccsr_version: "'2023.1'"
+    # CCSR Version numbers from HCUP
+    dxccsr_version: "'2023.1'"
+    prccsr_version: "'2023.1'"
 
-  ## CMS HCC data mart vars
-  # The payment_year variable has a default of the current year, this can be
-  # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
-  cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
+    ## CMS HCC data mart vars
+    # The payment_year variable has a default of the current year, this can be
+    # changed by adding the numeric value of a year (ex: cms_hcc_payment_year: 2019)
+    cms_hcc_payment_year: '{{ run_started_at.strftime("%Y") }}'
 
-  ## Quality Measures period var
-  # to run quality measueres for a period other than current year, add the below variable uncommented to your project
-  #quality_measures_period_end: "2020-12-31"
+    ## Quality Measures period var
+    # to run quality measueres for a period other than current year, add the below variable uncommented to your project
+    #quality_measures_period_end: "2020-12-31"
 
-  ## Enable Normalize engine var
-  # set to false or leave undefined to affect no change
-  # set to unmapped to enable models in normalize schema that list any codes not mapped to normalized codes
-  # set to true produce the unmapped code models, and to integrate a seed called custom_mapped to map codes to normalized
-  # enable_normalize_engine: false
+    ## Enable Normalize engine var
+    # set to false or leave undefined to affect no change
+    # set to unmapped to enable models in normalize schema that list any codes not mapped to normalized codes
+    # set to true produce the unmapped code models, and to integrate a seed called custom_mapped to map codes to normalized
+    # enable_normalize_engine: false
 
-  ## Tuva Last Run
-  # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
-  # Default timezone is UTC
-  tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
+    ## Tuva Last Run
+    # The date and timestamp of the dbt run that will populate the tuva_last_run column in all models.
+    # Default timezone is UTC
+    tuva_last_run: '{{ run_started_at.astimezone(modules.pytz.timezone("UTC")) }}'
 
-  ## Tuva seed S3 bucket override (for PG only) - also optional prefix in case the bucket has other content
-  #tuva_seeds_s3_bucket: "tuva-public-resources"
-  #tuva_seeds_s3_key_prefix: "tuva/seeds/example/prefix"
-  custom_bucket_name: tuva-public-resources
+    ## Tuva seed S3 bucket override (for PG only) - also optional prefix in case the bucket has other content
+    #tuva_seeds_s3_bucket: "tuva-public-resources"
+    #tuva_seeds_s3_key_prefix: "tuva/seeds/example/prefix"
+    custom_bucket_name: tuva-public-resources
 
-  ## DQI data testing on input layer
-  enable_input_layer_testing: true
+    ## DQI data testing on input layer
+    enable_input_layer_testing: true
 
-  ## Set this variable to true if you want legacy data quality models to build
-  enable_legacy_data_quality: false
+    ## Set this variable to true if you want legacy data quality models to build
+    enable_legacy_data_quality: false
 
-  ## Control whether the on-run-start tuva invocation tracking hook executes.
-  ## Set to true to disable the hook. Enabled by default.
-  disable_tuva_invocation_tracking: false
+    ## Control whether the on-run-start tuva invocation tracking hook executes.
+    ## Set to true to disable the hook. Enabled by default.
+    disable_tuva_invocation_tracking: false
 
 on-run-start:
   - "{{ log_invocation_start() }}"
@@ -75,8 +75,8 @@ snapshot-paths: ["snapshots"]
 docs-paths: ["dbt_doc_blocks"]
 target-path: "target"
 clean-targets:
-  - "target"
-  - "dbt_packages"
+    - "target"
+    - "dbt_packages"
 
 seeds:
   the_tuva_project:
@@ -194,7 +194,7 @@ seeds:
       terminology__rxnorm_to_atc:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','rxnorm_to_atc.csv',compression=true,null_marker=true) }}"
       terminology__rxnorm_brand_generic:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','rxnorm_brand_generic.csv',compression=true,null_marker=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','rxnorm_brand_generic.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.3','snomed_ct.csv',compression=true,null_marker=true) }}"
       terminology__snomed_ct_transitive_closures:
