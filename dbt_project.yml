@@ -61,10 +61,10 @@ vars:
   ## Set to true to disable the hook. Enabled by default.
   disable_tuva_invocation_tracking: false
 
-  on-run-start:
-    - "{{ log_invocation_start() }}"
-  on-run-end:
-    - "{{ log_warning_for_seeds() }}"
+on-run-start:
+  - "{{ log_invocation_start() }}"
+on-run-end:
+  - "{{ log_warning_for_seeds() }}"
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
