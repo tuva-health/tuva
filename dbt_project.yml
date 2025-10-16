@@ -57,17 +57,9 @@ vars:
   ## Set this variable to true if you want legacy data quality models to build
   enable_legacy_data_quality: false
 
-  ## Hook Configuration Variables
-  ## Control which on-run-start and on-run-end hooks execute.
-  ## All hooks are enabled by default. Set to true to disable a hook.
-
-  ## Disable invocation tracking (skip recording dbt runs in metadata.tuva_invocations)
+  ## Control whether the on-run-start tuva invocation tracking hook executes.
+  ## Set to true to disable the hook. Enabled by default.
   disable_tuva_invocation_tracking: false
-
-on-run-start:
-  - "{{ log_invocation_start() }}"
-on-run-end:
-  - "{{ log_warning_for_seeds() }}"
 
 model-paths: ["models"]
 analysis-paths: ["analyses"]
