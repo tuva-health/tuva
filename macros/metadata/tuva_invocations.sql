@@ -50,11 +50,17 @@
 
 
 {% macro log_invocation_start() %}
+    {# Check if invocation tracking is disabled #}
+    {% if the_tuva_project.get_config_var('disable_tuva_invocation_tracking') %}
+        {% do log("Tuva invocation tracking disabled via disable_tuva_invocation_tracking variable", info=true) %}
+        {% do return('') %}
+    {% endif %}
+
     {# Records the invocation start with the tuva project package version. #}
     {%- set schema_name = generate_schema_name(custom_schema_name='metadata') %}
     {# Capture the boolean result from create_tuva_invocations_table #}
     {%- set table_created = the_tuva_project.create_tuva_invocations_table(schema_name) -%}
-    
+
     {# Only run DML if table_created is true. It will be false if a non-supported database is used. #}
     {%- if table_created -%}
         {# Insert the record #}
@@ -67,14 +73,14 @@
                 run_started_at
             )
             values
-            ( 
+            (
                 '{{ invocation_id }}',
                 '{{ project_name }}',
                 '{{ the_tuva_project.get_tuva_package_version() }}',
                 '{{ run_started_at }}'
             )
         {% endset %}
-        
+
         {% do run_query(query) %}
 
         {%- do the_tuva_project.drop_old_tuva_invocations(schema_name) -%}
