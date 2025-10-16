@@ -1,11 +1,5 @@
 -- macros/log_warning_for_seeds.sql
 {% macro log_warning_for_seeds() %}
-    {# Check if seed validation is disabled #}
-    {% if the_tuva_project.get_config_var('disable_tuva_seed_validation') %}
-        {% do log("Seed validation disabled via disable_tuva_seed_validation variable", info=true) %}
-        {% do return('') %}
-    {% endif %}
-
     {% set seeds = get_selected_seeds() %}
 
     {% for seed in seeds %}

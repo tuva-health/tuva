@@ -1,8 +1,7 @@
 {% macro get_default_config() %}
   {# Centralized default configuration for all Tuva hooks #}
   {% set default_config = {
-    'disable_tuva_invocation_tracking': false,
-    'disable_tuva_seed_validation': false
+    'disable_tuva_invocation_tracking': false
   } %}
   {% do return(default_config) %}
 {% endmacro %}
