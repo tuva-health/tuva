@@ -119,7 +119,7 @@ select
     round(
         case 
             when era_duration_in_days > 0 
-            then (cast(total_days_exposed as {{ type_float() }}) / cast(era_duration_in_days as {{ type_float() }})) * 100
+            then (cast(total_days_exposed as {{ dbt.type_float() }}) / cast(era_duration_in_days as {{ dbt.type_float() }})) * 100
             else 0 
         end, 
         2
