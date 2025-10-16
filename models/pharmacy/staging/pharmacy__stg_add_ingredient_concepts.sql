@@ -10,141 +10,178 @@ product_to_ingredient as (
     select * from {{ ref('pharmacy__product_to_ingredient') }}
 ),
 
--- Step 1: Get ingredients for each claim line to build therapy key
-claim_lines_with_ingredients as (
+-- Step 1: Prepare claim lines with calculated end dates
+prepared_claim_lines as (
     select
-        pci.claim_id,
-        pci.claim_line_number,
-        pci.data_source,
-        pci.person_id,
-        pci.ndc_code,
-        pci.dispensing_date,
-        pci.days_supply,
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        ndc_code,
+        dispensing_date,
+        days_supply,
         -- Calculate original end date at claim line level
         case 
-            when pci.days_supply > 0 
-            then {{ dbt.dateadd('day', 'pci.days_supply - 1', 'pci.dispensing_date') }}
-            else pci.dispensing_date 
-        end as original_end_date,
-        -- Aggregate all ingredients for this NDC into a canonical therapy key
-        -- Sort ingredients to ensure consistent key regardless of order
-        string_agg(
-            cast(pti.ingredient_rxcui as varchar), 
-            '|' 
-            order by pti.ingredient_rxcui
-        ) as therapy_key
-    from pharmacy_claim_input pci
-    inner join product_to_ingredient pti
-        on pci.ndc_code = pti.ndc
+            when days_supply > 0 
+            then {{ dbt.dateadd('day', 'days_supply - 1', 'dispensing_date') }}
+            else dispensing_date 
+        end as original_end_date
+    from pharmacy_claim_input
     -- Filter invalid data upfront for data quality
-    where pci.days_supply is not null 
-      and pci.days_supply > 0
-    group by
-        pci.claim_id,
-        pci.claim_line_number,
-        pci.data_source,
-        pci.person_id,
-        pci.ndc_code,
-        pci.dispensing_date,
-        pci.days_supply,
-        case 
-            when pci.days_supply > 0 
-            then {{ dbt.dateadd('day', 'pci.days_supply - 1', 'pci.dispensing_date') }}
-            else pci.dispensing_date 
-        end
+    where days_supply is not null 
+      and days_supply > 0
 ),
 
--- Step 2: Number claim lines for sequential processing within each therapy
--- Now using ingredient-based therapy_key so brand/generic switches chain properly
-numbered_claim_lines as (
+-- Step 2: Explode claim lines to ingredient level BEFORE adjustment
+claim_line_ingredients as (
+    select
+        pcl.claim_id,
+        pcl.claim_line_number,
+        pcl.data_source,
+        pcl.person_id,
+        pcl.ndc_code,
+        pcl.dispensing_date as original_start_date,
+        pcl.original_end_date,
+        pcl.days_supply,
+        pti.ingredient_rxcui,
+        pti.ingredient_name
+    from prepared_claim_lines pcl
+    inner join product_to_ingredient pti
+        on pcl.ndc_code = pti.ndc
+),
+
+-- Step 3: Number rows at the ingredient level for sequential processing
+numbered_ingredient_exposures as (
     select
         claim_id,
         claim_line_number,
         data_source,
         person_id,
         ndc_code,
-        therapy_key,  -- Now contains sorted ingredient RxCUIs
-        dispensing_date as original_start_date,
-        original_end_date,
-        days_supply,
-        row_number() over(
-            partition by person_id, therapy_key  -- Partition by ingredients, not NDC
-            order by dispensing_date, claim_id, claim_line_number, data_source
-        ) as rn
-    from claim_lines_with_ingredients
-),
-
--- Step 3: RECURSIVE CLAIM LINE ADJUSTMENT WITHIN THERAPY GROUPS
--- Therapy groups based on actual ingredients
-recursive_claim_line_adjustments as (
-    -- Base case: first claim line for each person + therapy combination
-    select
-        claim_id,
-        claim_line_number,
-        data_source,
-        person_id,
-        ndc_code,
-        therapy_key,
         original_start_date,
         original_end_date,
         days_supply,
+        ingredient_rxcui,
+        ingredient_name,
+        row_number() over(
+            partition by person_id, ingredient_rxcui  -- Partition by individual ingredient
+            order by original_start_date, claim_id, claim_line_number, data_source
+        ) as rn
+    from claim_line_ingredients
+),
+
+-- Step 4: RECURSIVE ADJUSTMENT AT INGREDIENT LEVEL
+-- Each ingredient's chronology is adjusted independently
+recursive_ingredient_adjustments as (
+    -- Base case: first exposure for each person + ingredient combination
+    select
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        ndc_code,
+        original_start_date,
+        original_end_date,
+        days_supply,
+        ingredient_rxcui,
+        ingredient_name,
         rn,
         original_start_date as adjusted_start_date,
         original_end_date as adjusted_end_date
-    from numbered_claim_lines
+    from numbered_ingredient_exposures
     where rn = 1
     
     union all
     
-    -- Recursive case: subsequent claim lines within same therapy
+    -- Recursive case: subsequent exposures for same ingredient
     select
-        ncl.claim_id,
-        ncl.claim_line_number,
-        ncl.data_source,
-        ncl.person_id,
-        ncl.ndc_code,
-        ncl.therapy_key,
-        ncl.original_start_date,
-        ncl.original_end_date,
-        ncl.days_supply,
-        ncl.rn,
+        nie.claim_id,
+        nie.claim_line_number,
+        nie.data_source,
+        nie.person_id,
+        nie.ndc_code,
+        nie.original_start_date,
+        nie.original_end_date,
+        nie.days_supply,
+        nie.ingredient_rxcui,
+        nie.ingredient_name,
+        nie.rn,
         -- Adjusted start: later of (original start, prior adjusted end + 1 day)
         greatest(
-            ncl.original_start_date,
-            {{ dbt.dateadd('day', 1, 'rcla.adjusted_end_date') }}
+            nie.original_start_date,
+            {{ dbt.dateadd('day', 1, 'ria.adjusted_end_date') }}
         ) as adjusted_start_date,
         -- Adjusted end: adjusted start + days_supply - 1
         {{ dbt.dateadd(
             'day',
-            'ncl.days_supply - 1',
+            'nie.days_supply - 1',
             'greatest(
-                ncl.original_start_date,
-                ' ~ dbt.dateadd('day', 1, 'rcla.adjusted_end_date') ~ '
+                nie.original_start_date,
+                ' ~ dbt.dateadd('day', 1, 'ria.adjusted_end_date') ~ '
             )'
         ) }} as adjusted_end_date
-    from numbered_claim_lines ncl
-    inner join recursive_claim_line_adjustments rcla
-        on ncl.person_id = rcla.person_id
-        and ncl.therapy_key = rcla.therapy_key  -- Match on ingredient-based key
-        and ncl.rn = rcla.rn + 1  -- Sequential within therapy
+    from numbered_ingredient_exposures nie
+    inner join recursive_ingredient_adjustments ria
+        on nie.person_id = ria.person_id
+        and nie.ingredient_rxcui = ria.ingredient_rxcui  -- Match on specific ingredient
+        and nie.rn = ria.rn + 1  -- Sequential within ingredient
 ),
 
--- Step 4: Explode to ingredients, inheriting adjusted dates from claim line
--- All ingredients from the same claim line inherit the same adjusted dates
-add_ingredient as (
+-- Step 5: Collapse back to claim line level
+-- Take the MAX adjusted start date across all ingredients for each claim line
+claim_line_adjustments as (
     select
-        rcla.claim_id,
-        rcla.claim_line_number,
-        rcla.data_source,
-        rcla.person_id,
-        pti.ingredient_rxcui,
-        pti.ingredient_name,
-        rcla.adjusted_start_date as drug_exposure_start_date,
-        rcla.adjusted_end_date as drug_exposure_end_date,
-        rcla.days_supply
-    from recursive_claim_line_adjustments rcla
-    inner join product_to_ingredient pti
-        on rcla.ndc_code = pti.ndc
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        ndc_code,
+        max(adjusted_start_date) as adjusted_start_date,
+        -- Get days_supply (same for all ingredients from same claim line)
+        max(days_supply) as days_supply
+    from recursive_ingredient_adjustments
+    group by
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        ndc_code
+),
+
+-- Step 6: Calculate synchronized end date for the claim line
+claim_line_with_end_dates as (
+    select
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        ndc_code,
+        adjusted_start_date,
+        -- Recompute end date based on the synchronized start date
+        {{ dbt.dateadd('day', 'days_supply - 1', 'adjusted_start_date') }} as adjusted_end_date,
+        days_supply
+    from claim_line_adjustments
+),
+
+-- Step 7: Join synchronized dates back to all ingredients from each claim
+-- This ensures all ingredients from the same claim have identical coverage periods
+final_ingredient_exposures as (
+    select
+        cli.claim_id,
+        cli.claim_line_number,
+        cli.data_source,
+        cli.person_id,
+        cli.ingredient_rxcui,
+        cli.ingredient_name,
+        clw.adjusted_start_date as drug_exposure_start_date,
+        clw.adjusted_end_date as drug_exposure_end_date,
+        clw.days_supply
+    from claim_line_ingredients cli
+    inner join claim_line_with_end_dates clw
+        on cli.claim_id = clw.claim_id
+        and cli.claim_line_number = clw.claim_line_number
+        and cli.data_source = clw.data_source
+        and cli.person_id = clw.person_id
 )
 
-select * from add_ingredient
+select * from final_ingredient_exposures
