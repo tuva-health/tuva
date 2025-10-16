@@ -7,12 +7,13 @@ with sub_exposures as (
 ),
 
 -- Apply a 30-day persistence window
+-- Sub-exposures within 30 days are combined into the same era
 get_end_dates as (
     select
         person_id,
         ingredient_rxcui,
         ingredient_name,
-        {{ dbt.dateadd('day', -30, 'event_date') }} as end_date
+        event_date as end_date
     from (
         select
             person_id,
@@ -46,6 +47,7 @@ get_end_dates as (
             union all
 
             -- End events padded by 30 days for the grace period
+            -- This +30 days creates the persistence window
             select
                 person_id,
                 ingredient_rxcui,
@@ -56,17 +58,18 @@ get_end_dates as (
             from sub_exposures
         ) raw_data
     ) e
+    -- Event matching algorithm: pairs start/end events to identify era boundaries
     where (2 * e.start_ordinal) - e.overall_ord = 0
 ),
 
--- Determine the final drug era end date
+-- Determine the final drug era end date by joining sub-exposures with padded end dates
 drug_era_ends as (
     select
         se.person_id,
         se.ingredient_rxcui,
         se.ingredient_name,
         se.drug_sub_exposure_start_date,
-        min(e.end_date) as drug_era_end_date,
+        min(e.end_date) as drug_era_end_date, 
         se.drug_exposure_count,
         se.days_exposed
     from sub_exposures se
