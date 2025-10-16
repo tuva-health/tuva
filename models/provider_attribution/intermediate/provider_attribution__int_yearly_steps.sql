@@ -1,0 +1,94 @@
+{{ config(
+     enabled = var('provider_attribution_enabled', var('tuva_marts_enabled', True)) | as_bool
+   )
+}}
+
+-- Yearly attribution steps (ACO-agnostic): Step 1 (PCP/NPP), Step 2 (Specialist), Step 3 (optional, expanded window PCP/NPP)
+
+with person_years as (
+  select * from {{ ref('provider_attribution__int_person_years') }}
+)
+
+, claims as (
+  select * from {{ ref('provider_attribution__int_primary_care_claims') }}
+)
+
+, step1 AS (
+  -- 12-month window: Jan..Dec of performance_year, PCP/NPP
+  select 
+      py.person_id
+    , py.performance_year
+    , c.provider_id
+    , coalesce(c.bucket, 'unknown') as bucket
+    , c.prov_specialty
+    , 1 as step
+    , sum(c.allowed_amount) as allowed_charges
+    , count(distinct c.claim_id) as visits
+  from person_years py
+  inner join claims c
+    on py.person_id = c.person_id
+   and left(c.claim_year_month,4) = cast(py.performance_year as {{ dbt.type_string() }})
+   and c.bucket in ('pcp','npp')
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
+)
+
+, step1_benes as (
+  select distinct person_id, performance_year from step1
+)
+
+, step2 AS (
+  -- 12-month window: Jan..Dec of performance_year, Specialists only; only for benes not in step1
+  select 
+      py.person_id
+    , py.performance_year
+    , c.provider_id
+    , coalesce(c.bucket, 'unknown') as bucket
+    , c.prov_specialty
+    , 2 as step
+    , sum(c.allowed_amount) as allowed_charges
+    , count(distinct c.claim_id) as visits
+  from person_years py
+  inner join claims c
+    on py.person_id = c.person_id
+   and left(c.claim_year_month,4) = cast(py.performance_year as {{ dbt.type_string() }})
+   and c.bucket = 'specialist'
+  left join step1_benes s1
+    on s1.person_id = py.person_id and s1.performance_year = py.performance_year
+  where s1.person_id is null
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
+)
+
+, step2_benes as (
+  select distinct person_id, performance_year from step2
+)
+
+, step3 AS (
+  -- 24-month expanded: Jan of Y-1 .. Dec of Y, PCP/NPP only; only for benes not in step1/step2
+  select 
+      py.person_id
+    , py.performance_year
+    , c.provider_id
+    , coalesce(c.bucket, 'unknown') as bucket
+    , c.prov_specialty
+    , 3 as step
+    , sum(c.allowed_amount) as allowed_charges
+    , count(distinct c.claim_id) as visits
+  from person_years py
+  inner join claims c
+    on py.person_id = c.person_id
+   and c.claim_year_month between concat(cast(py.performance_year - 1 as {{ dbt.type_string() }}),'01') 
+                               and concat(cast(py.performance_year as {{ dbt.type_string() }}),'12')
+   and c.bucket in ('pcp','npp')
+  left join step1_benes s1
+    on s1.person_id = py.person_id and s1.performance_year = py.performance_year
+  left join step2_benes s2
+    on s2.person_id = py.person_id and s2.performance_year = py.performance_year
+  where s1.person_id is null and s2.person_id is null and {{ var('expanded_window_enabled', True) }}
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
+)
+
+select * from step1
+union all
+select * from step2
+union all
+select * from step3
