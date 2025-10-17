@@ -6,7 +6,7 @@ with union_cte as
 
 ,cte as (
 select *
-,row_number() over (partition by coverage_id, url order order by file_date desc)  as most_recent_record
+,row_number() over (partition by coverage_id, url order by file_date desc)  as most_recent_record
 from union_cte
 )
 
