@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('cms_provider_attribution_validation_enabled',var('tuva_marts_enabled',False))
+     enabled = var('cms_provider_attribution_validation_enabled'False)
  | as_bool
    )
 }}
