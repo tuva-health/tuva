@@ -20,7 +20,7 @@ select
     , count(distinct case when part_a_b_only_excluded = 0 and excl.person_id is not null then bene.person_id else null end) as incorrectly_excluded
     , count(distinct case when part_a_b_only_excluded = 1 and excl.person_id is null then bene.person_id else null end) as incorrectly_included
 from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}} bene
-inner join {{ref('cms_provider_attribution__stg_aalr1')}} aalr -- limit to just prospectively assigned benes
+inner join {{ref('cms_provider_attribution__stg_alr1')}} aalr -- limit to just prospectively assigned benes
     on  bene.aco_id = aalr.aco_id
     and bene.person_id = aalr.person_id
     and bene.performance_year = aalr.performance_year 

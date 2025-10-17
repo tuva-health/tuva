@@ -6,7 +6,7 @@ with totals as
 select 
       assignment_type
     , count(distinct person_id) as total_ct
-from {{ref('cms_provider_attribution__stg_aalr1')}}
+from {{ref('cms_provider_attribution__stg_alr1')}}
 where 1=1
     and excluded = 0
 group by 
@@ -40,7 +40,7 @@ select
     , count(distinct alr.person_id) as ct
     , avg(total_ct) as total_ct
     , count(distinct alr.person_id) * 1.0 / avg(total_ct)  as ratio
-from  {{ref('cms_provider_attribution__stg_aalr1')}} alr
+from  {{ref('cms_provider_attribution__stg_alr1')}} alr
 full outer join {{ref('cms_provider_attribution__assigned_beneficiaries')}} asgn
     on alr.person_id = asgn.person_id
 inner join totals
@@ -56,7 +56,7 @@ select count(distinct person_id) as ct from {{ref('cms_provider_attribution__ass
 select count(distinct person_id) as ct from {{ref('cms_provider_attribution__assignable_beneficiaries')}}
 )
 , alr_assigned as (
-select count(distinct person_id) as ct from {{ref('cms_provider_attribution__stg_aalr1')}}
+select count(distinct person_id) as ct from {{ref('cms_provider_attribution__stg_alr1')}}
 where excluded = 0
 )
 -- Step 2 misassigned as step 1
@@ -65,7 +65,7 @@ where excluded = 0
 select distinct
   pot.person_id
 from  {{ref('cms_provider_attribution__assigned_beneficiaries')}} pot
-inner join {{ref('cms_provider_attribution__stg_aalr1')}} alr
+inner join {{ref('cms_provider_attribution__stg_alr1')}} alr
     on pot.person_id = alr.person_id
     and pot.step != alr.assignment_type
     and excluded = 0
