@@ -33,7 +33,7 @@ inner join {{ ref('cms_provider_attribution__stg_coverage_extension') }} buyin
 )
 
 select 
-    {{var('aco_id')}} as aco_id
+    '{{var("aco_id")}}' as aco_id
   , person_id
   , performance_year
   , datefromparts(performance_year, cast(buyin_month as int), 1) as coverage_month

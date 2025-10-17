@@ -11,7 +11,7 @@ select distinct
     , prov.person_id
 
 from {{ref('cms_provider_attribution__int_table1_e__primary_care_services_by_valid_providers')}} prov
-left join {{ref('cms_provider_attribution__stg_aalr1')}} aalr
+left join {{ref('cms_provider_attribution__stg_alr1')}} aalr
     on  prov.aco_id = aalr.aco_id
     and prov.person_id = aalr.person_id
     and prov.performance_year = aalr.performance_year 

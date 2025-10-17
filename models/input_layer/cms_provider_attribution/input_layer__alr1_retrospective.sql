@@ -14,5 +14,4 @@ select
     , 0 as outside_us_excluded
     , 0 as other_shared_sav_init     
     , cast(filename as {{ dbt.type_string() }}) as file_name
-from {{source('phds_lakehouse_test', 'yak_alr_1_1')}}
-where filename = 'P.A5321.ACO.QALR.2025Q2.D259999.T0200000_1-1.csv'
+from from {{ref('alr1_retrospective')}}

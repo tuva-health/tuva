@@ -31,4 +31,4 @@ Can also be found at the following eCFR link: https://www.ecfr.gov/current/title
 -- Exclusions for retrospective are also based on the same year as the performance year
 where 1=1
   and performance_year = {{ var('performance_year') }}
-  and aco_id = {{ var('aco_id') }}
+  and aco_id = '{{ var("aco_id") }}'

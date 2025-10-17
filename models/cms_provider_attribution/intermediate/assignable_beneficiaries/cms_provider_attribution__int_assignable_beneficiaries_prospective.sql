@@ -22,7 +22,7 @@ select distinct
     , coalesce(asgn.assignment_methodology, 'prospective') as assignment_methodology
     , case when vol.person_id is not null then 1 else 0 end as voluntarily_aligned
 from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}} bene
-inner join {{ref('cms_provider_attribution__stg_aalr1')}} aalr -- limit to just prospectively assigned benes
+inner join {{ref('cms_provider_attribution__stg_alr1')}} aalr -- limit to just prospectively assigned benes
     on  bene.aco_id = aalr.aco_id
     and bene.person_id = aalr.person_id
     and bene.performance_year = aalr.performance_year 
