@@ -24,7 +24,7 @@ with yearly as (
   select cast(substring('{{ var('tuva_last_run') }}',1,10) as date) as as_of_date
 )
 
-, current as (
+, current_scope as (
   select 
       s.person_id
     , null as performance_year
@@ -33,7 +33,7 @@ with yearly as (
     , s.bucket
     , s.prov_specialty
     , s.step
-    , s.allowed_charges
+    , s.allowed_charges as charges
     , s.visits
     , 'current' as scope
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "s.person_id"]) }} as attribution_key
@@ -50,7 +50,7 @@ select
   , bucket
   , prov_specialty
   , step
-  , charges
+  , allowed_charges as charges
   , visits
   , scope
   , ranking
@@ -72,4 +72,4 @@ select
   , scope
   , ranking
   , attribution_key
-from current
+from current_scope
