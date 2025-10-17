@@ -66,7 +66,7 @@ vars:
     # claims_preprocessing_enabled: false
     # cms_chronic_conditions_enabled: false
     # cms_hcc_enabled: false
-    # cms_provider_attribution_enabled: false
+    # cms_provider_attribution_enabled: true
     # ed_classification_enabled: false
     # fhir_preprocessing_enabled: true # defaults to false
     # financial_pmpm_enabled: false
@@ -75,6 +75,15 @@ vars:
     # quality_measures_enabled: false
     # readmissions_enabled: true
     # tuva_chronic_conditions_enabled: false
+
+    # -- TEST (my test fields)
+    claims_enabled: true
+    performance_year: 2025
+    attribution_claims_source: bcda
+    assignment_methodology: retrospective
+    aco_id: "'A5321'"
+    cms_provider_attribution_enabled: true
+
     
 on-run-start:
   - "{{ log_invocation_start() }}"

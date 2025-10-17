@@ -1,0 +1,387 @@
+version: 2
+
+# Assignable models
+
+models:
+  - name: cms_provider_attribution__int_assignable_beneficiaries
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_assignable_beneficiaries
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id    
+  - name: cms_provider_attribution__int_assignable_beneficiaries_retrospective
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_beneficiaries_retrospective
+      tags: ["cms_provider_attribution", "intermediate"]
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+  - name: cms_provider_attribution__int_assignable_beneficiaries_prospective
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_beneficiaries_prospective
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id         
+  - name: cms_provider_attribution__int_deceased_beneficiaries
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_deceased_beneficiaries
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - person_id      
+  - name: cms_provider_attribution__int_table1_a__part_a_and_b
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_part_a_and_b
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id          
+  - name: cms_provider_attribution__int_table1_b__private_health_plan
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_private_health_plan
+      tags: ["cms_provider_attribution", "intermediate"]      
+    description: >
+      Medicare Group Private Health Plan Enrollment: Section 2.1, Table 1, B
+
+      "Beneficiary does not have any months of Medicare group
+      (private) health plan enrollment."
+
+      - We could use the private health plan claims, but we would need an EMPI to link person_ids together
+      - TODO: Set an input source for private health plan claims, but make it optional
+  - name: cms_provider_attribution__int_table1_c__other_shared_saving_initiative
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: other_shared_saving_initiative
+      tags: ["cms_provider_attribution", "intermediate"]      
+    description: >
+      Other Shared Savings Initiatives: Section 2.1, Table 1, C
+
+      "Beneficiary is not assigned to any other Medicare shared
+      savings initiative."
+
+      - TODO: Set an input source for benes on other Medicare shared savings initiatives, but make it optional
+  - name: cms_provider_attribution__int_table1_d__lived_in_us
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_lived_in_us
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id          
+  - name: cms_provider_attribution__int_table1_e__primary_care_services      
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_primary_care_services
+      tags: ["cms_provider_attribution", "intermediate"]     
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - performance_year
+            - person_id
+            - claim_id
+            - claim_line_number  
+  - name: cms_provider_attribution__int_table1_e__primary_care_services_by_valid_providers    
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_primary_care_services_by_valid_providers
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: aco_id
+        tests:
+          - not_null       
+      - name: performance_year
+        tests:
+          - not_null          
+      - name: person_id
+        tests:
+          - not_null                        
+      - name: claim_id
+        tests:
+          - not_null
+      - name: claim_line_number
+        tests:
+          - not_null
+      - name: provider_type_for_assignment
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - performance_year
+            - person_id
+            - claim_id
+            - claim_line_number
+  - name: cms_provider_attribution__int_table1_f__aco_plurality
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_aco_plurality
+      tags: ["cms_provider_attribution", "intermediate"]
+    description: >
+      Determine which ACOs win assignment for a beneficiary
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - person_id
+            - plurality_group
+            - aco_professional
+            - step
+  - name: cms_provider_attribution__int_table1_g__voluntary_alignment
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_voluntary_alignment
+      tags: ["cms_provider_attribution", "intermediate"]      
+    description: >
+      Voluntary Alignment Beneficiary Designation: Section 2.1, Table 1, G
+      "Beneficiary designated as a primary clinician through
+      MyMedicare.gov as an ACO professional participating in the
+      ACO."
+
+      This is only for voluntary alignment so not doing this here.
+# Assigned models  
+  - name: cms_provider_attribution__int_assigned_beneficiaries__asgn_windows
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_asgn_windows
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: aco_id
+        tests:
+          - not_null       
+      - name: claim_id
+        tests:
+          - not_null
+      - name: claim_line_number
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - claim_id
+            - claim_line_number      
+  - name: cms_provider_attribution__int_assigned_beneficiaries__step_0
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_step_0
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: aco_id
+        tests:
+          - not_null       
+      - name: performance_year
+        tests:
+          - not_null
+      - name: person_id
+        tests:
+          - not_null
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - performance_year
+            - person_id
+            - aco_professional
+  - name: cms_provider_attribution__int_assigned_beneficiaries__step_1
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_step_1
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+            - npi
+            - tin
+            - ccn    
+            - aco_professional
+  - name: cms_provider_attribution__int_assigned_beneficiaries__step_2
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_step_2
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+            - npi
+            - tin
+            - ccn     
+            - aco_professional   
+  - name: cms_provider_attribution__int_assigned_beneficiaries__step_3
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_step_3
+      tags: ["cms_provider_attribution", "intermediate"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+            - npi
+            - tin
+            - ccn
+            - aco_professional
+  - name: cms_provider_attribution__int_assigned_beneficiaries__provider_plurality
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_provider_plurality
+      tags: ["cms_provider_attribution", "intermediate"]      
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+            - step
+            - npi
+  - name: cms_provider_attribution__int_assigned_beneficiaries__all_steps
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: int_all_steps
+      tags: ["cms_provider_attribution", "intermediate"]        

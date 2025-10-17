@@ -1,0 +1,393 @@
+version: 2
+
+models:
+  - name: cms_provider_attribution__stg_aalr1_prospective
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_aalr_prospective
+      tags: ["cms_provider_attribution", "staging"]  
+  - name: cms_provider_attribution__stg_aalr1_retrospective
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_aalr_retrospective
+      tags: ["cms_provider_attribution", "staging"]  
+  - name: cms_provider_attribution__stg_aalr1
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_aalr
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+    description: >
+      MSSP AALR Files(s)   
+  - name: cms_provider_attribution__stg_providers
+    config:
+      materialized: table
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_providers
+      tags: ["cms_provider_attribution", "staging"]
+    description: >
+      ACO providers      
+    columns:
+      - name: provider_type_for_assignment
+        tests:
+          - not_null    
+      - name: npi
+        tests:
+          - not_null
+          - unique                       
+  - name: cms_provider_attribution__stg_assignment_methodology
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_assignment_methodology
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+    description: >
+      Assignment methodology for each ACO      
+  - name: cms_provider_attribution__stg_cclf1
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_cclf1
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+      - name: claim_id
+        tests:
+          - not_null
+          - unique
+    description: >
+      MSSP CCLF 1 File(s)  
+  - name: cms_provider_attribution__stg_cclf8
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_cclf8
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null     
+      - name: coverage_month
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null          
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - person_id   
+            - coverage_month
+            - performance_year
+    description: >
+      MSSP CCLF 8 File(s)
+  - name: cms_provider_attribution__stg_ccn_participant_list
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_ccn_participant_list
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table      
+    description: >
+      CMS MSSP CCN participant list(s)
+    columns:
+    - name: performance_year
+      tests:
+        - not_null
+    - name: aco_id
+      tests:
+        - not_null
+    - name: ccn
+      tests:
+        - not_null        
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - ccn
+  - name: cms_provider_attribution__stg_provider_supplier_list
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_provider_supplier_list
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+    - name: performance_year
+      tests:
+        - not_null
+    - name: aco_id
+      tests:
+        - not_null    
+    - name: tin
+      tests:
+        - not_null           
+    # TEST
+    # - name: file_date
+    #   tests:
+    #     - not_null              
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - tin
+            - npi    
+            - ccn
+            # TEST
+            # - file_date
+    description: >
+      Provider Supplier List(s)     
+  - name: cms_provider_attribution__stg_tin_participant_list
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_tin_participant_list
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table      
+    columns:
+    - name: performance_year
+      tests:
+        - not_null
+    - name: aco_id
+      tests:
+        - not_null
+    - name: tin
+      tests:
+        - not_null        
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - tin          
+    description: >
+      CMS MSSP TIN participant list(s)
+
+  # BCDA models
+  - name: cms_provider_attribution__stg_cclf1_bcda
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_cclf1_bcda
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+      - name: claim_id
+        tests:
+          - unique
+          - not_null 
+  - name: cms_provider_attribution__stg_cclf8_bcda
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_cclf8_bcda
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null     
+      - name: coverage_month
+        tests:
+          - not_null           
+      - name: performance_year
+        tests:
+          - not_null                
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - aco_id
+            - person_id   
+            - coverage_month
+            - performance_year
+    description: >
+      The BCDA file formatted similar to the MSSP CCLF 8 file  
+  - name: cms_provider_attribution__stg_coverage_extension
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_coverage_extension
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_coverage
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_coverage
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table      
+  - name: cms_provider_attribution__stg_eob_header
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_eob_header
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table      
+  - name: cms_provider_attribution__stg_eob_supporting_info
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_supporting_info
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table       
+  - name: cms_provider_attribution__stg_patient_identifier
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_patient_identifier
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table          
+  - name: cms_provider_attribution__stg_patient
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_patient
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_fips_ssa_state_map
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_fips_ssa_state_map
+      tags: ["cms_provider_attribution", "staging"]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - fips_state
+            - ssa_state
+  - name: cms_provider_attribution__stg_eob
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_eob
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_eob_extension
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_eob_extension
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_eob_careteam
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_eob_careteam
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_eob_item_0_extension
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_eob_item_0_extension
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_eob_lineitems
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_eob_lineitems
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table      
+  - name: cms_provider_attribution__stg_cclf5_bcda
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_cclf5_bcda
+      tags: ["cms_provider_attribution", "staging"]
+      materialized: table
+  - name: cms_provider_attribution__stg_beneficiary_demographics
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_beneficiary_demographics
+      tags: ["cms_provider_attribution", "staging"]      
+    columns:
+      - name: person_id
+        tests:
+          - not_null
+      - name: performance_year
+        tests:
+          - not_null
+      - name: aco_id
+        tests:
+          - not_null        
+      - name: coverage_month
+        tests:
+          - not_null      
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - performance_year
+            - aco_id
+            - person_id
+            - coverage_month      
+  - name: cms_provider_attribution__stg_part_a_header_claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_part_a_header_claims
+      tags: ["cms_provider_attribution", "staging"]  
+  - name: cms_provider_attribution__stg_part_b_professional_claims
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_part_b_professional_claims
+      tags: ["cms_provider_attribution", "staging"]
+  - name: cms_provider_attribution__stg_network_providers
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_network_providers
+      tags: ["cms_provider_attribution", "staging"]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tin
+            - ccn
+            - npi
+      
