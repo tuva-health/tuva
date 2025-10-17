@@ -15,18 +15,7 @@ hospitals, and FQHCs and RHCs identified based on CCNs sourced from PECOS, as sp
 on the ACO Provider/Supplier List."
 */
 
-
-with unpivoted_taxonomy_codes as (
-    {{ dbt_utils.unpivot(
-        relation=ref('cms_provider_attribution__stg_provider_taxonomy_codes'),
-        cast_to='varchar',
-        exclude=['npi','NPI'],
-        field_name='taxonomy_code_field',
-        value_name='taxonomy_code'
-    ) }}
-)
-
-, base as (
+with base as (
 select distinct
       cast(prov.npi as varchar) as npi
     , prov_supp.aco_id
@@ -49,7 +38,7 @@ select distinct
           -- All those who have a mapping, but aren't specialties used in assignment are 'invalid specialists'
           when asgn_all.specialty_code is null and spec.provider_taxonomy_code is not null then 'invalid_specialist'
       end) as provider_type_for_assignment
-from unpivoted_taxonomy_codes prov
+from {{ref('cms_provider_attribution__stg_provider_taxonomy_unpivot')}} prov
 left join {{ref('cms_provider_attribution__stg_provider_supplier_list')}}  prov_supp
     on  cast(prov.npi as varchar(10)) = prov_supp.npi
     and prov_supp.performance_year = {{ var('performance_year') }}

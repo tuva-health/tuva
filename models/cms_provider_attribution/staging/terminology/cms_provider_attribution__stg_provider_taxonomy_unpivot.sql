@@ -1,0 +1,1 @@
+select * from {{ref('terminology__provider_taxonomy_unpivot')}}
