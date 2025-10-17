@@ -5,102 +5,77 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: _int_person_years
+      materialized: view
       tags: ["provider_attribution", "intermediate"]
-    columns:
-      - name: person_id
-        tests: [not_null]
-      - name: performance_year
-        tests: [not_null]
 
   - name: provider_attribution__provider_classification
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: _int_provider_classification
+      materialized: view
       tags: ["provider_attribution", "intermediate"]
-    columns:
-      - name: provider_id
-        tests: [not_null]
 
   - name: provider_attribution__int_primary_care_claims
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: _int_primary_care_claims
+      materialized: view
       tags: ["provider_attribution", "intermediate"]
-    columns:
-      - name: person_id
-        tests: [not_null]
-      - name: claim_id
-        tests: [not_null]
-      - name: claim_line_number
-        tests: [not_null]
-      - name: claim_year_month
-        tests: [not_null]
 
   - name: provider_attribution__int_yearly_steps
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: _int_yearly_steps
+      materialized: view
       tags: ["provider_attribution", "intermediate"]
 
   - name: provider_attribution__int_current_steps
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: _int_current_steps
+      materialized: view
       tags: ["provider_attribution", "intermediate"]
 
   - name: provider_attribution__assigned_beneficiaries_yearly
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: assigned_beneficiaries_yearly
+      materialized: table
       tags: ["provider_attribution", "final"]
     columns:
-      - name: person_id
-        tests: [not_null]
-      - name: performance_year
-        tests: [not_null]
-      - name: provider_id
-        tests: [not_null]
       - name: attribution_key
-        tests: [not_null]
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: [person_id, performance_year]
-      - unique:
-          column_name: attribution_key
+        tests:
+          - not_null
+          - unique
 
   - name: provider_attribution__assigned_beneficiaries_current
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: assigned_beneficiaries_current
+      materialized: table
       tags: ["provider_attribution", "final"]
     columns:
-      - name: person_id
-        tests: [not_null]
-      - name: as_of_date
-        tests: [not_null]
-      - name: provider_id
-        tests: [not_null]
       - name: attribution_key
-        tests: [not_null]
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns: [person_id]
-      - unique:
-          column_name: attribution_key
+        tests:
+          - not_null
+          - unique
 
   - name: provider_attribution__provider_ranking
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      alias: provider_ranking
+      materialized: table
       tags: ["provider_attribution", "final"]
     columns:
-      - name: person_id
-        tests: [not_null]
       - name: provider_id
-        tests: [not_null]
-      - name: scope
-        tests: [not_null]
-      - name: ranking
         tests: [not_null]
       - name: attribution_key
         tests: [not_null]

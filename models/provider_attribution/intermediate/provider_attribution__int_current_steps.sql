@@ -3,11 +3,21 @@
    )
 }}
 
--- Current rolling 12-month attribution steps using var('tuva_last_run') as as_of_date
+-- Current rolling 12-month attribution steps using data-driven as_of_date
 
-with params as (
-  select 
-    cast(substring('{{ var('tuva_last_run') }}',1,10) as date) as as_of_date
+with claim_bounds as (
+  select max(claim_end_date) as max_claim_end_date
+  from {{ ref('provider_attribution__int_primary_care_claims') }}
+)
+
+, params as (
+  select case
+           when max_claim_end_date is not null
+             and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)
+             then max_claim_end_date
+           else cast({{ dbt.current_timestamp() }} as date)
+         end as as_of_date
+  from claim_bounds
 )
 
 , months as (
@@ -24,28 +34,31 @@ with params as (
   select 
       c.person_id
     , c.provider_id
-    , c.bucket
+    , c.provider_bucket
     , c.prov_specialty
+    , c.encounter_id
     , c.claim_id
     , c.claim_year_month
     , c.allowed_amount
   from {{ ref('provider_attribution__int_primary_care_claims') }} c
   inner join months m
     on c.claim_year_month = m.year_month
+  cross join params p
+  where c.claim_end_date <= p.as_of_date
 )
 
 , step1 as (
   select 
       c.person_id
     , c.provider_id
-    , coalesce(c.bucket,'unknown') as bucket
+    , coalesce(c.provider_bucket,'unknown') as provider_bucket
     , c.prov_specialty
     , 1 as step
-    , sum(c.allowed_amount) as allowed_charges
-    , count(distinct c.claim_id) as visits
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
   from claims c
-  where c.bucket in ('pcp','npp')
-  group by c.person_id, c.provider_id, coalesce(c.bucket,'unknown'), c.prov_specialty
+  where c.provider_bucket in ('pcp','npp')
+  group by c.person_id, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
 )
 
 , step1_benes as (
@@ -56,15 +69,15 @@ with params as (
   select 
       c.person_id
     , c.provider_id
-    , coalesce(c.bucket,'unknown') as bucket
+    , coalesce(c.provider_bucket,'unknown') as provider_bucket
     , c.prov_specialty
     , 2 as step
-    , sum(c.allowed_amount) as allowed_charges
-    , count(distinct c.claim_id) as visits
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
   from claims c
   left join step1_benes s1 on s1.person_id = c.person_id
-  where s1.person_id is null and c.bucket = 'specialist'
-  group by c.person_id, c.provider_id, coalesce(c.bucket,'unknown'), c.prov_specialty
+  where s1.person_id is null and c.provider_bucket = 'specialist'
+  group by c.person_id, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
 )
 
 select * from step1

@@ -19,17 +19,17 @@ with person_years as (
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.bucket, 'unknown') as bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 1 as step
-    , sum(c.allowed_amount) as allowed_charges
-    , count(distinct c.claim_id) as visits
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
   from person_years py
   inner join claims c
     on py.person_id = c.person_id
    and left(c.claim_year_month,4) = cast(py.performance_year as {{ dbt.type_string() }})
-   and c.bucket in ('pcp','npp')
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
+   and c.provider_bucket in ('pcp','npp')
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
 , step1_benes as (
@@ -42,20 +42,20 @@ with person_years as (
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.bucket, 'unknown') as bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 2 as step
-    , sum(c.allowed_amount) as allowed_charges
-    , count(distinct c.claim_id) as visits
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
   from person_years py
   inner join claims c
     on py.person_id = c.person_id
    and left(c.claim_year_month,4) = cast(py.performance_year as {{ dbt.type_string() }})
-   and c.bucket = 'specialist'
+   and c.provider_bucket = 'specialist'
   left join step1_benes s1
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
   where s1.person_id is null
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
 , step2_benes as (
@@ -68,17 +68,17 @@ with person_years as (
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.bucket, 'unknown') as bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 3 as step
-    , sum(c.allowed_amount) as allowed_charges
-    , count(distinct c.claim_id) as visits
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
   from person_years py
   inner join claims c
     on py.person_id = c.person_id
    and c.claim_year_month between concat(cast(py.performance_year - 1 as {{ dbt.type_string() }}),'01') 
                                and concat(cast(py.performance_year as {{ dbt.type_string() }}),'12')
-   and c.bucket in ('pcp','npp')
+   and c.provider_bucket in ('pcp','npp')
   left join step1_benes s1
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
   left join step2_benes s2
@@ -86,7 +86,7 @@ with person_years as (
   where s1.person_id is null
     and s2.person_id is null
     and {{ '1=1' if var('expanded_window_enabled', True) else '1=0' }}
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
 select * from step1

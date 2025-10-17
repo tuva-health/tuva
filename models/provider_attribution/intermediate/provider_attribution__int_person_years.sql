@@ -15,4 +15,3 @@ select
     cast(person_id as {{ dbt.type_string() }}) as person_id
   , cast(performance_year as {{ dbt.type_int() }}) as performance_year
 from mm
-

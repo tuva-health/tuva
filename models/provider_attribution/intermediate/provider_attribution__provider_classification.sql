@@ -21,7 +21,7 @@ with base as (
         when lower(a.primary_care_physician_step1) = 'yes' and a.physician = 1 then 'pcp'
         when lower(a.specialist_physician_step_2) = 'yes' and a.physician = 1 then 'specialist'
         when a.physician = 0 then 'npp'
-      end as bucket
+      end as provider_bucket
   from base b
   inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} x
     on cast(b.primary_taxonomy_code as {{ dbt.type_string() }}) = cast(x.provider_taxonomy_code as {{ dbt.type_string() }})
@@ -33,6 +33,5 @@ with base as (
 select 
     provider_id
   , prov_specialty
-  , bucket
+  , provider_bucket
 from mapped
-

@@ -10,7 +10,9 @@ with claim_month as (
       mc.person_id
     , mc.claim_id
     , mc.claim_line_number
+    , mc.encounter_id
     , mc.claim_start_date
+    , mc.claim_end_date
     , {{ concat_custom([date_part('year', 'mc.claim_start_date'), dbt.right(concat_custom(["'0'", date_part('month','mc.claim_start_date')]), 2)]) }} as claim_year_month
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
@@ -31,7 +33,9 @@ with claim_month as (
       e.person_id
     , e.claim_id
     , e.claim_line_number
+    , e.encounter_id
     , e.claim_start_date
+    , e.claim_end_date
     , e.claim_year_month
     , e.allowed_amount
     , e.provider_id
@@ -43,7 +47,7 @@ with claim_month as (
 , with_bucket as (
   select 
       pcc.*
-    , pc.bucket
+    , pc.provider_bucket
     , pc.prov_specialty
   from primary_care_claims pcc
   left join {{ ref('provider_attribution__provider_classification') }} pc
