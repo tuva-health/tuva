@@ -5,4 +5,4 @@ select
     , CONVERT(date, expanded_window_start, 101) as expanded_window_start
     , CONVERT(date, window_start, 101) as window_start
     , CONVERT(date, window_end, 101) as window_end
-from {{source('cms_provider_attribution', 'assignment_windows')}}
+from {{ref('cms_provider_attribution__assignment_windows')}}

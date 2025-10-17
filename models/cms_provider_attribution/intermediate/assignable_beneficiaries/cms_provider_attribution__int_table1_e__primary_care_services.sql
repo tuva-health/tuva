@@ -179,7 +179,7 @@ left join inpatient_excluded_claims as ip
     and outpt.claim_id = ip.claim_id
     and outpt.claim_line_number = ip.claim_line_number
     and outpt.hcpcs_code in ('99497', '99498')
-left join {{ref('terminology__electing_teaching_hospital_list')}} as eta
+left join {{ref('cms_provider_attribution__stg_electing_teaching_hospital_list')}} as eta
     on eta.ccn = outpt.ccn
     and eta.collection_year = benes.performance_year - 1
 where 1=1

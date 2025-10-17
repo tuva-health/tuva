@@ -4,4 +4,4 @@ select
     , primary_care_physician_step1
     , specialist_physician_step_2
     , physician
-from {{source('cms_provider_attribution', 'provider_specialty_assignment_codes')}}
+from {{ref('cms_provider_attribution__provider_specialty_assignment_codes')}}

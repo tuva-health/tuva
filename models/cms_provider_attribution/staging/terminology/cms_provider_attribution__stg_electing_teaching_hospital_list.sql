@@ -1,4 +1,3 @@
--- NOTE: This is temporary until this can be integrated into the Tuva project
 select
       collection_year
     , RIGHT('000000' + ccn, 6) as ccn
