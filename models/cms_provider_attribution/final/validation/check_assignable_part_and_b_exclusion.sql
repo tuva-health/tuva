@@ -1,6 +1,13 @@
 -- Confirms that the part A and B exclusions are correct
 -- To run this validation, set your ALR to the final AALR for a prior performance year and update the performance year in your dbt_project.yml
 -- TODO: Limit to prospective since excluded is not a field for retrospective ACOs
+
+{{ config(
+     enabled = var('cms_provider_attribution_validation_enabled',var('tuva_marts_enabled',False))
+ | as_bool
+   )
+}}
+
 with excluded as (
 select distinct 
     bene.person_id
