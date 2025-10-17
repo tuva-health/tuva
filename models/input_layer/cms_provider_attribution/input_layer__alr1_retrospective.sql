@@ -14,4 +14,4 @@ select
     , 0 as outside_us_excluded
     , 0 as other_shared_sav_init     
     , cast(filename as {{ dbt.type_string() }}) as file_name
-from from {{ref('alr1_retrospective')}}
+from {{ref('alr1_retrospective')}}
