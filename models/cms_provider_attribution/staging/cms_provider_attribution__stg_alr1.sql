@@ -1,11 +1,11 @@
 with base as (
 {% if var('assignment_methodology') == 'retrospective' %}
 
-select retro.*, 'retrospective' as assignment_methodology from {{ref('cms_provider_attribution__stg_alr1_retrospective')}} retro
+select retro.*, 'retrospective' as assignment_methodology from {{ref('input_layer__stg_alr1_retrospective')}} retro
 
 {% elif var('assignment_methodology') == 'prospective' %}
 
-select prosp.*, 'prospective' as assignment_methodology from {{ref('cms_provider_attribution__stg_alr1_prospective')}} prosp
+select prosp.*, 'prospective' as assignment_methodology from {{ref('input_layer__stg_alr1_prospective')}} prosp
 
 {% endif %}
 )
