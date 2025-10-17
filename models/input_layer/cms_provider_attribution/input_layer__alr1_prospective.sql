@@ -1,6 +1,6 @@
 -- The latest AALR report
 select
-      cast(bene_mbi_id as {{ dbt.type_string() }}) as person_id
+      cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(in_va_max as {{ dbt.type_int() }}) as in_va_max
     , cast(va_tin as {{ dbt.type_string() }}) as va_tin
     , cast(va_npi as {{ dbt.type_string() }}) as va_npi
@@ -13,5 +13,5 @@ select
     , cast(ghp_excluded as {{ dbt.type_int() }}) as ghp_excluded
     , cast(outside_us_excluded as {{ dbt.type_int() }}) as outside_us_excluded
     , cast(other_shared_sav_init as {{ dbt.type_int() }}) as other_shared_sav_init     
-    , cast(filename as {{ dbt.type_string() }}) as file_name
+    , cast(file_name as {{ dbt.type_string() }}) as file_name
 from {{ref('alr1_prospective')}}
