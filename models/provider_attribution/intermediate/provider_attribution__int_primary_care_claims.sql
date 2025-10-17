@@ -10,7 +10,7 @@ with claim_month as (
       mc.person_id
     , mc.claim_id
     , mc.claim_line_number
-    , mc.encounter_id
+    , cast(cm.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , mc.claim_start_date
     , mc.claim_end_date
     , {{ concat_custom([date_part('year', 'mc.claim_start_date'), dbt.right(concat_custom(["'0'", date_part('month','mc.claim_start_date')]), 2)]) }} as claim_year_month
@@ -18,6 +18,10 @@ with claim_month as (
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
     , mc.hcpcs_code
   from {{ ref('input_layer__medical_claim') }} mc
+  left join {{ ref('core__stg_claims_medical_claim') }} cm
+    on mc.claim_id = cm.claim_id
+   and mc.claim_line_number = cm.claim_line_number
+   and mc.data_source = cm.data_source
 )
 
 , eligible_claims as (
