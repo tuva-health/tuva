@@ -25,6 +25,7 @@ with params as (
       c.person_id
     , c.provider_id
     , c.bucket
+    , c.prov_specialty
     , c.claim_id
     , c.claim_year_month
     , c.allowed_amount

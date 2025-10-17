@@ -83,7 +83,9 @@ with person_years as (
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
   left join step2_benes s2
     on s2.person_id = py.person_id and s2.performance_year = py.performance_year
-  where s1.person_id is null and s2.person_id is null and {{ var('expanded_window_enabled', True) }}
+  where s1.person_id is null
+    and s2.person_id is null
+    and {{ '1=1' if var('expanded_window_enabled', True) else '1=0' }}
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.bucket, 'unknown'), c.prov_specialty
 )
 
