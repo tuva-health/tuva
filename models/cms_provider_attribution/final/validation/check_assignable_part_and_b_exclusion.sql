@@ -3,7 +3,7 @@
 -- TODO: Limit to prospective since excluded is not a field for retrospective ACOs
 
 {{ config(
-     enabled = var('cms_provider_attribution_validation_enabled'False)
+     enabled = var('cms_provider_attribution_validation_enabled',False)
  | as_bool
    )
 }}
