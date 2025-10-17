@@ -21,6 +21,61 @@ with steps as (
   from steps
 )
 
+, eligible as (
+  select 
+      person_id
+    , performance_year
+  from {{ ref('provider_attribution__int_person_years') }}
+)
+
+, assigned as (
+  select 
+      person_id
+    , performance_year
+    , provider_id
+    , provider_bucket
+    , prov_specialty
+    , assigned_step
+    , allowed_amount
+    , visits
+    , case 
+        when assigned_step = 3
+          then cast(concat(cast(performance_year - 1 as {{ dbt.type_string() }}),'01','01') as date)
+        else cast(concat(cast(performance_year as {{ dbt.type_string() }}),'01','01') as date)
+      end as lookback_start_date
+    , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'12','31') as date) as lookback_end_date
+    , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
+  from ranked
+  where provider_rank = 1
+)
+
+, missing as (
+  select 
+      e.person_id
+    , e.performance_year
+  from eligible e
+  left join assigned a
+    on e.person_id = a.person_id
+   and e.performance_year = a.performance_year
+  where a.person_id is null
+)
+
+, fallback as (
+  select 
+      person_id
+    , performance_year
+    , '9999999999' as provider_id
+    , 'no_history' as provider_bucket
+    , 'No assignable claims history' as prov_specialty
+    , 0 as assigned_step
+    , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
+    , 0 as visits
+    , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'01','01') as date) as lookback_start_date
+    , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'12','31') as date) as lookback_end_date
+    , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
+  from missing
+)
+
 select 
     person_id
   , performance_year
@@ -30,12 +85,23 @@ select
   , assigned_step
   , allowed_amount
   , visits
-  , case 
-      when assigned_step = 3
-        then cast(concat(cast(performance_year - 1 as {{ dbt.type_string() }}),'01','01') as date)
-      else cast(concat(cast(performance_year as {{ dbt.type_string() }}),'01','01') as date)
-    end as lookback_start_date
-  , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'12','31') as date) as lookback_end_date
-  , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
-from ranked
-where provider_rank = 1
+  , lookback_start_date
+  , lookback_end_date
+  , attribution_key
+from assigned
+
+union all
+
+select 
+    person_id
+  , performance_year
+  , provider_id
+  , provider_bucket
+  , prov_specialty
+  , assigned_step
+  , allowed_amount
+  , visits
+  , lookback_start_date
+  , lookback_end_date
+  , attribution_key
+from fallback

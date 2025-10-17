@@ -61,6 +61,46 @@ with yearly as (
   cross join params p
 )
 
+, yearly_placeholder as (
+  select 
+      person_id
+    , cast(performance_year as {{ dbt.type_int() }}) as performance_year
+    , null as as_of_date
+    , provider_id
+    , provider_bucket
+    , prov_specialty
+    , assigned_step as step
+    , allowed_amount
+    , visits
+    , 'yearly' as scope
+    , lookback_start_date
+    , lookback_end_date
+    , 1 as ranking
+    , attribution_key
+  from {{ ref('provider_attribution__assigned_beneficiaries_yearly') }}
+  where provider_id = '9999999999'
+)
+
+, current_placeholder as (
+  select 
+      person_id
+    , null as performance_year
+    , as_of_date
+    , provider_id
+    , provider_bucket
+    , prov_specialty
+    , assigned_step as step
+    , allowed_amount
+    , visits
+    , 'current' as scope
+    , lookback_start_date
+    , lookback_end_date
+    , 1 as ranking
+    , attribution_key
+  from {{ ref('provider_attribution__assigned_beneficiaries_current') }}
+  where provider_id = '9999999999'
+)
+
 select 
     person_id
   , performance_year
@@ -96,3 +136,41 @@ select
   , ranking
   , attribution_key
 from current_scope
+
+union all
+
+select 
+    person_id
+  , performance_year
+  , as_of_date
+  , provider_id
+  , provider_bucket
+  , prov_specialty
+  , step
+  , allowed_amount
+  , visits
+  , scope
+  , lookback_start_date
+  , lookback_end_date
+  , ranking
+  , attribution_key
+from yearly_placeholder
+
+union all
+
+select 
+    person_id
+  , performance_year
+  , as_of_date
+  , provider_id
+  , provider_bucket
+  , prov_specialty
+  , step
+  , allowed_amount
+  , visits
+  , scope
+  , lookback_start_date
+  , lookback_end_date
+  , ranking
+  , attribution_key
+from current_placeholder
