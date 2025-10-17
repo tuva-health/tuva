@@ -36,6 +36,18 @@ models:
       - name: claim_year_month
         tests: [not_null]
 
+  - name: provider_attribution__int_yearly_steps
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      tags: ["provider_attribution", "intermediate"]
+
+  - name: provider_attribution__int_current_steps
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
+      tags: ["provider_attribution", "intermediate"]
+
   - name: provider_attribution__assigned_beneficiaries_yearly
     config:
       schema: |
