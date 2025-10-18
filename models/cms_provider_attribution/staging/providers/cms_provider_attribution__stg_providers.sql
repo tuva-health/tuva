@@ -17,7 +17,7 @@ on the ACO Provider/Supplier List."
 
 with base as (
 select distinct
-      cast(prov.npi as varchar) as npi
+      prov.npi
     , prov_supp.aco_id
     , case when prov_supp.npi is not null then 1 else 0 end as aco_professional
     -- Preference is given to the PECOS list since the terminology__provider source is only the most
