@@ -79,7 +79,7 @@ with steps as (
       person_id
     , performance_year
     , '9999999999' as provider_id
-    , 'no_history' as provider_bucket
+    , 'no_eligible_history' as provider_bucket
     , 'No assignable claims history' as prov_specialty
     , 0 as assigned_step
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount

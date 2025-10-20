@@ -100,7 +100,7 @@ with claim_bounds as (
       m.person_id
     , p.as_of_date
     , '9999999999' as provider_id
-    , 'no_history' as provider_bucket
+    , 'no_eligible_history' as provider_bucket
     , 'No assignable claims history' as prov_specialty
     , 0 as assigned_step
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
