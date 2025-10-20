@@ -332,7 +332,7 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      alias: stg_cclf5_bcda
+      alias: stg_cclf5
       tags: ["cms_provider_attribution", "staging"]
       materialized: table      
   - name: cms_provider_attribution__stg_beneficiary_demographics
