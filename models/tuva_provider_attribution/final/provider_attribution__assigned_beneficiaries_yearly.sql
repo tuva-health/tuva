@@ -85,6 +85,7 @@ order by allowed_amount desc, visits desc, provider_id) as provider_rank
     , 0 as assigned_step
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
     , 0 as visits
+    -- No prior utilization exists, so anchor placeholders to the current year's window.
     , start_curr.first_day_of_month as lookback_start_date
     , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key

@@ -3,7 +3,7 @@
    )
 }}
 
--- Yearly attribution steps (ACO-agnostic): Step 1 (PCP/NPP), Step 2 (Specialist), Step 3 (optional, expanded window PCP/NPP)
+-- Yearly attribution steps (ACO-agnostic): Step 1 (PCP/NPP), Step 2 (Specialist), Step 3 (expanded window PCP/NPP)
 
 with person_years as (
   select * from {{ ref('provider_attribution__int_person_years') }}
@@ -85,7 +85,6 @@ with person_years as (
     on s2.person_id = py.person_id and s2.performance_year = py.performance_year
   where s1.person_id is null
     and s2.person_id is null
-    and {{ '1=1' if var('expanded_window_enabled', True) else '1=0' }}
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 

@@ -21,6 +21,7 @@ with base as (
         when lower(a.primary_care_physician_step1) = 'yes' and a.physician = 1 then 'pcp'
         when lower(a.specialist_physician_step_2) = 'yes' and a.physician = 1 then 'specialist'
         when a.physician = 0 then 'npp'
+        else 'unknown'
       end as provider_bucket
   from base as b
   inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x

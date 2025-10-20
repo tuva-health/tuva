@@ -17,11 +17,12 @@ with claim_month as (
     , cal.month as claim_month
     , cal.year_month_int as claim_year_month_int
     , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month
+    -- Fallback to paid_amount when allowed_amount is absent; many payers omit allowed values.
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
     , mc.hcpcs_code
   from {{ ref('provider_attribution__stg_input_layer__medical_claim') }} as mc
-  left outer join {{ ref('provider_attribution__stg_core__stg_claims_medical_claim') }} as cm
+  left outer join {{ ref('provider_attribution__stg_core__claims_medical_claim') }} as cm
     on mc.claim_id = cm.claim_id
    and mc.claim_line_number = cm.claim_line_number
    and mc.data_source = cm.data_source
