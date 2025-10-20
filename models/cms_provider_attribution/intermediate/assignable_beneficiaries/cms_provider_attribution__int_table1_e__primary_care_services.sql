@@ -143,6 +143,7 @@ select
     , outpt.claim_line_number
     , outpt.claim_start_date
     , outpt.paid_date
+    , outpt.file_date
     , outpt.hcpcs_code
     -- Using paid amount here instead since CCLF2 has no allowed amount field
     , outpt.paid_amount as allowed_amount
@@ -208,6 +209,7 @@ select
     , med.claim_line_number
     , med.claim_start_date
     , med.paid_date
+    , med.file_date
     , med.hcpcs_code
     , med.allowed_amount    
     , med.rendering_npi as npi
@@ -247,6 +249,7 @@ select distinct
     , benes.claim_line_number
     , benes.claim_start_date
     , benes.paid_date
+    , benes.file_date    
     , benes.hcpcs_code    
     , benes.npi
     , benes.tin
@@ -268,6 +271,7 @@ select
     , benes.claim_line_number
     , benes.claim_start_date
     , benes.paid_date
+    , benes.file_date
     , benes.hcpcs_code    
     , benes.npi
     , benes.tin

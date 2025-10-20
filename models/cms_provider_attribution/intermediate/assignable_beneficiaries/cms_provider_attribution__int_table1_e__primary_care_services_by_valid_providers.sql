@@ -110,6 +110,7 @@ select
     , base.claim_line_number
     , base.claim_start_date
     , base.paid_date
+    , base.file_date
     , base.hcpcs_code    
     , base.npi
     , base.tin
