@@ -28,6 +28,14 @@ with steps as (
   from {{ ref('provider_attribution__int_person_years') }}
 )
 
+, calendar_months as (
+  select distinct
+      year_month_int
+    , first_day_of_month
+    , last_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }}
+)
+
 , assigned as (
   select 
       person_id
@@ -40,12 +48,18 @@ with steps as (
     , visits
     , case 
         when assigned_step = 3
-          then cast(concat(cast(performance_year - 1 as {{ dbt.type_string() }}),'01','01') as date)
-        else cast(concat(cast(performance_year as {{ dbt.type_string() }}),'01','01') as date)
+          then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
+        else start_curr.first_day_of_month
       end as lookback_start_date
-    , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'12','31') as date) as lookback_end_date
+    , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
   from ranked
+  left join calendar_months start_curr
+    on start_curr.year_month_int = (performance_year * 100) + 1
+  left join calendar_months start_prev
+    on start_prev.year_month_int = ((performance_year - 1) * 100) + 1
+  left join calendar_months end_curr
+    on end_curr.year_month_int = (performance_year * 100) + 12
   where provider_rank = 1
 )
 
@@ -70,10 +84,14 @@ with steps as (
     , 0 as assigned_step
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
     , 0 as visits
-    , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'01','01') as date) as lookback_start_date
-    , cast(concat(cast(performance_year as {{ dbt.type_string() }}),'12','31') as date) as lookback_end_date
+    , start_curr.first_day_of_month as lookback_start_date
+    , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
   from missing
+  left join calendar_months start_curr
+    on start_curr.year_month_int = (performance_year * 100) + 1
+  left join calendar_months end_curr
+    on end_curr.year_month_int = (performance_year * 100) + 12
 )
 
 select 

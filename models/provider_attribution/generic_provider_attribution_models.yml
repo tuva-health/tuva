@@ -7,7 +7,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_person_years
       materialized: view
-      tags: ["provider_attribution", "intermediate"]
+      tags: ["general_provider_attribution"]
 
   - name: provider_attribution__provider_classification
     config:
@@ -15,7 +15,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_provider_classification
       materialized: view
-      tags: ["provider_attribution", "intermediate"]
+      tags: ["general_provider_attribution"]
 
   - name: provider_attribution__int_primary_care_claims
     config:
@@ -23,7 +23,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_primary_care_claims
       materialized: view
-      tags: ["provider_attribution", "intermediate"]
+      tags: ["general_provider_attribution"]
 
   - name: provider_attribution__int_yearly_steps
     config:
@@ -31,7 +31,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_yearly_steps
       materialized: view
-      tags: ["provider_attribution", "intermediate"]
+      tags: ["general_provider_attribution"]
 
   - name: provider_attribution__int_current_steps
     config:
@@ -39,7 +39,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: _int_current_steps
       materialized: view
-      tags: ["provider_attribution", "intermediate"]
+      tags: ["general_provider_attribution"]
 
   - name: provider_attribution__assigned_beneficiaries_yearly
     config:
@@ -47,7 +47,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: assigned_beneficiaries_yearly
       materialized: table
-      tags: ["provider_attribution", "final"]
+      tags: ["general_provider_attribution"]
     columns:
       - name: attribution_key
         tests:
@@ -60,7 +60,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: assigned_beneficiaries_current
       materialized: table
-      tags: ["provider_attribution", "final"]
+      tags: ["general_provider_attribution"]
     columns:
       - name: attribution_key
         tests:
@@ -73,7 +73,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_provider_attribution{% else %}provider_attribution{%- endif -%}
       alias: provider_ranking
       materialized: table
-      tags: ["provider_attribution", "final"]
+      tags: ["general_provider_attribution"]
     columns:
       - name: provider_id
         tests: [not_null]

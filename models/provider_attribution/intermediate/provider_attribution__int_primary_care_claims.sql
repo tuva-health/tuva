@@ -13,21 +13,26 @@ with claim_month as (
     , cast(cm.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , mc.claim_start_date
     , mc.claim_end_date
-    , {{ concat_custom([date_part('year', 'mc.claim_start_date'), dbt.right(concat_custom(["'0'", date_part('month','mc.claim_start_date')]), 2)]) }} as claim_year_month
+    , cal.year as claim_year
+    , cal.month as claim_month
+    , cal.year_month_int as claim_year_month_int
+    , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
     , mc.hcpcs_code
-  from {{ ref('input_layer__medical_claim') }} mc
-  left join {{ ref('core__stg_claims_medical_claim') }} cm
+  from {{ ref('provider_attribution__stg_input_layer__medical_claim') }} mc
+  left join {{ ref('provider_attribution__stg_core__stg_claims_medical_claim') }} cm
     on mc.claim_id = cm.claim_id
    and mc.claim_line_number = cm.claim_line_number
    and mc.data_source = cm.data_source
+  left join {{ ref('provider_attribution__stg_reference_data__calendar') }} cal
+    on cast(mc.claim_start_date as date) = cal.full_date
 )
 
 , eligible_claims as (
   select c.*
   from claim_month c
-  inner join {{ ref('core__member_months') }} mm
+  inner join {{ ref('provider_attribution__stg_core__member_months') }} mm
     on c.person_id = mm.person_id
    and c.claim_year_month = mm.year_month
 )

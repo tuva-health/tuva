@@ -8,13 +8,20 @@ with claim_bounds as (
   from {{ ref('provider_attribution__int_primary_care_claims') }}
 )
 
+{% set override_as_of_date = var('provider_attribution_as_of_date', none) %}
+
 , params as (
-  select case
-           when max_claim_end_date is not null
-             and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)
-             then max_claim_end_date
-           else cast({{ dbt.current_timestamp() }} as date)
-         end as as_of_date
+  select
+    {% if override_as_of_date %}
+      cast('{{ override_as_of_date }}' as date) as as_of_date
+    {% else %}
+      case
+        when max_claim_end_date is not null
+          and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)
+          then max_claim_end_date
+        else cast({{ dbt.current_timestamp() }} as date)
+      end as as_of_date
+    {% endif %}
   from claim_bounds
 )
 
@@ -38,18 +45,26 @@ with claim_bounds as (
 , months as (
   -- Build the last 12 calendar months (YYYYMM) ending at as_of_date
   select distinct 
-      {{ concat_custom(["c.year", dbt.right(concat_custom(["'0'", "c.month"]), 2)]) }} as year_month
-  from {{ ref('reference_data__calendar') }} c
+      c.year_month_int
+    , c.first_day_of_month
+    , c.last_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} c
   cross join params p
   where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
     and c.full_date <= p.as_of_date
 )
 
+, lookback_bounds as (
+  select 
+      min(first_day_of_month) as lookback_start_date
+  from months
+)
+
 , eligible as (
   select distinct mm.person_id
-  from {{ ref('core__member_months') }} mm
+  from {{ ref('provider_attribution__stg_core__member_months') }} mm
   inner join months m
-    on mm.year_month = m.year_month
+    on mm.year_month = cast(m.year_month_int as {{ dbt.type_string() }})
 )
 
 , assigned as (
@@ -62,11 +77,12 @@ with claim_bounds as (
     , r.assigned_step
     , r.allowed_amount
     , r.visits
-    , cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date) as lookback_start_date
+    , lb.lookback_start_date as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "r.person_id"]) }} as attribution_key
   from ranked r
   cross join params p
+  cross join lookback_bounds lb
   where r.provider_rank = 1
 )
 
@@ -89,11 +105,12 @@ with claim_bounds as (
     , 0 as assigned_step
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
     , 0 as visits
-    , cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date) as lookback_start_date
+    , lb.lookback_start_date as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "m.person_id"]) }} as attribution_key
   from missing m
   cross join params p
+  cross join lookback_bounds lb
 )
 
 select 

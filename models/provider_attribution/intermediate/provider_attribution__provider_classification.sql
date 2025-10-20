@@ -10,7 +10,7 @@ with base as (
     , p.primary_taxonomy_code
     , p.primary_specialty_description as prov_specialty
     , lower(p.entity_type_description) as entity_type
-  from {{ ref('terminology__provider') }} p
+  from {{ ref('provider_attribution__stg_terminology__provider') }} p
 )
 
 , mapped as (

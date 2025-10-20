@@ -3,7 +3,15 @@
    )
 }}
 
-with yearly as (
+with calendar_months as (
+  select distinct
+      year_month_int
+    , first_day_of_month
+    , last_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }}
+)
+
+, yearly as (
   select 
       s.person_id
     , cast(s.performance_year as {{ dbt.type_int() }}) as performance_year
@@ -17,13 +25,19 @@ with yearly as (
     , 'yearly' as scope
     , case 
         when s.step = 3
-          then cast(concat(cast(s.performance_year - 1 as {{ dbt.type_string() }}),'01','01') as date)
-        else cast(concat(cast(s.performance_year as {{ dbt.type_string() }}),'01','01') as date)
+          then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
+        else start_curr.first_day_of_month
       end as lookback_start_date
-    , cast(concat(cast(s.performance_year as {{ dbt.type_string() }}),'12','31') as date) as lookback_end_date
+    , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(s.performance_year as " ~ dbt.type_string() ~ ")", "'|'", "s.person_id"]) }} as attribution_key
     , rank() over (partition by s.person_id, s.performance_year order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   from {{ ref('provider_attribution__int_yearly_steps') }} s
+  left join calendar_months start_curr
+    on start_curr.year_month_int = (s.performance_year * 100) + 1
+  left join calendar_months start_prev
+    on start_prev.year_month_int = ((s.performance_year - 1) * 100) + 1
+  left join calendar_months end_curr
+    on end_curr.year_month_int = (s.performance_year * 100) + 12
 )
 
 , claim_bounds as (
@@ -31,14 +45,37 @@ with yearly as (
   from {{ ref('provider_attribution__int_primary_care_claims') }}
 )
 
+{% set override_as_of_date = var('provider_attribution_as_of_date', none) %}
+
 , params as (
-  select case
-           when max_claim_end_date is not null
-             and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)
-             then max_claim_end_date
-           else cast({{ dbt.current_timestamp() }} as date)
-         end as as_of_date
+  select
+    {% if override_as_of_date %}
+      cast('{{ override_as_of_date }}' as date) as as_of_date
+    {% else %}
+      case
+        when max_claim_end_date is not null
+          and max_claim_end_date <= cast({{ dbt.current_timestamp() }} as date)
+          then max_claim_end_date
+        else cast({{ dbt.current_timestamp() }} as date)
+      end as as_of_date
+    {% endif %}
   from claim_bounds
+)
+
+, months as (
+  select distinct 
+      c.year_month_int
+    , c.first_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} c
+  cross join params p
+  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.full_date <= p.as_of_date
+)
+
+, lookback_bounds as (
+  select 
+      min(first_day_of_month) as lookback_start_date
+  from months
 )
 
 , current_scope as (
@@ -53,12 +90,13 @@ with yearly as (
     , s.allowed_amount as allowed_amount
     , s.visits
     , 'current' as scope
-    , cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date) as lookback_start_date
+    , lb.lookback_start_date as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "s.person_id"]) }} as attribution_key
     , rank() over (partition by s.person_id order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   from {{ ref('provider_attribution__int_current_steps') }} s
   cross join params p
+  cross join lookback_bounds lb
 )
 
 , yearly_placeholder as (

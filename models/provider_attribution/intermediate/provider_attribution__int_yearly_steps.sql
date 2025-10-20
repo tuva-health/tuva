@@ -27,7 +27,7 @@ with person_years as (
   from person_years py
   inner join claims c
     on py.person_id = c.person_id
-   and left(c.claim_year_month,4) = cast(py.performance_year as {{ dbt.type_string() }})
+   and c.claim_year = py.performance_year
    and c.provider_bucket in ('pcp','npp')
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
@@ -50,7 +50,7 @@ with person_years as (
   from person_years py
   inner join claims c
     on py.person_id = c.person_id
-   and left(c.claim_year_month,4) = cast(py.performance_year as {{ dbt.type_string() }})
+   and c.claim_year = py.performance_year
    and c.provider_bucket = 'specialist'
   left join step1_benes s1
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
@@ -76,8 +76,8 @@ with person_years as (
   from person_years py
   inner join claims c
     on py.person_id = c.person_id
-   and c.claim_year_month between concat(cast(py.performance_year - 1 as {{ dbt.type_string() }}),'01') 
-                               and concat(cast(py.performance_year as {{ dbt.type_string() }}),'12')
+   and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
+                                  and (py.performance_year * 100 + 12)
    and c.provider_bucket in ('pcp','npp')
   left join step1_benes s1
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
