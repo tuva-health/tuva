@@ -45,9 +45,13 @@ with claim_month as (
     , e.encounter_id
     , e.claim_start_date
     , e.claim_end_date
+    , e.claim_year
+    , e.claim_month
     , e.claim_year_month
+    , e.claim_year_month_int
     , e.allowed_amount
     , e.provider_id
+    , e.hcpcs_code
   from eligible_claims e
   inner join {{ ref('cms_provider_attribution__primary_care_hcpcs_codes') }} pc
     on e.hcpcs_code = pc.hcpcs_code
