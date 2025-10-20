@@ -1,5 +1,6 @@
 select 
-    year as program_year
+    performance_year
+  , aco_id
   , REPLACE(cast(tin as VARCHAR), '''', '') as tin
   , REPLACE(cast(ccn as VARCHAR), '''', '') as ccn
   , REPLACE(cast(npi as VARCHAR), '''', '') as npi
