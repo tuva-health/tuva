@@ -29,18 +29,18 @@ with claim_bounds as (
 
 , months as (
   -- Build the last 12 calendar months (YYYYMM) ending at as_of_date
-  select distinct 
+  select distinct
       c.year_month_int
     , c.first_day_of_month
     , c.last_day_of_month
-  from {{ ref('provider_attribution__stg_reference_data__calendar') }} c
-  cross join params p
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
+  cross join params as p
   where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
     and c.full_date <= p.as_of_date
 )
 
 , claims as (
-  select 
+  select
       c.person_id
     , c.provider_id
     , c.provider_bucket
@@ -50,25 +50,25 @@ with claim_bounds as (
     , c.claim_year_month
     , c.claim_year_month_int
     , c.allowed_amount
-  from {{ ref('provider_attribution__int_primary_care_claims') }} c
-  inner join months m
+  from {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  inner join months as m
     on c.claim_year_month_int = m.year_month_int
-  cross join params p
+  cross join params as p
   where c.claim_end_date <= p.as_of_date
 )
 
 , step1 as (
-  select 
+  select
       c.person_id
     , c.provider_id
-    , coalesce(c.provider_bucket,'unknown') as provider_bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 1 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from claims c
-  where c.provider_bucket in ('pcp','npp')
-  group by c.person_id, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
+  from claims as c
+  where c.provider_bucket in ('pcp', 'npp')
+  group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
 , step1_benes as (
@@ -76,18 +76,18 @@ with claim_bounds as (
 )
 
 , step2 as (
-  select 
+  select
       c.person_id
     , c.provider_id
-    , coalesce(c.provider_bucket,'unknown') as provider_bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 2 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from claims c
-  left join step1_benes s1 on s1.person_id = c.person_id
+  from claims as c
+  left outer join step1_benes as s1 on s1.person_id = c.person_id
   where s1.person_id is null and c.provider_bucket = 'specialist'
-  group by c.person_id, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
+  group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
 select * from step1

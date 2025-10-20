@@ -6,7 +6,7 @@
 -- Primary care services from input_layer medical_claim, joined to member months and provider bucket
 
 with claim_month as (
-  select 
+  select
       mc.person_id
     , mc.claim_id
     , mc.claim_line_number
@@ -20,25 +20,25 @@ with claim_month as (
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
     , mc.hcpcs_code
-  from {{ ref('provider_attribution__stg_input_layer__medical_claim') }} mc
-  left join {{ ref('provider_attribution__stg_core__stg_claims_medical_claim') }} cm
+  from {{ ref('provider_attribution__stg_input_layer__medical_claim') }} as mc
+  left outer join {{ ref('provider_attribution__stg_core__stg_claims_medical_claim') }} as cm
     on mc.claim_id = cm.claim_id
    and mc.claim_line_number = cm.claim_line_number
    and mc.data_source = cm.data_source
-  left join {{ ref('provider_attribution__stg_reference_data__calendar') }} cal
+  left outer join {{ ref('provider_attribution__stg_reference_data__calendar') }} as cal
     on cast(mc.claim_start_date as date) = cal.full_date
 )
 
 , eligible_claims as (
   select c.*
-  from claim_month c
-  inner join {{ ref('provider_attribution__stg_core__member_months') }} mm
+  from claim_month as c
+  inner join {{ ref('provider_attribution__stg_core__member_months') }} as mm
     on c.person_id = mm.person_id
    and c.claim_year_month = mm.year_month
 )
 
 , primary_care_claims as (
-  select 
+  select
       e.person_id
     , e.claim_id
     , e.claim_line_number
@@ -52,18 +52,18 @@ with claim_month as (
     , e.allowed_amount
     , e.provider_id
     , e.hcpcs_code
-  from eligible_claims e
-  inner join {{ ref('cms_provider_attribution__primary_care_hcpcs_codes') }} pc
+  from eligible_claims as e
+  inner join {{ ref('cms_provider_attribution__primary_care_hcpcs_codes') }} as pc
     on e.hcpcs_code = pc.hcpcs_code
 )
 
 , with_bucket as (
-  select 
+  select
       pcc.*
     , pc.provider_bucket
     , pc.prov_specialty
-  from primary_care_claims pcc
-  left join {{ ref('provider_attribution__provider_classification') }} pc
+  from primary_care_claims as pcc
+  left outer join {{ ref('provider_attribution__provider_classification') }} as pc
     on pcc.provider_id = pc.provider_id
 )
 

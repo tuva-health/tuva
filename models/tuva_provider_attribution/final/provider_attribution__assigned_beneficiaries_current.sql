@@ -30,7 +30,7 @@ with claim_bounds as (
 )
 
 , ranked as (
-  select 
+  select
       s.person_id
     , s.provider_id
     , s.provider_bucket
@@ -39,36 +39,36 @@ with claim_bounds as (
     , s.allowed_amount
     , s.visits
     , rank() over (partition by s.person_id order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
-  from steps s
+  from steps as s
 )
 
 , months as (
   -- Build the last 12 calendar months (YYYYMM) ending at as_of_date
-  select distinct 
+  select distinct
       c.year_month_int
     , c.first_day_of_month
     , c.last_day_of_month
-  from {{ ref('provider_attribution__stg_reference_data__calendar') }} c
-  cross join params p
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
+  cross join params as p
   where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
     and c.full_date <= p.as_of_date
 )
 
 , lookback_bounds as (
-  select 
+  select
       min(first_day_of_month) as lookback_start_date
   from months
 )
 
 , eligible as (
   select distinct mm.person_id
-  from {{ ref('provider_attribution__stg_core__member_months') }} mm
-  inner join months m
+  from {{ ref('provider_attribution__stg_core__member_months') }} as mm
+  inner join months as m
     on mm.year_month = cast(m.year_month_int as {{ dbt.type_string() }})
 )
 
 , assigned as (
-  select 
+  select
       r.person_id
     , p.as_of_date
     , r.provider_id
@@ -80,23 +80,23 @@ with claim_bounds as (
     , lb.lookback_start_date as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "r.person_id"]) }} as attribution_key
-  from ranked r
-  cross join params p
-  cross join lookback_bounds lb
+  from ranked as r
+  cross join params as p
+  cross join lookback_bounds as lb
   where r.provider_rank = 1
 )
 
 , missing as (
-  select 
+  select
       e.person_id
-  from eligible e
-  left join assigned a
+  from eligible as e
+  left outer join assigned as a
     on e.person_id = a.person_id
   where a.person_id is null
 )
 
 , fallback as (
-  select 
+  select
       m.person_id
     , p.as_of_date
     , '9999999999' as provider_id
@@ -108,12 +108,12 @@ with claim_bounds as (
     , lb.lookback_start_date as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "m.person_id"]) }} as attribution_key
-  from missing m
-  cross join params p
-  cross join lookback_bounds lb
+  from missing as m
+  cross join params as p
+  cross join lookback_bounds as lb
 )
 
-select 
+select
     person_id
   , as_of_date
   , provider_id
@@ -129,7 +129,7 @@ from assigned
 
 union all
 
-select 
+select
     person_id
   , as_of_date
   , provider_id

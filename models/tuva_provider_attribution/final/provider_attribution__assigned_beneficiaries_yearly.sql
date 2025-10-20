@@ -8,7 +8,7 @@ with steps as (
 )
 
 , ranked as (
-  select 
+  select
       person_id
     , performance_year
     , provider_id
@@ -22,7 +22,7 @@ with steps as (
 )
 
 , eligible as (
-  select 
+  select
       person_id
     , performance_year
   from {{ ref('provider_attribution__int_person_years') }}
@@ -37,7 +37,7 @@ with steps as (
 )
 
 , assigned as (
-  select 
+  select
       person_id
     , performance_year
     , provider_id
@@ -46,7 +46,7 @@ with steps as (
     , assigned_step
     , allowed_amount
     , visits
-    , case 
+    , case
         when assigned_step = 3
           then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
         else start_curr.first_day_of_month
@@ -54,28 +54,28 @@ with steps as (
     , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
   from ranked
-  left join calendar_months start_curr
+  left outer join calendar_months as start_curr
     on start_curr.year_month_int = (performance_year * 100) + 1
-  left join calendar_months start_prev
+  left outer join calendar_months as start_prev
     on start_prev.year_month_int = ((performance_year - 1) * 100) + 1
-  left join calendar_months end_curr
+  left outer join calendar_months as end_curr
     on end_curr.year_month_int = (performance_year * 100) + 12
   where provider_rank = 1
 )
 
 , missing as (
-  select 
+  select
       e.person_id
     , e.performance_year
-  from eligible e
-  left join assigned a
+  from eligible as e
+  left outer join assigned as a
     on e.person_id = a.person_id
    and e.performance_year = a.performance_year
   where a.person_id is null
 )
 
 , fallback as (
-  select 
+  select
       person_id
     , performance_year
     , '9999999999' as provider_id
@@ -88,13 +88,13 @@ with steps as (
     , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
   from missing
-  left join calendar_months start_curr
+  left outer join calendar_months as start_curr
     on start_curr.year_month_int = (performance_year * 100) + 1
-  left join calendar_months end_curr
+  left outer join calendar_months as end_curr
     on end_curr.year_month_int = (performance_year * 100) + 12
 )
 
-select 
+select
     person_id
   , performance_year
   , provider_id
@@ -110,7 +110,7 @@ from assigned
 
 union all
 
-select 
+select
     person_id
   , performance_year
   , provider_id

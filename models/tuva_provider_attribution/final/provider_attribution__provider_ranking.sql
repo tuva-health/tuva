@@ -12,7 +12,7 @@ with calendar_months as (
 )
 
 , yearly as (
-  select 
+  select
       s.person_id
     , cast(s.performance_year as {{ dbt.type_int() }}) as performance_year
     , null as as_of_date
@@ -23,7 +23,7 @@ with calendar_months as (
     , s.allowed_amount
     , s.visits
     , 'yearly' as scope
-    , case 
+    , case
         when s.step = 3
           then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
         else start_curr.first_day_of_month
@@ -31,12 +31,12 @@ with calendar_months as (
     , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(s.performance_year as " ~ dbt.type_string() ~ ")", "'|'", "s.person_id"]) }} as attribution_key
     , rank() over (partition by s.person_id, s.performance_year order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
-  from {{ ref('provider_attribution__int_yearly_steps') }} s
-  left join calendar_months start_curr
+  from {{ ref('provider_attribution__int_yearly_steps') }} as s
+  left outer join calendar_months as start_curr
     on start_curr.year_month_int = (s.performance_year * 100) + 1
-  left join calendar_months start_prev
+  left outer join calendar_months as start_prev
     on start_prev.year_month_int = ((s.performance_year - 1) * 100) + 1
-  left join calendar_months end_curr
+  left outer join calendar_months as end_curr
     on end_curr.year_month_int = (s.performance_year * 100) + 12
 )
 
@@ -63,23 +63,23 @@ with calendar_months as (
 )
 
 , months as (
-  select distinct 
+  select distinct
       c.year_month_int
     , c.first_day_of_month
-  from {{ ref('provider_attribution__stg_reference_data__calendar') }} c
-  cross join params p
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
+  cross join params as p
   where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-11, from_date_or_timestamp='p.as_of_date') }} as date)
     and c.full_date <= p.as_of_date
 )
 
 , lookback_bounds as (
-  select 
+  select
       min(first_day_of_month) as lookback_start_date
   from months
 )
 
 , current_scope as (
-  select 
+  select
       s.person_id
     , null as performance_year
     , p.as_of_date
@@ -94,13 +94,13 @@ with calendar_months as (
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "s.person_id"]) }} as attribution_key
     , rank() over (partition by s.person_id order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
-  from {{ ref('provider_attribution__int_current_steps') }} s
-  cross join params p
-  cross join lookback_bounds lb
+  from {{ ref('provider_attribution__int_current_steps') }} as s
+  cross join params as p
+  cross join lookback_bounds as lb
 )
 
 , yearly_placeholder as (
-  select 
+  select
       person_id
     , cast(performance_year as {{ dbt.type_int() }}) as performance_year
     , null as as_of_date
@@ -120,7 +120,7 @@ with calendar_months as (
 )
 
 , current_placeholder as (
-  select 
+  select
       person_id
     , null as performance_year
     , as_of_date
@@ -139,7 +139,7 @@ with calendar_months as (
   where provider_id = '9999999999'
 )
 
-select 
+select
     person_id
   , performance_year
   , as_of_date
@@ -158,7 +158,7 @@ from yearly
 
 union all
 
-select 
+select
     person_id
   , performance_year
   , as_of_date
@@ -177,7 +177,7 @@ from current_scope
 
 union all
 
-select 
+select
     person_id
   , performance_year
   , as_of_date
@@ -196,7 +196,7 @@ from yearly_placeholder
 
 union all
 
-select 
+select
     person_id
   , performance_year
   , as_of_date

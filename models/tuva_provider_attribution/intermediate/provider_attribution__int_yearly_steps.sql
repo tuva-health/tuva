@@ -13,9 +13,9 @@ with person_years as (
   select * from {{ ref('provider_attribution__int_primary_care_claims') }}
 )
 
-, step1 AS (
+, step1 as (
   -- 12-month window: Jan..Dec of performance_year, PCP/NPP
-  select 
+  select
       py.person_id
     , py.performance_year
     , c.provider_id
@@ -24,11 +24,11 @@ with person_years as (
     , 1 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from person_years py
-  inner join claims c
+  from person_years as py
+  inner join claims as c
     on py.person_id = c.person_id
    and c.claim_year = py.performance_year
-   and c.provider_bucket in ('pcp','npp')
+   and c.provider_bucket in ('pcp', 'npp')
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -36,9 +36,9 @@ with person_years as (
   select distinct person_id, performance_year from step1
 )
 
-, step2 AS (
+, step2 as (
   -- 12-month window: Jan..Dec of performance_year, Specialists only; only for benes not in step1
-  select 
+  select
       py.person_id
     , py.performance_year
     , c.provider_id
@@ -47,12 +47,12 @@ with person_years as (
     , 2 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from person_years py
-  inner join claims c
+  from person_years as py
+  inner join claims as c
     on py.person_id = c.person_id
    and c.claim_year = py.performance_year
    and c.provider_bucket = 'specialist'
-  left join step1_benes s1
+  left outer join step1_benes as s1
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
   where s1.person_id is null
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
@@ -62,9 +62,9 @@ with person_years as (
   select distinct person_id, performance_year from step2
 )
 
-, step3 AS (
+, step3 as (
   -- 24-month expanded: Jan of Y-1 .. Dec of Y, PCP/NPP only; only for benes not in step1/step2
-  select 
+  select
       py.person_id
     , py.performance_year
     , c.provider_id
@@ -73,15 +73,15 @@ with person_years as (
     , 3 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from person_years py
-  inner join claims c
+  from person_years as py
+  inner join claims as c
     on py.person_id = c.person_id
    and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
                                   and (py.performance_year * 100 + 12)
-   and c.provider_bucket in ('pcp','npp')
-  left join step1_benes s1
+   and c.provider_bucket in ('pcp', 'npp')
+  left outer join step1_benes as s1
     on s1.person_id = py.person_id and s1.performance_year = py.performance_year
-  left join step2_benes s2
+  left outer join step2_benes as s2
     on s2.person_id = py.person_id and s2.performance_year = py.performance_year
   where s1.person_id is null
     and s2.person_id is null
