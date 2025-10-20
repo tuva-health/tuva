@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled', False) and var('attribution_claims_source') == 'bcda'
+ | as_bool)
+}}
+
 select distinct
     pat_id.value as person_id
   , eob.identifier_0_value as claim_id -- NOTE: Different from CUR_CLM_UNIQ_ID in CCLF since that is unique to CCLF

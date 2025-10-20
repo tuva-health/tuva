@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled', False) and var('attribution_claims_source') == 'bcda'
+ | as_bool)
+}}
+
 with union_cte as (
     select 
         *

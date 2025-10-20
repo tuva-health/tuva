@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled', False) and var('attribution_claims_source') == 'bcda'
+ | as_bool)
+}}
+
 with patient as (
 select distinct
     pat_id.value as person_id
