@@ -52,6 +52,7 @@ select
     , clms.claim_id
     , clms.claim_line_number
     , clms.claim_start_date
+    , clms.file_date
     , clms.hcpcs_code
     , clms.allowed_amount
     , clms.provider_type_for_assignment
