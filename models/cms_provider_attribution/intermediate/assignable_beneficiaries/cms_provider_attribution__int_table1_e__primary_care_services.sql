@@ -127,7 +127,6 @@ select
     , cclf1.othr_prvdr_npi_num
     , cclf1.atndg_prvdr_npi_num
     , cclf1.oprtg_prvdr_npi_num
-    , RIGHT('000000' + cclf1.ccn,6) as ccn
 from {{ref('medical_claim')}} as med
 inner join {{ref('cms_provider_attribution__stg_part_a_header_claims')}} as cclf1
     on med.claim_id  = cclf1.claim_id
