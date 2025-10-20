@@ -38,7 +38,8 @@ with claim_bounds as (
     , s.step as assigned_step
     , s.allowed_amount
     , s.visits
-    , rank() over (partition by s.person_id order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
+    , rank() over (partition by s.person_id
+order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
   from steps as s
 )
 

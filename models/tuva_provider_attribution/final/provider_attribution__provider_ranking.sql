@@ -30,7 +30,8 @@ with calendar_months as (
       end as lookback_start_date
     , end_curr.last_day_of_month as lookback_end_date
     , {{ concat_custom(["'yearly|'", "cast(s.performance_year as " ~ dbt.type_string() ~ ")", "'|'", "s.person_id"]) }} as attribution_key
-    , rank() over (partition by s.person_id, s.performance_year order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
+    , rank() over (partition by s.person_id, s.performance_year
+order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   from {{ ref('provider_attribution__int_yearly_steps') }} as s
   left outer join calendar_months as start_curr
     on start_curr.year_month_int = (s.performance_year * 100) + 1
@@ -93,7 +94,8 @@ with calendar_months as (
     , lb.lookback_start_date as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "s.person_id"]) }} as attribution_key
-    , rank() over (partition by s.person_id order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
+    , rank() over (partition by s.person_id
+order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   from {{ ref('provider_attribution__int_current_steps') }} as s
   cross join params as p
   cross join lookback_bounds as lb
