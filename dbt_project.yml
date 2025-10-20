@@ -226,8 +226,9 @@ seeds:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.4','medicare_provider_and_supplier_taxonomy_crosswalk.csv',compression=true,null_marker=true) }}"
       terminology__ssa_fips_state_county_crosswalk:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.4','ssa_fips_state_county_crosswalk.csv',compression=true,null_marker=true) }}"
+      # TODO: Remove headers
       terminology__provider_taxonomy_unpivot:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_provider_data/0.15.4','provider_taxonomy_unpivot.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_provider_data/0.15.4','provider_taxonomy_unpivot.csv',compression=true,null_marker=true, headers=true) }}"
 
     value_sets:
       ccsr:
