@@ -108,6 +108,7 @@ select
   , lookback_start_date
   , lookback_end_date
   , attribution_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from assigned
 
 union all
@@ -124,4 +125,5 @@ select
   , lookback_start_date
   , lookback_end_date
   , attribution_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from fallback

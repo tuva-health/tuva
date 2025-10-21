@@ -156,6 +156,7 @@ select
   , lookback_end_date
   , ranking
   , attribution_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from yearly
 
 union all
@@ -175,6 +176,7 @@ select
   , lookback_end_date
   , ranking
   , attribution_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from current_scope
 
 union all
@@ -194,6 +196,7 @@ select
   , lookback_end_date
   , ranking
   , attribution_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from yearly_placeholder
 
 union all
@@ -213,4 +216,5 @@ select
   , lookback_end_date
   , ranking
   , attribution_key
+  , '{{ var('tuva_last_run') }}' as tuva_last_run
 from current_placeholder
