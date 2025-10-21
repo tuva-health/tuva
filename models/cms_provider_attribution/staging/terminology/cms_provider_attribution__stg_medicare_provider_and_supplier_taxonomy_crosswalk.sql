@@ -4,4 +4,4 @@ select
     , medicare_provider_supplier_type_description
     , provider_taxonomy_code
     , provider_taxonomy_description
-from {{source('terminology', 'medicare_provider_and_supplier_taxonomy_crosswalk')}}
+from {{ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk')}}
