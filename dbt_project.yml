@@ -221,7 +221,7 @@ seeds:
       terminology__cms_acceptable_provider_specialty_codes:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.4','cms_acceptable_provider_specialty_codes.csv',compression=true,null_marker=true) }}"
       terminology__electing_teaching_hospital_list:
-        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.4','electing_teaching_hospital_list.csv',compression=true,null_marker=true) }}"
+        +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.4','electing_teaching_hospital_list.csv',compression=true,null_marker=true, headers=true) }}"
       terminology__medicare_provider_and_supplier_taxonomy_crosswalk:
         +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_terminology/0.15.4','medicare_provider_and_supplier_taxonomy_crosswalk.csv',compression=true,null_marker=true) }}"
       terminology__ssa_fips_state_county_crosswalk:
