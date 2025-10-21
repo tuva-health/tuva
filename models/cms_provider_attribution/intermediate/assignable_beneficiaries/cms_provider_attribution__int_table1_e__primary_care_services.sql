@@ -124,13 +124,10 @@ select
                 substring(revenue_center_code,1,3) = '098')
             then 'Method II CAH'
         end as outpatient_facility
-    , cclf1.othr_prvdr_npi_num
-    , cclf1.atndg_prvdr_npi_num
-    , cclf1.oprtg_prvdr_npi_num
+    , cclf1.other_npi
+    , cclf1.attending_npi
+    , cclf1.operating_npi
 from {{ref('medical_claim')}} as med
-inner join {{ref('cms_provider_attribution__stg_part_a_header_claims')}} as cclf1
-    on med.claim_id  = cclf1.claim_id
-    and nullif(trim(clm_mdcr_npmt_rsn_cd),'') is null
 
 )
 
@@ -150,8 +147,8 @@ select
     -- ETA and Method II CAH will be joined in via NPI, which is why the outpatient != 0 when they are identified
     , case 
         -- A tilde was being used as a stand-in for nulls
-        when outpatient_facility = 'ETA' then coalesce(othr_prvdr_npi_num,atndg_prvdr_npi_num)
-        when outpatient_facility = 'Method II CAH' then coalesce(rendering_npi, oprtg_prvdr_npi_num, othr_prvdr_npi_num, atndg_prvdr_npi_num)
+        when outpatient_facility = 'ETA' then coalesce(other_npi,attending_npi)
+        when outpatient_facility = 'Method II CAH' then coalesce(rendering_npi, operating_npi, other_npi, attending_npi)
         else outpt.rendering_npi
       end as npi
     , null as tin
