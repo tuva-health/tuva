@@ -3,7 +3,12 @@
    )
 }}
 
--- Current rolling 12-month attribution steps using data-driven as_of_date
+-- Current rolling 12-month attribution steps using a data-driven as_of_date.
+-- Steps:
+--   1 = PCP/NPP rendering primary-care HCPCS.
+--   2 = Specialist rendering primary-care HCPCS for beneficiaries not assigned in step 1.
+--   3 = Primary-care HCPCS fallback regardless of provider classification (captures missing taxonomy mapping).
+--   4 = Any rendering NPI within the lookback window (captures claims outside the HCPCS list or with null HCPCS/NPIs).
 
 with claim_bounds as (
   select max(claim_end_date) as max_claim_end_date
@@ -49,12 +54,59 @@ with claim_bounds as (
     , c.claim_id
     , c.claim_year_month
     , c.claim_year_month_int
+    , c.claim_end_date
     , c.allowed_amount
   from {{ ref('provider_attribution__int_primary_care_claims') }} as c
   inner join months as m
     on c.claim_year_month_int = m.year_month_int
   cross join params as p
   where c.claim_end_date <= p.as_of_date
+)
+
+, all_claim_month as (
+  select
+      mc.person_id
+    , mc.claim_id
+    , mc.claim_line_number
+    , cast(cm.encounter_id as {{ dbt.type_string() }}) as encounter_id
+    , mc.claim_start_date
+    , mc.claim_end_date
+    , cal.year_month_int as claim_year_month_int
+    , cast(cal.year_month_int as {{ dbt.type_string() }}) as claim_year_month
+    , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
+    , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
+  from {{ ref('provider_attribution__stg_input_layer__medical_claim') }} as mc
+  left outer join {{ ref('provider_attribution__stg_core__claims_medical_claim') }} as cm
+    on mc.claim_id = cm.claim_id
+   and mc.claim_line_number = cm.claim_line_number
+   and mc.data_source = cm.data_source
+  left outer join {{ ref('provider_attribution__stg_reference_data__calendar') }} as cal
+    on cast(mc.claim_start_date as date) = cal.full_date
+)
+
+, eligible_all_claims as (
+  select ac.*
+  from all_claim_month as ac
+  inner join {{ ref('provider_attribution__stg_core__member_months') }} as mm
+    on ac.person_id = mm.person_id
+   and ac.claim_year_month = mm.year_month
+)
+
+, all_rendering_claims as (
+  select
+      e.person_id
+    , e.provider_id
+    , e.encounter_id
+    , e.claim_id
+    , e.claim_year_month
+    , e.claim_year_month_int
+    , e.claim_end_date
+    , e.allowed_amount
+    , pc.provider_bucket
+    , pc.prov_specialty
+  from eligible_all_claims as e
+  left outer join {{ ref('provider_attribution__provider_classification') }} as pc
+    on e.provider_id = pc.provider_id
 )
 
 , step1 as (
@@ -86,10 +138,64 @@ with claim_bounds as (
     , count(distinct c.encounter_id) as visits
   from claims as c
   left outer join step1_benes as s1 on s1.person_id = c.person_id
-  where s1.person_id is null and c.provider_bucket = 'specialist'
+  where s1.person_id is null
+    and c.provider_bucket = 'specialist'
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
+)
+
+, step2_benes as (
+  select distinct person_id from step2
+)
+
+, step3 as (
+  select
+      c.person_id
+    , c.provider_id
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
+    , c.prov_specialty
+    , 3 as step
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
+  from claims as c
+  left outer join step1_benes as s1 on s1.person_id = c.person_id
+  left outer join step2_benes as s2 on s2.person_id = c.person_id
+  where s1.person_id is null
+    and s2.person_id is null
+  group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
+)
+
+, step3_benes as (
+  select distinct person_id from step3
+)
+
+, step4 as (
+  select
+      arc.person_id
+    , arc.provider_id
+    , coalesce(arc.provider_bucket, 'unknown') as provider_bucket
+    , arc.prov_specialty
+    , 4 as step
+    , sum(arc.allowed_amount) as allowed_amount
+    , count(distinct arc.encounter_id) as visits
+  from all_rendering_claims as arc
+  inner join months as m
+    on arc.claim_year_month_int = m.year_month_int
+  cross join params as p
+  left outer join step1_benes as s1 on s1.person_id = arc.person_id
+  left outer join step2_benes as s2 on s2.person_id = arc.person_id
+  left outer join step3_benes as s3 on s3.person_id = arc.person_id
+  where arc.provider_id is not null
+    and arc.claim_end_date <= p.as_of_date
+    and s1.person_id is null
+    and s2.person_id is null
+    and s3.person_id is null
+  group by arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
 select * from step1
 union all
 select * from step2
+union all
+select * from step3
+union all
+select * from step4

@@ -27,7 +27,8 @@ with base as (
   inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x
     on cast(b.primary_taxonomy_code as {{ dbt.type_string() }}) = cast(x.provider_taxonomy_code as {{ dbt.type_string() }})
   inner join {{ ref('cms_provider_attribution__provider_specialty_assignment_codes') }} as a
-    on cast(x.medicare_specialty_code as {{ dbt.type_string() }}) = cast(a.specialty_code as {{ dbt.type_string() }})
+    on cast(nullif(trim(x.medicare_specialty_code), '') as {{ dbt.type_numeric() }})
+     = cast(nullif(trim(a.specialty_code), '') as {{ dbt.type_numeric() }})
   where b.entity_type = 'individual'
 )
 
