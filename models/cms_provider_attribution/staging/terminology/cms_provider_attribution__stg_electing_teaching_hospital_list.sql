@@ -14,4 +14,4 @@ select
     , city_2
     , state_2
     , zip_code_2
-from {{source('terminology', 'electing_teaching_hospital_list')}}
+from {{ref('terminology__electing_teaching_hospital_list')}}
