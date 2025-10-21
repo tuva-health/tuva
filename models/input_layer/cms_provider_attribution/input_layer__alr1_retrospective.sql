@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled', False) and var('assignment_methodology') == 'retrospective'
+     enabled = var('cms_provider_attribution_enabled', False) and var('assignment_methodology') == 'retrospective'
  | as_bool)
 }}
 
