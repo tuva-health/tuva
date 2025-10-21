@@ -1,3 +1,8 @@
+{{ config(
+     enabled = var('claims_preprocessing_enabled', False) and var('assignment_methodology') == 'prospective'
+ | as_bool)
+}}
+
 -- The latest AALR report
 select
       cast(person_id as {{ dbt.type_string() }}) as person_id
