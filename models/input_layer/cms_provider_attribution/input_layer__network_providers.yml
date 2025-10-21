@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: input_layer__network_providers
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_input_layer{% else %}input_layer{%- endif -%}
+      tags: ["cms_provider_attribution", "input_layer"]
+      materialized: view
