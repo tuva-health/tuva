@@ -117,16 +117,16 @@ select
               then 'FQHC'
         when substring(bill_type_code,1,2) = '71' then 'RHC'
         -- TODO: Allowed charges for ETA are imputed , see p.96 of the 2025 SLAAM
-        when substring(bill_type_code,1,2) = '13' and cclf1.clm_type_cd = '40' then 'ETA'
+        when substring(bill_type_code,1,2) = '13' and claim_type_code = '40' then 'ETA'
         when substring(bill_type_code,1,2) = '85' and (
                 substring(revenue_center_code,1,3) = '096' or
                 substring(revenue_center_code,1,3) = '097' or
                 substring(revenue_center_code,1,3) = '098')
             then 'Method II CAH'
         end as outpatient_facility
-    , cclf1.other_npi
-    , cclf1.attending_npi
-    , cclf1.operating_npi
+    , other_npi
+    , attending_npi
+    , operating_npi
 from {{ref('medical_claim')}} as med
 
 )
