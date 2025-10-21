@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('provider_attribution_enabled', var('tuva_marts_enabled', True)) | as_bool
+     enabled = var('provider_attribution_enabled', var('claims_enabled', var('tuva_marts_enabled', True))) | as_bool
    )
 }}
 
@@ -15,7 +15,7 @@ with calendar_months as (
   select
       s.person_id
     , cast(s.performance_year as {{ dbt.type_int() }}) as performance_year
-    , null as as_of_date
+    , cast(null as date) as as_of_date
     , s.provider_id
     , s.provider_bucket
     , s.prov_specialty
@@ -105,7 +105,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   select
       person_id
     , cast(performance_year as {{ dbt.type_int() }}) as performance_year
-    , null as as_of_date
+    , cast(null as date) as as_of_date
     , provider_id
     , provider_bucket
     , prov_specialty
