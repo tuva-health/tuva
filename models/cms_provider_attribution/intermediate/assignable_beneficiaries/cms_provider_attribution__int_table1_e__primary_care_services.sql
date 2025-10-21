@@ -55,7 +55,7 @@ select distinct
         else 0
       end as inpatient_facility_claim
 from {{ref('medical_claim')}} med
-inner join {{ref('cms_provider_attribution__primary_care_hcpcs_codes')}} pc_codes
+inner join {{ref('cms_provider_attribution__stg_primary_care_hcpcs_codes')}} pc_codes
     on med.hcpcs_code = pc_codes.hcpcs_code    
 )
 
@@ -165,7 +165,7 @@ inner join outpatient_primary_care_claims as outpt
     on  benes.person_id = outpt.person_id
     -- TODO: Add test to catch if data source is incorrect
     and (lower(outpt.data_source) like '%cclf%' or lower(outpt.data_source) like '%bcda%')
-inner join {{ref('cms_provider_attribution__primary_care_hcpcs_codes')}} pc_codes
+inner join {{ref('cms_provider_attribution__stg_primary_care_hcpcs_codes')}} pc_codes
     on outpt.hcpcs_code = pc_codes.hcpcs_code    
 left join snf_excluded_claims as snf
     on  outpt.person_id = snf.person_id
@@ -219,7 +219,7 @@ from distinct_benes as benes
 inner join  {{ref('medical_claim')}} as med
     on  benes.person_id = med.person_id
     and (lower(med.data_source) like '%cclf%' or lower(med.data_source) like '%bcda%')
-inner join {{ref('cms_provider_attribution__primary_care_hcpcs_codes')}} pc_codes
+inner join {{ref('cms_provider_attribution__stg_primary_care_hcpcs_codes')}} pc_codes
     on med.hcpcs_code = pc_codes.hcpcs_code   
     and pc_codes.hcpcs_code != 'G0463' -- Only for ETA claims 
 left join snf_excluded_claims as snf
