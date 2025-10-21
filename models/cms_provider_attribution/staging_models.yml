@@ -1,6 +1,33 @@
 version: 2
 
 models:
+  # Terminology
+  - name: cms_provider_attribution__stg_cms_acceptable_provider_specialty_codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      tags: ["cms_provider_attribution", "staging"]
+  - name: cms_provider_attribution__stg_electing_teaching_hospital_list
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      tags: ["cms_provider_attribution", "staging"]      
+  - name: cms_provider_attribution__stg_fips_ssa_state_map
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: stg_fips_ssa_state_map
+      tags: ["cms_provider_attribution", "staging"]
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - fips_state
+            - ssa_state      
+  - name: cms_provider_attribution__stg_medicare_provider_and_supplier_taxonomy_crosswalk
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      tags: ["cms_provider_attribution", "staging"]
   - name: cms_provider_attribution__stg_provider_specialty_assignment_list
     config:
       schema: |
@@ -10,12 +37,24 @@ models:
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      tags: ["cms_provider_attribution", "staging"]    
-  - name: cms_provider_attribution__stg_electing_teaching_hospital_list
+      tags: ["cms_provider_attribution", "staging"]        
+  # Value sets
+  - name: cms_provider_attribution__primary_care_hcpcs_codes
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      tags: ["cms_provider_attribution", "staging"]        
+      tags: ["cms_provider_attribution", "staging"]  
+  - name: cms_provider_attribution__stg_assignment_windows
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      tags: ["cms_provider_attribution", "staging"]
+  - name: cms_provider_attribution__stg_provider_specialty_assignment_codes
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      tags: ["cms_provider_attribution", "staging"]       
+  # Other Staging
   - name: cms_provider_attribution__stg_alr1
     config:
       schema: |
@@ -290,17 +329,6 @@ models:
       alias: stg_patient
       tags: ["cms_provider_attribution", "staging"]
       materialized: table
-  - name: cms_provider_attribution__stg_fips_ssa_state_map
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      alias: stg_fips_ssa_state_map
-      tags: ["cms_provider_attribution", "staging"]
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - fips_state
-            - ssa_state
   - name: cms_provider_attribution__stg_eob
     config:
       schema: |
