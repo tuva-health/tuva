@@ -124,9 +124,6 @@ select
                 substring(revenue_center_code,1,3) = '098')
             then 'Method II CAH'
         end as outpatient_facility
-    , other_npi
-    , attending_npi
-    , operating_npi
 from {{ref('medical_claim')}} as med
 
 )
