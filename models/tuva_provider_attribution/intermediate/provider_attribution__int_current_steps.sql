@@ -152,6 +152,7 @@ with claim_bounds as (
     , count(distinct c.encounter_id) as visits
   from claims_12 as c
   where c.provider_bucket in ('pcp', 'npp')
+    and c.provider_id is not null
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -172,6 +173,7 @@ with claim_bounds as (
   left outer join step1_benes as s1 on s1.person_id = c.person_id
   where s1.person_id is null
     and c.provider_bucket = 'specialist'
+    and c.provider_id is not null
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -194,6 +196,7 @@ with claim_bounds as (
   where s1.person_id is null
     and s2.person_id is null
     and c.provider_bucket in ('pcp', 'npp')
+    and c.provider_id is not null
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -217,6 +220,7 @@ with claim_bounds as (
   where s1.person_id is null
     and s2.person_id is null
     and s3.person_id is null
+    and c.provider_id is not null
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
