@@ -14,6 +14,5 @@ and it's assumed there are no dead benes within the initial AALR file.
 select distinct
       aco_id
     , person_id
-
 from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}} 
 where bene_death_dt < DATEFROMPARTS(performance_year,1,1)

@@ -12,7 +12,7 @@ select
     , bene.performance_year
     , bene.person_id
     , bene.coverage_month
-    , bene.bene_fips_state_cd
+    , bene.state
     
 from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}} as bene
 inner join {{ref('cms_provider_attribution__stg_assignment_methodology')}} asgn
@@ -39,7 +39,7 @@ select distinct
     , benes.person_id
 from benes as benes
 left join {{ref('reference_data__ansi_fips_state')}} as state
-    on benes.bene_fips_state_cd = state.ansi_fips_state_code
+    on benes.state = state.ansi_fips_state_code
 inner join bene_latest_month ltst
     on  benes.aco_id = ltst.aco_id
     and benes.person_id = ltst.person_id
@@ -48,5 +48,5 @@ inner join bene_latest_month ltst
 where 1=1
     -- Not removing individuals who are missing state information
     and state.ansi_fips_state_code is not null 
-        or benes.bene_fips_state_cd is null 
-        or benes.bene_fips_state_cd = '00' -- 00 is a dummy filler value
+        or benes.state is null 
+        or benes.state = '00' -- 00 is a dummy filler value

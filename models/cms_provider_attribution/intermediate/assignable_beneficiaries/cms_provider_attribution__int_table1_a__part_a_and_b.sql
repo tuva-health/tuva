@@ -15,7 +15,7 @@ select distinct
 from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}}
 -- Not including the runout files was found after validating excluded benes
 where 1=1
-  and bene_entlmt_buyin_ind in ('1', '2', 'A', 'B') 
+  and medicare_entitlement_buyin_indicator in ('1', '2', 'A', 'B') 
   and runout_file = 0
 )
 
@@ -29,7 +29,7 @@ from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}}
 where 1=1
 -- Not including the runout files was found after validating excluded benes
 -- Including members with null buyin_ind was found after validating excluded benes
-  and bene_entlmt_buyin_ind in ('3', 'C') or bene_entlmt_buyin_ind is null
+  and medicare_entitlement_buyin_indicator in ('3', 'C') or medicare_entitlement_buyin_indicator is null
   and runout_file = 0
 )
 

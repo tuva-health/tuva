@@ -13,22 +13,35 @@ The assignable beneficiaries models are based on pages 12-13 of the SLAAM.
 Can also be found at the following eCFR link: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-425/subpart-E/section-425.401
 */
 
+with extract_performance_year as (
+select 
+    elig.*
+  , SUBSTRING(file_name, 
+      CHARINDEX('.D', file_name) - 3, 3
+    ) as performance_year_base
+from {{ref('eligibility')}} elig
+)
 
-{% if var('attribution_claims_source') == "cclf" %}
+, add_fields as (
+select
+    extr.* 
+  , coalesce(CONCAT('A',
+    SUBSTRING(filename, CHARINDEX('P.A', filename) + 3, 4
+              )), '{{var("aco_id")}}') as aco_id    
+  , 2000 + substring(performance_year_base,2,2) as performance_year 
+  , case when upper(performance_year_base) like 'R%' then 1 else 0 end as runout_file
+from extract_performance_year extr
+)
 
-  select *
-  from {{ref('cms_provider_attribution__stg_cclf8')}}
-
-{% elif var('attribution_claims_source') == "bcda" %}
-
-  select *
-  from {{ref('cms_provider_attribution__stg_cclf8_bcda')}}
-
-
-{% endif %}
-
--- Additions/exclusions for retrospective are based on the same year as the performance year
--- Exclusions for retrospective are also based on the same year as the performance year
+select 
+      aco_id
+    , coalesce(performance_year, reference_year) as performance_year
+    , person_id
+    , medicare_entitlement_buyin_indicator
+    , state
+    , runout_file
+    , date_trunc('month', enrollment_start_date) as coverage_month
+from add_performance_year
 where 1=1
   and performance_year = {{ var('performance_year') }}
   and aco_id = '{{ var("aco_id") }}'
