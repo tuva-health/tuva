@@ -134,9 +134,12 @@ with claim_bounds as (
     , e.claim_year_month_int
     , e.claim_end_date
     , e.allowed_amount
-    , pc.provider_bucket
-    , pc.prov_specialty
+    , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket
+    , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty
   from eligible_all_claims as e
+  inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp
+    on cast(e.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})
+   and lower(trim(sp.entity_type_description)) = 'individual'
   left outer join {{ ref('provider_attribution__provider_classification') }} as pc
     on e.provider_id = pc.provider_id
 )

@@ -58,14 +58,18 @@ with claim_month as (
     on e.hcpcs_code = pc.hcpcs_code
 )
 
+
 , with_bucket as (
   select
       pcc.*
-    , pc.provider_bucket
-    , pc.prov_specialty
+    , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket
+    , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty
   from primary_care_claims as pcc
   left outer join {{ ref('provider_attribution__provider_classification') }} as pc
     on pcc.provider_id = pc.provider_id
+  inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp
+    on cast(pcc.provider_id as {{ dbt.type_string() }}) = cast(sp.npi as {{ dbt.type_string() }})
+   and lower(trim(sp.entity_type_description)) = 'individual'
 )
 
 select * from with_bucket
