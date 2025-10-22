@@ -25,7 +25,7 @@ Can also be found at the following eCFR link: https://www.ecfr.gov/current/title
     , bene_fips_state_cd as state
     , runout_file
     , coverage_month
-    , death_date
+    , bene_death_dt as death_date
 
   from {{ref('cms_provider_attribution__stg_cclf8')}}
 
