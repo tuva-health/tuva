@@ -54,7 +54,7 @@ select distinct
         when place_of_service_code = 21 then 1
         else 0
       end as inpatient_facility_claim
-from {{ref('medical_claim')}} med
+from {{ref('input_layer__medical_claim')}} med
 inner join {{ref('cms_provider_attribution__stg_primary_care_hcpcs_codes')}} pc_codes
     on med.hcpcs_code = pc_codes.hcpcs_code    
 )
@@ -73,7 +73,7 @@ select distinct
       med.person_id
     , med.claim_id
     , med.claim_line_number
-from {{ref('medical_claim')}} med
+from {{ref('input_layer__medical_claim')}} med
 inner join claims_snf_or_inpatient snf
     on  med.person_id = snf.person_id
     and (med.claim_start_date between snf.claim_start_date and snf.claim_end_date
@@ -96,7 +96,7 @@ select distinct
       med.person_id
     , med.claim_id
     , med.claim_line_number
-from {{ref('medical_claim')}} med
+from {{ref('input_layer__medical_claim')}} med
 inner join claims_snf_or_inpatient ip
     on  med.person_id = ip.person_id
     and (med.claim_start_date between ip.claim_start_date and ip.claim_end_date
@@ -124,7 +124,7 @@ select
                 substring(revenue_center_code,1,3) = '098')
             then 'Method II CAH'
         end as outpatient_facility
-from {{ref('medical_claim')}} as med
+from {{ref('input_layer__medical_claim')}} as med
 
 )
 
@@ -211,7 +211,7 @@ select
     , null as ccn
     , med.claim_provider_specialty_code
 from distinct_benes as benes
-inner join  {{ref('medical_claim')}} as med
+inner join  {{ref('input_layer__medical_claim')}} as med
     on  benes.person_id = med.person_id
     and (lower(med.data_source) like '%cclf%' or lower(med.data_source) like '%bcda%')
 inner join {{ref('cms_provider_attribution__stg_primary_care_hcpcs_codes')}} pc_codes

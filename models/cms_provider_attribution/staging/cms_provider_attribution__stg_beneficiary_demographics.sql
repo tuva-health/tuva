@@ -19,7 +19,7 @@ select
   , SUBSTRING(file_name, 
       CHARINDEX('.D', file_name) - 3, 3
     ) as performance_year_base
-from {{ref('eligibility')}} elig
+from {{ref('input_layer__eligibility')}} elig
 )
 
 , add_fields as (
