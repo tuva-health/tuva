@@ -36,6 +36,7 @@ with claim_bounds as (
     , s.provider_bucket
     , max(s.prov_specialty) over (partition by s.person_id, s.provider_id) as prov_specialty
     , s.step as assigned_step
+    , s.step_description
     , s.allowed_amount
     , s.visits
     , rank() over (partition by s.person_id
@@ -100,6 +101,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
     , r.provider_bucket
     , r.prov_specialty
     , r.assigned_step
+    , r.step_description
     , r.allowed_amount
     , r.visits
     , case
@@ -131,6 +133,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
     , 'no_eligible_history' as provider_bucket
     , 'No assignable claims history' as prov_specialty
     , 0 as assigned_step
+    , 'No assignable history' as step_description
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
     , 0 as visits
     , lb.lookback_start_date_24 as lookback_start_date
@@ -148,6 +151,7 @@ select
   , provider_bucket
   , prov_specialty
   , assigned_step
+  , step_description
   , allowed_amount
   , visits
   , lookback_start_date
@@ -165,6 +169,7 @@ select
   , provider_bucket
   , prov_specialty
   , assigned_step
+  , step_description
   , allowed_amount
   , visits
   , lookback_start_date

@@ -228,6 +228,16 @@ with claim_bounds as (
   select distinct person_id from step4
 )
 
+, assigned_pairs as (
+  select person_id, provider_id from step1
+  union
+  select person_id, provider_id from step2
+  union
+  select person_id, provider_id from step3
+  union
+  select person_id, provider_id from step4
+)
+
 , step5 as (
   select
       arc.person_id
@@ -245,21 +255,45 @@ with claim_bounds as (
   left outer join step2_benes as s2 on s2.person_id = arc.person_id
   left outer join step3_benes as s3 on s3.person_id = arc.person_id
   left outer join step4_benes as s4 on s4.person_id = arc.person_id
+  left outer join assigned_pairs as assigned
+    on assigned.person_id = arc.person_id
+   and assigned.provider_id = arc.provider_id
   where arc.provider_id is not null
     and arc.claim_end_date <= p.as_of_date
     and s1.person_id is null
     and s2.person_id is null
     and s3.person_id is null
     and s4.person_id is null
+    and assigned.provider_id is null
   group by arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
-select * from step1
-union all
-select * from step2
-union all
-select * from step3
-union all
-select * from step4
-union all
-select * from step5
+, all_steps as (
+  select * from step1
+  union all
+  select * from step2
+  union all
+  select * from step3
+  union all
+  select * from step4
+  union all
+  select * from step5
+)
+
+select
+    person_id
+  , provider_id
+  , provider_bucket
+  , prov_specialty
+  , step
+  , case step
+      when 1 then '12-month PCP/NPP primary-care HCPCS'
+      when 2 then '12-month specialist primary-care HCPCS'
+      when 3 then '24-month PCP/NPP primary-care HCPCS'
+      when 4 then '24-month primary-care HCPCS (any classification)'
+      when 5 then '24-month any rendering NPI'
+      else 'Unknown'
+    end as step_description
+  , allowed_amount
+  , visits
+from all_steps

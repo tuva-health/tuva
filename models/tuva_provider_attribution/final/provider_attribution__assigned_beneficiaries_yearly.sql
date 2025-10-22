@@ -15,6 +15,7 @@ with steps as (
     , provider_bucket
     , max(prov_specialty) over (partition by person_id, performance_year, provider_id) as prov_specialty
     , step as assigned_step
+    , step_description
     , allowed_amount
     , visits
     , row_number() over (partition by person_id, performance_year
@@ -45,6 +46,7 @@ order by allowed_amount desc, visits desc, provider_id) as provider_rank
     , provider_bucket
     , prov_specialty
     , assigned_step
+    , step_description
     , allowed_amount
     , visits
     , case
@@ -83,6 +85,7 @@ order by allowed_amount desc, visits desc, provider_id) as provider_rank
     , 'no_eligible_history' as provider_bucket
     , 'No assignable claims history' as prov_specialty
     , 0 as assigned_step
+    , 'No assignable history' as step_description
     , cast(0 as {{ dbt.type_numeric() }}) as allowed_amount
     , 0 as visits
     -- No prior utilization exists, so anchor placeholders to the current year's window.
@@ -103,6 +106,7 @@ select
   , provider_bucket
   , prov_specialty
   , assigned_step
+  , step_description
   , allowed_amount
   , visits
   , lookback_start_date
@@ -120,6 +124,7 @@ select
   , provider_bucket
   , prov_specialty
   , assigned_step
+  , step_description
   , allowed_amount
   , visits
   , lookback_start_date

@@ -215,12 +215,33 @@ with person_years as (
   group by py.person_id, py.performance_year, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
-select * from step1
-union all
-select * from step2
-union all
-select * from step3
-union all
-select * from step4
-union all
-select * from step5
+, all_steps as (
+  select * from step1
+  union all
+  select * from step2
+  union all
+  select * from step3
+  union all
+  select * from step4
+  union all
+  select * from step5
+)
+
+select
+    person_id
+  , performance_year
+  , provider_id
+  , provider_bucket
+  , prov_specialty
+  , step
+  , case step
+      when 1 then '12-month PCP/NPP primary-care HCPCS'
+      when 2 then '12-month specialist primary-care HCPCS'
+      when 3 then '24-month PCP/NPP primary-care HCPCS'
+      when 4 then '24-month primary-care HCPCS (any classification)'
+      when 5 then '24-month any rendering NPI'
+      else 'Unknown'
+    end as step_description
+  , allowed_amount
+  , visits
+from all_steps

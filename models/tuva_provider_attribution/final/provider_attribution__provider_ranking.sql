@@ -20,6 +20,7 @@ with calendar_months as (
     , s.provider_bucket
     , s.prov_specialty
     , s.step
+    , s.step_description
     , s.allowed_amount
     , s.visits
     , 'yearly' as scope
@@ -110,6 +111,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
     , s.provider_bucket
     , s.prov_specialty
     , s.step
+    , s.step_description
     , s.allowed_amount as allowed_amount
     , s.visits
     , 'current' as scope
@@ -135,6 +137,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
     , provider_bucket
     , prov_specialty
     , assigned_step as step
+    , step_description
     , allowed_amount
     , visits
     , 'yearly' as scope
@@ -155,6 +158,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
     , provider_bucket
     , prov_specialty
     , assigned_step as step
+    , step_description
     , allowed_amount
     , visits
     , 'current' as scope
@@ -174,6 +178,7 @@ select
   , provider_bucket
   , prov_specialty
   , step
+  , step_description
   , allowed_amount
   , visits
   , scope
@@ -194,6 +199,7 @@ select
   , provider_bucket
   , prov_specialty
   , step
+  , step_description
   , allowed_amount
   , visits
   , scope
@@ -214,6 +220,7 @@ select
   , provider_bucket
   , prov_specialty
   , step
+  , 'No assignable history' as step_description
   , allowed_amount
   , visits
   , scope
@@ -234,6 +241,7 @@ select
   , provider_bucket
   , prov_specialty
   , step
+  , 'No assignable history' as step_description
   , allowed_amount
   , visits
   , scope
