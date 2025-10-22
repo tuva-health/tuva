@@ -9,7 +9,7 @@ with base as (
       cast(p.npi as {{ dbt.type_string() }}) as provider_id
     , p.primary_taxonomy_code
     , p.primary_specialty_description as prov_specialty
-    , lower(p.entity_type_description) as entity_type
+    , lower(trim(p.entity_type_description)) as entity_type
   from {{ ref('provider_attribution__stg_terminology__provider') }} as p
 )
 
@@ -25,7 +25,7 @@ with base as (
       end as provider_bucket
   from base as b
   inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x
-    on cast(b.primary_taxonomy_code as {{ dbt.type_string() }}) = cast(x.provider_taxonomy_code as {{ dbt.type_string() }})
+    on trim(cast(b.primary_taxonomy_code as {{ dbt.type_string() }})) = trim(cast(x.provider_taxonomy_code as {{ dbt.type_string() }}))
   inner join {{ ref('cms_provider_attribution__provider_specialty_assignment_codes') }} as a
     on right(concat('00', trim(x.medicare_specialty_code)), 2)
      = right(concat('00', trim(a.specialty_code)), 2)
