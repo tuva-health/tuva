@@ -13,24 +13,24 @@ The assignable beneficiaries models are based on pages 12-13 of the SLAAM.
 Can also be found at the following eCFR link: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-425/subpart-E/section-425.401
 */
 
-with extract_performance_year as (
+with extract_fields as (
 select 
     elig.*
   , SUBSTRING(file_name, 
       CHARINDEX('.D', file_name) - 3, 3
     ) as performance_year_base
+  , coalesce(CONCAT('A',
+    SUBSTRING(file_name, CHARINDEX('P.A', file_name) + 3, 4
+              )), '{{var("aco_id")}}') as aco_id   
 from {{ref('input_layer__eligibility')}} elig
 )
 
 , add_fields as (
 select
-    extr.* 
-  , coalesce(CONCAT('A',
-    SUBSTRING(filename, CHARINDEX('P.A', filename) + 3, 4
-              )), '{{var("aco_id")}}') as aco_id    
+    extr.*  
   , 2000 + substring(performance_year_base,2,2) as performance_year 
   , case when upper(performance_year_base) like 'R%' then 1 else 0 end as runout_file
-from extract_performance_year extr
+from extract_fields extr
 )
 
 select 
