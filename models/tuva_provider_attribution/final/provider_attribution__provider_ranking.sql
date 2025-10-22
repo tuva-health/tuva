@@ -63,7 +63,7 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   from claim_bounds
 )
 
-, months as (
+, months_12 as (
   select distinct
       c.year_month_int
     , c.first_day_of_month
@@ -73,10 +73,32 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
     and c.full_date <= p.as_of_date
 )
 
+, months_24 as (
+  select distinct
+      c.year_month_int
+    , c.first_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
+  cross join params as p
+  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.full_date <= p.as_of_date
+)
+
+, lookback_12 as (
+  select min(first_day_of_month) as lookback_start_date_12
+  from months_12
+)
+
+, lookback_24 as (
+  select min(first_day_of_month) as lookback_start_date_24
+  from months_24
+)
+
 , lookback_bounds as (
   select
-      min(first_day_of_month) as lookback_start_date
-  from months
+      l12.lookback_start_date_12
+    , l24.lookback_start_date_24
+  from lookback_12 as l12
+  cross join lookback_24 as l24
 )
 
 , current_scope as (
@@ -91,7 +113,10 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
     , s.allowed_amount as allowed_amount
     , s.visits
     , 'current' as scope
-    , lb.lookback_start_date as lookback_start_date
+    , case
+        when s.step in (1, 2) then lb.lookback_start_date_12
+        else lb.lookback_start_date_24
+      end as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "s.person_id"]) }} as attribution_key
     , rank() over (partition by s.person_id

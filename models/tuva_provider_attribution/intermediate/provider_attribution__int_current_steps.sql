@@ -3,12 +3,13 @@
    )
 }}
 
--- Current rolling 12-month attribution steps using a data-driven as_of_date.
+-- Current rolling attribution steps using a data-driven as_of_date.
 -- Steps:
---   1 = PCP/NPP rendering primary-care HCPCS.
---   2 = Specialist rendering primary-care HCPCS for beneficiaries not assigned in step 1.
---   3 = Primary-care HCPCS fallback regardless of provider classification (captures missing taxonomy mapping).
---   4 = Any rendering NPI within the lookback window (captures claims outside the HCPCS list or with null HCPCS/NPIs).
+--   1 = PCP/NPP rendering primary-care HCPCS inside the most recent 12 months.
+--   2 = Specialist rendering primary-care HCPCS (12 months) for beneficiaries not assigned in step 1.
+--   3 = PCP/NPP rendering primary-care HCPCS across the expanded 24-month window.
+--   4 = Primary-care HCPCS fallback across 24 months regardless of provider classification.
+--   5 = Any rendering NPI across 24 months (captures claims outside the HCPCS list or with null HCPCS/NPIs).
 
 with claim_bounds as (
   select max(claim_end_date) as max_claim_end_date
@@ -32,7 +33,7 @@ with claim_bounds as (
   from claim_bounds
 )
 
-, months as (
+, months_12 as (
   -- Build the last 12 calendar months (YYYYMM) ending at as_of_date
   select distinct
       c.year_month_int
@@ -44,7 +45,19 @@ with claim_bounds as (
     and c.full_date <= p.as_of_date
 )
 
-, claims as (
+, months_24 as (
+  -- Build the last 24 calendar months (YYYYMM) ending at as_of_date
+  select distinct
+      c.year_month_int
+    , c.first_day_of_month
+    , c.last_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
+  cross join params as p
+  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.full_date <= p.as_of_date
+)
+
+, claims_12 as (
   select
       c.person_id
     , c.provider_id
@@ -57,7 +70,26 @@ with claim_bounds as (
     , c.claim_end_date
     , c.allowed_amount
   from {{ ref('provider_attribution__int_primary_care_claims') }} as c
-  inner join months as m
+  inner join months_12 as m
+    on c.claim_year_month_int = m.year_month_int
+  cross join params as p
+  where c.claim_end_date <= p.as_of_date
+)
+
+, claims_24 as (
+  select
+      c.person_id
+    , c.provider_id
+    , c.provider_bucket
+    , c.prov_specialty
+    , c.encounter_id
+    , c.claim_id
+    , c.claim_year_month
+    , c.claim_year_month_int
+    , c.claim_end_date
+    , c.allowed_amount
+  from {{ ref('provider_attribution__int_primary_care_claims') }} as c
+  inner join months_24 as m
     on c.claim_year_month_int = m.year_month_int
   cross join params as p
   where c.claim_end_date <= p.as_of_date
@@ -118,7 +150,7 @@ with claim_bounds as (
     , 1 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from claims as c
+  from claims_12 as c
   where c.provider_bucket in ('pcp', 'npp')
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
@@ -136,7 +168,7 @@ with claim_bounds as (
     , 2 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from claims as c
+  from claims_12 as c
   left outer join step1_benes as s1 on s1.person_id = c.person_id
   where s1.person_id is null
     and c.provider_bucket = 'specialist'
@@ -156,11 +188,12 @@ with claim_bounds as (
     , 3 as step
     , sum(c.allowed_amount) as allowed_amount
     , count(distinct c.encounter_id) as visits
-  from claims as c
+  from claims_24 as c
   left outer join step1_benes as s1 on s1.person_id = c.person_id
   left outer join step2_benes as s2 on s2.person_id = c.person_id
   where s1.person_id is null
     and s2.person_id is null
+    and c.provider_bucket in ('pcp', 'npp')
   group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -170,25 +203,50 @@ with claim_bounds as (
 
 , step4 as (
   select
+      c.person_id
+    , c.provider_id
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
+    , c.prov_specialty
+    , 4 as step
+    , sum(c.allowed_amount) as allowed_amount
+    , count(distinct c.encounter_id) as visits
+  from claims_24 as c
+  left outer join step1_benes as s1 on s1.person_id = c.person_id
+  left outer join step2_benes as s2 on s2.person_id = c.person_id
+  left outer join step3_benes as s3 on s3.person_id = c.person_id
+  where s1.person_id is null
+    and s2.person_id is null
+    and s3.person_id is null
+  group by c.person_id, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
+)
+
+, step4_benes as (
+  select distinct person_id from step4
+)
+
+, step5 as (
+  select
       arc.person_id
     , arc.provider_id
     , coalesce(arc.provider_bucket, 'unknown') as provider_bucket
     , arc.prov_specialty
-    , 4 as step
+    , 5 as step
     , sum(arc.allowed_amount) as allowed_amount
     , count(distinct arc.encounter_id) as visits
   from all_rendering_claims as arc
-  inner join months as m
+  inner join months_24 as m
     on arc.claim_year_month_int = m.year_month_int
   cross join params as p
   left outer join step1_benes as s1 on s1.person_id = arc.person_id
   left outer join step2_benes as s2 on s2.person_id = arc.person_id
   left outer join step3_benes as s3 on s3.person_id = arc.person_id
+  left outer join step4_benes as s4 on s4.person_id = arc.person_id
   where arc.provider_id is not null
     and arc.claim_end_date <= p.as_of_date
     and s1.person_id is null
     and s2.person_id is null
     and s3.person_id is null
+    and s4.person_id is null
   group by arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
@@ -199,3 +257,5 @@ union all
 select * from step3
 union all
 select * from step4
+union all
+select * from step5

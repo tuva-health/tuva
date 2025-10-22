@@ -17,7 +17,7 @@ with steps as (
     , step as assigned_step
     , allowed_amount
     , visits
-    , rank() over (partition by person_id, performance_year
+    , row_number() over (partition by person_id, performance_year
 order by allowed_amount desc, visits desc, provider_id) as provider_rank
   from steps
 )

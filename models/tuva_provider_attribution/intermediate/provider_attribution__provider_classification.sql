@@ -32,8 +32,29 @@ with base as (
   where b.entity_type = 'individual'
 )
 
+, rnk as (
+  select
+      provider_id
+    , prov_specialty
+    , provider_bucket
+    , row_number() over (partition by provider_id
+order by bucket_priority) as bucket_rank
+  from (
+    select
+        mapped.*
+      , case provider_bucket
+          when 'pcp' then 1
+          when 'npp' then 2
+          when 'specialist' then 3
+          else 4
+        end as bucket_priority
+    from mapped
+  ) as prioritized
+)
+
 select
     provider_id
   , prov_specialty
   , provider_bucket
-from mapped
+from rnk
+where bucket_rank = 1
