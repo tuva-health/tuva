@@ -40,7 +40,8 @@ select
     , medicare_entitlement_buyin_indicator
     , state
     , runout_file
-    , date_trunc('month', enrollment_start_date) as coverage_month
+    , datefromparts(performance_year, cast(buyin_month as int), 1) as coverage_month
+    , enrollment_start_date as coverage_month
 from add_performance_year
 where 1=1
   and performance_year = {{ var('performance_year') }}
