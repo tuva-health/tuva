@@ -3,67 +3,30 @@
    )
 }}
 
-with steps as (
-  select * from {{ ref('provider_attribution__int_yearly_steps') }}
-)
-
-, ranked as (
-  select
-      person_id
-    , performance_year
-    , provider_id
-    , provider_bucket
-    , max(prov_specialty) over (partition by person_id, performance_year, provider_id) as prov_specialty
-    , step as assigned_step
-    , step_description
-    , allowed_amount
-    , visits
-    , row_number() over (partition by person_id, performance_year
-order by allowed_amount desc, visits desc, provider_id) as provider_rank
-  from steps
-)
-
-, eligible as (
+with eligible as (
   select
       person_id
     , performance_year
   from {{ ref('provider_attribution__int_person_years') }}
 )
 
-, calendar_months as (
-  select distinct
-      year_month_int
-    , first_day_of_month
-    , last_day_of_month
-  from {{ ref('provider_attribution__stg_reference_data__calendar') }}
-)
-
 , assigned as (
   select
-      person_id
-    , performance_year
-    , provider_id
-    , provider_bucket
-    , prov_specialty
-    , assigned_step
-    , step_description
-    , allowed_amount
-    , visits
-    , case
-        when assigned_step = 3
-          then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
-        else start_curr.first_day_of_month
-      end as lookback_start_date
-    , end_curr.last_day_of_month as lookback_end_date
-    , {{ concat_custom(["'yearly|'", "cast(performance_year as " ~ dbt.type_string() ~ ")", "'|'", "person_id"]) }} as attribution_key
-  from ranked
-  left outer join calendar_months as start_curr
-    on start_curr.year_month_int = (performance_year * 100) + 1
-  left outer join calendar_months as start_prev
-    on start_prev.year_month_int = ((performance_year - 1) * 100) + 1
-  left outer join calendar_months as end_curr
-    on end_curr.year_month_int = (performance_year * 100) + 12
-  where provider_rank = 1
+      pr.person_id
+    , pr.performance_year
+    , pr.provider_id
+    , pr.provider_bucket
+    , pr.prov_specialty
+    , pr.step as assigned_step
+    , pr.step_description
+    , pr.allowed_amount
+    , pr.visits
+    , pr.lookback_start_date
+    , pr.lookback_end_date
+    , pr.attribution_key
+  from {{ ref('provider_attribution__provider_ranking') }} as pr
+  where pr.scope = 'yearly'
+    and pr.ranking = 1
 )
 
 , missing as (

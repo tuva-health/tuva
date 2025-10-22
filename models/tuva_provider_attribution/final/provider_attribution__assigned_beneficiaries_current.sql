@@ -25,25 +25,6 @@ with claim_bounds as (
   from claim_bounds
 )
 
-, steps as (
-  select * from {{ ref('provider_attribution__int_current_steps') }}
-)
-
-, ranked as (
-  select
-      s.person_id
-    , s.provider_id
-    , s.provider_bucket
-    , max(s.prov_specialty) over (partition by s.person_id, s.provider_id) as prov_specialty
-    , s.step as assigned_step
-    , s.step_description
-    , s.allowed_amount
-    , s.visits
-    , rank() over (partition by s.person_id
-order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
-  from steps as s
-)
-
 , months_12 as (
   -- Build the last 12 calendar months (YYYYMM) ending at as_of_date
   select distinct
@@ -56,36 +37,6 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
     and c.full_date <= p.as_of_date
 )
 
-, months_24 as (
-  -- Build the last 24 calendar months ending at as_of_date
-  select distinct
-      c.year_month_int
-    , c.first_day_of_month
-    , c.last_day_of_month
-  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
-  cross join params as p
-  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
-    and c.full_date <= p.as_of_date
-)
-
-, lookback_12 as (
-  select min(first_day_of_month) as lookback_start_date_12
-  from months_12
-)
-
-, lookback_24 as (
-  select min(first_day_of_month) as lookback_start_date_24
-  from months_24
-)
-
-, lookback_bounds as (
-  select
-      l12.lookback_start_date_12
-    , l24.lookback_start_date_24
-  from lookback_12 as l12
-  cross join lookback_24 as l24
-)
-
 , eligible as (
   select distinct mm.person_id
   from {{ ref('provider_attribution__stg_core__member_months') }} as mm
@@ -95,25 +46,23 @@ order by s.allowed_amount desc, s.visits desc, s.provider_id) as provider_rank
 
 , assigned as (
   select
-      r.person_id
-    , p.as_of_date
-    , r.provider_id
-    , r.provider_bucket
-    , r.prov_specialty
-    , r.assigned_step
-    , r.step_description
-    , r.allowed_amount
-    , r.visits
-    , case
-        when r.assigned_step in (1, 2) then lb.lookback_start_date_12
-        else lb.lookback_start_date_24
-      end as lookback_start_date
-    , p.as_of_date as lookback_end_date
-    , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "r.person_id"]) }} as attribution_key
-  from ranked as r
+      pr.person_id
+    , pr.as_of_date
+    , pr.provider_id
+    , pr.provider_bucket
+    , pr.prov_specialty
+    , pr.step as assigned_step
+    , pr.step_description
+    , pr.allowed_amount
+    , pr.visits
+    , pr.lookback_start_date
+    , pr.lookback_end_date
+    , pr.attribution_key
+  from {{ ref('provider_attribution__provider_ranking') }} as pr
   cross join params as p
-  cross join lookback_bounds as lb
-  where r.provider_rank = 1
+  where pr.scope = 'current'
+    and pr.as_of_date = p.as_of_date
+    and pr.ranking = 1
 )
 
 , missing as (
