@@ -209,6 +209,7 @@ select
     , med.rendering_npi as npi
     , med.rendering_tin as tin
     , null as ccn
+    , med.claim_provider_specialty_code
 from distinct_benes as benes
 inner join  {{ref('medical_claim')}} as med
     on  benes.person_id = med.person_id
@@ -248,6 +249,7 @@ select distinct
     , benes.npi
     , benes.tin
     , benes.ccn
+    , null as claim_provider_specialty_code
     , benes.allowed_amount
     , fqhc_rhc_flag
     , method_ii_cah_flag
@@ -270,6 +272,7 @@ select
     , benes.npi
     , benes.tin
     , benes.ccn
+    , benes.claim_provider_specialty_code
     , benes.allowed_amount
     , 0 as fqhc_rhc_flag
     , 0 as method_ii_cah_flag

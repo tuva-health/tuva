@@ -1,11 +1,4 @@
-with cclf_denied as (
-select 
-    * 
-from {{ref('cms_provider_attribution__stg_part_b_professional_claims')}}
-where (upper(trim(clm_prcsg_ind_cd)) not in ('A','O','S','R')) or clm_carr_pmt_dnl_cd = '0'
-)
-
-, provider_type as (
+with provider_type as (
 select distinct
       claim_id
     , claim_line_number
@@ -15,9 +8,11 @@ select distinct
             when lower(asgn.specialist_physician_step_2) = 'yes' and asgn.physician = 1 then 'specialist'
             when asgn.physician = 0 then 'npp'
         end as provider_type_for_assignment
-from {{ ref('cms_provider_attribution__stg_part_b_professional_claims')}} claim
+from {{ref('cms_provider_attribution__int_table1_e__primary_care_services')}} claim
 left join {{ref('cms_provider_attribution__stg_provider_specialty_assignment_codes')}} as asgn
-    on right('00' + claim.clm_prvdr_spclty_cd,2) = asgn.specialty_code
+    on right('00' + claim.claim_provider_specialty_code,2) = asgn.specialty_code
+-- Added filter for only physician claims since only part B physician claims include a claim_provider_specialty_code
+where outpatient_flag = 0
 )
 
 -- NOTE: On rare occassion, a record has more than 1 valid provider for a given claim and it needs to be ranked
@@ -59,16 +54,10 @@ left join provider_type_ranked asgn
     and svc.claim_line_number = asgn.claim_line_number
     and svc.person_id = asgn.person_id    
     and asgn.provider_type_rank = 1
-    and outpatient_flag = 0
-left join cclf_denied
-    on  svc.claim_id = cclf_denied.claim_id
-    and svc.claim_line_number = cclf_denied.claim_line_number
-    and svc.person_id = cclf_denied.person_id    
 left join (select distinct performance_year, npi from {{ref('cms_provider_attribution__stg_provider_supplier_list')}}) prov_supp
     on  svc.npi = prov_supp.npi
     and svc.performance_year = prov_supp.performance_year
 where 1=1 
-    and cclf_denied.claim_id is null
     and abs(allowed_amount) > 0
 )
 

@@ -603,6 +603,9 @@ models:
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: claim_provider_specialty_code
+        description: >
+          Indicates the specialty code associated with the provider of services for the claim line item.
       - name: hcpcs_code
         description: '{{ doc("hcpcs_code") }}'
         tests:
