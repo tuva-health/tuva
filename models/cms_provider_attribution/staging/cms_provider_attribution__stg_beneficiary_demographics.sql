@@ -41,6 +41,7 @@ select
     , state
     , runout_file
     , enrollment_start_date as coverage_month
+    , death_date
 from add_fields
 where 1=1
   and performance_year = {{ var('performance_year') }}
