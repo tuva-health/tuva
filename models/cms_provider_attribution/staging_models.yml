@@ -356,14 +356,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
       alias: stg_cclf5_bcda
       tags: ["cms_provider_attribution", "staging"]
-      materialized: table
-  - name: cms_provider_attribution__stg_cclf5
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      alias: stg_cclf5
-      tags: ["cms_provider_attribution", "staging"]
-      materialized: table      
+      materialized: table  
   - name: cms_provider_attribution__stg_beneficiary_demographics
     config:
       schema: |
@@ -390,12 +383,6 @@ models:
             - aco_id
             - person_id
             - coverage_month      
-  - name: cms_provider_attribution__stg_part_b_professional_claims
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      alias: stg_part_b_professional_claims
-      tags: ["cms_provider_attribution", "staging"]
   - name: cms_provider_attribution__stg_network_providers
     config:
       schema: |
