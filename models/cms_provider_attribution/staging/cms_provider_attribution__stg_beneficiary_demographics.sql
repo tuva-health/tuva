@@ -40,7 +40,6 @@ select
     , medicare_entitlement_buyin_indicator
     , state
     , runout_file
-    , datefromparts(performance_year, cast(buyin_month as int), 1) as coverage_month
     , enrollment_start_date as coverage_month
 from add_fields
 where 1=1
