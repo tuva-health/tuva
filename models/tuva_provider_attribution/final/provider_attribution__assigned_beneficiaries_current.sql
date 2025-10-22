@@ -83,6 +83,8 @@ with claim_bounds as (
     , pr.attribution_key
   from {{ ref('provider_attribution__provider_ranking') }} as pr
   cross join params as p
+  inner join eligible as e
+    on pr.person_id = e.person_id
   where pr.scope = 'current'
     and pr.as_of_date = p.as_of_date
     and pr.ranking = 1

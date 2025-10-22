@@ -78,6 +78,15 @@ with calendar_months as (
   cross join lookback_24 as l24
 )
 
+, eligible_current as (
+  -- Current-scope eligibility: beneficiaries with at least one member month
+  -- within the 12-month window ending at as_of_date.
+  select distinct mm.person_id
+  from {{ ref('provider_attribution__stg_core__member_months') }} as mm
+  inner join months_12 as m
+    on mm.year_month = cast(m.year_month_int as {{ dbt.type_string() }})
+)
+
 , claims_12 as (
   select
       c.person_id
@@ -364,7 +373,7 @@ with calendar_months as (
     , y.visits
     , 'yearly' as scope
     , case
-        when y.step = 3
+        when y.step in (3,4,5)
           then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
         else start_curr.first_day_of_month
       end as lookback_start_date
@@ -407,6 +416,8 @@ with calendar_months as (
     , rank() over (partition by s.person_id
                    order by s.step asc, s.allowed_amount desc, s.visits desc, s.provider_id) as ranking
   from current_unique as s
+  inner join eligible_current as ec
+    on s.person_id = ec.person_id
   cross join params as p
   cross join lookback_bounds as lb
 )
