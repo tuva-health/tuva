@@ -10,6 +10,14 @@ with eligible as (
   from {{ ref('provider_attribution__int_person_years') }}
 )
 
+, calendar_months as (
+  select distinct
+      year_month_int
+    , first_day_of_month
+    , last_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }}
+)
+
 , assigned as (
   select
       pr.person_id

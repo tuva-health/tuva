@@ -37,6 +37,29 @@ with claim_bounds as (
     and c.full_date <= p.as_of_date
 )
 
+, months_24 as (
+  -- Build the last 24 calendar months ending at as_of_date (for fallback bounds)
+  select distinct
+      c.year_month_int
+    , c.first_day_of_month
+    , c.last_day_of_month
+  from {{ ref('provider_attribution__stg_reference_data__calendar') }} as c
+  cross join params as p
+  where c.full_date >= cast({{ dbt.dateadd(datepart='month', interval=-23, from_date_or_timestamp='p.as_of_date') }} as date)
+    and c.full_date <= p.as_of_date
+)
+
+, lookback_24 as (
+  select min(first_day_of_month) as lookback_start_date_24
+  from months_24
+)
+
+, lookback_bounds as (
+  select
+      l24.lookback_start_date_24
+  from lookback_24 as l24
+)
+
 , eligible as (
   select distinct mm.person_id
   from {{ ref('provider_attribution__stg_core__member_months') }} as mm
