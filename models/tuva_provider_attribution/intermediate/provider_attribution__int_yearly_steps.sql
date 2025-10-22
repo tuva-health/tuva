@@ -232,6 +232,11 @@ with person_years as (
    and p4.performance_year = py.performance_year
    and p4.provider_id = arc.provider_id
   where arc.provider_id is not null
+    -- Only include beneficiaries not assigned under steps 1–4
+    and s1.person_id is null
+    and s2.person_id is null
+    and s3.person_id is null
+    and s4.person_id is null
     and p4.provider_id is null
   group by py.person_id, py.performance_year, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
