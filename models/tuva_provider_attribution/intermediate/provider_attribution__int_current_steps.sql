@@ -233,11 +233,11 @@ with claim_bounds as (
 
 , assigned_pairs as (
   select person_id, provider_id from step1
-  union
+  union distinct
   select person_id, provider_id from step2
-  union
+  union distinct
   select person_id, provider_id from step3
-  union
+  union distinct
   select person_id, provider_id from step4
 )
 

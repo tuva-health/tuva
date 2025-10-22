@@ -177,47 +177,47 @@ with calendar_months as (
 -- Build all potential providers (no bene-level gating across steps), then
 -- collapse to the earliest qualifying step per person/provider.
 , current_all_steps as (
-  select person_id, provider_id, provider_bucket, prov_specialty, 1 as step,
-         sum(allowed_amount) as allowed_amount,
-         count(distinct encounter_id) as visits
+  select person_id, provider_id, provider_bucket, prov_specialty, 1 as step
+         , sum(allowed_amount) as allowed_amount
+         , count(distinct encounter_id) as visits
   from claims_12
-  where provider_id is not null and provider_bucket in ('pcp','npp')
+  where provider_id is not null and provider_bucket in ('pcp', 'npp')
   group by person_id, provider_id, provider_bucket, prov_specialty
 
   union all
-  select person_id, provider_id, provider_bucket, prov_specialty, 2 as step,
-         sum(allowed_amount) as allowed_amount,
-         count(distinct encounter_id) as visits
+  select person_id, provider_id, provider_bucket, prov_specialty, 2 as step
+         , sum(allowed_amount) as allowed_amount
+         , count(distinct encounter_id) as visits
   from claims_12
   where provider_id is not null and provider_bucket = 'specialist'
   group by person_id, provider_id, provider_bucket, prov_specialty
 
   union all
-  select person_id, provider_id, provider_bucket, prov_specialty, 3 as step,
-         sum(allowed_amount) as allowed_amount,
-         count(distinct encounter_id) as visits
+  select person_id, provider_id, provider_bucket, prov_specialty, 3 as step
+         , sum(allowed_amount) as allowed_amount
+         , count(distinct encounter_id) as visits
   from claims_24
-  where provider_id is not null and provider_bucket in ('pcp','npp')
+  where provider_id is not null and provider_bucket in ('pcp', 'npp')
   group by person_id, provider_id, provider_bucket, prov_specialty
 
   union all
-  select person_id, provider_id, provider_bucket, prov_specialty, 4 as step,
-         sum(allowed_amount) as allowed_amount,
-         count(distinct encounter_id) as visits
+  select person_id, provider_id, provider_bucket, prov_specialty, 4 as step
+         , sum(allowed_amount) as allowed_amount
+         , count(distinct encounter_id) as visits
   from claims_24
   where provider_id is not null
   group by person_id, provider_id, provider_bucket, prov_specialty
 
   union all
-  select arc.person_id, arc.provider_id, coalesce(arc.provider_bucket,'unknown') as provider_bucket,
-         arc.prov_specialty, 5 as step,
-         sum(arc.allowed_amount) as allowed_amount,
-         count(distinct arc.encounter_id) as visits
+  select arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown') as provider_bucket
+         , arc.prov_specialty, 5 as step
+         , sum(arc.allowed_amount) as allowed_amount
+         , count(distinct arc.encounter_id) as visits
   from all_rendering_claims as arc
   inner join months_24 as m on arc.claim_year_month_int = m.year_month_int
   cross join params as p
   where arc.provider_id is not null and arc.claim_end_date <= p.as_of_date
-  group by arc.person_id, arc.provider_id, coalesce(arc.provider_bucket,'unknown'), arc.prov_specialty
+  group by arc.person_id, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
 , current_unique as (
@@ -225,7 +225,8 @@ with calendar_months as (
   from (
     select
         s.*
-      , row_number() over (partition by s.person_id, s.provider_id order by s.step) as step_choice_rank
+      , row_number() over (partition by s.person_id, s.provider_id
+order by s.step) as step_choice_rank
     from current_all_steps as s
   ) as d
   where step_choice_rank = 1
@@ -237,7 +238,7 @@ with calendar_months as (
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.provider_bucket,'unknown') as provider_bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 1 as step
     , sum(c.allowed_amount) as allowed_amount
@@ -247,15 +248,15 @@ with calendar_months as (
     on py.person_id = c.person_id
    and c.claim_year = py.performance_year
    and c.provider_id is not null
-   and c.provider_bucket in ('pcp','npp')
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
+   and c.provider_bucket in ('pcp', 'npp')
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 
   union all
   select
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.provider_bucket,'unknown') as provider_bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 2 as step
     , sum(c.allowed_amount) as allowed_amount
@@ -266,14 +267,14 @@ with calendar_months as (
    and c.claim_year = py.performance_year
    and c.provider_id is not null
    and c.provider_bucket = 'specialist'
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 
   union all
   select
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.provider_bucket,'unknown') as provider_bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 3 as step
     , sum(c.allowed_amount) as allowed_amount
@@ -284,15 +285,15 @@ with calendar_months as (
    and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
                                   and (py.performance_year * 100 + 12)
    and c.provider_id is not null
-   and c.provider_bucket in ('pcp','npp')
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
+   and c.provider_bucket in ('pcp', 'npp')
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 
   union all
   select
       py.person_id
     , py.performance_year
     , c.provider_id
-    , coalesce(c.provider_bucket,'unknown') as provider_bucket
+    , coalesce(c.provider_bucket, 'unknown') as provider_bucket
     , c.prov_specialty
     , 4 as step
     , sum(c.allowed_amount) as allowed_amount
@@ -303,14 +304,14 @@ with calendar_months as (
    and c.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
                                   and (py.performance_year * 100 + 12)
    and c.provider_id is not null
-  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket,'unknown'), c.prov_specialty
+  group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 
   union all
   select
       py.person_id
     , py.performance_year
     , arc.provider_id
-    , coalesce(arc.provider_bucket,'unknown') as provider_bucket
+    , coalesce(arc.provider_bucket, 'unknown') as provider_bucket
     , arc.prov_specialty
     , 5 as step
     , sum(arc.allowed_amount) as allowed_amount
@@ -323,7 +324,7 @@ with calendar_months as (
       , e.encounter_id
       , e.claim_year_month_int
       , e.allowed_amount
-      , coalesce(pc.provider_bucket,'other_individual') as provider_bucket
+      , coalesce(pc.provider_bucket, 'other_individual') as provider_bucket
       , coalesce(pc.prov_specialty, sp.primary_specialty_description) as prov_specialty
     from eligible_all_claims as e
     inner join {{ ref('provider_attribution__stg_terminology__provider') }} as sp
@@ -336,7 +337,7 @@ with calendar_months as (
    and arc.claim_year_month_int between ((py.performance_year - 1) * 100 + 1)
                                    and (py.performance_year * 100 + 12)
   where arc.provider_id is not null
-  group by py.person_id, py.performance_year, arc.provider_id, coalesce(arc.provider_bucket,'unknown'), arc.prov_specialty
+  group by py.person_id, py.performance_year, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
 , yearly_unique as (
@@ -373,7 +374,7 @@ with calendar_months as (
     , y.visits
     , 'yearly' as scope
     , case
-        when y.step in (3,4,5)
+        when y.step in (3, 4, 5)
           then coalesce(start_prev.first_day_of_month, start_curr.first_day_of_month)
         else start_curr.first_day_of_month
       end as lookback_start_date
@@ -410,7 +411,7 @@ with calendar_months as (
     , s.allowed_amount
     , s.visits
     , 'current' as scope
-    , case when s.step in (1,2) then lb.lookback_start_date_12 else lb.lookback_start_date_24 end as lookback_start_date
+    , case when s.step in (1, 2) then lb.lookback_start_date_12 else lb.lookback_start_date_24 end as lookback_start_date
     , p.as_of_date as lookback_end_date
     , {{ concat_custom(["'current|'", "replace(cast(p.as_of_date as " ~ dbt.type_string() ~ "),'-','')", "'|'", "s.person_id"]) }} as attribution_key
     , rank() over (partition by s.person_id
