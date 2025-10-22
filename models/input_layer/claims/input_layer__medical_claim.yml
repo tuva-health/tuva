@@ -672,6 +672,24 @@ models:
               config:
                 severity: warn
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+      - name: ccn
+        description:
+          CCN stands for CMS Certification Number (also called OSCAR provider number). This is field is available on Medicare claims. 
+          Here is the definition provided by CMS (can be found as prvdr_oscar_num here: https://www.cms.gov/files/document/cclf-information-packet.pdf):
+          A facility’s Medicare/Medicaid identification number. It is also known as a Medicare/Medicaid Provider Number, or CCN. This number verifies that a provider has
+          been Medicare certified for a particular type of service.
+      - name: claim_type_code
+        description: >
+          Medicare claim type code. Definition can be found here under `clm_type_cd`: https://www.cms.gov/files/document/cclf-information-packet.pdf
+      - name: other_npi
+        description: >
+          Other NPI for the claim.
+      - name: attending_npi
+        description: >
+          Attending NPI for the claim.   
+      - name: operating_npi
+        description: >
+          Operating NPI for the claim.
       - name: rendering_npi
         description: >
           Rendering NPI for the claim (typically represents the physician or  entity
