@@ -81,6 +81,7 @@ with person_years as (
     on py.person_id = c.person_id
    and c.claim_year = py.performance_year
    and c.provider_bucket in ('pcp', 'npp')
+   and c.provider_id is not null
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -108,6 +109,7 @@ with person_years as (
     on s1.person_id = py.person_id
    and s1.performance_year = py.performance_year
   where s1.person_id is null
+    and c.provider_id is not null
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -140,6 +142,7 @@ with person_years as (
    and s2.performance_year = py.performance_year
   where s1.person_id is null
     and s2.person_id is null
+    and c.provider_id is not null
   group by py.person_id, py.performance_year, c.provider_id, coalesce(c.provider_bucket, 'unknown'), c.prov_specialty
 )
 
@@ -183,6 +186,16 @@ with person_years as (
   select distinct person_id, performance_year from step4
 )
 
+, step4_pairs as (
+  select person_id, performance_year, provider_id from step1
+  union
+  select person_id, performance_year, provider_id from step2
+  union
+  select person_id, performance_year, provider_id from step3
+  union
+  select person_id, performance_year, provider_id from step4
+)
+
 , step5 as (
   -- 24-month expanded window, any rendering NPI regardless of HCPCS.
   select
@@ -211,7 +224,12 @@ with person_years as (
   left outer join step4_benes as s4
     on s4.person_id = py.person_id
    and s4.performance_year = py.performance_year
+  left outer join step4_pairs as p4
+    on p4.person_id = py.person_id
+   and p4.performance_year = py.performance_year
+   and p4.provider_id = arc.provider_id
   where arc.provider_id is not null
+    and p4.provider_id is null
   group by py.person_id, py.performance_year, arc.provider_id, coalesce(arc.provider_bucket, 'unknown'), arc.prov_specialty
 )
 
