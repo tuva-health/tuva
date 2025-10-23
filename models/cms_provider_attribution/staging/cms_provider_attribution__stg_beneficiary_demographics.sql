@@ -31,7 +31,16 @@ Can also be found at the following eCFR link: https://www.ecfr.gov/current/title
 
 {% elif var('attribution_claims_source') == "bcda" %}
 
-  select *
+  select 
+      aco_id
+    , performance_year
+    , person_id
+    , bene_entlmt_buyin_ind as medicare_entitlement_buyin_indicator
+    , bene_fips_state_cd as state
+    , runout_file
+    , coverage_month
+    , bene_death_dt as death_date
+
   from {{ref('cms_provider_attribution__stg_cclf8_bcda')}}
 
 
