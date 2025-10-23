@@ -233,11 +233,23 @@ with claim_bounds as (
 
 , assigned_pairs as (
   select person_id, provider_id from step1
+  {% if target.type == 'fabric' %}
+  union
+  {% else %}
   union distinct
+  {% endif %}
   select person_id, provider_id from step2
+  {% if target.type == 'fabric' %}
+  union
+  {% else %}
   union distinct
+  {% endif %}
   select person_id, provider_id from step3
+  {% if target.type == 'fabric' %}
+  union
+  {% else %}
   union distinct
+  {% endif %}
   select person_id, provider_id from step4
 )
 
