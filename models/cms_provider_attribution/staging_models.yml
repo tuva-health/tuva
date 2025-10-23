@@ -117,36 +117,7 @@ models:
             - performance_year
             - aco_id
     description: >
-      Assignment methodology for each ACO      
-  - name: cms_provider_attribution__stg_cclf8
-    config:
-      schema: |
-        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
-      alias: stg_cclf8
-      tags: ["cms_provider_attribution", "staging"]
-      materialized: table
-    columns:
-      - name: person_id
-        tests:
-          - not_null
-      - name: aco_id
-        tests:
-          - not_null     
-      - name: coverage_month
-        tests:
-          - not_null
-      - name: performance_year
-        tests:
-          - not_null          
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - aco_id
-            - person_id   
-            - coverage_month
-            - performance_year
-    description: >
-      MSSP CCLF 8 File(s)
+      Assignment methodology for each ACO
   - name: cms_provider_attribution__stg_ccn_participant_list
     config:
       schema: |
