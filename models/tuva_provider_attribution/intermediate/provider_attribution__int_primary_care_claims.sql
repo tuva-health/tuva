@@ -10,7 +10,7 @@ with claim_month as (
       mc.person_id
     , mc.claim_id
     , mc.claim_line_number
-    , cast(cm.encounter_id as {{ dbt.type_string() }}) as encounter_id
+    , cast(mc.encounter_id as {{ dbt.type_string() }}) as encounter_id
     , mc.claim_start_date
     , mc.claim_end_date
     , cal.year as claim_year
@@ -21,11 +21,7 @@ with claim_month as (
     , coalesce(nullif(mc.allowed_amount, 0), mc.paid_amount, 0) as allowed_amount
     , cast(mc.rendering_npi as {{ dbt.type_string() }}) as provider_id
     , mc.hcpcs_code
-  from {{ ref('provider_attribution__stg_input_layer__medical_claim') }} as mc
-  left outer join {{ ref('provider_attribution__stg_core__claims_medical_claim') }} as cm
-    on mc.claim_id = cm.claim_id
-   and mc.claim_line_number = cm.claim_line_number
-   and mc.data_source = cm.data_source
+  from {{ ref('provider_attribution__stg_core__medical_claim') }} as mc
   left outer join {{ ref('provider_attribution__stg_reference_data__calendar') }} as cal
     on cast(mc.claim_start_date as date) = cal.full_date
 )

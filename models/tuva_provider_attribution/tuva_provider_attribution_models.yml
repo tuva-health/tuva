@@ -83,12 +83,12 @@ models:
       materialized: view
       tags: ["tuva_provider_attribution"]
 
-  - name: provider_attribution__stg_input_layer__medical_claim
-    description: Staging view of input layer medical claims used for provider attribution.
+  - name: provider_attribution__stg_core__medical_claim
+    description: Staging view of core medical claims used for provider attribution.
     config:
       schema: |
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_tuva_provider_attribution{% else %}tuva_provider_attribution{%- endif -%}
-      alias: _stg_input_layer__medical_claim
+      alias: _stg_core__medical_claim
       materialized: view
       tags: ["tuva_provider_attribution"]
 

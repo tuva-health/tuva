@@ -3,6 +3,9 @@
    )
 }}
 
+-- Staging view of core medical claims used for provider attribution.
+-- Provides the subset of fields needed by attribution, sourced only from core.
+
 select
     claim_id
   , claim_line_number
@@ -11,7 +14,9 @@ select
   , claim_end_date
   , allowed_amount
   , paid_amount
-  , rendering_npi
+  , rendering_id as rendering_npi
   , hcpcs_code
   , data_source
-from {{ ref('input_layer__medical_claim') }}
+  , encounter_id
+from {{ ref('core__medical_claim') }}
+
