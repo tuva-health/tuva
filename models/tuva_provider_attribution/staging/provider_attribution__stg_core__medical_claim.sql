@@ -19,4 +19,3 @@ select
   , data_source
   , encounter_id
 from {{ ref('core__medical_claim') }}
-
