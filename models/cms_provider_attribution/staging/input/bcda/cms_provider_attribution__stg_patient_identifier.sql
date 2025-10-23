@@ -1,5 +1,5 @@
 {{ config(
-     enabled = var('claims_preprocessing_enabled', False) and var('attribution_claims_source') == 'bcda'
+     enabled = var('cms_provider_attribution_enabled', False) and var('attribution_claims_source') == 'bcda'
  | as_bool)
 }}
 
