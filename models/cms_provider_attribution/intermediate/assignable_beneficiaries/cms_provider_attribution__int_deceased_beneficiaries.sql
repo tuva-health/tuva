@@ -15,4 +15,4 @@ select distinct
       aco_id
     , person_id
 from {{ref('cms_provider_attribution__stg_beneficiary_demographics')}} 
-where death_date < DATEFROMPARTS(performance_year,1,1)
+where death_date <= DATEFROMPARTS(performance_year,12,31)

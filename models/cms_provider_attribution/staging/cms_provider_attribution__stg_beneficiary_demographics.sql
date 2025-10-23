@@ -1,7 +1,7 @@
 /* 
 Determine all eligible beneficiaries for claims-based assignment.
 
-The AALR provides fields neeeded to determine eligibility for prospective assignment, but not retrospective assignment.
+The AALR provides fields needed to determine eligibility for prospective assignment, but not retrospective assignment.
 Therefore, this file does not use AALR, but medical claims to determine eligibility.
 
 Instructions can be found in the CMS SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY (SLAAM) for a given year.
