@@ -22,11 +22,14 @@ select
     , asgn.assignment_methodology
     -- When date is greater than the start, but less than the end, then rolling 12
     , case 
-        when GETDATE() between window.window_start and window.window_end then DATEADD(DAY, 1, DATEADD(YEAR, -1, GETDATE()))
+        -- TEST
+        -- when GETDATE() between window.window_start and window.window_end then DATEADD(DAY, 1, DATEADD(YEAR, -1, GETDATE()))
+        when GETDATE() between window.window_start and window.window_end then '2024-07-01'
         else window.window_start
       end as rolling_12_window_start
     , case 
-        when GETDATE() between window.window_start and window.window_end then GETDATE()
+        -- when GETDATE() between window.window_start and window.window_end then GETDATE()
+        when GETDATE() between window.window_start and window.window_end then '2025-06-30'
         else window.window_end
       end as rolling_12_window_end
 from {{ref('cms_provider_attribution__int_assignable_beneficiaries')}} as asgn
