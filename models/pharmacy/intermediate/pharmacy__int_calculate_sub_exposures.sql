@@ -2,7 +2,7 @@
     enabled = var('brand_generic_enabled', var('claims_enabled', var('tuva_marts_enabled', False))) | as_bool
 ) }}
 
-with recursive pharmacy_claim_input as (
+with pharmacy_claim_input as (
     select * from {{ ref('pharmacy_claim') }}
 ),
 
@@ -50,27 +50,25 @@ claim_line_ingredients as (
         on pcl.ndc_code = pti.ndc
 ),
 
--- Step 3: Create unique claims (collapse claim lines to claim level)
--- This assumes all lines in a claim have the same dates
-unique_claims as (
+-- Step 3: Work at claim_line level (not claim level) to preserve granularity
+-- Each claim line may have different dates, so we treat them independently
+unique_claim_lines as (
     select distinct
         claim_id,
+        claim_line_number,
         data_source,
         person_id,
-        min(original_start_date) as original_start_date,
-        max(original_end_date) as original_end_date,
-        max(days_supply) as days_supply
+        original_start_date,
+        original_end_date,
+        days_supply
     from claim_line_ingredients
-    group by
-        claim_id,
-        data_source,
-        person_id
 ),
 
--- Step 4: Get all ingredients for each claim
-claim_ingredients as (
+-- Step 4: Get all ingredients for each claim line
+claim_line_ingredients_distinct as (
     select distinct
         claim_id,
+        claim_line_number,
         data_source,
         person_id,
         ingredient_rxcui,
@@ -78,97 +76,91 @@ claim_ingredients as (
     from claim_line_ingredients
 ),
 
--- Step 5: Build dependency graph - find the most recent prior claim that shares any ingredient
--- For each claim, find its "parent" claim (the most recent prior claim sharing an ingredient)
-claim_dependencies as (
+-- Step 5: Replaced complex self-join and recursive CTE logic to use LAG to find the prior exposure for each ingredient
+ingredient_with_prior as (
     select
-        c.claim_id,
-        c.data_source,
-        c.person_id,
-        c.original_start_date,
-        c.original_end_date,
-        c.days_supply,
-        -- Find the most recent prior claim that shares any ingredient
-        max(prior.claim_id) as parent_claim_id
-    from unique_claims c
-    left join unique_claims prior
-        on c.person_id = prior.person_id
-        and c.data_source = prior.data_source
-        and prior.original_start_date < c.original_start_date  -- Prior claim
-        -- Check if they share any ingredient
-        and exists (
-            select 1
-            from claim_ingredients ci1
-            inner join claim_ingredients ci2
-                on ci1.ingredient_rxcui = ci2.ingredient_rxcui
-                and ci1.person_id = ci2.person_id
-                and ci1.data_source = ci2.data_source
-            where ci1.claim_id = c.claim_id
-              and ci1.data_source = c.data_source
-              and ci2.claim_id = prior.claim_id
-              and ci2.data_source = prior.data_source
-        )
-    group by
-        c.claim_id,
-        c.data_source,
-        c.person_id,
-        c.original_start_date,
-        c.original_end_date,
-        c.days_supply
+        cli.claim_id,
+        cli.claim_line_number,
+        cli.data_source,
+        cli.person_id,
+        cli.ingredient_rxcui,
+        cli.ingredient_name,
+        ucl.original_start_date,
+        ucl.original_end_date,
+        ucl.days_supply,
+        lag(ucl.original_end_date) over (
+            partition by cli.person_id, cli.ingredient_rxcui
+            order by ucl.original_start_date, cli.claim_id, cli.claim_line_number
+        ) as prior_end_date
+    from claim_line_ingredients_distinct cli
+    inner join unique_claim_lines ucl
+        on cli.claim_id = ucl.claim_id
+        and cli.claim_line_number = ucl.claim_line_number
+        and cli.data_source = ucl.data_source
+        and cli.person_id = ucl.person_id
 ),
 
--- Step 6: RECURSIVE CTE to adjust claims based on dependencies
-adjusted_claims as (
-    -- Base case: Claims with no parent (first claims for each person or claims with no shared ingredients)
+-- Step 6: For each claim line, find the latest prior_end_date across all its ingredients
+-- This ensures all ingredients from the same claim line stay synchronized
+claim_line_dependencies as (
     select
         claim_id,
+        claim_line_number,
         data_source,
         person_id,
         original_start_date,
         original_end_date,
         days_supply,
-        parent_claim_id,
-        original_start_date as adjusted_start_date,
-        original_end_date as adjusted_end_date,
-        0 as recursion_depth
-    from claim_dependencies
-    where parent_claim_id is null
-    
-    union all
-    
-    -- Recursive case: Claims with a parent
-    select
-        cd.claim_id,
-        cd.data_source,
-        cd.person_id,
-        cd.original_start_date,
-        cd.original_end_date,
-        cd.days_supply,
-        cd.parent_claim_id,
-        -- Adjusted start: later of (original start, parent's adjusted end + 1 day)
-        greatest(
-            cd.original_start_date,
-            {{ dbt.dateadd('day', 1, 'ac.adjusted_end_date') }}
-        ) as adjusted_start_date,
-        -- Adjusted end: adjusted start + days_supply - 1
-        {{ dbt.dateadd(
-            'day',
-            'cd.days_supply - 1',
-            'greatest(
-                cd.original_start_date,
-                ' ~ dbt.dateadd('day', 1, 'ac.adjusted_end_date') ~ '
-            )'
-        ) }} as adjusted_end_date,
-        ac.recursion_depth + 1 as recursion_depth
-    from claim_dependencies cd
-    inner join adjusted_claims ac
-        on cd.parent_claim_id = ac.claim_id
-        and cd.data_source = ac.data_source
-        and cd.person_id = ac.person_id
-    where ac.recursion_depth < 100  -- Prevent infinite recursion
+        max(prior_end_date) as max_prior_end_date
+    from ingredient_with_prior
+    group by
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        original_start_date,
+        original_end_date,
+        days_supply
 ),
 
--- Step 7: Join adjusted dates back to all claim lines and ingredients
+-- Step 7: Adjust claim lines based on prior exposures
+adjusted_claim_lines as (
+    select
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        original_start_date,
+        original_end_date,
+        days_supply,
+        -- Adjusted start: later of (original start, prior end + 1 day)
+        case
+            when max_prior_end_date is not null
+            then greatest(
+                original_start_date,
+                {{ dbt.dateadd('day', 1, 'max_prior_end_date') }}
+            )
+            else original_start_date
+        end as adjusted_start_date
+    from claim_line_dependencies
+),
+
+-- Step 8: Calculate adjusted end date for each claim line
+adjusted_claim_lines_with_end as (
+    select
+        claim_id,
+        claim_line_number,
+        data_source,
+        person_id,
+        adjusted_start_date,
+        -- Adjusted end: adjusted start + days_supply - 1
+        {{ dbt.dateadd('day', 'days_supply - 1', 'adjusted_start_date') }} as adjusted_end_date,
+        days_supply
+    from adjusted_claim_lines
+),
+
+-- Step 9: Join adjusted dates back to all claim line ingredients
+-- All ingredients from the same claim line get the same adjusted dates
 final_ingredient_exposures as (
     select
         cli.claim_id,
@@ -181,8 +173,9 @@ final_ingredient_exposures as (
         ac.adjusted_end_date as drug_exposure_end_date,
         cli.days_supply
     from claim_line_ingredients cli
-    inner join adjusted_claims ac
+    inner join adjusted_claim_lines_with_end ac
         on cli.claim_id = ac.claim_id
+        and cli.claim_line_number = ac.claim_line_number
         and cli.data_source = ac.data_source
         and cli.person_id = ac.person_id
 )
