@@ -24,4 +24,4 @@ left join {{ ref('cms_provider_attribution__stg_eob_extension') }} dnl
   and dnl.url = 'https://bluebutton.cms.gov/resources/variables/carr_clm_pmt_dnl_cd'
 left join {{ref('cms_provider_attribution__stg_eob_careteam')}} care
   on eob.id = care.eob_id
-  and qualification_coding_prvdr_spclty_system = 'https://bluebutton.cms.gov/resources/variables/prvdr_spclty'
+  and care.qualification_coding_prvdr_spclty_system = 'https://bluebutton.cms.gov/resources/variables/prvdr_spclty'
