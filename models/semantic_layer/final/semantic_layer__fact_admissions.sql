@@ -13,7 +13,7 @@ SELECT
   , r.readmit_30_flag
   , r.unplanned_readmit_30_flag
   , e.encounter_start_date as admit_date
-  , e.encounter_start_date as discharge_date
+  , e.encounter_end_date as discharge_date
   , e.length_of_stay
   , e.admit_source_code
   , e.admit_source_description
@@ -40,7 +40,17 @@ SELECT
   , r.readmission_specialty_cohort
   , r.readmission_died_flag
   , r.readmission_diagnosis_ccs
+  , case when p.encounter_id is not null then 1 else 0 end as pqi_flag
+  , p.pqi_number
+  , p.pqi_name
+  , e.paid_amount
+  , e.allowed_amount
+  , e.charge_amount
+  , e.claim_count
+  , e.inst_claim_count
+  , e.prof_claim_count
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM {{ ref('readmissions__encounter_augmented') }} ea 
-LEFT JOIN {{ ref('core__encounter') }} e ON ea.encounter_id = e.encounter_id
-LEFT JOIN {{ ref('readmissions__readmission_summary') }} r ON r.encounter_id = ea.encounter_id
+FROM {{ ref('readmissions__encounter_augmented') }} as ea 
+LEFT JOIN {{ ref('core__encounter') }} as e ON ea.encounter_id = e.encounter_id
+LEFT JOIN {{ ref('readmissions__readmission_summary') }} as r ON r.encounter_id = ea.encounter_id
+LEFT JOIN {{ ref('ahrq_measures__pqi_summary') }} as p ON p.encounter_id = ea.encounter_id

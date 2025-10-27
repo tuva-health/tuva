@@ -168,6 +168,17 @@ models:
     tags: semantic_layer
     materialized: table
 
+- name: semantic_layer__fact_admissions
+  description: >
+    Admission and readmissions classifications for all inpatient encounters.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_admissions
+    tags: semantic_layer
+    materialized: table
+
 - name: semantic_layer__fact_claims
   description: >
     Claim line level fact for use in Power BI data models.
@@ -237,6 +248,17 @@ models:
     tags: semantic_layer
     materialized: table
 
+- name: semantic_layer__fact_hcc_gaps
+  description: >
+    HCC gaps for use in analytic data models.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_hcc_gaps
+    tags: semantic_layer
+    materialized: table
+
 - name: semantic_layer__fact_member_condition_bridge
   description: >
     Member to condition bridge table table for use in Power BI data models.
@@ -279,14 +301,35 @@ models:
     tags: semantic_layer
     materialized: table
 
-- name: semantic_layer__fact_hcc_gaps
+- name: semantic_layer__fact_pharmacy_claims
   description: >
-    HCC gaps for use in analytic data models.
+    HCC risk scores by patient, model version and payment year.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
       {% else %}semantic_layer{%- endif -%}
-    alias: fact_hcc_gaps
+    alias: fact_pharmacy_claims
     tags: semantic_layer
     materialized: table
 
+- name: semantic_layer__fact_risk_factors
+  description: >
+    Risk factors included in risk score calculation with coefficients.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_risk_factors
+    tags: semantic_layer
+    materialized: table
+
+- name: semantic_layer__fact_risk_scores
+  description: >
+    HCC risk scores by patient, model version and payment year.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: fact_risk_scores
+    tags: semantic_layer
+    materialized: table

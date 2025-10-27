@@ -108,7 +108,7 @@
     , cast(null as DECIMAL) AS outpatient_radiology_paid_amount_pred
     , cast(null as DECIMAL) AS outpatient_pt_ot_st_paid_amount_pred
     , cast(null as DECIMAL) AS outpatient_hospice_paid_amount_pred
-    , cast(null as DECIMAL)AS urgent_care_paid_amount_pred
+    , cast(null as DECIMAL) AS urgent_care_paid_amount_pred
     , cast(null as DECIMAL) AS outpatient_hospital_or_clinic_paid_amount_pred
     , cast(null as DECIMAL) AS home_health_paid_amount_pred
     , cast(null as DECIMAL) AS dialysis_paid_amount_pred

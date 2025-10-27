@@ -22,72 +22,72 @@ with encounter_sk as (
 )
 
 select
-    medical_claim_id
+    mc.medical_claim_id
   , mc.encounter_id
-  , encounter_group_sk
-  , encounter_type_sk
-  , primary_diagnosis_code
-  , primary_diagnosis_description
-  , primary_provider_id
-  , specialty
-  , ccsr_parent_category
-  , ccsr_category
-  , ccsr_category_description
-  , person_id
-  , {{ dbt.concat(["person_id", "'|'", "mc.data_source"]) }} as patient_source_key
-  , {{ dbt.concat(["person_id", "'|'", "TO_CHAR(claim_start_date, 'YYYYMM')"]) }} as member_month_sk
-  , TO_CHAR(claim_start_date, 'YYYYMM') as year_month
+  , esk.encounter_group_sk
+  , esk.encounter_type_sk
+  , esk.primary_diagnosis_code
+  , esk.primary_diagnosis_description
+  , esk.primary_provider_id
+  , esk.specialty
+  , esk.ccsr_parent_category
+  , esk.ccsr_category
+  , esk.ccsr_category_description
+  , mc.person_id
+  , {{ dbt.concat(["mc.person_id", "'|'", "mc.data_source"]) }} as patient_source_key
+  , {{ dbt.concat(["mc.person_id", "'|'", "TO_CHAR(claim_start_date, 'YYYYMM')"]) }} as member_month_sk
+  , TO_CHAR(mc.claim_start_date, 'YYYYMM') as year_month
   , sc.service_category_sk
-  , claim_id
-  , claim_line_number
-  , claim_type
-  , payer
-  , {{ quote_column('plan') }}
-  , claim_start_date
-  , claim_end_date
-  , claim_line_start_date
-  , claim_line_end_date
-  , admission_date
-  , discharge_date
-  , admit_source_code
-  , admit_source_description
-  , admit_type_code
-  , admit_type_description
-  , discharge_disposition_code
-  , discharge_disposition_description
-  , place_of_service_code
-  , place_of_service_description
-  , bill_type_code
-  , bill_type_description
-  , drg_code_type
-  , drg_code
-  , drg_description
-  , revenue_center_code
-  , revenue_center_description
-  , service_unit_quantity
-  , hcpcs_code
-  , hcpcs_modifier_1
-  , hcpcs_modifier_2
-  , hcpcs_modifier_3
-  , hcpcs_modifier_4
-  , hcpcs_modifier_5
-  , rendering_id
-  , rendering_tin
-  , rendering_name
-  , billing_id
-  , billing_tin
-  , billing_name
-  , facility_id
-  , facility_name
-  , paid_date
-  , paid_amount
-  , allowed_amount
-  , charge_amount
-  , coinsurance_amount
-  , copayment_amount
-  , deductible_amount
-  , total_cost_amount
-  , in_network_flag
+  , mc.claim_id
+  , mc.claim_line_number
+  , mc.claim_type
+  , mc.payer
+  , mc.{{ quote_column('plan') }}
+  , mc.claim_start_date
+  , mc.claim_end_date
+  , mc.claim_line_start_date
+  , mc.claim_line_end_date
+  , mc.admission_date
+  , mc.discharge_date
+  , mc.admit_source_code
+  , mc.admit_source_description
+  , mc.admit_type_code
+  , mc.admit_type_description
+  , mc.discharge_disposition_code
+  , mc.discharge_disposition_description
+  , mc.place_of_service_code
+  , mc.place_of_service_description
+  , mc.bill_type_code
+  , mc.bill_type_description
+  , mc.drg_code_type
+  , mc.drg_code
+  , mc.drg_description
+  , mc.revenue_center_code
+  , mc.revenue_center_description
+  , mc.service_unit_quantity
+  , mc.hcpcs_code
+  , mc.hcpcs_modifier_1
+  , mc.hcpcs_modifier_2
+  , mc.hcpcs_modifier_3
+  , mc.hcpcs_modifier_4
+  , mc.hcpcs_modifier_5
+  , mc.rendering_id
+  , mc.rendering_tin
+  , mc.rendering_name
+  , mc.billing_id
+  , mc.billing_tin
+  , mc.billing_name
+  , mc.facility_id
+  , mc.facility_name
+  , mc.paid_date
+  , mc.paid_amount
+  , mc.allowed_amount
+  , mc.charge_amount
+  , mc.coinsurance_amount
+  , mc.copayment_amount
+  , mc.deductible_amount
+  , mc.total_cost_amount
+  , mc.in_network_flag
   , mc.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medical_claim') }} mc
