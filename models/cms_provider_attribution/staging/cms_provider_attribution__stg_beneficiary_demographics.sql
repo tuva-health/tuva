@@ -16,9 +16,10 @@ Can also be found at the following eCFR link: https://www.ecfr.gov/current/title
 with extract_fields as (
 select 
     elig.*
-  , SUBSTRING(file_name, 
+  , reference_year as performance_year
+  , case when upper(SUBSTRING(file_name, 
       CHARINDEX('.D', file_name) - 3, 3
-    ) as performance_year_base
+    )) like 'R%' then 1 else 0 end as runout_file
   , case 
       when CHARINDEX('P.A', file_name) > 0 
         then CONCAT('A',
@@ -29,17 +30,9 @@ select
 from {{ref('input_layer__eligibility')}} elig
 )
 
-, add_fields as (
-select
-    extr.*  
-  , 2000 + substring(performance_year_base,2,2) as performance_year 
-  , case when upper(performance_year_base) like 'R%' then 1 else 0 end as runout_file
-from extract_fields extr
-)
-
 select 
       aco_id
-    , coalesce(performance_year, reference_year) as performance_year
+    , performance_year
     , person_id
     , medicare_entitlement_buyin_indicator
     , state
