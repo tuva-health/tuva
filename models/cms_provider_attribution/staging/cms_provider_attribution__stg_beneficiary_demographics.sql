@@ -40,7 +40,7 @@ select
     , enrollment_start_date as coverage_month
     , death_date
     , file_name
-from add_fields
+from extract_fields
 where 1=1
   and performance_year = {{ var('performance_year') }}
   and aco_id = '{{ var("aco_id") }}'
