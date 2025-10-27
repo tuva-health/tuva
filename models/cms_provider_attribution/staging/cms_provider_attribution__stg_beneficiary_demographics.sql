@@ -44,3 +44,4 @@ from extract_fields
 where 1=1
   and performance_year = {{ var('performance_year') }}
   and aco_id = '{{ var("aco_id") }}'
+  and medicare_entitlement_buyin_indicator is not null
