@@ -1433,3 +1433,109 @@ seeds:
         description: Device associated with the ICD-10-PCS code; corresponds to the sixth character of the code
       - name: qualifier
         description: Qualifier associated with the ICD-10-PCS code; corresponds to the seventh character of the code
+
+  - name: terminology__medicare_provider_and_supplier_taxonomy_crosswalk
+    description: |
+      A source for crosswalk CMS provider specialty codes with NPPES taxonomy codes. Source can be found here: 
+      https://data.cms.gov/provider-characteristics/medicare-provider-supplier-enrollment/medicare-provider-and-supplier-taxonomy-crosswalk/data
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: medicare_provider_and_supplier_taxonomy_crosswalk
+      tags:
+        - terminology
+      column_types:
+        medicare_specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(16) {%- endif -%}
+        medicare_provider_supplier_type_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        provider_taxonomy_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        provider_taxonomy_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+
+  - name: terminology__electing_teaching_hospital_list
+    description: |
+      CMS electing teaching hospitals. Source can be found here: https://www.cms.gov/priorities/key-initiatives/open-payments/resources/reporting-entitities
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: electing_teaching_hospital_list
+      tags:
+        - terminology
+      column_types:
+        collection_year: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        ccn: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(6) {%- endif -%}
+        tin: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(9) {%- endif -%}
+        hospital_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        pecos_legal_business_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        po_box: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        city: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        state: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        zip_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address_1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        street_address_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        city_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        state_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        zip_code_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+
+  - name: terminology__cms_acceptable_provider_specialty_codes
+    description: |
+      A list of acceptable provider specialty codes for risk adjustment. Source can be found here: https://www.cms.gov/medicare/payment/medicare-advantage-rates-statistics/risk-adjustment/acceptable-physician-specialty-type-lists
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: cms_acceptable_provider_specialty_codes
+      tags:
+        - terminology
+      column_types:
+        specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(8) {%- endif -%} 
+        specialty_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        pecos_specialty_description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+
+  - name: terminology__ssa_fips_state_county_crosswalk
+    description: |
+      SSA to FIPS State county crosswalk from the National Bureau of Economic Research.
+      Source can be found here: https://www.nber.org/research/data/ssa-federal-information-processing-series-fips-state-and-county-crosswalk
+    config:
+      schema: |
+        {%- if  var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_terminology{% else %}terminology{%- endif -%}
+      alias: ssa_fips_state_county_crosswalk
+      tags:
+        - terminology
+      column_types:
+        fipscounty: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+        countyname_fips: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        state: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(2) {%- endif -%} 
+        cbsa_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+        cbsa_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
+        ssa_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%} 
+        state_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(64) {%- endif -%} 
+        countyname_rate: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(128) {%- endif -%} 
