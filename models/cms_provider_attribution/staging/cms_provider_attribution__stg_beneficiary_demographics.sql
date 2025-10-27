@@ -19,9 +19,13 @@ select
   , SUBSTRING(file_name, 
       CHARINDEX('.D', file_name) - 3, 3
     ) as performance_year_base
-  , coalesce(CONCAT('A',
+  , case 
+      when CHARINDEX('P.A', file_name) > 0 
+        then CONCAT('A',
     SUBSTRING(file_name, CHARINDEX('P.A', file_name) + 3, 4
-              )), '{{var("aco_id")}}') as aco_id   
+              ))
+      else '{{var("aco_id")}}'
+    end as aco_id   
 from {{ref('input_layer__eligibility')}} elig
 )
 
