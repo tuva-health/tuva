@@ -14,4 +14,4 @@ SELECT
   , rs.member_months
   , rs.payment_year
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM {{ ref('cms_hcc__patient_risk_scores') }} as rs
+FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores') }} as rs

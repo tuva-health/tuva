@@ -29,4 +29,4 @@ SELECT
   , p.age
   , p.age_group
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM {{ ref('core__patient')}} p
+FROM {{ ref('semantic_layer__stg_core__patient')}} as p

@@ -5,6 +5,7 @@
 
 
 SELECT
-  p.pqi_number
+    p.pqi_number
   , p.pqi_name
+  , p.encounter_id
 FROM {{ ref('ahrq_measures__pqi_summary') }} as p

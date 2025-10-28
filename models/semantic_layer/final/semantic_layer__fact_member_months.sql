@@ -78,7 +78,7 @@ WITH monthly_patient_costs AS (
       , medical_paid
       , total_allowed
       , medical_allowed
-    FROM {{ ref('financial_pmpm__pmpm_prep') }}
+    FROM {{ ref('semantic_layer__stg_financial_pmpm__pmpm_prep') }}
 ),
 
 monthly_patient_risk_cte AS (
@@ -86,14 +86,14 @@ monthly_patient_risk_cte AS (
         TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
       , person_id
       , normalized_risk_score
-    FROM {{ ref('cms_hcc__patient_risk_scores_monthly') }}
+    FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
 ),
 
 monthly_population_risk_cte AS (
     SELECT
         TO_CHAR(collection_end_date, 'YYYYMM') AS year_month
       , AVG(normalized_risk_score) AS monthly_avg_risk_score
-    FROM {{ ref('cms_hcc__patient_risk_scores_monthly') }}
+    FROM {{ ref('semantic_layer__stg_cms_hcc__patient_risk_scores_monthly') }}
     GROUP BY
         TO_CHAR(collection_end_date, 'YYYYMM')
 ),
@@ -182,7 +182,7 @@ combined_data_cte AS (
       , pc.medical_paid
       , pc.total_allowed
       , pc.medical_allowed
-    FROM {{ ref('core__member_months') }} mm
+    FROM {{ ref('semantic_layer__stg_core__member_months') }} mm
     LEFT JOIN monthly_patient_risk_cte mpr
         ON mm.person_id = mpr.person_id AND mm.year_month = mpr.year_month
     LEFT JOIN monthly_population_risk_cte pop_risk
@@ -276,4 +276,4 @@ SELECT
   , cd.total_allowed
   , cd.medical_allowed
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM combined_data_cte cd
+FROM combined_data_cte as cd

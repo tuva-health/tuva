@@ -90,10 +90,10 @@ select
   , mc.in_network_flag
   , mc.data_source
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-from {{ ref('core__medical_claim') }} mc
-INNER JOIN {{ ref('semantic_layer__dim_service_category') }} sc on mc.service_category_1 = sc.service_category_1
+from {{ ref('semantic_layer__stg_core__medical_claim') }} as mc
+INNER JOIN {{ ref('semantic_layer__dim_service_category') }} as sc on mc.service_category_1 = sc.service_category_1
     AND mc.service_category_2 = sc.service_category_2
     AND mc.service_category_3 = sc.service_category_3
 INNER JOIN encounter_sk esk on mc.encounter_id = esk.encounter_id
-INNER JOIN {{ ref('semantic_layer__dim_data_source') }} ds on mc.data_source = ds.data_source
+INNER JOIN {{ ref('semantic_layer__dim_data_source') }} as ds on mc.data_source = ds.data_source
 WHERE enrollment_flag = 1

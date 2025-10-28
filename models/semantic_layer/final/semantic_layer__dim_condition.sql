@@ -6,7 +6,7 @@
 with cte as (
   SELECT DISTINCT
       condition
-  FROM {{ ref('chronic_conditions__tuva_chronic_conditions_long')}}
+  FROM {{ ref('semantic_layer__stg_chronic_conditions__tuva_chronic_conditions_long')}}
 )
 
 select 

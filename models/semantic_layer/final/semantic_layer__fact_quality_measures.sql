@@ -19,4 +19,4 @@ SELECT
   , sl.measure_name
   , sl.measure_version
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM {{ ref('quality_measures__summary_long') }} sl
+FROM {{ ref('semantic_layer__stg_quality_measures__summary_long') }} as sl

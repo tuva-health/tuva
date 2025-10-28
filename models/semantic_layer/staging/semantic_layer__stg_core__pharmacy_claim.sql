@@ -18,5 +18,6 @@ select
   , p.paid_date
   , p.dispensing_date
   , p.days_supply
+  , p.quantity
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__pharmacy_claim') }} as p

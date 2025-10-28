@@ -6,19 +6,19 @@
 with data_sources as (
 SELECT DISTINCT 
   data_source
-FROM {{ ref('core__eligibility')}}
+FROM {{ ref('semantic_layer__stg_core__eligibility')}}
 
 UNION ALL
 
 SELECT DISTINCT 
   data_source
-FROM {{ ref('core__medical_claim')}}
+FROM {{ ref('semantic_layer__stg_core__medical_claim')}}
 
 UNION ALL
 
 SELECT DISTINCT 
   data_source
-FROM {{ ref('core__pharmacy_claim')}}
+FROM {{ ref('semantic_layer__stg_core__pharmacy_claim')}}
 
 )
 

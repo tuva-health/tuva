@@ -21,7 +21,7 @@ WITH data_with_sks AS (
     , mm.custom_attributed_provider_organization
     , mm.custom_attributed_provider_lob
     , LEFT(mm.year_month, 4) AS year_nbr
-  FROM {{ ref('core__member_months') }} mm
+  FROM {{ ref('semantic_layer__stg_core__member_months') }} as mm
 )
 SELECT
     dws.person_id

@@ -7,4 +7,5 @@
 SELECT
     p.npi
   , p.specialty
+  , p.practitioner_id
 FROM {{ ref('core__practitioner') }} as p

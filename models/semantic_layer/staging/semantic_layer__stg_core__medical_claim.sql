@@ -3,7 +3,6 @@
    )
 }}
 
-
 select
     mc.medical_claim_id
   , mc.encounter_id
@@ -59,5 +58,9 @@ select
   , mc.total_cost_amount
   , mc.in_network_flag
   , mc.data_source
+  , mc.service_category_1
+  , mc.service_category_2
+  , mc.service_category_3
+  , mc.enrollment_flag
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__medical_claim') }} as mc
