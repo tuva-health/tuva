@@ -229,7 +229,7 @@ models:
 
 - name: semantic_layer__fact_member_condition_bridge
   description: >
-    Member to condition bridge table table for use in Power BI data models.
+    Member to condition bridge table for use in Power BI data models.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -271,7 +271,7 @@ models:
 
 - name: semantic_layer__fact_pharmacy_claims
   description: >
-    HCC risk scores by patient, model version and payment year.
+    Pharmacy claim data from core object.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
@@ -369,7 +369,7 @@ models:
     materialized: ephemeral
 
 - name: semantic_layer__stg_core__encounter
-  description: Staging table for monthly patient risk scores from CMS HCC model.
+  description: Staging table with data from core entounter object.
   config:
     schema: |
       {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
