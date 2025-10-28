@@ -490,7 +490,7 @@ jobs:
       # Changed to compile to save processing time
       - name: dbt-compile
         run: |
-          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"semantic_layer_enabled":true}'
+          dbt compile --profiles-dir ./profiles/snowflake --vars '{"use_synthetic_data": true,"claims_enabled":true,"semantic_layer_enabled":true}'
         working-directory: ci_testing
 
       - name: Get the result
