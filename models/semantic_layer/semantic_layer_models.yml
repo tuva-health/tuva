@@ -136,38 +136,6 @@ models:
         config:
           severity: error
 
-- name: semantic_layer__dim_year
-  description: >
-    Year dimension for use in Power BI data models.
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
-      {% else %}semantic_layer{%- endif -%}
-    alias: dim_year
-    tags: semantic_layer
-    materialized: table
-- name: semantic_layer__dim_year_month
-  description: >
-    Year month dimension for use in Power BI data models.
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
-      {% else %}semantic_layer{%- endif -%}
-    alias: dim_year_month
-    tags: semantic_layer
-    materialized: table
-
-- name: semantic_layer__fact_claims_summary
-  description: >
-    Claims summary fact table for use in Power BI data models.
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
-      {% else %}semantic_layer{%- endif -%}
-    alias: fact_claims_summary
-    tags: semantic_layer
-    materialized: table
-
 - name: semantic_layer__fact_admissions
   description: >
     Admission and readmissions classifications for all inpatient encounters.
@@ -332,17 +300,6 @@ models:
       {% else %}semantic_layer{%- endif -%}
     alias: fact_risk_scores
     tags: semantic_layer
-    materialized: table
-
-- name: semantic_layer__stg_ahrq_measures__pqi_summary
-  description: Staging table for AHRQ PQI measure definitions.
-  config:
-    schema: |
-      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
-      {% else %}semantic_layer{%- endif -%}
-    alias: semantic_layer__stg_ahrq_measures__pqi_summary
-    tags:
-      - semantic_layer
     materialized: table
 
 - name: semantic_layer__stg_ahrq_measures__pqi_summary
