@@ -1,1 +1,0 @@
-select * from {{ref('cms_provider_attribution__primary_care_hcpcs_codes')}}
