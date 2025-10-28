@@ -312,3 +312,179 @@ models:
     tags:
       - semantic_layer
     materialized: table
+
+- name: semantic_layer__stg_chronic_conditions__tuva_chronic_conditions_long
+  description: Staging table for Tuva chronic conditions long format.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_chronic_conditions__tuva_chronic_conditions_long
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_cms_hcc__patient_risk_scores_monthly
+  description: Staging table for monthly patient risk scores from CMS HCC model.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_cms_hcc__patient_risk_scores_monthly
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_cms_hcc__patient_risk_scores
+  description: Staging table for monthly patient risk scores from CMS HCC model.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_cms_hcc__patient_risk_scores
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_core__encounter
+  description: Staging table for monthly patient risk scores from CMS HCC model.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_core__encounter
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_core__medical_claim
+  description: Staging table for core medical claim object.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_core__medical_claim
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_core__member_months
+  description: Staging table for core member month object.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_core__member_months
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_core__patient
+  description: Staging table for core patient object.
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_core__patient
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_core__pharmacy_claim
+  description: Staging table for core pharmacy claim object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_core__pharmacy_claim
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_core__practitioner
+  description: Staging table for core practitioner object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_core__practitioner
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_ed_classification__summary
+  description: Staging table for ed classification object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_ed_classification__summary
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_financial_pmpm__pmpm_prep
+  description: Staging table for financial pmpm object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_financial_pmpm__pmpm_prep
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_hcc_suspecting__list_rollup
+  description: Staging table for hcc suspecting object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_hcc_suspecting__list_rollup
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_quality_measures__summary_long
+  description: Staging table for quality measure summary object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_quality_measures__summary_long
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_readmissions__encounter_augmented
+  description: Staging table for readmissions encounter object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_readmissions__encounter_augmented
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_readmissions__readmission_summary
+  description: Staging table for readmissions summary object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_readmissions__readmission_summary
+    tags:
+      - semantic_layer
+    materialized: table
+
+- name: semantic_layer__stg_reference_data__calendar
+  description: Staging table for calendar object
+  config:
+    schema: |
+      {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer
+      {% else %}semantic_layer{%- endif -%}
+    alias: semantic_layer__stg_reference_data__calendar
+    tags:
+      - semantic_layer
+    materialized: table

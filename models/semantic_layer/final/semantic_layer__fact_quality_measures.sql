@@ -4,7 +4,7 @@
 }}
 
 SELECT
-  sl.person_id
+    sl.person_id
   , sl.denominator_flag
   , sl.numerator_flag
   , sl.exclusion_flag

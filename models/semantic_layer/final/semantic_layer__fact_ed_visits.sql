@@ -20,7 +20,7 @@ SELECT
   , e.inst_claim_count
   , e.prof_claim_count
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM {{ ref('core__encounter') }} e
-LEFT JOIN {{ ref('ed_classification__summary')}} s
+FROM {{ ref('core__encounter') }} as e
+LEFT JOIN {{ ref('ed_classification__summary')}} as s
     ON e.encounter_id = s.encounter_id
 WHERE e.encounter_type = 'emergency department'
