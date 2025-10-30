@@ -331,11 +331,11 @@ seeds:
         cms_provider_attribution__primary_care_hcpcs_codes:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','cms_provider_attribution__primary_care_hcpcs_codes.csv',compression=true,null_marker=true, headers=true) }}"
         cms_provider_attribution__provider_specialty_assignment_codes:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.3','cms_provider_attribution__provider_specialty_assignment_codes.csv',compression=true,null_marker=true,headers=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','cms_provider_attribution__provider_specialty_assignment_codes.csv',compression=true,null_marker=true,headers=true) }}"
       semantic_layer:
         encounter_group_sk:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.3','encounter_group_sk.csv',compression=true,null_marker=true,headers=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','encounter_group_sk.csv',compression=true,null_marker=true,headers=true) }}"
         encounter_type_sk:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.3','encounter_type_sk.csv',compression=true,null_marker=true,headers=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','encounter_type_sk.csv',compression=true,null_marker=true,headers=true) }}"
         predictor_encounter_xwalk:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.3','predictor_encounter_xwalk.csv',compression=true,null_marker=true,headers=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','predictor_encounter_xwalk.csv',compression=true,null_marker=true,headers=true) }}"
