@@ -41,4 +41,4 @@ SELECT
   , dws.custom_attributed_provider_organization
   , dws.custom_attributed_provider_lob
   , '{{ var('tuva_last_run') }}' as tuva_last_run
-FROM data_with_sks dws
+FROM data_with_sks as dws
