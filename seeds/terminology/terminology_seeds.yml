@@ -1560,4 +1560,14 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
         taxonomy_switch: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%} 
-          
+      columns:
+        - name: npi
+          description: 'The National Provider Identifier (NPI).'
+        - name: taxonomy_col
+          description: 'The taxonomy column identifier.'
+        - name: taxonomy_code
+          description: 'The provider taxonomy code.'
+        - name: switch_col
+          description: 'The switch column identifier.'
+        - name: taxonomy_switch
+          description: 'The taxonomy switch value.'          
