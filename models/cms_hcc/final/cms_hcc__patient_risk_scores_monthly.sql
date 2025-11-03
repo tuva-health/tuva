@@ -17,6 +17,7 @@ with seed_adjustment_rates as (
 
     select
           person_id
+        , payer
         , coefficient
         , model_version
         , payment_year
@@ -29,12 +30,14 @@ with seed_adjustment_rates as (
 , member_months as (
 
     select
-        person_id
+          person_id
+        , payer
         , cast({{ substring('year_month', 1, 4) }} as integer) as eligible_year
         , count(1) as member_months
     from {{ ref('cms_hcc__stg_core__member_months') }}
     group by
-        person_id
+          person_id
+        , payer
         , cast({{ substring('year_month', 1, 4) }} as integer)
 )
 
@@ -42,6 +45,7 @@ with seed_adjustment_rates as (
 
     select
           person_id
+        , payer
         , sum(coefficient) as risk_score
         , model_version
         , payment_year
@@ -50,6 +54,7 @@ with seed_adjustment_rates as (
     from risk_factors
     group by
           person_id
+        , payer
         , model_version
         , payment_year
         , collection_start_date
@@ -74,6 +79,7 @@ with seed_adjustment_rates as (
 
     select
           person_id
+        , payer
         , risk_score
         , case
             when payment_year <= 2023 and model_version = 'CMS-HCC-V24' then risk_score
@@ -102,6 +108,7 @@ with seed_adjustment_rates as (
 
     select
           person_id
+        , payer
         , max(v24_risk_score) as v24_risk_score
         , max(v28_risk_score) as v28_risk_score
         , payment_year
@@ -110,6 +117,7 @@ with seed_adjustment_rates as (
     from transition_scores
     group by
           person_id
+        , payer
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -120,6 +128,7 @@ with seed_adjustment_rates as (
 
     select
           person_id
+        , payer
         , v24_risk_score
         , v28_risk_score
         , v24_risk_score + v28_risk_score as blended_risk_score
@@ -134,6 +143,7 @@ with seed_adjustment_rates as (
 
     select
           blended.person_id
+        , blended.payer
         , blended.v24_risk_score
         , blended.v28_risk_score
         , blended.blended_risk_score
@@ -151,6 +161,7 @@ with seed_adjustment_rates as (
 
     select
           normalized.person_id
+        , normalized.payer
         , normalized.v24_risk_score
         , normalized.v28_risk_score
         , normalized.blended_risk_score
@@ -168,7 +179,8 @@ with seed_adjustment_rates as (
 , weighted_score as (
 
     select
-        payment.person_id
+          payment.person_id
+        , payment.payer
         , payment.v24_risk_score
         , payment.v28_risk_score
         , payment.blended_risk_score
@@ -182,6 +194,7 @@ with seed_adjustment_rates as (
     from payment
     left outer join member_months
             on payment.person_id = member_months.person_id
+            and payment.payer = member_months.payer
             and payment.payment_year = member_months.eligible_year
 )
 
@@ -189,6 +202,7 @@ with seed_adjustment_rates as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer  
         , round(cast(v24_risk_score as {{ dbt.type_numeric() }}), 3) as v24_risk_score
         , round(cast(v28_risk_score as {{ dbt.type_numeric() }}), 3) as v28_risk_score
         , round(cast(blended_risk_score as {{ dbt.type_numeric() }}), 3) as blended_risk_score
@@ -205,6 +219,7 @@ with seed_adjustment_rates as (
 
 select
       person_id
+    , payer
     , v24_risk_score
     , v28_risk_score
     , blended_risk_score

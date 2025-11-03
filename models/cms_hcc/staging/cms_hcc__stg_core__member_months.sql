@@ -4,8 +4,8 @@
 }}
 select
       person_id
-    , year_month
     , payer
+    , year_month
     , {{ quote_column('plan') }}
     , data_source
     , '{{ var('tuva_last_run') }}' as tuva_last_run
