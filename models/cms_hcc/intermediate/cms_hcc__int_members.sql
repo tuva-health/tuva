@@ -19,6 +19,7 @@ with stg_eligibility as (
 
     select
           elig.person_id
+        , elig.payer
         , elig.enrollment_start_date
         , elig.enrollment_end_date
         , elig.original_reason_entitlement_code
@@ -54,6 +55,7 @@ with stg_eligibility as (
 
     select
           patient.person_id
+        , patient.payer
         , patient.sex
         , patient.birth_date
         , dates.payment_year
@@ -69,6 +71,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , enrollment_start_date
         , enrollment_end_date
         , payment_year
@@ -90,13 +93,17 @@ with stg_eligibility as (
 
 , calculate_prior_coverage as (
 
-    select person_id
+    select 
+          person_id
+        , payer
         , payment_year
         , collection_end_date
         , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
         , min({{ datediff('collection_start_date', 'collection_end_date', 'month') }} + 1) as collection_months
     from cap_collection_start_end_dates
-    group by person_id
+    group by 
+          person_id
+        , payer
         , payment_year
         , collection_end_date
 
@@ -110,6 +117,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , payment_year
         , collection_end_date
         , case
@@ -124,6 +132,7 @@ with stg_eligibility as (
 
     select
           stg_eligibility.person_id
+        , stg_eligibility.payer
         , stg_eligibility.payment_year
         , stg_eligibility.collection_start_date
         , stg_eligibility.collection_end_date
@@ -151,10 +160,12 @@ with stg_eligibility as (
     from stg_eligibility
         left outer join add_enrollment
             on stg_eligibility.person_id = add_enrollment.person_id
+            and stg_eligibility.payer = add_enrollment.payer
             and stg_eligibility.payment_year = add_enrollment.payment_year
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left outer join stg_patient
             on stg_eligibility.person_id = stg_patient.person_id
+            and stg_eligibility.payer = stg_patient.payer
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
 
@@ -164,6 +175,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -212,6 +224,7 @@ with stg_eligibility as (
 
     select
           person_id
+        , payer
         , payment_year
         , collection_start_date
         , collection_end_date
@@ -283,6 +296,7 @@ with stg_eligibility as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(gender as {{ dbt.type_string() }}) as gender
         , cast(age_group as {{ dbt.type_string() }}) as age_group
@@ -310,6 +324,7 @@ with stg_eligibility as (
 
 select
       person_id
+    , payer
     , enrollment_status
     , gender
     , age_group

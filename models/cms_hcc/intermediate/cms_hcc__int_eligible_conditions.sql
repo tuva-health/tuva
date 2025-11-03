@@ -28,6 +28,7 @@ with medical_claims as (
           claim_id
         , claim_line_number
         , claim_type
+        , payer
         , person_id
         , claim_start_date
         , claim_end_date
@@ -41,6 +42,7 @@ with medical_claims as (
 
     select
           claim_id
+        , payer
         , person_id
         , code
     from {{ ref('cms_hcc__stg_core__condition') }}
@@ -63,6 +65,7 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
+        , medical_claims.payer
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
@@ -87,6 +90,7 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
+        , medical_claims.payer
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
@@ -109,6 +113,7 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
+        , medical_claims.payer
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
@@ -142,6 +147,7 @@ with medical_claims as (
 
     select distinct
           eligible_claims.claim_id
+        , eligible_claims.payer
         , eligible_claims.person_id
         , eligible_claims.payment_year
         , eligible_claims.collection_start_date
@@ -151,13 +157,15 @@ with medical_claims as (
         inner join conditions
             on eligible_claims.claim_id = conditions.claim_id
             and eligible_claims.person_id = conditions.person_id
+            and eligible_claims.payer = conditions.payer
 
 )
 
 , add_data_types as (
 
     select distinct
-          cast(person_id as {{ dbt.type_string() }}) as person_id
+          cast(payer as {{ dbt.type_string() }}) as payer
+        , cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
@@ -168,6 +176,7 @@ with medical_claims as (
 
 select
       person_id
+    , payer
     , condition_code
     , payment_year
     , collection_start_date

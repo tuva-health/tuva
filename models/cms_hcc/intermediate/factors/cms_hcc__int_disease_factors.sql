@@ -7,6 +7,7 @@ with demographics as (
 
     select
           person_id
+        , payer
         , enrollment_status
         , gender
         , age_group
@@ -26,6 +27,7 @@ with demographics as (
 
     select
           person_id
+        , payer
         , hcc_code
         , model_version
         , payment_year
@@ -56,6 +58,7 @@ with demographics as (
 
     select
           demographics.person_id
+        , demographics.payer
         , demographics.enrollment_status
         , demographics.gender
         , demographics.age_group
@@ -71,6 +74,7 @@ with demographics as (
     from demographics
         inner join hcc_hierarchy
             on demographics.person_id = hcc_hierarchy.person_id
+            and demographics.payer = hcc_hierarchy.payer
             and demographics.model_version = hcc_hierarchy.model_version
             and demographics.payment_year = hcc_hierarchy.payment_year
             and demographics.collection_end_date = hcc_hierarchy.collection_end_date
@@ -81,6 +85,7 @@ with demographics as (
 
     select
           demographics_with_hccs.person_id
+        , demographics_with_hccs.payer
         , demographics_with_hccs.hcc_code
         , demographics_with_hccs.model_version
         , demographics_with_hccs.payment_year
@@ -105,6 +110,7 @@ with demographics as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(description as {{ dbt.type_string() }}) as hcc_description
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
@@ -119,6 +125,7 @@ with demographics as (
 
 select
       person_id
+    , payer
     , hcc_code
     , hcc_description
     , coefficient

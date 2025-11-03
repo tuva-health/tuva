@@ -7,6 +7,7 @@ with members as (
 
     select
           person_id
+        , payer
         , enrollment_status
         , gender
         , age_group
@@ -47,6 +48,7 @@ with members as (
 
     select
           members.person_id
+        , members.payer
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -76,10 +78,11 @@ with members as (
 
 )
 
-, v24_continuining_enrollees as (
+, v24_continuing_enrollees as (
 
     select
           members.person_id
+        , members.payer
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -116,6 +119,7 @@ with members as (
 
     select
           members.person_id
+        , members.payer
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -145,10 +149,11 @@ with members as (
 
 )
 
-, v28_continuining_enrollees as (
+, v28_continuing_enrollees as (
 
     select
           members.person_id
+        , members.payer
         , members.enrollment_status
         , members.gender
         , members.age_group
@@ -197,6 +202,7 @@ with members as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(gender as {{ dbt.type_string() }}) as gender
         , cast(age_group as {{ dbt.type_string() }}) as age_group
@@ -227,6 +233,7 @@ with members as (
 
 select
       person_id
+    , payer
     , enrollment_status
     , gender
     , age_group

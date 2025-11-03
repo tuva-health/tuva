@@ -393,6 +393,13 @@ models:
       alias: _int_eligible_conditions
       tags: cms_hcc
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - condition_code
+            - payment_year
     description: >
       Conditions from eligible risk-adjustable claims per claim type for the 
       collection year.
