@@ -336,6 +336,6 @@ seeds:
         encounter_group_sk:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','encounter_group_sk.csv',compression=true,null_marker=true) }}"
         encounter_type_sk:
-          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','encounter_type_sk.csv',compression=true,null_marker=true,headers=true) }}"
+          +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','encounter_type_sk.csv',compression=true,null_marker=true) }}"
         predictor_encounter_xwalk:
           +post-hook: "{{ load_seed(var('custom_bucket_name','tuva-public-resources') ~ '/versioned_value_sets/0.15.4','predictor_encounter_xwalk.csv',compression=true,null_marker=true,headers=true) }}"
