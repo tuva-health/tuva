@@ -4,6 +4,7 @@
 }}
 select
       claim_id
+    , payer
     , person_id
     , recorded_date
     , condition_type

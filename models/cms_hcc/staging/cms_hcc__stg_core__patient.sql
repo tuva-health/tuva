@@ -3,7 +3,8 @@
    )
 }}
 select
-      person_id
+      payer
+    , person_id
     , sex
     , birth_date
     , death_date

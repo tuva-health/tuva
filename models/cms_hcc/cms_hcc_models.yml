@@ -614,6 +614,14 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging conditions from core.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - recorded_date
+            - normalized_code_type 
+            - normalized_code            
     columns:
       - name: claim_id
         description: Unique claim_id for each claim.
@@ -636,6 +644,11 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging eligibility from core.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id    
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
@@ -658,6 +671,13 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging medical claims from core.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - claim_id
+            - claim_line_number      
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -704,6 +724,12 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging member months from financial_pmpm
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - year_month    
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.

@@ -5,7 +5,8 @@
 
 with patient_stage as (
     select
-        person_id
+          payer
+        , person_id
         , name_suffix
         , first_name
         , middle_name
@@ -25,7 +26,7 @@ with patient_stage as (
         , ethnicity
         , data_source
         , row_number() over (
-	        partition by person_id
+	        partition by person_id, payer
 	        order by case when enrollment_end_date is null
                 then cast('2050-01-01' as date)
                 else enrollment_end_date end desc)
@@ -36,7 +37,8 @@ with patient_stage as (
 )
 
 select
-    cast(person_id as {{ dbt.type_string() }}) as person_id
+      cast(payer as {{ dbt.type_string() }}) as payer
+    , cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(name_suffix as {{ dbt.type_string() }}) as name_suffix
     , cast(first_name as {{ dbt.type_string() }}) as first_name
     , cast(middle_name as {{ dbt.type_string() }}) as middle_name

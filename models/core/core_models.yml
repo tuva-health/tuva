@@ -1061,14 +1061,18 @@ models:
       alias: patient
       tags: core
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
     columns:
+      - name: payer
+        description: '{{ doc("person_id") }}'
       - name: person_id
         description: '{{ doc("person_id") }}'
         tests:
           - not_null
-          - unique:
-              config:
-                severity: error
       - name: sex
         description: '{{ doc("sex") }}'
         meta:
@@ -1455,6 +1459,13 @@ models:
         - core
         - core_stage_claims
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - claim_id
+            - claim_line_number
+            - payer
+            - person_id
 
   - name: core__stg_claims_procedure
     description: Staging core claims procedures

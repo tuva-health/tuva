@@ -13,6 +13,7 @@ with unpivot_cte as (
   select
         claim_id
         , claim_line_number
+        , payer
         , person_id
         , member_id
         , coalesce(admission_date
@@ -38,6 +39,8 @@ with unpivot_cte as (
 select distinct
 {{ dbt.safe_cast(
     concat_custom([
+        "CAST(unpivot_cte.payer AS " ~ dbt.type_string() ~ ")",
+        "'_'",
         "CAST(unpivot_cte.data_source AS " ~ dbt.type_string() ~ ")",
         "'_'",
         "CAST(unpivot_cte.claim_id AS " ~ dbt.type_string() ~ ")",
@@ -47,6 +50,7 @@ select distinct
         "CAST(unpivot_cte.source_code AS " ~ dbt.type_string() ~ ")",
     ]), api.Column.translate_type("string"))
  }} as condition_id
+    , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
     , cast(unpivot_cte.person_id as {{ dbt.type_string() }}) as person_id
     , cast(unpivot_cte.member_id as {{ dbt.type_string() }}) as member_id
     , cast(null as {{ dbt.type_string() }}) as patient_id
