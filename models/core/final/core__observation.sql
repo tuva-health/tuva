@@ -8,6 +8,7 @@
 select
       obs.observation_id
     , obs.person_id
+    , obs.payer
     , obs.patient_id
     , obs.encounter_id
     , obs.panel_id
@@ -99,6 +100,7 @@ left outer join {{ ref('terminology__observation_type') }} as ot
 select
       obs.observation_id
     , obs.person_id
+    , obs.payer
     , obs.patient_id
     , obs.encounter_id
     , obs.panel_id

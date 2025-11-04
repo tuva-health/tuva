@@ -7,6 +7,7 @@ with all_conditions as (
 
     select
           person_id
+        , payer
         , data_source
         , recorded_date
         , condition_type
@@ -22,6 +23,7 @@ with all_conditions as (
 
     select
           person_id
+        , payer
         , data_source
         , hcc_code
         , hcc_description
@@ -31,6 +33,7 @@ with all_conditions as (
     where hcc_code is not null
     group by
           person_id
+        , payer
         , hcc_code
         , hcc_description
         , data_source
@@ -41,6 +44,7 @@ with all_conditions as (
 
     select
           person_id
+        , payer
         , data_source
         , hcc_code
         , hcc_description
@@ -50,6 +54,7 @@ with all_conditions as (
     and lower(condition_type) <> 'problem'
     group by
           person_id
+        , payer
         , hcc_code
         , hcc_description
         , data_source
@@ -60,6 +65,7 @@ with all_conditions as (
 
     select
           hcc_grouped.person_id
+        , hcc_grouped.payer
         , hcc_grouped.data_source
         , hcc_grouped.hcc_code
         , hcc_grouped.hcc_description
@@ -75,6 +81,7 @@ with all_conditions as (
     from hcc_grouped
          left outer join hcc_billed
          on hcc_grouped.person_id = hcc_billed.person_id
+         and hcc_grouped.payer = hcc_billed.payer
          and hcc_grouped.hcc_code = hcc_billed.hcc_code
          and hcc_grouped.data_source = hcc_billed.data_source
 
@@ -84,6 +91,7 @@ with all_conditions as (
 
     select distinct
           all_conditions.person_id
+        , all_conditions.payer
         , all_conditions.data_source
         , all_conditions.recorded_date
         , all_conditions.condition_type
@@ -109,6 +117,7 @@ with all_conditions as (
     from all_conditions
          left outer join add_flag
             on all_conditions.person_id = add_flag.person_id
+            and all_conditions.payer = add_flag.payer
             and all_conditions.hcc_code = add_flag.hcc_code
             and all_conditions.data_source = add_flag.data_source
 
@@ -118,6 +127,7 @@ with all_conditions as (
 
     select distinct
           person_id
+        , payer
         , data_source
         , recorded_date
         , condition_type
@@ -148,6 +158,7 @@ with all_conditions as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
@@ -171,6 +182,7 @@ with all_conditions as (
 
 select
       person_id
+    , payer
     , data_source
     , recorded_date
     , condition_type

@@ -5,6 +5,7 @@
 select
       claim_id
     , person_id
+    , payer
     , recorded_date
     , condition_type
     , lower(normalized_code_type) as code_type

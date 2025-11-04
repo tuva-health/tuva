@@ -52,6 +52,8 @@ models:
               config:
                 severity: warn
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: payer
+        description: '{{ doc("payer") }}'                
       - name: patient_id
         description: '{{ doc("patient_id") }}'
         tests:

@@ -7,6 +7,7 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -29,6 +30,7 @@ with egfr_labs as (
 
     select distinct
           person_id
+        , payer
         , data_source
         , hcc_code
         , current_year_billed
@@ -46,11 +48,13 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , max(result_date) as max_result_date
     from egfr_labs
     group by
           person_id
+        , payer
         , data_source
 
 )
@@ -59,6 +63,7 @@ with egfr_labs as (
 
     select
           egfr_labs.person_id
+        , egfr_labs.payer
         , egfr_labs.data_source
         , max_lab_date.max_result_date
         , max(egfr_labs.result_date) as lookback_result_date
@@ -69,6 +74,7 @@ with egfr_labs as (
     where egfr_labs.result_date <= {{ dateadd('day', -90, 'max_result_date') }}
     group by
           egfr_labs.person_id
+        , egfr_labs.payer
         , egfr_labs.data_source
         , max_lab_date.max_result_date
 
@@ -81,6 +87,7 @@ with egfr_labs as (
 
     select
           egfr_labs.person_id
+        , egfr_labs.payer
         , egfr_labs.data_source
         , egfr_labs.code_type
         , egfr_labs.code
@@ -89,12 +96,14 @@ with egfr_labs as (
         , row_number() over (
             partition by
                   egfr_labs.person_id
+                , egfr_labs.payer
                 , egfr_labs.data_source
             order by egfr_labs.result desc
         ) as row_num
     from egfr_labs
         inner join lab_lookback
         on egfr_labs.person_id = lab_lookback.person_id
+        and egfr_labs.payer = lab_lookback.payer
         and egfr_labs.data_source = lab_lookback.data_source
     where egfr_labs.result_date >= lab_lookback.lookback_result_date
 
@@ -113,6 +122,7 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code as lab_code
@@ -148,6 +158,7 @@ with egfr_labs as (
 
     select
           unioned.person_id
+        , unioned.payer
         , unioned.data_source
         , unioned.result_date
         , unioned.result
@@ -161,6 +172,7 @@ with egfr_labs as (
             on unioned.hcc_code = seed_hcc_descriptions.hcc_code
         left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
+            and unioned.payer = billed_hccs.payer
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
 
@@ -170,6 +182,7 @@ with egfr_labs as (
 
     select
           person_id
+        , payer
         , data_source
         , result_date
         , result
@@ -188,6 +201,7 @@ with egfr_labs as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(result_date as date) as result_date
         , cast(result as {{ dbt.type_numeric() }}) as result
@@ -208,6 +222,7 @@ with egfr_labs as (
 
 select
       person_id
+    , payer
     , data_source
     , result_date
     , result

@@ -7,6 +7,7 @@ with conditions as (
 
     select
           person_id
+        , payer
         , recorded_date
         , condition_type
         , code_type
@@ -39,6 +40,7 @@ with conditions as (
 
     select
           conditions.person_id
+        , conditions.payer
         , conditions.recorded_date
         , conditions.condition_type
         , conditions.code
@@ -58,6 +60,7 @@ with conditions as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
         , cast(code as {{ dbt.type_string() }}) as icd_10_cm_code

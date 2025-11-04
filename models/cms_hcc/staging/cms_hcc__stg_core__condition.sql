@@ -4,8 +4,8 @@
 }}
 select
       claim_id
-    , payer
     , person_id
+    , payer
     , recorded_date
     , condition_type
     , normalized_code_type as code_type

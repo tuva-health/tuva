@@ -10,6 +10,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
+        , payer
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
         , status
@@ -26,6 +27,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
+        , payer
         , lower(coalesce(normalized_component_type, source_component_type)) as code_type
         , coalesce(normalized_component_code, source_component_code) as code
         , status
@@ -48,6 +50,7 @@ with lab_order as (
 select distinct
       lab_result_id
     , person_id
+    , payer
     , code_type
     , code
     , status
@@ -63,6 +66,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
+        , payer
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
         , status
@@ -79,6 +83,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
+        , payer
         , lower(coalesce(normalized_component_type, source_component_type)) as code_type
         , coalesce(normalized_component_code, source_component_code) as code
         , status
@@ -101,6 +106,7 @@ with lab_order as (
 select distinct
       lab_result_id
     , person_id
+    , payer
     , code_type
     , code
     , status
@@ -114,6 +120,7 @@ from unioned
 select {% if target.type == 'fabric' %} top 0 {% else %}{% endif %}
       cast(null as {{ dbt.type_string() }} ) as lab_result_id
     , cast(null as {{ dbt.type_string() }} ) as person_id
+    , cast(null as {{ dbt.type_string() }} ) as payer
     , cast(null as {{ dbt.type_string() }} ) as code_type
     , cast(null as {{ dbt.type_string() }} ) as code
     , cast(null as {{ dbt.type_string() }} ) as status
