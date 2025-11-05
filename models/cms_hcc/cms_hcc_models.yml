@@ -655,7 +655,10 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - payer
-            - person_id    
+            - person_id
+            - enrollment_start_date
+            - enrollment_end_date
+            - data_source
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
