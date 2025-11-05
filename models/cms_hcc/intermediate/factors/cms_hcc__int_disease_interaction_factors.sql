@@ -107,6 +107,8 @@ with demographics as (
 
 )
 
+-- TODO: Review if this is labelling every HCC with an interaction as having an interaction
+-- since its joining to HCC code 2 from the interactions table
 , disease_interactions as (
 
     select

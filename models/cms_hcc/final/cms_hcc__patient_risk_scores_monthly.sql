@@ -17,7 +17,7 @@ select
     , collection_start_date
     , collection_end_date
     , tuva_last_run
-from ref('cms_hcc__patient_risk_scores_monthly_by_factor_type')
+from {{ref('cms_hcc__patient_risk_scores_monthly_by_factor_type')}}
 group by 
       person_id
     , payer
