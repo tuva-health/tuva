@@ -625,10 +625,12 @@ models:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
             - payer
+            - claim_id
             - person_id
             - recorded_date
-            - normalized_code_type 
-            - normalized_code            
+            - condition_type
+            - code_type 
+            - code            
     columns:
       - name: claim_id
         description: Unique claim_id for each claim.
