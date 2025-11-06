@@ -147,6 +147,7 @@ with medical_claims as (
 
     select distinct
           eligible_claims.claim_id
+        , eligible_claims.claim_line_number
         , eligible_claims.payer
         , eligible_claims.person_id
         , eligible_claims.payment_year
@@ -178,6 +179,7 @@ with medical_claims as (
 select
       person_id
     , claim_id
+    , claim_line_number
     , payer
     , condition_code
     , payment_year
