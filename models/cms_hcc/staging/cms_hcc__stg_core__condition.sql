@@ -2,7 +2,8 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
    )
 }}
-select
+-- NOTE: Need distinct since condition rank is not included
+select distinct
       claim_id
     , person_id
     , payer
