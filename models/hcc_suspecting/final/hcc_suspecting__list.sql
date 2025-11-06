@@ -13,7 +13,7 @@ select
     , contributing_factor
     , suspect_date
     , tuva_last_run
-from {{ref('hcc_suspecting_list_all')}}
+from {{ref('hcc_suspecting__list_all')}}
     {% if target.type == 'fabric' %}
         where (current_year_billed = 0
             or current_year_billed is null)
