@@ -164,7 +164,8 @@ with medical_claims as (
 , add_data_types as (
 
     select distinct
-          cast(payer as {{ dbt.type_string() }}) as payer
+          cast(claim_id as {{ dbt.type_string() }}) as claim_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
         , cast(payment_year as integer) as payment_year
@@ -176,6 +177,7 @@ with medical_claims as (
 
 select
       person_id
+    , claim_id
     , payer
     , condition_code
     , payment_year
