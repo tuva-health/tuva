@@ -166,6 +166,7 @@ with medical_claims as (
 
     select distinct
           cast(claim_id as {{ dbt.type_string() }}) as claim_id
+        , cast(claim_id as {{ dbt.type_string() }}) as claim_line_number
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
