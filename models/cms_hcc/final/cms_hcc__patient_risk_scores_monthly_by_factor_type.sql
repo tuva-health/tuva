@@ -190,7 +190,7 @@ with seed_adjustment_rates as (
     select
           payment.person_id
         , payment.payer
-        , weighted.factor_type
+        , payment.factor_type
         , payment.v24_risk_score
         , payment.v28_risk_score
         , payment.blended_risk_score
