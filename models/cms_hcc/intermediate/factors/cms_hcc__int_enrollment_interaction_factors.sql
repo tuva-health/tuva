@@ -113,7 +113,7 @@ with demographics as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
-        , cast(person_id as {{ dbt.type_string() }}) as payer
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(description as {{ dbt.type_string() }}) as description
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
