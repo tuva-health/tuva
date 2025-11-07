@@ -51,6 +51,7 @@ with demographics as (
 
     select
           demographics.person_id
+        , demographics.payer
         , demographics.enrollment_status
         , demographics.institutional_status
         , demographics.model_version
