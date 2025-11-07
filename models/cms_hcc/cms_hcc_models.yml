@@ -156,7 +156,13 @@ models:
           The payment year the HCC and risk scores are being calculated for.
       - name: tuva_last_run
         description: The date the model was run.
-
+  - name: cms_hcc__patient_risk_scores_monthly_by_factor_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: patient_risk_scores_monthly_by_factor_type
+      tags: cms_hcc
+      materialized: table  
   - name: cms_hcc__patient_risk_scores_monthly
     config:
       schema: |
