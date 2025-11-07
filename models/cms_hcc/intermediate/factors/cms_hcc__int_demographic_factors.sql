@@ -194,7 +194,7 @@ with members as (
     union all
     select * from v28_new_enrollees
     union all
-    select * from v28_continuining_enrollees
+    select * from v28_continuing_enrollees
 
 )
 
