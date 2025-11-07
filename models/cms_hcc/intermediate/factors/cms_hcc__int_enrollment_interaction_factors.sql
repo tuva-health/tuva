@@ -127,6 +127,7 @@ with demographics as (
 
 select
       person_id
+    , payer
     , description
     , coefficient
     , factor_type
