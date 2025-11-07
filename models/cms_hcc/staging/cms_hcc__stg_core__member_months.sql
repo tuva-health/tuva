@@ -7,7 +7,6 @@ select distinct
       person_id
     , payer
     , year_month
-    , {{ quote_column('plan') }}
     , data_source
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__member_months') }}
