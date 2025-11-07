@@ -125,6 +125,8 @@ with medical_claims as (
     from medical_claims
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+        -- TODO: Review if this needs to be done here...likely can be done much later to avoid increasing number of rows by 12
+        -- this early on
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.payment_year = dates.payment_year

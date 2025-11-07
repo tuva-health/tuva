@@ -2,7 +2,7 @@
      enabled = var('cms_hcc_enabled',var('claims_enabled',var('tuva_marts_enabled',False))) | as_bool
    )
 }}
--- NOTE: Need distinct since condition rank is not included
+-- NOTE: Need distinct since condition_rank is not included
 select distinct
       claim_id
     , person_id
