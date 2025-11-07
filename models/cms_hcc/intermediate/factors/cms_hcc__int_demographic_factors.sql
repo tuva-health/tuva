@@ -190,7 +190,7 @@ with members as (
 
     select * from v24_new_enrollees
     union all
-    select * from v24_continuining_enrollees
+    select * from v24_continuing_enrollees
     union all
     select * from v28_new_enrollees
     union all
