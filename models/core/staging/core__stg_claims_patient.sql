@@ -37,8 +37,7 @@ with patient_stage as (
 )
 
 select
-      cast(payer as {{ dbt.type_string() }}) as payer
-    , cast(person_id as {{ dbt.type_string() }}) as person_id
+      cast(person_id as {{ dbt.type_string() }}) as person_id
     , cast(name_suffix as {{ dbt.type_string() }}) as name_suffix
     , cast(first_name as {{ dbt.type_string() }}) as first_name
     , cast(middle_name as {{ dbt.type_string() }}) as middle_name
@@ -60,6 +59,7 @@ select
     , cast(email as {{ dbt.type_string() }}) as email
     , cast(ethnicity as {{ dbt.type_string() }}) as ethnicity
     , cast(data_source as {{ dbt.type_string() }}) as data_source
+    , cast(payer as {{ dbt.type_string() }}) as payer
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }}) as age
     , cast(
         case
