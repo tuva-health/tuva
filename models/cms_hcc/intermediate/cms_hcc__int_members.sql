@@ -93,7 +93,7 @@ with stg_eligibility as (
 
 , calculate_prior_coverage as (
 
-    select 
+    select
           person_id
         , payer
         , payment_year
@@ -101,7 +101,7 @@ with stg_eligibility as (
         , sum({{ datediff('proxy_enrollment_start_date', 'proxy_enrollment_end_date', 'month') }} + 1) as coverage_months  /* include starting month */
         , min({{ datediff('collection_start_date', 'collection_end_date', 'month') }} + 1) as collection_months
     from cap_collection_start_end_dates
-    group by 
+    group by
           person_id
         , payer
         , payment_year

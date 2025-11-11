@@ -15,8 +15,8 @@ from {{ ref('core__stg_claims_patient') }}
 union all
 select cscp.*
 from {{ ref('core__stg_clinical_patient') }} as cscp
-left outer join person_list_to_exclude_because_in_claims as pltebic 
-    on  cscp.person_id = pltebic.person_id
+left outer join person_list_to_exclude_because_in_claims as pltebic
+    on cscp.person_id = pltebic.person_id
 /* IF EXISTS IN CLAIMS, CHOOSE CLAIMS RECORD OVER CLINICAL RECORD */
 where pltebic.person_id is null
 

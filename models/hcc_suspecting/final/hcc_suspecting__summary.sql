@@ -27,7 +27,7 @@ with patients as (
         , payer
         , count(*) as gaps
     from {{ ref('hcc_suspecting__list') }}
-    group by 
+    group by
           person_id
         , payer
 
@@ -44,7 +44,7 @@ with patients as (
         , suspecting_list.gaps
     from patients
          inner join suspecting_list
-         on  patients.person_id = suspecting_list.person_id
+         on patients.person_id = suspecting_list.person_id
          and patients.payer = suspecting_list.payer
 
 )

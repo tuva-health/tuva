@@ -118,7 +118,7 @@ with seed_adjustment_rates as (
         , collection_start_date
         , collection_end_date
         , max(v24_risk_score) as v24_risk_score
-        , max(v28_risk_score) as v28_risk_score        
+        , max(v28_risk_score) as v28_risk_score
     from transition_scores
     group by
           person_id
@@ -212,7 +212,7 @@ with seed_adjustment_rates as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
-        , cast(payer as {{ dbt.type_string() }}) as payer  
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , round(cast(v24_risk_score as {{ dbt.type_numeric() }}), 3) as v24_risk_score
         , round(cast(v28_risk_score as {{ dbt.type_numeric() }}), 3) as v28_risk_score
