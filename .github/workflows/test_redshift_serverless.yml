@@ -67,10 +67,10 @@ jobs:
                           'password': os.environ['DBT_REDSHIFT_PASSWORD'],
                           'dbname': os.environ['DBT_REDSHIFT_DATABASE'],
                           'schema': os.environ['DBT_REDSHIFT_SCHEMA'],
-                          'threads': 16,
+                          'threads': 32,
                           'sslmode': 'require',
                           'is_serverless': True,
-                          'connect_timeout': 60
+                          'connect_timeout': 120
                       }
                   },
                   'target': 'dev'
