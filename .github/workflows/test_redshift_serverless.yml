@@ -26,52 +26,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup PostgreSQL credentials file
-        run: |
-          # Create .pgpass file with credentials (format: host:port:database:username:password)
-          echo "${{ env.REDSHIFT_HOST }}:5439:${{ env.REDSHIFT_DATABASE }}:${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}:${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}" > ~/.pgpass
-          chmod 600 ~/.pgpass
-          
-          # Verify file was created (without showing contents)
-          ls -la ~/.pgpass
-          echo "✅ Credentials file created securely"
-
-      - name: Test Connection with psql
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
-          
-          echo "Testing connection to Redshift Serverless..."
-          echo "Host: ${{ env.REDSHIFT_HOST }}"
-          echo "Database: ${{ env.REDSHIFT_DATABASE }}"
-          echo "User: [REDACTED]"
-          
-          # Use psql with explicit SSL mode and credentials from .pgpass
-          PGSSLMODE=require psql \
-            -h ${{ env.REDSHIFT_HOST }} \
-            -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
-            -d ${{ env.REDSHIFT_DATABASE }} \
-            -p 5439 \
-            -c "SELECT current_database(), current_user, version();"
-          
-          echo "✅ Connection successful!"
-
-      - name: Create Temporary Schema
-        id: create-schema
-        run: |
-          SCHEMA_NAME="ci_test_${{ github.run_id }}"
-          echo "schema_name=$SCHEMA_NAME" >> $GITHUB_OUTPUT
-          
-          echo "Creating schema: $SCHEMA_NAME"
-          PGSSLMODE=require psql \
-            -h ${{ env.REDSHIFT_HOST }} \
-            -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
-            -d ${{ env.REDSHIFT_DATABASE }} \
-            -p 5439 \
-            -c "CREATE SCHEMA IF NOT EXISTS \"$SCHEMA_NAME\";"
-          
-          echo "✅ Schema $SCHEMA_NAME created!"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -81,6 +35,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+
+      - name: Create Temporary Schema Name
+        id: create-schema
+        run: |
+          SCHEMA_NAME="ci_test_${{ github.run_id }}"
+          echo "schema_name=$SCHEMA_NAME" >> $GITHUB_OUTPUT
+          echo "Using schema: $SCHEMA_NAME"
 
       - name: Create dbt profiles.yml
         run: |
@@ -111,10 +72,12 @@ jobs:
           dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt debug
+      - name: dbt debug (tests connection)
         run: |
-          echo "Testing dbt connection..."
+          echo "Testing dbt connection to Redshift Serverless..."
+          echo "This will create the schema and test the connection"
           dbt debug --profiles-dir ./profiles/redshift
+          echo "✅ Connection successful!"
         working-directory: ci_testing
 
       - name: dbt compile (quick test)
@@ -157,26 +120,10 @@ jobs:
           echo "Job status: ${{ job.status }}"
           echo "Redshift Serverless Host: ${{ env.REDSHIFT_HOST }}"
           echo "================================================"
-
-      - name: Cleanup - Drop Schema
-        if: always()
-        run: |
-          echo "Cleaning up schema: ${{ steps.create-schema.outputs.schema_name }}"
-          
-          PGSSLMODE=require psql \
-            -h ${{ env.REDSHIFT_HOST }} \
-            -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
-            -d ${{ env.REDSHIFT_DATABASE }} \
-            -p 5439 \
-            -c "DROP SCHEMA IF EXISTS \"${{ steps.create-schema.outputs.schema_name }}\" CASCADE;" || true
-          
-          echo "✅ Schema cleanup complete!"
-
-      - name: Cleanup credentials file
-        if: always()
-        run: |
-          rm -f ~/.pgpass
-          echo "✅ Credentials file removed"
+          echo ""
+          echo "Note: Schema will remain for manual inspection."
+          echo "To clean up, run in DataGrip:"
+          echo "DROP SCHEMA IF EXISTS ${{ steps.create-schema.outputs.schema_name }} CASCADE;"
 
       - name: Final Status
         if: always()
