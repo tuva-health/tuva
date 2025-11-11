@@ -14,8 +14,6 @@ on:
 env:
   AWS_REGION: us-east-1
   REDSHIFT_WORKGROUP: default-workgroup
-  REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
-  REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
   PYTHON_VERSION: '3.11'
 
 jobs:
@@ -43,27 +41,53 @@ jobs:
           echo "schema_name=$SCHEMA_NAME" >> $GITHUB_OUTPUT
           echo "Using schema: $SCHEMA_NAME"
 
-      - name: Create dbt profiles.yml
+      - name: Create dbt profiles.yml using environment variables
+        env:
+          DBT_REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          DBT_REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          DBT_REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          DBT_REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          DBT_REDSHIFT_SCHEMA: ${{ steps.create-schema.outputs.schema_name }}
         run: |
           mkdir -p ./profiles/redshift
-          cat > ./profiles/redshift/profiles.yml << EOF
-          default:
-            outputs:
-              dev:
-                type: redshift
-                host: ${{ env.REDSHIFT_HOST }}
-                port: 5439
-                user: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
-                password: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
-                dbname: ${{ env.REDSHIFT_DATABASE }}
-                schema: ${{ steps.create-schema.outputs.schema_name }}
-                threads: 16
-                sslmode: require
-                connect_timeout: 30
-            target: dev
-          EOF
           
-          echo "✅ dbt profile created"
+          # Use Python to create the profile to avoid YAML escaping issues
+          python3 << 'PYTHON_SCRIPT'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['DBT_REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['DBT_REDSHIFT_USER'],
+                          'password': os.environ['DBT_REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['DBT_REDSHIFT_DATABASE'],
+                          'schema': os.environ['DBT_REDSHIFT_SCHEMA'],
+                          'threads': 16,
+                          'sslmode': 'require',
+                          'connect_timeout': 30
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          
+          print("✅ dbt profile created")
+          PYTHON_SCRIPT
+
+        working-directory: ci_testing
+
+      - name: Verify profile was created
+        run: |
+          echo "Profile contents (passwords redacted):"
+          cat ./profiles/redshift/profiles.yml | grep -v password
         working-directory: ci_testing
 
       - name: dbt deps
@@ -75,7 +99,6 @@ jobs:
       - name: dbt debug (tests connection)
         run: |
           echo "Testing dbt connection to Redshift Serverless..."
-          echo "This will create the schema and test the connection"
           dbt debug --profiles-dir ./profiles/redshift
           echo "✅ Connection successful!"
         working-directory: ci_testing
@@ -118,12 +141,7 @@ jobs:
           echo "================================================"
           echo "Schema used: ${{ steps.create-schema.outputs.schema_name }}"
           echo "Job status: ${{ job.status }}"
-          echo "Redshift Serverless Host: ${{ env.REDSHIFT_HOST }}"
           echo "================================================"
-          echo ""
-          echo "Note: Schema will remain for manual inspection."
-          echo "To clean up, run in DataGrip:"
-          echo "DROP SCHEMA IF EXISTS ${{ steps.create-schema.outputs.schema_name }} CASCADE;"
 
       - name: Final Status
         if: always()
