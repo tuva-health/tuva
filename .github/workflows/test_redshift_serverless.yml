@@ -69,7 +69,8 @@ jobs:
                           'schema': os.environ['DBT_REDSHIFT_SCHEMA'],
                           'threads': 16,
                           'sslmode': 'require',
-                          'connect_timeout': 30
+                          'is_serverless': True,
+                          'connect_timeout': 60
                       }
                   },
                   'target': 'dev'
