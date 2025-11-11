@@ -81,72 +81,74 @@ with seed_adjustment_rates as (
 , transition_scores as (
 
     select
-          person_id
-        , payer
-        , factor_type
-        , risk_score
-        , case
-            when payment_year <= 2023 and model_version = 'CMS-HCC-V24' then risk_score
-            when payment_year = 2024 and model_version = 'CMS-HCC-V24' then risk_score * 0.67
-            when payment_year = 2025 and model_version = 'CMS-HCC-V24' then risk_score * 0.33
-            when payment_year >= 2026 and model_version = 'CMS-HCC-V24' then 0
-            end as v24_risk_score
-        , case
-            when payment_year <= 2023 and model_version = 'CMS-HCC-V28' then 0
-            when payment_year = 2024 and model_version = 'CMS-HCC-V28' then risk_score * 0.33
-            when payment_year = 2025 and model_version = 'CMS-HCC-V28' then risk_score * 0.67
-            when payment_year >= 2026 and model_version = 'CMS-HCC-V28' then risk_score
-            end as v28_risk_score
-        , model_version
-        , payment_year
-        , collection_start_date
-        , collection_end_date
-    from raw_score
-
-)
-
-/*
-    Grouping by patient to create a single row per patient.
-*/
-, transition_scores_grouped as (
-
-    select
-          person_id
-        , payer
-        , factor_type
-        , payment_year
-        , collection_start_date
-        , collection_end_date
-        , max(v24_risk_score) as v24_risk_score
-        , max(v28_risk_score) as v28_risk_score
-    from transition_scores
-    group by
-          person_id
-        , payer
-        , factor_type
-        , payment_year
-        , collection_start_date
-        , collection_end_date
-
-)
-
-, blended as (
-
-    select
-          person_id
-        , payer
-        , factor_type
-        , v24_risk_score
-        , v28_risk_score
-        , v24_risk_score + v28_risk_score as blended_risk_score
-        , payment_year
-        , collection_start_date
-        , collection_end_date
-    from transition_scores_grouped
+          raw.person_id
+        , raw.payer
+        , raw.factor_type
+        , raw.risk_score as raw_risk_score
+        , raw.risk_score * adj.blend_weight end as weighted_raw_risk_score
+        , adj.normalization_factor
+        , adj.ma_coding_pattern_adjustment
+        , raw.model_version
+        , raw.payment_year
+        , raw.collection_start_date
+        , raw.collection_end_date
+    from raw_score raw
+    left outer join seed_adjustment_rates as adj
+        on  raw.payment_year = seed_adjustment_rates.payment_year
+        and raw.model_version = seed_adjustment_rates.model_version
 
 )
 
 , normalized as (
+
+    select
+          person_id
+        , payer
+        , factor_type
+        , model_version
+        , raw_risk_score
+        , weighted_raw_risk_score
+        , weighted_raw_risk_score / normalization_factor as normalized_risk_score
+        , payment_year
+        , collection_start_date
+        , collection_end_date
+    from transition_scores
+)
+
+, payment as (
+
+    select
+          person_id
+        , payer
+        , factor_type
+        , model_version
+        , raw_risk_score
+        , weighted_raw_risk_score
+        , normalized_risk_score
+        , normalized_risk_score * (1 - ma_coding_pattern_adjustment) as payment_risk_score
+        , payment_year
+        , collection_start_date
+        , collection_end_date
+    from normalized
+)
+
+, blended as (
+select
+          person_id
+        , payer
+        , factor_type
+        , payment_year
+        , collection_start_date
+        , collection_end_date        
+        , max(case when model_version = 'CMS-HCC-V24' then weighted_raw_risk_score end) as v24_risk_score
+        , max(case when model_version = 'CMS-HCC-V28' then weighted_raw_risk_score end) as v28_risk_score
+        , sum(weighted_raw_risk_score) as blended_risk_score
+        , sum(normalized_risk_score) as normalized_risk_score
+        , sum(payment_risk_score) as payment_risk_score
+from payment
+)
+
+, weighted_score as (
 
     select
           blended.person_id
@@ -155,57 +157,18 @@ with seed_adjustment_rates as (
         , blended.v24_risk_score
         , blended.v28_risk_score
         , blended.blended_risk_score
-        , blended.blended_risk_score / seed_adjustment_rates.normalization_factor as normalized_risk_score
+        , blended.normalized_risk_score
+        , blended.payment_risk_score
+        , member_months.member_months
+        , blended.payment_risk_score * member_months.member_months as payment_risk_score_weighted_by_months
         , blended.payment_year
         , blended.collection_start_date
         , blended.collection_end_date
     from blended
-        left outer join seed_adjustment_rates
-            on blended.payment_year = seed_adjustment_rates.payment_year
-
-)
-
-, payment as (
-
-    select
-          normalized.person_id
-        , normalized.payer
-        , normalized.factor_type
-        , normalized.v24_risk_score
-        , normalized.v28_risk_score
-        , normalized.blended_risk_score
-        , normalized.normalized_risk_score
-        , normalized.normalized_risk_score * (1 - seed_adjustment_rates.ma_coding_pattern_adjustment) as payment_risk_score
-        , normalized.payment_year
-        , normalized.collection_start_date
-        , normalized.collection_end_date
-    from normalized
-        left outer join seed_adjustment_rates
-            on normalized.payment_year = seed_adjustment_rates.payment_year
-
-)
-
-, weighted_score as (
-
-    select
-          payment.person_id
-        , payment.payer
-        , payment.factor_type
-        , payment.v24_risk_score
-        , payment.v28_risk_score
-        , payment.blended_risk_score
-        , payment.normalized_risk_score
-        , payment.payment_risk_score
-        , member_months.member_months
-        , payment.payment_risk_score * member_months.member_months as payment_risk_score_weighted_by_months
-        , payment.payment_year
-        , payment.collection_start_date
-        , payment.collection_end_date
-    from payment
     left outer join member_months
-            on payment.person_id = member_months.person_id
-            and payment.payer = member_months.payer
-            and payment.payment_year = member_months.eligible_year
+            on blended.person_id = member_months.person_id
+            and blended.payer = member_months.payer
+            and blended.payment_year = member_months.eligible_year
 )
 
 , add_data_types as (
