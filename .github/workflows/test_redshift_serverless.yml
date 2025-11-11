@@ -1,0 +1,192 @@
+name: Test Redshift Serverless
+on:
+  workflow_dispatch:
+    inputs:
+      run_full_build:
+        description: 'Run full dbt build (vs just compile)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+env:
+  AWS_REGION: us-east-1
+  REDSHIFT_WORKGROUP: default-workgroup
+  REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+  REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  test_redshift_serverless:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PostgreSQL credentials file
+        run: |
+          # Create .pgpass file with credentials (format: host:port:database:username:password)
+          mkdir -p ~/.pgpass_dir
+          echo "${{ env.REDSHIFT_HOST }}:5439:${{ env.REDSHIFT_DATABASE }}:${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}:${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}" > ~/.pgpass
+          chmod 600 ~/.pgpass
+          echo "✅ Credentials file created securely"
+
+      - name: Test Connection with psql
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+          
+          echo "Testing connection to Redshift Serverless..."
+          echo "Host: ${{ env.REDSHIFT_HOST }}"
+          echo "Database: ${{ env.REDSHIFT_DATABASE }}"
+          echo "User: [REDACTED]"
+          
+          psql \
+            -h ${{ env.REDSHIFT_HOST }} \
+            -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
+            -d ${{ env.REDSHIFT_DATABASE }} \
+            -p 5439 \
+            -c "SELECT current_database(), current_user, version();"
+          
+          echo "✅ Connection successful!"
+
+      - name: Create Temporary Schema
+        id: create-schema
+        run: |
+          SCHEMA_NAME="ci_test_${{ github.run_id }}"
+          echo "schema_name=$SCHEMA_NAME" >> $GITHUB_OUTPUT
+          
+          echo "Creating schema: $SCHEMA_NAME"
+          psql \
+            -h ${{ env.REDSHIFT_HOST }} \
+            -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
+            -d ${{ env.REDSHIFT_DATABASE }} \
+            -p 5439 \
+            -c "CREATE SCHEMA IF NOT EXISTS \"$SCHEMA_NAME\";"
+          
+          echo "✅ Schema $SCHEMA_NAME created!"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
+
+      - name: Create dbt profiles.yml
+        run: |
+          mkdir -p ./profiles/redshift
+          cat > ./profiles/redshift/profiles.yml << EOF
+          default:
+            outputs:
+              dev:
+                type: redshift
+                host: ${{ env.REDSHIFT_HOST }}
+                port: 5439
+                user: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+                password: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+                dbname: ${{ env.REDSHIFT_DATABASE }}
+                schema: ${{ steps.create-schema.outputs.schema_name }}
+                threads: 16
+                sslmode: require
+                connect_timeout: 30
+            target: dev
+          EOF
+          
+          echo "✅ dbt profile created"
+        working-directory: ci_testing
+
+      - name: dbt deps
+        run: |
+          echo "Installing dbt dependencies..."
+          dbt deps --profiles-dir ./profiles/redshift
+        working-directory: ci_testing
+
+      - name: dbt debug
+        run: |
+          echo "Testing dbt connection..."
+          dbt debug --profiles-dir ./profiles/redshift
+        working-directory: ci_testing
+
+      - name: dbt compile (quick test)
+        if: github.event.inputs.run_full_build != 'true'
+        run: |
+          echo "Running dbt compile (validates SQL without executing)..."
+          dbt compile --profiles-dir ./profiles/redshift --vars '{
+            "use_synthetic_data": true,
+            "clinical_enabled": true,
+            "claims_enabled": true,
+            "provider_attribution_enabled": true,
+            "fhir_preprocessing_enabled": true
+          }'
+          echo "✅ dbt compile successful!"
+        working-directory: ci_testing
+
+      - name: dbt build (full test)
+        if: github.event.inputs.run_full_build == 'true'
+        run: |
+          echo "Running full dbt build..."
+          echo "⏱️  This may take 15-30 minutes..."
+          
+          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{
+            "use_synthetic_data": true,
+            "clinical_enabled": true,
+            "claims_enabled": true,
+            "provider_attribution_enabled": true,
+            "fhir_preprocessing_enabled": true
+          }'
+          echo "✅ dbt build successful!"
+        working-directory: ci_testing
+
+      - name: Show dbt run summary
+        if: always()
+        run: |
+          echo "================================================"
+          echo "dbt Run Summary"
+          echo "================================================"
+          echo "Schema used: ${{ steps.create-schema.outputs.schema_name }}"
+          echo "Job status: ${{ job.status }}"
+          echo "Redshift Serverless Host: ${{ env.REDSHIFT_HOST }}"
+          echo "================================================"
+
+      - name: Cleanup - Drop Schema
+        if: always()
+        run: |
+          echo "Cleaning up schema: ${{ steps.create-schema.outputs.schema_name }}"
+          
+          psql \
+            -h ${{ env.REDSHIFT_HOST }} \
+            -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
+            -d ${{ env.REDSHIFT_DATABASE }} \
+            -p 5439 \
+            -c "DROP SCHEMA IF EXISTS \"${{ steps.create-schema.outputs.schema_name }}\" CASCADE;" || true
+          
+          echo "✅ Schema cleanup complete!"
+
+      - name: Cleanup credentials file
+        if: always()
+        run: |
+          rm -f ~/.pgpass
+          echo "✅ Credentials file removed"
+
+      - name: Final Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "🎉 Redshift Serverless test PASSED!"
+            echo ""
+            echo "Next steps:"
+            echo "1. Check AWS Cost Explorer for usage costs"
+            echo "2. Compare run time to existing Redshift cluster"
+            echo "3. If satisfied, update main CI workflow"
+          else
+            echo "❌ Redshift Serverless test FAILED!"
+            echo "Check the logs above for details"
+            exit 1
+          fi
