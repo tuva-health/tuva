@@ -29,9 +29,11 @@ jobs:
       - name: Setup PostgreSQL credentials file
         run: |
           # Create .pgpass file with credentials (format: host:port:database:username:password)
-          mkdir -p ~/.pgpass_dir
           echo "${{ env.REDSHIFT_HOST }}:5439:${{ env.REDSHIFT_DATABASE }}:${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}:${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}" > ~/.pgpass
           chmod 600 ~/.pgpass
+          
+          # Verify file was created (without showing contents)
+          ls -la ~/.pgpass
           echo "✅ Credentials file created securely"
 
       - name: Test Connection with psql
@@ -44,7 +46,8 @@ jobs:
           echo "Database: ${{ env.REDSHIFT_DATABASE }}"
           echo "User: [REDACTED]"
           
-          psql \
+          # Use psql with explicit SSL mode and credentials from .pgpass
+          PGSSLMODE=require psql \
             -h ${{ env.REDSHIFT_HOST }} \
             -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
             -d ${{ env.REDSHIFT_DATABASE }} \
@@ -60,7 +63,7 @@ jobs:
           echo "schema_name=$SCHEMA_NAME" >> $GITHUB_OUTPUT
           
           echo "Creating schema: $SCHEMA_NAME"
-          psql \
+          PGSSLMODE=require psql \
             -h ${{ env.REDSHIFT_HOST }} \
             -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
             -d ${{ env.REDSHIFT_DATABASE }} \
@@ -160,7 +163,7 @@ jobs:
         run: |
           echo "Cleaning up schema: ${{ steps.create-schema.outputs.schema_name }}"
           
-          psql \
+          PGSSLMODE=require psql \
             -h ${{ env.REDSHIFT_HOST }} \
             -U ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }} \
             -d ${{ env.REDSHIFT_DATABASE }} \
