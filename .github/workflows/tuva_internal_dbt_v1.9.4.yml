@@ -28,10 +28,6 @@ env:
   DBT_FABRIC_TENANT_ID: ${{ secrets.DBT_FABRIC_TENANT_ID }}
   DBT_FABRIC_CI_DATABASE: ${{ secrets.DBT_FABRIC_CI_DATABASE }}
   DBT_FABRIC_CI_SCHEMA: ${{ secrets.DBT_FABRIC_CI_SCHEMA }}
-#######  Redshift
-  DBT_REDSHIFT_CI_HOST: ${{ secrets.DBT_REDSHIFT_CI_HOST }}
-  DBT_REDSHIFT_CI_USER: ${{ secrets.DBT_REDSHIFT_CI_USER }}
-  DBT_REDSHIFT_CI_PASSWORD: ${{ secrets.DBT_REDSHIFT_CI_PASSWORD }}
 #######  Snowflake
   DBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
   DBT_TUVA_CI_DATABASE: ${{ secrets.DBT_TUVA_CI_DATABASE }}
@@ -255,32 +251,67 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install dbt-core and Redshift adapter
+      - name: Install dbt and Redshift adapter
         run: |
           python -m pip install --upgrade pip
-          pip install dbt-core==1.9.4 dbt-redshift
+          pip install dbt-core==1.9.4 dbt-redshift==1.9.4
 
-      - name: dbt-deps
+      - name: Create dbt profile
+        env:
+          REDSHIFT_HOST: ${{ secrets.REDSHIFT_SERVERLESS_TEST_HOST }}
+          REDSHIFT_USER: ${{ secrets.REDSHIFT_SERVERLESS_TEST_USERNAME }}
+          REDSHIFT_PASSWORD: ${{ secrets.REDSHIFT_SERVERLESS_TEST_PASSWORD }}
+          REDSHIFT_DATABASE: ${{ secrets.REDSHIFT_SERVERLESS_TEST_DATABASE }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/redshift
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'redshift',
+                          'host': os.environ['REDSHIFT_HOST'],
+                          'port': 5439,
+                          'user': os.environ['REDSHIFT_USER'],
+                          'password': os.environ['REDSHIFT_PASSWORD'],
+                          'dbname': os.environ['REDSHIFT_DATABASE'],
+                          'schema': f"ci_test_{os.environ['SCHEMA_SUFFIX']}",
+                          'threads': 32,
+                          'sslmode': 'require',
+                          'is_serverless': True,
+                          'connect_timeout': 120
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/redshift/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt deps
         run: dbt deps --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-debug
+      - name: dbt debug
         run: dbt debug --profiles-dir ./profiles/redshift
         working-directory: ci_testing
 
-      - name: dbt-build
+      - name: dbt build
         run: |
-          dbt build --full-refresh --profiles-dir ./profiles/redshift --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
+          dbt build --full-refresh --profiles-dir ./profiles/redshift \
+            --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
-
-      - name: Get the result
-        if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
-        shell: bash
 
 #######  Snowflake
   snowflake_clinical_and_claims_enabled:
