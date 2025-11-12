@@ -16,6 +16,7 @@ concurrency:
 env:
   PYTHON_VERSION: '3.11'
   LINT_SCRIPT_PATH: ./lint_tuva_project.sh
+  DUCKDB_VERSION: '0.9.2'
 
 #######  Secrets #######
 #######  BigQuery
@@ -135,6 +136,72 @@ jobs:
             ```text
             ${{ steps.read-lint-output.outputs.content }}
             ```
+  ####### DuckDB - Clinical and Claims Enabled
+  duckdb_clinical_and_claims_enabled:
+    needs: sqlfluff-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb==1.9.0
+          # Install DuckDB Python package for any direct DB operations if needed
+          pip install duckdb==${{ env.DUCKDB_VERSION }}
+
+      - name: Create dbt profiles directory for DuckDB
+        run: mkdir -p ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: Create dbt profiles.yml for DuckDB
+        run: |
+          # Use a file-based database in the current directory
+          # Each job gets its own database file to avoid conflicts
+          echo "default:
+            outputs:
+              dev:
+                type: duckdb
+                path: ./tuva_ci_${{ github.run_id }}_clinical_claims.duckdb
+                threads: 8
+                settings:
+                  memory_limit: '4GB'
+                  max_memory: '4GB'
+                  temp_directory: './tmp'
+            target: dev" > ./profiles/duckdb/profiles.yml
+        working-directory: ci_testing
+
+      - name: Create temp directory for DuckDB
+        run: mkdir -p ./tmp
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/duckdb \
+            --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Cleanup DuckDB files
+        if: always()
+        run: |
+          rm -f ./tuva_ci_${{ github.run_id }}_*.duckdb
+          rm -f ./tuva_ci_${{ github.run_id }}_*.duckdb.wal
+          rm -rf ./tmp
+        working-directory: ci_testing
 
   # ============================================================================
   # Build Jobs (Run only if Linting Passes)
