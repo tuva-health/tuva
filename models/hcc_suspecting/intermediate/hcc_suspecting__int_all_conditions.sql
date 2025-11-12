@@ -18,15 +18,25 @@ with conditions as (
 
 )
 
+
+-- TODO: Include prior years HCC mappings
 , seed_hcc_mapping as (
 
     select
           diagnosis_code
         , cms_hcc_v28 as hcc_code
-        , 'CMS-HCC-V28' as model_version 
+        , 'CMS-HCC-V28' as model_version
     from {{ ref('hcc_suspecting__icd_10_cm_mappings') }}
     where cms_hcc_v28 is not null
 
+    union all
+
+    select
+          diagnosis_code
+        , cms_hcc_v24 as hcc_code
+        , 'CMS-HCC-V24' as model_version
+    from {{ ref('hcc_suspecting__icd_10_cm_mappings') }}
+    where cms_hcc_v24 is not null
 )
 
 , seed_hcc_descriptions as (
