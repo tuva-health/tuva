@@ -168,11 +168,11 @@ jobs:
             outputs:
               dev:
                 type: duckdb
-                path: ./tuva_ci_${{ github.run_id }}_clinical_claims.duckdb
+                path: ':memory:'
                 threads: 8
                 settings:
-                  memory_limit: '4GB'
-                  max_memory: '4GB'
+                  memory_limit: '12GB'
+                  max_memory: '12GB'
                   temp_directory: './tmp'
             target: dev" > ./profiles/duckdb/profiles.yml
         working-directory: ci_testing
