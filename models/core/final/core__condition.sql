@@ -12,12 +12,12 @@ with all_conditions as (
     select *
     from {{ ref('core__stg_claims_condition') }}
     union all
-    select *
-    from {{ ref('core__stg_clinical_condition') }}
+    select cond.*, 'clinical source' as payer
+    from {{ ref('core__stg_clinical_condition') }} as cond
 
 {% elif var('clinical_enabled', var('tuva_marts_enabled',False)) == true -%}
 
-    select *
+    select *, 'clinical source' as payer
     from {{ ref('core__stg_clinical_condition') }}
 
 {% elif var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}

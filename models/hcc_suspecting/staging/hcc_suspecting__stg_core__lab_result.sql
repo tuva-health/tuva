@@ -10,7 +10,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
-        , payer
+        , 'clinical source' as payer
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
         , status
@@ -27,7 +27,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
-        , payer
+        , 'clinical source' as payer
         , lower(coalesce(normalized_component_type, source_component_type)) as code_type
         , coalesce(normalized_component_code, source_component_code) as code
         , status
@@ -66,7 +66,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
-        , payer
+        , 'clinical source' as payer
         , lower(coalesce(normalized_order_type, source_order_type)) as code_type
         , coalesce(normalized_order_code, source_order_code) as code
         , status
@@ -83,7 +83,7 @@ with lab_order as (
     select
           lab_result_id
         , person_id
-        , payer
+        , 'clinical source' as payer
         , lower(coalesce(normalized_component_type, source_component_type)) as code_type
         , coalesce(normalized_component_code, source_component_code) as code
         , status

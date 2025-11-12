@@ -9,7 +9,6 @@
 select
       labs.lab_result_id
     , labs.person_id
-    , labs.payer
     , labs.patient_id
     , labs.encounter_id
     , labs.accession_number
@@ -98,7 +97,6 @@ from {{ ref('core__stg_clinical_lab_result') }} as labs
 select
       labs.lab_result_id
     , labs.person_id
-    , labs.payer
     , labs.patient_id
     , labs.encounter_id
     , labs.accession_number
