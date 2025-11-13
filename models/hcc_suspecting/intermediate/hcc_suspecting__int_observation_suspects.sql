@@ -220,8 +220,7 @@ with conditions as (
         cross join seed_hcc_descriptions
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
         and result >= 35
-        on seed_hcc_descriptions.hcc_code = '48'
-
+        and seed_hcc_descriptions.hcc_code = '48'
 )
 
 , bmi_over_35_with_hypertension as (
