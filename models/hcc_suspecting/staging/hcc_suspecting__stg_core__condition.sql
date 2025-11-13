@@ -2,7 +2,8 @@
      enabled = var('hcc_suspecting_enabled',var('claims_enabled',var('clinical_enabled',var('tuva_marts_enabled',False)))) | as_bool
    )
 }}
-select
+-- NOTE: Need distinct since condition_rank is not included
+select distinct
       claim_id
     , person_id
     , payer

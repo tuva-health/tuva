@@ -6,7 +6,6 @@
 
 select
       person_id
-    , payer
     , dispensing_date
     , source_code
     , source_code_type
@@ -19,7 +18,6 @@ from {{ ref('core__medication') }}
 
 select
       person_id
-    , payer
     , dispensing_date
     , source_code
     , source_code_type
@@ -33,7 +31,6 @@ from {{ ref('core__medication') }}
 {% if target.type == 'fabric' %}
     select top 0
           cast(null as {{ dbt.type_string() }} ) as person_id
-        , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
         , cast(null as {{ dbt.type_string() }} ) as source_code
         , cast(null as {{ dbt.type_string() }} ) as source_code_type
@@ -43,7 +40,6 @@ from {{ ref('core__medication') }}
 {% else %}
 select
           cast(null as {{ dbt.type_string() }} ) as person_id
-        , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
         , cast(null as {{ dbt.type_string() }} ) as source_code
         , cast(null as {{ dbt.type_string() }} ) as source_code_type

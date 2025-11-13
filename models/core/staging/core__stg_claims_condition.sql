@@ -50,7 +50,6 @@ select distinct
         "CAST(unpivot_cte.source_code AS " ~ dbt.type_string() ~ ")",
     ]), api.Column.translate_type("string"))
  }} as condition_id
-    , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
     , cast(unpivot_cte.person_id as {{ dbt.type_string() }}) as person_id
     , cast(unpivot_cte.member_id as {{ dbt.type_string() }}) as member_id
     , cast(null as {{ dbt.type_string() }}) as patient_id
@@ -76,6 +75,7 @@ select distinct
     , cast(poa.present_on_admit_description as {{ dbt.type_string() }}) as present_on_admit_description
     , cast(unpivot_cte.data_source as {{ dbt.type_string() }}) as data_source
     , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
+    , cast(unpivot_cte.payer as {{ dbt.type_string() }}) as payer
 from unpivot_cte
 --inner join {{ ref('encounters__combined_claim_line_crosswalk') }} x on unpivot_cte.claim_id = x.claim_id
 --and

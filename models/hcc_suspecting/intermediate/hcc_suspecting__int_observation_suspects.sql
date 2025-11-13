@@ -21,7 +21,7 @@ with conditions as (
 
     select
           person_id
-        , payer
+        , 'clinical source' as payer
         , observation_date
         , result
         , code_type

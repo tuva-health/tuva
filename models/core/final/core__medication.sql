@@ -10,7 +10,6 @@ with source_mapping as (
     select
      meds.medication_id
    , meds.person_id
-   , meds.payer
    , meds.patient_id
    , meds.encounter_id
    , meds.dispensing_date
@@ -77,7 +76,6 @@ from {{ ref('core__stg_clinical_medication') }} as meds
  select
      meds.medication_id
    , meds.person_id
-   , meds.payer
    , meds.patient_id
    , meds.encounter_id
    , meds.dispensing_date
@@ -193,7 +191,6 @@ from {{ ref('core__stg_clinical_medication') }} meds
 select
      sm.medication_id
    , sm.person_id
-   , sm.payer
    , sm.encounter_id
    , sm.dispensing_date
    , sm.prescribing_date

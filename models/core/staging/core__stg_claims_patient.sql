@@ -5,8 +5,7 @@
 
 with patient_stage as (
     select
-          payer
-        , person_id
+          person_id
         , name_suffix
         , first_name
         , middle_name
@@ -26,7 +25,7 @@ with patient_stage as (
         , ethnicity
         , data_source
         , row_number() over (
-	        partition by person_id, payer
+	        partition by person_id
 	        order by case when enrollment_end_date is null
                 then cast('2050-01-01' as date)
                 else enrollment_end_date end desc)
@@ -59,7 +58,6 @@ select
     , cast(email as {{ dbt.type_string() }}) as email
     , cast(ethnicity as {{ dbt.type_string() }}) as ethnicity
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-    , cast(payer as {{ dbt.type_string() }}) as payer
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }}) as age
     , cast(
         case

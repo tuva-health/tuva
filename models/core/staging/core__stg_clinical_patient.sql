@@ -31,7 +31,6 @@ select
     , cast(email as {{ dbt.type_string() }}) as email
     , cast(ethnicity as {{ dbt.type_string() }}) as ethnicity
     , cast(data_source as {{ dbt.type_string() }}) as data_source
-    , 'clinical source' as payer
     , cast(floor({{ datediff('birth_date', 'tuva_last_run_date', 'hour') }} / 8760.0) as {{ dbt.type_int() }}) as age
     , cast(
         case

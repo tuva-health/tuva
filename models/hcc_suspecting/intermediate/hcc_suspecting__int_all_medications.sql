@@ -7,7 +7,7 @@ with medications as (
 
     select
           person_id
-        , payer
+        , 'clinical source' as payer
         , dispensing_date
         , source_code
         , source_code_type

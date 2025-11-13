@@ -7,7 +7,7 @@
 
 select
       person_id
-    , payer
+    , 'clinical source' as payer
     , observation_date
     , result
     , lower(coalesce(normalized_code_type, source_code_type)) as code_type
@@ -19,7 +19,7 @@ from {{ ref('core__observation') }}
 
 select
       person_id
-    , payer
+    , 'clinical source' as payer
     , observation_date
     , result
     , lower(coalesce(normalized_code_type,source_code_type)) as code_type
