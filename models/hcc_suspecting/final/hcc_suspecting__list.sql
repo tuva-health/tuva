@@ -7,6 +7,7 @@ select
       person_id
     , payer
     , data_source
+    , model_version
     , hcc_code
     , hcc_description
     , reason
