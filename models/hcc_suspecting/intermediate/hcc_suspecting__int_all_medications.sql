@@ -73,6 +73,7 @@ with medications as (
 
     select
           person_id
+        , payer
         , dispensing_date
         , source_code as drug_code
         , 'rxnorm' as code_system
