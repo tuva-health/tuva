@@ -27,11 +27,13 @@ with conditions as (
 
 )
 
+-- TODO: Add support for multiple model versions
 , seed_hcc_descriptions as (
 
     select distinct
           hcc_code
         , hcc_description
+        , 'CMS-HCC-V28' as model_version
     from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
@@ -42,6 +44,7 @@ with conditions as (
           person_id
         , payer
         , data_source
+        , model_version
         , hcc_code
         , current_year_billed
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
@@ -145,6 +148,7 @@ with conditions as (
           diabetes_dedupe.person_id
         , diabetes_dedupe.payer
         , diabetes_dedupe.data_source
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
         , diabetes_dedupe.concept_name as condition_1_concept_name
@@ -160,8 +164,8 @@ with conditions as (
             and diabetes_dedupe.data_source = ckd_stage_1_or_2_dedupe.data_source
             /* ensure conditions overlap in the same year */
             and {{ date_part('year', 'diabetes_dedupe.recorded_date') }} = {{ date_part('year', 'ckd_stage_1_or_2_dedupe.recorded_date') }}
-        inner join seed_hcc_descriptions
-            on hcc_code = '37'
+        cross join seed_hcc_descriptions
+        where seed_hcc_descriptions.hcc_code = '37'
 
 )
 /* END HCC 37 logic */
@@ -178,6 +182,7 @@ with conditions as (
           unioned.person_id
         , unioned.payer
         , unioned.data_source
+        , unioned.model_version
         , unioned.hcc_code
         , unioned.hcc_description
         , unioned.condition_1_concept_name
@@ -193,6 +198,7 @@ with conditions as (
             and unioned.payer = billed_hccs.payer
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
+            and unioned.model_version = billed_hccs.model_version
 
 )
 
@@ -202,6 +208,7 @@ with conditions as (
           person_id
         , payer
         , data_source
+        , model_version
         , hcc_code
         , hcc_description
         , condition_1_concept_name
@@ -237,6 +244,7 @@ with conditions as (
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
+        , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(hcc_description as {{ dbt.type_string() }}) as hcc_description
         , cast(condition_1_concept_name as {{ dbt.type_string() }}) as condition_1_concept_name
@@ -261,6 +269,7 @@ select
       person_id
     , payer
     , data_source
+    , model_version
     , hcc_code
     , hcc_description
     , condition_1_concept_name
