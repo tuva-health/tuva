@@ -166,6 +166,7 @@ with egfr_labs as (
         , unioned.result_date
         , unioned.result
         , unioned.lab_code
+        , unioned.model_version
         , unioned.hcc_code
         , unioned.contributing_factor
         , seed_hcc_descriptions.hcc_description
@@ -173,6 +174,7 @@ with egfr_labs as (
     from unioned
         inner join seed_hcc_descriptions
             on unioned.hcc_code = seed_hcc_descriptions.hcc_code
+            and unioned.model_version = seed_hcc_descriptions.model_version
         left outer join billed_hccs
             on unioned.person_id = billed_hccs.person_id
             and unioned.payer = billed_hccs.payer

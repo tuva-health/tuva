@@ -70,6 +70,7 @@ with conditions as (
     select distinct
           hcc_code
         , hcc_description
+        , 'CMS-HCC-V28' as model_version
     from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
@@ -80,6 +81,7 @@ with conditions as (
           person_id
         , payer
         , data_source
+        , model_version
         , hcc_code
         , current_year_billed
     from {{ ref('hcc_suspecting__int_patient_hcc_history') }}
@@ -174,6 +176,7 @@ with conditions as (
         , obstructive_sleep_apnea.code as condition_code
         , obstructive_sleep_apnea.recorded_date as condition_date
         , obstructive_sleep_apnea.concept_name as condition_concept_name
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -184,10 +187,10 @@ with conditions as (
             on numeric_observations.person_id = obstructive_sleep_apnea.person_id
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'obstructive_sleep_apnea.recorded_date') }}
-        inner join seed_hcc_descriptions
-            on hcc_code = '48'
+        cross join seed_hcc_descriptions
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
-    and result >= 30
+        and result >= 30
+        and seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -202,6 +205,7 @@ with conditions as (
         , diabetes.code as condition_code
         , diabetes.recorded_date as condition_date
         , diabetes.concept_name as condition_concept_name
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -213,10 +217,10 @@ with conditions as (
             and numeric_observations.payer = diabetes.payer
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'diabetes.recorded_date') }}
-        inner join seed_hcc_descriptions
-            on hcc_code = '48'
+        cross join seed_hcc_descriptions
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
-    and result >= 35
+        and result >= 35
+        on seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -231,6 +235,7 @@ with conditions as (
         , hypertension.code as condition_code
         , hypertension.recorded_date as condition_date
         , hypertension.concept_name as condition_concept_name
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
@@ -242,10 +247,10 @@ with conditions as (
             and numeric_observations.payer = hypertension.payer
             /* ensure bmi and condition overlaps in the same year */
             and {{ date_part('year', 'numeric_observations.observation_date') }} = {{ date_part('year', 'hypertension.recorded_date') }}
-        inner join seed_hcc_descriptions
-            on hcc_code = '48'
+        cross join seed_hcc_descriptions            
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
-    and result >= 35
+        and result >= 35
+        and seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -260,16 +265,17 @@ with conditions as (
         , CAST(null as {{ dbt.type_string() }}) as condition_code
         , CAST(null as date) as condition_date
         , CAST(null as {{ dbt.type_string() }}) as condition_concept_name
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
     from numeric_observations
         inner join seed_clinical_concepts
             on numeric_observations.code_type = seed_clinical_concepts.code_system
             and numeric_observations.code = seed_clinical_concepts.code
-        inner join seed_hcc_descriptions
-            on hcc_code = '48'
+        cross join seed_hcc_descriptions
     where LOWER(seed_clinical_concepts.concept_name) = 'bmi'
-    and result >= 40
+        and result >= 40
+        and seed_hcc_descriptions.hcc_code = '48'
 
 )
 
@@ -296,6 +302,7 @@ with conditions as (
         , condition_code
         , condition_date
         , condition_concept_name
+        , model_version
         , hcc_code
         , hcc_description
         , {{ concat_custom([
@@ -383,6 +390,7 @@ with conditions as (
         , CAST(null as {{ dbt.type_string() }}) as condition_code
         , CAST(null as date) as condition_date
         , depression_assessments_ordered.concept_name as condition_concept_name
+        , seed_hcc_descriptions.model_version
         , seed_hcc_descriptions.hcc_code
         , seed_hcc_descriptions.hcc_description
         , {{ concat_custom([
@@ -391,10 +399,10 @@ with conditions as (
             "' on '",
             "depression_assessments_ordered.observation_date"]) }} as contributing_factor
     from depression_assessments_ordered
-        inner join seed_hcc_descriptions
-            on hcc_code = '155'
+        cross join seed_hcc_descriptions
     where result_order = 1
-    and result >= 15
+        and result >= 15
+        and seed_hcc_descriptions.hcc_code = '155'
 
 )
 
@@ -419,6 +427,7 @@ with conditions as (
         , unioned.condition_code
         , unioned.condition_date
         , unioned.condition_concept_name
+        , unioned.model_version
         , unioned.hcc_code
         , unioned.hcc_description
         , unioned.contributing_factor
@@ -428,6 +437,7 @@ with conditions as (
             on unioned.person_id = billed_hccs.person_id
             and unioned.data_source = billed_hccs.data_source
             and unioned.hcc_code = billed_hccs.hcc_code
+            and unioned.model_version = billed_hccs.model_version
 
 )
 
@@ -442,6 +452,7 @@ with conditions as (
         , condition_code
         , condition_date
         , condition_concept_name
+        , model_version
         , hcc_code
         , hcc_description
         , contributing_factor
@@ -463,6 +474,7 @@ with conditions as (
         , CAST(condition_code as {{ dbt.type_string() }}) as condition_code
         , CAST(condition_date as date) as condition_date
         , CAST(condition_concept_name as {{ dbt.type_string() }}) as condition_concept_name
+        , CAST(model_version as {{ dbt.type_string() }}) as model_version
         , CAST(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , CAST(hcc_description as {{ dbt.type_string() }}) as hcc_description
         {% if target.type == 'fabric' %}
@@ -486,6 +498,7 @@ select
     , condition_code
     , condition_date
     , condition_concept_name
+    , model_version
     , hcc_code
     , hcc_description
     , current_year_billed
