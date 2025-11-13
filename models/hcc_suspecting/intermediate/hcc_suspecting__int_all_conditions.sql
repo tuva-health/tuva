@@ -39,11 +39,13 @@ with conditions as (
     where cms_hcc_v24 is not null
 )
 
+-- Add in support for v24
 , seed_hcc_descriptions as (
 
     select distinct
           hcc_code
         , hcc_description
+        , 'CMS-HCC-V28' as model_version
     from {{ ref('hcc_suspecting__hcc_descriptions') }}
 
 )
