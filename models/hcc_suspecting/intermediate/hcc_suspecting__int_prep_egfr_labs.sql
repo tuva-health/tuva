@@ -7,6 +7,7 @@ with lab_result as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -32,6 +33,7 @@ with lab_result as (
 
     select distinct
           lab_result.person_id
+        , lab_result.payer
         , lab_result.data_source
         , lab_result.code_type
         , lab_result.code
@@ -50,6 +52,7 @@ with lab_result as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -73,6 +76,7 @@ with lab_result as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -111,6 +115,7 @@ with lab_result as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -122,6 +127,7 @@ with lab_result as (
 
     select
           person_id
+        , payer
         , data_source
         , code_type
         , code
@@ -136,6 +142,7 @@ with lab_result as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(data_source as {{ dbt.type_string() }}) as data_source
         , cast(code_type as {{ dbt.type_string() }}) as code_type
         , cast(code as {{ dbt.type_string() }}) as code
@@ -147,6 +154,7 @@ with lab_result as (
 
 select
       person_id
+    , payer
     , data_source
     , code_type
     , code

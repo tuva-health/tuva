@@ -6,6 +6,7 @@
 
 select
       person_id
+    , payer
     , dispensing_date
     , ndc_code
     , paid_date
@@ -16,6 +17,7 @@ from {{ ref('core__pharmacy_claim') }}
 
 select
       person_id
+    , payer
     , dispensing_date
     , ndc_code
     , paid_date
@@ -27,6 +29,7 @@ from {{ ref('core__pharmacy_claim') }}
 {% if target.type == 'fabric' %}
     select top 0
           cast(null as {{ dbt.type_string() }} ) as person_id
+        , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
         , cast(null as {{ dbt.type_string() }} ) as ndc_code
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
@@ -34,6 +37,7 @@ from {{ ref('core__pharmacy_claim') }}
 {% else %}
     select
           cast(null as {{ dbt.type_string() }} ) as person_id
+        , cast(null as {{ dbt.type_string() }} ) as payer
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as dispensing_date
         , cast(null as {{ dbt.type_string() }} ) as ndc_code
         , {{ try_to_cast_date('null', 'YYYY-MM-DD') }} as paid_date
