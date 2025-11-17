@@ -37,6 +37,7 @@ with demographics as (
 
 )
 
+-- TODO: Add a year component since coefficients can change over time
 , seed_disease_factors as (
 
     select
@@ -50,6 +51,22 @@ with demographics as (
         , hcc_code
         , description
         , coefficient
+        , case  
+            -- Long Term Institutional (INS)
+            when institutional_status = 'Yes' then 'INS'
+            -- Community NonDual Aged (CNA)
+            when medicaid_status = 'No' and orec = 'Aged' then 'CNA'
+            -- Community NonDual Disabled (CND)
+            when medicaid_status = 'No' and orec = 'Disabled' then 'CND'
+            -- Community Full Benefit Dual Aged (CFA)
+            when dual_status = 'Full' and orec = 'Aged' then 'CFA'
+            -- Community Full Benefit Dual Disabled (CFD)
+            when dual_status = 'Full' and orec = 'Disabled' then 'CFD'
+            -- Community Partial Benefit Dual Aged (CPA)
+            when dual_status = 'Partial' and orec = 'Aged' then 'CPA'
+            -- Community Partial Benefit Dual Disabled (CPD)
+            when dual_status = 'Partial' and orec = 'Disabled' then 'CPD'
+        end as risk_model_code        
     from {{ ref('cms_hcc__disease_factors') }}
 
 )
@@ -94,6 +111,7 @@ with demographics as (
         , seed_disease_factors.factor_type
         , seed_disease_factors.description
         , seed_disease_factors.coefficient
+        , seed_disease_factors.risk_model_code
     from demographics_with_hccs
         inner join seed_disease_factors
             on demographics_with_hccs.enrollment_status = seed_disease_factors.enrollment_status
@@ -113,6 +131,7 @@ with demographics as (
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(hcc_code as {{ dbt.type_string() }}) as hcc_code
         , cast(description as {{ dbt.type_string() }}) as hcc_description
+        , cast(risk_model_code as {{ dbt.type_string() }}) as risk_model_code
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
@@ -128,6 +147,7 @@ select
     , payer
     , hcc_code
     , hcc_description
+    , risk_model_code
     , coefficient
     , factor_type
     , model_version

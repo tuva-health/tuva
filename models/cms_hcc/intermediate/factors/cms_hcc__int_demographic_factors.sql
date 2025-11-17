@@ -149,6 +149,8 @@ with members as (
 
 )
 
+-- TODO: Add enrollment type for MSSP ACOs
+-- Logic for determining enrollment type can be found here: https://www.cms.gov/files/document/uses-and-limitations-cclfs.pdf on p. 46
 , v28_continuing_enrollees as (
 
     select
