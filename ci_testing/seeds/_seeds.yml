@@ -29,9 +29,9 @@ seeds:
         normalized_appointment_type_description: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         start_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         end_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         duration: integer
         location_id: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
@@ -76,7 +76,7 @@ seeds:
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: eligibility_seed
     config:
@@ -152,7 +152,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_date: date
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: immunization_seed
     config:
@@ -209,7 +209,7 @@ seeds:
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: lab_result_seed
     config:
@@ -261,9 +261,9 @@ seeds:
         result: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         result_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         collection_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
         source_units: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         normalized_units: |
@@ -287,7 +287,7 @@ seeds:
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: medical_claim_seed
     config:
@@ -559,7 +559,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_date: date
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: observation_seed
     config:
@@ -616,7 +616,7 @@ seeds:
         file_name: |
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: pharmacy_claim_seed
     config:
@@ -664,7 +664,7 @@ seeds:
           {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(255) {%- endif -%}
         file_date: date
         ingest_datetime: |
-          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena") -%} timestamp {%- else -%} datetime {%- endif -%}
+          {%- if target.type in ("fabric") -%} datetime2(0) {%- elif target.type in ("athena", "databricks") -%} timestamp {%- else -%} datetime {%- endif -%}
 
   - name: provider_attribution_seed
     config:
