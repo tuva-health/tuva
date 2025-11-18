@@ -105,8 +105,8 @@ with seed_adjustment_rates as (
         , raw.collection_end_date
     from raw_score raw
     left outer join seed_adjustment_rates as adj
-        on  raw.payment_year = seed_adjustment_rates.payment_year
-        and raw.model_version = seed_adjustment_rates.model_version
+        on  raw.payment_year = adj.payment_year
+        and raw.model_version = adj.model_version
 
 )
 
