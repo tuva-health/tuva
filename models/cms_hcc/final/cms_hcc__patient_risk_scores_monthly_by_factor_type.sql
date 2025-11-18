@@ -85,7 +85,18 @@ with seed_adjustment_rates as (
         , raw.payer
         , raw.factor_type
         , raw.risk_score as raw_risk_score
-        , raw.risk_score * adj.blend_weight end as weighted_raw_risk_score
+        -- TODO: Uncomment when seed is updated
+        -- , raw.risk_score * adj.blend_weight as weighted_raw_risk_score
+        , case
+            when payment_year <= 2023 and model_version = 'CMS-HCC-V24' then risk_score
+            when payment_year = 2024 and model_version = 'CMS-HCC-V24' then risk_score * 0.67
+            when payment_year = 2025 and model_version = 'CMS-HCC-V24' then risk_score * 0.33
+            when payment_year >= 2026 and model_version = 'CMS-HCC-V24' then 0
+            when payment_year <= 2023 and model_version = 'CMS-HCC-V28' then 0
+            when payment_year = 2024 and model_version = 'CMS-HCC-V28' then risk_score * 0.33
+            when payment_year = 2025 and model_version = 'CMS-HCC-V28' then risk_score * 0.67
+            when payment_year >= 2026 and model_version = 'CMS-HCC-V28' then risk_score            
+            end as weighted_raw_risk_score
         , adj.normalization_factor
         , adj.ma_coding_pattern_adjustment
         , raw.model_version
