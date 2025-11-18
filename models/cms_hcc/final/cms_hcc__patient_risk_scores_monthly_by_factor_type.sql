@@ -120,6 +120,7 @@ with seed_adjustment_rates as (
         , raw_risk_score
         , weighted_raw_risk_score
         , weighted_raw_risk_score / normalization_factor as normalized_risk_score
+        , ma_coding_pattern_adjustment
         , payment_year
         , collection_start_date
         , collection_end_date
