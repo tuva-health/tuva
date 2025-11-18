@@ -158,6 +158,13 @@ select
         , sum(normalized_risk_score) as normalized_risk_score
         , sum(payment_risk_score) as payment_risk_score
 from payment
+group by
+          person_id
+        , payer
+        , factor_type
+        , payment_year
+        , collection_start_date
+        , collection_end_date  
 )
 
 , weighted_score as (
