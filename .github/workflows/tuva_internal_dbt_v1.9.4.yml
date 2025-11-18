@@ -36,6 +36,12 @@ env:
   DBT_SNOWFLAKE_CI_SCHEMA: ${{ secrets.DBT_SNOWFLAKE_CI_SCHEMA }}
   DBT_SNOWFLAKE_CI_USER: ${{ secrets.DBT_SNOWFLAKE_CI_USER }}
   DBT_SNOWFLAKE_CI_WAREHOUSE: ${{ secrets.DBT_SNOWFLAKE_CI_WAREHOUSE }}
+#######  DatabricksBT_TUVA_SNOWFLAKE_ACCOUNT: ${{ secrets.DBT_TUVA_SNOWFLAKE_ACCOUNT }}
+  DBT_DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+  DBT_DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+  DBT_DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+  DBT_DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+  DBT_DATABRICKS_SCHEMA: ${{ secrets.DBT_DATABRICKS_SCHEMA }}
 
 # Permissions needed for the comment action
 permissions:
@@ -198,6 +204,93 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
+#######  Databricks
+  databricks_clinical_and_claims_enabled:
+    needs: sqlfluff-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and Databricks adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-databricks
+          # Install SSL certificates fix
+          pip install certifi
+
+      - name: Set SSL certificate environment variables
+        run: |
+          echo "SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+          echo "REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt" >> $GITHUB_ENV
+
+      - name: Create dbt profile for Databricks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DBT_DATABRICKS_HOST }}
+          DATABRICKS_HTTP_PATH: ${{ secrets.DBT_DATABRICKS_HTTP_PATH }}
+          DATABRICKS_TOKEN: ${{ secrets.DBT_DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DBT_DATABRICKS_CATALOG }}
+          SCHEMA_SUFFIX: ${{ github.run_id }}
+        run: |
+          mkdir -p ./profiles/databricks
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          # Use schema suffix for CI isolation
+          schema_name = os.environ.get('DATABRICKS_SCHEMA', 'ci_testing')
+          if os.environ.get('SCHEMA_SUFFIX'):
+              schema_name = f"ci_test_{os.environ['SCHEMA_SUFFIX']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'databricks',
+                          'host': os.environ['DATABRICKS_HOST'],
+                          'http_path': os.environ['DATABRICKS_HTTP_PATH'],
+                          'token': os.environ['DATABRICKS_TOKEN'],
+                          'catalog': os.environ.get('DATABRICKS_CATALOG', 'hive_metastore'),
+                          'schema': schema_name,
+                          'threads': 8,
+                          'connect_timeout': 60,
+                          'connect_retries': 3
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/databricks/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          
+          print(f"Created Databricks profile with catalog={profile['default']['outputs']['dev']['catalog']}, schema={schema_name}")
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/databricks
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/databricks \
+            --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
 
 #######  Fabric
   fabric_clinical_and_claims_enabled:
