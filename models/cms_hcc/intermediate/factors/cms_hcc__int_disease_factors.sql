@@ -13,7 +13,8 @@ with demographics as (
         , age_group
         , medicaid_status
         , dual_status
-        , orec
+        -- Test
+        , 'Aged' as orec
         , institutional_status
         , model_version
         , payment_year
