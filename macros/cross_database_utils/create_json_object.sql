@@ -115,6 +115,33 @@ from (
 group by {{ group_by_col }}
 {% endmacro %}
 
+/* databricks */
+{% macro databricks__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
+select
+    {{ group_by_col }},
+    to_json(
+        collect_list(
+            struct(
+                {%- for col in object_col_list %}
+                {% if not loop.first %}, {% endif -%}
+                {%- if 'list' in col | lower -%}
+                from_json({{ col }}, 'array<string>') as {{ the_tuva_project.snake_to_camel(col) }} /* Parse JSON lists */
+                {%- else -%}
+                {{ col }} as {{ the_tuva_project.snake_to_camel(col) }}
+                {%- endif %}
+                {%- endfor %}
+            )
+        )
+    ) as {{ object_col_name }}
+from {{ table_ref }}
+group by {{ group_by_col }}
+{% endmacro %}
+
+/* spark - alias for databricks */
+{% macro spark__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
+    {{ return(databricks__create_json_object(table_ref, group_by_col, object_col_name, object_col_list)) }}
+{% endmacro %}
+
 /* fabric */
 {% macro fabric__create_json_object(table_ref, group_by_col, object_col_name, object_col_list) %}
 select
