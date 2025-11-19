@@ -159,7 +159,6 @@ jobs:
       - name: Create dbt profile for DuckDB/MotherDuck
         env:
           MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
-          DB_SUFFIX: ${{ github.run_id }}
         run: |
           mkdir -p ./profiles/duckdb
           python3 << 'EOF'
@@ -167,7 +166,7 @@ jobs:
           import yaml
           
           # Create unique database name for CI run
-          db_name = f"ci_test_{os.environ['DB_SUFFIX']}"
+          db_name = "my_db_temp"
           
           # Build the MotherDuck connection string
           motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
@@ -214,26 +213,6 @@ jobs:
         run: echo "${{ steps.dbt-build.outputs.result }}"
         shell: bash
 
-      # Optional: Clean up the test database after the run
-      - name: Clean up test database
-        if: always()
-        continue-on-error: true
-        env:
-          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
-          DB_SUFFIX: ${{ github.run_id }}
-        run: |
-          python3 << 'EOF'
-          import os
-          try:
-              import duckdb
-              db_name = f"ci_test_{os.environ['DB_SUFFIX']}"
-              conn = duckdb.connect(f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}")
-              conn.execute(f"DROP DATABASE IF EXISTS {db_name} CASCADE")
-              conn.close()
-              print(f"Cleaned up database: {db_name}")
-          except Exception as e:
-              print(f"Could not clean up database: {e}")
-          EOF
 
   # ============================================================================
   # Build Jobs (Run only if Linting Passes)
