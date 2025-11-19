@@ -97,8 +97,15 @@ with seed_adjustment_rates as (
             when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V28' then risk_score * 0.67
             when raw.payment_year >= 2026 and raw.model_version = 'CMS-HCC-V28' then risk_score            
             end as weighted_raw_risk_score
-        , adj.normalization_factor
-        , adj.ma_coding_pattern_adjustment
+        -- , adj.normalization_factor
+        -- , adj.ma_coding_pattern_adjustment
+        -- TODO: Once the seed is update remove the case when for norm factor + ma coding pattern adj
+        , case 
+            when raw.payment_year = 2025 and raw.model_version = 'CMS-HCC-V24' then 1.153
+            when raw.payment_year = 2024 and raw.model_version = 'CMS-HCC-V24' then 1.146
+            else adj.normalization_factor
+          end as normalization_factor
+        , case when raw.payment_year in (2024,2025) then adj.ma_coding_pattern_adjustment end as ma_coding_pattern_adjustment        
         , raw.model_version
         , raw.payment_year
         , raw.collection_start_date
