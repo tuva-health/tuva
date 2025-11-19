@@ -140,7 +140,7 @@ jobs:
 
 #######  DuckDB/MotherDuck
   duckdb_clinical_and_claims_enabled:
-    needs: sqlfluff-lint
+#    needs: sqlfluff-lint
     runs-on: ubuntu-latest
 
     steps:
@@ -166,7 +166,7 @@ jobs:
           import yaml
           
           # Create unique database name for CI run
-          db_name = "my_db_temp"
+          db_name = "my_db"
           
           # Build the MotherDuck connection string
           motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
