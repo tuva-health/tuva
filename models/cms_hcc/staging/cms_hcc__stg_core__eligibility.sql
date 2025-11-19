@@ -11,6 +11,7 @@ select distinct
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code
+    , enrollment_status
     , data_source
     , '{{ var('tuva_last_run') }}' as tuva_last_run
 from {{ ref('core__eligibility') }}

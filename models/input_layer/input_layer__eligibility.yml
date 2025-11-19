@@ -383,6 +383,17 @@ models:
                 enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
                 meta:
                   dqi_test_description: "https://resdac.org/cms-data/variables/medicare-status-code-january"
+      - name: enrollment_status
+        description: Indicates the type of enrollment status for a beneficiary
+        tests:
+          - accepted_values:
+              tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_hccs']
+              values: ['Continuing', 'New', 'Institutional', null]
+              config:
+                severity: warn
+                enabled: "{{ (var('enable_input_layer_testing', true)) | as_bool }}"
+                meta:
+                  dqi_test_description: "https://resdac.org/cms-data/variables/medicare-medicaid-dual-eligibility-code-january"      
       - name: group_id
         description: '{{ doc("group_id") }}'
         tests:

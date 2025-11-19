@@ -31,6 +31,7 @@ select
     , original_reason_entitlement_code
     , dual_status_code
     , medicare_status_code
+    , enrollment_status
     , group_id
     , group_name
     , name_suffix
