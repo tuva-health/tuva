@@ -6,9 +6,9 @@
 with mm as (
   select
       person_id
-    , left(year_month, 4) as performance_year
+    , substr(year_month, 1,4) as performance_year
   from {{ ref('provider_attribution__stg_core__member_months') }}
-  group by person_id, left(year_month, 4)
+  group by person_id, substr(year_month, 1,4)
 )
 
 select
