@@ -124,7 +124,7 @@ with stg_eligibility as (
         , case
             when coverage_months < collection_months then 'New'
             else 'Continuing'
-          end as enrollment_status_calc
+          end as enrollment_status
     from calculate_prior_coverage
 
 )
