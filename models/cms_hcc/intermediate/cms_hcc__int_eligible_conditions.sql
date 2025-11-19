@@ -73,6 +73,26 @@ left join {{ ref('terminology__cms_acceptable_provider_specialty_codes') }} accp
 group by prov.npi
 )
 
+
+-- All or nothing when doing filtering based on CPT codes
+-- Refer to p.3 https://www.hhs.gov/guidance/sites/default/files/hhs-guidance-documents/FinalEncounterDataDiagnosisFilteringLogic.pdf
+, cpt_filtered_claims as (
+    select distinct
+          medical_claims.claim_id
+        , medical_claims.payer
+        , cpt_hcpcs_list.payment_year
+        , dates.collection_start_date
+        , dates.collection_end_date
+    from medical_claims
+    inner join cpt_hcpcs_list
+        on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+    -- TODO: Review if this needs to be done here...likely can be done much later to avoid increasing number of rows by 12
+    -- this early on        
+    inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+        on claim_end_date between dates.collection_start_date and dates.collection_end_date
+        and cpt_hcpcs_list.payment_year = dates.payment_year        
+)
+
 , professional_claims as (
 
     select
@@ -85,25 +105,23 @@ group by prov.npi
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
-        , dates.payment_year
-        , dates.collection_start_date
-        , dates.collection_end_date
+        , cpt_claims.payment_year
+        , cpt_claims.collection_start_date
+        , cpt_claims.collection_end_date
     from medical_claims
-        inner join cpt_hcpcs_list
-            on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
-        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
-        -- CMS uses the claim line level provider specialty code, but this is good enough for now
-        -- TODO: Use claim line provider specialty codes instead
-        left join accepted_providers prov
-            on medical_claims.rendering_npi = prov.npi
+    inner join cpt_filtered_claims cpt_claims
+        on  medical_claims.claim_id = cpt_claims.claim_id
+        and medical_claims.payer = cpt_claims.payer
+    -- CMS uses the claim line level provider specialty code, but this is good enough for now
+    -- TODO: Use claim line provider specialty codes instead
+    left join accepted_providers prov
+        on medical_claims.rendering_npi = prov.npi
     where claim_type = 'professional'
-        and 1 = (case 
-                    when prov.npi is null then 1
-                    else prov.accepted_provider
-                end
-                    )
+        -- and 1 = (case 
+        --             when prov.npi is null then 1
+        --             else prov.accepted_provider
+        --         end
+        --             )
 
 )
 
@@ -123,8 +141,8 @@ group by prov.npi
         , dates.collection_start_date
         , dates.collection_end_date
     from medical_claims
-        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
+    inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
+        on claim_end_date between dates.collection_start_date and dates.collection_end_date
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('11', '41')
 
@@ -142,17 +160,13 @@ group by prov.npi
         , medical_claims.claim_end_date
         , medical_claims.bill_type_code
         , medical_claims.hcpcs_code
-        , dates.payment_year
-        , dates.collection_start_date
-        , dates.collection_end_date
+        , cpt_claims.payment_year
+        , cpt_claims.collection_start_date
+        , cpt_claims.collection_end_date
     from medical_claims
-        inner join cpt_hcpcs_list
-            on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
-        -- TODO: Review if this needs to be done here...likely can be done much later to avoid increasing number of rows by 12
-        -- this early on
-        inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
-            on claim_end_date between dates.collection_start_date and dates.collection_end_date
-            and cpt_hcpcs_list.payment_year = dates.payment_year
+    inner join cpt_filtered_claims cpt_claims
+        on  medical_claims.claim_id = cpt_claims.claim_id
+        and medical_claims.payer = cpt_claims.payer
     where claim_type = 'institutional'
         and substring(bill_type_code, 1, 2) in ('12', '13', '43', '71', '73', '76', '77', '85')
 
