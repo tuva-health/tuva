@@ -30,6 +30,7 @@ with medical_claims as (
         , claim_type
         , payer
         , person_id
+        , rendering_id as rendering_npi
         , claim_start_date
         , claim_end_date
         , bill_type_code
@@ -59,6 +60,17 @@ with medical_claims as (
 
 )
 
+, accepted_providers as (
+-- Distinct is to remove duplicates when a taxonomy maps to more than 1 medicare specialty code
+select distinct
+      prov.npi
+from {{ ref('terminology__provider') }} as prov
+inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as xwalk
+    on prov.primary_taxonomy_code = xwalk.provider_taxonomy_code
+inner join {{ ref('terminology__cms_acceptable_provider_specialty_codes') }} accpt
+    on xwalk.medicare_specialty_code = ltrim(accpt.specialty_code, '0')
+)
+
 , professional_claims as (
 
     select
@@ -80,6 +92,8 @@ with medical_claims as (
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.payment_year = dates.payment_year
+        inner join accepted_providers prov
+            on medical_claims.rendering_npi = prov.npi
     where claim_type = 'professional'
 
 )
