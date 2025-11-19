@@ -18,6 +18,8 @@ env:
   LINT_SCRIPT_PATH: ./lint_tuva_project.sh
 
 #######  Secrets #######
+#######  DuckDB/MotherDuck
+  DBT_MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
 #######  BigQuery
   TUVA_BIGQUERY_TOKEN: ${{ secrets.TUVA_BIGQUERY_TOKEN }}
   TUVA_BIGQUERY_PROJECT: ${{ secrets.TUVA_BIGQUERY_PROJECT }}
@@ -141,6 +143,82 @@ jobs:
             ```text
             ${{ steps.read-lint-output.outputs.content }}
             ```
+
+#######  DuckDB/MotherDuck
+  duckdb_clinical_and_claims_enabled:
+    needs: sqlfluff-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dbt-core and DuckDB adapter
+        run: |
+          python -m pip install --upgrade pip
+          pip install dbt-core==1.9.4 dbt-duckdb
+
+      - name: Create dbt profile for DuckDB/MotherDuck
+        env:
+          MOTHERDUCK_TOKEN: ${{ secrets.DBT_MOTHERDUCK_TOKEN }}
+        run: |
+          mkdir -p ./profiles/duckdb
+          python3 << 'EOF'
+          import os
+          import yaml
+          
+          # Create unique database name for CI run
+          db_name = "my_db"
+          
+          # Build the MotherDuck connection string
+          motherduck_path = f"md:{db_name}?motherduck_token={os.environ['MOTHERDUCK_TOKEN']}"
+          
+          profile = {
+              'default': {
+                  'outputs': {
+                      'dev': {
+                          'type': 'duckdb',
+                          'path': motherduck_path,
+                          'threads': 4,
+                          'settings': {
+                              'custom_user_agent': 'dbt-ci'
+                          }
+                      }
+                  },
+                  'target': 'dev'
+              }
+          }
+          
+          with open('./profiles/duckdb/profiles.yml', 'w') as f:
+              yaml.dump(profile, f, default_flow_style=False)
+          
+          print(f"Created DuckDB/MotherDuck profile with database: {db_name}")
+          EOF
+        working-directory: ci_testing
+
+      - name: dbt-deps
+        run: dbt deps --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-debug
+        run: dbt debug --profiles-dir ./profiles/duckdb
+        working-directory: ci_testing
+
+      - name: dbt-build
+        run: |
+          dbt build --full-refresh --profiles-dir ./profiles/duckdb \
+            --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
+        working-directory: ci_testing
+
+      - name: Get the result
+        if: ${{ always() }}
+        run: echo "${{ steps.dbt-build.outputs.result }}"
+        shell: bash
+
 
   # ============================================================================
   # Build Jobs (Run only if Linting Passes)
