@@ -270,16 +270,17 @@ models:
           combination_of_columns:
             - person_id
             - claim_id
+            - data_source
             - start_date
             - condition
-      - dbt_expectations.expect_table_row_count_to_be_between:
+      - the_tuva_project.expect_table_row_count_to_be_between:
 # description: This is a check in one of the final downstream marts to see if chronic_conditions__cms_chronic_conditions_long is populated. If this is flagging, please check other areas further upstream on the input layer.
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_cms_chronic_conditions', 'dqi_usability']
           min_value: 1
           strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+            enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
             meta:
               dqi_test_description: "This is a check in one of the final downstream
@@ -304,18 +305,18 @@ models:
             The type of chronic condition as defined by CMS. 
             ('Common' or 'Other chronic or potentially disabling conditions')
           meta:
-            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__cms_chronic_conditions_hierarchy.csv
+            terminology: https://thetuvaproject.com/value-sets/chronic-conditions#cms_chronic_conditions_hierarchy
         - name: condition_category
           description: >
             The category of the condition (e.g. Cardiovascular Disease).
           meta:
-            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__cms_chronic_conditions_hierarchy.csv
+            terminology: https://thetuvaproject.com/value-sets/chronic-conditions#cms_chronic_conditions_hierarchy
         - name: condition
           description: The name of the chronic condition.
           tests:
             - not_null
           meta:
-            terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/chronic_conditions/chronic_conditions__cms_chronic_conditions_hierarchy.csv
+            terminology: https://thetuvaproject.com/value-sets/chronic-conditions#cms_chronic_conditions_hierarchy
         - name: data_source
           description: >
             Indicates the name of the source dataset (e.g. Medicare Claims).

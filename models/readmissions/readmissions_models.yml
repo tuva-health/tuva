@@ -23,16 +23,16 @@ models:
       - name: discharge_disposition_code
         description: "The valid 2-digit discharge status for the inpatient visit"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+          terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: facility_id
         description: "An ID for the facility where the inpatient visit occurred"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology: https://thetuvaproject.com/terminology/provider
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: ms_drg_code
         description: "The MS-DRG associted with the inpatient visit"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+          terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: paid_amount
         description: "The number of dollars paid on the encounter"
       - name: length_of_stay
@@ -47,14 +47,14 @@ models:
       - name: specialty_cohort
         description: "Specialty cohort the encounter belongs to"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/readmissions/readmissions__specialty_cohort.csv
+          terminology: https://thetuvaproject.com/value-sets/readmissions#specialty_cohort
       - name: died_flag
         description: "Flag to indicate of the patient died in this encounter"
         data_type: boolean
       - name: diagnosis_ccs
         description: "CCS code associated with the primary diagnosis for the encounter"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/readmissions/readmissions__acute_diagnosis_ccs.csv
+          terminology: https://thetuvaproject.com/value-sets/readmissions#acute_diagnosis_ccs
       - name: disqualified_encounter_flag
         description: "A flag that indicates whether this encounter is disqualified from being used in readmission measures for any critical data quality problem."
         data_type: boolean
@@ -107,14 +107,14 @@ models:
       materialized: table
     description: "This model includes all rows from the encounter_augmented model where disqualified_encounter_flag = 0 (all rows for encounters that are not disqualified for data quality issues). For each of these encounters we add fields to indicate whether it had a readmission and, when a readmission was present, to show relevant fields for the readmission."
     tests:
-      - dbt_expectations.expect_table_row_count_to_be_between:
-# description: This is a check in one of the final downstream marts to see if readmissions__readmission_summary is populated. If this is flagging, please check other areas further upstream on the input layer.
+      - the_tuva_project.expect_table_row_count_to_be_between:
+          description: This is a check in one of the final downstream marts to see if readmissions__readmission_summary is populated. If this is flagging, please check other areas further upstream on the input layer.
           tags: ['tuva_dqi_sev_3', 'dqi', 'dqi_readmission', 'dqi_usability']
           min_value: 1
-          strictly: false # (Optional. Adds an 'or equal to' to the comparison operator for min/max)
+          strictly: false
           config:
             severity: warn
-            enabled: "{{ ((target.type != 'fabric') and var('enable_input_layer_testing',
+            enabled: "{{ (var('enable_input_layer_testing',
               true)) | as_bool }}"
             meta:
               dqi_test_description: "This is a check in one of the final downstream
@@ -133,16 +133,16 @@ models:
       - name: discharge_disposition_code
         description: "The valid 2-digit discharge status for the inpatient visit"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+          terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: facility_id
         description: "An ID for the facility where the inpatient visit occurred"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology: https://thetuvaproject.com/terminology/provider
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: ms_drg_code
         description: "The MS-DRG associted with the inpatient visit"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+          terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: paid_amount
         description: "The amount paid for the visit"
       - name: length_of_stay
@@ -157,14 +157,14 @@ models:
       - name: specialty_cohort
         description: "Specialty cohort the encounter belongs to"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/readmissions/readmissions__specialty_cohort.csv
+          terminology: https://thetuvaproject.com/value-sets/readmissions#specialty_cohort
       - name: died_flag
         description: "Flag to indicate of the patient died in this encounter"
         data_type: boolean
       - name: diagnosis_ccs
         description: "CCS code associated with the primary diagnosis for the encounter"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/readmissions/readmissions__acute_diagnosis_ccs.csv
+          terminology: https://thetuvaproject.com/value-sets/readmissions#acute_diagnosis_ccs
       - name: had_readmission_flag
         description: "A flag to indicate whether the encounter had a readmission any number of days after discharge"
         data_type: boolean
@@ -186,16 +186,16 @@ models:
       - name: readmission_discharge_disposition_code
         description: "The valid 2-digit discharge status for the readmission inpatient visit"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__discharge_disposition.csv
+          terminology: https://thetuvaproject.com/terminology/discharge-disposition
       - name: readmission_facility
         description: "A name or ID for the facility where the readmission inpatient visit occured"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__provider.csv
+          terminology: https://thetuvaproject.com/terminology/provider
           terminology_note: "**Note: this terminology set is too large to be loaded as a seed and is instead loaded from public cloud storage for supported adapters."
       - name: readmission_ms_drg
         description: "The MS-DRG associted with the readmission inpatient visit"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__ms_drg.csv
+          terminology: https://thetuvaproject.com/terminology/ms-drg
       - name: readmission_length_of_stay
         description: "Integer representing the length of stay of the readmission inpatient visit in days"
         data_type: integer
@@ -208,14 +208,14 @@ models:
       - name: readmission_specialty_cohort
         description: "Specialty cohort the readmission encounter belongs to"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/readmissions/readmissions__specialty_cohort.csv
+          terminology: https://thetuvaproject.com/value-sets/readmissions#specialty_cohort
       - name: readmission_died_flag
         description: "Flag to indicate of the patient died in the readmission encounter"
         data_type: boolean
       - name: readmission_diagnosis_ccs
         description: "CCS code associated with the primary diagnosis for the readmission encounter"
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/value_sets/readmissions/readmissions__acute_diagnosis_ccs.csv
+          terminology: https://thetuvaproject.com/value-sets/readmissions#acute_diagnosis_ccs
       - name: tuva_last_run
         description: The time at with the model was materialized. Generated by `dbt_utils.pretty_time` as the local time of the `dbt run` environment.  Timezone is configurable via the `tuva_last_run` var.
 
@@ -265,14 +265,14 @@ models:
       alias: _int_encounter_overlap
       tags: readmissions
       materialized: view
-    description: "This model lists all pairs of encounters that have some date overlap."
+    description: "This model lists and labels encounters that overlap to identify the best one out of the group."
     columns:
       - name: person_id
         description: "The unique identifier for the patient"
-      - name: encounter_id_A
-        description: "Unique identifier for one of the overlapping encounters"
-      - name: encounter_id_B
-        description: "Unique identifier for the other overlapping encounter"
+      - name: is_best_encounter
+        description: "Flag that identifies the best encounter that has overlapping dates between encounters for the same patient."
+      - name: selection_reason
+        description: "Reason why or why not a particular encounter is selected as best for overlapping dates"
 
   - name: readmissions__encounter_specialty_cohort
     config:

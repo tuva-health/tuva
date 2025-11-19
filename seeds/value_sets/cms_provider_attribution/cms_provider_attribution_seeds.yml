@@ -1,0 +1,64 @@
+version: 2
+
+seeds:
+  - name: cms_provider_attribution__assignment_windows
+    description: |
+      Taken from p.82-86 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), "APPENDIX B: ASSIGNMENT WINDOW, EXPANDED WINDOW FOR ASSIGNMENT, AND EXPENDITURES PERIOD DATES".
+      Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: _assignment_windows
+      tags: cms_provider_attribution
+      enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        performance_year: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        service_year: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        assignment_methodology: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        expanded_window_start: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        window_start: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+        window_end: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(32) {%- endif -%}
+
+  - name: cms_provider_attribution__primary_care_hcpcs_codes
+    description: |
+      Taken from p.87 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), "APPENDIX C: PRIMARY CARE AND SPECIALTY CODES USED IN ASSIGNMENT".
+      Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: _primary_care_hcpcs_codes
+      tags: cms_provider_attribution
+      enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        hcpcs_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(5) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+
+        
+  - name: cms_provider_attribution__provider_specialty_assignment_codes
+    description: |
+       Taken from p.93 of the SLAAM (SHARED SAVINGS AND LOSSES, ASSIGNMENT AND QUALITY PERFORMANCE STANDARD METHODOLOGY), in Table 11 and 12.
+       Source can be found here: https://www.cms.gov/files/document/medicare-shared-savings-program-shared-savings-and-losses-and-assignment-methodology-specifications.pdf-4 (Link updates yearly)
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_provider_attribution{% else %}cms_provider_attribution{%- endif -%}
+      alias: _provider_specialty_assignment_codes
+      tags: cms_provider_attribution
+      enabled: "{{ var('cms_provider_attribution_enabled',var('tuva_marts_enabled',True)) }}"
+      column_types:
+        specialty_code: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(8) {%- endif -%}
+        description: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(512) {%- endif -%}
+        primary_care_physician_step1: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        specialist_physician_step_2: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(4) {%- endif -%}
+        physician: integer

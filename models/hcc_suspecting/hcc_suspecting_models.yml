@@ -24,7 +24,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -57,7 +57,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -88,7 +88,7 @@ models:
       - name: patient_sex
         description: The gender of the patient.
         meta:
-          terminology: https://github.com/tuva-health/the_tuva_project/blob/main/seeds/terminology/terminology__gender.csv
+          terminology: https://thetuvaproject.com/terminology/gender
       - name: patient_birth_date
         description: The birth date of the patient.
       - name: patient_age
@@ -172,7 +172,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -227,7 +227,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -265,7 +265,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -317,7 +317,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -365,7 +365,7 @@ models:
         description: >
           HCC code from the latest CMS HCC model available in the mart.
         meta:
-          terminology: https://github.com/tuva-health/tuva/blob/main/seeds/value_sets/hcc_suspecting/hcc_suspecting__hcc_descriptions.csv
+          terminology: https://thetuvaproject.com/value-sets/hcc-suspecting#hcc_descriptions
       - name: hcc_description
         description: >
           HCC description from the latest CMS HCC model available in the mart.
@@ -454,7 +454,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_condition
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging conditions from core.
     columns:
       - name: claim_id
@@ -471,7 +471,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_lab_result
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging conditions from core.
     columns:
       - name: lab_result_id
@@ -489,7 +489,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_medication
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging medications from core.
     columns:
       - name: person_id
@@ -506,7 +506,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_observation
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging observations from core.
     columns:
       - name: person_id
@@ -522,7 +522,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_patient
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging patients from core.
     columns:
       - name: person_id
@@ -536,7 +536,7 @@ models:
         {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_hcc_suspecting{% else %}hcc_suspecting{%- endif -%}
       alias: _stg_pharmacy_claim
       tags: hcc_suspecting
-      materialized: ephemeral
+      materialized: view
     description: Staging pharmacy claims from core.
     columns:
      - name: person_id

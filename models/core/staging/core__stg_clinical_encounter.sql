@@ -32,6 +32,7 @@ select
   , cast(null as {{ dbt.type_string() }}) as delivery_type
   , cast(null as {{ dbt.type_int() }}) as newborn_flag
   , cast(null as {{ dbt.type_int() }}) as nicu_flag
+  , cast(null as {{ dbt.type_int() }}) as snf_part_b_flag
   , cast(primary_diagnosis_code_type as {{ dbt.type_string() }}) as primary_diagnosis_code_type
   , cast(primary_diagnosis_code as {{ dbt.type_string() }}) as primary_diagnosis_code
   , cast(primary_diagnosis_description as {{ dbt.type_string() }}) as primary_diagnosis_description
@@ -46,5 +47,6 @@ select
   , cast(null as {{ dbt.type_int() }}) as prof_claim_count
   , cast(null as {{ dbt.type_string() }}) as source_model
   , cast(data_source as {{ dbt.type_string() }}) as data_source
+  , cast('clinical' as {{ dbt.type_string() }}) as encounter_source_type
   , cast('{{ var('tuva_last_run') }}' as {{ dbt.type_timestamp() }}) as tuva_last_run
 from {{ ref('input_layer__encounter') }}

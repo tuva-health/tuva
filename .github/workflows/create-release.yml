@@ -1,0 +1,57 @@
+name: Create Release
+# creates a draft release if there is a push to main/ that changes "version" in /dbt_project.yml
+# user must manually publish the release and check the latest release option
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dbt_project.yml'
+
+jobs:
+  create-draft:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Check version change
+        id: check_version
+        run: |
+          NEW_VERSION=$(yq '.version' dbt_project.yml)
+          OLD_VERSION=$(git show HEAD^:dbt_project.yml | yq '.version')
+
+          echo "NEW: $NEW_VERSION"
+          echo "OLD: $OLD_VERSION"
+
+          if [ "$NEW_VERSION" != "$OLD_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Tag
+        if: steps.check_version.outputs.changed == 'true'
+        run: |
+          git tag v${{ steps.check_version.outputs.version }}
+          git push origin v${{ steps.check_version.outputs.version }}
+
+      - name: Create Draft Release
+        if: steps.check_version.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.check_version.outputs.version }}
+          name: the_tuva_project v${{ steps.check_version.outputs.version }}
+          draft: true
+          prerelease: false
+          generate_release_notes: true

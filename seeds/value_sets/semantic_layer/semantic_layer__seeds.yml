@@ -1,0 +1,70 @@
+version: 2
+
+seeds:
+  - name: encounter_group_sk
+    description: Assigning SK to encounter groups
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer{% else %}semantic_layer{%- endif -%}
+      alias: _value_set_encounter_group_sk
+      tags:
+        - semantic_layer
+      enabled: "{{ var('semantic_layer_enabled',False) }}"
+      column_types:
+        encounter_group: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        encounter_group_sk: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+    columns:
+      - name: encounter_group
+        description: Encounter group name
+      - name: encounter_group_sk
+        description: SK for encounter groups
+
+  - name: encounter_type_sk
+    description: Assigning SKs to encounter types and matching to groups
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer{% else %}semantic_layer{%- endif -%}
+      alias: _value_set_encounter_type_sk
+      tags:
+        - semantic_layer
+      enabled: "{{ var('semantic_layer_enabled',False) }}"
+      column_types:
+        encounter_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        encounter_type_sk: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        encounter_group_sk: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+    columns:
+      - name: encounter_type
+        description: Encounter type name
+      - name: encounter_type_sk
+        description: SK for encounter types
+      - name: encounter_group_sk
+        description: Matching types to groups
+
+  - name: predictor_encounter_xwalk
+    description: Assigning predictors to encounter types and groups
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_semantic_layer{% else %}semantic_layer{%- endif -%}
+      alias: _value_set_predictor_encounter_xwalk
+      tags:
+        - semantic_layer
+      enabled: "{{ var('semantic_layer_enabled',False) }}"
+      column_types:
+        predictor_name: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        predictor_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(256) {%- endif -%}
+        encounter_type: |
+          {%- if target.type in ("bigquery", "databricks") -%} string {%- else -%} varchar(1000) {%- endif -%}
+    columns:
+      - name: predictor_name
+        description: Name of predictor column
+      - name: predictor_type
+        description: Count vs paid amount
+      - name: encounter_type
+        description: Matching encounter type

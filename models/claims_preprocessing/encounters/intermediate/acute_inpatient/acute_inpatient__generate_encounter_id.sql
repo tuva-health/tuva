@@ -51,23 +51,26 @@ order by end_date, start_date, claim_id) as row_num
     , aa.row_num as row_num_a
     , bb.row_num as row_num_b
     , case
-        -- Claims with same end_date and same facility_id should be merged:
-        when aa.end_date = bb.end_date
-          and aa.facility_id = bb.facility_id then 1
+      -- Condition 1: Exact End Date Match (Catches duplicates/corrections)
+      when aa.end_date = bb.end_date
+        and aa.facility_id = bb.facility_id then 1
 
-        -- Claims with different end_date and start_date that are
-        -- adjacent (i.e. separated by 1 day) should be merged:
-        when {{ dbt.dateadd(datepart= 'day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
-          and aa.facility_id = bb.facility_id
-          and aa.discharge_disposition_code = '30' then 1
+      -- Condition 2: Consecutive Stay with Transfer (Catches month-end billing)
+      when {{ dbt.dateadd(datepart='day', interval=1, from_date_or_timestamp='aa.end_date') }} = bb.start_date
+        and aa.facility_id = bb.facility_id
+        and aa.discharge_disposition_code = '30' then 1
 
-        -- Claims with different end_date 
-        -- should be merged if they overlap:
-        when aa.end_date <> bb.end_date
-          and aa.end_date > bb.start_date
-          and aa.facility_id = bb.facility_id then 1
-        else 0
-      end as merge_flag
+      -- Condition 3: Same-Day Start / Superseded Claim
+      when aa.start_date = bb.start_date
+        and aa.facility_id = bb.facility_id
+        and aa.discharge_disposition_code = '30' then 1
+
+      -- Condition 4: General Overlapping Stay
+      when aa.end_date <> bb.end_date
+        and aa.end_date > bb.start_date
+        and aa.facility_id = bb.facility_id then 1
+      else 0
+    end as merge_flag
   from add_row_num as aa
   inner join add_row_num as bb
     on aa.patient_data_source_id = bb.patient_data_source_id

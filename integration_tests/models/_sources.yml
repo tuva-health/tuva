@@ -8,9 +8,11 @@ sources:
       enabled: |
         {% if var('use_synthetic_data') == true -%} {{ false|as_bool }} {%- else -%} {{ true|as_bool }} {%- endif -%}
     tables:
+      - name: appointment
       - name: condition
       - name: eligibility
       - name: encounter
+      - name: immunization
       - name: lab_result
       - name: location
       - name: medical_claim
@@ -21,3 +23,6 @@ sources:
       - name: practitioner
       - name: procedure
       - name: provider_attribution
+      # optional mart data
+      - name: hedis_cql_engine_log
+      - name: hedis_measure_report
