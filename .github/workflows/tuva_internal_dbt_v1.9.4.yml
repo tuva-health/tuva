@@ -288,11 +288,6 @@ jobs:
             --vars '{"use_synthetic_data": true,"clinical_enabled": true,"claims_enabled": true,"provider_attribution_enabled":true,"fhir_preprocessing_enabled":true}'
         working-directory: ci_testing
 
-      - name: Get the result
-        if: ${{ always() }}
-        run: echo "${{ steps.dbt-build.outputs.result }}"
-        shell: bash
-
 #######  Fabric
   fabric_clinical_and_claims_enabled:
     needs: sqlfluff-lint
