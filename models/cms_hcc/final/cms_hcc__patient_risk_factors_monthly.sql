@@ -52,6 +52,7 @@ with demographic_factors as (
           person_id
         , payer
         , model_version
+        , enrollment_status
         , enrollment_status_default
         , medicaid_dual_status_default
         , orec_default
@@ -165,6 +166,7 @@ with demographic_factors as (
           unioned.person_id
         , unioned.payer
         , demographic_defaults.enrollment_status_default
+        , demographic_defaults.enrollment_status
         , demographic_defaults.medicaid_dual_status_default
         , demographic_defaults.orec_default
         , demographic_defaults.institutional_status_default
@@ -190,6 +192,7 @@ with demographic_factors as (
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         {% if target.type == 'fabric' %}
             , cast(enrollment_status_default as bit) as enrollment_status_default
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
@@ -215,6 +218,7 @@ with demographic_factors as (
 select
       person_id
     , payer
+    , enrollment_status
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default

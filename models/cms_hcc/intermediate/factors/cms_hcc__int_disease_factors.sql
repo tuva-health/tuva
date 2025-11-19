@@ -53,6 +53,7 @@ with demographics as (
         , description
         , coefficient
         , case  
+            when enrollment_status = 'ESRD' then 'ESRD'
             -- Long Term Institutional (INS)
             when institutional_status = 'Yes' then 'INS'
             -- Community NonDual Aged (CNA)
