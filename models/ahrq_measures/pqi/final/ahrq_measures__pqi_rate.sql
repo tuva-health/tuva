@@ -33,7 +33,7 @@ select
   , d.year_number
   , d.pqi_number
   , d.denom_count
-  , coalesce(num.num_count, 0)*1.0 as num_count
+  , coalesce(num.num_count, 0) as num_count
   , coalesce(num.num_count, 0)*1.0 / d.denom_count * 100000 as rate_per_100_thousand
   , '{{ var('tuva_last_run') }}' as tuva_last_run
 from denom as d
