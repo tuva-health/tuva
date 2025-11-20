@@ -230,7 +230,7 @@ with stg_eligibility as (
         , payment_year
         , collection_start_date
         , collection_end_date
-        , enrollment_status
+        , case when original_reason_entitlement_code in ('2','3') then 'ESRD' else enrollment_status end as enrollment_status
         , case
             when gender = 'female' then 'Female'
             when gender = 'male' then 'Male'

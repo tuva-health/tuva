@@ -23,6 +23,7 @@ with seed_adjustment_rates as (
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , model_version
         , payment_year
         , collection_start_date
@@ -54,6 +55,7 @@ with seed_adjustment_rates as (
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , model_version
         , payment_year
         , collection_start_date
@@ -67,6 +69,7 @@ with seed_adjustment_rates as (
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , model_version
         , payment_year
         , collection_start_date
@@ -96,6 +99,7 @@ with seed_adjustment_rates as (
         , raw.risk_model_code
         , raw.enrollment_status
         , raw.enrollment_status_default
+        , raw.orec_default
         , raw.risk_score as raw_risk_score
         -- TODO: Uncomment when seed is updated
         -- , raw.risk_score * adj.blend_weight as weighted_raw_risk_score
@@ -138,6 +142,7 @@ with seed_adjustment_rates as (
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , model_version
         , raw_risk_score
         , weighted_raw_risk_score
@@ -158,6 +163,7 @@ with seed_adjustment_rates as (
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , model_version
         , raw_risk_score
         , weighted_raw_risk_score
@@ -177,6 +183,7 @@ select
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , payment_year
         , collection_start_date
         , collection_end_date        
@@ -193,6 +200,7 @@ group by
         , risk_model_code
         , enrollment_status
         , enrollment_status_default
+        , orec_default
         , payment_year
         , collection_start_date
         , collection_end_date  
@@ -207,6 +215,7 @@ group by
         , blended.risk_model_code
         , blended.enrollment_status
         , blended.enrollment_status_default
+        , blended.orec_default
         , blended.v24_risk_score
         , blended.v28_risk_score
         , blended.blended_risk_score
@@ -233,6 +242,7 @@ group by
         , cast(risk_model_code as {{ dbt.type_string() }}) as risk_model_code
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(enrollment_status_default as {{ dbt.type_string() }}) as enrollment_status_default
+        , cast(orec_default as {{ dbt.type_string() }}) as orec_default
         , round(cast(v24_risk_score as {{ dbt.type_numeric() }}), 3) as v24_risk_score
         , round(cast(v28_risk_score as {{ dbt.type_numeric() }}), 3) as v28_risk_score
         , round(cast(blended_risk_score as {{ dbt.type_numeric() }}), 3) as blended_risk_score
@@ -254,6 +264,7 @@ select
     , risk_model_code
     , enrollment_status
     , enrollment_status_default
+    , orec_default
     , v24_risk_score
     , v28_risk_score
     , blended_risk_score
