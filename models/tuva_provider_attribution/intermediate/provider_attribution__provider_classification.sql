@@ -27,8 +27,13 @@ with base as (
   inner join {{ ref('terminology__medicare_provider_and_supplier_taxonomy_crosswalk') }} as x
     on trim(cast(b.primary_taxonomy_code as {{ dbt.type_string() }})) = trim(cast(x.provider_taxonomy_code as {{ dbt.type_string() }}))
   inner join {{ ref('cms_provider_attribution__provider_specialty_assignment_codes') }} as a
+  {% if target.type == 'athena' %}
     on substr(concat('00', trim(x.medicare_specialty_code)), -2)
      = substr(concat('00', trim(a.specialty_code)), -2)
+  {% else %}
+    on right(concat('00', trim(x.medicare_specialty_code)), 2)
+     = right(concat('00', trim(a.specialty_code)), 2)
+  {% endif %}
   where b.entity_type = 'individual'
 )
 
