@@ -20,6 +20,7 @@ with seed_adjustment_rates as (
         , payer
         , factor_type
         , coefficient
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , model_version
@@ -50,6 +51,7 @@ with seed_adjustment_rates as (
           person_id
         , payer
         , factor_type
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , model_version
@@ -62,6 +64,7 @@ with seed_adjustment_rates as (
           person_id
         , payer
         , factor_type
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , model_version
@@ -90,6 +93,7 @@ with seed_adjustment_rates as (
           raw.person_id
         , raw.payer
         , raw.factor_type
+        , raw.risk_model_code
         , raw.enrollment_status
         , raw.enrollment_status_default
         , raw.risk_score as raw_risk_score
@@ -131,6 +135,7 @@ with seed_adjustment_rates as (
           person_id
         , payer
         , factor_type
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , model_version
@@ -150,6 +155,7 @@ with seed_adjustment_rates as (
           person_id
         , payer
         , factor_type
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , model_version
@@ -168,6 +174,7 @@ select
           person_id
         , payer
         , factor_type
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , payment_year
@@ -183,6 +190,7 @@ group by
           person_id
         , payer
         , factor_type
+        , risk_model_code
         , enrollment_status
         , enrollment_status_default
         , payment_year
@@ -196,6 +204,7 @@ group by
           blended.person_id
         , blended.payer
         , blended.factor_type
+        , blended.risk_model_code
         , blended.enrollment_status
         , blended.enrollment_status_default
         , blended.v24_risk_score
@@ -221,6 +230,7 @@ group by
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
+        , cast(risk_model_code as {{ dbt.type_string() }}) as risk_model_code
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
         , cast(enrollment_status_default as {{ dbt.type_string() }}) as enrollment_status_default
         , round(cast(v24_risk_score as {{ dbt.type_numeric() }}), 3) as v24_risk_score
@@ -241,6 +251,7 @@ select
       person_id
     , payer
     , factor_type
+    , risk_model_code
     , enrollment_status
     , enrollment_status_default
     , v24_risk_score

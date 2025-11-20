@@ -6,6 +6,7 @@
 select
       person_id
     , payer
+    , risk_model_code
     , enrollment_status
     , enrollment_status_default
     , sum(v24_risk_score) as v24_risk_score
@@ -23,6 +24,7 @@ from {{ ref('cms_hcc__patient_risk_scores_monthly_by_factor_type') }}
 group by
       person_id
     , payer
+    , risk_model_code
     , enrollment_status
     , enrollment_status_default
     , payment_year

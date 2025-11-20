@@ -38,6 +38,7 @@ with demographic_factors as (
 
         , coefficient
         , factor_type
+        , risk_model_code
         , model_version
         , payment_year
         , collection_start_date
@@ -53,6 +54,7 @@ with demographic_factors as (
         , payer
         , model_version
         , enrollment_status
+        , risk_model_code
         , enrollment_status_default
         , medicaid_dual_status_default
         , orec_default
@@ -170,6 +172,7 @@ with demographic_factors as (
         , demographic_defaults.medicaid_dual_status_default
         , demographic_defaults.orec_default
         , demographic_defaults.institutional_status_default
+        , demographic_defaults.risk_model_code
         , unioned.description as risk_factor_description
         , unioned.coefficient
         , unioned.factor_type
@@ -193,6 +196,7 @@ with demographic_factors as (
           cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(payer as {{ dbt.type_string() }}) as payer
         , cast(enrollment_status as {{ dbt.type_string() }}) as enrollment_status
+        , cast(risk_model_code as {{ dbt.type_string() }}) as risk_model_code
         {% if target.type == 'fabric' %}
             , cast(enrollment_status_default as bit) as enrollment_status_default
             , cast(medicaid_dual_status_default as bit) as medicaid_dual_status_default
@@ -219,6 +223,7 @@ select
       person_id
     , payer
     , enrollment_status
+    , risk_model_code
     , enrollment_status_default
     , medicaid_dual_status_default
     , orec_default

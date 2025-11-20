@@ -68,7 +68,7 @@ with demographics as (
             when dual_status = 'Partial' and orec = 'Aged' then 'CPA'
             -- Community Partial Benefit Dual Disabled (CPD)
             when dual_status = 'Partial' and orec = 'Disabled' then 'CPD'
-        end as risk_model_code        
+        end as risk_model_code
     from {{ ref('cms_hcc__disease_factors') }}
 
 )
