@@ -153,8 +153,8 @@ with demographic_factors as (
     union all
     select * from enrollment_interactions
     union all
-    select * from disabled_interactions
-    union all
+    -- select * from disabled_interactions
+    -- union all
     select * from disease_interactions
     union all
     select * from hcc_counts
