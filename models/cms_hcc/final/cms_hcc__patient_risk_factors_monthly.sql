@@ -38,7 +38,6 @@ with demographic_factors as (
 
         , coefficient
         , factor_type
-        , risk_model_code
         , model_version
         , payment_year
         , collection_start_date

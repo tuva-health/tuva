@@ -17,6 +17,7 @@ with demographics as (
         , institutional_status
         , model_version
         , payment_year
+        , risk_model_code
         , collection_start_date
         , collection_end_date
     from {{ ref('cms_hcc__int_demographic_factors') }}
@@ -52,23 +53,6 @@ with demographics as (
         , hcc_code
         , description
         , coefficient
-        , case  
-            when enrollment_status = 'ESRD' then 'ESRD'
-            -- Long Term Institutional (INS)
-            when institutional_status = 'Yes' then 'INS'
-            -- Community NonDual Aged (CNA)
-            when medicaid_status = 'No' and orec = 'Aged' then 'CNA'
-            -- Community NonDual Disabled (CND)
-            when medicaid_status = 'No' and orec = 'Disabled' then 'CND'
-            -- Community Full Benefit Dual Aged (CFA)
-            when dual_status = 'Full' and orec = 'Aged' then 'CFA'
-            -- Community Full Benefit Dual Disabled (CFD)
-            when dual_status = 'Full' and orec = 'Disabled' then 'CFD'
-            -- Community Partial Benefit Dual Aged (CPA)
-            when dual_status = 'Partial' and orec = 'Aged' then 'CPA'
-            -- Community Partial Benefit Dual Disabled (CPD)
-            when dual_status = 'Partial' and orec = 'Disabled' then 'CPD'
-        end as risk_model_code
     from {{ ref('cms_hcc__disease_factors') }}
 
 )
@@ -87,6 +71,7 @@ with demographics as (
         , demographics.institutional_status
         , demographics.model_version
         , demographics.payment_year
+        , demographics.risk_model_code
         , demographics.collection_start_date
         , demographics.collection_end_date
         , hcc_hierarchy.hcc_code
@@ -110,10 +95,10 @@ with demographics as (
         , demographics_with_hccs.payment_year
         , demographics_with_hccs.collection_start_date
         , demographics_with_hccs.collection_end_date
+        , demographics_with_hccs.risk_model_code
         , seed_disease_factors.factor_type
         , seed_disease_factors.description
         , seed_disease_factors.coefficient
-        , seed_disease_factors.risk_model_code
     from demographics_with_hccs
         inner join seed_disease_factors
             on demographics_with_hccs.enrollment_status = seed_disease_factors.enrollment_status

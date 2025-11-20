@@ -83,6 +83,7 @@ with members as (
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
+        , seed_demographic_factors.risk_model_code
     from members
         inner join seed_demographic_factors
             on members.enrollment_status = seed_demographic_factors.enrollment_status
@@ -117,6 +118,7 @@ with members as (
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
+        , seed_demographic_factors.risk_model_code
     from members
         inner join seed_demographic_factors
             on members.enrollment_status = seed_demographic_factors.enrollment_status
@@ -154,6 +156,7 @@ with members as (
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
+        , seed_demographic_factors.risk_model_code
     from members
         inner join seed_demographic_factors
             on members.enrollment_status = seed_demographic_factors.enrollment_status
@@ -190,6 +193,7 @@ with members as (
         , seed_demographic_factors.model_version
         , seed_demographic_factors.factor_type
         , seed_demographic_factors.coefficient
+        , seed_demographic_factors.risk_model_code
     from members
         inner join seed_demographic_factors
             on members.enrollment_status = seed_demographic_factors.enrollment_status
@@ -241,6 +245,7 @@ with members as (
             , cast(institutional_status_default as boolean) as institutional_status_default
         {% endif %}
         , round(cast(coefficient as {{ dbt.type_numeric() }}), 3) as coefficient
+        , cast(risk_model_code as {{ dbt.type_string() }}) as risk_model_code
         , cast(factor_type as {{ dbt.type_string() }}) as factor_type
         , cast(model_version as {{ dbt.type_string() }}) as model_version
         , cast(payment_year as integer) as payment_year
@@ -266,6 +271,7 @@ select
     , institutional_status_default
     , coefficient
     , factor_type
+    , risk_model_code
     , model_version
     , payment_year
     , collection_start_date
