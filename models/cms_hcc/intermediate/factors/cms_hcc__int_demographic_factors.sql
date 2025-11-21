@@ -13,7 +13,24 @@ with members as (
         , age_group
         , medicaid_status
         , dual_status
-        , orec
+        /* HACK: Adhoc fix for new enrollees and <65 years old. They are being given coefficient = 0, but really should be given what is currently listed as 'Aged'.
+        Aged is an incorrect label here and should just be null given the labels in the SAS code look like this: NE_NMCAID_NORIGDIS_NEF0_34.
+        This simply says 'New Enrollee, Not Medicaid, Not Originally Disabled, Female, 0-34'. Not Originally Disabled != Aged.
+        Here is the definition for originally disabled per the SAS code:
+            %* disabled;
+            DISABL = (&AGEF < 65 & &OREC ne "0");
+            %* originally disabled;
+            ORIGDS  = (&OREC = '1')*(DISABL = 0);
+        This means that < 65 is just disabled and not originally disabled.
+       */
+        , case       
+            when enrollment_status = 'New' and age_group = '0-34' then 'Aged'
+            when enrollment_status = 'New' and age_group = '35-44' then 'Aged'
+            when enrollment_status = 'New' and age_group = '45-54' then 'Aged'
+            when enrollment_status = 'New' and age_group = '55-59' then 'Aged'
+            when enrollment_status = 'New' and age_group = '60-64' then 'Aged'
+            else orec
+         end as orec
         , institutional_status
         , enrollment_status_default
         , medicaid_dual_status_default
@@ -36,24 +53,7 @@ with members as (
         , age_group
         , medicaid_status
         , dual_status
-        /* HACK: Adhoc fix for new enrollees and <65 years old. They are being given coefficient = 0, but really should be given what is currently listed as 'Aged'.
-        Aged is an incorrect label here and should just be null given the labels in the SAS code look like this: NE_NMCAID_NORIGDIS_NEF0_34.
-        This simply says 'New Enrollee, Not Medicaid, Not Originally Disabled, Female, 0-34'. Not Originally Disabled != Aged.
-        Here is the definition for originally disabled per the SAS code:
-            %* disabled;
-            DISABL = (&AGEF < 65 & &OREC ne "0");
-            %* originally disabled;
-            ORIGDS  = (&OREC = '1')*(DISABL = 0);
-        This means that < 65 is just disabled and not originally disabled.
-       */
-        , case       
-            when enrollment_status = 'New' and age_group = '0-34' then 'Aged'
-            when enrollment_status = 'New' and age_group = '35-44' then 'Aged'
-            when enrollment_status = 'New' and age_group = '45-54' then 'Aged'
-            when enrollment_status = 'New' and age_group = '55-59' then 'Aged'
-            when enrollment_status = 'New' and age_group = '60-64' then 'Aged'
-            else orec
-         end as orec
+        , orec
         , institutional_status
         , coefficient
         , case  
