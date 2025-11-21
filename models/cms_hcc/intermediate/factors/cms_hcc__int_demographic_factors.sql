@@ -52,9 +52,8 @@ with members as (
             when enrollment_status = 'New' and age_group = '45-54' then 'Aged'
             when enrollment_status = 'New' and age_group = '55-59' then 'Aged'
             when enrollment_status = 'New' and age_group = '60-64' then 'Aged'
-            else enrollment_status
-         end as enrollment_status
-        , orec
+            else orec
+         end as orec
         , institutional_status
         , coefficient
         , case  
