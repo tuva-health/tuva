@@ -156,7 +156,13 @@ models:
           The payment year the HCC and risk scores are being calculated for.
       - name: tuva_last_run
         description: The date the model was run.
-
+  - name: cms_hcc__patient_risk_scores_monthly_by_factor_type
+    config:
+      schema: |
+        {%- if var('tuva_schema_prefix',None) != None -%}{{var('tuva_schema_prefix')}}_cms_hcc{% else %}cms_hcc{%- endif -%}
+      alias: patient_risk_scores_monthly_by_factor_type
+      tags: cms_hcc
+      materialized: table  
   - name: cms_hcc__patient_risk_scores_monthly
     config:
       schema: |
@@ -173,6 +179,7 @@ models:
           combination_of_columns:
             - person_id
             - payment_year
+            - payer
             - collection_end_date
     columns:
       - name: person_id
@@ -393,6 +400,17 @@ models:
       alias: _int_eligible_conditions
       tags: cms_hcc
       materialized: table
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - person_id
+            - payer
+            - claim_id
+            - claim_line_number
+            - condition_code
+            - payment_year
+            - collection_start_date
+            - collection_end_date
     description: >
       Conditions from eligible risk-adjustable claims per claim type for the 
       collection year.
@@ -614,6 +632,16 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging conditions from core.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - claim_id
+            - person_id
+            - recorded_date
+            - condition_type
+            - code_type 
+            - code            
     columns:
       - name: claim_id
         description: Unique claim_id for each claim.
@@ -636,6 +664,14 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging eligibility from core.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - enrollment_start_date
+            - enrollment_end_date
+            - data_source
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.
@@ -658,6 +694,13 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging medical claims from core.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - claim_id
+            - claim_line_number      
     columns:
       - name: claim_id
         description: Unique identifier for each claim.
@@ -704,6 +747,12 @@ models:
       tags: cms_hcc
       materialized: ephemeral
     description: Staging member months from financial_pmpm
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - payer
+            - person_id
+            - year_month    
     columns:
       - name: person_id
         description: Unique identifier for each patient in the dataset.

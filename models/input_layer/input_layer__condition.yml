@@ -39,6 +39,10 @@ models:
               config:
                 severity: error
                 enabled: "{{ var('enable_input_layer_testing', true) | as_bool }}"
+      - name: payer
+        description: '{{ doc("payer") }}'
+      - name: person_id
+        description: '{{ doc("person_id") }}'              
       - name: patient_id
         description: '{{ doc("patient_id") }}'
         tests:

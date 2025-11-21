@@ -7,6 +7,8 @@ with conditions as (
 
     select
           person_id
+        , payer
+        , claim_id
         , recorded_date
         , condition_type
         , code_type
@@ -37,6 +39,8 @@ with conditions as (
 
     select
           person_id
+        , payer
+        , claim_id
         , recorded_date
         , condition_type
         , 'icd-10-cm' as code_type
@@ -53,6 +57,8 @@ with conditions as (
 
     select
           person_id
+        , payer
+        , claim_id
         , recorded_date
         , condition_type
         , code_type
@@ -75,6 +81,8 @@ with conditions as (
 
     select
           cast(person_id as {{ dbt.type_string() }}) as person_id
+        , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast(claim_id as {{ dbt.type_string() }}) as claim_id
         , cast(recorded_date as date) as recorded_date
         , cast(condition_type as {{ dbt.type_string() }}) as condition_type
         , cast(code_type as {{ dbt.type_string() }}) as code_type
@@ -86,6 +94,8 @@ with conditions as (
 
 select
       person_id
+    , payer
+    , claim_id
     , recorded_date
     , condition_type
     , code_type

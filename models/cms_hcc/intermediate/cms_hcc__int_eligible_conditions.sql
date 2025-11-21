@@ -28,6 +28,7 @@ with medical_claims as (
           claim_id
         , claim_line_number
         , claim_type
+        , payer
         , person_id
         , claim_start_date
         , claim_end_date
@@ -41,6 +42,7 @@ with medical_claims as (
 
     select
           claim_id
+        , payer
         , person_id
         , code
     from {{ ref('cms_hcc__stg_core__condition') }}
@@ -63,6 +65,7 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
+        , medical_claims.payer
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
@@ -87,6 +90,7 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
+        , medical_claims.payer
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
@@ -109,6 +113,7 @@ with medical_claims as (
           medical_claims.claim_id
         , medical_claims.claim_line_number
         , medical_claims.claim_type
+        , medical_claims.payer
         , medical_claims.person_id
         , medical_claims.claim_start_date
         , medical_claims.claim_end_date
@@ -120,6 +125,8 @@ with medical_claims as (
     from medical_claims
         inner join cpt_hcpcs_list
             on medical_claims.hcpcs_code = cpt_hcpcs_list.hcpcs_cpt_code
+        -- TODO: Review if this needs to be done here...likely can be done much later to avoid increasing number of rows by 12
+        -- this early on
         inner join {{ ref('cms_hcc__int_monthly_collection_dates') }} as dates
             on claim_end_date between dates.collection_start_date and dates.collection_end_date
             and cpt_hcpcs_list.payment_year = dates.payment_year
@@ -142,6 +149,8 @@ with medical_claims as (
 
     select distinct
           eligible_claims.claim_id
+        , eligible_claims.claim_line_number
+        , eligible_claims.payer
         , eligible_claims.person_id
         , eligible_claims.payment_year
         , eligible_claims.collection_start_date
@@ -151,13 +160,17 @@ with medical_claims as (
         inner join conditions
             on eligible_claims.claim_id = conditions.claim_id
             and eligible_claims.person_id = conditions.person_id
+            and eligible_claims.payer = conditions.payer
 
 )
 
 , add_data_types as (
 
     select distinct
-          cast(person_id as {{ dbt.type_string() }}) as person_id
+          cast(claim_id as {{ dbt.type_string() }}) as claim_id
+        , cast(claim_line_number as {{ dbt.type_string() }}) as claim_line_number
+        , cast(payer as {{ dbt.type_string() }}) as payer
+        , cast(person_id as {{ dbt.type_string() }}) as person_id
         , cast(code as {{ dbt.type_string() }}) as condition_code
         , cast(payment_year as integer) as payment_year
         , cast(collection_start_date as date) as collection_start_date
@@ -168,6 +181,9 @@ with medical_claims as (
 
 select
       person_id
+    , claim_id
+    , claim_line_number
+    , payer
     , condition_code
     , payment_year
     , collection_start_date
