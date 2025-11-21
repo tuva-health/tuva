@@ -5,7 +5,7 @@
 }}
 
 {% if var('clinical_enabled', var('tuva_marts_enabled',False)) == true and var('claims_enabled', var('tuva_marts_enabled',False)) == true -%}
-
+-- TODO: Doesn't take into account claims coming from separate payers
 with person_list_to_exclude_because_in_claims as (
     select distinct person_id
     from {{ ref('core__stg_claims_patient') }}
