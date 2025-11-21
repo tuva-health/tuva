@@ -1061,18 +1061,12 @@ models:
       alias: patient
       tags: core
       materialized: table
-    tests:
-      - dbt_utils.unique_combination_of_columns:
-          combination_of_columns:
-            - payer
-            - person_id
     columns:
-      - name: payer
-        description: '{{ doc("payer") }}'
       - name: person_id
         description: '{{ doc("person_id") }}'
         tests:
           - not_null
+          - unique
       - name: sex
         description: '{{ doc("sex") }}'
         meta:
