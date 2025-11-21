@@ -25,6 +25,7 @@ with stg_eligibility as (
         , elig.original_reason_entitlement_code
         , elig.dual_status_code
         , elig.medicare_status_code
+        , elig.enrollment_status
         , dates.collection_year
         , dates.payment_year
         , dates.collection_start_date
@@ -55,10 +56,11 @@ with stg_eligibility as (
 
     select
           patient.person_id
+        , patient.payer
         , patient.sex
         , patient.birth_date
         , dates.payment_year
-        , floor({{ datediff('birth_date', 'payment_year_age_date', 'month') }} / 12) as payment_year_age
+        , floor({{ datediff('birth_date', 'payment_year_age_date', 'year') }}) as payment_year_age
         , patient.death_date
     from {{ ref('cms_hcc__stg_core__patient') }} as patient
     cross join payment_year_age_dates as dates
@@ -142,17 +144,18 @@ with stg_eligibility as (
         , stg_eligibility.medicare_status_code
         /* Defaulting to "New" enrollment status when missing */
         , case
+            when stg_eligibility.enrollment_status is not null then stg_eligibility.enrollment_status
             when add_enrollment.enrollment_status is null then 'New'
             else add_enrollment.enrollment_status
           end as enrollment_status
         {% if target.type == 'fabric' %}
             , case
-                when add_enrollment.enrollment_status is null then 1
+                when add_enrollment.enrollment_status is null and stg_eligibility.enrollment_status is null then 1
                 else 0
               end as enrollment_status_default
         {% else %}
             , case
-                when add_enrollment.enrollment_status is null then true
+                when add_enrollment.enrollment_status is null and stg_eligibility.enrollment_status is null then true
                 else false
               end as enrollment_status_default
         {% endif %}
@@ -164,6 +167,7 @@ with stg_eligibility as (
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left outer join stg_patient
             on stg_eligibility.person_id = stg_patient.person_id
+            and stg_eligibility.payer = stg_patient.payer
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
 
@@ -226,7 +230,7 @@ with stg_eligibility as (
         , payment_year
         , collection_start_date
         , collection_end_date
-        , enrollment_status
+        , case when original_reason_entitlement_code in ('2','3') then 'ESRD' else enrollment_status end as enrollment_status
         , case
             when gender = 'female' then 'Female'
             when gender = 'male' then 'Male'
@@ -255,7 +259,7 @@ with stg_eligibility as (
             when coalesce(original_reason_entitlement_code, medicare_status_code) is null then 'Aged'
           end as orec
         /* Defaulting everyone to non-institutional until logic is added */
-        , cast('No' as {{ dbt.type_string() }}) as institutional_status
+        , case when enrollment_status = 'Institutional' then 'Yes' else 'No' end as institutional_status
         , enrollment_status_default
         , case
             {% if target.type == 'fabric' %}
