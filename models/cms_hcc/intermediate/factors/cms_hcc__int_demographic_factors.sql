@@ -46,7 +46,6 @@ with members as (
             ORIGDS  = (&OREC = '1')*(DISABL = 0);
         This means that < 65 is just disabled and not originally disabled.
        */
-        , case 
         , case       
             when enrollment_status = 'New' and age_group = '0-34' then 'Aged'
             when enrollment_status = 'New' and age_group = '35-44' then 'Aged'
