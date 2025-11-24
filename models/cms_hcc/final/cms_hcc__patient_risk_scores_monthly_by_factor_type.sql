@@ -146,7 +146,7 @@ with seed_adjustment_rates as (
         , model_version
         , raw_risk_score
         , weighted_raw_risk_score
-        , weighted_raw_risk_score / normalization_factor as normalized_risk_score
+        , round((weighted_raw_risk_score / normalization_factor),3) as normalized_risk_score
         , ma_coding_pattern_adjustment
         , payment_year
         , collection_start_date
@@ -168,7 +168,7 @@ with seed_adjustment_rates as (
         , raw_risk_score
         , weighted_raw_risk_score
         , normalized_risk_score
-        , normalized_risk_score * (1 - ma_coding_pattern_adjustment) as payment_risk_score
+        , round((normalized_risk_score * (1 - ma_coding_pattern_adjustment)),3) as payment_risk_score
         , payment_year
         , collection_start_date
         , collection_end_date
