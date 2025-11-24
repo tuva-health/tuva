@@ -4,7 +4,6 @@
 }}
 select
       person_id
-    , payer
     , sex
     , birth_date
     , death_date

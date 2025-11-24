@@ -56,7 +56,6 @@ with stg_eligibility as (
 
     select
           patient.person_id
-        , patient.payer
         , patient.sex
         , patient.birth_date
         , dates.payment_year
@@ -167,7 +166,6 @@ with stg_eligibility as (
             and stg_eligibility.collection_end_date = add_enrollment.collection_end_date
         left outer join stg_patient
             on stg_eligibility.person_id = stg_patient.person_id
-            and stg_eligibility.payer = stg_patient.payer
             and stg_eligibility.payment_year = stg_patient.payment_year
     where stg_eligibility.row_num = 1
 
